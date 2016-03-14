@@ -1,0 +1,125 @@
+module oc-xr-mapping {
+
+  namespace "http://cisco.com/ns/yang/cisco-oc-xr-mapping";
+  prefix "cisco";
+
+  organization "Cisco Systems, Inc.";
+
+  contact 
+    "Cisco Systems, Inc.
+     Customer Service
+
+     Postal: 170 W Tasman Drive
+     San Jose, CA 95134
+
+     Tel: +1 1800 553-NETS
+
+     E-mail: cs-yang@cisco.com";
+
+
+  description       
+    "This module contains a collection of IOS-XR derived YANG data 
+     types.
+    
+     Copyright (c) 2013-2015 by Cisco Systems, Inc.
+     All rights reserved.";
+
+  revision "2015-02-10" {
+    description
+      "Initial revision.";
+  }
+
+  extension mapping {
+    description "Define basic information about mapping.";
+  }
+
+  extension model-id {
+    description "Define model id used for a part of generated function name.";
+    argument "model-id";
+  }
+
+  extension module-id {
+    description "Define module id used for a part of generated source file name.";
+    argument "module-id";
+  }
+
+  extension target {
+    description "Define information of target model.";
+  }
+
+  extension namespace {
+    description "namespace of the target model.";
+    argument "ns";
+  }
+
+  extension default-prefix {
+    description "Default namespace prefix used when path does not specify it.";
+    argument "default-ns";
+  }
+
+  extension map-to {
+    description "The oc-xr-map statement takes as an argument
+                 relevant XR yang model node(s).";
+  }
+
+  extension from {
+    description "In case the node is under group and there are multiple parent uses the same group";
+  }
+
+  extension parent {
+    description "Parent path that this mapping should be used";
+    argument "parent_path";
+  }
+
+  extension path {
+    description "The path in XR model mapped for this node.";
+    argument "xpath";
+  }
+
+  extension path-set {
+    description "The path in XR model mapped for this node.";
+    argument "xpath";
+  }
+
+  extension path-del {
+    description "The path in XR model mapped for this node.";
+    argument "xpath";
+  }
+
+  extension path-get {
+    description "The path in XR model mapped for this node.";
+    argument "xpath";
+  }
+
+  extension function {
+    description "The function called for mapping this node.";
+    argument "name";
+  }
+
+  extension description {
+    description "Instructions for mapping specific to this node.";
+    argument "description";
+  }
+  
+  extension dt-convert-to {
+    description "The statement specifies that this leaf has data type 
+                  conversion before being mapped";
+    argument "dt-convert-to";
+  }
+  
+  extension dt-case {
+    description "This specifies the datatype conversion cases. 
+                 The value maps to the datatype it should be converted to";
+    argument "dt-case";
+  }
+ 
+  extension dt-value {
+    description "This specifies the datatype conversion value.";
+    argument "dt-value";
+  }
+
+  extension dt-action {
+    description "This specifies the action for some datatype conversions";
+    argument "dt-action";
+  } 
+}

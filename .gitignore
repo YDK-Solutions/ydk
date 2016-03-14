@@ -1,0 +1,15 @@
+*.log
+.settings/
+.pydevproject
+.project
+.externalToolBuilders/
+*.pyc
+*~
+debug.log
+netconf.log
+protocol.log
+myenv
+v/
+gittmp*/
+.DS_Store
+

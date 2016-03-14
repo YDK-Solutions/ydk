@@ -1,0 +1,1463 @@
+module bgp-multiprotocol {
+
+  yang-version "1";
+
+  // namespace
+  namespace "http://openconfig.net/yang/bgp-multiprotocol";
+
+  prefix "bgp-mp";
+
+  // import some basic inet types
+  import routing-policy { prefix rpol; }
+  import bgp-types { prefix bgp-types; }
+  import bgp-operational { prefix bgp-op; }
+
+  // Import for mapping annotation
+  import oc-xr-mapping { prefix xr; }
+
+  // meta
+  organization
+    "OpenConfig working group";
+
+  contact
+    "OpenConfig working group
+    netopenconfig@googlegroups.com";
+
+  description
+    "This module is part of a YANG model for BGP protocol
+    configuration, focusing on configuration of multiprotocol
+    BGP, in particular various relevant address families (AFI) and
+    sub-address families (SAFI).
+
+    Identities (rather than enumerated types) are used to identify
+    each AFI / SAFI type to make it easier for users to extend to
+    pre-standard or custom AFI/SAFI types.  This module is only
+    intended to capture the most";
+
+
+  revision "2015-05-15" {
+    description
+      "Refactored multiprotocol module";
+    reference "TBD";
+  }
+
+  grouping ipv4-unicast-group {
+    description
+      "Group for IPv4 Unicast configuration options";
+
+    container ipv4-unicast {
+      when "../afi-safi-name = 'bgp-mp:ipv4-unicast'" {
+        description
+          "Include this container for IPv4 Unicast specific
+          configuration";
+      }
+
+      description "IPv4 unicast configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:description
+            "Should be mapped only when af-name is 'ipv4-unicast'.";
+          xr:path "";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:description
+            "Should be mapped only when af-name is 'ipv4-unicast'.";
+          xr:path "";
+        }
+      }
+
+      // include common IPv[46] unicast options
+      uses ipv4-ipv6-unicast-common;
+
+      // placeholder for IPv4 unicast  specific configuration
+    }
+  }
+
+  grouping ipv6-unicast-group {
+    description
+      "Group for IPv6 Unicast configuration options";
+
+    container ipv6-unicast {
+      when "../afi-safi-name = 'bgp-mp:ipv6-unicast'" {
+        description
+          "Include this container for IPv6 Unicast specific
+          configuration";
+      }
+
+      description "IPv6 unicast configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv6-unicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv6-unicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common IPv[46] unicast options
+      uses ipv4-ipv6-unicast-common;
+
+      // placeholder for IPv6 unicast specific configuration
+      // options
+    }
+  }
+
+  grouping ipv4-labelled-unicast-group {
+    description
+      "Group for IPv4 Labelled Unicast configuration options";
+
+    container ipv4-labelled-unicast {
+      when "../afi-safi-name = 'bgp-mp:ipv4-labelled-unicast'" {
+        description
+          "Include this container for IPv4 Labelled Unicast specific
+          configuration";
+      }
+
+      description "IPv4 Labelled Unicast configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv4-labelled-unicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv4-labelled-unicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      uses all-afi-safi-common;
+
+      // placeholder for IPv4 Labelled Unicast specific config
+      // options
+    }
+  }
+
+  grouping ipv6-labelled-unicast-group {
+    description
+      "Group for IPv6 Labelled Unicast configuration options";
+
+    container ipv6-labelled-unicast {
+      when "../afi-safi-name = 'bgp-mp:ipv6-labelled-unicast'" {
+        description
+          "Include this container for IPv6 Labelled Unicast specific
+          configuration";
+      }
+
+      description "IPv6 Labelled Unicast configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv6-labelled-unicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'ipv6-labelled-unicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      uses all-afi-safi-common;
+
+      // placeholder for IPv6 Labelled Unicast specific config
+      // options.
+    }
+  }
+
+  grouping l3vpn-ipv4-unicast-group {
+    description
+      "Group for IPv4 Unicast L3VPN configuration options";
+
+    container l3vpn-ipv4-unicast {
+      when "../afi-safi-name = 'bgp-mp:l3vpn-ipv4-unicast'" {
+        description
+          "Include this container for IPv4 Unicast L3VPN specific
+          configuration";
+      }
+
+      description "Unicast IPv4 L3VPN configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv4-unicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv4-unicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L3VPN configuration options
+      uses l3vpn-ipv4-ipv6-unicast-common;
+
+      // placeholder for IPv4 Unicast L3VPN specific config options.
+    }
+  }
+
+  grouping l3vpn-ipv6-unicast-group {
+    description
+      "Group for IPv6 Unicast L3VPN configuration options";
+
+    container l3vpn-ipv6-unicast {
+      when "../afi-safi-name = 'bgp-mp:l3vpn-ipv6-unicast'" {
+        description
+          "Include this container for unicast IPv6 L3VPN specific
+          configuration";
+      }
+
+      description "Unicast IPv6 L3VPN configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv6-unicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv6-unicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L3VPN configuration options
+      uses l3vpn-ipv4-ipv6-unicast-common;
+
+      // placeholder for IPv6 Unicast L3VPN specific configuration
+      // options
+    }
+  }
+
+  grouping l3vpn-ipv4-multicast-group {
+    description
+      "Group for IPv4 L3VPN multicast configuration options";
+
+    container l3vpn-ipv4-multicast {
+      when "../afi-safi-name = 'bgp-mp:l3vpn-ipv4-multicast'" {
+        description
+          "Include this container for multicast IPv6 L3VPN specific
+          configuration";
+      }
+
+      description "Multicast IPv4 L3VPN configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv4-multicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv4-multicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L3VPN multicast options
+      uses l3vpn-ipv4-ipv6-multicast-common;
+
+      // placeholder for IPv4 Multicast L3VPN specific configuration
+      // options
+    }
+  }
+
+  grouping l3vpn-ipv6-multicast-group {
+    description
+      "Group for IPv6 L3VPN multicast configuration options";
+
+    container l3vpn-ipv6-multicast {
+      when "../afi-safi-name = 'bgp-mp:l3vpn-ipv6-multicast'" {
+        description
+          "Include this container for multicast IPv6 L3VPN specific
+          configuration";
+      }
+
+      description "Multicast IPv6 L3VPN configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv6-multicast'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l3vpn-ipv6-multicast'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L3VPN multicast options
+      uses l3vpn-ipv4-ipv6-multicast-common;
+
+      // placeholder for IPv6 Multicast L3VPN specific configuration
+      // options
+    }
+  }
+
+  grouping l2vpn-vpls-group {
+    description
+      "Group for BGP-signalled VPLS configuration options";
+
+    container l2vpn-vpls {
+      when "../afi-safi-name = 'bgp-mp:l2vpn-vpls'" {
+        description
+          "Include this container for BGP-signalled VPLS specific
+          configuration";
+      }
+
+      description "BGP-signalled VPLS configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l2vpn-vpls'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l2vpn-vpls'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L2VPN options
+      uses l2vpn-common;
+
+      // placeholder for BGP-signalled VPLS specific configuration
+      // options
+    }
+  }
+
+  grouping l2vpn-evpn-group {
+    description
+      "Group for BGP EVPN configuration options";
+
+    container l2vpn-evpn {
+      when "../afi-safi-name = 'bgp-mp:l2vpn-evpn'" {
+        description
+          "Include this container for BGP EVPN specific
+          configuration";
+      }
+
+      description "BGP EVPN configuration options";
+
+      xr:map-to {
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l2vpn-evpn'.";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path "";
+        }
+        xr:from {
+          xr:description
+            "Should be mapped only when af-name is 'l2vpn-evpn'.";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path "";
+        }
+      }
+
+      // include common L2VPN options
+      uses l2vpn-common;
+
+      // placeholder for BGP EVPN specific configuration options
+    }
+  }
+
+
+
+  grouping bgp-route-selection-options_config {
+    description
+      "Set of configuration options that govern best
+       path selection.";
+
+    leaf always-compare-med {
+      type boolean;
+      default "false";
+      description
+        "Compare multi-exit discriminator (MED) value from
+        different ASes when selecting the best route.  The
+        default behavior is to only compare MEDs for paths
+        received from the same AS.";
+      xr:map-to {
+        xr:description "true -> empty, false -> delete";
+        xr:path 
+          "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+          "best-path-med-always";
+      }
+    }
+
+    leaf ignore-as-path-length {
+      type boolean;
+      default "false";
+      description
+        "Ignore the AS path length when selecting the best path.
+        The default is to use the AS path length and prefer paths
+        with shorter length.";
+      xr:map-to {
+        xr:description "true -> empty, false -> delete";
+        xr:path 
+          "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+          "best-path-as-path-length";
+      }
+    }
+
+    leaf external-compare-router-id {
+      type boolean;
+      default "true";
+      description
+        "When comparing similar routes received from external
+        BGP peers, use the router-id as a criterion to select
+        the active path.";
+      xr:map-to {
+        xr:description "true -> empty, false -> delete";
+        xr:path 
+          "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+          "best-path-router-id";
+      }
+    }
+
+    leaf advertise-inactive-routes {
+      type boolean;
+      default "false";
+      description
+        "Advertise inactive routes to external peers.  The
+        default is to only advertise active routes.";
+    }
+
+    leaf enable-aigp {
+      type boolean;
+      default false;
+      description
+        "Flag to enable sending / receiving accumulated IGP
+        attribute in routing updates";
+      xr:map-to {
+        xr:description "true -> delete, false -> empty";
+        xr:path 
+          "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+          "best-path-aigp-ignore";
+      }
+    }
+
+    leaf ignore-next-hop-igp-metric {
+      type boolean;
+      default "false";
+      description
+        "Ignore the IGP metric to the next-hop when calculating
+        BGP best-path. The default is to select the route for
+        which the metric to the next-hop is lowest";
+    }
+  }
+
+  grouping bgp-use-multiple-paths-ebgp-as-options_config {
+    description
+      "Configuration parameters specific to eBGP multipath applicable
+      to all contexts";
+
+    leaf allow-multiple-as {
+     type boolean;
+     default "false";
+     description
+      "Allow multipath to use paths from different neighbouring
+      ASes.  The default is to only consider multiple paths from
+      the same neighbouring AS.";
+    }
+  }
+
+  grouping bgp-use-multiple-paths-ebgp_config {
+    description
+      "Configuration parameters relating to multipath for eBGP";
+
+    uses bgp-use-multiple-paths-ebgp-as-options_config;
+
+    leaf maximum-paths {
+     type uint32;
+     default 1;
+     description
+      "Maximum number of parallel paths to consider when using
+      BGP multipath. The default is use a single path.";
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/global/use-multiple-paths/ebgp/config";
+          xr:function "";
+          xr:description 
+            "Need to map this with all AF.\n" +
+            "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ebgp/\n" +
+            "paths-value";
+        }
+        xr:from {
+          xr:parent "/bgp/global/use-multiple-paths/ebgp/state";
+          xr:function "";
+          xr:description 
+            "Need to map this with all AF.\n" +
+            "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ebgp/\n" +
+            "paths-value";
+        }
+        xr:from {
+          xr:parent 
+            "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ebgp/config";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ebgp/paths-value";
+        }
+        xr:from {
+          xr:parent 
+            "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ebgp/state";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ebgp/paths-value";
+        }
+      }
+    }
+  }
+
+  grouping bgp-use-multiple-paths-ibgp_config {
+    description
+      "Configuration parmaeters relating to multipath for iBGP";
+
+    leaf maximum-paths {
+      type uint32;
+      default 1;
+      description
+        "Maximum number of parallel paths to consider when using
+        iBGP multipath. The default is to use a single path";
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/global/use-multiple-paths/ibgp/config";
+          xr:function "";
+          xr:description 
+            "Need to map this with all AF.\n" +
+            "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ibgp/\n" +
+            "paths-value";
+        }
+        xr:from {
+          xr:parent "/bgp/global/use-multiple-paths/ibgp/state";
+          xr:function "";
+          xr:description 
+            "Need to map this with all AF.\n" +
+            "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ibgp/\n" +
+            "paths-value";
+        }
+        xr:from {
+          xr:parent 
+            "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ibgp/config";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ibgp/paths-value";
+        }
+        xr:from {
+          xr:parent 
+            "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ibgp/state";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ibgp/paths-value";
+        }
+      }
+    }
+  }
+
+  grouping bgp-use-multiple-paths {
+    description
+      "Configuration parameters relating to multipath for BGP - both
+      iBGP and eBGP";
+
+    container use-multiple-paths {
+      description
+        "Parameters related to the use of multiple paths for the
+        same NLRI";
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/global";
+          xr:function "";
+          xr:description 
+            "Need to map this with all AF.\n" +
+            "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ebgp\n" +
+            "and /bgp/instance/instance-as/four-byte-as/\n" +
+            "default-vrf/global/global-afs/global-af[af-name]/ibgp";
+        }
+        xr:from {
+          xr:parent "/bgp/global/afi-safis/afi-safi";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ebgp";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "global-afs/global-af[af-name]/ibgp";
+        }
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+            "neighbor-af[af-name]/multipath";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbor-groups/neighbor-group[neighbor-group-name]/" +
+            "neighbor-group-afs/neighbor-group-af[af-name]/multipath";
+        }
+      }
+
+      container config {
+        description
+          "Configuration parameters relating to multipath";
+        xr:map-to {
+          xr:from {
+            xr:parent
+              "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+              "neighbor-af[af-name]/multipath";
+          }
+          xr:from {
+            xr:parent 
+            "/bgp/peer-groups/peer-group/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbor-groups/neighbor-group[neighbor-group-name]/" +
+              "neighbor-group-afs/neighbor-group-af[af-name]/multipath";
+          }
+        }
+        uses bgp-use-multiple-paths_config;
+      }
+      container state {
+        description
+          "State parameters relating to multipath";
+        xr:map-to {
+          xr:from {
+            xr:parent
+              "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+              "neighbor-af[af-name]/multipath";
+          }
+          xr:from {
+            xr:parent 
+            "/bgp/peer-groups/peer-group/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbor-groups/neighbor-group[neighbor-group-name]/" +
+              "neighbor-group-afs/neighbor-group-af[af-name]/multipath";
+          }
+        }
+        uses bgp-use-multiple-paths_config;
+      }
+
+      container ebgp {
+        description
+          "Multipath parameters for eBGP";
+        xr:map-to {
+          xr:from {
+            xr:parent "/bgp/global/use-multiple-paths";
+            xr:function "";
+            xr:description 
+              "Need to map this with all AF.\n" +
+              "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+              "default-vrf/global/global-afs/global-af[af-name]/ebgp";
+          }
+          xr:from {
+            xr:parent "/bgp/global/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "global-afs/global-af[af-name]/ebgp";
+          }
+        }
+        container config {
+          description
+            "Configuration parameters relating to eBGP multipath";
+          xr:map-to {
+            xr:from {
+              xr:parent "/bgp/global/use-multiple-paths/ebgp";
+              xr:function "";
+              xr:description 
+                "Need to map this with all AF.\n" +
+                "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+                "default-vrf/global/global-afs/global-af[af-name]/ebgp";
+            }
+            xr:from {
+              xr:parent
+                "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ebgp";
+              xr:path 
+                "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+                "global-afs/global-af[af-name]/ebgp";
+            }
+          }
+          uses bgp-use-multiple-paths-ebgp_config;
+        }
+        container state {
+          config false;
+          description
+            "State information relating to eBGP multipath";
+          xr:map-to {
+            xr:from {
+              xr:parent "/bgp/global/use-multiple-paths/ebgp";
+              xr:function "";
+              xr:description 
+                "Need to map this with all AF.\n" +
+                "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+                "default-vrf/global/global-afs/global-af[af-name]/ebgp";
+            }
+            xr:from {
+              xr:parent
+                "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ebgp";
+              xr:path 
+                "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+                "global-afs/global-af[af-name]/ebgp";
+            }
+          }
+          uses bgp-use-multiple-paths-ebgp_config;
+        }
+      }
+
+      container ibgp {
+        description
+          "Multipath parameters for iBGP";
+        xr:map-to {
+          xr:from {
+            xr:parent "/bgp/global/use-multiple-paths";
+            xr:function "";
+            xr:description 
+              "Need to map this with all AF.\n" +
+              "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+              "default-vrf/global/global-afs/global-af[af-name]/ibgp";
+          }
+          xr:from {
+            xr:parent "/bgp/global/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "global-afs/global-af[af-name]/ibgp";
+          }
+        }
+        container config {
+          description
+            "Configuration parameters relating to iBGP multipath";
+          xr:map-to {
+            xr:from {
+              xr:parent "/bgp/global/use-multiple-paths/ibgp";
+              xr:function "";
+              xr:description 
+                "Need to map this with all AF.\n" +
+                "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+                "default-vrf/global/global-afs/global-af[af-name]/ibgp";
+            }
+            xr:from {
+              xr:parent
+                "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ibgp";
+              xr:path 
+                "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+                "global-afs/global-af[af-name]/ibgp";
+            }
+          }
+          uses bgp-use-multiple-paths-ibgp_config;
+        }
+        container state {
+          config false;
+          description
+            "State information relating to iBGP multipath";
+          xr:map-to {
+            xr:from {
+              xr:parent "/bgp/global/use-multiple-paths/ibgp";
+              xr:function "";
+              xr:description 
+                "Need to map this with all AF.\n" +
+                "It maps to /bgp/instance/instance-as/four-byte-as/\n" +
+                "default-vrf/global/global-afs/global-af[af-name]/ibgp";
+            }
+            xr:from {
+              xr:parent
+                "/bgp/global/afi-safis/afi-safi/use-multiple-paths/ibgp";
+              xr:path 
+                "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+                "global-afs/global-af[af-name]/ibgp";
+            }
+          }
+          uses bgp-use-multiple-paths-ibgp_config;
+        }
+      }
+    }
+  }
+
+  grouping bgp-use-multiple-paths-neighbor {
+    description
+      "Per-neighbor configuration for multipath for BGP";
+
+    container use-multiple-paths {
+      description
+        "Parameters related to the use of multiple-paths for the same
+        NLRI when they are received only from this neighbor";
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+            "neighbor-af[af-name]/multipath";
+        }
+      }
+
+      container config {
+        description
+          "Configuration parameters relating to multipath";
+        xr:map-to {
+          xr:from {
+            xr:parent
+              "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+              "neighbor-af[af-name]/multipath";
+          }
+        }
+        uses bgp-use-multiple-paths_config;
+      }
+      container state {
+        description
+          "State parameters relating to multipath";
+        xr:map-to {
+          xr:from {
+            xr:parent
+              "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths";
+            xr:path 
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+              "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+              "neighbor-af[af-name]/multipath";
+          }
+        }
+        uses bgp-use-multiple-paths_config;
+      }
+
+      container ebgp {
+        description
+          "Multipath configuration for eBGP";
+        container config {
+          description
+            "Configuration parameters relating to eBGP multipath";
+          uses bgp-use-multiple-paths-ebgp-as-options_config;
+        }
+        container state {
+          config false;
+          description
+            "State information relating to eBGP multipath";
+          uses bgp-use-multiple-paths-ebgp-as-options_config;
+        }
+      }
+    }
+  }
+
+  grouping bgp-use-multiple-paths_config {
+    description
+      "Generic configuration options relating to use of multiple
+      paths for a referenced AFI-SAFI, group or neighbor";
+
+    leaf enabled {
+      type boolean;
+      default false;
+      description
+        "Whether the use of multiple paths for the same NLRI is
+        enabled for the neighbor. This value is overridden by
+        any more specific configuration value.";
+      xr:map-to {
+        xr:from {
+          xr:parent 
+          "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths/config";
+          xr:description "true -> empty, false -> delete";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+            "neighbor-af[af-name]/multipath";
+        }
+        xr:from {
+          xr:parent 
+          "/bgp/neighbors/neighbor/afi-safis/afi-safi/use-multiple-paths/state";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbors/neighbor[neighbor-address]/neighbor-afs/" +
+            "neighbor-af[af-name]/multipath";
+        }
+        xr:from {
+          xr:parent 
+          "/bgp/peer-groups/peer-group/afi-safis/afi-safi/use-multiple-paths/" +
+          "config";
+          xr:description "true -> empty, false -> delete";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbor-groups/neighbor-group[neighbor-group-name]/" +
+            "neighbor-group-afs/neighbor-group-af[af-name]/multipath";
+        }
+        xr:from {
+          xr:parent 
+          "/bgp/peer-groups/peer-group/afi-safis/afi-safi/use-multiple-paths/" +
+          "state";
+          xr:path 
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/bgp-entity/" +
+            "neighbor-groups/neighbor-group[neighbor-group-name]/" +
+            "neighbor-group-afs/neighbor-group-af[af-name]/multipath";
+        }
+      }
+    }
+  }
+
+  grouping bgp-afi-safi-graceful-restart_config {
+    description
+      "BGP graceful restart parameters that apply on a per-AFI-SAFI
+      basis";
+
+    leaf enabled {
+      type boolean;
+      default false;
+      description
+        "This leaf indicates whether graceful-restart is enabled for
+        this AFI-SAFI";
+    }
+  }
+
+  grouping bgp-afi-safi_config {
+    description
+      "Configuration parameters used for all BGP AFI-SAFIs";
+
+    leaf afi-safi-name {
+      /*type identityref {
+        base bgp-types:afi-safi-type;
+      }*/
+      type string;
+      description "AFI,SAFI";
+      xr:map-to {
+        xr:description
+          "Name mapping:\n" +
+          "  ipv4-unicast <-> ipv4-unicast\n" +
+          "  ipv6-unicast <-> ipv6-unicast\n" +
+          "  ipv4-labelled-unicast <-> ipv4-labeled-unicast\n" +
+          "  ipv6-labelled-unicast <-> ipv6-labeled-unicast\n" +
+          "  l3vpn-ipv4-unicast <-> vp-nv4-unicast\n" +
+          "  l3vpn-ipv6-unicast <-> vp-nv6-unicast\n" +
+          "  l3vpn-ipv4-multicast <-> vp-nv4-multicast\n" +
+          "  l3vpn-ipv6-multicast <-> vp-nv6-multicast\n" +
+          "  l2vpn-vpls <-> l2vpnvpls\n" +
+          "  l2vpn-evpn <-> l2vpnevpn\n";
+        xr:from {
+          xr:parent "/bgp/global/afi-safis/afi-safi/config";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "enable";
+        }
+        xr:from {
+          xr:parent "/bgp/global/afi-safis/afi-safi/state";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "enable";
+        }
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi/config";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "activate";
+        }
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi/state";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "activate";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi/config";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "activate";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi/state";
+          xr:path "af-name";
+          // This is to avoid entire afi-safi config is returned for get
+          xr:path "activate";
+        }
+      }
+    }
+
+    leaf enabled {
+      type boolean;
+      default false;
+      description
+        "This leaf indicates whether the IPv4 Unicast AFI,SAFI is
+        enabled for the neighbour or group";
+      xr:map-to {
+        xr:from {
+          xr:description "Set 'enable' (empty) when the value is 'True'";
+          xr:parent "/bgp/global/afi-safis/afi-safi/config";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "global-afs/global-af[af-name]/enable";
+        }
+        xr:from {
+          xr:parent "/bgp/global/afi-safis/afi-safi/state";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "global-afs/global-af[af-name]/enable";
+        }
+        xr:from {
+          xr:description "Set 'activate' (empty) when the value is 'True'";
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi/config";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "bgp-entity/neighbors/neighbor[neighbor-address]/" +
+                  "neighbor-afs/neighbor-af[af-name]/activate";
+        }
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi/state";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "bgp-entity/neighbors/neighbor[neighbor-address]/" +
+                  "neighbor-afs/neighbor-af[af-name]/activate";
+        }
+        xr:from {
+          xr:description "Set 'activate' (empty) when the value is 'True'";
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi/config";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "bgp-entity/neighbor-groups/" +
+                  "neighbor-group[neighbor-group-name]/" +
+                  "neighbor-group-afs/neighbor-group-af[af-name]/activate";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi/state";
+          xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                  "bgp-entity/neighbor-groups/" +
+                  "neighbor-group[neighbor-group-name]/" +
+                  "neighbor-group-afs/neighbor-group-af[af-name]/activate";
+        }
+      }
+    }
+  }
+
+  grouping all-afi-safi-common-prefix-limit_config {
+    description
+      "Configuration parameters relating to prefix-limits for an
+      AFI-SAFI";
+
+    leaf max-prefixes {
+      type uint32;
+      description
+        "Maximum number of prefixes that will be accepted
+        from the neighbour";
+      xr:map-to {
+        xr:description
+          "When creating these leaf nodes, all three of 'prefix-limit',\n" +
+          "'warning-percentage', 'restart-time' must be configured at \n" +
+          "the same time (that is, the request must contain all the \n" +
+          "three).\n" + 
+          "Also two leaf nodes, 'warning-only' and 'discard-extra-paths'\n" +
+          "need to be set implicitly with its default value.\n" +
+          "When updating these, only one of them (or two) can be \n" +
+          "configured.\n" +
+          "Set both 'warning-only' and 'discard-extra-paths' as 'False'";
+        xr:path "prefix-limit";
+        xr:path "warning-only=false";
+        xr:path "discard-extra-paths=false";
+      }
+    }
+
+    leaf shutdown-threshold-pct {
+      type bgp-types:percentage;
+      description
+        "Threshold on number of prefixes that can be received
+        from a neighbour before generation of warning messages
+        or log entries. Expressed as a percentage of
+        max-prefixes";
+      xr:map-to {
+        xr:description
+          "Set its default value '75' for delete operation";
+        xr:path "warning-percentage";
+      }
+    }
+
+    leaf restart-timer {
+      type decimal64 {
+        fraction-digits 2;
+      }
+      units "seconds";
+      description
+        "Time interval in seconds after which the BGP session
+        is re-established after being torn down due to exceeding
+        the max-prefix limit.";
+      xr:map-to {
+        xr:description
+          "Set its default value '0' for delete operation";
+        xr:path "restart-time";
+      }
+    }
+  }
+
+  grouping ipv4-ipv6-unicast-common_config {
+    description
+      "Common configuration parameters for IPv4 and IPv6 Unicast
+      address families";
+
+    leaf send-default-route {
+      type boolean;
+      default "false";
+      description
+        "If set to true, send the default-route to the neighbour(s)";
+      xr:map-to {
+        xr:path "";
+      }
+    }
+  }
+
+  grouping all-afi-safi-common {
+    description
+      "Grouping for configuration common to all AFI,SAFI";
+
+    container prefix-limit {
+      description
+        "Configure the maximum number of prefixes that will be
+        accepted from a peer";
+      xr:map-to {
+        xr:path "maximum-prefixes";
+      }
+
+      container config {
+        description
+          "Configuration parameters relating to the prefix
+          limit for the AFI-SAFI";
+        xr:map-to {
+          xr:path "";
+        }
+        uses all-afi-safi-common-prefix-limit_config;
+      }
+      container state {
+        config false;
+        description
+          "State information relating to the prefix-limit for the
+          AFI-SAFI";
+        xr:map-to {
+          xr:path "";
+        }
+        uses all-afi-safi-common-prefix-limit_config;
+      }
+    }
+  }
+
+  grouping ipv4-ipv6-unicast-common {
+    description
+      "Common configuration that is applicable for IPv4 and IPv6
+      unicast";
+
+    // include common afi-safi options.
+    uses all-afi-safi-common;
+
+    // configuration options that are specific to IPv[46] unicast
+    container config {
+      description
+        "Configuration parameters for common IPv4 and IPv6 unicast
+        AFI-SAFI options";
+      xr:map-to {
+        xr:path "default-originate/enable";
+      }
+      uses ipv4-ipv6-unicast-common_config;
+    }
+    container state {
+      config false;
+      description
+        "State information for common IPv4 and IPv6 unicast
+        parameters";
+      xr:map-to {
+        xr:path "default-originate/enable";
+      }
+      uses ipv4-ipv6-unicast-common_config;
+    }
+  }
+
+  grouping l3vpn-ipv4-ipv6-unicast-common {
+    description
+      "Common configuration applied across L3VPN for IPv4
+       and IPv6";
+
+    // placeholder -- specific configuration options that are generic
+    // across IPv[46] unicast address families.
+    uses all-afi-safi-common;
+  }
+
+  grouping l3vpn-ipv4-ipv6-multicast-common {
+    description
+      "Common configuration applied across L3VPN for IPv4
+      and IPv6";
+
+    // placeholder -- specific configuration options that are
+    // generic across IPv[46] multicast address families.
+    uses all-afi-safi-common;
+  }
+
+  grouping l2vpn-common {
+    description
+      "Common configuration applied across L2VPN address
+      families";
+
+    // placeholder -- specific configuration options that are
+    // generic across L2VPN address families
+    uses all-afi-safi-common;
+  }
+
+  grouping bgp-route-selection-options {
+    description
+      "Parameters relating to the BGP route selection process";
+
+    container route-selection-options {
+      description
+        "Parameters relating to options for route selection";
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/global";
+          xr:path
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "best-path-med-always";
+          xr:path
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "best-path-as-path-length";
+          xr:path
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "best-path-router-id";
+          xr:path
+            "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+            "best-path-aigp-ignore";
+        }
+      }
+      container config {
+        description
+          "Configuration parameters relating to route selection
+          options";
+        xr:map-to {
+          xr:from {
+            xr:parent "/bgp/global/route-selection-options";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-med-always";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-as-path-length";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-router-id";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-aigp-ignore";
+          }
+        }
+        uses bgp-route-selection-options_config;
+      }
+      container state {
+        config false;
+        description
+          "State information for the route selection options";
+        xr:map-to {
+          xr:from {
+            xr:parent "/bgp/global/route-selection-options";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-med-always";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-as-path-length";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-router-id";
+            xr:path
+              "/bgp/instance/instance-as/four-byte-as/default-vrf/global/" +
+              "best-path-aigp-ignore";
+          }
+        }
+        uses bgp-route-selection-options_config;
+      }
+    }
+  }
+
+  // *********** STRUCTURE GROUPINGS **********************
+
+  grouping bgp-global-afi-safi {
+    description
+      "Parameters and route selection options for MP-BGP
+      specific to the Global AFI-SAFI";
+    uses bgp-route-selection-options;
+  }
+
+  grouping bgp-group-afi-safi {
+    description
+      "Parameters and route selection options for MP-BGP
+      specific to peer groups";
+    uses bgp-route-selection-options;
+  }
+
+  grouping bgp-common-afi-safi-list {
+    description
+      "List of address-families associated with the BGP instance,
+      a peer-group or neighbor";
+
+    list afi-safi {
+      key "afi-safi-name";
+
+      description
+        "AFI,SAFI configuration available for the
+        neighbour or group";
+
+      xr:map-to {
+        xr:from {
+          xr:parent "/bgp/global/afi-safis";
+          xr:path "global-af[af-name]";
+        }
+        xr:from {
+          xr:parent "/bgp/neighbors/neighbor/afi-safis";
+          xr:path "neighbor-af[af-name]";
+        }
+        xr:from {
+          xr:parent "/bgp/peer-groups/peer-group/afi-safis";
+          xr:path "neighbor-group-af[af-name]";
+        }
+      }
+
+      leaf afi-safi-name {
+        type leafref {
+          path "../config/afi-safi-name";
+        }
+        description
+          "Reference to the AFI-SAFI name used as a key
+          for the AFI-SAFI list";
+        xr:map-to {
+          xr:description
+            "Name mapping:\n" +
+            "  ipv4-unicast <-> ipv4-unicast\n" +
+            "  ipv6-unicast <-> ipv6-unicast\n" +
+            "  ipv4-labelled-unicast <-> ipv4-labeled-unicast\n" +
+            "  ipv6-labelled-unicast <-> ipv6-labeled-unicast\n" +
+            "  l3vpn-ipv4-unicast <-> vp-nv4-unicast\n" +
+            "  l3vpn-ipv6-unicast <-> vp-nv6-unicast\n" +
+            "  l3vpn-ipv4-multicast <-> vp-nv4-multicast\n" +
+            "  l3vpn-ipv6-multicast <-> vp-nv6-multicast\n" +
+            "  l2vpn-vpls <-> l2vpnvpls\n" +
+            "  l2vpn-evpn <-> l2vpnevpn\n";
+          xr:path "af-name";
+        }
+      }
+
+      container graceful-restart {
+        description
+          "Parameters relating to BGP graceful-restart";
+        container config {
+          description
+            "Configuration options for BGP graceful-restart";
+          uses bgp-afi-safi-graceful-restart_config;
+        }
+        container state {
+          config false;
+          description
+            "State information for BGP graceful-restart";
+          uses bgp-afi-safi-graceful-restart_config;
+        }
+      }
+
+      container config {
+        description
+          "Configuration parameters for the AFI-SAFI";
+        xr:map-to {
+          xr:from {
+            xr:description "Map this only for get operation";
+            xr:parent "/bgp/global/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "global-afs/global-af[af-name]";
+          }
+          xr:from {
+            xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "bgp-entity/neighbors/neighbor[neighbor-address]/" +
+                    "neighbor-afs/neighbor-af[af-name]";
+          }
+          xr:from {
+            xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "bgp-entity/neighbor-groups/" +
+                    "neighbor-group[neighbor-group-name]/" +
+                    "neighbor-group-afs/neighbor-group-af[af-name]";
+          }
+        }
+        uses bgp-afi-safi_config;
+      }
+      container state {
+        config false;
+        description
+          "State information relating to the AFI-SAFI";
+        xr:map-to {
+          xr:from {
+            xr:parent "/bgp/global/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "global-afs/global-af[af-name]";
+            xr:path
+              "opr:/bgp/instances/instance[instance-name]/instance-active/" +
+              "default-vrf/afs/af[af-name]";
+          }
+          xr:from {
+            xr:parent "/bgp/neighbors/neighbor/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "bgp-entity/neighbors/neighbor[neighbor-address]/" +
+                    "neighbor-afs/neighbor-af[af-name]";
+          }
+          xr:from {
+            xr:parent "/bgp/peer-groups/peer-group/afi-safis/afi-safi";
+            xr:path "/bgp/instance/instance-as/four-byte-as/default-vrf/" +
+                    "bgp-entity/neighbor-groups/" +
+                    "neighbor-group[neighbor-group-name]/" +
+                    "neighbor-group-afs/neighbor-group-af[af-name]";
+          }
+        }
+        uses bgp-afi-safi_config;
+        uses bgp-op:bgp-afi-safi_state;
+      }
+
+      // import and export policy included for the afi/safi
+      uses rpol:apply-policy-group;
+
+      uses ipv4-unicast-group;
+      uses ipv6-unicast-group;
+      uses ipv4-labelled-unicast-group;
+      uses ipv6-labelled-unicast-group;
+      uses l3vpn-ipv4-unicast-group;
+      uses l3vpn-ipv6-unicast-group;
+      uses l3vpn-ipv4-multicast-group;
+      uses l3vpn-ipv6-multicast-group;
+      uses l2vpn-vpls-group;
+      uses l2vpn-evpn-group;
+    }
+  }
+}

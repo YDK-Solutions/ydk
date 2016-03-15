@@ -64,7 +64,7 @@ def _parse_and_return_modules(resolved_model_dir):
             fd = open(f)
             text = fd.read()
         except IOError as ex:
-            print("error %s: %s\n" % (filename, str(ex)))
+            logger.error("error %s: %s\n" % (filename, str(ex)))
             raise YdkGenException(ex)
 
         m = r.search(filename)
@@ -72,7 +72,7 @@ def _parse_and_return_modules(resolved_model_dir):
         if m is not None:
             (name, _dummy, rev, _) = m.groups()
             name = os.path.basename(name)
-            print(
+            logger.debug(
                 'Parsing file %s format %s name %s revision %s', filename, format, name, rev)
             module = ctx.add_module(filename, text, format, name, rev,
                                     expect_failure_error=False)
@@ -103,11 +103,11 @@ def _parse_and_return_modules(resolved_model_dir):
 
         elevel = error.err_level(etag)
         if error.is_warning(elevel):
-            print('%s: %s\n' %
+            logger.warning('%s: %s\n' %
                            (str(epos), error.err_to_str(etag, eargs)))
         else:
             err_msg = '%s: %s\n' % (str(epos), error.err_to_str(etag, eargs))
-            print(err_msg)
+            logger.error(err_msg)
             error_messages.append(err_msg)
 
     if len(error_messages) > 0:
@@ -133,15 +133,15 @@ def generate(profile_file, output_directory, nodoc, ydk_root, groupings_as_class
     resolved_model_dir = None
 
     if profile_file is None:
-        print('profile_file is None.')
+        logger.error('profile_file is None.')
         raise YdkGenException('profile_file cannot be None.')
 
     if output_directory is None:
-        print('output_directory is None.')
+        logger.error('output_directory is None.')
         raise YdkGenException('output_directory cannot be None.')
 
     if ydk_root is None:
-        print('ydk_root is None.')
+        logger.error('ydk_root is None.')
         raise YdkGenException('YDKGEN_HOME is not set.')
 
     try:
@@ -150,10 +150,10 @@ def generate(profile_file, output_directory, nodoc, ydk_root, groupings_as_class
             resolved_model_dir = resolve_profile.resolve_profile(
                 profile_data, ydk_root)
     except IOError as e:
-        print('Cannot open profile file (%s)', e.strerror)
+        logger.error('Cannot open profile file (%s)', e.strerror)
         raise YdkGenException(e.strerror)
     except ValueError as e:
-        print('Cannot parse profile file (%s)', e.message)
+        logger.error('Cannot parse profile file (%s)', e.message)
 
     modules = _parse_and_return_modules(resolved_model_dir)
 

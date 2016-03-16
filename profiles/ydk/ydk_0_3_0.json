@@ -13,14 +13,15 @@
 	    "profiles/ydk/yang/openconfig/bgp-types@2015-05-15.yang",
 	    "profiles/ydk/yang/openconfig/oc-xr-mapping@2015-02-10.yang",
 	    "profiles/ydk/yang/openconfig/policy-types@2015-05-15.yang",
-	    "profiles/ydk/yang/openconfig/routing-policy@2015-05-15.yang"
+	    "profiles/ydk/yang/openconfig/routing-policy@2015-05-15.yang",
+	    "profiles/ydk/yang/ietf/ietf-interfaces-ext.yang"
         ]
     ,
     
 	"_descr_git": "Each element on the list has details on git repositories to source models from, including commit ids and relative paths inside the repositories. If no commit id is specified, HEAD is taken. This is unwise. The nested dir and file references are interpreted the same way as specific dir and file references above.",
 	"git": [
 	    {
-		"url": "http://gitlab.cisco.com/ydk-dev/YangModels.git",
+		"url": "https://github.com/YangModels/yang.git",
 		"commits": [
 					{  
 						"commitid": "ddf208f3fa265e9eb7656abe3fc3f110479d329b",
@@ -425,14 +426,6 @@
 	    			
 	    			{
 		
-						"commitid": "3c86e8a69f99fea2472aedb87ed2728712a38b67",
-						"file": [
-								"experimental/ietf/ietf-interfaces-ext.yang"
-								]
-	    			},
-	    			
-	    			{
-		
 						"commitid": "a5e3d7f27e0e846cac6b6357ff460b8facc810a8",
 						"file": [
 		    					"standard/ietf/RFC/ietf-inet-types.yang",
@@ -462,7 +455,7 @@
 	    },
 	    
 	    {
-	    "url": "http://gitlab.cisco.com/ydk-dev/openconfig.git",
+	    "url": "https://github.com/openconfig/public.git",
 	    "commits": [
 	    			{
 						"commitid": "4ab22755c2484e893b2c2b6d88f800b8dd41bb09",

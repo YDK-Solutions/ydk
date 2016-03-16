@@ -72,7 +72,6 @@ class NetconfServiceProvider(ServiceProvider):
                                % (self.address, self.port, self.protocol))
 
         self.sp_instance = self.ne.sp_instance
-        self.payload_log = self.ne.payload_log
         self.encode_format = self.ne.encode_format
 
     def close(self):

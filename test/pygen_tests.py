@@ -32,8 +32,13 @@ import filecmp
 import difflib
 from shutil import rmtree
 from filecmp import dircmp
+import ydkgen
+from optparse import OptionParser
+import logging
 
 yang_mod_path = []
+
+logger = logging.getLogger('ydkgen')
 
 def we_are_frozen():
     #All of the modules are built-in to the interpreter e.g by p2e
@@ -45,10 +50,24 @@ def module_path():
         return os.path.dirname(unicode(sys.executable, encoding))
     return os.path.dirname(unicode(__file__, encoding))    
 
-def suite():
+def init_verbose_logger():
+    """ Initialize the logging infra and add a handler """
+    logger.setLevel(logging.DEBUG)
+
+    # create a console logger
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    # add the handlers to the logger
+    logger.addHandler(ch)
+
+def suite(profile, actual_directory, expected_directory, groupings_as_class):
     
     class PyGenTest(unittest.TestCase):
-        def __init__(self):
+        def __init__(self, profile, actual_directory, expected_directory, groupings_as_class):
+            self.profile = profile
+            self.actual_directory = actual_directory
+            self.expected_directory = expected_directory
+            self.groupings_as_class = groupings_as_class
             setattr(self, "Python Gen", self.translate_and_check)
             unittest.TestCase.__init__(self, "Python Gen")
 
@@ -73,99 +92,38 @@ def suite():
                          diff %s'%(self.test_case_name, dest, src, src, os.path.dirname(dest), delta))
                     return
         
+        def are_dir_trees_equal(self, dir1, dir2, ignore=[]):
+           
+            dirs_cmp = filecmp.dircmp(dir1, dir2, ignore)
+            if len(dirs_cmp.left_only)>0 or len(dirs_cmp.right_only)>0 or \
+                len(dirs_cmp.funny_files)>0:
+                return False
+            (_, mismatch, errors) =  filecmp.cmpfiles(
+                dir1, dir2, dirs_cmp.common_files, shallow=False)
+            if len(mismatch)>0 or len(errors)>0:
+                return False
+            for common_dir in dirs_cmp.common_dirs:
+                new_dir1 = os.path.join(dir1, common_dir)
+                new_dir2 = os.path.join(dir2, common_dir)
+                if not self.are_dir_trees_equal(new_dir1, new_dir2, ignore):
+                    return False
+            return True
     
         def translate_and_check(self):
-            self.assertTrue(os.environ.has_key('YDKGEN_HOME'), 'Need to have YDKGEN_HOME set!')
-            ydk_root = os.environ['YDKGEN_HOME']
-            if not os.environ.has_key('PYANG_PLUGINPATH'):
-                os.environ['PYANG_PLUGINPATH'] = ydk_root + '/src/pyang-plugins'
-            else:
-                os.environ['PYANG_PLUGINPATH'] += ':' + ydk_root + '/src/pyang-plugins'
             
-            pythonpath_additions = ydk_root + ':' + ydk_root + '/src/translators'
-            if not os.environ.has_key('PYTHONPATH'):
-                os.environ['PYTHONPATH'] = pythonpath_additions
-            else:
-                os.environ['PYTHONPATH'] += ':' +pythonpath_additions
-            
-            os.chdir(ydk_root)
-            
-            yang_models = []
-            ydk_model_paths = []
-            
-            # Create a list of fully expanded models to work with (yang_models)
-            # and a list of the directories within which models reside
-            # (yang_model_paths)
-            #
-            
-            for path, sub, files in os.walk(os.getenv('YANG_MODELS', ydk_root + '/yang/ydktest')):
-                for f in files:
-                    if f.endswith('.yang'):
-                        with open(os.path.join(path, f)) as fd:
-                            subm = False
-                            for line in fd.readlines():
-                                # check first line for module or submodule
-                                if 'submodule' in line:
-                                    subm = True
-                                    break
-                                elif 'module' in line:
-                                    break
-                            if subm:
-                                continue
-                            if path not in ydk_model_paths:
-                                ydk_model_paths.append(path)
-                            yang_models.append(os.path.join(path, f))
-                                
-                
-            # Convert the list of model paths to a mroe standard string in a unix
-            # path format for use later as a parameter to pyang
-            #
-            ydk_model_paths = ':'.join(ydk_model_paths)
-            
-            current_env = os.environ.copy()
-            pyang, stderr = subprocess.Popen(['which', 'pyang'], stdout=subprocess.PIPE, env=current_env).communicate()
-            self.assertTrue(len(pyang) > 0, "Cannot find pyang, please enable in your environment!")
-            pyang = pyang[:-1]
-            py_sdk_root = ydk_root + '/test/test-cases/python/actual/ydk'
-            expected_py_sdk_root = ydk_root + '/test/test-cases/python/expected/ydk'
-            
-            if os.path.isdir(py_sdk_root):
-                rmtree(py_sdk_root)
-            
-            os.mkdir(py_sdk_root)
-            os.mkdir('%s/models'%py_sdk_root)
-            
-            args = [sys.executable, pyang, '-p', ydk_model_paths,
-                            '-f', 'ydk-py', '--ydk-dir', py_sdk_root]
-            
-            args.extend(yang_models)
-            
-            print ' '.join(args)
-            exit_code = subprocess.call(args, env=os.environ.copy(), cwd=os.environ['YDKGEN_HOME'])
-            if exit_code != 0:
-                print 'Code generation failed !!!'
+            ydkgen.generate(self.profile, self.actual_directory, True, ydk_root, self.groupings_as_class)
             
             def check_diff_files(dcmp, diff_files):
                 
                 for name in dcmp.diff_files:
                     diff_files.append('File %s/%s does not match'%(dcmp.left,name))
-                    #dest_file = open('%s/%s'%(dcmp.left,name), 'r')
-                    #src_file = open('%s/%s'%(dcmp.right,name), 'r')
-                    #diff = difflib.context_diff(dest_file.readlines(), src_file.readlines())
-                    #delta = ''.join(diff)
-                    #diff_files.append('File %s at %s does not match diff:-\n %s \n' % (name, dcmp.left, delta))
+                   
                 for sub_dcmp in dcmp.subdirs.values():
                     check_diff_files(sub_dcmp, diff_files)
             
-            result = dircmp(py_sdk_root, expected_py_sdk_root)
-            diff_files = []
-            check_diff_files(result, diff_files)
-            self.assertTrue(len(diff_files) == 0, 'Total number of files that differ %s.\nList of files that differ:- %s'%(len(diff_files),'\n'.join(diff_files)))
-            
-            #print result.report()
-            
-            
-        
+            self.assertTrue(self.are_dir_trees_equal(self.actual_directory+'/python/ydk/models', self.expected_directory + '/ydk/models', ['.gitignore']))
+
+
         def setUp(self):
             pass
 
@@ -178,13 +136,76 @@ def suite():
     
     suite = unittest.TestSuite()
 
-    suite.addTest(PyGenTest())
+    suite.addTest(PyGenTest(profile, actual_directory, expected_directory, groupings_as_class))
     
     return suite
 
 
 if __name__ == "__main__":
-    ret = unittest.TextTestRunner(verbosity=2).run(suite()).wasSuccessful()
+    
+    parser = OptionParser(usage="usage: %prog [options]",
+                          version="%prog 0.3.0")
+
+    parser.add_option("--profile",
+                      type=str,
+                      dest="profile",
+                      help="Take options from a profile file, any CLI targets ignored")
+
+    parser.add_option("--actual-directory",
+                      type=str,
+                      dest="actual_directory",
+                      help="The actual directory where the sdk will get created.")
+    
+    parser.add_option("--expected-directory",
+                      type=str,
+                      dest="expected_directory",
+                      help="The expected directory whose contents will be compared to the actual directory.")
+
+   
+    parser.add_option("-v", "--verbose",
+                      action="store_true",
+                      dest="verbose",
+                      default=False,
+                      help="Verbose mode")
+
+   
+    parser.add_option("--groupings-as-class",
+                      action="store_true",
+                      dest="groupings_as_class",
+                      default=False,
+                      help="Consider yang groupings as classes.")
+
+    (options, args) = parser.parse_args()
+
+    if options.verbose:
+        init_verbose_logger()
+    
+    if not os.environ.has_key('YDKGEN_HOME'):
+        logger.error('YDKGEN_HOME not set')
+        print >> sys.stderr, "Need to have YDKGEN_HOME set!"
+        sys.exit(1)
+    
+    ydk_root = os.environ['YDKGEN_HOME']
+    
+    actual_directory = ydk_root + '/test/test-cases/python/actual'
+    if options.actual_directory is not None:
+        actual_directory = options.actual_directory
+    
+    #create the actual directory if it does not exist
+    if not os.path.isdir(actual_directory):
+        os.mkdir(actual_directory)
+    
+    expected_directory = ydk_root + '/test/test-cases/python/expected'
+    if options.expected_directory is not None:
+        expected_directory = options.expected_directory
+    
+    profile = ydk_root + '/profiles/test/ydktest.json'
+    if options.profile is not None:
+        profile =options.profile
+    
+     
+    
+    ret = unittest.TextTestRunner(verbosity=2).run(suite(profile, actual_directory, expected_directory, options.groupings_as_class)).wasSuccessful()
     if ret:
         sys.exit(0)
     else:

@@ -25,7 +25,6 @@ class Service(object):
 
     def execute_payload(self, provider, payload):
         # print payload
-        provider.payload_log(payload)
         reply = provider.sp_instance.execute_operation(
                                             provider.sp_instance._nc_manager,
                                             payload)

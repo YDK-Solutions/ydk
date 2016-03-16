@@ -41,9 +41,7 @@ def generate_documentation(output_directory):
     py_api_doc = output_directory + '/python/docs_expanded'
 
     os.mkdir(py_api_doc)
-    os.symlink(ydk_root + '/sdk/python/README.rst',
-               py_api_doc_gen + '/getting_started.rst')
-
+    
     # set documentation version and release from setup.py setting
     release = ''
     version = ''
@@ -94,7 +92,7 @@ def create_pip_package(output_directory):
 if __name__ == '__main__':
 
     parser = OptionParser(usage="usage: %prog [options]",
-                          version="%prog 0.1.0")
+                          version="%prog 0.3.0")
 
     parser.add_option("--profile",
                       type=str,

@@ -1,0 +1,27 @@
+language: python
+python:
+  - "2.7"
+
+install:
+    - virtualenv mypython
+    - source mypython/bin/activate
+    - pip install -r requirements.txt
+    - source env.sh
+    - export PYTHONPATH=.:$PYTHONPATH
+    - python test/pygen_tests.py
+
+script:
+    - python generate.py --profile profiles/test/ydktest.json --python  --no-doc --verbose
+    - deactivate
+    - virtualenv myenv
+    - source myenv/bin/activate
+    - pip install gen-api/python/dist/ydk-0.3.0.tar.gz
+    - source gen-api/python/env.sh
+    - cd gen-api/python
+# TODO - enable these once sanity test's dependency on ncclient/netconf agent is removed
+#    - python tests/test_sanity_types.py
+#    - python tests/test_sanity_filters.py
+#    - python tests/test_sanity_levels.py
+#    - python tests/test_sanity_filter_read.py
+    - cd ydk/tests
+    - python import_tests.py

@@ -25,6 +25,7 @@ from ._network_element import _NetworkElement
 from .provider import ServiceProvider
 from ._session_config import _SessionConfig
 from ._ydk_types import _SessionTransportMode, _ServiceProtocolName
+from ydk.errors import YPYError
 
 
 class NetconfServiceProvider(ServiceProvider):
@@ -48,12 +49,7 @@ class NetconfServiceProvider(ServiceProvider):
         self.protocol = kwargs.get('protocol', 'ssh')
 
         if self.protocol == 'tcp':
-            self.session_config = _SessionConfig(
-                                                 _SessionTransportMode.TCP,
-                                                 self.address,
-                                                 self.port,
-                                                 self.username,
-                                                 self.password)
+            raise YPYError('Plain text TCP not supported.')
         else:
             self._session_config = _SessionConfig(
                                            _SessionTransportMode.SSH,

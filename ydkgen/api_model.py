@@ -24,10 +24,10 @@
 from pyang import statements
 from pyang.types import EnumerationTypeSpec, BitsTypeSpec, UnionTypeSpec, PathTypeSpec, \
     IdentityrefTypeSpec
-from pyang.error import EmitError
 from helper import camel_case, iskeyword
 from helper import snake_case, escape_name
 from common import YdkGenException
+
 
 
 class Element(object):
@@ -52,6 +52,68 @@ class Element(object):
         self.owner = None
         self.comment = None
 
+class Deviation(Element):
+    def __init__(self):
+        Element.__init__(self)
+        self._stmt = None
+        self.d_type = None
+        self.d_target = None
+
+    @property
+    def stmt(self):
+        return self._stmt
+
+    @stmt.setter
+    def stmt(self, stmt):
+        self._stmt = stmt
+
+    def qn(self):
+        names = []
+        stmt = self.d_target
+        while stmt.parent:
+            if stmt.keyword not in ('container', 'list', 'rpc'):
+                names.append(self.convert_prop_name(stmt))
+            else:
+                names.append(self.convert_owner_name(stmt))
+            stmt = stmt.parent
+
+        return '.'.join(reversed(names))
+
+
+    def convert_prop_name(self, stmt):
+        name = snake_case(stmt.arg)
+        if iskeyword(name):
+            name = '%s_' % name
+
+        if name.startswith('_'):
+            name = '%s%s' % ('y', name)
+        return name
+
+    def convert_owner_name(self, stmt):
+        name = escape_name(stmt.arg)
+        if stmt.keyword == 'grouping':
+            name = '%s_Grouping' % camel_case(name)
+        elif stmt.keyword == 'identity':
+            name = '%s_Identity' % camel_case(name)
+        elif stmt.keyword == 'rpc':
+            name = camel_case(name) + 'Rpc'
+        else:
+            name = camel_case(name)
+        if iskeyword(name):
+            name = '%s_' % name
+
+        if name.startswith('_'):
+            name = '%s%s' % ('Y', name)
+        return name
+
+    def get_package(self):
+        if self.owner is None:
+            return None
+        if isinstance(self.owner, Package):
+            return self.owner
+        else:
+            if hasattr(self.owner, 'get_package'):
+                return self.owner.get_package()
 
 class NamedElement(Element):
 
@@ -121,6 +183,8 @@ class NamedElement(Element):
         names = []
         element = self
         while element is not None:
+            if isinstance(element, Deviation):
+                element = element.owner
             names.append(element.name)
             element = element.owner
         return '.'.join(reversed(names))
@@ -131,6 +195,8 @@ class NamedElement(Element):
         names = []
         element = self
         while element is not None and not isinstance(element, Package):
+            if isinstance(element, Deviation):
+                element = element.owner
             names.append(element.name)
             element = element.owner
         return '.'.join(reversed(names))
@@ -207,8 +273,6 @@ class Class(NamedElement):
     def __init__(self):
         super(Class, self).__init__()
         self._stmt = None
-        self.is_abstract = False
-        self.is_final_specialization = False
         self._extends = []
         self._module = None
 
@@ -246,6 +310,9 @@ class Class(NamedElement):
     def is_grouping(self):
         """ Returns True if this is a class for a YANG grouping. """
         return self._stmt.keyword == 'grouping'
+
+    def is_rpc(self):
+        return self._stmt.keyword == 'rpc'
 
     def all_owned_elements(self):
         """ Returns all the owned_element of this class and its super classes."""
@@ -595,7 +662,7 @@ class Enum(DataType):
         while leaf_or_typedef.parent is not None and not leaf_or_typedef.keyword in ('leaf', 'leaf-list', 'typedef'):
             leaf_or_typedef = leaf_or_typedef.parent
 
-        name = '%s_Enum' % camel_case(escape_name(leaf_or_typedef.arg))
+        name = '%sEnum' % camel_case(escape_name(leaf_or_typedef.arg))
         if iskeyword(name):
             name = '%s_' % name
 
@@ -778,8 +845,85 @@ def resolve_expanded_cross_references(element):
         for owned_element in element.owned_elements:
             resolve_expanded_cross_references(owned_element)
 
+def add_to_deviation_package(target, parent_element, deviation_packages):
+    i_deviation = target.i_deviation
+    for d_type in i_deviation:
+        d_obj = Deviation()
+        d_obj.d_type = d_type
+        d_obj.d_target = target
+        d_obj.owner = parent_element
+        d_obj.d_stmts = []
+        for (d_module, d_stmt) in i_deviation[d_type]:
+            d_module_name = d_module.arg
+            target_package = [p for p in deviation_packages if p.stmt.arg == d_module_name][0]
+            d_obj.d_stmts.append(d_stmt)
+            if d_stmt.keyword == 'type':
+                d_obj.d_target = target.copy()
+                d_target = d_obj.d_target
+                idx = d_target.substmts.index(d_target.search_one('type'))
+                d_target.substmts[idx] = d_stmt
+                add_leaf_leaflist_prop(d_target, d_obj)
+            if d_obj not in target_package.owned_elements:
+                target_package.owned_elements.append(d_obj)
 
-def create_expanded_api_model(stmt, parent_element):
+def add_leaf_leaflist_prop(stmt, parent_element):
+    prop = Property()
+    stmt.i_property = prop
+    prop.stmt = stmt
+    parent_element.owned_elements.append(prop)
+    prop.owner = parent_element
+    # for inlined enum types where leaf { type enumeration {
+    enum_type = _get_enum_type_stmt(stmt)
+    bits_type = _get_bits_type_stmt(stmt)
+    union_type = _get_union_type_stmt(stmt)
+    # if the type statement is totally self contained
+    # then we need to extract this type
+    if enum_type is not None and enum_type == stmt.search_one('type'):
+            # we have to create the enum
+            enum_class = Enum()
+            enum_class.stmt = enum_type
+            parent_element.owned_elements.append(enum_class)
+            enum_class.owner = parent_element
+            prop.property_type = enum_class
+    elif bits_type is not None and bits_type == stmt.search_one('type'):
+            # we have to create the specific subclass of FixedBitsDict
+            bits_class = Bits()
+            bits_class.stmt = bits_type
+            parent_element.owned_elements.append(bits_class)
+            bits_class.owner = parent_element
+            prop.property_type = bits_class
+    elif union_type is not None and union_type == stmt.search_one('type'):
+        def _add_union_type(union_type_stmt, parent_element):
+            for contained_type in union_type_stmt.i_type_spec.types:
+                contained_enum_type = _get_enum_type_stmt(contained_type)
+                contained_bits_type = _get_bits_type_stmt(contained_type)
+                contained_union_type = _get_union_type_stmt(contained_type)
+
+                if contained_enum_type is not None and contained_enum_type == contained_type:
+                    enum_class = Enum()
+                    enum_class.stmt = contained_enum_type
+                    parent_element.owned_elements.append(enum_class)
+                    enum_class.owner = parent_element
+                    contained_enum_type.i_enum = enum_class
+
+                if contained_bits_type is not None and contained_bits_type == contained_type:
+                    bits_class = Bits()
+                    bits_class.stmt = contained_bits_type
+                    parent_element.owned_elements.append(bits_class)
+                    bits_class.owner = parent_element
+                    contained_bits_type.i_bits = bits_class
+
+                if contained_union_type is not None and contained_union_type == contained_type:
+                    _add_union_type(contained_union_type, parent_element)
+
+        # is this embedded ?
+        if union_type == stmt.search_one('type'):
+            # we need to check for the types under the union to see if
+            # any of them need to be handled differently
+            _add_union_type(union_type, parent_element)
+
+
+def create_expanded_api_model(stmt, parent_element, deviation_packages):
     """
         Converts the stmt to an Element in the api_model according
         to the expanded code generation algorithm.
@@ -796,6 +940,7 @@ def create_expanded_api_model(stmt, parent_element):
 
         :param `pyang.statements.Statement` stmt The statement to convert
         :param  `Element` The parent element.
+        :param list of 'Package' The deviation packages.
     """
 
     # process typedefs first so that they are resolved
@@ -819,85 +964,32 @@ def create_expanded_api_model(stmt, parent_element):
     if stmt.keyword == 'module':
         pass
 
-    elif stmt.keyword == 'container' or stmt.keyword == 'list' or stmt.keyword == 'rpc':
-        clazz = Class()
-        stmt.i_class = clazz
-        clazz.stmt = stmt
-        parent_element.owned_elements.append(clazz)
-        clazz.owner = parent_element
-        element = clazz
+    elif stmt.keyword == 'container' or stmt.keyword == 'list' or stmt.keyword == 'rpc' or stmt.keyword == 'input' or stmt.keyword == 'output':
+        if (stmt.keyword == 'input' or stmt.keyword == 'output') and len(stmt.substmts) == 0:
+            pass
+        else:
+            clazz = Class()
+            stmt.i_class = clazz
+            clazz.stmt = stmt
+            parent_element.owned_elements.append(clazz)
+            clazz.owner = parent_element
+            element = clazz
 
-        if not isinstance(parent_element, Package):
-            # create a property along with the class
-            prop = Property()
-            stmt.i_property = prop
-            prop.stmt = stmt
-            prop.property_type = clazz
-            parent_element.owned_elements.append(prop)
-            prop.owner = parent_element
+            if not isinstance(parent_element, Package):
+                # create a property along with the class
+                prop = Property()
+                stmt.i_property = prop
+                prop.stmt = stmt
+                prop.property_type = clazz
+                parent_element.owned_elements.append(prop)
+                prop.owner = parent_element
 
-    elif stmt.keyword == 'anyxml':
-        any_xml = AnyXml()
-        any_xml.stmt = stmt
-        any_xml = camel_case(stmt.arg) + 'Entity'
-        parent_element.owned_elements.append(any_xml)
+    elif stmt.keyword == 'leaf' or stmt.keyword == 'leaf-list' or stmt.keyword == 'anyxml':
+        add_leaf_leaflist_prop(stmt, parent_element)
 
-    elif stmt.keyword == 'leaf' or stmt.keyword == 'leaf-list':
-        prop = Property()
-        stmt.i_property = prop
-        prop.stmt = stmt
-        parent_element.owned_elements.append(prop)
-        prop.owner = parent_element
-        # for inlined enum types where leaf { type enumeration {
-        enum_type = _get_enum_type_stmt(stmt)
-        bits_type = _get_bits_type_stmt(stmt)
-        union_type = _get_union_type_stmt(stmt)
-        # if the type statement is totally self contained
-        # then we need to extract this type
-        if enum_type is not None and enum_type == stmt.search_one('type'):
-                # we have to create the enum
-            enum_class = Enum()
-            enum_class.stmt = enum_type
-            parent_element.owned_elements.append(enum_class)
-            enum_class.owner = parent_element
-            prop.property_type = enum_class
-        elif bits_type is not None and bits_type == stmt.search_one('type'):
-            # we have to create the specific subclass of FixedBitsDict
-            bits_class = Bits()
-            bits_class.stmt = bits_type
-            parent_element.owned_elements.append(bits_class)
-            bits_class.owner = parent_element
-            prop.property_type = bits_class
-        elif union_type is not None and union_type == stmt.search_one('type'):
-            def _add_union_type(union_type_stmt, parent_element):
-                for contained_type in union_type_stmt.i_type_spec.types:
-                    contained_enum_type = _get_enum_type_stmt(contained_type)
-                    contained_bits_type = _get_bits_type_stmt(contained_type)
-                    contained_union_type = _get_union_type_stmt(contained_type)
-
-                    if contained_enum_type is not None and contained_enum_type == contained_type:
-                        enum_class = Enum()
-                        enum_class.stmt = contained_enum_type
-                        parent_element.owned_elements.append(enum_class)
-                        enum_class.owner = parent_element
-                        contained_enum_type.i_enum = enum_class
-
-                    if contained_bits_type is not None and contained_bits_type == contained_type:
-                        bits_class = Bits()
-                        bits_class.stmt = contained_bits_type
-                        parent_element.owned_elements.append(bits_class)
-                        bits_class.owner = parent_element
-                        contained_bits_type.i_bits = bits_class
-
-                    if contained_union_type is not None and contained_union_type == contained_type:
-                        _add_union_type(contained_union_type, parent_element)
-
-            # is this embedded ?
-            if union_type == stmt.search_one('type'):
-                # we need to check for the types under the union to see if
-                # any of them need to be handled differently
-                _add_union_type(union_type, parent_element)
-
+    if hasattr(stmt, 'i_deviation'):
+        add_to_deviation_package(stmt, parent_element, deviation_packages)
+    
     # walk the children
     if hasattr(stmt, 'i_children'):
         sanitize_namespace(stmt)
@@ -909,7 +1001,7 @@ def create_expanded_api_model(stmt, parent_element):
                or child.keyword == 'input'
                or child.keyword == 'output']
         for child_stmt in chs:
-            create_expanded_api_model(child_stmt, element)
+            create_expanded_api_model(child_stmt, element, deviation_packages)
 
 
 def sanitize_namespace(stmt):
@@ -960,15 +1052,28 @@ def generate_expanded_api_model(modules):
         :param list of `pyang.statements.Statement`
 
     """
+
+    d_modules = [module for module in modules if hasattr(module, 'is_deviation_module')]
+    modules = [module for module in modules if not hasattr(module, 'is_deviation_module')]
     only_modules = [module for module in modules if module.keyword == 'module']
     packages = []
+    deviation_packages = []
+
+    for module in d_modules:
+        package = Package()
+        module.i_package = package
+        package.stmt = module
+        package.is_deviation = True
+        deviation_packages.append(package)
+
     for module in only_modules:
         package = Package()
         module.i_package = package
         package.stmt = module
-        create_expanded_api_model(module, package)
+        create_expanded_api_model(module, package, deviation_packages)
         packages.append(package)
 
+    packages.extend(deviation_packages)
     # resolve cross references
     for package in packages:
         resolve_expanded_cross_references(package)

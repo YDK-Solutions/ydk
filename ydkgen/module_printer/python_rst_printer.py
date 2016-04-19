@@ -23,7 +23,7 @@ Print rst documents for the generated Python api
 
 from ydkgen.api_model import Class, Enum, Package
 from ydkgen.helper import get_rst_file_name
-from ydkgen.meta_data_util import get_class_docstring
+from ydkgen.meta_data_util import get_class_docstring, get_enum_class_docstring
 
 
 class PythonRstPrinter(object):
@@ -143,15 +143,6 @@ class PythonRstPrinter(object):
                     self.ctx.bline()
 
         if not clazz.is_identity() and not clazz.is_grouping():
-            # Presence Method
-            self.ctx.writeln('.. method:: is_presence()\n')
-            self.ctx.lvl_inc()
-            self.ctx.writeln("Returns True if this instance \
-                represents presence container else returns False")
-            self.ctx.lvl_dec()
-
-            self.ctx.bline()
-
             # Config Method
             self.ctx.writeln('.. method:: is_config()\n')
             self.ctx.lvl_inc()
@@ -202,8 +193,13 @@ class PythonRstPrinter(object):
         self.ctx.writeln('Bases: %s' % (', '.join(bases)))
         self.ctx.bline()
 
-        if enumz.comment is not None:
-            self.ctx.writeln(enumz.comment)
-            self.ctx.bline()
+        enumz_docstring = get_enum_class_docstring(enumz)
+
+        if len(enumz_docstring):
+            for line in enumz_docstring.split('\n'):
+                if line.strip() != '':
+                    self.ctx.writeln(line)
+                    self.ctx.bline()
+
 
         self.ctx.lvl_dec()

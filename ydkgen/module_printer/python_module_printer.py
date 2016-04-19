@@ -30,6 +30,7 @@ from .class_meta_printer import ClassMetaPrinter
 from pyang.error import EmitError
 from .test_case_printer import TestCasePrinter
 from .python_rst_printer import PythonRstPrinter
+from .deviation_printer import DeviationPrinter
 
 
 class _Stack:
@@ -82,7 +83,7 @@ from ydk.errors import YPYError, YPYDataValidationError
 
 ''')
 
-    def meta_header(self):
+    def meta_header(self, anyxml_import):
         self.ctx.str("""
 
 
@@ -91,17 +92,17 @@ import collections
 
 from enum import Enum
 
-from ydk._core._dm_meta_info import _MetaInfoClassMember, _MetaInfoClass, _MetaInfoEnum, _dm_validate_value
+from ydk._core._dm_meta_info import _MetaInfoClassMember, _MetaInfoClass, _MetaInfoEnum
 from ydk.types import Empty, YList, DELETE, Decimal64, FixedBitsDict
 from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, \
-    REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_BITS, REFERENCE_UNION
+    REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_BITS, REFERENCE_UNION{0}
 
 from ydk.errors import YPYError, YPYDataValidationError
 from ydk.models import _yang_ns
 
-""")
+""".format(anyxml_import))
 
-    def yang_ns_header(self):
+    def print_yang_ns_header(self):
         self.ctx.str('''
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
@@ -144,7 +145,7 @@ from ydk.models import _yang_ns
 
         self.ctx.bline()
 
-    def namespace(self, ns):
+    def print_namespaces(self, ns):
         for n in ns:
             self.ctx.writeln("_global_%s_nsp = '%s'" % (n[0], n[1]))
         self.ctx.writeln("_namespaces = { \\")
@@ -153,7 +154,14 @@ from ydk.models import _yang_ns
         self.ctx.writeln("}")
         self.ctx.bline()
 
-    def identity_map(self, packages):
+    def print_namespaces_map(self, namespace_map):
+        self.ctx.writeln("_namespace_package_map = { \\")
+        for namespace, python_import in namespace_map.iteritems():
+            self.ctx.writeln("('%s', '%s') : 'from %s import %s', " % (namespace[0], namespace[1], python_import[0], python_import[1]))
+        self.ctx.writeln("}")
+        self.ctx.bline()
+
+    def print_identity_map(self, packages):
         self.ctx.writeln("_identity_map = { \\")
         self.ctx.lvl_inc()
         for package in packages:
@@ -175,9 +183,6 @@ from ydk.models import _yang_ns
 
     def print_classes_meta_parents(self, unsorted_classes):
         ClassMetaPrinter(self.ctx, self).print_parents(unsorted_classes)
-
-    def print_rpcs_meta(self, rpcs):
-        ClassMetaPrinter(self.ctx, self).print_output(rpcs)
 
     def print_child_enums(self, parent):
         enumz = []
@@ -202,12 +207,11 @@ from ydk.models import _yang_ns
     def print_bits(self, bits):
         BitsPrinter(self.ctx, self).print_bits(bits)
 
-    def print_enum(self, enum_class):
-        EnumPrinter(self.ctx, self).print_enum(enum_class)
+    def print_enum(self, enum_class, no_meta=False):
+        EnumPrinter(self.ctx, self).print_enum(enum_class, no_meta)
 
-    def print_enum_meta(self, enum_class, inline_enum=':', inline_enum_quote=("'", "'", ",")):
-        EnumPrinter(self.ctx, self).print_enum_meta(
-            enum_class, inline_enum, inline_enum_quote)
+    def print_enum_meta(self, enum_class):
+        EnumPrinter(self.ctx, self).print_enum_meta(enum_class)
 
     def print_import_tests(self, packages):
         ImportTestPrinter(self.ctx, self).print_import_tests(packages)
@@ -220,3 +224,9 @@ from ydk.models import _yang_ns
 
     def print_ydk_models_rst(self, packages):
         PythonRstPrinter(self.ctx, self).print_ydk_models_rst(packages)
+
+    def print_deviation(self, package):
+        DeviationPrinter(self.ctx, self).print_deviation(package)
+
+    def print_meta_class_member(self, meta, ctx):
+        ClassMetaPrinter(self.ctx, self).print_meta_class_member(meta, ctx)

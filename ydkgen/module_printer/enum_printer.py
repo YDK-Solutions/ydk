@@ -23,7 +23,7 @@
 
 from ydkgen.api_model import Enum
 from ydkgen.helper import convert_to_reStructuredText, get_module_name
-
+from ydkgen.meta_data_util import get_enum_class_docstring
 
 class EnumPrinter(object):
 
@@ -31,18 +31,15 @@ class EnumPrinter(object):
         self.ctx = ctx
         self.parent = parent
 
-    def print_enum(self, enum_class):
+    def print_enum(self, enum_class, no_meta_assign):
         assert isinstance(enum_class, Enum)
         self._print_enum_header(enum_class)
-        self._print_enum_body(enum_class)
+        self._print_enum_body(enum_class, no_meta_assign)
         self._print_enum_trailer(enum_class)
 
-    def print_enum_meta(self, enum_class, inline_enum=':', inline_enum_quote=("'", "'", ",")):
-        self.ctx.writeln("%s%s%s %s _MetaInfoEnum('%s', '%s'," % (
-                         inline_enum_quote[0],
+    def print_enum_meta(self, enum_class):
+        self.ctx.writeln("'%s' : _MetaInfoEnum('%s', '%s'," % (
                          enum_class.qn(),
-                         inline_enum_quote[1],
-                         inline_enum,
                          enum_class.name,
                          enum_class.get_py_mod_name()))
         self.ctx.lvl_inc()
@@ -51,9 +48,7 @@ class EnumPrinter(object):
         for literal in enum_class.literals:
             self.ctx.writeln("'%s':'%s'," % (literal.stmt.arg, literal.name))
         self.ctx.lvl_dec()
-
-        self.ctx.writeln("}, '%s', _yang_ns._namespaces['%s'])%s" % (get_module_name(
-            enum_class.stmt), get_module_name(enum_class.stmt), inline_enum_quote[2]))
+        self.ctx.writeln("}, '%s', _yang_ns._namespaces['%s'])," % (get_module_name(enum_class.stmt), get_module_name(enum_class.stmt)))
         self.ctx.lvl_dec()
 
     def _print_enum_header(self, enum_class):
@@ -61,19 +56,20 @@ class EnumPrinter(object):
         self.ctx.writeln('class %s(Enum):' % enum_class.name)
         self.ctx.lvl_inc()
 
-    def _print_enum_body(self, enum_class):
+    def _print_enum_body(self, enum_class, no_meta_assign):
         self._print_enum_docstring(enum_class)
         self._print_enum_literals(enum_class)
-        self._print_enum_meta_assignment(enum_class)
+        if not no_meta_assign:
+            self._print_enum_meta_assignment(enum_class)
 
     def _print_enum_docstring(self, enum_class):
         self.ctx.writeln('"""')
-        self.ctx.writeln('%s' % enum_class.name)
-        self.ctx.bline()
-        if enum_class.comment is not None:
-            for line in enum_class.comment.split("\n"):
-                self.ctx.writeln(convert_to_reStructuredText(line))
-            self.ctx.bline()
+        enumz_docstring = get_enum_class_docstring(enum_class)
+        if len(enumz_docstring):
+            for line in enumz_docstring.split('\n'):
+                if line.strip() != '':
+                    self.ctx.writeln(line)
+                    self.ctx.bline()
         self.ctx.writeln('"""')
         self.ctx.bline()
 
@@ -82,13 +78,6 @@ class EnumPrinter(object):
             self._print_enum_literal(enum_literal)
 
     def _print_enum_literal(self, enum_literal):
-        if enum_literal.comment is not None:
-            self.ctx.writeln('"""')
-            self.ctx.bline()
-            for line in enum_literal.comment.split("\n"):
-                self.ctx.writeln(convert_to_reStructuredText(line))
-            self.ctx.bline()
-            self.ctx.writeln('"""')
         self.ctx.writeln('%s = %s' % (enum_literal.name, enum_literal.value))
         self.ctx.bline()
 

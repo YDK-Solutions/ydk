@@ -21,47 +21,43 @@ from ydk.errors import YPYError, YPYDataValidationError
 
 
 
-class YdkEnumTest_Enum(Enum):
+class YdkEnumTestEnum(Enum):
     """
-    YdkEnumTest_Enum
+    YdkEnumTestEnum
 
     YDK Enum test
 
-    """
+    .. data:: NOT_SET = 0
+
+    	Not Set
+
+    .. data:: NONE = 1
+
+    	None
+
+    .. data:: LOCAL = 2
+
+    	Local
+
+    .. data:: REMOTE = 3
+
+    	Remote
 
     """
 
-    Not Set
-
-    """
     NOT_SET = 0
 
-    """
-
-    None
-
-    """
     NONE = 1
 
-    """
-
-    Local
-
-    """
     LOCAL = 2
 
-    """
-
-    Remote
-
-    """
     REMOTE = 3
 
 
     @staticmethod
     def _meta_info():
         from ydk.models.ydktest._meta import _ydktest_union as meta
-        return meta._meta_table['YdkEnumTest_Enum']
+        return meta._meta_table['YdkEnumTestEnum']
 
 
 
@@ -72,7 +68,7 @@ class BuiltInT(object):
     .. attribute:: younion
     
     	
-    	**type**\: one of { :py:class:`YdkEnumTest_Enum <ydk.models.ydktest.ydktest_union.YdkEnumTest_Enum>` | int }
+    	**type**\: one of { :py:class:`YdkEnumTestEnum <ydk.models.ydktest.ydktest_union.YdkEnumTestEnum>` | int }
     
     
 
@@ -96,15 +92,9 @@ class BuiltInT(object):
     def _has_data(self):
         if not self.is_config():
             return False
-        if self.is_presence():
-            return True
         if self.younion is not None:
             return True
 
-        return False
-
-    def is_presence(self):
-        ''' Returns True if this instance represents presence container else returns False '''
         return False
 
     @staticmethod

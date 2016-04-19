@@ -28,6 +28,7 @@ from .class_is_config_printer import ClassIsConfigPrinter
 from ydkgen.helper import sort_classes_at_same_level
 
 
+
 class ClassPrinter(object):
 
     def __init__(self, ctx, parent):
@@ -66,7 +67,6 @@ class ClassPrinter(object):
             self._print_common_path_functions(clazz)
             self._print_is_config_function(clazz)
             self._print_has_data_functions(clazz)
-            self._print_is_presence_function(clazz)
 
     def _print_class_trailer(self, clazz):
         self.ctx.writeln('@staticmethod')
@@ -85,6 +85,7 @@ class ClassPrinter(object):
         parents = 'object'
         if len(clazz.extends) > 0:
             parents = ' ,'.join([sup.qn() for sup in clazz.extends])
+
         self.ctx.writeln("class %s(%s):" % (clazz.name, parents))
 
     def _print_class_docstring(self, clazz):
@@ -102,19 +103,6 @@ class ClassPrinter(object):
 
     def _print_class_inits(self, clazz):
         ClassInitsPrinter(self.ctx, self.parent).print_output(clazz)
-
-    def _print_is_presence_function(self, clazz):
-        # prints a function for the entity clazz to
-        # indicate the current entity is a presence
-        # container or not
-        self.ctx.writeln('def is_presence(self):')
-        self.ctx.lvl_inc()
-        self.ctx.writeln(
-            "''' Returns True if this instance represents presence container else returns False '''")
-        is_pre = False if not clazz.stmt.search_one('presence') else True
-        self.ctx.writeln('return %s' % str(is_pre))
-        self.ctx.lvl_dec()
-        self.ctx.bline()
 
     def _print_is_config_function(self, clazz):
         ClassIsConfigPrinter(self.ctx, self.parent).print_output(clazz)

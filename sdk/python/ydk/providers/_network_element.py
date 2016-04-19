@@ -53,6 +53,5 @@ class _NetworkElement(object):
 
     def disconnect(self):
         self.sp_instance._nc_manager.close_session()
-        
         return True
 

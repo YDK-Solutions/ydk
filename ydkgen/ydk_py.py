@@ -47,18 +47,21 @@ class _EmitArgs:
 # ============================================================
 class YDKPythonGen():
 
-    def __init__(self, ydk_dir, ydk_doc_dir, groupings_as_classes):
+    def __init__(self, ydk_dir, ydk_doc_dir):
         self.ydk_dir = ydk_dir
-        self.groupings_as_classes = groupings_as_classes
         self.ydk_doc_dir = ydk_doc_dir
 
-    def emit(self, modules):
+    def emit(self, packages):
         self.ypy_ctx = None
         self.packages = []
         self.models_dir = ''
         self.test_dir = ''
-
-        self.parse_modules(modules)
+        
+        self.packages = packages
+        self.packages = sorted(self.packages, key=lambda package: package.name)
+        self.deviation_packages = [p for p in self.packages if hasattr(p, 'is_deviation')]
+        self.packages = [p for p in self.packages if not hasattr(p, 'is_deviation')]
+        
         self.initialize_print_environment()
         self.print_files()
 
@@ -66,19 +69,13 @@ class YDKPythonGen():
         self.initialize_top_level_directories()
         self.initialize_printer_context()
 
-    def parse_modules(self, modules):
-        if not self.groupings_as_classes:
-            self.packages = api_model.generate_expanded_api_model(modules)
-        else:
-            self.packages = api_model.generate_grouping_class_api_model(
-                modules)
-        self.packages = sorted(self.packages, key=lambda package: package.name)
-
     def initialize_top_level_directories(self):
         self.models_dir = self.initialize_output_directory(
             self.ydk_dir + '/models', True)
         self.test_dir = self.initialize_output_directory(
             self.ydk_dir + '/tests', True)
+        self.deviation_dir = self.initialize_output_directory(
+            self.models_dir + '/_deviate', True)
 
     def initialize_printer_context(self):
         self.ypy_ctx = common.PrintCtx()
@@ -91,6 +88,7 @@ class YDKPythonGen():
         self.print_init_file(self.models_dir)
         self.print_yang_ns_file()
         self.print_import_tests_file()
+        self.print_deviate_file()
 
         # RST Documentation
         if self.ydk_doc_dir is not None:
@@ -169,9 +167,17 @@ class YDKPythonGen():
                         _EmitArgs(self.ypy_ctx, package))
 
     def print_yang_ns_file(self):
+        packages = self.packages + self.deviation_packages
         self.print_file(get_yang_ns_file_name(self.models_dir),
                         gen_target.emit_yang_ns,
-                        _EmitArgs(self.ypy_ctx, self.packages))
+                        _EmitArgs(self.ypy_ctx, packages))
+
+    def print_deviate_file(self):
+        self.print_init_file(self.deviation_dir)
+        for package in self.deviation_packages:
+            self.print_file(get_meta_module_file_name(self.deviation_dir, package),
+                            gen_target.emit_deviation,
+                            _EmitArgs(self.ypy_ctx, package))
 
     def print_import_tests_file(self):
         self.print_file(get_import_test_file_name(self.test_dir),

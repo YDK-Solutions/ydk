@@ -36,7 +36,7 @@ def merge_file_path_segments(segs):
 
 
 def iskeyword(word):
-    return keyword.iskeyword(word) or word in ('None',)
+    return keyword.iskeyword(word) or word in ('None', 'parent')
 
 
 def get_sphinx_ref_label(named_element):
@@ -97,12 +97,7 @@ def snake_case(input_text):
 
 
 def camel_case(input_text):
-    camel_fn = lambda x: x[0:1].upper() + x[1:]
-    camel_case = ''
-    camel_case = camel_case.join(
-        [word for word in map(camel_fn, input_text.split('-'))])
-
-    return camel_case
+    return ''.join([word.title() for word in input_text.split('-')])
 
 
 def escape_name(name):

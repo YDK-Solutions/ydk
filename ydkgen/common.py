@@ -13,7 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
+import sys
+import logging
 """
  common.py 
  
@@ -93,6 +94,9 @@ class YdkGenException(Exception):
 
     def __init__(self, msg):
         self.msg = msg
+        logger = logging.getLogger('ydkgen')
+        if len(logger.handlers) == 1:
+            print >> sys.stderr, msg
 
 
 class PrintCtx(object):

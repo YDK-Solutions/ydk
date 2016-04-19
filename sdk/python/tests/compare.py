@@ -96,10 +96,16 @@ def is_equal(lhs, rhs):
         errtyp, ret = ErrNo.WRONG_CLASS, False
     else:
         dict_lhs, dict_rhs = lhs.__dict__, rhs.__dict__
-        if len(dict_lhs) != len(dict_rhs):
+        len_lhs = len(dict_lhs)
+        len_rhs = len(dict_rhs)
+        if 'i_meta' in dict_lhs:
+            len_lhs -= 1
+        if 'i_meta' in dict_rhs:
+            len_rhs -= 1
+        if len_lhs != len_rhs:
             errtyp, ret = ErrNo.WRONG_DICT, False
         for k in dict_lhs:
-            if k == 'parent':
+            if k == 'parent' or k == 'i_meta':
                 continue
             elif is_builtin_type(dict_lhs[k]) or is_builtin_type(dict_rhs[k]):
                 try:

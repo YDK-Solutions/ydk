@@ -25,7 +25,6 @@ from ._network_element import _NetworkElement
 from .provider import ServiceProvider
 from ._session_config import _SessionConfig
 from ._ydk_types import _SessionTransportMode, _ServiceProtocolName
-from ydk.errors import YPYError
 
 
 class NetconfServiceProvider(ServiceProvider):
@@ -49,7 +48,12 @@ class NetconfServiceProvider(ServiceProvider):
         self.protocol = kwargs.get('protocol', 'ssh')
 
         if self.protocol == 'tcp':
-            raise YPYError('Plain text TCP not supported.')
+            self.session_config = _SessionConfig(
+                                                 _SessionTransportMode.TCP,
+                                                 self.address,
+                                                 self.port,
+                                                 self.username,
+                                                 self.password)
         else:
             self._session_config = _SessionConfig(
                                            _SessionTransportMode.SSH,
@@ -62,9 +66,9 @@ class NetconfServiceProvider(ServiceProvider):
                                   self._session_config,
                                   _ServiceProtocolName.NETCONF)
 
-        netconf_sp_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
+        self.netconf_sp_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
         self.ne.connect()
-        netconf_sp_logger.info('NetconfServiceProvider connected to %s:%s using %s'
+        self.netconf_sp_logger.info('NetconfServiceProvider connected to %s:%s using %s'
                                % (self.address, self.port, self.protocol))
 
         self.sp_instance = self.ne.sp_instance
@@ -73,3 +77,8 @@ class NetconfServiceProvider(ServiceProvider):
     def close(self):
         """ Closes the netconf session """
         self.ne.disconnect()
+        self.netconf_sp_logger.info('\nNetconfServiceProvider disconnected from %s:%s using %s'
+                               % (self.address, self.port, self.protocol))
+
+    def get_capabilities(self):
+        return self.sp_instance._nc_manager.server_capabilities

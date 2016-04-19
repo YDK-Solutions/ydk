@@ -45,6 +45,7 @@ class ClassInitsPrinter(object):
             self.ctx.writeln('pass')
         else:
             self._print_class_inits_properties(clazz)
+            self.print_class_is_rpc(clazz)
 
     def _print_class_inits_properties(self, clazz):
         # first the parent prop
@@ -52,7 +53,9 @@ class ClassInitsPrinter(object):
             self.ctx.writeln('self.parent = None')
         properties = clazz.properties()
         if len(properties) == 0:
-            self.ctx.writeln('pass')
+            # print _is_presence
+            if clazz.stmt.search_one('presence'):
+                self._print_presence_property(clazz)
         else:
             for prop in properties:
                 self._print_class_inits_property(prop)
@@ -87,6 +90,14 @@ class ClassInitsPrinter(object):
         else:
             self.ctx.writeln('self.%s = None' % (prop.name,))
 
+    def print_class_is_rpc(self, clazz):
+        if clazz.is_rpc():
+            self.ctx.bline()
+            self.ctx.writeln('self.is_rpc = True')
+
     def _print_class_inits_trailer(self, clazz):
         self.ctx.lvl_dec()
         self.ctx.bline()
+
+    def _print_presence_property(self, clazz):
+        self.ctx.writeln('self.%s = %s' % ('_is_presence', 'True'))

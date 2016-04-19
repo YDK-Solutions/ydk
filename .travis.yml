@@ -13,4 +13,4 @@ before_install:
     - docker pull ydkdev/confd
 
 script:
-    - docker run ydkdev/confd /bin/bash -c './root/confd_install_ydktest.sh'
+    - docker run ydkdev/confd /root/confd_all.sh -r https://github.com/psykokwak4/ydk-gen.git

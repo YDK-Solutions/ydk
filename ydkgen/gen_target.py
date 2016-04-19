@@ -106,12 +106,15 @@ def emit_module_header(ctx, package, mheader=None, is_meta=False):
     # ::::::::::::::::::::::::::::::::::::::::
     s = package.stmt
     if is_meta:
-        ctx.printer.meta_header()
+        rpcs = [idx for idx in package.owned_elements if isinstance(idx, Class) and idx.is_rpc()]
+        anyxml_import = ''
+        if len(rpcs) > 0:
+            anyxml_import = ', ANYXML_CLASS'
+        ctx.printer.meta_header(anyxml_import)
     else:
         comment = s.search_one('description')
         ctx.writeln('""" %s ' % package.name)
         ctx.bline()
-        # _construct_tree(ctx, package)
 
         if comment is not None and not is_meta:
             ctx.comment = comment.arg
@@ -148,17 +151,25 @@ def emit_module_header(ctx, package, mheader=None, is_meta=False):
 
 def emit_yang_ns(ctx, packages):
 
-    ctx.printer.yang_ns_header()
+    ctx.printer.print_yang_ns_header()
     ns_list = []
+    namespace_map = {}
     for m in [p.stmt for p in packages]:
 
         ns = m.search_one('namespace')
         if ns is not None:
             ns_list.append((m.arg.replace('-', '_'), ns.arg, yang_id(m)))
 
-    ctx.printer.namespace(ns_list)
+    for package in packages:
+        ns = package.stmt.search_one('namespace')
+        for ele in package.owned_elements:
+            if hasattr(ele, 'stmt') and ele.stmt is not None and ele.stmt.keyword == 'container':                
+                namespace_map[(ns.arg, ele.stmt.arg)] = (package.get_py_mod_name(), ele.name)
 
-    ctx.printer.identity_map(packages)
+
+    ctx.printer.print_namespaces(ns_list)
+    ctx.printer.print_identity_map(packages)
+    ctx.printer.print_namespaces_map(namespace_map)
 
 
 def emit_importests(ctx, packages):
@@ -215,10 +226,8 @@ def emit_meta(ctx, package):
     if package is not None:
         emit_meta_table_open(ctx)
         for nested_enumz in [e for e in package.owned_elements if isinstance(e, Enum)]:
-            ctx.printer.print_enum_meta(
-                nested_enumz, inline_enum=':', inline_enum_quote=("'", "'", ","))
-        ctx.printer.print_classes_meta(
-            [c for c in package.owned_elements if isinstance(c, Class)])
+            ctx.printer.print_enum_meta(nested_enumz)
+        ctx.printer.print_classes_meta([c for c in package.owned_elements if isinstance(c, Class)])
         emit_meta_table_close(ctx)
         ctx.printer.print_classes_meta_parents(
             [c for c in package.owned_elements if isinstance(c, Class)])
@@ -232,3 +241,6 @@ def emit_meta_table_open(ctx):
 def emit_meta_table_close(ctx):
     ctx.lvl_dec()
     ctx.writeln('}')
+
+def emit_deviation(ctx, package):
+    ctx.printer.print_deviation(package)

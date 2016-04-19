@@ -26,9 +26,6 @@ from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 from ydk.types import READ, YList
 
-from pdb import set_trace as bp 
-import logging
-
 class SanityYang(unittest.TestCase):
 
 
@@ -37,6 +34,7 @@ class SanityYang(unittest.TestCase):
         self.ncc = NetconfServiceProvider(address='127.0.0.1', username='admin', password='admin', protocol='ssh', port=12022)
         self.crud = CRUDService()
         a = self.getInitEntity()
+        self.crud.delete(self.ncc, a)
         self.crud.create(self.ncc, a)
 
     @classmethod

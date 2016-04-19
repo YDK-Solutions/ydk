@@ -66,6 +66,7 @@ def generate_documentation(output_directory):
     stdout, stderr = p.communicate()
     logger.debug(stdout)
     logger.error(stderr)
+    print >> sys.stderr, stderr
     print(stdout)
     print('*' * 28 + '\n' + 'DOCUMENTATION ERRORS/WARNINGS\n' +
           '*' * 28 + '\n' + stderr)
@@ -92,7 +93,7 @@ def create_pip_package(output_directory):
 if __name__ == '__main__':
 
     parser = OptionParser(usage="usage: %prog [options]",
-                          version="%prog 0.3.0")
+                          version="%prog 0.4.0")
 
     parser.add_option("--profile",
                       type=str,

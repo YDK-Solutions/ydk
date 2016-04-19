@@ -130,7 +130,7 @@ def resolve_profile(p, ydk_root=None):
     # check for basic validity
     if 'models' not in p:
         return None
-
+    
     # we think we have models, so let's go...firt order of business is
     # to create a temporary directory name to store all the models in
     # as we will be pulling them all together for a brief period of
@@ -146,14 +146,16 @@ def resolve_profile(p, ydk_root=None):
                 globals()[
                     'resolve_' + source](p['models'][source], tmp_dir, ydk_root)
             except shutil.Error as e:
-                logger.error('%s', e.message)
+                err_msg = '%s' % e.message
+                logger.error(err_msg)
                 shutil.rmtree(tmp_dir)
-                raise YdkGenException('%s' % e.message)
+                raise YdkGenException(err_msg)
             except Exception as inst:
-                logger.error('Got exception of type %s and args %s' %
-                             (str(type(inst)), inst.args))
+                err_msg = 'Got exception of type %s and args %s' % \
+                             (str(type(inst)), inst.args)
+                logger.error(err_msg)
                 shutil.rmtree(tmp_dir)
-                raise YdkGenException('%s' % inst.message)
+                raise YdkGenException(err_msg)
 
     # if we get here, we assume that we just return the tmp_dir as a
     # sign of success!
@@ -185,15 +187,21 @@ if __name__ == '__main__':
         with open(args.profile) as json_file:
             profile_data = json.load(json_file)
     except IOError as e:
-        logger.error('Cannot open profile file (' + e.strerror + ')')
+        err_msg = 'Cannot open profile file (%s)' % e.strerror
+        logger.error(err_msg)
+        raise YdkGenException(err_msg)
         sys.exit(1)
     except ValueError as e:
-        logger.error('Cannot parse profile file (' + e.message + ')')
+        err_msg = 'Cannot parse profile file (%s)' % e.message
+        logger.error(err_msg)
+        raise YdkGenException(err_msg)
         sys.exit(1)
 
     model_dir = resolve_profile(profile_data)
     if not model_dir:
-        logger.error('No resolution!')
+        err_msg = 'No resolution!'
+        logger.error(err_msg)
+        raise YdkGenException(err_msg)
     else:
         print('Resolved models to ' + model_dir)
         print('Models resolved:')

@@ -24,47 +24,43 @@ from ydk.errors import YPYError, YPYDataValidationError
 
 
 
-class YdkEnumTest_Enum(Enum):
+class YdkEnumTestEnum(Enum):
     """
-    YdkEnumTest_Enum
+    YdkEnumTestEnum
 
     YDK Enum test
 
-    """
+    .. data:: NOT_SET = 0
+
+    	Not Set
+
+    .. data:: NONE = 1
+
+    	None
+
+    .. data:: LOCAL = 2
+
+    	Local
+
+    .. data:: REMOTE = 3
+
+    	Remote
 
     """
 
-    Not Set
-
-    """
     NOT_SET = 0
 
-    """
-
-    None
-
-    """
     NONE = 1
 
-    """
-
-    Local
-
-    """
     LOCAL = 2
 
-    """
-
-    Remote
-
-    """
     REMOTE = 3
 
 
     @staticmethod
     def _meta_info():
         from ydk.models.ydktest._meta import _ydktest_sanity as meta
-        return meta._meta_table['YdkEnumTest_Enum']
+        return meta._meta_table['YdkEnumTestEnum']
 
 
 
@@ -101,6 +97,16 @@ class Runner(object):
     
     	
     	**type**\: :py:class:`LeafRef <ydk.models.ydktest.ydktest_sanity.Runner.LeafRef>`
+    
+    .. attribute:: not_supported_1
+    
+    	
+    	**type**\: :py:class:`NotSupported1 <ydk.models.ydktest.ydktest_sanity.Runner.NotSupported1>`
+    
+    .. attribute:: not_supported_2
+    
+    	
+    	**type**\: list of :py:class:`NotSupported2 <ydk.models.ydktest.ydktest_sanity.Runner.NotSupported2>`
     
     .. attribute:: one
     
@@ -154,6 +160,11 @@ class Runner(object):
         self.inbtw_list.parent = self
         self.leaf_ref = Runner.LeafRef()
         self.leaf_ref.parent = self
+        self.not_supported_1 = Runner.NotSupported1()
+        self.not_supported_1.parent = self
+        self.not_supported_2 = YList()
+        self.not_supported_2.parent = self
+        self.not_supported_2.name = 'not_supported_2'
         self.one = Runner.One()
         self.one.parent = self
         self.one_list = Runner.OneList()
@@ -311,18 +322,12 @@ class Runner(object):
                     def _has_data(self):
                         if not self.is_config():
                             return False
-                        if self.is_presence():
-                            return True
                         if self.number is not None:
                             return True
 
                         if self.name is not None:
                             return True
 
-                        return False
-
-                    def is_presence(self):
-                        ''' Returns True if this instance represents presence container else returns False '''
                         return False
 
                     @staticmethod
@@ -344,8 +349,6 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.name is not None:
                         return True
 
@@ -357,10 +360,6 @@ class Runner(object):
                             if child_ref._has_data():
                                 return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -382,8 +381,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
@@ -393,13 +390,6 @@ class Runner(object):
                 if self.subc is not None and self.subc._has_data():
                     return True
 
-                if self.subc is not None and self.subc.is_presence():
-                    return True
-
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -419,17 +409,11 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.ldata is not None:
                 for child_ref in self.ldata:
                     if child_ref._has_data():
                         return True
 
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -492,10 +476,12 @@ class Runner(object):
             """
             
             
-            .. attribute:: name
+            .. attribute:: name_of_one
             
             	
             	**type**\: str
+            
+            	**pattern:** (([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])\\.){3}([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])(%[\\p{N}\\p{L}]+)?
             
             .. attribute:: two
             
@@ -511,7 +497,7 @@ class Runner(object):
 
             def __init__(self):
                 self.parent = None
-                self.name = None
+                self.name_of_one = None
                 self.two = Runner.LeafRef.One.Two()
                 self.two.parent = self
 
@@ -548,15 +534,9 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.self_ref_one_name is not None:
                         return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -576,21 +556,12 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
-                if self.name is not None:
+                if self.name_of_one is not None:
                     return True
 
                 if self.two is not None and self.two._has_data():
                     return True
 
-                if self.two is not None and self.two.is_presence():
-                    return True
-
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -610,12 +581,7 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.one is not None and self.one._has_data():
-                return True
-
-            if self.one is not None and self.one.is_presence():
                 return True
 
             if self.ref_inbtw is not None:
@@ -632,14 +598,153 @@ class Runner(object):
 
             return False
 
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
+        @staticmethod
+        def _meta_info():
+            from ydk.models.ydktest._meta import _ydktest_sanity as meta
+            return meta._meta_table['Runner.LeafRef']['meta_info']
+
+
+    class NotSupported1(object):
+        """
+        
+        
+        .. attribute:: not_supported_1_2
+        
+        	
+        	**type**\: :py:class:`NotSupported12 <ydk.models.ydktest.ydktest_sanity.Runner.NotSupported1.NotSupported12>`
+        
+        .. attribute:: not_supported_leaf
+        
+        	
+        	**type**\: str
+        
+        
+
+        """
+
+        _prefix = 'ydkut'
+        _revision = '2015-11-17'
+
+        def __init__(self):
+            self.parent = None
+            self.not_supported_1_2 = Runner.NotSupported1.NotSupported12()
+            self.not_supported_1_2.parent = self
+            self.not_supported_leaf = None
+
+
+        class NotSupported12(object):
+            """
+            
+            
+            .. attribute:: some_leaf
+            
+            	
+            	**type**\: str
+            
+            
+
+            """
+
+            _prefix = 'ydkut'
+            _revision = '2015-11-17'
+
+            def __init__(self):
+                self.parent = None
+                self.some_leaf = None
+
+            @property
+            def _common_path(self):
+
+                return '/ydktest-sanity:runner/ydktest-sanity:not-supported-1/ydktest-sanity:not-supported-1-2'
+
+            def is_config(self):
+                ''' Returns True if this instance represents config data else returns False '''
+                return True
+
+            def _has_data(self):
+                if not self.is_config():
+                    return False
+                if self.some_leaf is not None:
+                    return True
+
+                return False
+
+            @staticmethod
+            def _meta_info():
+                from ydk.models.ydktest._meta import _ydktest_sanity as meta
+                return meta._meta_table['Runner.NotSupported1.NotSupported12']['meta_info']
+
+        @property
+        def _common_path(self):
+
+            return '/ydktest-sanity:runner/ydktest-sanity:not-supported-1'
+
+        def is_config(self):
+            ''' Returns True if this instance represents config data else returns False '''
+            return True
+
+        def _has_data(self):
+            if not self.is_config():
+                return False
+            if self.not_supported_1_2 is not None and self.not_supported_1_2._has_data():
+                return True
+
+            if self.not_supported_leaf is not None:
+                return True
+
             return False
 
         @staticmethod
         def _meta_info():
             from ydk.models.ydktest._meta import _ydktest_sanity as meta
-            return meta._meta_table['Runner.LeafRef']['meta_info']
+            return meta._meta_table['Runner.NotSupported1']['meta_info']
+
+
+    class NotSupported2(object):
+        """
+        
+        
+        .. attribute:: number
+        
+        	Integer key for not supported list
+        	**type**\: int
+        
+        	**range:** \-2147483648..2147483647
+        
+        
+
+        """
+
+        _prefix = 'ydkut'
+        _revision = '2015-11-17'
+
+        def __init__(self):
+            self.parent = None
+            self.number = None
+
+        @property
+        def _common_path(self):
+            if self.number is None:
+                raise YPYDataValidationError('Key property number is None')
+
+            return '/ydktest-sanity:runner/ydktest-sanity:not-supported-2[ydktest-sanity:number = ' + str(self.number) + ']'
+
+        def is_config(self):
+            ''' Returns True if this instance represents config data else returns False '''
+            return True
+
+        def _has_data(self):
+            if not self.is_config():
+                return False
+            if self.number is not None:
+                return True
+
+            return False
+
+        @staticmethod
+        def _meta_info():
+            from ydk.models.ydktest._meta import _ydktest_sanity as meta
+            return meta._meta_table['Runner.NotSupported2']['meta_info']
 
 
     class One(object):
@@ -718,18 +823,12 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.name is not None:
                     return True
 
                 if self.number is not None:
                     return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -749,8 +848,6 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.name is not None:
                 return True
 
@@ -760,13 +857,6 @@ class Runner(object):
             if self.one_aug is not None and self.one_aug._has_data():
                 return True
 
-            if self.one_aug is not None and self.one_aug.is_presence():
-                return True
-
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -847,18 +937,12 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
                 if self.name is not None:
                     return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -938,18 +1022,12 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.number is not None:
                         return True
 
                     if self.name is not None:
                         return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -969,8 +1047,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.enabled is not None:
                     return True
 
@@ -979,10 +1055,6 @@ class Runner(object):
                         if child_ref._has_data():
                             return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -1002,8 +1074,6 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.ldata is not None:
                 for child_ref in self.ldata:
                     if child_ref._has_data():
@@ -1012,13 +1082,6 @@ class Runner(object):
             if self.one_aug_list is not None and self.one_aug_list._has_data():
                 return True
 
-            if self.one_aug_list is not None and self.one_aug_list.is_presence():
-                return True
-
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -1035,6 +1098,11 @@ class Runner(object):
         
         	
         	**type**\: str
+        
+        .. attribute:: _is_presence
+        
+        	Is present if this instance represents presence container else not
+        	**type**\: bool
         
         
 
@@ -1061,16 +1129,10 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.some_leaf is not None:
                 return True
 
             return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
-            return True
 
         @staticmethod
         def _meta_info():
@@ -1178,15 +1240,9 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.number is not None:
                         return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -1206,21 +1262,12 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
                 if self.sub2 is not None and self.sub2._has_data():
                     return True
 
-                if self.sub2 is not None and self.sub2.is_presence():
-                    return True
-
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -1240,8 +1287,6 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.name is not None:
                 return True
 
@@ -1251,13 +1296,6 @@ class Runner(object):
             if self.sub1 is not None and self.sub1._has_data():
                 return True
 
-            if self.sub1 is not None and self.sub1.is_presence():
-                return True
-
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -1407,18 +1445,12 @@ class Runner(object):
                     def _has_data(self):
                         if not self.is_config():
                             return False
-                        if self.is_presence():
-                            return True
                         if self.number is not None:
                             return True
 
                         if self.name is not None:
                             return True
 
-                        return False
-
-                    def is_presence(self):
-                        ''' Returns True if this instance represents presence container else returns False '''
                         return False
 
                     @staticmethod
@@ -1442,8 +1474,6 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.number is not None:
                         return True
 
@@ -1455,10 +1485,6 @@ class Runner(object):
                             if child_ref._has_data():
                                 return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -1480,8 +1506,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
@@ -1493,10 +1517,6 @@ class Runner(object):
                         if child_ref._has_data():
                             return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -1516,17 +1536,11 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.ldata is not None:
                 for child_ref in self.ldata:
                     if child_ref._has_data():
                         return True
 
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -1605,15 +1619,9 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -1633,8 +1641,6 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.name is not None:
                 return True
 
@@ -1644,13 +1650,6 @@ class Runner(object):
             if self.sub1 is not None and self.sub1._has_data():
                 return True
 
-            if self.sub1 is not None and self.sub1.is_presence():
-                return True
-
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -1763,18 +1762,12 @@ class Runner(object):
                 def _has_data(self):
                     if not self.is_config():
                         return False
-                    if self.is_presence():
-                        return True
                     if self.number is not None:
                         return True
 
                     if self.name is not None:
                         return True
 
-                    return False
-
-                def is_presence(self):
-                    ''' Returns True if this instance represents presence container else returns False '''
                     return False
 
                 @staticmethod
@@ -1796,8 +1789,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.number is not None:
                     return True
 
@@ -1809,10 +1800,6 @@ class Runner(object):
                         if child_ref._has_data():
                             return True
 
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -1832,17 +1819,11 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.ldata is not None:
                 for child_ref in self.ldata:
                     if child_ref._has_data():
                         return True
 
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -1906,6 +1887,11 @@ class Runner(object):
             
             	**range:** 1..3.14 \| 10..None \| 20..92233720368547758.07
             
+            .. attribute:: embeded_enum
+            
+            	enum embeded in leaf
+            	**type**\: :py:class:`EmbededEnumEnum <ydk.models.ydktest.ydktest_sanity.Runner.Ytypes.BuiltInT.EmbededEnumEnum>`
+            
             .. attribute:: emptee
             
             	this is empty value
@@ -1914,7 +1900,7 @@ class Runner(object):
             .. attribute:: enum_value
             
             	this is enum type value
-            	**type**\: :py:class:`YdkEnumTest_Enum <ydk.models.ydktest.ydktest_sanity.YdkEnumTest_Enum>`
+            	**type**\: :py:class:`YdkEnumTestEnum <ydk.models.ydktest.ydktest_sanity.YdkEnumTestEnum>`
             
             .. attribute:: identity_ref_value
             
@@ -1997,7 +1983,7 @@ class Runner(object):
             .. attribute:: younion
             
             	union test value
-            	**type**\: one of { :py:class:`YdkEnumTest_Enum <ydk.models.ydktest.ydktest_sanity.YdkEnumTest_Enum>` | int }
+            	**type**\: one of { :py:class:`YdkEnumTestEnum <ydk.models.ydktest.ydktest_sanity.YdkEnumTestEnum>` | int }
             
             
 
@@ -2012,6 +1998,7 @@ class Runner(object):
                 self.bits_value = Runner.Ytypes.BuiltInT.BitsValue_Bits()
                 self.bool_value = None
                 self.deci64 = None
+                self.embeded_enum = None
                 self.emptee = None
                 self.enum_value = None
                 self.identity_ref_value = None
@@ -2027,6 +2014,33 @@ class Runner(object):
                 self.u_number64 = None
                 self.u_number8 = None
                 self.younion = None
+
+            class EmbededEnumEnum(Enum):
+                """
+                EmbededEnumEnum
+
+                enum embeded in leaf
+
+                .. data:: ZERO = 0
+
+                .. data:: TWO = 1
+
+                .. data:: SEVEN = 7
+
+                """
+
+                ZERO = 0
+
+                TWO = 1
+
+                SEVEN = 7
+
+
+                @staticmethod
+                def _meta_info():
+                    from ydk.models.ydktest._meta import _ydktest_sanity as meta
+                    return meta._meta_table['Runner.Ytypes.BuiltInT.EmbededEnumEnum']
+
 
             class BitsValue_Bits(FixedBitsDict):
                 """
@@ -2059,8 +2073,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
                 if self.bincoded is not None:
                     return True
 
@@ -2072,6 +2084,9 @@ class Runner(object):
                     return True
 
                 if self.deci64 is not None:
+                    return True
+
+                if self.embeded_enum is not None:
                     return True
 
                 if self.emptee is not None:
@@ -2123,10 +2138,6 @@ class Runner(object):
 
                 return False
 
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
-                return False
-
             @staticmethod
             def _meta_info():
                 from ydk.models.ydktest._meta import _ydktest_sanity as meta
@@ -2146,7 +2157,6 @@ class Runner(object):
 
             def __init__(self):
                 self.parent = None
-                pass
 
             @property
             def _common_path(self):
@@ -2160,12 +2170,6 @@ class Runner(object):
             def _has_data(self):
                 if not self.is_config():
                     return False
-                if self.is_presence():
-                    return True
-                return False
-
-            def is_presence(self):
-                ''' Returns True if this instance represents presence container else returns False '''
                 return False
 
             @staticmethod
@@ -2185,24 +2189,12 @@ class Runner(object):
         def _has_data(self):
             if not self.is_config():
                 return False
-            if self.is_presence():
-                return True
             if self.built_in_t is not None and self.built_in_t._has_data():
-                return True
-
-            if self.built_in_t is not None and self.built_in_t.is_presence():
                 return True
 
             if self.derived_t is not None and self.derived_t._has_data():
                 return True
 
-            if self.derived_t is not None and self.derived_t.is_presence():
-                return True
-
-            return False
-
-        def is_presence(self):
-            ''' Returns True if this instance represents presence container else returns False '''
             return False
 
         @staticmethod
@@ -2222,72 +2214,44 @@ class Runner(object):
     def _has_data(self):
         if not self.is_config():
             return False
-        if self.is_presence():
-            return True
         if self.inbtw_list is not None and self.inbtw_list._has_data():
-            return True
-
-        if self.inbtw_list is not None and self.inbtw_list.is_presence():
             return True
 
         if self.leaf_ref is not None and self.leaf_ref._has_data():
             return True
 
-        if self.leaf_ref is not None and self.leaf_ref.is_presence():
+        if self.not_supported_1 is not None and self.not_supported_1._has_data():
             return True
+
+        if self.not_supported_2 is not None:
+            for child_ref in self.not_supported_2:
+                if child_ref._has_data():
+                    return True
 
         if self.one is not None and self.one._has_data():
-            return True
-
-        if self.one is not None and self.one.is_presence():
             return True
 
         if self.one_list is not None and self.one_list._has_data():
             return True
 
-        if self.one_list is not None and self.one_list.is_presence():
-            return True
-
         if self.runner_2 is not None and self.runner_2._has_data():
-            return True
-
-        if self.runner_2 is not None and self.runner_2.is_presence():
             return True
 
         if self.three is not None and self.three._has_data():
             return True
 
-        if self.three is not None and self.three.is_presence():
-            return True
-
         if self.three_list is not None and self.three_list._has_data():
-            return True
-
-        if self.three_list is not None and self.three_list.is_presence():
             return True
 
         if self.two is not None and self.two._has_data():
             return True
 
-        if self.two is not None and self.two.is_presence():
-            return True
-
         if self.two_list is not None and self.two_list._has_data():
-            return True
-
-        if self.two_list is not None and self.two_list.is_presence():
             return True
 
         if self.ytypes is not None and self.ytypes._has_data():
             return True
 
-        if self.ytypes is not None and self.ytypes.is_presence():
-            return True
-
-        return False
-
-    def is_presence(self):
-        ''' Returns True if this instance represents presence container else returns False '''
         return False
 
     @staticmethod
@@ -2309,7 +2273,6 @@ class ChildIdentity_Identity(BaseIdentity_Identity):
 
     def __init__(self):
         BaseIdentity_Identity.__init__(self)
-        pass
 
     @staticmethod
     def _meta_info():
@@ -2330,7 +2293,6 @@ class ChildChildIdentity_Identity(ChildIdentity_Identity):
 
     def __init__(self):
         ChildIdentity_Identity.__init__(self)
-        pass
 
     @staticmethod
     def _meta_info():

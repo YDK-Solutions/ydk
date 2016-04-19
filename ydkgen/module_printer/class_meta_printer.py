@@ -20,7 +20,7 @@ class_meta_printer.py
  YANG model driven API, class emitter.
  
 """
-from ydkgen.api_model import Class, Enum
+from ydkgen.api_model import Class, Enum, Property
 from ydkgen.helper import sort_classes_at_same_level, get_module_name
 from ydkgen.meta_data_util import get_meta_info_data
 
@@ -30,6 +30,7 @@ class ClassMetaPrinter(object):
     def __init__(self, ctx, parent):
         self.ctx = ctx
         self.parent = parent
+        self.is_rpc = False
 
     def print_output(self, unsorted_classes):
         ''' This arranges the classes at the same level 
@@ -38,7 +39,7 @@ class ClassMetaPrinter(object):
         sorted_classes = sort_classes_at_same_level(unsorted_classes)
 
         for clazz in sorted_classes:
-            self._print_class_meta(clazz)
+            self.print_class_meta(clazz)
 
     def print_parents(self, unsorted_classes):
         ''' This arranges the classes at the same level 
@@ -57,7 +58,10 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('_meta_table[\'%s\'][\'meta_info\'].parent =_meta_table[\'%s\'][\'meta_info\']' % (
                 nested_class.qn(), clazz.qn()))
 
-    def _print_class_meta(self, clazz):
+    def print_class_meta(self, clazz):
+        if clazz.is_rpc():
+            self.is_rpc = True
+
         self.print_output(
             [nested_class for nested_class in clazz.owned_elements if isinstance(nested_class, Class)])
         enumz = []
@@ -78,12 +82,16 @@ class ClassMetaPrinter(object):
             self.ctx.writeln('False, ')
         self.ctx.writeln('[')
 
-        prop_list = clazz.properties()
+        prop_list = []
+        if self.is_rpc:
+            prop_list = [p for p in clazz.owned_elements if isinstance(p, Property)]
+        else:
+            prop_list = clazz.properties()
 
         for prop in prop_list:
             meta_info_data = get_meta_info_data(
                 prop, prop.property_type, prop.stmt.search_one('type'))
-            self._print_meta_class_member(meta_info_data, self.ctx)
+            self.print_meta_class_member(meta_info_data, self.ctx)
 
         '''
         class _MetaInfoClass(object):
@@ -113,7 +121,7 @@ class ClassMetaPrinter(object):
         self.ctx.lvl_dec()
         self.ctx.writeln('},')
 
-    def _print_meta_class_member(self, meta_info_data, ctx):
+    def print_meta_class_member(self, meta_info_data, ctx):
 
         name = meta_info_data.name
         mtype = meta_info_data.mtype
@@ -142,7 +150,7 @@ class ClassMetaPrinter(object):
                 "'%s', %s, [" % (meta_info_data.module_name, meta_info_data.is_key))
             ctx.lvl_inc()
             for child_meta_info_data in meta_info_data.children:
-                self._print_meta_class_member(child_meta_info_data, ctx)
+                self.print_meta_class_member(child_meta_info_data, ctx)
             ctx.lvl_dec()
             ctx.write(']')
         else:

@@ -55,7 +55,8 @@ class ClassHasDataPrinter(object):
 
     def _print_has_data_functions_body(self, clazz):
         self._print_has_data_function('not self.is_config()', 'False')
-        self._print_has_data_function('self.is_presence()')
+        if clazz.stmt.search_one('presence') and len(clazz.properties()) == 0:
+            self._print_has_data_function('self._is_presence')
 
         for prop in clazz.properties():
             if isinstance(prop.property_type, Class):
@@ -63,9 +64,6 @@ class ClassHasDataPrinter(object):
                     if not prop.property_type.is_identity():
                         self._print_has_data_function(
                             'self.%s is not None and self.%s._has_data()' % (prop.name, prop.name))
-                        self.ctx.bline()
-                        self._print_has_data_function(
-                            'self.%s is not None and self.%s.is_presence()' % (prop.name, prop.name))
                         self.ctx.bline()
                     else:
                         self._print_has_data_function(

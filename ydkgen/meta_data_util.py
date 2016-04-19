@@ -60,7 +60,7 @@ def get_class_docstring(clazz):
     if clazz.comment is not None:
         class_description = clazz.comment
 
-    properties_description = ''
+    properties_description = []
     for prop in clazz.properties():
         prop_comment = ''
         if prop.comment is not None:
@@ -73,17 +73,46 @@ def get_class_docstring(clazz):
 
         prop_restriction = get_property_restriction(meta_info_data)
 
-        properties_description += '.. attribute:: %s\n\n' % (prop.name)
+        properties_description.append('.. attribute:: %s\n\n' % (prop.name))
 
-        properties_description += '\t%s\n' % (
-            convert_to_reStructuredText(prop_comment))
+        properties_description.append('\t%s\n' % (
+            convert_to_reStructuredText(prop_comment)))
 
-        properties_description += '\t**type**\: %s\n\n' % doc_link
+        properties_description.append('\t**type**\: %s\n\n' % doc_link)
 
         if prop_restriction is not None and len(prop_restriction) > 0:
-            properties_description += '\t%s\n\n' % prop_restriction
+            properties_description.append('\t%s\n\n' % prop_restriction)
 
-    return convert_to_reStructuredText(class_description) + '\n\n' + properties_description
+        if clazz.stmt.search_one('presence'):
+            properties_description.append(add_presence_property_docstring(clazz))
+
+    return convert_to_reStructuredText(class_description) + '\n\n' + ''.join(properties_description)
+
+def add_presence_property_docstring(clazz):
+    description = []
+    description.append(".. attribute:: %s\n\n" % ("_is_presence"))
+    description.append("\tIs present if this instance represents presence container else not\n")
+    description.append("\t**type**\: bool\n\n")
+
+
+    return ''.join(description)
+
+
+def get_enum_class_docstring(enumz):
+    enumz_description = ''
+    if enumz.comment is not None:
+        enumz_description = enumz.comment
+
+    enumz_description = "%s\n\n\n" % (enumz.name) + enumz_description
+
+    literals_description = []
+    for enum_literal in enumz.literals:
+        literals_description.append(".. data:: %s = %s\n" % (enum_literal.name, enum_literal.value))
+        if enum_literal.comment is not None:
+            for line in enum_literal.comment.split("\n"):
+                literals_description.append("\t%s\n\n" % line)
+
+    return ''.join([convert_to_reStructuredText(enumz_description)] + ['\n\n'] + literals_description)
 
 
 def get_property_restriction(meta_info_data):
@@ -121,7 +150,6 @@ def get_meta_info_data(prop, property_type, type_stmt):
             property_type : The type under consideration
             type_stmt : The type stmt currently under consideration 
     """
-
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
     target_type_stmt = type_stmt
@@ -182,6 +210,11 @@ def get_meta_info_data(prop, property_type, type_stmt):
         if prop.stmt.keyword == 'leaf-list':
             meta_info_data.mtype = 'REFERENCE_LEAFLIST'
             meta_info_data.doc_link = 'list of '
+        elif prop.stmt.keyword == 'anyxml':
+            meta_info_data.mtype = 'ANYXML_CLASS'
+            meta_info_data.doc_link = 'anyxml'
+            meta_info_data.ptype = 'object'
+            return meta_info_data
         else:
             meta_info_data.mtype = 'ATTRIBUTE'
             meta_info_data.doc_link = ''

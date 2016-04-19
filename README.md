@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/psykokwak4/ydk-gen.svg?branch=master)](https://travis-ci.org/psykokwak4/ydk-gen)
+[![Build Status](https://travis-ci.org/CiscoDevNet/ydk-gen.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-gen)
 
 # INSTALL
 

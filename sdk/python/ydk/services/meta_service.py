@@ -29,13 +29,37 @@ class MetaService(Service):
 
     @classmethod
     def normalize_meta(cls, capabilities, entity):
+        """ Get meta information from entity._meta_info(), modify and inject i_meta attribute back to entity.
+
+            Args:
+                cls: First argument for class method
+                capabilities: List of capabilities get from provider
+                entity: An instance of YDK object
+
+            Returns:
+                entity: An instance of YDK object
+
+            Raises:
+                `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if try to access an unsupported feature.
+
+        """
         deviation_tables = MetaService.get_active_deviation_tables(capabilities, entity)
         MetaService.inject_imeta(entity, deviation_tables)
         return entity
 
     @classmethod
     def get_active_deviation_tables(cls, capabilities, entity):
-        """ Return active deviation tables """
+        """ Return active deviation tables
+
+            Args:
+                cls: First argument for class method
+                capabilities: List of capabilities get from provider
+                enttiy: An instance of YDk object
+
+            Returns:
+                deviation_tables: A dictionary for deviation tables
+
+        """
         active_dmodule_names = get_active_deviation_module_names(capabilities, entity)
 
         deviation_tables = {}
@@ -50,6 +74,13 @@ class MetaService(Service):
 
     @classmethod
     def inject_imeta(cls, entity, deviation_tables):
+        """ Inject i_meta to entity using existing deviation table
+
+            Args:
+                cls: First argument for class method
+                deviation_tables: A dictionary of existing deviation tables
+
+        """
         if len(deviation_tables) == 0:
             inject_imeta_helper(entity, deviation_tables)
         else:

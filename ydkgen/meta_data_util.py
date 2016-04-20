@@ -265,8 +265,9 @@ def get_meta_info_data(prop, property_type, type_stmt):
             while hasattr(target_type_stmt, 'i_typedef') and target_type_stmt.i_typedef is not None:
                 target_type_stmt = target_type_stmt.i_typedef.search_one(
                     'type')
-            meta_info_data.pattern.append(
-                target_type_stmt.search_one('pattern').arg.encode('ascii'))
+            pattern = target_type_stmt.search_one('pattern')
+            if pattern is not None:
+                meta_info_data.pattern.append(pattern.arg.encode('ascii'))
         elif isinstance(type_spec, RangeTypeSpec):
             meta_info_data.ptype = get_range_base_type_name(type_spec)
             meta_info_data.prange = get_range_limits(type_spec)

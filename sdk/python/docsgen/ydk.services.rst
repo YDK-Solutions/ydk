@@ -392,3 +392,31 @@ CodecService: Provides encode/decode API's
 				:return: decoded entity
  
 				:raises ydk.errors.YPYDataValidationError: if validation error has occurred
+
+
+MetaService: Provide deviation validation capability
+------------------------------------------------------
+
+.. py:class:: ydk.services.MetaService
+
+		Bases: :class:`ydk.services.Service`
+
+		Meta Service class to modify entity meta at run time.
+
+		.. py:classmethod:: normalize_meta(cls, capabilities, entity)
+
+				Get meta information from entity._meta_info(), modify and inject i_meta attribute back to entity.
+
+				:return: entity with i_meta injected
+
+				:raises ydk.errors.YPYDataValidationError: if try to access an unsupported feature
+
+		.. py:classmethod:: get_active_deviation_tables(cls, capabilities, entity)
+
+				Return active deviation tables
+
+				:return: a dictionary for deviation tables
+
+		.. py:classmethod:: inject_imeta(cls, entity, deviation_tables)
+
+				Inject i_meta to entity using existing deviation table

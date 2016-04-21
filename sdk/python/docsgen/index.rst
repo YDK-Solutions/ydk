@@ -17,6 +17,7 @@ Contents:
    read_filter.rst
    presence_class.rst
    types_doc.rst
+   deviation.rst
    ydk.rst
    ydk.models.rst
 

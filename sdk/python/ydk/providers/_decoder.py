@@ -213,7 +213,7 @@ class XmlDecoder(object):
                 identity_mod_name = None
                 identity_name = None
 
-                if ':' in rt[0]:
+                if ':' in rt[0].text:
                     (prefix, identity_name) = rt[0].text.split(':')
                     identity_ns = rt[0].nsmap[prefix]
                     identity_mod_name = None

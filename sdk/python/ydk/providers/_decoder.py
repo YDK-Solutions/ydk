@@ -105,7 +105,7 @@ class XmlDecoder(object):
                 return rt[0].text
             elif contained_member.ptype == 'long' and rt[0].text is not None and rt[0].text.isdigit():
                 return long(rt[0].text)
-            elif contained_member.ptype == 'int' and rt[0].text is not None and rt[0].isidigit():
+            elif contained_member.ptype == 'int' and rt[0].text is not None and rt[0].text.isdigit():
                 return int(rt[0].text)
             elif contained_member.ptype == 'Decimal64' and rt[0].text is not None:
                 try:

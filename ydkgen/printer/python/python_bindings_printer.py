@@ -65,6 +65,10 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
     def print_module(self, index, package, size):
         print 'Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref)
 
+        # Skip generating module for empty modules
+        if len(package.owned_elements) == 0:
+            return
+
         py_mod_name = package.get_py_mod_name()
         sub = py_mod_name[len('ydk.models.'): py_mod_name.rfind('.')]
 
@@ -83,9 +87,6 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
     def print_python_rst_module(self, package):
         if self.ydk_doc_dir is None:
-            return
-        # Skip generating documentation for empty modules
-        if len(package.owned_elements) == 0:
             return
 
         def _walk_n_print(named_element, p):

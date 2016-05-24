@@ -2020,7 +2020,7 @@ class Runner(object):
             .. attribute:: u_number64
             
             	64 bit uinteger value type
-            	**type**\: int
+            	**type**\: long
             
             	**range:** 0..18446744073709551615
             

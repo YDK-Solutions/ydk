@@ -142,6 +142,9 @@ class XmlDecoder(object):
                 return int(text)
             else:
                 return text
+            return int(text)
+        elif _type == 'long':
+            return long(text)
         elif _type == 'str':
             return text
         elif _type == 'bool':

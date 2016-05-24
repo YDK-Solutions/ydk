@@ -61,15 +61,6 @@ class SanityTest(unittest.TestCase):
 
         return runner
 
-    # def test_invalids(self):
-    #     runner = self._create_runner()
-    #     runner.ytypes.built_in_t.name = []
-    #     runner.ytypes.built_in_t.u_number8 = -1
-    #     runner.ytypes.built_in_t.enum_value = ''
-
-    #     self.crud.create(self.ncc, runner)
-    #     with self.assertRaises(YPYDataValidationError):
-    #     self.crud.create(self.ncc, runner)
 
     def test_int8(self):
         # Create Runner
@@ -85,22 +76,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('skip till validation in place')
-    def test_int8_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number8 = 8.5
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # invalid object is not equal
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
-
     def test_int16(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number16 = 126
@@ -114,23 +89,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('skip till validation in place')
-    def test_int16_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number16 = {}
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
-
     def test_int32(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number32 = 200000
@@ -143,23 +101,6 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
-
-    @unittest.skip('skip till validation in place')
-    def test_int32_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number32 = []
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
 
     def test_bits(self):
         runner = self._create_runner()
@@ -187,23 +128,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('skip till validation in place')
-    def test_int64_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number64 = 9223372036854775808
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
-
     def test_uint8(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number8 = 0
@@ -216,23 +140,6 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
-
-    @unittest.skip('skip till validation in place')
-    def test_uint8_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number8 = -1
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
 
     def test_uint16(self):
         runner = self._create_runner()
@@ -247,23 +154,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('skip till validation in place')
-    def test_unint16_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number16 = 'not an uint'
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
-
     def test_uint32(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number32 = 5927
@@ -277,22 +167,18 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('skip till validation in place')
-    def test_unint32_invalid(self):
+    def test_uint64(self):
         runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number32 = 4294967296
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
+        runner.ytypes.built_in_t.u_number64 = 18446744073709551615
+        self.crud.create(self.ncc, runner)
 
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
+        # Read into Runner2
+        runner1 = ysanity.Runner()
+        runner1 = self.crud.read(self.ncc, runner1)
 
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
+        # Compare runners
+        result = is_equal(runner, runner1)
+        self.assertEqual(result, True)
 
     def test_decimal64(self):
         runner = self._create_runner()
@@ -307,37 +193,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-    @unittest.skip('Revisit implementation')
-    def test_uint64(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number64 = 18446744073709551615
-        self.crud.create(self.ncc, runner)
-
-        # Read into Runner2
-        runner1 = ysanity.Runner()
-        runner1 = self.crud.read(self.ncc, runner1)
-
-        # Compare runners
-        result = is_equal(runner, runner1)
-        self.assertEqual(result, True)
-
-    @unittest.skip('skip till validation in place')
-    def test_uint64_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number64 = 18446744073709551616
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
-
     def test_string(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.name = 'name_str'
@@ -350,22 +205,6 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
-
-    # but invalid input is sent to the device
-    def test_string_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.name = ['name_str']
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-        # self.crud.create(self.ncc, runner)
-
-        # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
 
     def test_empty(self):
         runner = self._create_runner()
@@ -387,25 +226,6 @@ class SanityTest(unittest.TestCase):
         # runner2 = self.crud.read(self.ncc, self._create_runner())
 
         # self.assertEqual(runner2.ytypes.built_in_t.emptee, None)
-
-
-    def test_empty_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.emptee = 0
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # self.assertRaises(YPYDataValidationError,
-            # self.crud.create, self.ncc, runner)
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
 
     def test_boolean(self):
         runner = self._create_runner()
@@ -432,24 +252,6 @@ class SanityTest(unittest.TestCase):
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
 
-
-    @unittest.skip('boolean type will convert empty string to false')
-    def test_boolean_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.bool_value = ''
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, True)
-
     def test_enum(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.enum_value = YdkEnumTestEnum.NONE
@@ -462,25 +264,6 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         result = is_equal(runner, runner1)
         self.assertEqual(result, True)
-
-    def test_enum_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.enum_value = 'not an enum'
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
-            self.crud.create, self.ncc, runner)
-
-        # OLD
-        # with self.assertRaises(YPYError) as e:
-        #     self.crud.create(self.ncc, runner)
-
-        # # Read into Runner2
-        # runner1 = ysanity.Runner()
-        # runner1 = self.crud.read(self.ncc, runner1)
-
-        # # # Compare runners
-        # result = is_equal(runner, runner1)
-        # self.assertEqual(result, False)
 
     def test_union(self):
         runner = self._create_runner()
@@ -656,20 +439,6 @@ class SanityTest(unittest.TestCase):
 
     # def test_binary_invalid(self):
     #     pass
-
-    # def test_bits(self):
-    #     pass
-
-    # def test_bits_invalid(self):
-    #     pass
-
-    # def test_union(self):
-    #     pass
-
-    # def test_union_invalid(self):
-    #     pass
-
-
 
 if __name__ == '__main__':
     unittest.main()

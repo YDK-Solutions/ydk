@@ -179,8 +179,8 @@ def _dm_validate_value(meta, value, parent, optype, i_errors):
             # enum, etc.
             return value
     # check for type(Empty.SET), type(Empty.UNSET). Needs to be refined
-    elif meta._ptype is 'int':
-        return value
+    # elif meta._ptype is 'int':
+    #     return value
 
     elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_LEAFLIST:
         # A leaf list.

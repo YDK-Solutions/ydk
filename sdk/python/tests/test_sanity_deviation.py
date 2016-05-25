@@ -139,7 +139,7 @@ class SanityTest(unittest.TestCase):
     # changed to type uint64
     def test_uint32(self):
         runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number32 = 4294967296
+        runner.ytypes.built_in_t.u_number32 = 18446744073709551615
         self.crud.create(self.ncc, runner)
 
         # Read into Runner2

@@ -89,8 +89,6 @@ class ClassMetaPrinter(object):
             prop_list = clazz.properties()
 
         for prop in prop_list:
-            # if prop.name == 'u_number64':
-            #     from pdb import set_trace; set_trace()
             meta_info_data = get_meta_info_data(
                 prop, prop.property_type, prop.stmt.search_one('type'))
             self.print_meta_class_member(meta_info_data, self.ctx)

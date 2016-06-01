@@ -27,6 +27,8 @@ class YPYErrorCode(Enum):
     ''' Exception Enum for YDK errors '''
     INVALID_UNION_VALUE = 'Cannot translate union value'
     INVALID_ENCODE_VALUE = 'Cannot encode value'
+    OOR_VALUE = 'Value is out of range'
+
     INVALID_HIERARCHY_PARENT = 'Parent is not set. \
                     Parent Hierarchy cannot be determined'
     INVALID_HIERARCHY_KEY = 'Key value is not set. \
@@ -50,7 +52,7 @@ class YPYError(Exception):
         else:
             ret = self.errcode.value
             if self.errmsg is not None:
-                ret = ['']
+                ret = [ret]
                 parser = etree.XMLParser(remove_blank_text=True)
                 root = etree.XML(self.errmsg.xml, parser)
                 for r in root.iter():

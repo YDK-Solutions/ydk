@@ -26,7 +26,7 @@ from ncclient import manager
 from ncclient.operations import RPC, RPCReply
 
 from ydk._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
-from ydk.errors import YPYDataValidationError, YPYError, YPYErrorCode
+from ydk.errors import YPYServiceProviderError, YPYDataValidationError, YPYErrorCode
 from ydk.types import Empty, DELETE, READ, Decimal64, YList, YListItem, YLeafList
 
 from ._decoder import XmlDecoder
@@ -130,7 +130,7 @@ class _NCClientSPPlugin(_SPPlugin):
 
             if not found:
                 self.crud_logger.error('Error determing what needs to be returned')
-                raise YPYError('Error determining what needs to be returned')
+                raise YPYServiceProviderError('Error determining what needs to be returned')
 
         return current
 
@@ -142,7 +142,7 @@ class _NCClientSPPlugin(_SPPlugin):
 
         if non_list_filter is None:
             self.crud_logger.error('Cannot determine hierarchy for entity. Please set the parent reference')
-            raise YPYError('Cannot determine hierarchy for entity. Please set the parent reference')
+            raise YPYServiceProviderError('Cannot determine hierarchy for entity. Please set the parent reference')
 
         top_entity_meta_info = non_list_filter._meta_info()
 
@@ -203,7 +203,7 @@ class _NCClientSPPlugin(_SPPlugin):
 
     def _handle_rpc_error(self, payload, reply_str, pathlist):
         self.netconf_sp_logger.error('%s\n%s\n%s\n%s' , self.separator, payload, reply_str.xml, self.separator)
-        raise YPYError(YPYErrorCode.SERVER_REJ, reply_str)
+        raise YPYServiceProviderError(YPYErrorCode.SERVER_REJ, reply_str)
 
     def _handle_commit(self, payload, reply_str):
         assert self._nc_manager is not None
@@ -212,7 +212,7 @@ class _NCClientSPPlugin(_SPPlugin):
         if 'ok' not in commit.xml:
             self.netconf_sp_logger.error('%s\n%s\n%s\ncommit-reply\n%s\n%s', self.separator,
                                     payload, reply_str.xml, commit.xml, self.separator)
-            raise YPYError(YPYErrorCode.SERVER_COMMIT_ERR, reply_str)
+            raise YPYServiceProviderError(YPYErrorCode.SERVER_COMMIT_ERR, reply_str)
         else:
             self.netconf_sp_logger.debug('\n%s\n%s' , reply_str, self.separator)
 
@@ -442,19 +442,19 @@ class _NCClientSPPlugin(_SPPlugin):
 
     def _raise_parent_hierarchy_error(self):
         self.netconf_sp_logger.error(YPYErrorCode.INVALID_HIERARCHY_PARENT)
-        raise YPYError(YPYErrorCode.INVALID_HIERARCHY_PARENT)
+        raise YPYServiceProviderError(YPYErrorCode.INVALID_HIERARCHY_PARENT)
 
     def _raise_key_missing_error(self):
         self.netconf_sp_logger.error(YPYErrorCode.INVALID_HIERARCHY_KEY)
-        raise YPYError(YPYErrorCode.INVALID_HIERARCHY_KEY)
+        raise YPYServiceProviderError(YPYErrorCode.INVALID_HIERARCHY_KEY)
 
     def _raise_read_only_edit_error(self):
         self.netconf_sp_logger.error(YPYErrorCode.INVALID_MODIFY)
-        raise YPYError(YPYErrorCode.INVALID_MODIFY)
+        raise YPYServiceProviderError(YPYErrorCode.INVALID_MODIFY)
 
     def _raise_non_rpc_error(self):
         self.netconf_sp_logger.error(YPYErrorCode.INVALID_RPC)
-        raise YPYError(YPYErrorCode.INVALID_RPC)
+        raise YPYServiceProviderError(YPYErrorCode.INVALID_RPC)
     
     def _encode_keys(self, root, entity, meta_info):
         for key in meta_info.key_members():

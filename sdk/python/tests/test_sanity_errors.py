@@ -116,7 +116,7 @@ class SanityTest(unittest.TestCase):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number64 = 18446744073709551616
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYError,
             self.crud.create, self.ncc, runner)
 
     # but invalid input is sent to the device

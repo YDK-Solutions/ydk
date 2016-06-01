@@ -36,7 +36,6 @@ class YPYErrorCode(Enum):
     SERVER_REJ = 'Server rejected request.'
     SERVER_COMMIT_ERR = 'Server reported an error while committing change.'
 
-
 class YPYError(Exception):
     ''' Base Exception for YDK Errors '''
     def __init__(self, error_code=None, error_msg=None):
@@ -49,14 +48,17 @@ class YPYError(Exception):
             ret = self.errmsg
             return ret
         else:
+            ret = self.errcode.value
             if self.errmsg is not None:
+                ret = ['']
                 parser = etree.XMLParser(remove_blank_text=True)
                 root = etree.XML(self.errmsg.xml, parser)
                 for r in root.iter():
                     tag = r.tag[r.tag.rfind('}') + 1 :]
                     if r.text is not None:
                         ret.append('\t{}: {}'.format(tag, r.text.strip()))
-            return '\n'.join(ret)
+                ret = '\n'.join(ret)
+            return ret
 
 
 class YPYDataValidationError(YPYError):
@@ -76,4 +78,20 @@ class YPYDataValidationError(YPYError):
     '''
     def __init__(self, errmsg):
         super(YPYDataValidationError, self).__init__(error_msg=errmsg)
+
+class YPYServicesError(YPYError):
+    '''
+    Exception for Service Side Validation
+    '''
+    def __init__(self, errcode=None, errmsg=None):
+        super(YPYServicesError, self).__init__(error_code=errcode, error_msg=errmsg)
+
+class YPYServiceProviderError(YPYError):
+    '''
+    Exception for Provider Side Validation
+    '''
+    def __init__(self, errcode=None, errmsg=None):
+        super(YPYServiceProviderError, self).__init__(error_code=errcode, error_msg=errmsg)
+
+
 

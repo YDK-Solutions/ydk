@@ -21,7 +21,7 @@ sanity test for netconf
 import unittest
 from tests.compare import is_equal
 
-from ydk.errors import YPYDataValidationError, YPYError
+from ydk.errors import YPYModelError, YPYError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 try:
     from ydk.models.ietf import ietf_netconf
@@ -115,7 +115,7 @@ class SanityNetconf(unittest.TestCase):
         try:
             self.netconf_service.validate(self.ncc, config=runner)
         except Exception as e:
-            self.assertIsInstance(e, YPYDataValidationError)
+            self.assertIsInstance(e, YPYModelError)
 
     def test_commit_discard(self):
         runner = ysanity.Runner()

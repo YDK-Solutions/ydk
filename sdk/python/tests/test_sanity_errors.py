@@ -16,7 +16,6 @@
 
 import ydk.types as ytypes
 import unittest
-# from errors import YPYDataValidationError 
 
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
@@ -24,7 +23,7 @@ from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
 from tests.compare import is_equal
-from ydk.errors import YPYError, YPYDataValidationError
+from ydk.errors import YPYError, YPYModelError
 
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
 
@@ -60,56 +59,56 @@ class SanityTest(unittest.TestCase):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number8 = 8.5
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_int16_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number16 = {}
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_int32_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number32 = []
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_int64_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number64 = 9223372036854775808
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_uint8_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number8 = -1
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_uint16_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number16 = 'not an uint'
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_uint16_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number16 = 'not an uint'
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_uint32_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.u_number32 = 4294967296
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_uint64_invalid(self):
@@ -123,7 +122,7 @@ class SanityTest(unittest.TestCase):
     def test_string_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.name = ['name_str']
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
         # self.crud.create(self.ncc, runner)
 
@@ -131,21 +130,21 @@ class SanityTest(unittest.TestCase):
         runner = self._create_runner()
         runner.ytypes.built_in_t.emptee = '0'
         
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_boolean_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.bool_value = ''
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_enum_invalid(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.enum_value = 'not an enum'
         # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
 

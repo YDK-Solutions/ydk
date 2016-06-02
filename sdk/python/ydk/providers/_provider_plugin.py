@@ -26,7 +26,7 @@ from ncclient import manager
 from ncclient.operations import RPC, RPCReply
 
 from ydk._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
-from ydk.errors import YPYServiceProviderError, YPYDataValidationError, YPYErrorCode
+from ydk.errors import YPYServiceProviderError, YPYErrorCode
 from ydk.types import Empty, DELETE, READ, Decimal64, YList, YListItem, YLeafList
 
 from ._decoder import XmlDecoder

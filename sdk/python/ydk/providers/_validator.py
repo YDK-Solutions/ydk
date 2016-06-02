@@ -20,7 +20,7 @@
    
 """
 from ._value_encoder import ValueEncoder
-from ydk.errors import YPYDataValidationError, YPYErrorCode
+from ydk.errors import YPYModelError, YPYErrorCode
 from ydk.types import READ, DELETE, Decimal64, Empty, YList, YLeafList, YListItem
 from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_LIST, \
             REFERENCE_LEAFLIST, REFERENCE_IDENTITY_CLASS, REFERENCE_BITS, REFERENCE_UNION
@@ -37,7 +37,7 @@ def validate_entity(entity, optype):
         _i_errors = map((lambda t: '%s: %s' % t), i_errors)
         _i_errors.insert(0, '')
         errmsg = '\n  '.join(_i_errors)
-        raise YPYDataValidationError(errmsg)
+        raise YPYModelError(errmsg)
 
 
 def validate_entity_delegate(entity, optype, i_errors):
@@ -47,7 +47,7 @@ def validate_entity_delegate(entity, optype, i_errors):
         has any errors , the errors will available in the injected member i_errors ,
         which is a list of tuples of form (<name of the class member>, <error messsage>)
         
-        Note this method will raise ydk.errors.YPYDataValidationError if validation fails
+        Note this method will raise ydk.errors.YPYModelError if validation fails
     """
     for member in entity.i_meta.meta_info_class_members:
         # print member.mtype, member.name

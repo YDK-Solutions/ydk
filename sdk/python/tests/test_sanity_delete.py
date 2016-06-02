@@ -24,7 +24,7 @@ from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64, YLeafList
 from tests.compare import is_equal
-from ydk.errors import YPYError, YPYDataValidationError
+from ydk.errors import YPYError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from pdb import set_trace as bp
 

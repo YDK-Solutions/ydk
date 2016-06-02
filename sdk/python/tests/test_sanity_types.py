@@ -16,7 +16,6 @@
 
 import ydk.types as ytypes
 import unittest
-# from errors import YPYDataValidationError 
 
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
@@ -25,7 +24,7 @@ from ydk.models.ydktest import ydktest_types as y_types
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
 from tests.compare import is_equal
-from ydk.errors import YPYError, YPYDataValidationError
+from ydk.errors import YPYError, YPYModelError
 
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
 
@@ -391,7 +390,7 @@ class SanityTest(unittest.TestCase):
 
     def test_leaflist_unique(self):
         runner = self._create_runner()
-        with self.assertRaises(YPYDataValidationError):
+        with self.assertRaises(YPYModelError):
             runner.ytypes.built_in_t.llstring.extend([None for i in range(3)])
 
     def test_list_max_elements(self):
@@ -404,7 +403,7 @@ class SanityTest(unittest.TestCase):
             l.name = str(i)
             elems.append(l)
         runner.one_list.ldata.extend(elems)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     def test_submodule(self):

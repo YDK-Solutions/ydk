@@ -63,7 +63,7 @@ class YPYError(Exception):
             return ret
 
 
-class YPYDataValidationError(YPYError):
+class YPYModelError(YPYError):
     '''
     Exception for Client Side Data Validation
 
@@ -79,7 +79,7 @@ class YPYDataValidationError(YPYError):
 
     '''
     def __init__(self, errmsg):
-        super(YPYDataValidationError, self).__init__(error_msg=errmsg)
+        super(YPYModelError, self).__init__(error_msg=errmsg)
 
 class YPYServicesError(YPYError):
     '''

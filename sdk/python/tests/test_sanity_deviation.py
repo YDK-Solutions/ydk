@@ -16,14 +16,13 @@
 
 import ydk.types as ytypes
 import unittest
-# from errors import YPYDataValidationError 
 
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
 from tests.compare import is_equal
-from ydk.errors import YPYError, YPYDataValidationError
+from ydk.errors import YPYError, YPYModelError
 
 from pdb import set_trace as bp
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
@@ -105,7 +104,7 @@ class SanityTest(unittest.TestCase):
     def test_int64(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.number64 = -9223372036854775808
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     # changed to type uint16
@@ -208,7 +207,7 @@ class SanityTest(unittest.TestCase):
 
         runner = self._create_runner()
         runner.ytypes.built_in_t.bool_value = False
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.update, self.ncc, runner)
 
 
@@ -216,21 +215,21 @@ class SanityTest(unittest.TestCase):
     def test_leaflist_max_elements(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.llstring.extend([str(i) for i in range(8)])
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     # not supported leaf
     def test_not_supported_leaf(self):
         runner = self._create_runner()
         runner.not_supported_1.not_supported_leaf = 'leaf value'
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     # not supported container
     def test_not_supported_container(self):
         runner = self._create_runner()
         runner.not_supported_1.not_supported_1_2.some_leaf = 'some leaf'
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     # not supported list
@@ -240,7 +239,7 @@ class SanityTest(unittest.TestCase):
         for i in range(5):
             elems.append(runner.NotSupported2())
         runner.not_supported_2.extend(elems)
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
     # Will only test max-elements. If min-elements is set, then this
@@ -248,7 +247,7 @@ class SanityTest(unittest.TestCase):
     def test_leaflist_max_elements(self):
         runner = self._create_runner()
         runner.ytypes.built_in_t.llstring.extend([str(i) for i in range(20)])
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, runner)
 
 

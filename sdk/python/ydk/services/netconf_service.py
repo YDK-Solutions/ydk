@@ -21,7 +21,7 @@
 from .executor_service import ExecutorService
 from .service import Service
 from enum import Enum
-from ydk.errors import YPYDataValidationError
+from ydk.errors import YPYModelError
 try:
     from ydk.models.ietf import ietf_netconf
     from ydk.models.ietf import ietf_netconf_with_defaults
@@ -61,7 +61,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -83,7 +83,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -102,7 +102,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -129,7 +129,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -156,7 +156,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -186,7 +186,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -210,7 +210,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -234,7 +234,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -272,7 +272,7 @@ class NetconfService(Service):
                    An empty data container indicates that the request did not produce any results
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -305,7 +305,7 @@ class NetconfService(Service):
                    An empty data container indicates that the request did not produce any results
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -334,7 +334,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -356,7 +356,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -380,7 +380,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -404,7 +404,7 @@ class NetconfService(Service):
                  - ok reply if operation succeeds else, raises an exception
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation error occurs.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation error occurs.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -435,7 +435,7 @@ def _get_rpc_datastore_object(datastore, rpc_datastore_type):
         rpc_datastore_type.startup = Empty()
         return rpc_datastore_type
     else:
-        raise YPYDataValidationError('Invalid datastore specified')
+        raise YPYModelError('Invalid datastore specified')
 
 
 def payload_convert(payload):

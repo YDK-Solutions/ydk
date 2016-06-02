@@ -45,7 +45,7 @@ class CRUDService(Service):
                  None
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be 
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
@@ -68,7 +68,7 @@ class CRUDService(Service):
                  None
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed. 
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed. 
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be a service side error
               or if there isn't enough information in the entity to prepare the message (missing keys for example)
                   
@@ -91,7 +91,7 @@ class CRUDService(Service):
                  None
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be a service side error
               or if there isn't enough information in the entity to prepare the message (missing keys for example)
                   
@@ -120,7 +120,7 @@ class CRUDService(Service):
                  The entity or entities as identified by the read_filter.
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed.
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed.
               `YPYServicesError <ydk.errors.html#ydk.errors.YPYServicesError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)

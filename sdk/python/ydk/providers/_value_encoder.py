@@ -22,7 +22,6 @@ import logging
 
 from ydk._core._dm_meta_info import REFERENCE_BITS, \
     REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_LEAFLIST
-from ydk.errors import YPYDataValidationError
 from ydk.types import Empty, Decimal64, YListItem
 
 import ydk.models._yang_ns as _yang_ns

@@ -27,7 +27,6 @@ class YPYErrorCode(Enum):
     ''' Exception Enum for YDK errors '''
     INVALID_UNION_VALUE = 'Cannot translate union value'
     INVALID_ENCODE_VALUE = 'Cannot encode value'
-    OOR_VALUE = 'Value is out of range'
 
     INVALID_HIERARCHY_PARENT = 'Parent is not set. \
                     Parent Hierarchy cannot be determined'
@@ -37,6 +36,9 @@ class YPYErrorCode(Enum):
     INVALID_MODIFY = 'Entity is read-only, cannot modify a read-only entity.'
     SERVER_REJ = 'Server rejected request.'
     SERVER_COMMIT_ERR = 'Server reported an error while committing change.'
+
+    INVALID_TYPE = 'Cannot encode value'
+    INVALID_VALUE = 'Value is out of range'
 
 class YPYError(Exception):
     ''' Base Exception for YDK Errors '''

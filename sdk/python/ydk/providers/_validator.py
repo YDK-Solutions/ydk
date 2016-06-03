@@ -32,9 +32,7 @@ def validate_entity(entity, optype):
     i_errors = []
     validate_entity_delegate(entity, optype, i_errors)
     if len(i_errors) > 0:
-        # _i_errors = map((lambda t: '%s:\n    %s: %s' % t), i_errors)
-        # _i_errors = map((lambda t: '%s: (%s, %s)' % t), i_errors)
-        _i_errors = map((lambda t: '%s: %s' % t), i_errors)
+        _i_errors = map((lambda t: '%s: (%s, %s)' % t), i_errors)
         _i_errors.insert(0, '')
         errmsg = '\n  '.join(_i_errors)
         raise YPYModelError(errmsg)
@@ -221,7 +219,7 @@ def _handle_error(meta, parent, i_errors, errmsg=None, errcode=None):
         errcode = YPYErrorCode.INVALID_ENCODE_VALUE
     if errmsg is None:
         errmsg = errcode.value
-    entry = (path, errmsg)
+    entry = (path, errcode.name, errmsg)
 
-    services_logger.error('Validation error for property %s . Error message %s.' % entry)
+    services_logger.error('Validation error for property %s . Error message (%s, %s).' % entry)
     i_errors.append(entry)

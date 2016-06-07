@@ -83,12 +83,12 @@ class YPYModelError(YPYError):
     def __init__(self, errmsg):
         super(YPYModelError, self).__init__(error_msg=errmsg)
 
-class YPYServicesError(YPYError):
+class YPYServiceError(YPYError):
     '''
     Exception for Service Side Validation
     '''
     def __init__(self, errcode=None, errmsg=None):
-        super(YPYServicesError, self).__init__(error_code=errcode, error_msg=errmsg)
+        super(YPYServiceError, self).__init__(error_code=errcode, error_msg=errmsg)
 
 class YPYServiceProviderError(YPYError):
     '''

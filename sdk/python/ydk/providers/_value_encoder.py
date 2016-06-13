@@ -75,7 +75,7 @@ class ValueEncoder(object):
                 text = value
             elif member.ptype == 'int' and isinstance(value, int):
                 text = str(value)
-            elif member.ptype == 'long' and isinstance(value, long):
+            elif member.ptype == 'long' and isinstance(value, (int, long)):
                 text = str(value)
             else:
                 ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')

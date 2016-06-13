@@ -48,7 +48,6 @@ def validate_entity_delegate(entity, optype, errors):
         Note this method will raise ydk.errors.YPYModelError if validation fails
     """
     for member in entity.i_meta.meta_info_class_members:
-        # print member.mtype, member.name
         value = eval('entity.%s' % member.presentation_name)
         if isinstance(value, READ) or isinstance(value, DELETE):
             continue
@@ -79,6 +78,7 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             % (meta.pmodule_name, meta.clazz_name.split('.')[0])
         exec exec_import
 
+    isNumber = False
     path = '%s.%s' % (parent.i_meta.name, meta.presentation_name)
 
     if meta.mtype in (REFERENCE_IDENTITY_CLASS,
@@ -116,7 +116,7 @@ def _dm_validate_value(meta, value, parent, optype, errors):
                 enum_found = True
                 break
         if not enum_found:
-            errmsg = "Invalid enum, type = %s" % value
+            errmsg = "Invalid type: '%s'. Expected type: Enum" % (type(value).__name__)
             _handle_error(meta, parent, errors, errmsg)
         return value
 
@@ -127,26 +127,8 @@ def _dm_validate_value(meta, value, parent, optype, errors):
         return value
 
     elif isinstance(value, eval(meta._ptype)):
-        if isinstance(value, int) or isinstance(value, long):
-            if len(meta._range) > 0:
-                valid = False
-                for prange in meta._range:
-                    if type(prange) == tuple:
-                        pmin, pmax = prange
-                        if value >= pmin and value <= pmax:
-                            valid = True
-                            break
-                    else:
-                        if value == prange:
-                            valid = True
-                            break
-                if not valid:
-                    errcode = YPYErrorCode.INVALID_VALUE
-                    _range = str(meta._range) if len(meta._range) > 1 else str(meta._range[0])
-                    errmsg = '{}: {} not in {}'.format(errcode.value, value, _range)
-                    _handle_error(meta, parent, errors, errmsg, errcode)
-
-            return value
+        if isinstance(value, (int, long)):
+            return _validate_number(meta, value, parent, errors)
         elif isinstance(value, str):
             if len(meta._range) > 0:
                 valid = False
@@ -181,6 +163,9 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             # enum, etc.
             return value
 
+    elif isinstance(value, (int, long)) and eval(meta._ptype) in (int,long):
+        return _validate_number(meta, value, parent, errors)
+
     elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_LEAFLIST:
         # A leaf list.
         min_elements = meta.min_elements if meta.min_elements else 0
@@ -211,6 +196,25 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             errmsg = "Invalid type: '%s'. Expected type: '%s'" % (type(value).__name__, meta._ptype)
             _handle_error(meta, parent, errors, errmsg)
 
+def _validate_number(meta, value, parent, errors):
+    if len(meta._range) > 0:
+        valid = False
+        for prange in meta._range:
+            if type(prange) == tuple:
+                pmin, pmax = prange
+                if value >= pmin and value <= pmax:
+                    valid = True
+                    break
+            else:
+                if value == prange:
+                    valid = True
+                    break
+        if not valid:
+            errcode = YPYErrorCode.INVALID_VALUE
+            _range = str(meta._range) if len(meta._range) > 1 else str(meta._range[0])
+            errmsg = '{}: {} not in {}'.format(errcode.value, value, _range)
+            _handle_error(meta, parent, errors, errmsg, errcode)
+    return value
 
 def _handle_error(meta, parent, errors, errmsg=None, errcode=None):
     services_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')

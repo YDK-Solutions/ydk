@@ -56,95 +56,146 @@ class SanityTest(unittest.TestCase):
         return runner
 
     def test_int8_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number8 = 8.5
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.number8 = 8.5
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.number8: (INVALID_TYPE, Invalid type: 'float'. Expected type: 'int')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_int16_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number16 = {}
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.number16 = {}
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.number16: (INVALID_TYPE, Invalid type: 'dict'. Expected type: 'int')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_int32_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number32 = []
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.number32 = []
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.number32: (INVALID_TYPE, Invalid type: 'list'. Expected type: 'int')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_int64_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.number64 = 9223372036854775808
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.number64 = 9223372036854775808
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.number64: (INVALID_VALUE, Value is out of range: 9223372036854775808 not in (-9223372036854775808, 9223372036854775807))"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_uint8_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number8 = -1
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.u_number8 = -1
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.u_number8: (INVALID_VALUE, Value is out of range: -1 not in (0, 255))"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_uint16_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number16 = 'not an uint'
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
-
-    def test_uint16_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number16 = 'not an uint'
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.u_number16 = 'not an uint'
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.u_number16: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'int')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_uint32_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number32 = 4294967296
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.u_number32 = 4294967296
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.u_number32: (INVALID_VALUE, Value is out of range: 4294967296 not in (0, 4294967295))"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
-    def test_uint64_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.u_number64 = 18446744073709551616
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYError,
-            self.crud.create, self.ncc, runner)
+    def test_uint64_invalid_1(self):
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.u_number64 = -1
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.u_number64: (INVALID_VALUE, Value is out of range: -1 not in (0, 18446744073709551615L))"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
-    # but invalid input is sent to the device
+    def test_uint64_invalid_2(self):
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.u_number64 = 18446744073709551616
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.u_number64: (INVALID_VALUE, Value is out of range: 18446744073709551616 not in (0, 18446744073709551615L))"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
+
     def test_string_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.name = ['name_str']
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
-        # self.crud.create(self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.name = ['name_str']
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.name: (INVALID_TYPE, Invalid type: 'list'. Expected type: 'str')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_empty_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.emptee = '0'
-        
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.emptee = '0'
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.emptee: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'Empty')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_boolean_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.bool_value = ''
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.bool_value = ''
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.bool_value: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'bool')"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
     def test_enum_invalid(self):
-        runner = self._create_runner()
-        runner.ytypes.built_in_t.enum_value = 'not an enum'
-        # self.crud.create(self.ncc, runner)
-        self.assertRaises(YPYModelError,
-            self.crud.create, self.ncc, runner)
+        try:
+            runner = self._create_runner()
+            runner.ytypes.built_in_t.enum_value = 'not an enum'
+            self.crud.create(self.ncc, runner)
+        except YPYModelError as err:
+            expected_msg = "Runner.Ytypes.BuiltInT.enum_value: (INVALID_TYPE, Invalid type: 'str'. Expected type: Enum)"
+            self.assertEqual(err.errmsg.strip(), expected_msg)
+        else:
+            raise Exception('YPYModelError not raised')
 
 

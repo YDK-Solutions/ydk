@@ -39,8 +39,8 @@ class ExecutorService(Service):
                  None
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation.
-              `YPYError <ydk.errors.html#ydk.errors.YPYError>`_ if other error has occurred. Possible errors could be 
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation.
+              `YPYServiceError <ydk.errors.html#ydk.errors.YPYServiceError>`_ if other error has occurred. Possible errors could be 
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """

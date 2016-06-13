@@ -230,7 +230,6 @@ class NamedElement(Element):
             element = element.owner
         return '::'.join(reversed(names))
 
-
 class Package(NamedElement):
 
     """
@@ -282,7 +281,6 @@ class Package(NamedElement):
         else:
             return False
 
-
 class DataType(NamedElement):
 
     """
@@ -291,7 +289,6 @@ class DataType(NamedElement):
 
     def __init__(self):
         super(DataType, self).__init__()
-
 
 class Class(NamedElement):
 
@@ -497,7 +494,6 @@ class Class(NamedElement):
         else:
             return False
 
-
 class AnyXml(NamedElement):
 
     """
@@ -522,7 +518,6 @@ class AnyXml(NamedElement):
 
     def properties(self):
         return get_properties(self.owned_elements)
-
 
 class Bits(DataType):
 
@@ -583,7 +578,6 @@ class Bits(DataType):
             pos_stmt = bit_stmt.search_one('position')
             if pos_stmt is not None:
                 self._pos_map[bit_stmt.arg] = pos_stmt.arg
-
 
 class Property(NamedElement):
 

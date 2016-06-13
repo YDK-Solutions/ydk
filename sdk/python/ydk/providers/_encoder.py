@@ -24,7 +24,6 @@ from lxml import etree
 from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_LIST , REFERENCE_LEAFLIST, \
                                  REFERENCE_UNION, ANYXML_CLASS, REFERENCE_BITS, \
                                  REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
-from ydk.errors import YPYDataValidationError, YPYError
 from ydk.types import Empty, DELETE, READ, Decimal64, YList, YLeafList, YListItem
 
 import ydk.models._yang_ns as _yang_ns

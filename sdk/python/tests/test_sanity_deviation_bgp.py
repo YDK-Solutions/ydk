@@ -15,14 +15,13 @@
 # ------------------------------------------------------------------
 
 import ydk.types as ytypes
-import unittest
-# from errors import YPYDataValidationError 
+import unittest 
 
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
 from tests.compare import is_equal
-from ydk.errors import YPYError, YPYDataValidationError
+from ydk.errors import YPYError, YPYModelError
 from ydk.models.bgp import bgp
 from ydk.models.routing.routing_policy import DefaultPolicyTypeEnum, RoutingPolicy
 
@@ -60,7 +59,7 @@ class SanityTest(unittest.TestCase):
             DefaultPolicyTypeEnum.ACCEPT_ROUTE
         bgp_cfg.global_.afi_safis.afi_safi.append(ipv4_afsf)
 
-        self.assertRaises(YPYDataValidationError,
+        self.assertRaises(YPYModelError,
             self.crud.create, self.ncc, bgp_cfg)
 
 

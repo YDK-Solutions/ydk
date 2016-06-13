@@ -22,7 +22,7 @@
      CRUDService: Provide Create/Read/Update/Delete API's 
      
 """
-from ydk.errors import YPYError
+from ydk.errors import YPYServiceError
 from ydk.types import YList
 from .service import Service
 from meta_service import MetaService
@@ -45,8 +45,8 @@ class CRUDService(Service):
                  None
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation.
-              `YPYError <ydk.errors.html#ydk.errors.YPYError>`_ if other error has occurred. Possible errors could be 
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation.
+              `YPYServiceError <ydk.errors.html#ydk.errors.YPYServiceError>`_ if other error has occurred. Possible errors could be 
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
                   
@@ -68,8 +68,8 @@ class CRUDService(Service):
                  None
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed. 
-              `YPYError <ydk.errors.html#ydk.errors.YPYError>`_ if other error has occurred. Possible errors could be a service side error
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed. 
+              `YPYServiceError <ydk.errors.html#ydk.errors.YPYServiceError>`_ if other error has occurred. Possible errors could be a service side error
               or if there isn't enough information in the entity to prepare the message (missing keys for example)
                   
         """
@@ -85,14 +85,14 @@ class CRUDService(Service):
 
            Note:
                - A given member of an entity can be deleted by setting its attribute to an instance of ydk.types.Delete class.
-               - An entity can only be updated if it exists on the server. Otherwise a YPYError will be raised
+               - An entity can only be updated if it exists on the server. Otherwise a YPYServiceError will be raised
 
            Returns:
                  None
 
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed.
-              `YPYError <ydk.errors.html#ydk.errors.YPYError>`_ if other error has occurred. Possible errors could be a service side error
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed.
+              `YPYServiceError <ydk.errors.html#ydk.errors.YPYServiceError>`_ if other error has occurred. Possible errors could be a service side error
               or if there isn't enough information in the entity to prepare the message (missing keys for example)
                   
         """
@@ -120,8 +120,8 @@ class CRUDService(Service):
                  The entity or entities as identified by the read_filter.
         
            Raises:
-              `YPYDataValidationError <ydk.errors.html#ydk.errors.YPYDataValidationError>`_ if validation failed.
-              `YPYError <ydk.errors.html#ydk.errors.YPYError>`_ if other error has occurred. Possible errors could be
+              `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if validation failed.
+              `YPYServiceError <ydk.errors.html#ydk.errors.YPYServiceError>`_ if other error has occurred. Possible errors could be
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
                   - if the type to be returned cannot be determined.
@@ -150,11 +150,11 @@ class CRUDService(Service):
     def _perform_read_filter_check(self, read_filter):
         if read_filter is None:
             self.crudLogger.error('Passed in a none filter')
-            raise YPYError('Filter cannot be None')
+            raise YPYServiceError('Filter cannot be None')
 
         if not isinstance(read_filter, YList) and not hasattr(read_filter, '_meta_info'):
             self.crudLogger.error('Illegal filter type passed in for read')
-            raise YPYError('Illegal filter')
+            raise YPYServiceError('Illegal filter')
 
     def _entity_exists(self, provider, entity):
         read_entity = self.read(provider,
@@ -162,7 +162,7 @@ class CRUDService(Service):
 
         if not read_entity._has_data():
             self.service_logger.error('Entity does not exist on remote server. Cannot perform update operations.')
-            raise YPYError('Entity does not exist on remote server. Cannot perform update operation.')
+            raise YPYServiceError('Entity does not exist on remote server. Cannot perform update operation.')
 
         return True
 

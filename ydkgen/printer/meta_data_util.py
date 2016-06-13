@@ -271,6 +271,8 @@ def get_meta_info_data(prop, property_type, type_stmt):
             raise EmitError('Illegal Code path')
         elif isinstance(type_spec, IntTypeSpec):
             meta_info_data.ptype = 'int'
+            if not isinstance(type_spec.min, int) or not isinstance(type_spec.max, int):
+                meta_info_data.ptype = 'long'
             meta_info_data.doc_link += meta_info_data.ptype
             meta_info_data.prange.append((type_spec.min, type_spec.max))
         elif isinstance(type_spec, LengthTypeSpec):

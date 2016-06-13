@@ -266,7 +266,7 @@ _deviation_table = {
         'deviation_typ' : 'replace',
         'keyword_value' : [
             ('type', 
-                _MetaInfoClassMember('u_number32', ATTRIBUTE, 'int' , None, None, 
+                _MetaInfoClassMember('u_number32', ATTRIBUTE, 'long' , None, None, 
                     [(0, 18446744073709551615L)], [], 
                     '''                    32 bit uinteger value type
                     ''',

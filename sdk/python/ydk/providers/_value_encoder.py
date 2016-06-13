@@ -22,7 +22,6 @@ import logging
 
 from ydk._core._dm_meta_info import REFERENCE_BITS, \
     REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_LEAFLIST
-from ydk.errors import YPYDataValidationError, YPYError
 from ydk.types import Empty, Decimal64, YListItem
 
 import ydk.models._yang_ns as _yang_ns
@@ -76,7 +75,7 @@ class ValueEncoder(object):
                 text = value
             elif member.ptype == 'int' and isinstance(value, int):
                 text = str(value)
-            elif member.ptype == 'long' and isinstance(value, long):
+            elif member.ptype == 'long' and isinstance(value, (int, long)):
                 text = str(value)
             else:
                 ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')

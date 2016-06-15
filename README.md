@@ -6,7 +6,18 @@
 [![Coverage Status](https://coveralls.io/repos/github/CiscoDevNet/ydk-gen/badge.svg?branch=master)](https://coveralls.io/github/CiscoDevNet/ydk-gen?branch=master)
 
 
-**ydk-gen** is a tool which is meant to be used to generate bindings for different languages like python, C++ etc from a given set of YANG models. The input YANG models are specified in a profile file.
+**ydk-gen** is a developer tool that can generate API bindings to YANG data models for, today, Python. Work is underway to support C++, and the ydk-gen may be used as the starting point for supporting bindings to any language.
+
+Other tools and libraries are used to deliver ydk-gen's functionality. In particular:
+
+* YANG model analysis and code generation is implemented as an extension to [pyang](https://github.com/mbj4668/pyang)
+* Core libraries are built on [ncclient](https://github.com/ncclient/ncclient)
+* Documentation is generated using [Sphinx](http://www.sphinx-doc.org/en/stable/)
+
+Of course, many other libraries are used as an integral part of ydk-gen and its dependencies, too many to mention!
+
+Developers can either use pre-packaged generated code (e.g. [ydk-py](http://cs.co/ydk-py)), or they can define the YANG models that code is to be generated for are specified in a profile file. This gives a developer the ability to customize the scope of their SDK based on their requirements.
+
 
 ##System Requirements:
 

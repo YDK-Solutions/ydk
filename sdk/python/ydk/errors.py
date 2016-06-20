@@ -40,25 +40,26 @@ class YPYErrorCode(Enum):
     INVALID_TYPE = 'Cannot encode value'
     INVALID_VALUE = 'Value is out of range'
 
+
 class YPYError(Exception):
     ''' Base Exception for YDK Errors '''
     def __init__(self, error_code=None, error_msg=None):
-        self.errcode = error_code
-        self.errmsg = error_msg
+        self.code = error_code
+        self.message = error_msg
 
     def __str__(self):
         ret = None
-        if self.errcode is None:
-            ret = self.errmsg
+        if self.code is None:
+            ret = self.message
             return ret
         else:
-            ret = self.errcode.value
-            if self.errmsg is not None:
+            ret = self.code.value
+            if self.message is not None:
                 ret = [ret]
                 parser = etree.XMLParser(remove_blank_text=True)
-                root = etree.XML(self.errmsg.xml, parser)
+                root = etree.XML(self.message.xml, parser)
                 for r in root.iter():
-                    tag = r.tag[r.tag.rfind('}') + 1 :]
+                    tag = r.tag[r.tag.rfind('}') + 1:]
                     if r.text is not None:
                         ret.append('\t{}: {}'.format(tag, r.text.strip()))
                 ret = '\n'.join(ret)
@@ -83,19 +84,20 @@ class YPYModelError(YPYError):
     def __init__(self, errmsg):
         super(YPYModelError, self).__init__(error_msg=errmsg)
 
+
 class YPYServiceError(YPYError):
     '''
     Exception for Service Side Validation
     '''
     def __init__(self, errcode=None, errmsg=None):
-        super(YPYServiceError, self).__init__(error_code=errcode, error_msg=errmsg)
+        super(YPYServiceError, self).__init__(
+            error_code=errcode, error_msg=errmsg)
+
 
 class YPYServiceProviderError(YPYError):
     '''
     Exception for Provider Side Validation
     '''
     def __init__(self, errcode=None, errmsg=None):
-        super(YPYServiceProviderError, self).__init__(error_code=errcode, error_msg=errmsg)
-
-
-
+        super(YPYServiceProviderError, self).__init__(
+            error_code=errcode, error_msg=errmsg)

@@ -99,7 +99,7 @@ class YdkGenException(Exception):
         self.msg = msg
         logger = logging.getLogger('ydkgen')
         if len(logger.handlers) == 1:
-            print >> sys.stderr, msg
+            print msg
 
 
 def yang_id(stmt):

@@ -125,12 +125,15 @@ function run_sanity_tests {
     cp -r gen-api/python/ydk/models/* sdk/python/ydk/models
     run_test sdk/python/tests/test_sanity_codec.py
     run_test sdk/python/tests/test_sanity_types.py
+    run_test sdk/python/tests/test_sanity_errors.py
     run_test sdk/python/tests/test_sanity_filters.py
     run_test sdk/python/tests/test_sanity_levels.py
     run_test sdk/python/tests/test_sanity_filter_read.py
     run_test sdk/python/tests/test_sanity_netconf.py
     run_test sdk/python/tests/test_sanity_rpc.py
     run_test sdk/python/tests/test_sanity_delete.py
+    run_test sdk/python/tests/test_sanity_service_errors.py
+
 
     export PYTHONPATH=./gen-api/python:$PYTHONPATH
     run_test gen-api/python/ydk/tests/import_tests.py

@@ -19,8 +19,7 @@
 
 """
 import importlib
-
-from ydk.errors import YPYModelError
+from ydk.errors import YPYModelError, YPYServiceError
 from ydk.types import YList, READ, DELETE, YListItem, YLeafList
 from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, \
     REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_BITS, REFERENCE_UNION, ANYXML_CLASS
@@ -46,6 +45,9 @@ class MetaService(Service):
                 `YPYModelError <ydk.errors.html#ydk.errors.YPYModelError>`_ if try to access an unsupported feature.
 
         """
+        if None in (capabilities, entity):
+            err_msg = "'capabilities' and 'entity' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         deviation_tables = MetaService.get_active_deviation_tables(capabilities, entity)
         MetaService.inject_imeta(entity, deviation_tables)
         return entity
@@ -170,7 +172,6 @@ def modify_member_meta(full_name, deviation_table, member):
                 raise YPYModelError(
                     "Key {} not found in {}".format(member.presentation_name))
     return member
-
 
 def inject_imeta_helper(entity, deviation_table, parent=None):
     """ Inject i_meta field to entity """

@@ -21,7 +21,7 @@
 from .executor_service import ExecutorService
 from .service import Service
 from enum import Enum
-from ydk.errors import YPYModelError
+from ydk.errors import YPYModelError, YPYServiceError
 try:
     from ydk.models.ietf import ietf_netconf
     from ydk.models.ietf import ietf_netconf_with_defaults
@@ -161,11 +161,15 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert target is not None
-        assert source is not None
+        if None in (target, source):
+            self.service_logger.error('Passed in a None arg')
+            err_msg = "'target' and 'source' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
 
-        if with_defaults_option is not None:
-            assert isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsMode_Enum)
+        # from pdb import set_trace; set_trace()
+        if with_defaults_option is not None and not isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsModeEnum):
+            err_msg = "optional arg 'with_defaults_option' must be of type ietf_netconf_with_defaults.WithDefaultsModeEnum"
+            raise YPYServiceError(errmsg=err_msg)
 
         self.service_logger.info('Executing copy-config RPC')
 
@@ -191,7 +195,9 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert target is not None
+        if target is None:
+            err_msg = "'target' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         self.service_logger.info('Executing delete-config RPC')
 
         rpc = ietf_netconf.DeleteConfigRpc()
@@ -239,15 +245,20 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert target is not None
-        assert config is not None
+        if None in (target, config):
+            self.service_logger.error('Passed in a None arg')
+            err_msg = "'target' and 'config' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
 
-        if default_operation is not None:
-            assert isinstance(default_operation, ietf_netconf.EditConfigRpc.Input.DefaultOperation_Enum)
-        if error_option is not None:
-            assert isinstance(error_option, ietf_netconf.EditConfigRpc.Input.ErrorOption_Enum)
-        if test_option is not None:
-            assert isinstance(test_option, ietf_netconf.EditConfigRpc.Input.TestOption_Enum)
+        if default_operation is not None and not isinstance(default_operation, ietf_netconf.EditConfigRpc.Input.DefaultOperationEnum):
+            err_msg = "optional arg 'default_operation' must be of type ietf_netconf.EditConfigRpc.Input.DefaultOperationEnum"
+            raise YPYServiceError(errmsg=err_msg)
+        if error_option is not None and not isinstance(error_option, ietf_netconf.EditConfigRpc.Input.ErrorOptionEnum):
+            err_msg = "optional arg 'error_option' must be of type ietf_netconf.EditConfigRpc.Input.ErrorOptionEnum"
+            raise YPYServiceError(errmsg=err_msg)
+        if test_option is not None and not isinstance(test_option, ietf_netconf.EditConfigRpc.Input.TestOptionEnum):
+            err_msg = "optional arg 'test_option' must be of type ietf_netconf.EditConfigRpc.Input.TestOptionEnum"
+            raise YPYServiceError(errmsg=err_msg)
 
         self.service_logger.info('Executing edit-config RPC')
 
@@ -277,11 +288,13 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert source is not None
+        if source is None:
+            err_msg = "'source' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
 
-
-        if with_defaults_option is not None:
-            assert isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsMode_Enum)
+        if with_defaults_option is not None and not isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsModeEnum):
+            err_msg = "optional arg 'with_defaults_option' must be of type ietf_netconf_with_defaults.WithDefaultsModeEnum"
+            raise YPYServiceError(errmsg=err_msg)
 
         self.service_logger.info('Executing get-config RPC')
 
@@ -311,9 +324,9 @@ class NetconfService(Service):
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
 
-        if with_defaults_option is not None:
-            assert isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsMode_Enum)
-
+        if with_defaults_option is not None and not isinstance(with_defaults_option, ietf_netconf_with_defaults.WithDefaultsModeEnum):
+            err_msg = "optional arg 'with_defaults_option' must be of type ietf_netconf_with_defaults.WithDefaultsModeEnum"
+            raise YPYServiceError(errmsg=err_msg)
         self.service_logger.info('Executing get RPC')
 
         rpc = ietf_netconf.GetRpc()
@@ -361,7 +374,9 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert target is not None
+        if target is None:
+            err_msg = "'target' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         self.service_logger.info('Executing lock RPC')
 
         rpc = ietf_netconf.LockRpc()
@@ -385,7 +400,9 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert target is not None
+        if target is None:
+            err_msg = "'target' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         self.service_logger.info('Executing unlock RPC')
 
         rpc = ietf_netconf.UnlockRpc()
@@ -409,7 +426,9 @@ class NetconfService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
-        assert source is not None or config is not None
+        if source is None and config is None:
+            err_msg = "'source' and 'config' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         self.service_logger.info('Executing validate RPC')
 
         rpc = ietf_netconf.ValidateRpc()

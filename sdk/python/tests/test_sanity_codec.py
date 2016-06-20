@@ -24,6 +24,7 @@ from tests.compare import is_equal
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import CodecServiceProvider
 from ydk.services import CodecService
+from ydk.errors import YPYServiceError
 
 
 class SanityYang(unittest.TestCase):
@@ -113,9 +114,69 @@ class SanityYang(unittest.TestCase):
         payload = self.codec.encode(self.provider, r_1)
         self.assertEqual(self._enum_payload_1, payload)
 
+    def test_encode_invalid_1(self):
+        try:
+            self.codec.encode(self.provider, None)
+        except YPYServiceError as err:
+            self.assertEqual(
+                err.message, "'encoder' and 'entity' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
+
+    def test_encode_invalid_2(self):
+        try:
+            self.codec.encode(None, self._get_runner_entity())
+        except YPYServiceError as e:
+            err = e
+            self.assertEqual(
+                err.message, "'encoder' and 'entity' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
+
+    def test_encode_invalid_3(self):
+        try:
+            self.codec.encode(None, None)
+        except YPYServiceError as e:
+            err = e
+            self.assertEqual(
+                err.message, "'encoder' and 'entity' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
+
     def test_decode_1(self):
         entity = self.codec.decode(self.provider, self._enum_payload_2)
-        self.assertEqual(self._enum_payload_2, self.codec.encode(self.provider, entity))
+        self.assertEqual(
+            self._enum_payload_2, self.codec.encode(self.provider, entity))
+
+    def test_decode_invalid_1(self):
+        try:
+            self.codec.decode(None, self._enum_payload_2)
+        except YPYServiceError as e:
+            err = e
+            self.assertEqual(
+                err.message, "'decoder' and 'payload' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
+
+    def test_decode_invalid_2(self):
+        try:
+            self.codec.decode(self.provider, None)
+        except YPYServiceError as e:
+            err = e
+            self.assertEqual(
+                err.message, "'decoder' and 'payload' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
+
+    def test_decode_invalid_3(self):
+        try:
+            self.codec.decode(None, None)
+        except YPYServiceError as e:
+            err = e
+            self.assertEqual(
+                err.message, "'decoder' and 'payload' cannot be None")
+        else:
+            raise Exception('YPYServiceError not raised')
 
     def test_encode_decode(self):
         r_1 = self._get_runner_entity()

@@ -134,7 +134,7 @@ class SanityRpc(unittest.TestCase):
             self.executor.execute_rpc(self.ncc, runner)
         except Exception as e:
             self.assertIsInstance(e, YPYError)
-            self.assertEqual(e.errcode, YPYErrorCode.INVALID_RPC)
+            self.assertEqual(e.code, YPYErrorCode.INVALID_RPC)
 
     '''TODO: get-schema rpc is not yet supported on netsim
     def test_execute_get_schema(self):

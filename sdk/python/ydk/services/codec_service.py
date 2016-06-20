@@ -22,20 +22,27 @@ from .service import Service
 from meta_service import MetaService
 import logging
 
+from ydk.errors import YPYServiceError
+
 
 class CodecService(Service):
-    """ Codec Service to encode and decode XML, JSON and other protocol payloads """
+    """Codec Service to encode and decode
+    XML, JSON and other protocol payloads """
     def __init__(self):
         self.service_logger = logging.getLogger(__name__)
 
     def encode(self, encoder, entity):
-        assert encoder is not None, 'Encoder should be valid object'
+        if None in (encoder, entity):
+            err_msg = "'encoder' and 'entity' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         payload = self.operate_on_object_or_dictionary(entity, CodecService._encode_entity, [encoder])
         self.service_logger.info('Encoding operation completed\n')
         return payload
 
     def decode(self, decoder, payload):
-        assert decoder is not None, 'Decoder should be valid object'
+        if None in (decoder, payload):
+            err_msg = "'decoder' and 'payload' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         entity = self.operate_on_object_or_dictionary(payload, CodecService._decode_payload, [decoder])
         self.service_logger.info('Decoding operation completed\n')
         return entity

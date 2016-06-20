@@ -19,6 +19,7 @@
      
 """
 from .service import Service
+from ydk.errors import YPYServiceError
 from meta_service import MetaService
 import logging
 
@@ -44,6 +45,10 @@ class ExecutorService(Service):
                   - a server side error
                   - if there isn't enough information in the entity to prepare the message (missing keys for example)
         """
+        if None in (provider, rpc):
+            self.service_logger.error('Passed in a None arg')
+            err_msg = "'provider' and 'rpc' cannot be None"
+            raise YPYServiceError(errmsg=err_msg)
         try:
             rpc = MetaService.normalize_meta(provider._get_capabilities(), rpc)
             return provider.execute(

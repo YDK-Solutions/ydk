@@ -62,7 +62,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.number8: (INVALID_TYPE, Invalid type: 'float'. Expected type: 'int')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -73,7 +73,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.number16: (INVALID_TYPE, Invalid type: 'dict'. Expected type: 'int')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -84,7 +84,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.number32: (INVALID_TYPE, Invalid type: 'list'. Expected type: 'int')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -95,7 +95,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.number64: (INVALID_VALUE, Value is out of range: 9223372036854775808 not in (-9223372036854775808, 9223372036854775807))"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -106,7 +106,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.u_number8: (INVALID_VALUE, Value is out of range: -1 not in (0, 255))"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -117,7 +117,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.u_number16: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'int')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -128,7 +128,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.u_number32: (INVALID_VALUE, Value is out of range: 4294967296 not in (0, 4294967295))"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -139,7 +139,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.u_number64: (INVALID_VALUE, Value is out of range: -1 not in (0, 18446744073709551615L))"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -150,7 +150,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.u_number64: (INVALID_VALUE, Value is out of range: 18446744073709551616 not in (0, 18446744073709551615L))"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -161,7 +161,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.name: (INVALID_TYPE, Invalid type: 'list'. Expected type: 'str')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -172,7 +172,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.emptee: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'Empty')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -183,7 +183,7 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.bool_value: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'bool')"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
@@ -194,8 +194,9 @@ class SanityTest(unittest.TestCase):
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
             expected_msg = "Runner.Ytypes.BuiltInT.enum_value: (INVALID_TYPE, Invalid type: 'str'. Expected type: Enum)"
-            self.assertEqual(err.errmsg.strip(), expected_msg)
+            self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
 
-
+if __name__ == '__main__':
+    unittest.main()

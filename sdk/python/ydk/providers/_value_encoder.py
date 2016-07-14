@@ -33,7 +33,7 @@ class ValueEncoder(object):
         text = ''
         if member.mtype == REFERENCE_IDENTITY_CLASS:
             module = importlib.import_module(member.pmodule_name)
-            clazz = getattr(module, member.clazz_name)
+            clazz = reduce(getattr, member.clazz_name.split('.'), module)
 
             if issubclass(type(value), clazz):
                 identity_inst = value
@@ -53,9 +53,8 @@ class ValueEncoder(object):
                     text = value
         elif member.mtype == REFERENCE_ENUM_CLASS or 'Enum' in member.ptype:
             enum_value = value
-            exec_import = 'from ' + member.pmodule_name + ' import ' + member.clazz_name.split('.')[0]
-            exec exec_import
-            enum_clazz = eval(member.clazz_name)
+            module = importlib.import_module(member.pmodule_name)
+            enum_clazz = reduce(getattr, member.clazz_name.split('.'), module)
             literal_map = enum_clazz._meta_info().literal_map
             for yang_enum_name in literal_map:
                 literal = literal_map[yang_enum_name]
@@ -82,4 +81,3 @@ class ValueEncoder(object):
             ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
             ydk_logger.info('Could not encode leaf {0}, type: {1}, {2} value: {3}'.format(member.name, member.mtype, member.ptype, value))
         return text
-

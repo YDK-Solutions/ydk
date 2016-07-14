@@ -267,10 +267,8 @@ class XmlDecoder(object):
 
     @staticmethod
     def _bind_to_enum_helper(member, elem):
-        exec_import = 'from ' + member.pmodule_name + ' import ' + member.clazz_name.split('.')[0]
-        exec exec_import
-        # first get the enum_class
-        meta_info = eval('%s._meta_info()' % member.clazz_name)
+        enum_clazz = get_class(member.pmodule_name, member.clazz_name)
+        meta_info = enum_clazz._meta_info()
         enum_literal_key = elem.text
         if enum_literal_key not in meta_info.literal_map:
             sp_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
@@ -281,15 +279,15 @@ class XmlDecoder(object):
             if enum_literal_key.upper() in meta_info.literal_map:
                 sp_logger.debug('Found literal using secondary mechanism')
                 enum_literal = meta_info.literal_map[enum_literal_key.upper()]
-                return eval('%s.%s' % (member.clazz_name, enum_literal))
+                return getattr(enum_clazz, enum_literal)
 
             elif enum_literal_key.lower() in meta_info.literal_map:
                 sp_logger.debug('Found literal using secondary mechanism')
                 enum_literal = meta_info.literal_map[enum_literal_key.lower()]
-                return eval('%s.%s' % (member.clazz_name, enum_literal))
+                return getattr(enum_clazz, enum_literal)
         else:
             enum_literal = meta_info.literal_map[enum_literal_key]
-            return eval('%s.%s' % (member.clazz_name, enum_literal))
+            return getattr(enum_clazz, enum_literal)
 
 
 def get_class(py_mod_name, clazz_name):
@@ -394,4 +392,3 @@ def is_digit(n):
         return True
     except ValueError:
         return  False
-

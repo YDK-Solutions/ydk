@@ -219,7 +219,10 @@ def get_meta_info_data(prop, property_type, type_stmt, identity_subclasses=None)
                 ))
             meta_info_data.doc_link_description = 'one of the below types:'
 
-        if prop.is_many:
+        if prop.stmt.keyword == 'leaf-list':
+            meta_info_data.mtype = 'REFERENCE_LEAFLIST'
+            meta_info_data.doc_link = 'list of %s' % meta_info_data.doc_link
+        elif prop.stmt.keyword == 'list':
             meta_info_data.mtype = 'REFERENCE_LIST'
             meta_info_data.doc_link_description = 'list of %s' % meta_info_data.doc_link_description
         elif property_type.is_identity():

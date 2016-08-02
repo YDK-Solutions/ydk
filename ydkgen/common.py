@@ -1,3 +1,4 @@
+from __future__ import print_function
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -99,7 +100,7 @@ class YdkGenException(Exception):
         self.msg = msg
         logger = logging.getLogger('ydkgen')
         if len(logger.handlers) == 1:
-            print msg
+            print(msg)
 
 
 def yang_id(stmt):

@@ -542,7 +542,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('u_number32', ATTRIBUTE, 'long' , None, None, 
-                    [(0, 18446744073709551615L)], [], 
+                    [(0, 18446744073709551615)], [], 
                     '''                    32 bit uinteger value type
                     ''',
                     'u_number32',

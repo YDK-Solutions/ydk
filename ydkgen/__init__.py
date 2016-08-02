@@ -16,6 +16,7 @@
 """
 Generate YDK core library, profile package and bundle packages.
 """
+from __future__ import print_function
 import os
 import json
 import shutil
@@ -328,20 +329,20 @@ def _modify_python_setup(gen_api_root, pkg_name, version, dependencies=None):
     for line in fileinput.input(setup_file, inplace=True):
         if not replaced_package and "$PACKAGE$" in line:
             replaced_package = True
-            print line.replace("$PACKAGE$", pkg_name),
+            print(line.replace("$PACKAGE$", pkg_name), end='')
         elif not replaced_version and "$VERSION$" in line:
             replaced_version = True
-            print line.replace("$VERSION$", version),
+            print(line.replace("$VERSION$", version), end='')
         elif not replaced_dependencies and "$DEPENDENCY$" in line:
             replaced_dependencies = True
             if dependencies:
                 additional_requires = ["'ydk-models-%s>=%s'" % (d.name, d.str_version)
                                        for d in dependencies]
-                print line.replace("'$DEPENDENCY$'", ", ".join(additional_requires))
+                print(line.replace("'$DEPENDENCY$'", ", ".join(additional_requires)))
             else:
-                print line.replace("'$DEPENDENCY$'", "")
+                print(line.replace("'$DEPENDENCY$'", ""))
         else:
-            print line,
+            print(line, end='')
 
 
 # Generator checks #####################################################

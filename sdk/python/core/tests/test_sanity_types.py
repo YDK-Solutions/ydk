@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -23,7 +26,7 @@ from ydk.models import ydktest_sanity_types as ysanity_types
 from ydk.models import ydktest_types as y_types
 from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
-from compare import is_equal
+from .compare import is_equal
 from ydk.errors import YPYError, YPYModelError
 
 from ydk.models.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum

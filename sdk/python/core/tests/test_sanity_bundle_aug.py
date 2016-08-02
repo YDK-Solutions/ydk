@@ -17,11 +17,12 @@
     test_sanity_bundle_augmentation.py
         Unittest for bundle augmentation.
 """
+from __future__ import absolute_import
 import unittest
 
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
-from compare import is_equal
+from .compare import is_equal
 
 
 class SanityYang(unittest.TestCase):

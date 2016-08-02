@@ -20,6 +20,7 @@
    uses ncclient (a Netconf client library) to provide CRUD services.
 
 """
+from builtins import object
 
 
 class ServiceProvider(object):

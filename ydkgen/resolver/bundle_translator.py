@@ -21,6 +21,7 @@ Translate profile file to profile file to bundle file.
 Regular expression taken from:
 https://github.com/xym-tool/symd/blob/master/symd.py.
 """
+from __future__ import print_function
 import os
 import re
 import sys
@@ -162,6 +163,16 @@ def get_git_attrs(repos, root, remote=None):
         rmtree(tmp_dir)
 
 
+<<<<<<< bfba8b25b66229bc100c5f5004168a1428e2ce43
+=======
+def check_envs():
+    if 'YDKGEN_HOME' not in os.environ:
+        logger.error('YDKGEN_HOME not set.')
+        print("Need to have YDKGEN_HOME set!", file=sys.stderr)
+        sys.exit(1)
+
+
+>>>>>>> stage1/safe changes, trivial tweaking
 def load_profile_attr(profile_file, attr):
     with open(profile_file) as f:
         data = json.load(f)

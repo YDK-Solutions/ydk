@@ -17,9 +17,11 @@
 """test_sanity_codec.py
 sanity test for CodecService
 """
+from __future__ import absolute_import
+from builtins import str
 
 import unittest
-from compare import is_equal
+from .compare import is_equal
 
 from ydk.models import ydktest_sanity as ysanity
 from ydk.models import oc_pattern

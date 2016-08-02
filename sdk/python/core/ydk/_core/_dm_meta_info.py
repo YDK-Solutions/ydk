@@ -1,3 +1,4 @@
+from builtins import object
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #

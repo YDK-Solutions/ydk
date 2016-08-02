@@ -17,9 +17,10 @@
 """test_sanity_rpc.py
 sanity test for netconf
 """
+from __future__ import absolute_import
 
 import unittest
-from compare import is_equal
+from .compare import is_equal
 
 from ydk.errors import YPYModelError, YPYError
 from ydk.models import ydktest_sanity as ysanity

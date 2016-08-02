@@ -19,9 +19,13 @@
    Contains type definitions.
 
 """
+from __future__ import absolute_import
+from past.builtins import cmp
+from builtins import str
+from builtins import object
 
 from decimal import Decimal, getcontext
-from errors import YPYModelError
+from .errors import YPYModelError
 
 
 class DELETE(object):

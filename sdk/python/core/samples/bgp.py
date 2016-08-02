@@ -24,11 +24,13 @@
 
 
 
+from __future__ import print_function
+from __future__ import absolute_import
 from ydk.types import Empty
 from ydk.services import CRUDService
 import logging
 
-from session_mgr import establish_session, init_logging
+from .session_mgr import establish_session, init_logging
 from ydk.models.openconfig import bgp
 from ydk.models.openconfig.bgp_types import Ipv4UnicastIdentity
 from ydk.models.openconfig.bgp_types import Ipv6UnicastIdentity
@@ -83,7 +85,7 @@ def bgp_run(crud_service, session):
     try:
         crud_service.delete(session, bgp_cfg)
     except Exception:
-        print 'BGP config does not exist!'
+        print('BGP config does not exist!')
 
     #set up routing policy definition
     routing_policy = RoutingPolicy()
@@ -92,7 +94,7 @@ def bgp_run(crud_service, session):
     try:
         crud_service.delete(session, routing_policy)
     except YPYError:
-        print 'Routing policy does not exist!'
+        print('Routing policy does not exist!')
 
     pass_all_policy_defn = RoutingPolicy.PolicyDefinitions.PolicyDefinition()
     pass_all_policy_defn.name = 'PASS-ALL'
@@ -187,7 +189,7 @@ def bgp_run(crud_service, session):
 
 
     # help(nbr_ipv6_read)
-    print nbr_ipv6_read
+    print(nbr_ipv6_read)
 
     #crud_service.read(session,bgp_cfg1)
 

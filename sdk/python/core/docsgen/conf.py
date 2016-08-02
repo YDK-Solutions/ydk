@@ -17,7 +17,7 @@ import os
 import shlex
 import sphinx_rtd_theme
 
-if not os.environ.has_key('YDKGEN_HOME'):
+if 'YDKGEN_HOME' not in os.environ:
     ydk_root = os.getcwd()
 else:
     ydk_root = os.environ['YDKGEN_HOME']

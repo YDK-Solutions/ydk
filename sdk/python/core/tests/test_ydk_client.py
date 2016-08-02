@@ -17,8 +17,11 @@
     test_ydk_client.py
         Unittest for DELETE object.
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
 import unittest
-from compare import is_equal
+from .compare import is_equal
 
 from ydk.services import NetconfService
 from ydk.providers import NativeNetconfServiceProvider, NetconfServiceProvider
@@ -92,8 +95,8 @@ class SanityTest(unittest.TestCase):
         native_end_time = time.time()
         ncc_result = self.netconf_service.get(ncc, None)
         ncc_end_time = time.time()
-        print 'Native client time taken: ' + str(native_end_time - start_time) + ' seconds'
-        print 'NCClient time taken: ' + str(ncc_end_time - native_end_time) + ' seconds'
+        print('Native client time taken: ' + str(native_end_time - start_time) + ' seconds')
+        print('NCClient time taken: ' + str(ncc_end_time - native_end_time) + ' seconds')
         self.assertEqual(True, is_equal(native_result, ncc_result))
 
 

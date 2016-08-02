@@ -20,6 +20,7 @@
 #
 
 # import providers, services and models
+from __future__ import print_function
 import ydk_client
 
 if __name__ == "__main__":
@@ -28,9 +29,9 @@ if __name__ == "__main__":
     # create ydk_client
     client = ydk_client.NetconfClient("admin", "admin", "127.0.0.1", 12022, 0)
     result = client.connect()
-    print 'Created native ydk_client and tried to connect to router with result: ', 'SUCCESS' if result == 0 else 'ERROR'
+    print('Created native ydk_client and tried to connect to router with result: ', 'SUCCESS' if result == 0 else 'ERROR')
     client.close()
-    print 'Native ydk_client test completed successfully'
+    print('Native ydk_client test completed successfully')
     exit()
 # End of script
 

@@ -20,9 +20,10 @@
  The meta-model of the generated API.
  Translation process converts the YANG model to classes defined in this module.
 """
+from __future__ import absolute_import
 
-from common import camel_case, iskeyword
-from common import snake_case, escape_name
+from .common import camel_case, iskeyword
+from .common import snake_case, escape_name
 
 from pyang.types import UnionTypeSpec
 
@@ -410,7 +411,7 @@ class Class(NamedElement):
         return imported_types
     
     def _get_union_types(self, type_stmt, p):
-        from builder import TypesExtractor
+        from .builder import TypesExtractor
         prop_type = TypesExtractor().get_property_type(type_stmt)
         prop_types = [prop_type]
         if isinstance(prop_type, UnionTypeSpec):

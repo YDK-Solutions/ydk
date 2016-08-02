@@ -1,3 +1,4 @@
+from __future__ import print_function
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -101,7 +102,7 @@ def read_interfaces(crud_service, provider):
         for interface in interfaces.interface:
             print_interface(interface)
     except YPYError:
-        print 'An error occurred reading interfaces.'
+        print('An error occurred reading interfaces.')
 
 
 def create_interfaces_config(crud_service, provider):
@@ -113,7 +114,7 @@ def create_interfaces_config(crud_service, provider):
     try:
         crud_service.create(provider, interface)
     except YPYError:
-        print 'An error occurred creating the interface.'
+        print('An error occurred creating the interface.')
 
 
 

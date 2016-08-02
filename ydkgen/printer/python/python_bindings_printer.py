@@ -18,6 +18,7 @@
    YDK PY converter
 
 '''
+from __future__ import print_function
 
 
 import os
@@ -67,7 +68,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
             self.print_module(index, package, size)
 
     def print_module(self, index, package, size):
-        print 'Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref)
+        print('Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref))
 
         # Skip generating module for empty modules
         if len(package.owned_elements) == 0:

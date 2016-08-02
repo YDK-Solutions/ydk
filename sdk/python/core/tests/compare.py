@@ -16,6 +16,9 @@
 """compare.py
 return True if attributes in entity(lhs) = entity(rhs)
 """
+from builtins import str
+from builtins import zip
+from builtins import object
 
 import logging
 from enum import Enum
@@ -28,7 +31,7 @@ LOGGER.setLevel(logging.DEBUG)
 
 def is_builtin_type(attr):
     # all the deridved types should have __cmp__ implemented
-    if (isinstance(attr, (int, bool, dict, str, long, float)) or
+    if (isinstance(attr, (int, bool, dict, str, int, float)) or
             isinstance(attr, (Enum, Empty, Decimal64, FixedBitsDict)) or
             isinstance(attr, (YLeafList, YListItem))):
         return True
@@ -88,8 +91,10 @@ def is_equal(lhs, rhs):
         if len(lhs) != len(rhs):
             errtyp, ret = ErrNo.WRONG_VALUE, False
         else:
-            cmp_lst = zip(lhs, rhs)
-            ret = reduce(lambda init, (l, r): init and is_equal(l,r), cmp_lst, True)
+            cmp_lst = list(zip(lhs, rhs))
+            ret = True
+            for (left, right) in cmp_lst:
+                ret |= is_equal(left, right)
     elif lhs.__class__ != rhs.__class__:
         errtyp, ret = ErrNo.WRONG_CLASS, False
     else:

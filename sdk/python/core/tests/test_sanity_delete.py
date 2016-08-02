@@ -17,13 +17,16 @@
     test_sanity_delete.py
         Unittest for DELETE object.
 """
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
 import ydk.types as ytypes
 import unittest
 
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64, YLeafList
-from compare import is_equal
+from .compare import is_equal
 from ydk.errors import YPYError
 from ydk.models import ydktest_sanity as ysanity
 

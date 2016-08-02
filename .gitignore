@@ -11,6 +11,7 @@ netconf.log
 protocol.log
 myenv
 mypython
+mypython3
 v/
 gittmp*/
 .DS_Store

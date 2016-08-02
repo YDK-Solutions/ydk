@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -22,7 +23,7 @@
 #  open-config bgp yang module.
 #
 
-
+from __future__ import print_function
 from ydk.providers import CodecServiceProvider
 from ydk.services import CodecService
 
@@ -41,7 +42,7 @@ def bgp_run(codec_service, provider):
 def run_routing(codec_service, provider):
     routing_policy = _get_routing_cfg()
     routing_payload = codec_service.encode(provider, routing_policy)
-    print routing_payload
+    print(routing_payload)
     routing_entity = codec_service.decode(provider, routing_payload)
 #     print 'Encoded payload:\n', routing_payload, \
 #             '\nRe-encode the decoded payload:\n', codec_service.encode(provider, routing_entity)

@@ -17,9 +17,11 @@
 """test_sanity_nested_containers.py
 sanity test for ydktest-sanity.yang
 """
+from __future__ import absolute_import
+from builtins import str
 
 import unittest
-from compare import is_equal
+from .compare import is_equal
 
 from ydk.types import Empty
 from ydk.models import ydktest_sanity as ysanity

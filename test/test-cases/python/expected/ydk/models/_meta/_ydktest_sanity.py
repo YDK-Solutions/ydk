@@ -870,7 +870,7 @@ _meta_table = {
                 'u_number32',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('u_number64', ATTRIBUTE, 'long' , None, None, 
-                [(0, 18446744073709551615L)], [], 
+                [(0, 18446744073709551615)], [], 
                 '''                64 bit uinteger value type
                 ''',
                 'u_number64',

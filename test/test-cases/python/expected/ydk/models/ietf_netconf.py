@@ -16,6 +16,7 @@ This version of this YANG module is part of RFC 6241; see
 the RFC itself for full legal notices.
 
 """
+from builtins import object
 
 
 import re

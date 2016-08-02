@@ -11,6 +11,8 @@ Copyright (c) 2013\-2014 by Cisco Systems, Inc.
 All rights reserved.
 
 """
+from builtins import str
+from builtins import object
 
 
 import re

@@ -19,6 +19,7 @@
    uses ncclient (a Netconf client library) to provide CRUD services.
 
 """
+from builtins import int, map, str
 from ._value_encoder import ValueEncoder
 from ydk.errors import YPYModelError, YPYErrorCode
 from ydk.types import READ, DELETE, Decimal64, Empty, YList, YLeafList, YListItem
@@ -27,13 +28,14 @@ from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_L
 
 import logging
 import importlib
+from functools import reduce
 
 
 def validate_entity(entity, optype):
     errors = []
     validate_entity_delegate(entity, optype, errors)
     if len(errors) > 0:
-        _errors = map((lambda t: '%s: (%s, %s)' % t), errors)
+        _errors = list(map((lambda t: '%s: (%s, %s)' % t), errors))
         _errors.insert(0, '')
         errmsg = '\n  '.join(_errors)
         raise YPYModelError(errmsg)
@@ -71,13 +73,13 @@ def _dm_validate_value(meta, value, parent, optype, errors):
         value = value.item
 
     if meta._ptype == 'Empty':
-        exec 'from ydk.types import Empty'
+        exec('from ydk.types import Empty')
     elif meta._ptype == 'Decimal64':
-        exec 'from ydk.types import Decimal64'
+        exec('from ydk.types import Decimal64')
     elif 'Enum' in meta._ptype:
         exec_import = 'from %s import %s' \
             % (meta.pmodule_name, meta.clazz_name.split('.')[0])
-        exec exec_import
+        exec(exec_import)
 
     isNumber = False
     path = '%s.%s' % (parent.i_meta.name, meta.presentation_name)
@@ -125,7 +127,7 @@ def _dm_validate_value(meta, value, parent, optype, errors):
         return value
 
     elif value.__class__.__name__ == meta._ptype:
-        if isinstance(value, (int, long)):
+        if isinstance(value, (int, int)):
             return _validate_number(meta, value, parent, errors)
         elif isinstance(value, str):
             if len(meta._range) > 0:
@@ -161,7 +163,7 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             # enum, etc.
             return value
 
-    elif isinstance(value, (int, long)) and meta._ptype in ('int', 'long'):
+    elif isinstance(value, int) and meta._ptype == 'int':
         return _validate_number(meta, value, parent, errors)
 
     elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_LEAFLIST:
@@ -200,6 +202,7 @@ def _validate_number(meta, value, parent, errors):
         for prange in meta._range:
             if type(prange) == tuple:
                 pmin, pmax = prange
+                pmin, pmax = int(pmin), int(pmax)
                 if value >= pmin and value <= pmax:
                     valid = True
                     break

@@ -18,6 +18,7 @@
    Encoder.
 
 """
+from builtins import object
 from ._validator import validate_entity
 from ._value_encoder import ValueEncoder
 from lxml import etree
@@ -35,7 +36,7 @@ class XmlEncoder(object):
 
     def encode(self, entity):
         ''' Convert the entity to an xml payload '''
-        return etree.tostring(self.encode_to_xml(entity, etree.Element('a'), ''), method='xml', pretty_print='True')
+        return etree.tostring(self.encode_to_xml(entity, etree.Element('a'), ''), method='xml', pretty_print='True', encoding='utf-8').decode('utf-8')
 
     def encode_to_xml(self, entity, root, optype, is_filter=False):
         ''' Convert the entity to an xml payload '''

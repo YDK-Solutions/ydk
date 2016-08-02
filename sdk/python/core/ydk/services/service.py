@@ -19,6 +19,7 @@
    The base Service class.
 
 """
+from builtins import object
 
 
 class Service(object):
@@ -27,7 +28,7 @@ class Service(object):
         result=None
         if isinstance(entity, dict):
             result = {}
-            for module, child in entity.iteritems():
+            for module, child in entity.items():
                 result[module] = function(child, *args)
         else:
             result = function(entity, *args)

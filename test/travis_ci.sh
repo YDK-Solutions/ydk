@@ -97,6 +97,11 @@ function setup_env {
 
     cd $YDKGEN_HOME
     virtualenv myenv
+    virtualenv -p python3 mypython3
+    source mypython3/bin/activate
+    pip install coverage
+    pip install -r requirements.txt
+    deactivate
     source myenv/bin/activate
     pip install coverage
     pip install -r requirements.txt
@@ -215,6 +220,8 @@ function run_sanity_native_tests {
 
 function run_sanity_tests {
     print_msg "In Method: run_sanity_tests"
+    deactivate
+    source $YDKGEN_HOME/mypython3/bin/activate
     pip install gen-api/python/dist/ydk*.tar.gz
 
     printf "\nRunning sanity tests\n"
@@ -233,11 +240,7 @@ function run_sanity_tests {
 function run_ydk_model_tests {
     print_msg "In Method: run_ydk_model_tests"
     cd $YDKGEN_HOME
-
-    virtualenv myenv
-    source myenv/bin/activate
-    pip install coverage
-    pip install -r requirements.txt
+    source mypython3/bin/activate
 
     printf "\nGenerating ydk model APIs for testing\n"
     python generate.py --profile profiles/test/ydk-models-test.json --verbose
@@ -306,6 +309,7 @@ function run_cmake_tests {
 function run_deviation_sanity {
     print_msg "In Method: run_deviation_sanity"
     cd $YDKGEN_HOME
+    source mypython3/bin/activate
     rm -rf gen-api/python/*
     # ydktest deviation
     cp_fxs $YDKTEST_DEVIATION_SOURCE_FXS $YDKTEST_DEST_FXS
@@ -341,6 +345,7 @@ function generate_ydktest_augm_packages {
 # install ydktest augmentation packages
 function install_ydktest_augm_packages {
     print_msg "In Method: install_ydktest_augm_packages"
+    source $YDKGEN_HOME/mypython3/bin/activate
     pip uninstall ydk -y
     CORE_PKG=$(find gen-api/python/ydk/dist -name "ydk*.tar.gz")
     AUGM_BASE_PKG=$(find gen-api/python/ietf/dist -name "ydk*.tar.gz")
@@ -400,6 +405,7 @@ cp_fxs $YDKGEN_HOME/yang/ydktest $YDKTEST_MODEL_DEST_FXS
 init_confd $YDKTEST_DEST_FXS
 #run_pygen_test
 generate_ydktest_package
+
 run_sanity_tests
 submit_coverage
 run_cpp_gen_tests

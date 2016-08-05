@@ -29,7 +29,8 @@ import logging
 import argparse
 import subprocess
 from difflib import context_diff
-from itertools import filterfalse, tee
+from itertools import tee
+from future.moves.itertools import filterfalse
 from unittest import TestCase, TestSuite, TextTestRunner
 
 import pip

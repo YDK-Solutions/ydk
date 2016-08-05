@@ -41,7 +41,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -70,7 +70,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -93,7 +93,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -191,12 +191,12 @@ _meta_table = {
                 'ref_one_name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('ref-three-sub1-sub2-number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                ''',
                 'ref_three_sub1_sub2_number',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('ref-two-sub1-number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                ''',
                 'ref_two_sub1_number',
                 'ydktest-sanity', False),
@@ -249,7 +249,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                Integer key for not supported list
                 ''',
                 'number',
@@ -272,7 +272,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity-augm', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -295,7 +295,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -318,7 +318,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -341,7 +341,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -426,7 +426,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -443,7 +443,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -472,7 +472,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -495,7 +495,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -518,7 +518,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -547,7 +547,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -593,7 +593,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -616,7 +616,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -639,7 +639,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -662,7 +662,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -767,7 +767,7 @@ _meta_table = {
                         'enum_int_value',
                         'ydktest-sanity', False),
                     _MetaInfoClassMember('enum-int-value', ATTRIBUTE, 'int' , None, None, 
-                        [(1, 4096)], [], 
+                        [('1', '4096')], [], 
                         '''                        enum int type
                         ''',
                         'enum_int_value',
@@ -797,7 +797,7 @@ _meta_table = {
                 'identity_ref_value',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('leaf-ref', ATTRIBUTE, 'int' , None, None, 
-                [(-128, 127)], [], 
+                [('-128', '127')], [], 
                 '''                leaf-ref
                 ''',
                 'leaf_ref',
@@ -815,7 +815,7 @@ _meta_table = {
                 'llunion',
                 'ydktest-sanity', False, [
                     _MetaInfoClassMember('llunion', REFERENCE_LEAFLIST, 'int' , None, None, 
-                        [(-32768, 32767)], [], 
+                        [('-32768', '32767')], [], 
                         '''                        A list of union
                         ''',
                         'llunion',
@@ -834,49 +834,49 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number16', ATTRIBUTE, 'int' , None, None, 
-                [(-32768, 32767)], [], 
+                [('-32768', '32767')], [], 
                 '''                16 bit integer value type
                 ''',
                 'number16',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number32', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number32',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number64', ATTRIBUTE, 'int' , None, None, 
-                [(-9223372036854775808, 9223372036854775807)], [], 
+                [('-9223372036854775808', '9223372036854775807')], [], 
                 '''                integer value type
                 ''',
                 'number64',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number8', ATTRIBUTE, 'int' , None, None, 
-                [(-128, 127)], [], 
+                [('-128', '127')], [], 
                 '''                 8 bit integer value type
                 ''',
                 'number8',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('u_number16', ATTRIBUTE, 'int' , None, None, 
-                [(0, 65535)], [], 
+                [('0', '65535')], [], 
                 '''                16 bit uinteger value type
                 ''',
                 'u_number16',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('u_number32', ATTRIBUTE, 'int' , None, None, 
-                [(0, 4294967295)], [], 
+                [('0', '4294967295')], [], 
                 '''                32 bit uinteger value type
                 ''',
                 'u_number32',
                 'ydktest-sanity', False),
-            _MetaInfoClassMember('u_number64', ATTRIBUTE, 'long' , None, None, 
-                [(0, 18446744073709551615)], [], 
+            _MetaInfoClassMember('u_number64', ATTRIBUTE, 'int' , None, None, 
+                [('0', '18446744073709551615')], [], 
                 '''                64 bit uinteger value type
                 ''',
                 'u_number64',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('u_number8', ATTRIBUTE, 'int' , None, None, 
-                [(0, 255)], [], 
+                [('0', '255')], [], 
                 '''                 8 bit uinteger value type
                 ''',
                 'u_number8',
@@ -894,7 +894,7 @@ _meta_table = {
                         'younion',
                         'ydktest-sanity', False),
                     _MetaInfoClassMember('younion', ATTRIBUTE, 'int' , None, None, 
-                        [(0, 63)], [], 
+                        [('0', '63')], [], 
                         '''                        union test value
                         ''',
                         'younion',
@@ -913,7 +913,7 @@ _meta_table = {
                         'younion_list',
                         'ydktest-sanity', False, [
                             _MetaInfoClassMember('younion-list', REFERENCE_LEAFLIST, 'int' , None, None, 
-                                [(0, 4294967295)], [], 
+                                [('0', '4294967295')], [], 
                                 '''                                members of the younion
                                 ''',
                                 'younion_list',
@@ -951,7 +951,7 @@ _meta_table = {
                         'younion_recursive',
                         'ydktest-sanity', False, [
                             _MetaInfoClassMember('younion-recursive', ATTRIBUTE, 'int' , None, None, 
-                                [(0, 4294967295)], [], 
+                                [('0', '4294967295')], [], 
                                 '''                                Recursive union leaf
                                 ''',
                                 'younion_recursive',
@@ -964,7 +964,7 @@ _meta_table = {
                                 'ydktest-sanity', False),
                         ]),
                     _MetaInfoClassMember('younion-recursive', ATTRIBUTE, 'int' , None, None, 
-                        [(-128, 127)], [], 
+                        [('-128', '127')], [], 
                         '''                        Recursive union leaf
                         ''',
                         'younion_recursive',
@@ -1106,7 +1106,7 @@ _meta_table = {
                 'name',
                 'ydktest-sanity', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',

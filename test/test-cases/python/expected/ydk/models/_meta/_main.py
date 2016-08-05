@@ -36,7 +36,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('three', ATTRIBUTE, 'int' , None, None, 
-                [(-32768, 32767)], [], 
+                [('-32768', '32767')], [], 
                 '''                blah
                 ''',
                 'three',
@@ -53,7 +53,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('poo', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                blah
                 ''',
                 'poo',
@@ -70,7 +70,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('meh', ATTRIBUTE, 'int' , None, None, 
-                [(-128, 127)], [], 
+                [('-128', '127')], [], 
                 '''                blah
                 ''',
                 'meh',
@@ -129,7 +129,7 @@ _meta_table = {
                 'main_aug3_d',
                 'main-aug3', False),
             _MetaInfoClassMember('one', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                blah
                 ''',
                 'one',

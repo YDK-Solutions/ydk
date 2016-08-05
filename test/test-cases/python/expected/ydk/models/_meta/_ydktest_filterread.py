@@ -139,7 +139,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                ''',
                 'number',
                 'ydktest-filterread', True),

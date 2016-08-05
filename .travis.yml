@@ -25,6 +25,7 @@ script:
     - deactivate
     - virtualenv -p python3 mypython3
     - source mypython3/bin/activate
+    - pip install -r requirements.txt
     - pip install gen-api/python/dist/*
     - export PYTHONPATH=gen-api/python:$PYTHONPATH
     - python gen-api/python/tests/test_sanity_codec.py

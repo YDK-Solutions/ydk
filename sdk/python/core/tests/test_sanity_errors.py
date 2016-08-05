@@ -25,7 +25,7 @@ from ydk.models import ydktest_sanity as ysanity
 from ydk.models import ydktest_sanity_types as ysanity_types
 from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
 from ydk.types import Empty, DELETE, Decimal64
-from .compare import is_equal
+from compare import is_equal
 from ydk.errors import YPYError, YPYModelError, YPYServiceError
 
 from ydk.models.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum

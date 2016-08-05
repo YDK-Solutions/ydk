@@ -22,7 +22,7 @@ import unittest
 
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
-from .compare import is_equal
+from compare import is_equal
 
 
 class SanityYang(unittest.TestCase):

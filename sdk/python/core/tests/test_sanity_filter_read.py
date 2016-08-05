@@ -20,7 +20,7 @@ read API according to discussion
 from __future__ import absolute_import
 
 import unittest
-from .compare import is_equal
+from compare import is_equal
 from ydk.types import READ, YList
 from ydk.services import CRUDService
 from ydk.models import ydktest_filterread as ysanity

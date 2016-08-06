@@ -23,6 +23,7 @@ script:
     - pip install -r requirements.txt
     - python generate.py --profile profiles/test/ydktest.json
     - deactivate
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
     - virtualenv -p python3 mypython3
     - source mypython3/bin/activate
     - pip install -r requirements.txt

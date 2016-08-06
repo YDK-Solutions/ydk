@@ -68,6 +68,13 @@ function run_test {
 
 function setup_env {
     print_msg "In Method: setup_env"
+
+    printf "\nSetting up locale\n"
+    locale-gen "en_US.UTF-8"
+    export LANG="en_US.UTF-8"
+    export LANGUAGE="en_US:en"
+    export LC_ALL="en_US.UTF-8"
+
     cd $ROOT
     printf "\nCloning from: %s, branch: %s\n" "$REPO" "$BRANCH"
     git clone -b $BRANCH $REPO
@@ -78,7 +85,7 @@ function setup_env {
 
     printf "\nInstalling packages...\n"
     sudo apt-get update
-    sudo apt-get --assume-yes install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libboost-dev libboost-python-dev libtool libssh-dev libcurl4-gnutls-dev cmake
+    sudo apt-get --assume-yes install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libboost-dev libboost-python-dev libtool libssh-dev libcurl4-gnutls-dev cmake python3.4-dev
 
     cd ~
     git clone https://github.com/unittest-cpp/unittest-cpp.git

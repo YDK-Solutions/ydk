@@ -212,7 +212,14 @@ def _validate_number(meta, value, parent, errors):
                     break
         if not valid:
             errcode = YPYErrorCode.INVALID_VALUE
-            _range = str(meta._range) if len(meta._range) > 1 else str(meta._range[0])
+            _range = None
+            size = len(meta._range)
+            if size > 1:
+                _range = str(meta._range)
+            else:
+                (lower, upper) = meta._range[0]
+                lower, upper = int(lower), int(upper)
+                _range = lower, upper
             errmsg = '{}: {} not in range {}'.format(errcode.value, value, _range)
             _handle_error(meta, parent, errors, errmsg, errcode)
     return value

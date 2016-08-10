@@ -297,6 +297,8 @@ class Package(NamedElement):
         else:
             return False
 
+    __hash__ = NamedElement.__hash__
+
 
 class DataType(NamedElement):
 
@@ -524,6 +526,8 @@ class Class(NamedElement):
         else:
             return False
 
+    __hash__ = NamedElement.__hash__
+
 
 class AnyXml(NamedElement):
 
@@ -610,6 +614,8 @@ class Bits(DataType):
             pos_stmt = bit_stmt.search_one('position')
             if pos_stmt is not None:
                 self._pos_map[bit_stmt.arg] = pos_stmt.arg
+
+    __hash__ = DataType.__hash__
 
 
 class Property(NamedElement):

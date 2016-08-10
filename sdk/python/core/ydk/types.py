@@ -54,6 +54,7 @@ class Empty(object):
     def __ne__(self, rhs):
         return not isinstance(rhs, Empty)
 
+    __hash__ = object.__hash__
 
 
 class Decimal64(object):
@@ -151,6 +152,9 @@ class Decimal64(object):
 
         return self_dec >= rhs_dec
 
+    __hash__ = object.__hash__
+
+
 class FixedBitsDict(object):
     """ Super class of all classes that represents the bits type in YANG
 
@@ -187,6 +191,9 @@ class FixedBitsDict(object):
             if self._dictionary[key]:
                 return True
         return False
+
+    __hash__ = object.__hash__
+
 
 class YList(list):
     """ Represents a list with support for hanging a parent
@@ -263,6 +270,9 @@ class YListItem(object):
         else:
             # Enum, Identity, Python primitive types.
             return True
+
+    __hash__ = object.__hash__
+
 
 class YLeafList(YList):
     """ Represents an associate list with support for hanging a parent

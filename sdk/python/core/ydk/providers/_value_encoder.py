@@ -18,7 +18,10 @@
    Value encoder.
 
 """
-from builtins import int, object, str
+from __future__ import unicode_literals
+from builtins import int as newint
+from builtins import str as newstr
+from builtins import object
 import logging
 import importlib
 
@@ -73,10 +76,10 @@ class ValueEncoder(object):
             pass
         elif member.ptype == 'Decimal64' and isinstance(value, Decimal64):
             text = value.s
-        elif member.ptype == 'str' and isinstance(value, str):
-            text = value
-        elif member.ptype == 'int' and isinstance(value, int):
-            text = str(value)
+        elif member.ptype == 'str' and isinstance(value, (str, newstr)):
+            text = newstr(value)
+        elif member.ptype == 'int' and isinstance(value, (int, newint)):
+            text = newstr(value)
         else:
             ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
             ydk_logger.info('Could not encode leaf {0}, type: {1}, {2} value: {3}'.format(member.name, member.mtype, member.ptype, value))

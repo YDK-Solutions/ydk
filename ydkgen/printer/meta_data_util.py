@@ -374,14 +374,14 @@ def get_meta_info_data(prop, property_type, type_stmt, identity_subclasses=None)
 
 def _get_identity_docstring(identity_subclasses, doc_link_template, property_type):
     doc_link = []
-    if property_type in identity_subclasses:
-        for subclass in identity_subclasses[property_type]:
+    if id(property_type) in identity_subclasses:
+        for subclass in identity_subclasses[id(property_type)]:
             doc_link.append(doc_link_template % (
                 subclass.name,
                 subclass.get_py_mod_name(),
                 subclass.qn()
             ))
-            if subclass in identity_subclasses:
+            if id(subclass) in identity_subclasses:
                 doc_link.extend(x for x in _get_identity_docstring(identity_subclasses, doc_link_template, subclass) if x not in doc_link)
     else:
         doc_link.append(doc_link_template % (

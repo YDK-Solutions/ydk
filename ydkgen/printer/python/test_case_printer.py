@@ -92,10 +92,10 @@ class TestCasePrinter(object):
         if isinstance(element, Class):
             for prop in element.properties():
                 if isinstance(prop.property_type, Class) and prop.property_type.is_identity():
-                    ref_class = self.identity_subclasses[prop.property_type][0]
+                    ref_class = self.identity_subclasses[id(prop.property_type)][0]
                     child_class = ref_class
-                    if ref_class in self.identity_subclasses:
-                        child_class = self.identity_subclasses[ref_class][0]
+                    if id(ref_class) in self.identity_subclasses:
+                        child_class = self.identity_subclasses[id(ref_class)][0]
                     leafref_imports.append('from %s import %s' % (child_class.get_py_mod_name(), child_class.qn().split('.')[0]))
                 elif isinstance(prop.property_type, PathTypeSpec):
                     if prop.stmt.i_leafref_ptr is not None:
@@ -324,10 +324,10 @@ class TestCasePrinter(object):
 
         if isinstance(type_spec, Class):
             if type_spec.is_identity():
-                ref_class = self.identity_subclasses[type_spec][0]
+                ref_class = self.identity_subclasses[id(type_spec)][0]
                 child_class = ref_class
-                if ref_class in self.identity_subclasses:
-                    child_class = self.identity_subclasses[ref_class][0]
+                if id(ref_class) in self.identity_subclasses:
+                    child_class = self.identity_subclasses[id(ref_class)][0]
                 self.ctx.writeln(format_string % (obj_name, prop.name, child_class.qn() + '()'))
         elif isinstance(type_spec, Enum):
             self.ctx.writeln(format_string % (obj_name, prop.name, type_spec.qn() + '.' + type_spec.literals[0].name))

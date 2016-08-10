@@ -209,6 +209,20 @@ class YList(list):
         self.parent = None
         self.name = None
 
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            ret = YList()
+            ret.parent = self.parent
+            ret.name = self.name
+            start = 0 if not key.start else key.start
+            step = 1 if not key.step else key.step
+            stop = len(self) if not key.stop else key.stop
+            for k in range(start, stop, step):
+                ret.append(super(YList, self).__getitem__(k))
+        else:
+            ret = super(YList, self).__getitem__(key)
+        return ret
+
     def __getslice__(self, i, j):
         ret = YList()
         ret.parent = self.parent
@@ -276,7 +290,18 @@ class YLeafList(YList):
         super(YLeafList, self).__setitem__(key, lst_item)
 
     def __getitem__(self, key):
-        return super(YLeafList, self).__getitem__(key)
+        if isinstance(key, slice):
+            ret = YLeafList()
+            ret.parent = self.parent
+            ret.name = self.name
+            start = 0 if not key.start else key.start
+            step = 1 if not key.step else key.step
+            stop = len(self) if not key.stop else key.stop
+            for k in range(start, stop, step):
+                ret.append(super(YLeafList, self).__getitem__(k))
+        else:
+            ret = super(YLeafList, self).__getitem__(key)
+        return ret
 
     def __getslice__(self, i, j):
         # override __getslice__ implemented by CPython
@@ -296,7 +321,6 @@ class YLeafList(YList):
     def extend(self, items):
         for item in items:
             self.append(item)
-
 
     def pop(self, i=-1):
         lst_item = super(YLeafList, self).pop(i)

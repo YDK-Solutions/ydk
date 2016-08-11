@@ -148,7 +148,7 @@ function compile_model_test_yang_to_fxs {
 function compile_yang_to_fxs {
     source $CONFD_RC
     cd $1
-    print_msg "In Method: compile_yang_to_fxs"
+    print_msg "In Method: compile_yang_to_fxs in $(pwd)"
     for YANG_FILE in *.yang
     do
         if [[ ${YANG_FILE} != *"submodule"* ]];then
@@ -162,7 +162,7 @@ function compile_yang_to_fxs {
 # move fxs files from $1 to $2
 function cp_fxs {
     cp $1/*.fxs $2
-    print_msg "In Method: cp_fxs"
+    print_msg "In Method: cp_fxs from ${1} to ${2}"
 }
 
 # init confd using confd.conf in $1
@@ -170,7 +170,7 @@ function init_confd {
     source $CONFD_RC
     confd --stop
     cd $1
-    print_msg "In Method: init_confd"
+    print_msg "In Method: init_confd in $(pwd)"
     printf "\nInitializing confd...\n"
     confd -c confd.conf
     cd $YDKGEN_HOME
@@ -342,6 +342,7 @@ function run_deviation_sanity {
 
 # generate ydktest augmentation packages
 function generate_ydktest_augm_packages {
+    print_msg "In Method: generate_ydktest_augm_packages"
     rm -rf gen-api/python/*
     run_test generate.py --core
     run_test generate.py --bundle profiles/test-augmentation/ietf.json --verbose

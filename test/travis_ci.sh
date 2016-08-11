@@ -321,7 +321,7 @@ function run_deviation_sanity {
     # ydktest deviation
     cp_fxs $YDKTEST_DEVIATION_SOURCE_FXS $YDKTEST_DEST_FXS
     init_confd $YDKTEST_DEST_FXS
-    printf "\nGenerating ydktest model APIs with grouping classes\n"
+    printf "\nGenerating ydktest model APIs\n"
     run_test_no_coverage generate.py --profile profiles/test/ydktest.json --python --verbose
     pip install gen-api/python/dist/*.tar.gz
     run_test_no_coverage gen-api/python/tests/test_sanity_deviation.py

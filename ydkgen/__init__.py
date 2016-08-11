@@ -248,7 +248,6 @@ class YdkGenerator(object):
         # clean up gen_api_root
         if not os.path.isdir(gen_api_root):
             os.makedirs(gen_api_root)
-        shutil.rmtree(gen_api_root)
 
         self._copy_sdk_template(gen_api_root, pkg_type)
 
@@ -289,10 +288,10 @@ class YdkGenerator(object):
         template_dir = os.path.join(self.ydk_root, 'sdk', self.language)
         if self.language == 'python':
             template_dir = os.path.join(template_dir, pkg_type)
-        shutil.copytree(template_dir,
-                        gen_api_root,
-                        ignore=shutil.ignore_patterns('.gitignore',
-                                                      'ncclient'))
+        shutil.rmtree(gen_api_root)
+        _copytree(template_dir,
+                  gen_api_root,
+                  ignore=shutil.ignore_patterns('.gitignore', 'ncclient'))
 
 
 def _set_api_pkg_sub_name(bundles, api_pkgs):
@@ -387,3 +386,27 @@ def _check_description_file(description_file):
     if not os.path.isfile(description_file):
         logger.error('Path to description file is not valid.')
         raise YdkGenException('Path to description file is not valid.')
+
+
+def _copytree(src, dst, ignore=None):
+    """For Python3.4. shutil.copytree for symlink directory seems not work."""
+    names = os.listdir(src)
+    if ignore is not None:
+        ignore_names = ignore(src, names)
+    else:
+        ignore_names = set()
+    os.makedirs(dst)
+    for name in names:
+        if name in ignore_names:
+            continue
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        if os.path.islink(srcname):
+            if os.path.isdir(srcname):
+                _copytree(srcname, dstname, ignore)
+            else:
+                shutil.copy(srcname, dstname)
+        elif os.path.isdir(srcname):
+            _copytree(srcname, dstname, ignore)
+        else:
+            shutil.copy(srcname, dstname)

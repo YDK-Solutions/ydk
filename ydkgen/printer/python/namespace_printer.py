@@ -18,7 +18,7 @@
    YDK PY converter
 
 '''
-
+from future.utils import iteritems
 from ydkgen.common import yang_id
 
 from ydkgen.api_model import Class
@@ -72,7 +72,7 @@ class NamespacePrinter(object):
 
     def _print_namespaces_map(self, namespace_map):
         self.ctx.writeln("_namespace_package_map = { \\")
-        for namespace, python_import in sorted(namespace_map.iteritems()):
+        for namespace, python_import in sorted(iteritems(namespace_map)):
             self.ctx.writeln("('%s', '%s') : 'from %s import %s', " % (namespace[0], namespace[1], python_import[0], python_import[1]))
         self.ctx.writeln("}")
         self.ctx.bline()

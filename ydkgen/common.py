@@ -215,6 +215,8 @@ def escape_name(name):
 
 
 def convert_to_reStructuredText(yang_text):
+    if isinstance(yang_text, bytes):
+        yang_text = yang_text.decode('utf-8')
     reSt = yang_text
     if reSt is not None and len(reSt) > 0:
         reSt = yang_text.replace('\\', '\\\\')
@@ -285,5 +287,7 @@ def get_rst_file_name(named_element):
         package = named_element.get_package()
     else:
         package = named_element
-    hex_name = hashlib.sha1(package.bundle_name + named_element.fqn()).hexdigest()
+    filename = package.bundle_name + named_element.fqn()
+    filename = filename.encode('utf-8')
+    hex_name = hashlib.sha1(filename).hexdigest()
     return hex_name

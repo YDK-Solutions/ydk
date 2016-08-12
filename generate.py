@@ -125,8 +125,8 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     logger.error(stderr)
     print(stderr, file=sys.stderr)
     print(stdout)
-    print('*' * 28 + '\n' + 'DOCUMENTATION ERRORS/WARNINGS\n' +
-          '*' * 28 + '\n' + stderr)
+    msg = '%s\nDOCUMENTATION ERRORS/WARNINGS\n%s\n%s' % ('*' * 28, '*' * 28, stderr.decode('utf-8'))
+    print(msg)
 
 
 def create_pip_packages(output_directory):

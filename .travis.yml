@@ -3,6 +3,11 @@ sudo: required
 services:
     - docker
 
+language: python
+python:
+    - 2.7
+    - 3.4
+
 os:
     - linux
     - osx
@@ -18,20 +23,24 @@ script:
     - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
     - export REPO=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_REPO_SLUG; else echo `curl -s $PR | jq -r .head.repo.full_name`; fi)
     - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH, REPO=$REPO"
-    - virtualenv myenv
-    - source myenv/bin/activate
-    - pip install -r requirements.txt
-    - python generate.py --profile profiles/test/ydktest.json
-    - deactivate
-    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
-    - virtualenv -p python3 mypython3
-    - source mypython3/bin/activate
-    - pip install -r requirements.txt
-    - pip install gen-api/python/dist/*
-    - export PYTHONPATH=gen-api/python:$PYTHONPATH
-    - python gen-api/python/tests/test_sanity_codec.py
+    - ./test/osx_linux_tests.sh -g python$TRAVIS_PYTHON_VERSION
+    - ./test/osx_linux_tests.sh -g python$TRAVIS_PYTHON_VERSION -t python3.4
+
+    # - virtualenv myenv
+    # - source myenv/bin/activate
+    # - pip install -r requirements.txt
+    # - python generate.py --profile profiles/test/ydktest.json
+    # - deactivate
+    # - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3; fi
+    # - virtualenv -p python3 mypython3
+    # - source mypython3/bin/activate
+    # - pip install -r requirements.txt
+    # - pip install gen-api/python/dist/*
+    # - export PYTHONPATH=gen-api/python:$PYTHONPATH
+    # - python gen-api/python/tests/test_sanity_codec.py
 #    - cd test && sudo ./test_native_ydk.py
 #    - cd ..
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python$TRAVIS_PYTHON_VERSION; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python$TRAVIS_PYTHON_VERSION -t python3.4; fi
 
 

@@ -12,6 +12,8 @@ protocol.log
 myenv
 mypython
 mypython3
+py2env
+py3env
 v/
 gittmp*/
 .DS_Store

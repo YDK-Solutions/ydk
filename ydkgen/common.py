@@ -266,7 +266,7 @@ def sort_classes_at_same_level(classes, sort_clazz):
             classes_not_processed[clazz] = dependent_siblings
     classes_not_processed = OrderedDict(classes_not_processed.items())
     while len(classes_not_processed) > 0:
-        for clazz in classes_not_processed.keys():
+        for clazz in list(classes_not_processed.keys()):
             dependent_siblings = classes_not_processed[clazz]
 
             not_processed = False

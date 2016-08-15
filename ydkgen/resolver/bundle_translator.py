@@ -163,17 +163,6 @@ def get_git_attrs(repos, root, remote=None):
         logger.debug('Bundle Translator: Removing folder %s' % tmp_dir)
         rmtree(tmp_dir)
 
-
-<<<<<<< bfba8b25b66229bc100c5f5004168a1428e2ce43
-=======
-def check_envs():
-    if 'YDKGEN_HOME' not in os.environ:
-        logger.error('YDKGEN_HOME not set.')
-        print("Need to have YDKGEN_HOME set!", file=sys.stderr)
-        sys.exit(1)
-
-
->>>>>>> stage1/safe changes, trivial tweaking
 def load_profile_attr(profile_file, attr):
     with open(profile_file) as f:
         data = json.load(f)

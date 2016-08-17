@@ -19,7 +19,7 @@
    uses ncclient (a Netconf client library) to provide CRUD services.
 
 """
-from builtins import int, map, str
+from builtins import int, str
 from ._value_encoder import ValueEncoder
 from ydk.errors import YPYModelError, YPYErrorCode
 from ydk.types import READ, DELETE, Decimal64, Empty, YList, YLeafList, YListItem

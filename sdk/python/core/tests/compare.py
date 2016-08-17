@@ -18,7 +18,6 @@ return True if attributes in entity(lhs) = entity(rhs)
 """
 from builtins import str as newstr
 from builtins import int as newint
-from builtins import zip
 
 import logging
 from enum import Enum

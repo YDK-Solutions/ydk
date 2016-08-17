@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 from builtins import str
-from builtins import range
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #

@@ -19,7 +19,6 @@
    uses ncclient (a Netconf client library) to provide CRUD services.
 
 """
-from builtins import object
 from ._ydk_types import _DEFAULT_SERVICE_TYPE, _DEFAULT_TRANSPORT_MODE
 
 

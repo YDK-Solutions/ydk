@@ -17,7 +17,6 @@
 
     Merge _yang_ns for subpackage to a single _yang_ns at runtime.
 """
-from builtins import object
 import importlib
 import pkgutil
 from ydk import models

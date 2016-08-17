@@ -18,7 +18,6 @@
    Encoder.
 
 """
-from builtins import object
 from ._validator import validate_entity
 from ._value_encoder import ValueEncoder
 from lxml import etree

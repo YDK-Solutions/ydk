@@ -19,8 +19,6 @@
    The base Service class.
 
 """
-from builtins import object
-
 
 class Service(object):
     """ Base service class which can be extended for different ways of communicating to remote server """

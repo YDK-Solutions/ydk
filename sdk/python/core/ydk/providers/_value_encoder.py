@@ -21,7 +21,6 @@
 from __future__ import unicode_literals
 from builtins import int as newint
 from builtins import str as newstr
-from builtins import object
 import logging
 import importlib
 

@@ -20,7 +20,6 @@
 
 """
 from __future__ import absolute_import
-from past.builtins import cmp
 from builtins import str
 from builtins import object
 
@@ -76,20 +75,15 @@ class Decimal64(object):
 
         return self.s
 
-    def __cmp__(self, rhs):
-        if not isinstance(rhs, Decimal64):
-            raise YPYModelError("Decimal64 comparision error, invalid rhs\n")
-        return cmp(self.s, rhs.s)
-
     def __eq__(self, rhs):
         if not isinstance(rhs, Decimal64):
             raise YPYModelError("Decimal64 comparision error, invalid rhs\n")
-        return self.__cmp__(rhs) == 0
+        return self.s == rhs.s
 
     def __ne__(self, rhs):
         if not isinstance(rhs, Decimal64):
             raise YPYModelError("Decimal64 comparision error, invalid rhs\n")
-        return self.__cmp__(rhs) != 0
+        return self.s != rhs.s
 
     def __lt__(self, rhs):
         if not isinstance(rhs, Decimal64):

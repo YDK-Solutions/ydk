@@ -19,7 +19,6 @@
 
 """
 from __future__ import unicode_literals
-from builtins import int as newint
 from builtins import str as newstr
 import logging
 import importlib
@@ -30,6 +29,10 @@ from ydk.types import Empty, Decimal64, YListItem
 
 from ._importer import _yang_ns
 from functools import reduce
+
+import sys
+if sys.version_info > (3,):
+    long = int
 
 
 class ValueEncoder(object):
@@ -77,7 +80,9 @@ class ValueEncoder(object):
             text = value.s
         elif member.ptype == 'str' and isinstance(value, (str, newstr)):
             text = newstr(value)
-        elif member.ptype == 'int' and isinstance(value, (int, newint)):
+        elif member.ptype == 'int' and isinstance(value, int):
+            text = newstr(value)
+        elif member.ptype == 'long' and isinstance(value, long):
             text = newstr(value)
         else:
             ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')

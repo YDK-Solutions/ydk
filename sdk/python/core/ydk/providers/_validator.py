@@ -19,7 +19,7 @@
    uses ncclient (a Netconf client library) to provide CRUD services.
 
 """
-from builtins import int, str
+from builtins import str
 from ._value_encoder import ValueEncoder
 from ydk.errors import YPYModelError, YPYErrorCode
 from ydk.types import READ, DELETE, Decimal64, Empty, YList, YLeafList, YListItem
@@ -29,6 +29,10 @@ from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_ENUM_CLASS, REFERENCE_L
 import logging
 import importlib
 from functools import reduce
+
+import sys
+if sys.version_info > (3,):
+    long = int
 
 
 def validate_entity(entity, optype):
@@ -127,7 +131,7 @@ def _dm_validate_value(meta, value, parent, optype, errors):
         return value
 
     elif value.__class__.__name__ == meta._ptype:
-        if isinstance(value, (int, int)):
+        if isinstance(value, (int, long)):
             return _validate_number(meta, value, parent, errors)
         elif isinstance(value, str):
             if len(meta._range) > 0:
@@ -165,6 +169,8 @@ def _dm_validate_value(meta, value, parent, optype, errors):
 
     elif isinstance(value, int) and meta._ptype == 'int':
         return _validate_number(meta, value, parent, errors)
+    elif isinstance(value, long) and meta._ptype == 'long':
+        return _validate_number(meta, valid, parent, errors)
 
     elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_LEAFLIST:
         # A leaf list.
@@ -202,7 +208,10 @@ def _validate_number(meta, value, parent, errors):
         for prange in meta._range:
             if type(prange) == tuple:
                 pmin, pmax = prange
-                pmin, pmax = int(pmin), int(pmax)
+                if meta.ptype == 'int':
+                    pmin, pmax = int(pmin), int(pmax)
+                elif meta.ptype == 'long':
+                    pmin, pmax = long(pmin), long(pmax)
                 if value >= pmin and value <= pmax:
                     valid = True
                     break
@@ -218,7 +227,10 @@ def _validate_number(meta, value, parent, errors):
                 _range = str(meta._range)
             else:
                 (lower, upper) = meta._range[0]
-                lower, upper = int(lower), int(upper)
+                if meta.ptype == 'int':
+                    lower, upper = int(lower), int(upper)
+                elif meta.ptype == 'long':
+                    lower, upper = long(lower), long(upper)
                 _range = lower, upper
             errmsg = '{}: {} not in range {}'.format(errcode.value, value, _range)
             _handle_error(meta, parent, errors, errmsg, errcode)

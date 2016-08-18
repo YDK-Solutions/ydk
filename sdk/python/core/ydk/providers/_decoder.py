@@ -18,7 +18,6 @@
    Decoder.
 
 """
-from builtins import int
 from lxml import etree
 from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_LEAFLIST, \
             REFERENCE_LIST, REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, \

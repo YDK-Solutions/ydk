@@ -167,10 +167,8 @@ def _dm_validate_value(meta, value, parent, optype, errors):
             # enum, etc.
             return value
 
-    elif isinstance(value, int) and meta._ptype == 'int':
+    elif isinstance(value, (int, long)) and meta._ptype == 'int':
         return _validate_number(meta, value, parent, errors)
-    elif isinstance(value, long) and meta._ptype == 'long':
-        return _validate_number(meta, valid, parent, errors)
 
     elif isinstance(value, YLeafList) and meta.mtype == REFERENCE_LEAFLIST:
         # A leaf list.
@@ -210,8 +208,6 @@ def _validate_number(meta, value, parent, errors):
                 pmin, pmax = prange
                 if meta.ptype == 'int':
                     pmin, pmax = int(pmin), int(pmax)
-                elif meta.ptype == 'long':
-                    pmin, pmax = long(pmin), long(pmax)
                 if value >= pmin and value <= pmax:
                     valid = True
                     break
@@ -226,12 +222,8 @@ def _validate_number(meta, value, parent, errors):
             if size > 1:
                 _range = str(meta._range)
             else:
-                (lower, upper) = meta._range[0]
-                if meta.ptype == 'int':
-                    lower, upper = int(lower), int(upper)
-                elif meta.ptype == 'long':
-                    lower, upper = long(lower), long(upper)
-                _range = lower, upper
+                lower, upper = meta._range[0]
+                _range = '(%s, %s)' % (lower, upper)
             errmsg = '{}: {} not in range {}'.format(errcode.value, value, _range)
             _handle_error(meta, parent, errors, errmsg, errcode)
     return value

@@ -19,6 +19,7 @@
   
   YANG model driven API, python emitter.
 """
+from builtins import int as newint
 
 from ydkgen.api_model import Class, Enum, Bits
 from ydkgen.builder import TypesExtractor
@@ -304,7 +305,7 @@ def get_meta_info_data(prop, property_type, type_stmt, identity_subclasses=None)
         elif isinstance(type_spec, Decimal64TypeSpec):
             meta_info_data.ptype = 'Decimal64'
             meta_info_data.prange.append(
-                ('%s' % type_spec.min.s, '%s' % type_spec.max.s))
+                ('%s' % str(type_spec.min.s), '%s' % str(type_spec.max.s)))
             # ' :ref:`Decimal64 <ydk_models_types_Decimal64>`'
             meta_info_data.doc_link += ':py:class:`Decimal64 <ydk.types.Decimal64>`'
         elif isinstance(type_spec, EmptyTypeSpec):
@@ -317,10 +318,10 @@ def get_meta_info_data(prop, property_type, type_stmt, identity_subclasses=None)
             raise EmitError('Illegal Code path')
         elif isinstance(type_spec, IntTypeSpec):
             meta_info_data.ptype = 'int'
-            if not isinstance(type_spec.min, int) or not isinstance(type_spec.max, int):
-                meta_info_data.ptype = 'long'
             meta_info_data.doc_link += meta_info_data.ptype
-            meta_info_data.prange.append((type_spec.min, type_spec.max))
+            lower = str(type_spec.min)
+            upper = str(type_spec.max)
+            meta_info_data.prange.append((lower, upper))
         elif isinstance(type_spec, LengthTypeSpec):
             meta_info_data.ptype = 'str'
             meta_info_data.doc_link += meta_info_data.ptype
@@ -373,14 +374,14 @@ def get_meta_info_data(prop, property_type, type_stmt, identity_subclasses=None)
 
 def _get_identity_docstring(identity_subclasses, doc_link_template, property_type):
     doc_link = []
-    if property_type in identity_subclasses:
-        for subclass in identity_subclasses[property_type]:
+    if id(property_type) in identity_subclasses:
+        for subclass in identity_subclasses[id(property_type)]:
             doc_link.append(doc_link_template % (
                 subclass.name,
                 subclass.get_py_mod_name(),
                 subclass.qn()
             ))
-            if subclass in identity_subclasses:
+            if id(subclass) in identity_subclasses:
                 doc_link.extend(x for x in _get_identity_docstring(identity_subclasses, doc_link_template, subclass) if x not in doc_link)
     else:
         doc_link.append(doc_link_template % (
@@ -428,8 +429,8 @@ def get_range_limits(range_type):
                 if m_max is not None:
                     pmax = m_max
             if types.yang_type_specs['uint64'].max == pmax:
-                prange.append((long(pmin), long(pmax)))
-            prange.append((pmin, pmax))
+                prange.append((str(pmin), str(pmax)))
+            prange.append((str(pmin), str(pmax)))
     elif isinstance(base_type, Decimal64TypeSpec):
         for m_min, m_max in range_type.ranges:
             pmin = None
@@ -444,7 +445,7 @@ def get_range_limits(range_type):
             else:
                 if m_max is not None:
                     pmax = str(m_max)
-            prange.append(('%s' % pmin, '%s' % pmax))
+            prange.append(('%s' % str(pmin), '%s' % str(pmax)))
     return prange
 
 
@@ -452,15 +453,6 @@ def get_range_base_type_name(range_type):
     base_type = get_range_base_type_spec(range_type)
     if isinstance(base_type, IntTypeSpec):
         ptype = 'int'
-        for m_min, m_max in range_type.ranges:
-            pmax = None
-            if m_max == 'max':
-                pmax = range_type.base.max
-            else:
-                if m_max is not None:
-                    pmax = m_max
-            if types.yang_type_specs['uint64'].max == pmax:
-                ptype = 'long'
     elif isinstance(base_type, Decimal64TypeSpec):
         ptype = 'Decimal64'
     else:

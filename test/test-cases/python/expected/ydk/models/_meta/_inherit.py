@@ -25,7 +25,7 @@ _meta_table = {
                 'name',
                 'inherit', False),
             _MetaInfoClassMember('number', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                integer value type
                 ''',
                 'number',
@@ -42,7 +42,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('jumper', ATTRIBUTE, 'int' , None, None, 
-                [(-2147483648, 2147483647)], [], 
+                [('-2147483648', '2147483647')], [], 
                 '''                ''',
                 'jumper',
                 'inherit', False),

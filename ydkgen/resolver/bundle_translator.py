@@ -21,6 +21,7 @@ Translate profile file to profile file to bundle file.
 Regular expression taken from:
 https://github.com/xym-tool/symd/blob/master/symd.py.
 """
+from __future__ import print_function
 import os
 import re
 import sys
@@ -126,8 +127,9 @@ def get_module_attrs(module_file, root, remote=None):
 
 def get_file_attrs(files, root, remote=None):
     for f in files:
-        # logger.debug('Getting attrs from file: %s' % f)
-        yield get_module_attrs(os.path.join(root, f), root, remote)
+        if f.endswith('.yang'):
+            # logger.debug('Getting attrs from file: %s' % f)
+            yield get_module_attrs(os.path.join(root, f), root, remote)
 
 
 def get_dir_attrs(dirs, root, remote=None):
@@ -160,7 +162,6 @@ def get_git_attrs(repos, root, remote=None):
                     yield fattr
         logger.debug('Bundle Translator: Removing folder %s' % tmp_dir)
         rmtree(tmp_dir)
-
 
 def load_profile_attr(profile_file, attr):
     with open(profile_file) as f:

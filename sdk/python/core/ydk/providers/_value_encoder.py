@@ -18,6 +18,8 @@
    Value encoder.
 
 """
+from __future__ import unicode_literals
+from builtins import str as newstr
 import logging
 import importlib
 
@@ -26,6 +28,11 @@ from ydk._core._dm_meta_info import REFERENCE_BITS, \
 from ydk.types import Empty, Decimal64, YListItem
 
 from ._importer import _yang_ns
+from functools import reduce
+
+import sys
+if sys.version_info > (3,):
+    long = int
 
 
 class ValueEncoder(object):
@@ -71,12 +78,10 @@ class ValueEncoder(object):
             pass
         elif member.ptype == 'Decimal64' and isinstance(value, Decimal64):
             text = value.s
-        elif member.ptype == 'str' and isinstance(value, str):
-            text = value
-        elif member.ptype == 'int' and isinstance(value, int):
-            text = str(value)
-        elif member.ptype == 'long' and isinstance(value, (int, long)):
-            text = str(value)
+        elif member.ptype == 'str' and isinstance(value, (str, newstr)):
+            text = newstr(value)
+        elif member.ptype == 'int' and isinstance(value, (int, long)):
+            text = newstr(value)
         else:
             ydk_logger = logging.getLogger('ydk.providers.NetconfServiceProvider')
             ydk_logger.info('Could not encode leaf {0}, type: {1}, {2} value: {3}'.format(member.name, member.mtype, member.ptype, value))

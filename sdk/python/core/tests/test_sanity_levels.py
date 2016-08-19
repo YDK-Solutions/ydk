@@ -17,6 +17,8 @@
 """test_sanity_nested_containers.py
 sanity test for ydktest-sanity.yang
 """
+from __future__ import absolute_import
+from builtins import str
 
 import unittest
 from compare import is_equal

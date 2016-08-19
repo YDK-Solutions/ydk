@@ -17,6 +17,7 @@
     test_sanity_bundle_augmentation.py
         Unittest for bundle augmentation.
 """
+from __future__ import absolute_import
 import unittest
 
 from ydk.services import CRUDService

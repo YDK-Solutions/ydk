@@ -1,3 +1,4 @@
+from __future__ import print_function
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -51,13 +52,13 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     # modify about_ydk.rst page
     for line in fileinput.input(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'r+w'):
         if 'git clone repo-url' in line:
-            print line.replace('repo-url', 'https://{0}.git'.format(url)),
+            print(line.replace('repo-url', 'https://{0}.git'.format(url)), end=' ')
         elif 'git checkout commit-id' in line:
-            print line.replace('commit-id', '{}'.format(commit_id))
+            print(line.replace('commit-id', '{}'.format(commit_id)))
         elif 'version-id' in line:
-            print line.replace('version-id', '{}'.format(release.replace('release=', '')))
+            print(line.replace('version-id', '{}'.format(release.replace('release=', ''))))
         else:
-            print line,
+            print(line, end=' ')
 
 
 def get_release_version(output_directory):
@@ -122,10 +123,10 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     stdout, stderr = p.communicate()
     logger.debug(stdout)
     logger.error(stderr)
-    print >> sys.stderr, stderr
+    print(stderr, file=sys.stderr)
     print(stdout)
-    print('*' * 28 + '\n' + 'DOCUMENTATION ERRORS/WARNINGS\n' +
-          '*' * 28 + '\n' + stderr)
+    msg = '%s\nDOCUMENTATION ERRORS/WARNINGS\n%s\n%s' % ('*' * 28, '*' * 28, stderr.decode('utf-8'))
+    print(msg)
 
 
 def create_pip_packages(output_directory):
@@ -304,5 +305,5 @@ if __name__ == '__main__':
         create_pip_packages(output_directory)
 
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print 'Code generation completed successfully!\nTime taken: {0} {1}\n'.format(minutes_str, seconds_str)
-
+    print('Code generation completed successfully!')
+    print('Time taken: {0} {1}\n'.format(minutes_str, seconds_str))

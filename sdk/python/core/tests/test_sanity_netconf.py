@@ -17,6 +17,7 @@
 """test_sanity_rpc.py
 sanity test for netconf
 """
+from __future__ import absolute_import
 
 import unittest
 from compare import is_equal

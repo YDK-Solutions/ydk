@@ -17,6 +17,7 @@
 """test_sanity_levels.py
 sanity test for ydktest-sanity.yang
 """
+from __future__ import absolute_import
 
 import unittest
 from compare import is_equal

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -22,8 +23,7 @@
 #  open-config bgp yang module.
 #
 
-
-
+from __future__ import print_function
 from ydk.types import Empty
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.services import CRUDService, NetconfService, CodecService, Datastore
@@ -44,7 +44,7 @@ def bgp_run(netconf_service, session):
     netconf_service.edit_config(session, Datastore.candidate, bgp_cfg)
 
     bgp_cfg_read = netconf_service.get_config(session, Datastore.candidate, bgp.Bgp())
-    print bgp_cfg_read
+    print(bgp_cfg_read)
 
     # IPv6 Neighbor instance config
     nbr_ipv6 = bgp.Bgp.Neighbors.Neighbor()
@@ -68,7 +68,7 @@ def bgp_run(netconf_service, session):
 
     nbr_ipv6_read = netconf_service.get_config(session, Datastore.candidate, bgp_cfg)
 
-    print nbr_ipv6_read
+    print(nbr_ipv6_read)
 
 
 def run_multiple_routing_bgp(netconf_service, session):

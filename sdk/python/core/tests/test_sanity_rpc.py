@@ -17,6 +17,7 @@
 """test_sanity_rpc.py
 sanity test for RPCs
 """
+from __future__ import print_function
 
 import unittest
 
@@ -150,7 +151,7 @@ class SanityRpc(unittest.TestCase):
         get_schema_rpc.input.identifier = 'ietf-netconf-monitoring'
         get_schema_rpc.input.format = ietf_netconf_monitoring.Yang_Identity()
         op = self.executor.execute_rpc(self.ncc, get_schema_rpc)
-        print op
+        print(op)
 
 if __name__ == '__main__':
     import sys

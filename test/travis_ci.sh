@@ -34,6 +34,10 @@ DEVIATION_DEST_FXS=/root/confd/etc/deviation
 YDKTEST_DEVIATION_SOURCE_FXS=/root/confd/src/confd/yang/ydktest/fxs/ydktest_deviation
 BGP_DEVIATION_SOURCE_FXS=/root/confd/src/confd/yang/ydktest/fxs/bgp_deviation
 
+# Python Variables
+PY_GENERATE="python2.7"
+PY_TEST="python2.7"
+
 function print_msg {
     echo -e "${RED}*** $(date) $1${NOCOLOR}"
 }
@@ -68,6 +72,13 @@ function run_test {
 
 function setup_env {
     print_msg "In Method: setup_env"
+
+    printf "\nSetting up locale\n"
+    locale-gen "en_US.UTF-8"
+    export LANG="en_US.UTF-8"
+    export LANGUAGE="en_US:en"
+    export LC_ALL="en_US.UTF-8"
+
     cd $ROOT
     printf "\nCloning from: %s, branch: %s\n" "$REPO" "$BRANCH"
     git clone -b $BRANCH $REPO
@@ -78,7 +89,7 @@ function setup_env {
 
     printf "\nInstalling packages...\n"
     sudo apt-get update
-    sudo apt-get --assume-yes install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libboost-dev libboost-python-dev libtool libssh-dev libcurl4-gnutls-dev cmake
+    sudo apt-get --assume-yes install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libboost-dev libboost-python-dev libtool libssh-dev libcurl4-gnutls-dev cmake python3.4-dev
 
     cd ~
     git clone https://github.com/unittest-cpp/unittest-cpp.git
@@ -95,9 +106,17 @@ function setup_env {
     cd ~/libnetconf
     ./configure && make && make install
 
+    printf "Generating api in $PY_GENERATE"
+    printf "Testing api in $PY_TEST"
+
     cd $YDKGEN_HOME
-    virtualenv myenv
-    source myenv/bin/activate
+    virtualenv -p $PY_GENERATE gen_env
+    virtualenv -p $PY_TEST test_env
+    source test_env/bin/activate
+    pip install coverage
+    pip install -r requirements.txt
+    deactivate
+    source gen_env/bin/activate
     pip install coverage
     pip install -r requirements.txt
 }
@@ -105,10 +124,14 @@ function setup_env {
 function teardown_env {
     print_msg "In Method: teardown_env"
     deactivate
+    cd $YDKGEN_HOME
+    rm -rf gen_env
+    rm -rf test_env
 }
 
 # clone YDK model test YANG models
 function compile_model_test_yang_to_fxs {
+    print_msg "In Method: compile_model_test_yang_to_fxs"
     rm -rf $YDKTEST_MODEL_FXS
     mkdir $YDKTEST_MODEL_FXS
     cd $YDKTEST_MODEL_FXS
@@ -136,7 +159,7 @@ function compile_model_test_yang_to_fxs {
 function compile_yang_to_fxs {
     source $CONFD_RC
     cd $1
-    print_msg "In Method: compile_yang_to_fxs"
+    print_msg "In Method: compile_yang_to_fxs in $(pwd)"
     for YANG_FILE in *.yang
     do
         if [[ ${YANG_FILE} != *"submodule"* ]];then
@@ -150,7 +173,7 @@ function compile_yang_to_fxs {
 # move fxs files from $1 to $2
 function cp_fxs {
     cp $1/*.fxs $2
-    print_msg "In Method: cp_fxs"
+    print_msg "In Method: cp_fxs from ${1} to ${2}"
 }
 
 # init confd using confd.conf in $1
@@ -158,7 +181,7 @@ function init_confd {
     source $CONFD_RC
     confd --stop
     cd $1
-    print_msg "In Method: init_confd"
+    print_msg "In Method: init_confd in $(pwd)"
     printf "\nInitializing confd...\n"
     confd -c confd.conf
     cd $YDKGEN_HOME
@@ -187,6 +210,7 @@ function generate_ydktest_package {
 
 # sanity tests
 function run_sanity_ncclient_tests {
+    print_msg "In Method: run_sanity_ncclient_tests"
     printf "\nRunning sanity tests on NCClient client\n"
     run_test sdk/python/tests/test_sanity_types.py
     run_test sdk/python/tests/test_sanity_errors.py
@@ -200,6 +224,7 @@ function run_sanity_ncclient_tests {
 }
 
 function run_sanity_native_tests {
+    print_msg "In Method: run_sanity_native_tests"
     printf "\nRunning sanity tests on native client\n"
     run_test sdk/python/tests/test_sanity_types.py native
     run_test sdk/python/tests/test_sanity_errors.py native
@@ -215,6 +240,8 @@ function run_sanity_native_tests {
 
 function run_sanity_tests {
     print_msg "In Method: run_sanity_tests"
+    deactivate
+    source $YDKGEN_HOME/test_env/bin/activate
     pip install gen-api/python/dist/ydk*.tar.gz
 
     printf "\nRunning sanity tests\n"
@@ -233,11 +260,7 @@ function run_sanity_tests {
 function run_ydk_model_tests {
     print_msg "In Method: run_ydk_model_tests"
     cd $YDKGEN_HOME
-
-    virtualenv myenv
-    source myenv/bin/activate
-    pip install coverage
-    pip install -r requirements.txt
+    source test_env/bin/activate
 
     printf "\nGenerating ydk model APIs for testing\n"
     python generate.py --profile profiles/test/ydk-models-test.json --verbose
@@ -306,12 +329,17 @@ function run_cmake_tests {
 function run_deviation_sanity {
     print_msg "In Method: run_deviation_sanity"
     cd $YDKGEN_HOME
+    source gen_env/bin/activate
     rm -rf gen-api/python/*
     # ydktest deviation
     cp_fxs $YDKTEST_DEVIATION_SOURCE_FXS $YDKTEST_DEST_FXS
     init_confd $YDKTEST_DEST_FXS
-    printf "\nGenerating ydktest model APIs with grouping classes\n"
+    printf "\nGenerating ydktest model APIs\n"
     run_test_no_coverage generate.py --profile profiles/test/ydktest.json --python --verbose
+    
+    source test_env/bin/activate
+    pip uninstall ydk -y
+
     pip install gen-api/python/dist/*.tar.gz
     run_test_no_coverage gen-api/python/tests/test_sanity_deviation.py
 #    run_test_no_coverage gen-api/python/tests/test_sanity_deviation.py native
@@ -320,17 +348,25 @@ function run_deviation_sanity {
     cp_fxs $BGP_DEVIATION_SOURCE_FXS $DEVIATION_DEST_FXS
     init_confd $DEVIATION_DEST_FXS
     printf "\nGenerating ydktest deviation model APIs\n"
+    
+    source gen_env/bin/activate
+    rm -rf gen-api/python/*
     run_test_no_coverage generate.py --python --profile profiles/test/deviation/deviation.json
+
+    source test_env/bin/activate
+    pip uninstall ydk -y
+
     pip install gen-api/python/dist/ydk*.tar.gz
     run_test_no_coverage gen-api/python/tests/test_sanity_deviation_bgp.py
-#    run_test_no_coverage gen-api/python/tests/test_sanity_deviation_bgp.py 
-#    native
+    # run_test_no_coverage gen-api/python/tests/test_sanity_deviation_bgp.py native
 
     pip uninstall ydk -y
 }
 
 # generate ydktest augmentation packages
 function generate_ydktest_augm_packages {
+    print_msg "In Method: generate_ydktest_augm_packages"
+    source gen_env/bin/activate
     rm -rf gen-api/python/*
     run_test generate.py --core
     run_test generate.py --bundle profiles/test-augmentation/ietf.json --verbose
@@ -341,6 +377,7 @@ function generate_ydktest_augm_packages {
 # install ydktest augmentation packages
 function install_ydktest_augm_packages {
     print_msg "In Method: install_ydktest_augm_packages"
+    source $YDKGEN_HOME/test_env/bin/activate
     pip uninstall ydk -y
     CORE_PKG=$(find gen-api/python/ydk/dist -name "ydk*.tar.gz")
     AUGM_BASE_PKG=$(find gen-api/python/ietf/dist -name "ydk*.tar.gz")
@@ -377,17 +414,34 @@ REPO=$1
 BRANCH=master
 #TODO ADD Argument check
 
-while getopts "r:b:" o; do
-    case "${o}" in
-        r)
-            REPO=${OPTARG}
-            ;;
-        b)
-            BRANCH=${OPTARG}
-            ;;
-    esac
-done
+while [[ $# -gt 1 ]]
+do
+key="$1"
 
+case $key in
+    -r|--repo)
+        REPO="$2"
+        shift # past argument
+        ;;
+    -b|--branch)
+        BRANCH="$2"
+        shift # past argument
+        ;;
+    -g|--gen_py_version)
+        PY_GENERATE="$2"
+        shift # past argument
+        ;;
+    -t|--test_py_version)
+        PY_TEST="$2"
+        shift # past argument
+        ;;
+    *)
+        echo "Illegal option: $1"
+        exit 1
+        ;;
+esac
+shift # past argument or value
+done
 
 setup_env
 
@@ -400,11 +454,12 @@ cp_fxs $YDKGEN_HOME/yang/ydktest $YDKTEST_MODEL_DEST_FXS
 init_confd $YDKTEST_DEST_FXS
 #run_pygen_test
 generate_ydktest_package
+
 run_sanity_tests
 submit_coverage
-run_cpp_gen_tests
-run_cpp_sanity_tests
-run_cmake_tests
+# run_cpp_gen_tests
+# run_cpp_sanity_tests
+# run_cmake_tests
 
 # deviaiton
 cp_fxs $DEVIATION_SOURCE_FXS $DEVIATION_DEST_FXS

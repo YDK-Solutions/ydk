@@ -367,7 +367,7 @@ _deviation_table = {
                             'bits_value',
                             'ydktest-sanity', False),
                         _MetaInfoClassMember('bits-value', ATTRIBUTE, 'int' , None, None, 
-                            [(0, 63)], [], 
+                            [('0', '63')], [], 
                             '''                            this is bits type value
                             ''',
                             'bits_value',
@@ -477,7 +477,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('number16', ATTRIBUTE, 'int' , None, None, 
-                    [(-2147483648, 2147483647)], [], 
+                    [('-2147483648', '2147483647')], [], 
                     '''                    16 bit integer value type
                     ''',
                     'number16',
@@ -490,7 +490,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('number32', ATTRIBUTE, 'int' , None, None, 
-                    [(-9223372036854775808, 9223372036854775807)], [], 
+                    [('-9223372036854775808', '9223372036854775807')], [], 
                     '''                    integer value type
                     ''',
                     'number32',
@@ -503,7 +503,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('number64', ATTRIBUTE, 'int' , None, None, 
-                    [(0, 255)], [], 
+                    [('0', '255')], [], 
                     '''                    integer value type
                     ''',
                     'number64',
@@ -516,7 +516,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('number8', ATTRIBUTE, 'int' , None, None, 
-                    [(-32768, 32767)], [], 
+                    [('-32768', '32767')], [], 
                     '''                     8 bit integer value type
                     ''',
                     'number8',
@@ -529,7 +529,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('u_number16', ATTRIBUTE, 'int' , None, None, 
-                    [(0, 4294967295)], [], 
+                    [('0', '4294967295')], [], 
                     '''                    16 bit uinteger value type
                     ''',
                     'u_number16',
@@ -541,8 +541,8 @@ _deviation_table = {
         'deviation_typ' : 'replace',
         'keyword_value' : [
             ('type', 
-                _MetaInfoClassMember('u_number32', ATTRIBUTE, 'long' , None, None, 
-                    [(0, 18446744073709551615L)], [], 
+                _MetaInfoClassMember('u_number32', ATTRIBUTE, 'int' , None, None, 
+                    [('0', '18446744073709551615')], [], 
                     '''                    32 bit uinteger value type
                     ''',
                     'u_number32',
@@ -555,7 +555,7 @@ _deviation_table = {
         'keyword_value' : [
             ('type', 
                 _MetaInfoClassMember('u_number8', ATTRIBUTE, 'int' , None, None, 
-                    [(0, 65535)], [], 
+                    [('0', '65535')], [], 
                     '''                     8 bit uinteger value type
                     ''',
                     'u_number8',

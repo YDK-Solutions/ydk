@@ -18,6 +18,7 @@
    YDK PY converter
 
 '''
+from __future__ import print_function
 from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _EmitArgs
 
 from .header_printer import HeaderPrinter
@@ -37,7 +38,7 @@ class CppBindingsPrinter(LanguageBindingsPrinter):
             self.print_module(index, package, size)
 
     def print_module(self, index, package, size):
-        print 'Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref)
+        print('Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref))
 
         py_mod_name = package.get_py_mod_name()
 

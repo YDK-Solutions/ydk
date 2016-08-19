@@ -17,6 +17,7 @@
 """test_sanity_fitler_read.py
 read API according to discussion
 """
+from __future__ import absolute_import
 
 import unittest
 from compare import is_equal

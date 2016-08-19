@@ -1,3 +1,4 @@
+from __future__ import print_function
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -99,7 +100,7 @@ class YdkGenException(Exception):
         self.msg = msg
         logger = logging.getLogger('ydkgen')
         if len(logger.handlers) == 1:
-            print msg
+            print(msg)
 
 
 def yang_id(stmt):
@@ -214,6 +215,8 @@ def escape_name(name):
 
 
 def convert_to_reStructuredText(yang_text):
+    if isinstance(yang_text, bytes):
+        yang_text = yang_text.decode('utf-8')
     reSt = yang_text
     if reSt is not None and len(reSt) > 0:
         reSt = yang_text.replace('\\', '\\\\')
@@ -263,7 +266,7 @@ def sort_classes_at_same_level(classes, sort_clazz):
             classes_not_processed[clazz] = dependent_siblings
     classes_not_processed = OrderedDict(classes_not_processed.items())
     while len(classes_not_processed) > 0:
-        for clazz in classes_not_processed.keys():
+        for clazz in list(classes_not_processed.keys()):
             dependent_siblings = classes_not_processed[clazz]
 
             not_processed = False
@@ -284,5 +287,7 @@ def get_rst_file_name(named_element):
         package = named_element.get_package()
     else:
         package = named_element
-    hex_name = hashlib.sha1(package.bundle_name + named_element.fqn()).hexdigest()
+    filename = package.bundle_name + named_element.fqn()
+    filename = filename.encode('utf-8')
+    hex_name = hashlib.sha1(filename).hexdigest()
     return hex_name

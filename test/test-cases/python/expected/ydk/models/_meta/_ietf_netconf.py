@@ -109,7 +109,7 @@ _meta_table = {
                 'confirmed',
                 'ietf-netconf', False),
             _MetaInfoClassMember('confirm-timeout', ATTRIBUTE, 'int' , None, None, 
-                [(1, 4294967295)], [], 
+                [('1', '4294967295')], [], 
                 '''                The timeout interval for a confirmed commit.
                 ''',
                 'confirm_timeout',
@@ -630,7 +630,7 @@ _meta_table = {
             False, 
             [
             _MetaInfoClassMember('session-id', ATTRIBUTE, 'int' , None, None, 
-                [(1, 4294967295)], [], 
+                [('1', '4294967295')], [], 
                 '''                Particular session to kill.
                 ''',
                 'session_id',

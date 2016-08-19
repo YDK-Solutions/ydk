@@ -16,6 +16,7 @@
 """
 Generate YDK core library, profile package and bundle packages.
 """
+from __future__ import print_function
 import os
 import json
 import shutil
@@ -247,7 +248,6 @@ class YdkGenerator(object):
         # clean up gen_api_root
         if not os.path.isdir(gen_api_root):
             os.makedirs(gen_api_root)
-        shutil.rmtree(gen_api_root)
 
         self._copy_sdk_template(gen_api_root, pkg_type)
 
@@ -288,10 +288,10 @@ class YdkGenerator(object):
         template_dir = os.path.join(self.ydk_root, 'sdk', self.language)
         if self.language == 'python':
             template_dir = os.path.join(template_dir, pkg_type)
-        shutil.copytree(template_dir,
-                        gen_api_root,
-                        ignore=shutil.ignore_patterns('.gitignore',
-                                                      'ncclient'))
+        shutil.rmtree(gen_api_root)
+        _copytree(template_dir,
+                  gen_api_root,
+                  ignore=shutil.ignore_patterns('.gitignore', 'ncclient'))
 
 
 def _set_api_pkg_sub_name(bundles, api_pkgs):
@@ -328,20 +328,20 @@ def _modify_python_setup(gen_api_root, pkg_name, version, dependencies=None):
     for line in fileinput.input(setup_file, inplace=True):
         if not replaced_package and "$PACKAGE$" in line:
             replaced_package = True
-            print line.replace("$PACKAGE$", pkg_name),
+            print(line.replace("$PACKAGE$", pkg_name), end='')
         elif not replaced_version and "$VERSION$" in line:
             replaced_version = True
-            print line.replace("$VERSION$", version),
+            print(line.replace("$VERSION$", version), end='')
         elif not replaced_dependencies and "$DEPENDENCY$" in line:
             replaced_dependencies = True
             if dependencies:
                 additional_requires = ["'ydk-models-%s>=%s'" % (d.name, d.str_version)
                                        for d in dependencies]
-                print line.replace("'$DEPENDENCY$'", ", ".join(additional_requires))
+                print(line.replace("'$DEPENDENCY$'", ", ".join(additional_requires)))
             else:
-                print line.replace("'$DEPENDENCY$'", "")
+                print(line.replace("'$DEPENDENCY$'", ""))
         else:
-            print line,
+            print(line, end='')
 
 
 # Generator checks #####################################################
@@ -386,3 +386,27 @@ def _check_description_file(description_file):
     if not os.path.isfile(description_file):
         logger.error('Path to description file is not valid.')
         raise YdkGenException('Path to description file is not valid.')
+
+
+def _copytree(src, dst, ignore=None):
+    """For Python3.4. shutil.copytree for symlink directory seems not work."""
+    names = os.listdir(src)
+    if ignore is not None:
+        ignore_names = ignore(src, names)
+    else:
+        ignore_names = set()
+    os.makedirs(dst)
+    for name in names:
+        if name in ignore_names:
+            continue
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        if os.path.islink(srcname):
+            if os.path.isdir(srcname):
+                _copytree(srcname, dstname, ignore)
+            else:
+                shutil.copy(srcname, dstname)
+        elif os.path.isdir(srcname):
+            _copytree(srcname, dstname, ignore)
+        else:
+            shutil.copy(srcname, dstname)

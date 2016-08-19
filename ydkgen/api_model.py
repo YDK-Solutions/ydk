@@ -20,9 +20,10 @@
  The meta-model of the generated API.
  Translation process converts the YANG model to classes defined in this module.
 """
+from __future__ import absolute_import
 
-from common import camel_case, iskeyword
-from common import snake_case, escape_name
+from .common import camel_case, iskeyword
+from .common import snake_case, escape_name
 
 from pyang.types import UnionTypeSpec
 
@@ -296,6 +297,8 @@ class Package(NamedElement):
         else:
             return False
 
+    __hash__ = NamedElement.__hash__
+
 
 class DataType(NamedElement):
 
@@ -410,7 +413,7 @@ class Class(NamedElement):
         return imported_types
     
     def _get_union_types(self, type_stmt, p):
-        from builder import TypesExtractor
+        from .builder import TypesExtractor
         prop_type = TypesExtractor().get_property_type(type_stmt)
         prop_types = [prop_type]
         if isinstance(prop_type, UnionTypeSpec):
@@ -523,6 +526,8 @@ class Class(NamedElement):
         else:
             return False
 
+    __hash__ = NamedElement.__hash__
+
 
 class AnyXml(NamedElement):
 
@@ -609,6 +614,8 @@ class Bits(DataType):
             pos_stmt = bit_stmt.search_one('position')
             if pos_stmt is not None:
                 self._pos_map[bit_stmt.arg] = pos_stmt.arg
+
+    __hash__ = DataType.__hash__
 
 
 class Property(NamedElement):

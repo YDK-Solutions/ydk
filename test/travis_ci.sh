@@ -106,8 +106,8 @@ function setup_env {
     cd ~/libnetconf
     ./configure && make && make install
 
-    print_msg "Generating api in $PY_GENERATE"
-    print_msg "Testing api in $PY_TEST"
+    printf "Generating api in $PY_GENERATE"
+    printf "Testing api in $PY_TEST"
 
     cd $YDKGEN_HOME
     virtualenv -p $PY_GENERATE gen_env
@@ -414,21 +414,33 @@ REPO=$1
 BRANCH=master
 #TODO ADD Argument check
 
-while getopts r:b:g:t: o; do
-    case "${o}" in
-        r)
-            REPO=${OPTARG}
-            ;;
-        b)
-            BRANCH=${OPTARG}
-            ;;
-        g)
-            PY_GENERATE=${OPTARG}
-            ;;
-        t)
-            PY_TEST=${OPTARG}
-            ;;
-    esac
+while [[ $# -gt 1 ]]
+do
+key="$1"
+
+case $key in
+    -r|--repo)
+        REPO="$2"
+        shift # past argument
+        ;;
+    -b|--branch)
+        BRANCH="$2"
+        shift # past argument
+        ;;
+    -g|--gen_py_version)
+        PY_GENERATE="$2"
+        shift # past argument
+        ;;
+    -t|--test_py_version)
+        PY_TEST="$2"
+        shift # past argument
+        ;;
+    *)
+        echo "Illegal option: $1"
+        exit 1
+        ;;
+esac
+shift # past argument or value
 done
 
 setup_env

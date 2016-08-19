@@ -1,10 +1,10 @@
 PY_GENERATE="python2.7"
 PY_TEST="python2.7"
 
-while getopts g:t: option 
+while getopts gen_py_version:test_py_version: option 
 do case "${option}" in 
-g) PY_GENERATE=${OPTARG};; 
-t) PY_TEST=${OPTARG};; 
+gen_py_version) PY_GENERATE=${OPTARG};; 
+test_py_version) PY_TEST=${OPTARG};; 
 esac 
 done
 

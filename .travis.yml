@@ -19,14 +19,14 @@ script:
     - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
     - export REPO=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_REPO_SLUG; else echo `curl -s $PR | jq -r .head.repo.full_name`; fi)
     - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH, REPO=$REPO"
-    - ./test/osx_linux_tests.sh -g python2.7 -t python2.7
-    - ./test/osx_linux_tests.sh -g python2.7 -t python3.4
-    - ./test/osx_linux_tests.sh -g python3.4 -t python2.7
-    - ./test/osx_linux_tests.sh -g python3.4 -t python3.4
+    - ./test/osx_linux_tests.sh --gen_py_version python2.7 --test_py_version python2.7
+    - ./test/osx_linux_tests.sh --gen_py_version python2.7 --test_py_version python3.4
+    - ./test/osx_linux_tests.sh --gen_py_version python3.4 --test_py_version python2.7
+    - ./test/osx_linux_tests.sh --gen_py_version python3.4 --test_py_version python3.4
 
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python2.7 -t python2.7; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python2.7 -t python3.4; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python3.4 -t python2.7; fi
-    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh -r https://github.com/$REPO.git -b $BRANCH -g python3.4 -t python3.4; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh --repo https://github.com/$REPO.git --branch $BRANCH --gen_py_version python2.7 --test_py_version python2.7; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh --repo https://github.com/$REPO.git --branch $BRANCH --gen_py_version python2.7 --test_py_version python3.4; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh --repo https://github.com/$REPO.git --branch $BRANCH --gen_py_version python3.4 --test_py_version python2.7; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -v $PWD/test/:/root/test/ ydkdev/confd-beta /root/test/travis_ci.sh --repo https://github.com/$REPO.git --branch $BRANCH --gen_py_version python3.4 --test_py_version python3.4; fi
 
 

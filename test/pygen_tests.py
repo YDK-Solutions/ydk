@@ -3,7 +3,6 @@
 Copyright (c) 2015 by Cisco Systems, Inc.
 All rights reserved.
 """
-from builtins import filter
 
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
@@ -30,7 +29,8 @@ import argparse
 import subprocess
 from difflib import context_diff
 from itertools import tee
-from future.moves.itertools import filterfalse
+
+from itertools import ifilter, ifilterfalse
 from unittest import TestCase, TestSuite, TextTestRunner
 
 import pip
@@ -223,8 +223,8 @@ class PyBundlePatchTest(TestCase):
             return True
         def partition(predicate, lines):
             lines_1, lines_2 = tee(lines)
-            table = list(filter(predicate, lines_1))
-            meta = sorted(filterfalse(predicate, lines_2))
+            table = list(ifilter(predicate, lines_1))
+            meta = sorted(list(ifilterfalse(predicate, lines_2)))
             return table, meta
         with open(src) as src_file:
             src_lines = src_file.readlines()

@@ -19,7 +19,6 @@
   
   YANG model driven API, python emitter.
 """
-from builtins import int as newint
 
 from ydkgen.api_model import Class, Enum, Bits
 from ydkgen.builder import TypesExtractor

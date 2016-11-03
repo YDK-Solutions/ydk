@@ -1,0 +1,13 @@
+{
+    "name": "deviation",
+    "version": "0.1.0",
+    "Author": "Cisco",
+    "Copyright": "Cisco",
+    "Description": "YDK Test Profile",
+    "models": {
+    "dir": [
+        "/yang/deviation",
+        "/yang/ietf"
+        ]
+    }
+}

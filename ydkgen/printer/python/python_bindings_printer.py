@@ -23,17 +23,17 @@ from __future__ import print_function
 
 import os
 
-from ydkgen.api_model import Class, Enum
+from ydkgen.api_model import Bits, Class, Enum
 from ydkgen.common import get_rst_file_name
 
 from .deviation_printer import DeviationPrinter
-from .doc_printer import DocPrinter
 from .import_test_printer import ImportTestPrinter
 from .module_printer import ModulePrinter
 from .module_meta_printer import ModuleMetaPrinter
 from .test_case_printer import TestCasePrinter
 from .namespace_printer import NamespacePrinter
 from .init_file_printer import InitPrinter
+from ..doc import DocPrinter
 from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _EmitArgs
 
 
@@ -76,7 +76,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         sub = package.sub_name
 
-        if hasattr(package, 'aug_bundle_name'):
+        if package.aug_bundle_name != '':
             package.augments_other = True
             module_dir = self.initialize_output_directory(
                 '%s/%s/%s' % (self.models_dir, self.bundle_name, '_aug'))
@@ -106,7 +106,9 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
                             _EmitArgs(self.ypy_ctx, named_element, self.identity_subclasses))
 
             for owned_element in named_element.owned_elements:
-                if isinstance(owned_element, Class) or isinstance(owned_element, Enum):
+                if any((isinstance(owned_element, Bits),
+                        isinstance(owned_element, Class),
+                        isinstance(owned_element, Enum))):
                     _walk_n_print(owned_element, p)
 
         _walk_n_print(package, self.ydk_doc_dir)
@@ -221,11 +223,11 @@ def emit_importests(ctx, packages):
 
 
 def emit_module_documentation(ctx, named_element, identity_subclasses):
-    DocPrinter(ctx).print_module_documentation(named_element, identity_subclasses)
+    DocPrinter(ctx, 'py').print_module_documentation(named_element, identity_subclasses)
 
 
 def emit_table_of_contents(ctx, packages, bundle_name):
-    DocPrinter(ctx).print_table_of_contents(packages, bundle_name)
+    DocPrinter(ctx, 'py').print_table_of_contents(packages, bundle_name)
 
 
 def emit_module(ctx, package, extra_args):

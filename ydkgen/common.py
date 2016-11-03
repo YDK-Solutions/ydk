@@ -14,7 +14,6 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-import sys
 import logging
 import hashlib
 import keyword
@@ -120,8 +119,19 @@ def merge_file_path_segments(segs):
     return return_seg
 
 
-def iskeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent', 'operator')
+def ispythonkeyword(word):
+    return keyword.iskeyword(word) or word in ('None', 'parent')
+
+
+def iscppkeyword(word):
+    return word in ('parent', 'operator', 'inline', 'default', 'virtual',
+                    'children', 'value', 'auto', 'entity', 'int', 'static',
+                    'final', 'template', 'index', 'protected', 'true', 'false',
+                    'default' , 'auto', 'static', 'or', 'do', 'new', 'delete',
+                    'private', 'public', 'export' , 'virtual', 'for', 'and',
+                    'break', 'case', 'catch', 'float', 'long', 'return',
+                    'explicit', 'class', 'if', 'try', 'while', 'and', 'or',
+                    'const', 'continue', 'double', 'else', 'value', 'namespace')
 
 
 def get_sphinx_ref_label(named_element):
@@ -289,5 +299,5 @@ def get_rst_file_name(named_element):
         package = named_element
     filename = package.bundle_name + named_element.fqn()
     filename = filename.encode('utf-8')
-    hex_name = hashlib.sha1(filename).hexdigest()
+    hex_name = 'gen_doc_%s' % hashlib.sha1(filename).hexdigest()
     return hex_name

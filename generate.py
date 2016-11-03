@@ -21,9 +21,11 @@ from optparse import OptionParser
 import fileinput
 import logging
 import os
+import shutil
 import subprocess
 import sys
 import time
+import re
 
 from git import Repo
 from ydkgen import YdkGenerator
@@ -52,18 +54,23 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     # modify about_ydk.rst page
     for line in fileinput.input(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'r+w'):
         if 'git clone repo-url' in line:
-            print(line.replace('repo-url', 'https://{0}.git'.format(url)), end=' ')
+            print(line.replace('repo-url', 'https://{0}.git'.format(url)), end='')
         elif 'git checkout commit-id' in line:
-            print(line.replace('commit-id', '{}'.format(commit_id)))
+            print(line.replace('commit-id', '{}'.format(commit_id)), end='')
         elif 'version-id' in line:
-            print(line.replace('version-id', '{}'.format(release.replace('release=', ''))))
+            print(line.replace('version-id', '{}'.format(release.replace('release=', ''))), end='')
         else:
-            print(line, end=' ')
+            print(line, end='')
 
 
-def get_release_version(output_directory):
-    version = ''
-    release = ''
+def get_release_version(output_directory, language):
+    if language == 'python':
+        return get_py_release_version(output_directory)
+    elif language == 'cpp':
+        return get_cpp_release_version(output_directory)
+
+
+def get_py_release_version(output_directory):
     setup_file = os.path.join(output_directory, 'setup.py')
     with open(setup_file, 'r') as f:
         for line in f:
@@ -74,7 +81,30 @@ def get_release_version(output_directory):
                 release = "release=" + rv
                 version = "version=" + rv
                 break
-    return release, version
+    return (release, version)
+
+
+def get_cpp_release_version(output_directory):
+    MAJOR_VERSION = re.compile(r"set\(YDK_[A-Z]*[_]*MAJOR_VERSION (?P<num>\d+)\)")
+    MINOR_VERSION = re.compile(r"set\(YDK_[A-Z]*[_]*MINOR_VERSION (?P<num>\d+)\)")
+    SERVICE_VERSION = re.compile(r"set\(YDK_[A-Z]*[_]*SERVICE_VERSION (?P<num>\d+)\)")
+    major_version, minor_version, service_version = 0, 0, 0
+    cmake_file = os.path.join(output_directory, 'CMakeLists.txt')
+    with open(cmake_file) as f:
+        for line in f:
+            major_match = MAJOR_VERSION.match(line)
+            minor_match = MINOR_VERSION.match(line)
+            service_match = SERVICE_VERSION.match(line)
+            if major_match:
+                major_version = major_match.group('num')
+            if minor_match:
+                minor_version = minor_match.group('num')
+            if service_match:
+                service_version = service_match.group('num')
+    version = "%s.%s.%s" % (major_version, minor_version, service_version)
+    release = "release=%s" % version
+    version = "version=%s" % version
+    return (release, version)
 
 
 def copy_docs_from_bundles(ydk_root, language, destination_dir):
@@ -106,7 +136,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     py_api_doc_gen = os.path.join(output_directory, 'docsgen')
     py_api_doc = os.path.join(output_directory, 'docs_expanded')
     # if it is package type
-    release, version = get_release_version(output_directory)
+    release, version = get_release_version(output_directory, language)
     os.mkdir(py_api_doc)
     # print about YDK page
     print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
@@ -137,7 +167,7 @@ def create_pip_packages(output_directory):
 
     if exit_code == 0:
         print('\nSuccessfully created source distribution at %s/dist' %
-              (py_sdk_root,))
+              py_sdk_root)
     else:
         print('\nFailed to create source distribution')
         sys.exit(exit_code)
@@ -147,22 +177,25 @@ def create_pip_packages(output_directory):
         py_sdk_root,))
 
 
-def create_shared_libraries(output_directory):
-    cpp_sdk_root = output_directory
-    os.chdir(cpp_sdk_root)
-    args = ['make']
-    exit_code = subprocess.call(args, env=os.environ.copy())
-
-    if exit_code == 0 and os.path.isfile(
-                            os.path.join(cpp_sdk_root, 'ydk_cpp.so')):
-        print('\nSuccessfully created shared library %s as ydk_cpp.so' %
-              (cpp_sdk_root))
-    else:
+def create_shared_libraries(output_directory, sudo):
+    cpp_sdk_root = os.path.join(output_directory)
+    cmake_build_dir = os.path.join(output_directory, 'build')
+    if os.path.exists(cmake_build_dir):
+        shutil.rmtree(cmake_build_dir)
+    os.makedirs(cmake_build_dir)
+    os.chdir(cmake_build_dir)
+    sudo_cmd = 'sudo' if sudo else ''
+    try:
+        subprocess.check_call(['%s' % sudo_cmd, 'cmake', '..'])
+        subprocess.check_call(['%s' % sudo_cmd, 'make', '-j5'])
+        subprocess.check_call(['%s' % sudo_cmd, 'make', 'install'])
+    except subprocess.CalledProcessError as e:
         print('\nERROR: Failed to create shared library!\n')
-        sys.exit(exit_code)
+        sys.exit(e.returncode)
+    print('\nSuccessfully created and installed shared libraries')
     print('\n=================================================')
     print('Successfully generated C++ YDK at %s' % (cpp_sdk_root,))
-    print('Please read %sREADME.rst for information on how to install the package in your environment\n' % (
+    print('Please read %s/README.rst for information on how to install the package in your environment\n' % (
         cpp_sdk_root,))
 
 
@@ -238,6 +271,12 @@ if __name__ == '__main__':
                       default=False,
                       help="Consider yang groupings as classes.")
 
+    parser.add_option("--sudo",
+                      action="store_true",
+                      dest="sudo",
+                      default=False,
+                      help="Use sudo for C++ core library installation.")
+
     try:
         arg = sys.argv[1]
     except IndexError:
@@ -267,43 +306,45 @@ if __name__ == '__main__':
     elif options.python:
         language = 'python'
 
-
     if options.profile:
         output_directory = (YdkGenerator(
-                           output_directory,
-                           ydk_root,
-                           options.groupings_as_class,
-			               options.gentests,
-                           language,
-                           'profile').generate(options.profile))
+                            output_directory,
+                            ydk_root,
+                            options.groupings_as_class,
+                            options.gentests,
+                            language,
+                            'profile').generate(options.profile))
 
     elif options.bundle:
         output_directory = (YdkGenerator(
-                           output_directory,
-                           ydk_root,
-                           options.groupings_as_class,
-			               options.gentests,
-                           language,
-                           'bundle').generate(options.bundle))
+                            output_directory,
+                            ydk_root,
+                            options.groupings_as_class,
+                            options.gentests,
+                            language,
+                            'bundle').generate(options.bundle))
 
-    elif options.core:
+    if options.core:
         output_directory = (YdkGenerator(
-                           output_directory,
-                           ydk_root,
-                           options.groupings_as_class,
-                           options.gentests,
-                           language,
-                           'core').generate())
-
+                            output_directory,
+                            ydk_root,
+                            options.groupings_as_class,
+                            options.gentests,
+                            language,
+                            'core').generate())
 
     if options.gendoc:
         generate_documentations(output_directory, ydk_root, language, options.bundle, options.core)
 
+    minutes_str, seconds_str = _get_time_taken(start_time)
+    print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
+    print('\nPerforming compilation and/or installation...\n')
+
     if options.cpp:
-        create_shared_libraries(output_directory)
+        create_shared_libraries(output_directory, options.sudo)
     else:
         create_pip_packages(output_directory)
 
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print('Code generation completed successfully!')
-    print('Time taken: {0} {1}\n'.format(minutes_str, seconds_str))
+    print('Code generation and installation completed successfully!')
+    print('Total time taken: {0} {1}\n'.format(minutes_str, seconds_str))

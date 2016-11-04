@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 2.8.9)
 cmake_policy(SET CMP0048 NEW)
 project(ydk_@BRIEF_NAME@ VERSION 0.5.0)
 

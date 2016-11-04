@@ -19,8 +19,8 @@
 
 #include "ydk/netconf_provider.hpp"
 #include "ydk/crud_service.hpp"
-#include "ydk_ydktest/openconfig_bgp.hpp"
-#include "ydk_ydktest/openconfig_bgp_types.hpp"
+#include "ydk_openconfig/openconfig_bgp.hpp"
+#include "ydk_openconfig/openconfig_bgp_types.hpp"
 
 #include "args_parser.h"
 
@@ -88,13 +88,20 @@ int main(int argc, char* argv[])
 					    );
 	}
 
-	NetconfServiceProvider provider{host, username, password, port};
-	CrudService crud{};
+	try
+	{
+		NetconfServiceProvider provider{host, username, password, port};
+		CrudService crud{};
 
-	auto bgp = make_unique<openconfig_bgp::Bgp>();
-	config_bgp(bgp.get());
-	bool reply = crud.create(provider, *bgp);
+		auto bgp = make_unique<openconfig_bgp::Bgp>();
+		config_bgp(bgp.get());
+		bool reply = crud.create(provider, *bgp);
 
-	if(reply) cout << "Create operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+		if(reply) cout << "Create operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+	}
+	catch(YDKException & e)
+	{
+		cerr << "Error details: "<<boost::diagnostic_information(e)<<endl;
+	}
 
 }

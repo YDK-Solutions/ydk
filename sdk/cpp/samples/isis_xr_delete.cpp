@@ -41,18 +41,15 @@ int main(int argc, char* argv[])
 	bool verbose=(args[4]=="--verbose");
 	if(verbose)
 	{
-		boost::log::core::get()->set_filter(
-			        boost::log::trivial::severity >= boost::log::trivial::debug
-			    );
+		boost::log::core::get()->set_filter( boost::log::trivial::severity >= boost::log::trivial::debug );
 	}
 	else
 	{
-		boost::log::core::get()->set_filter(
-					        boost::log::trivial::severity >= boost::log::trivial::error
-					    );
+		boost::log::core::get()->set_filter( boost::log::trivial::severity >= boost::log::trivial::error );
 	}
 
-	try {
+	try
+	{
 		NetconfServiceProvider provider{host, username, password, port};
 		CrudService crud{};
 

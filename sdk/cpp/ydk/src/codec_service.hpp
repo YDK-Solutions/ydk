@@ -36,8 +36,8 @@ namespace ydk
         CodecService();
         ~CodecService();
 
-        std::string encode(CodecServiceProvider & provider, Entity & entity, bool pretty);
-        std::map<std::string, std::string> encode(CodecServiceProvider & provider, std::map<std::string, std::unique_ptr<Entity>> & entity, bool pretty);
+        std::string encode(CodecServiceProvider & provider, Entity & entity, bool pretty=false);
+        std::map<std::string, std::string> encode(CodecServiceProvider & provider, std::map<std::string, std::unique_ptr<Entity>> & entity, bool pretty=false);
 
         std::unique_ptr<Entity> decode(CodecServiceProvider & provider, std::string & payload);
         std::map<std::string, std::unique_ptr<Entity>> decode(CodecServiceProvider & provider, std::map<std::string, std::string> & payload_map);

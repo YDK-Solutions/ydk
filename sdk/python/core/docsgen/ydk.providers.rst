@@ -35,7 +35,7 @@ uses ncclient (a Netconf client library) to provide CRUD services.
     
     Codec Service Provider.
     
-    Initialization parameter of NetconfServiceProvider
+    Initialization parameter of CodecServiceProvider
     
     :param type: Type of encoding. Currently, 'xml' type is supported
 

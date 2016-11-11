@@ -223,6 +223,7 @@ class YdkGenerator(object):
         elif self.language == 'cpp':
             _modify_cpp_cmake(gen_api_root,
                               bundle.name,
+                              api_pkgs,
                               bundle.models,
                               bundle.version)
         # write init file for bundle models directory.
@@ -304,41 +305,57 @@ def _modify_python_setup(gen_api_root, pkg_name, version, dependencies=None):
             print(line, end='')
 
 
-def _modify_cpp_cmake(gen_api_root, pkg_name, models, version, descriptions=""):
+def _modify_cpp_cmake(gen_api_root, bundle_name, packages, models, version, descriptions=""):
     """ Modify CMakeLists.txt template for cpp libraries.
 
     Args:
         gen_api_root (str): Root directory for generated APIs.
-        pkg_name (str): Package name for generated APIs.
+        bundle_name (str): Package name for generated APIs.
         version (str): Package version for generated APIs.
     """
     cmake_file = os.path.join(gen_api_root, 'CMakeLists.txt')
 
-    header_files = _get_cpp_files(models, 'hpp')
-    source_files = _get_cpp_files(models, 'cpp')
+    files = _get_cpp_files(packages, models, {'source':'cpp', 'header':'hpp'})
     for line in fileinput.input(cmake_file, inplace=True):
         if "@DESCRIPTIONS@" in line:
             print(line.replace("@DESCRIPTIONS@", descriptions), end='')
         elif "@BRIEF_NAME@" in line:
-            line = line.replace("@BRIEF_NAME@", pkg_name)
+            line = line.replace("@BRIEF_NAME@", bundle_name)
             if "@SOURCE_FILES@" in line:
-                line = line.replace("@SOURCE_FILES@", source_files)
+                line = line.replace("@SOURCE_FILES@", files['source'])
             elif "@HEADER_FILES@" in line:
-                line = line.replace("@HEADER_FILES@", header_files)
+                line = line.replace("@HEADER_FILES@", files['header'])
             print(line, end='')
         elif "@BRIEF_NAME_CAP@" in line:
-            print(line.replace("@BRIEF_NAME_CAP@", pkg_name.upper()), end='')
+            print(line.replace("@BRIEF_NAME_CAP@", bundle_name.upper()), end='')
         else:
             print(line, end='')
 
 
-def _get_cpp_files(models, extension):
-    files = []
+def _get_cpp_files(packages, models, extensions):
+    files = {}
     for model in models:
-        if 'deviation' not in model.pkg_name:
-            file_name = 'ydk/models/%s.%s' % (model.pkg_name, extension)
-            files.append(file_name)
-    return ' '.join(files)
+        skip = False
+        if 'deviation' in model.pkg_name:
+            skip = True
+        else:
+            for package in packages:
+                if (package.name == model.pkg_name) and (len(package.owned_elements) == 0):
+                    skip = True
+                    break
+        if skip:
+            continue
+
+        for key, val in extensions.items():
+            file_name = 'ydk/models/%s.%s' % (model.pkg_name, val)
+            if key not in files:
+                files[key] = [file_name]
+            else:
+                files[key].append(file_name)
+    for key, val in files.items():
+        files[key] = ' '.join(files[key])
+    return files
+
 
 # Generator checks #####################################################
 def _check_generator_args(output_dir, ydk_root, language, pkg_type):

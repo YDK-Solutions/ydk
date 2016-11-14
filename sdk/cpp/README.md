@@ -32,7 +32,7 @@ System Requirements
   
 ```
     $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-    $ brew install boost pkg-config libssh cmake
+    $ brew install boost curl libssh pcre xml2 cmake
     $ xcode-select --install
 ```
 

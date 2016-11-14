@@ -63,7 +63,7 @@ We instantiate an instance of the service provider that creates a NETCONF sessio
 
 Using the model APIs
 ----------------------
-After establishing the connection, we instantiate the entities and set some data. Now, create a BGP configuration object and set the attributes
+After establishing the connection, we instantiate the entities and set some data. Now, create an :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` configuration object and set the attributes
 
 .. code-block:: c++
  :linenos:

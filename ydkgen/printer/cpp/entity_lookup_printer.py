@@ -39,14 +39,12 @@ class EntityLookUpPrinter(FilePrinter):
         self._print_headers()
         self._print_get_entity_lookup_func()
 
-    def print_header(self, packages, bundle_name):
-        pass
-
     def _init_headers(self, packages):
         unique_headers = set()
         self._add_common_headers(unique_headers)
         for package in packages:
-            self._add_package_headers(unique_headers, package)
+            if len(package.owned_elements) > 0:
+                self._add_package_headers(unique_headers, package)
         self.headers = list(sorted(unique_headers))
 
     def _add_common_headers(self, unique_headers):

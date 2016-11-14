@@ -187,14 +187,17 @@ def create_shared_libraries(output_directory, sudo):
     os.makedirs(cmake_build_dir)
     os.chdir(cmake_build_dir)
     sudo_cmd = 'sudo' if sudo else ''
-    try:
-        FNULL = open(os.devnull, 'w')
-        subprocess.check_call(['cmake', '..'], stdout=FNULL, stderr=FNULL)
-        subprocess.check_call(['make', '-j5'], stdout=FNULL, stderr=FNULL)
-        subprocess.check_call(['%s' % sudo_cmd, 'make', 'install'])
-    except subprocess.CalledProcessError as e:
-        print('\nERROR: Failed to create shared library!\n')
-        sys.exit(e.returncode)
+    log_file_name = cmake_build_dir + '/build_log.txt'
+    with open(log_file_name, 'w') as BUILD_LOG:
+        try:
+            subprocess.check_call(['cmake', '..'], stdout=BUILD_LOG, stderr=BUILD_LOG)
+            subprocess.check_call(['make', '-j5'], stdout=BUILD_LOG, stderr=BUILD_LOG)
+            subprocess.check_call(['%s' % sudo_cmd, 'make', 'install'])
+        except subprocess.CalledProcessError as e:
+            with open(log_file_name, 'r') as BUILD_LOG_READ:
+                print (BUILD_LOG_READ.read())
+            print('\nERROR: Failed to create shared library! Log written to:\n{0}\n'.format(log_file_name))
+            sys.exit(e.returncode)
     print('\nSuccessfully created and installed shared libraries')
     print('\n=================================================')
     print('Successfully generated C++ YDK at %s' % (cpp_sdk_root,))

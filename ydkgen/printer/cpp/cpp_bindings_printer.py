@@ -48,7 +48,11 @@ class CppBindingsPrinter(LanguageBindingsPrinter):
             self._print_cpp_rst_toc()
 
     def print_module(self, index, package, size):
+
         print('Processing %d of %d %s' % (index + 1, size, package.stmt.pos.ref))
+        # Skip generating module for empty modules
+        if len(package.owned_elements) == 0:
+            return
 
         self._print_header_file(package, self.models_dir)
         self._print_source_file(package, self.models_dir)
@@ -125,10 +129,6 @@ def emit_source(ctx, package, sort_clazz):
 
 def emit_entity_lookup_source(ctx, packages, bundle_name):
     EntityLookUpPrinter(ctx).print_source(packages, bundle_name)
-
-
-def emit_entity_lookup_header(ctx, packages, bundle_name):
-    EntityLookUpPrinter(ctx).print_header(packages, bundle_name)
 
 
 def emit_cpp_doc(ctx, named_element, identity_subclasses):

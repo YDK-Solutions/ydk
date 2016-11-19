@@ -1,5 +1,5 @@
 //
-// @file core.hpp
+// @file path_api.hpp
 // @brief The main ydk public header.
 //
 // YANG Development Kit
@@ -770,6 +770,7 @@ namespace ydk {
 
             };
 
+            SchemaValueBitsType(std::vector<Bit> bits);
             ~SchemaValueBitsType();
 
             DiagnosticNode<std::string, ValidationError> validate(const std::string& value) const;

@@ -32,9 +32,6 @@ namespace ydk
 static std::string get_xml_lookup_key(std::string & payload);
 static std::string get_json_lookup_key(std::string & payload);
 
-TopEntityLookUp ydk_global_entities;
-std::vector<path::Capability> ydk_global_caps;
-
 re::sregex XML_LOOKUP_KEY = re::sregex::compile("<(?P<entity>[^ ]+) xmlns=\"(?P<ns>[^\"]+)\"");
 re::sregex JSON_LOOKUP_KEY = re::sregex::compile("{[^\"]+\"(?P<key>[^\"]+)\"");
 std::string ERROR_MSG{"Failed to find namespace from %1% payload,"
@@ -56,7 +53,7 @@ CodecServiceProvider::CodecServiceProvider(path::Repository * repo, EncodingForm
 		BOOST_THROW_EXCEPTION(YDKServiceProviderException("Encoding format not supported"));
 	}
     augment_lookup_tables();
-    m_root_schema = std::unique_ptr<ydk::path::RootSchemaNode>(m_repo->create_root_schema(ydk_global_caps));
+    m_root_schema = std::unique_ptr<ydk::path::RootSchemaNode>(m_repo->create_root_schema(get_global_capabilities()));
 }
 
 CodecServiceProvider::~CodecServiceProvider()
@@ -74,11 +71,11 @@ CodecServiceProvider::get_top_entity(std::string & payload)
 {
     if (m_encoding == path::CodecService::Format::XML)
     {
-        return ydk_global_entities.lookup(get_xml_lookup_key(payload));
+        return lookup_top_entity(get_xml_lookup_key(payload));
     }
     else
     {
-        return ydk_global_entities.lookup(get_json_lookup_key(payload));
+        return lookup_top_entity(get_json_lookup_key(payload));
     }
 }
 

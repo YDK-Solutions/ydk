@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(test_uint64)
 	BOOST_REQUIRE(r_1->ytypes->built_in_t->u_number64 == r_2->ytypes->built_in_t->u_number64);
 }
 
-BOOST_AUTO_TEST_CASE(test_bits)
+BOOST_AUTO_TEST_CASE(bits)
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{&repo, "127.0.0.1", "admin", "admin", 12022};
@@ -234,8 +234,7 @@ BOOST_AUTO_TEST_CASE(test_bits)
     BOOST_REQUIRE(reply);
 
     //CREATE
-    r_1->ytypes->built_in_t->bits_value["disable-nagle"] = true;
-//    r_1->ytypes->built_in_t->bits_value["auto-sense-speed"] = true; //TODO: setting both bits values doesn't work
+    r_1->ytypes->built_in_t->bits_value["auto-sense-speed"] = true;
 	reply = crud.create(provider, *r_1);
 	BOOST_REQUIRE(reply);
 
@@ -429,7 +428,7 @@ BOOST_AUTO_TEST_CASE(test_identity)
 	BOOST_REQUIRE(reply);
 
 	//CREATE
-	r_1->ytypes->built_in_t->identity_ref_value = ydktest_sanity::ChildIdentityIdentity();
+	r_1->ytypes->built_in_t->identity_ref_value = ydktest_sanity_types::OtherIdentity();
 	reply = crud.create(provider, *r_1);
 	BOOST_REQUIRE(reply);
 
@@ -438,9 +437,9 @@ BOOST_AUTO_TEST_CASE(test_identity)
 	auto r_read = crud.read(provider, *filter);
 	BOOST_REQUIRE(r_read!=nullptr);
 
-	//TODO
-//	ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-//	BOOST_REQUIRE(r_1->ytypes->built_in_t->identity_ref_value == r_2->ytypes->built_in_t->identity_ref_value);
+	ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+    cout<<r_2->ytypes->built_in_t->identity_ref_value<<endl;
+	BOOST_REQUIRE(r_1->ytypes->built_in_t->identity_ref_value == r_2->ytypes->built_in_t->identity_ref_value);
 }
 
 BOOST_AUTO_TEST_CASE(test_submodule)
@@ -449,25 +448,24 @@ BOOST_AUTO_TEST_CASE(test_submodule)
 	NetconfServiceProvider provider{&repo, "127.0.0.1", "admin", "admin", 12022};
 	CrudService crud{};
 
-	//TODO: not working
 	//DELETE
-//	auto r_1 = make_unique<ydktest_sanity::SubTest>();
-//	bool reply = crud.delete_(provider, *r_1);
-//	BOOST_REQUIRE(reply);
-//
-//	//CREATE
-//	r_1->one_aug->name = "test";
-//	r_1->one_aug->number = 3;
-//	reply = crud.create(provider, *r_1);
-//	BOOST_REQUIRE(reply);
-//
-//	//READ
-//	auto filter = make_unique<ydktest_sanity::SubTest>();
-//	auto r_read = crud.read(provider, *filter);
-//	BOOST_REQUIRE(r_read!=nullptr);
-//	ydktest_sanity::SubTest * r_2 = dynamic_cast<ydktest_sanity::SubTest*>(r_read.get());
-//	BOOST_REQUIRE(r_1->one_aug->name == r_2->one_aug->name);
-//	BOOST_REQUIRE(r_1->one_aug->number == r_2->one_aug->number);
+	auto r_1 = make_unique<ydktest_sanity::SubTest>();
+	bool reply = crud.delete_(provider, *r_1);
+	BOOST_REQUIRE(reply);
+
+	//CREATE
+	r_1->one_aug->name = "test";
+	r_1->one_aug->number = 3;
+	reply = crud.create(provider, *r_1);
+	BOOST_REQUIRE(reply);
+
+	//READ
+	auto filter = make_unique<ydktest_sanity::SubTest>();
+	auto r_read = crud.read(provider, *filter);
+	BOOST_REQUIRE(r_read!=nullptr);
+	ydktest_sanity::SubTest * r_2 = dynamic_cast<ydktest_sanity::SubTest*>(r_read.get());
+	BOOST_REQUIRE(r_1->one_aug->name == r_2->one_aug->name);
+	BOOST_REQUIRE(r_1->one_aug->number == r_2->one_aug->number);
 }
 
 

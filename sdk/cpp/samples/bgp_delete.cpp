@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	if(verbose)
 	{
 		boost::log::core::get()->set_filter(
-			        boost::log::trivial::severity >= boost::log::trivial::debug
+			        boost::log::trivial::severity >= boost::log::trivial::trace
 			    );
 	}
 	else

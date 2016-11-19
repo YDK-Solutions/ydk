@@ -15,6 +15,7 @@
  ------------------------------------------------------------------*/
 
 #define BOOST_TEST_MODULE LevelsTests
+#include <boost/exception/all.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
@@ -54,7 +55,7 @@ BOOST_AUTO_TEST_CASE(one_level_pos_set)
     auto r_1 = make_unique<ydktest_sanity::Runner>();
 
     r_1->one->number = 1;
-    r_1->one->name = "runner:one:name";
+    r_1->one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
     bool reply = crud.create(provider, *r_1);
     BOOST_REQUIRE(reply);
 }
@@ -71,7 +72,7 @@ BOOST_AUTO_TEST_CASE(one_level_pos)
     BOOST_REQUIRE(reply);
 
     r_1->one->number = 1;
-    r_1->one->name = "runner:one:name";
+    r_1->one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
     reply = crud.create(provider, *r_1);
     BOOST_REQUIRE(reply);
 
@@ -477,7 +478,7 @@ BOOST_AUTO_TEST_CASE(test_leafref_simple_pos)
     auto r_2 = make_unique<ydktest_sanity::Runner>();
 
 	r_1->ytypes->built_in_t->number8 = 100;
-	r_1->ytypes->built_in_t->leaf_ref = r_1->ytypes->built_in_t->number8;
+	r_1->ytypes->built_in_t->leaf_ref = r_1->ytypes->built_in_t->number8.get();
 	crud.create(provider, *r_1);
 
 	//READ
@@ -486,7 +487,7 @@ BOOST_AUTO_TEST_CASE(test_leafref_simple_pos)
 
 	//UPDATE
 	r_1->ytypes->built_in_t->number8 = 110;
-	r_1->ytypes->built_in_t->leaf_ref = r_1->ytypes->built_in_t->number8;
+	r_1->ytypes->built_in_t->leaf_ref = r_1->ytypes->built_in_t->number8.get();
 	crud.update(provider, *r_1);
 	r_read = crud.read(provider, *r_2);
 	BOOST_REQUIRE(r_read != nullptr);
@@ -504,7 +505,7 @@ BOOST_AUTO_TEST_CASE(test_leafref_pos)
     BOOST_REQUIRE(reply);
 
     //CREATE
-    r_1->one->name = "runner:one:name";
+    r_1->one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
     r_1->two->sub1->number = 21;
     r_1->three->sub1->sub2->number = 311;
     auto e_1  = make_unique<ydktest_sanity::Runner::InbtwList::Ldata>();
@@ -542,12 +543,11 @@ BOOST_AUTO_TEST_CASE(test_leafref_pos)
 	r_1->inbtw_list->ldata.push_back(move(e_1));
 	r_1->inbtw_list->ldata.push_back(move(e_2));
 
-//TODO: below leafrefs not working
-//	r_1->leaf_ref->ref_one_name = r_1->one->name;
-//	r_1->leaf_ref->ref_two_sub1_number = r_1->two->sub1->number;
-//	r_1->leaf_ref->ref_three_sub1_sub2_number = r_1->three->sub1->sub2->number;
-//	r_1->leaf_ref->one->name_of_one = r_1->one->name;
-	r_1->leaf_ref->one->two->self_ref_one_name = r_1->leaf_ref->ref_one_name;
+	r_1->leaf_ref->ref_one_name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+	r_1->leaf_ref->ref_two_sub1_number = 21;
+	r_1->leaf_ref->ref_three_sub1_sub2_number = r_1->three->sub1->sub2->number.get();
+	r_1->leaf_ref->one->name_of_one = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+	r_1->leaf_ref->one->two->self_ref_one_name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
 	reply = crud.create(provider, *r_1);
 	BOOST_REQUIRE(reply);
 
@@ -585,10 +585,9 @@ BOOST_AUTO_TEST_CASE(aug_one_pos)
 	auto r_filter = make_unique<ydktest_sanity::Runner>();
 	auto r_read = crud.read(provider, *r_filter);
 	BOOST_REQUIRE(r_read!=nullptr);
-	//TODO: below not working
-	//ydktest_sanity::Runner* r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-	//BOOST_REQUIRE(r_1->one->one_aug->number == r_2->one->one_aug->number);
-	//BOOST_REQUIRE(r_1->one->one_aug->name == r_2->one->one_aug->name);
+	ydktest_sanity::Runner* r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+	BOOST_REQUIRE(r_1->one->one_aug->number == r_2->one->one_aug->number);
+	BOOST_REQUIRE(r_1->one->one_aug->name == r_2->one->one_aug->name);
 
 	//UPDATE
 	r_1->one->one_aug->number = 10;
@@ -611,11 +610,12 @@ BOOST_AUTO_TEST_CASE(aug_onelist_pos)
 	//CREATE
 	auto e_1 = make_unique<ydktest_sanity::Runner::OneList::OneAugList::Ldata>();
 	auto e_2 = make_unique<ydktest_sanity::Runner::OneList::OneAugList::Ldata>();
-	//TODO: below not working
-//	e_1->number = 1;
-//	e_1->name = "1name";
-//	e_2->number = 2;
-//	e_2->name = "2name";
+	e_1->number = 1;
+	e_1->name = "1name";
+    e_1->parent = r_1->one_list->one_aug_list.get();
+	e_2->number = 2;
+	e_2->name = "2name";
+    e_2->parent = r_1->one_list->one_aug_list.get();
 	r_1->one_list->one_aug_list->ldata.push_back(move(e_1));
 	r_1->one_list->one_aug_list->ldata.push_back(move(e_2));
 	r_1->one_list->one_aug_list->enabled = true;
@@ -626,10 +626,9 @@ BOOST_AUTO_TEST_CASE(aug_onelist_pos)
 	auto r_filter = make_unique<ydktest_sanity::Runner>();
 	auto r_read = crud.read(provider, *r_filter);
 	BOOST_REQUIRE(r_read!=nullptr);
-	//TODO: below not working
-//	ydktest_sanity::Runner* r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-//	BOOST_REQUIRE(r_1->one_list->one_aug_list->ldata[0]->name == r_2->one_list->one_aug_list->ldata[0]->name);
-//	BOOST_REQUIRE(r_1->one_list->one_aug_list->ldata[0]->number == r_2->one_list->one_aug_list->ldata[0]->number);
+	ydktest_sanity::Runner* r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+	BOOST_REQUIRE(r_1->one_list->one_aug_list->ldata[0]->name == r_2->one_list->one_aug_list->ldata[0]->name);
+	BOOST_REQUIRE(r_1->one_list->one_aug_list->ldata[0]->number == r_2->one_list->one_aug_list->ldata[0]->number);
 }
 
 BOOST_AUTO_TEST_CASE(parent_empty)
@@ -644,15 +643,14 @@ BOOST_AUTO_TEST_CASE(parent_empty)
 	BOOST_REQUIRE(reply);
 
 	//CREATE
-	//TODO: below not working
-	//r_1->ytypes->built_in_t->emptee = Empty();
+	r_1->ytypes->built_in_t->emptee = Empty();
 	reply = crud.create(provider, *r_1);
 	BOOST_REQUIRE(reply);
 
 	//READ
-//	auto r_filter = make_unique<ydktest_sanity::Runner>();
-//	auto r_read = crud.read(provider, *r_filter);
-//	BOOST_REQUIRE(r_read!=nullptr);
+	auto r_filter = make_unique<ydktest_sanity::Runner>();
+	auto r_read = crud.read(provider, *r_filter);
+	BOOST_REQUIRE(r_read!=nullptr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

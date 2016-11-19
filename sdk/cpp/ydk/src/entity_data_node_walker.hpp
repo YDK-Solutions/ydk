@@ -30,7 +30,7 @@
 
 #include <vector>
 #include <map>
-#include "core.hpp"
+#include "path_api.hpp"
 
 namespace ydk {
 

@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <memory>
-#include "../src/core.hpp"
+#include "../src/path_api.hpp"
 #include "../src/netconf_provider.hpp"
 
 
@@ -24,19 +24,19 @@ void print_paths(ydk::path::SchemaNode* sn)
 void test_bgp_create()
 {
     ydk::path::Repository repo{};
-    
+
     ydk::NetconfServiceProvider sp{&repo,"127.0.0.1", "admin", "admin",  2022};
-    
+
     ydk::path::RootSchemaNode* schema = sp.get_root_schema();
     print_paths(schema);
-        
+
     auto bgp = schema->create("openconfig-bgp:bgp", "");
 
     //get the root
     std::unique_ptr<const ydk::path::DataNode> data_root{bgp->root()};
 
     bgp->create("global/config/as", "65172");
-    
+
 
     auto l3vpn_ipv4_unicast = bgp->create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
     l3vpn_ipv4_unicast->create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
@@ -59,9 +59,9 @@ void test_bgp_create()
     auto s = ydk::path::CodecService{};
     auto xml = s.encode(bgp, ydk::path::CodecService::Format::XML, true);
     //auto json = s.encode(bgp, ydk::path::CodecService::Format::JSON, true);
-    
+
     std::cout << "Testing encoding" << std::endl;
-    
+
     std::cout << "*********************************************************" << std::endl;
     std::cout << "*********************************************************" << std::endl;
     std::cout <<  xml << std::endl;
@@ -70,24 +70,24 @@ void test_bgp_create()
     //std::cout <<  json << std::endl;
     std::cout << "*********************************************************" << std::endl;
     std::cout << "*********************************************************" << std::endl;
-    
+
     std::cout << "Testing decoding" << std::endl;
-    
+
     //todo enable after fixing bugs
-    
+
     //codec service bugs
     auto new_bgp = s.decode(schema, xml, ydk::path::CodecService::Format::XML);
     if (new_bgp) {
         std::cout << "deserialized successfully" << std::endl;
     }
-    
+
     auto new_xml = s.encode(new_bgp, ydk::path::CodecService::Format::XML, true);
     std::cout << "*********************************************************" << std::endl;
     std::cout << "*********************************************************" << std::endl;
     std::cout <<  new_xml << std::endl;
     std::cout << "*********************************************************" << std::endl;
     std::cout << "*********************************************************" << std::endl;
-    
+
 
     //TODO fix rpc
     std::unique_ptr<ydk::path::Rpc> create_rpc { schema->rpc("ydk:create") };
@@ -141,8 +141,8 @@ void test_bgp_create()
 
 int main() {
 
-	
-    
+
+
     //create
     test_bgp_create();
 

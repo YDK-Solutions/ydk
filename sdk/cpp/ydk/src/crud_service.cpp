@@ -25,7 +25,7 @@
 
 #include "crud_service.hpp"
 #include "types.hpp"
-#include "core.hpp"
+#include "path_api.hpp"
 #include "entity_data_node_walker.hpp"
 
 using namespace std;

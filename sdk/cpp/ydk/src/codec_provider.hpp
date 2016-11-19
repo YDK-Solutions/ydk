@@ -25,15 +25,12 @@
 #define CODEC_PROVIDER_HPP
 
 
-#include "core.hpp"
+#include "path_api.hpp"
 #include "types.hpp"
 #include "entity_lookup.hpp"
 
 namespace ydk
 {
-    extern TopEntityLookUp ydk_global_entities;
-    extern std::vector<path::Capability> ydk_global_caps;
-
     class CodecServiceProvider
     {
     public:

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Yang Development Kit's documentation!
+Welcome to YDK's C++ documentation!
 ================================================
 
 Contents:

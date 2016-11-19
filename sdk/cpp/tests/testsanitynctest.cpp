@@ -24,7 +24,7 @@
 #define BOOST_TEST_MODULE OCBgpTest
 #include <boost/test/unit_test.hpp>
 #include <iostream>
-#include "../ydk/src/core.hpp"
+#include "../ydk/src/path_api.hpp"
 #include "config.hpp"
 #include "../ydk/src/netconf_provider.hpp"
 

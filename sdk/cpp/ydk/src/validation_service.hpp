@@ -31,7 +31,7 @@
 #include <string>
 #include <memory>
 #include "service.hpp"
-#include "core.hpp"
+#include "path_api.hpp"
 #include "types.hpp"
 
 namespace ydk {

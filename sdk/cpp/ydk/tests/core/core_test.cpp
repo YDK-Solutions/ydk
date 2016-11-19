@@ -24,8 +24,8 @@
 #define BOOST_TEST_MODULE CoreTest
 #include <boost/test/unit_test.hpp>
 #include <iostream>
-#include "../../src/core.hpp"
-#include "../../src/path/core_private.hpp"
+#include "../../src/path_api.hpp"
+#include "../../src/path/path_private.hpp"
 #include "../config.hpp"
 
 BOOST_AUTO_TEST_CASE( test_segmentalize  )

@@ -17,7 +17,7 @@ Behind the scenes the repository is responsible for loading and parsing the YANG
 
     .. cpp:function:: Repository()
 
-        Constructs an instance of the ``Repository`` class. If the server supports model download, the repo will attempt to download all models from the server using the provided :cpp:class:`ModelProvider<ModelProvider>`.
+        Constructs an instance of the ``Repository`` class. If the server supports model download, the repo will attempt to download all models from the server using the :cpp:class:`ModelProvider<ModelProvider>` provided using the :cpp:func:`add_model_provider<add_model_provider>` method.
 
         :raises: :cpp:class:`YDKInvalidArgumentException<YDKInvalidArgumentException>` if the search_dir is not a valid directory in the filesystem.
 

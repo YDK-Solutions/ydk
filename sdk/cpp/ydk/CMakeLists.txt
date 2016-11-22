@@ -60,7 +60,7 @@ set(libydk_src
     src/ydk_yang.cpp
     src/path/annotation.cpp
     src/path/capability.cpp
-    src/path/core.cpp
+    src/path/path.cpp
     src/path/data_node.cpp
     src/path/repository.cpp
     src/path/root_data_node.cpp
@@ -76,7 +76,7 @@ set(libydk_headers
     src/codec_service.hpp
     src/codec_provider.hpp
     src/entity_lookup.hpp
-    src/core.hpp
+    src/path_api.hpp
     src/entity_data_node_walker.hpp
     src/types.hpp
     src/errors.hpp
@@ -89,7 +89,7 @@ set(libydk_install_headers
     src/codec_provider.hpp
     src/entity_lookup.hpp
     src/entity_util.hpp
-    src/core.hpp
+    src/path_api.hpp
     src/crud_service.hpp
     src/errors.hpp
     src/types.hpp
@@ -275,7 +275,7 @@ set(libyang_headers_location ${CMAKE_CURRENT_BINARY_DIR}/project_libyang/headers
 ExternalProject_Add(project_libyang
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/project_libyang"
     URL "https://github.com/manradhaCisco/libyang/archive/master.zip"
-    CMAKE_ARGS -DSTATIC=true
+    CMAKE_ARGS -DSTATIC=true -DCMAKE_BUILD_TYPE:STRING=release
     INSTALL_DIR "${libyang_location}"
     INSTALL_COMMAND mkdir -p ${libyang_headers_location}/libyang && cp ${libyang_headers} ${libyang_headers_location}/libyang
 )

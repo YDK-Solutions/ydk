@@ -282,7 +282,7 @@ function cpp_sanity_core_gen_install {
     print_msg "cpp_sanity_core_gen_install"
 
     cd $YDKGEN_HOME && source gen_env/bin/activate
-    run_test generate.py --core --cpp --verbose --sudo --generate-doc
+    run_test generate.py --core --cpp --verbose --generate-doc
 }
 
 function cpp_sanity_core_test {
@@ -290,7 +290,7 @@ function cpp_sanity_core_test {
 
     init_confd $YDKGEN_HOME/sdk/cpp/ydk/tests/confd/ydktest
     cd gen-api/cpp/ydk/build
-    run_exec_test make test
+    run_exec_test make install test
 }
 
 function cpp_sanity_ydktest {
@@ -304,7 +304,10 @@ function cpp_sanity_ydktest_gen_install {
     print_msg "cpp_sanity_ydktest_gen"
 
     cd $YDKGEN_HOME && source gen_env/bin/activate
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json --cpp --sudo --generate-doc
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json --cpp --generate-doc
+    cd gen-api/cpp/ydktest-bundle/build
+    run_exec_test make install
+    cd -
 }
 
 function cpp_sanity_ydktest_test {

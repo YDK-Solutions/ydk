@@ -29,7 +29,12 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE release)
 endif()
 
-set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+if(SHOW_WARNINGS)
+  set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+else(SHOW_WARNINGS)
+  set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -w")
+endif(SHOW_WARNINGS)
+
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0")
 

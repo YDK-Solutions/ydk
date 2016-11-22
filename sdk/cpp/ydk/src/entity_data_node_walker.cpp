@@ -4,8 +4,8 @@
 #include <boost/log/trivial.hpp>
 #include <iostream>
 
-#include "path/core_private.hpp"
-#include "core.hpp"
+#include "path/path_private.hpp"
+#include "path_api.hpp"
 #include "types.hpp"
 
 using namespace std;
@@ -50,7 +50,7 @@ static void walk_children(Entity & entity, path::DataNode* data_node)
 	for(auto const& child : children)
 	{
 		BOOST_LOG_TRIVIAL(trace) <<"=================="<<endl;
-		BOOST_LOG_TRIVIAL(trace) <<"Looking at child "<<child.second->get_entity_path(child.second->parent).path;
+		BOOST_LOG_TRIVIAL(trace) <<"Looking at child '"<< child.first << "': " << child.second->get_entity_path(child.second->parent).path;
 		if(child.second->has_data())
 			populate_data_node(*(child.second), data_node);
 		else

@@ -32,7 +32,7 @@
 #include "libyang/tree_data.h"
 #include "libyang/xml.h"
 
-#include "../core.hpp"
+#include "../path_api.hpp"
 
 #include <algorithm>
 #include <map>

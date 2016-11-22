@@ -25,7 +25,7 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-#include "ydk/core.hpp"
+#include "ydk/path_api.hpp"
 #include "ydk/netconf_provider.hpp"
 #include "ydk_ydktest/ydktest_sanity.hpp"
 #include "ydk/types.hpp"
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_int32 )
     BOOST_REQUIRE( !diagnostic.has_errors() );
 
 }
-/*
+
 BOOST_AUTO_TEST_CASE( test_sanity_types_int64 )
 {
     ydk::path::Repository repo{TEST_HOME};
@@ -95,14 +95,14 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_int64 )
     ydk::ValidationService validation_service{};
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
-    builtInT.number64 = static_cast<int64_t>(-922337203685477580LL);
+    builtInT.number64 = -922337203685477580LL;
 
     auto diagnostic = validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG);
 
     BOOST_REQUIRE( !diagnostic.has_errors() );
 
 }
-*/
+
 BOOST_AUTO_TEST_CASE( test_sanity_types_uint8 )
 {
      ydk::path::Repository repo{TEST_HOME};
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_uint32 )
 
     BOOST_REQUIRE( !diagnostic.has_errors() );
 }
-/*
+
 BOOST_AUTO_TEST_CASE( test_sanity_types_uint64 )
 {
 
@@ -164,15 +164,15 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_uint64 )
     ydk::ValidationService validation_service{};
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
-    builtInT.u_number64 = static_cast<uint64_t>(18446744073709551615ULL);
+    builtInT.u_number64 = 18446744073709551615ULL;
 
     auto diagnostic = validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG);
 
     BOOST_REQUIRE( !diagnostic.has_errors() );
 }
-*/
 
-BOOST_AUTO_TEST_CASE( test_sanity_types_bits )
+
+BOOST_AUTO_TEST_CASE( bits )
 {
     ydk::path::Repository repo{TEST_HOME};
 
@@ -182,11 +182,12 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_bits )
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.bits_value["disable-nagle"] = true;
+    builtInT.bits_value["auto-sense-speed"] = true;
     auto r = builtInT.get_entity_path(nullptr);
     BOOST_TEST_MESSAGE(r.path);
 
     auto diagnostic = validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG);
-    //BOOST_REQUIRE( !diagnostic.has_errors() ); //TODO: possible bug in core not able to validate bits
+    BOOST_REQUIRE( !diagnostic.has_errors() );
 
 }
 
@@ -199,12 +200,10 @@ BOOST_AUTO_TEST_CASE( test_sanity_types_decimal64 )
     ydk::ValidationService validation_service{};
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
-    builtInT.deci64 = "3.2";
-    auto r = builtInT.get_entity_path(nullptr);
-    BOOST_TEST_MESSAGE(r.path);
+    builtInT.deci64 = ydk::Decimal64("3.2");
 
     auto diagnostic = validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG);
-    BOOST_REQUIRE( !diagnostic.has_errors() ); //TODO: possible bug in core not able to validate bits
+    BOOST_REQUIRE( !diagnostic.has_errors() );
 
 }
 
@@ -369,10 +368,10 @@ BOOST_AUTO_TEST_CASE( test_union_leaflist)
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     ydk::Value value1{ydk::YType::int16, "llunion"};
-    value1 = (ydk::int16)1;
+    value1 = static_cast<uint16_t>(1);
 
     ydk::Value value2{ydk::YType::int16, "llunion"};
-    value2 = (ydk::int16)2;
+    value2 = static_cast<uint16_t>(2);
 
     builtInT.llunion.append(value1);
     builtInT.llunion.append(value2);
@@ -393,14 +392,9 @@ BOOST_AUTO_TEST_CASE( test_enum_leaflist)
     ydk::ValidationService validation_service{};
 
     ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
-    ydk::Value value1{ydk::YType::enumeration, "enum-llist"};
-    value1 = ydk::ydktest_sanity::YdkEnumTestEnum::local;
-    builtInT.enum_llist.append(value1);
 
-
-    ydk::Value value2{ydk::YType::enumeration, "enum-llist"};
-    value2 = ydk::ydktest_sanity::YdkEnumTestEnum::remote;
-    builtInT.enum_llist.append(value2);
+    builtInT.enum_llist.append(ydk::ydktest_sanity::YdkEnumTestEnum::local);
+    builtInT.enum_llist.append(ydk::ydktest_sanity::YdkEnumTestEnum::remote);
 
     auto diagnostic = validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG);
 

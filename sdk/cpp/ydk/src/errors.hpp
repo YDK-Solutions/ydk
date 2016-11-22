@@ -41,10 +41,9 @@ namespace ydk {
 ///
 struct YDKException : public std::exception, public boost::exception
 {
-	YDKException(const std::string& msg) : err_msg{msg}
-	{
+	YDKException(const std::string& msg);
 
-	}
+	const char* what() const noexcept;
 
 	std::string err_msg;
 };

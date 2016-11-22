@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////
 
 
-#include "core_private.hpp"
+#include "path_private.hpp"
 #include "../ydk_yang.hpp"
 #include <boost/log/trivial.hpp>
 #include <fstream>
@@ -32,12 +32,39 @@ namespace fs = boost::filesystem;
 //////////////////////////////////////////////////////////////////////////
 // class ydk::Repository
 //////////////////////////////////////////////////////////////////////////
+namespace ydk
+{
+namespace path
+{
+void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
+{
+	std::ostringstream err_path{};
+	if(path)
+	{
+		err_path << "Path: '" << path<<"'";
+	}
+	switch(level)
+	{
+		case LY_LLERR:
+			BOOST_LOG_TRIVIAL(error)<<"Libyang ERROR: "<<msg<<" "<<err_path.str();
+			break;
+		case LY_LLSILENT:
+		case LY_LLWRN:
+		case LY_LLVRB:
+		case LY_LLDBG:
+			BOOST_LOG_TRIVIAL(trace)<<"Libyang TRACE: "<<msg<<" "<<err_path.str();
+			break;
+	}
+}
+}
+}
 
 ydk::path::Repository::Repository()
   : using_temp_directory(true)
 {
     path = fs::temp_directory_path();
-    ly_verb(LY_LLSILENT);
+    ly_verb(LY_LLSILENT); //turn off libyang logging at the beginning
+    ly_set_log_clb(libyang_log_callback, 1);
 }
 
 
@@ -49,7 +76,8 @@ ydk::path::Repository::Repository(const std::string& search_dir)
         BOOST_THROW_EXCEPTION(YDKInvalidArgumentException{"path is not a valid directory"});
     }
 
-    ly_verb(LY_LLSILENT);
+    ly_verb(LY_LLSILENT); //turn off libyang logging at the beginning
+    ly_set_log_clb(libyang_log_callback, 1);
 }
 
 
@@ -231,6 +259,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
 
     }
 
+    ly_verb(LY_LLVRB); // enable libyang logging after model download has completed
     RootSchemaNodeImpl* rs = new RootSchemaNodeImpl{ctx};
     return rs;
 }

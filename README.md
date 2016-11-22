@@ -64,7 +64,6 @@ Options:
   -c, --cpp           Generate C++ bundle/core
   --core              Install the python/C++ core
   --bundle=PROFILE    Take options from a bundle profile file describing YANG
-  --sudo              Use superuser permission (during C++ bundle/core generation if necessary)
   -v, --verbose       Verbose mode
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
@@ -141,7 +140,7 @@ Only directory examples are shown below.
 ```
 ### Generating documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three bundles and the core:
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three bundles and the core. Note that this process could take a few hours due to the size of the cisco_ios_xr bundle:
 
 ```
 ./generate.py --python --bundle profiles/bundles/ietf_0_1_1.json
@@ -197,8 +196,11 @@ $ python test/test_sanity_filters.py
 ### C++
 First, install the [test](profiles/test/ydktest-cpp.json) bundle and core package
 ```
-$./generate.py --core --cpp
-$./generate.py --bundle profiles/test/ydktest-cpp.json --cpp
+$ ./generate.py --core --cpp
+$ ./generate.py --bundle profiles/test/ydktest-cpp.json --cpp
+$ cd gen-api/cpp/ydktest-bundle/build
+$ sudo make install
+$ cd -
 ```
 
 To run the core and bundle tests, do the following
@@ -206,7 +208,7 @@ To run the core and bundle tests, do the following
 ```
 $ cd ydk-gen/sdk/cpp/ydk
 $ mkdir build && cd build
-$ cmake .. && make all test
+$ cmake .. && sudo make all install test
 
 $ cd ydk-gen/sdk/cpp/tests
 $ mkdir build && cd build

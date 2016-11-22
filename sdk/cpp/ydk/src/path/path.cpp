@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////
 
 
-#include "core_private.hpp"
+#include "path_private.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -219,7 +219,13 @@ namespace ydk {
                     break;
                     }
                 case LY_TYPE_BITS: {
-                    SchemaValueBitsType* bits = new SchemaValueBitsType{};
+                	std::vector<SchemaValueBitsType::Bit> bit_values;
+                	for(int index=0; index < type->info.bits.count; index++)
+                	{
+                		bit_values.push_back(SchemaValueBitsType::Bit{type->info.bits.bit[index].name, type->info.bits.bit[index].pos});
+                	}
+
+                    SchemaValueBitsType* bits = new SchemaValueBitsType{bit_values};
                     m_type = bits;
                     break;
                 }

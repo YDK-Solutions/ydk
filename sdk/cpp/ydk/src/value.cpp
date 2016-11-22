@@ -30,7 +30,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "core.hpp"
+#include "path_api.hpp"
 #include "errors.hpp"
 #include "types.hpp"
 
@@ -88,31 +88,6 @@ Value::Value(Value&& val):
     type{val.type},
 	bits_value{val.bits_value}
 {
-    val.is_set = false;
-}
-
-ydk::Value&
-Value::operator=(const Value& val)
-{
-    is_set = val.is_set;
-    name = val.name;
-    value = val.value;
-    type = val.type;
-    bits_value = val.bits_value;
-
-    return *this;
-}
-
-ydk::Value&
-Value::operator=(Value&& val)
-{
-    is_set = val.is_set;
-    name = std::move(val.name);
-    value = std::move(val.value);
-    type = val.type;
-    bits_value = std::move(val.bits_value);
-
-    return *this;
 }
 
 

@@ -109,9 +109,8 @@ def get_cpp_release_version(output_directory):
     return (release, version)
 
 
-def copy_docs_from_bundles(ydk_root, language, destination_dir):
-    output_root_dir = os.path.join(ydk_root, 'gen-api')
-    output_root_dir = os.path.join(output_root_dir, language)
+def copy_docs_from_bundles(output_directory, destination_dir):
+    output_root_dir = os.path.join(output_directory, '..')
     bundle_dirs = os.listdir(output_root_dir)
     index_file = os.path.join(destination_dir, 'index.rst')
     backup_index_file = os.path.join(destination_dir, 'index_bkp.rst')
@@ -145,7 +144,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     # print about YDK page
     print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
     if is_core:
-        copy_docs_from_bundles(ydk_root, language, py_api_doc_gen)
+        copy_docs_from_bundles(output_directory, py_api_doc_gen)
     # build docs
     p = subprocess.Popen(['sphinx-build',
                           '-D', release,
@@ -180,29 +179,23 @@ def create_pip_packages(output_directory):
         py_sdk_root,))
 
 
-def create_shared_libraries(output_directory, sudo):
+def create_shared_libraries(output_directory):
     cpp_sdk_root = os.path.join(output_directory)
     cmake_build_dir = os.path.join(output_directory, 'build')
     if os.path.exists(cmake_build_dir):
         shutil.rmtree(cmake_build_dir)
     os.makedirs(cmake_build_dir)
     os.chdir(cmake_build_dir)
-    sudo_cmd = 'sudo' if sudo else ''
-    log_file_name = os.path.join(cmake_build_dir, 'build_log.txt')
-    with open(log_file_name, 'w') as BUILD_LOG:
-        try:
-            subprocess.check_call(['cmake', '..'], stdout=BUILD_LOG, stderr=BUILD_LOG)
-            subprocess.check_call(['make', '-j5'], stdout=BUILD_LOG, stderr=BUILD_LOG)
-            subprocess.check_call(['%s' % sudo_cmd, 'make', 'install'])
-        except subprocess.CalledProcessError as e:
-            with open(log_file_name, 'r') as BUILD_LOG_READ:
-                print (BUILD_LOG_READ.read())
-            print('\nERROR: Failed to create shared library! Log written to:\n{0}\n'.format(log_file_name))
-            sys.exit(e.returncode)
-    print('\nSuccessfully created and installed shared libraries')
+    try:
+        subprocess.check_call(['cmake', '..'])
+        subprocess.check_call(['make', '-j5'])
+    except subprocess.CalledProcessError as e:
+        print('\nERROR: Failed to create shared library!\n')
+        sys.exit(e.returncode)
+    print('\nSuccessfully created shared libraries at {0}.\nTo install, run "[sudo] make install" from {0}'.format(output_directory, cmake_build_dir))
     print('\n=================================================')
     print('Successfully generated C++ YDK at %s' % (cpp_sdk_root,))
-    print('Please read %s/README.md for information on how to install the package in your environment\n' % (
+    print('Please read %s/README.md for information on how to use YDK\n' % (
         cpp_sdk_root,))
 
 
@@ -273,12 +266,6 @@ if __name__ == '__main__':
                       default=False,
                       help="Consider yang groupings as classes.")
 
-    parser.add_option("--sudo",
-                      action="store_true",
-                      dest="sudo",
-                      default=False,
-                      help="Use sudo for C++ core library installation.")
-
     try:
         arg = sys.argv[1]
     except IndexError:
@@ -331,10 +318,10 @@ if __name__ == '__main__':
 
     minutes_str, seconds_str = _get_time_taken(start_time)
     print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
-    print('\nPerforming compilation and/or installation...\n')
+    print('\nBuilding {0} package...\n'.format(language))
 
     if options.cpp:
-        create_shared_libraries(output_directory, options.sudo)
+        create_shared_libraries(output_directory)
     else:
         create_pip_packages(output_directory)
 

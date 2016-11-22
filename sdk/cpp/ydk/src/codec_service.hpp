@@ -23,7 +23,7 @@
 #ifndef CODEC_SERVICE_HPP
 #define CODEC_SERVICE_HPP
 
-#include "core.hpp"
+#include "path_api.hpp"
 #include "types.hpp"
 #include "codec_provider.hpp"
 

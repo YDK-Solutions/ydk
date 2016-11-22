@@ -33,6 +33,7 @@ find_library(ssh_location ssh)
 find_library(ssh_threads_location ssh_threads)
 find_library(pcre_location pcre)
 find_library(xslt_location xslt)
+find_package(Boost REQUIRED)
 find_package(Boost COMPONENTS log_setup log thread date_time system filesystem unit_test_framework REQUIRED)
 set(BOOST_INCLUDE_DIRS $boost_installation_prefix/include)
 

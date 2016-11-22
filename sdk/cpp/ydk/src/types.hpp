@@ -201,8 +201,8 @@ class Value {
     Value(const Value& val);
     Value(Value&& val);
 
-    Value& operator=(const Value& val);
-    Value& operator=(Value&& val);
+    Value& operator=(const Value& val)=delete;
+    Value& operator=(Value&& val)=delete;
 
 	const std::string get() const;
 	std::pair<std::string, std::string> get_name_value() const;

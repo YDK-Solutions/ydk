@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "core.hpp"
+#include "path_api.hpp"
 
 namespace ydk {
 

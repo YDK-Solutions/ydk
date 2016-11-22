@@ -48,9 +48,9 @@ class EntityLookUpPrinter(FilePrinter):
         self.headers = list(sorted(unique_headers))
 
     def _add_common_headers(self, unique_headers):
-        unique_headers.add('#include "ydk/core.hpp"')
+        unique_headers.add('#include "ydk/path_api.hpp"')
         unique_headers.add('#include "ydk/types.hpp"')
-        unique_headers.add('#include "ydk/codec_provider.hpp"')
+        unique_headers.add('#include "ydk/entity_lookup.hpp"')
 
     def _add_package_headers(self, unique_headers, package):
         self._add_import_statement(unique_headers, package)
@@ -73,7 +73,7 @@ class EntityLookUpPrinter(FilePrinter):
         self.capability_lookup = capability_lookup
 
     def _get_module_revision(self, package):
-        module_name, revision = None, ""
+        revision = ""
         revision_stmt = package.stmt.search_one('revision')
         if revision_stmt:
             revision = revision_stmt.arg
@@ -108,9 +108,10 @@ class EntityLookUpPrinter(FilePrinter):
 
     def _print_get_entity_lookup_func_header(self):
         self.ctx.bline()
-        self.ctx.writelns(["namespace ydk {\n",
-                           "void",
-                           "augment_lookup_tables()",
+        self.ctx.writeln('namespace ydk')
+        self.ctx.writeln('{')
+        self.ctx.bline()
+        self.ctx.writelns(["void augment_lookup_tables()",
                            "{"])
 
         self.ctx.bline()
@@ -120,17 +121,20 @@ class EntityLookUpPrinter(FilePrinter):
         for path in self.entity_lookup:
             self._print_insert_statement(path)
 
+        self.ctx.bline()
+        self.ctx.bline()
+
         for (module_name, revision) in self.capability_lookup:
-            self._print_emplace_statement(module_name, revision)
+            self._print_push_back_statement(module_name, revision)
 
     def _print_insert_statement(self, path):
         qualified_name = self.entity_lookup[path]
-        self.ctx.writeln("ydk_global_entities.insert(std::string{\"%s\"},"
+        self.ctx.writeln("ydk_top_entities_table.insert(std::string{\"%s\"},"
                          "std::make_unique<%s>());"
                          % (path, qualified_name))
 
-    def _print_emplace_statement(self, module_name, revision):
-        self.ctx.writeln("ydk_global_caps.emplace_back("
+    def _print_push_back_statement(self, module_name, revision):
+        self.ctx.writeln("ydk_global_capabilities.push_back("
                          "path::Capability{std::string{\"%s\"},"
                          "\"%s\", {}, {}});"
                          % (module_name, revision))

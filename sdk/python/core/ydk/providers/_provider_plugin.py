@@ -22,7 +22,6 @@
 
 """
 from lxml import etree
-from xml.dom import minidom
 
 from ydk._core._dm_meta_info import REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS
 from ydk.errors import YPYServiceProviderError, YPYErrorCode

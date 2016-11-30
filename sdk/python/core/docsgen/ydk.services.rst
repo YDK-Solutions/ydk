@@ -191,7 +191,7 @@ Netconf Service class for executing netconf operations.
                 :param provider: A provider instance.
                 :type provider: ydk.providers.ServiceProvider
                 :param target: Particular configuration to copy to. Valid options are :py:attr:`.Datastore.candidate`, :py:attr:`.Datastore.running`, :py:attr:`.Datastore.startup` and url(``str``) if the device has such feature advertised in device capability.
-                :param source: Particular configuration to copy from. Valid options are :py:attr:`.Datastore.candidate`, :py:attr:`.Datastore.running`, :py:attr:`.Datastore.startup` and url(``str``) if the deivce has such feature advertised in capability. YDK entity object could also be used as a config block for this parameter.
+                :param source: Particular configuration to copy from. Valid options are :py:attr:`.Datastore.candidate`, :py:attr:`.Datastore.running`, :py:attr:`.Datastore.startup` and url(``str``) if the deivce has such feature advertised in capability. A YDK entity object can also be used for this parameter.
                 :param with_defaults: The explicit defaults processing mode requested.
                 :type with_defaults: :py:attr:`ietf_netconf.WithDefaultsModeEnum`
 
@@ -375,7 +375,7 @@ Netconf Service class for executing netconf operations.
 
                 :param provider: A provider instance.
                 :type provider: ydk.providers.ServiceProvider
-                :param source: Particular configuration to validate. Valid options are :py:attr:`.Datastore.candidate`, :py:attr:`.Datastore.running`, :py:attr:`.Datastore.startup` and url(``str``) if the deivce has such feature advertised in device capability. YDK entity object could also be used as a config block for this parameter.
+                :param source: Particular configuration to validate. Valid options are :py:attr:`.Datastore.candidate`, :py:attr:`.Datastore.running`, :py:attr:`.Datastore.startup` and url(``str``) if the deivce has such feature advertised in device capability. A YDK entity object can also be used for this parameter.
                 :param with_defaults: The explicit defaults processing mode requested.
                 :type with_defaults: :py:attr:`ietf_netconf.WithDefaultsModeEnum`
 

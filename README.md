@@ -48,7 +48,7 @@ It is recommended to install a python distribution like [PythonXY](https://pytho
 ```
 $ git clone https://github.com/CiscoDevNet/ydk-gen.git
 $ cd ydk-gen
-$ pip install -r requirements
+$ pip install -r requirements.txt
 ```
 
 ## Usage

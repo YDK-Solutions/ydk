@@ -283,6 +283,9 @@ function cpp_sanity_core_gen_install {
 
     cd $YDKGEN_HOME && source gen_env/bin/activate
     run_test generate.py --core --cpp --verbose --generate-doc
+    cd $YDKGEN_HOME/gen-api/cpp/ydk/build
+    run_exec_test make install
+    cd $YDKGEN_HOME
 }
 
 function cpp_sanity_core_test {
@@ -290,7 +293,7 @@ function cpp_sanity_core_test {
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
     cd gen-api/cpp/ydk/build
-    run_exec_test make install test
+    run_exec_test make test
 }
 
 function cpp_sanity_ydktest {
@@ -323,12 +326,12 @@ function cpp_sanity_ydktest_test {
         for test_name in $(ls test*);
         do
             echo "Running $test_name"
-            ./$test_name -l all > output 
+            ./$test_name -l all > output
             local test_status=$?
             if [ $test_status -ne 0 ]; then
                 cat output
                 exit $test_status
-            fi 
+            fi
         done
         exit $status
     fi
@@ -355,6 +358,63 @@ function cpp_tests {
     init_env "python" "python"
     cpp_sanity_core
     cpp_sanity_ydktest
+    teardown_env
+}
+
+function cpp_test_gen_test {
+    print_msg "cpp_test_gen_test"
+
+    cd $YDKGEN_HOME
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
+    mkdir -p gen-api/cpp/models_test-bundle/ydk/tests/build
+    cd gen-api/cpp/models_test-bundle/ydk/tests/build
+    run_exec_test cmake ..
+    run_exec_test make
+    ctest --output-on-failure
+}
+
+function cpp_test_gen {
+    print_msg "cpp_test_gen"
+
+    cd $YDKGEN_HOME
+    cpp_sanity_core_gen_install
+    run_test generate.py --bundle profiles/test/ydk-models-test.json --verbose --generate-tests --cpp
+    cd gen-api/cpp/models_test-bundle/build/
+    run_exec_test make install
+
+    # cpp_test_gen_test
+}
+
+function py_test_gen_test {
+    print_msg "py_test_gen_test"
+
+    cd $YDKGEN_HOME
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
+    cd gen-api/python/models_test-bundle/ydk/tests/models_test/
+    python -m unittest discover
+}
+
+function py_test_gen {
+    print_msg "py_test_gen"
+
+    cd $YDKGEN_HOME
+    run_test generate.py --core --python
+    run_test generate.py --bundle profiles/test/ydk-models-test.json --verbose --generate-tests --python
+    pip install gen-api/python/ydk/dist/ydk*.tar.gz
+    pip install gen-api/python/models_test-bundle/dist/ydk*.tar.gz
+
+    # py_test_gen_test
+}
+
+function test_gen_tests {
+    print_msg "test_gen_tests"
+
+    init_env "python" "python"
+    cd $YDKGEN_HOME && source gen_env/bin/activate
+    git clone https://github.com/abhikeshav/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
+
+    py_test_gen
+    cpp_test_gen
 }
 
 
@@ -365,6 +425,7 @@ cd $DIR/..
 
 py_tests
 cpp_tests
+test_gen_tests
 cd $YDKGEN_HOME
 print_msg "combining coverage"
 coverage combine

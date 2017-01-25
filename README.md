@@ -4,14 +4,18 @@
 
 - [YDK-GEN](#ydk-gen)
   - [Installation](#installation)
+    - [Setting up your environment](#setting-up-your-environment)
+    - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
   - [Usage](#usage)
-    - [Installing the YDK core](#installing-the-ydk-core)
-    - [Bundle profiles](#bundle-profiles)
+    - [First step: choose your bundle profile](#first-step-choose-your-bundle-profile)
       - [Details](#details)
-    - [Generating documentation](#generating-documentation)
+    - [Second step: Generate & install the core](#second-step-generate--install-the-core)
+    - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
+    - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
+    - [Documentation](#documentation)
   - [Notes](#notes)
     - [Python version](#python-version)
-    - [Directory Structure](#directory-structure)
+    - [Directory structure](#directory-structure)
     - [Troubleshooting](#troubleshooting)
   - [Running Unit Tests](#running-unit-tests)
     - [Python](#python)
@@ -29,7 +33,7 @@
 
 **ydk-gen** is a developer tool that can generate API bindings to YANG data models for, today, Python and C++, with planned future support for other language bindings.
 
-Other tools and libraries are used to deliver ydk-gen's functionality. In particular:
+Other tools and libraries are used to deliver `ydk-gen`'s functionality. In particular:
 
 * YANG model analysis and code generation is implemented using APIs from the [pyang](https://github.com/mbj4668/pyang) library
 * Documentation is generated using [Sphinx](http://www.sphinx-doc.org/en/stable/)
@@ -41,7 +45,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 ##System Requirements:
 
-YDK-Py requires ydk-cpp core to be built and installed.
+`ydk-py` requires `ydk-cpp` core to be built and installed.
 
 ####Linux
 Ubuntu (Debian-based): The following packages must be present in your system before installing YDK-Py:
@@ -60,14 +64,35 @@ It is recommended to install homebrew (http://brew.sh) and Xcode command line to
 ```
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ xcode-select --install
-$ brew install boost boost-python pkg-config cmake libssh
+$ brew install boost pkg-config cmake libssh xml2 curl pcre
 ```
 
 ####Windows
 It is recommended to install a python distribution like [PythonXY](https://python-xy.github.io/) on your system before installing YDK-Py
 
 ## Installation
+### Setting up your environment
 
+We recommend that you run ydk-gen under a Python virtual environment (``virtualenv``/``virtualenvwrapper``).  To install support in your system, execute
+
+```
+  $ pip install virtualenv virtualenvwrapper
+  $ source /usr/local/bin/virtualenvwrapper.sh
+```
+
+In some systems (e.g. Debian-based Linux), you may need to install support for Python virtual environments as root
+
+```
+  $ sudo pip install virtualenv virtualenvwrapper
+  $ source /usr/local/bin/virtualenvwrapper.sh
+```
+
+At this point, create a new virtual environment
+
+```
+  $ mkvirtualenv -p python2.7 py2
+```
+### Clone ydk-gen and install the requirements
 ```
 $ git clone https://github.com/CiscoDevNet/ydk-gen.git
 $ cd ydk-gen
@@ -91,32 +116,23 @@ Options:
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
+The below steps specify how to use `ydk-gen` to generate the python core and a python bundle. Similar steps can be followed for C++. Pre-generated bundles and core are available for python and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
 
-### Installing the YDK core
+### First step: choose your bundle profile
 
-```
- ./generate.py --core
-```
+The first step in using ydk-gen is either using one of the already existing [bundle profiles](https://github.com/CiscoDevNet/ydk-gen/tree/master/profiles/bundles) or constructing your own bundle profile, consisting of the YANG models you are interested in:
 
-### Bundle profiles
-
-1. Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies
-
-2. Generate the bundle using a command of the form:
-
-```
-./generate.py --python --bundle profiles/bundles/ietf_0_1_1.json
-```
-
-The generated bundle will in ```ydk-gen/gen-api/python``` or ```ydk-gen/gen-api/cpp```.
+Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies
 
 #### Details
 
-A sample bundle profile file is described below. The file is in a JSON format. The initial section of metadata is mostly ignored for now. It will be used later.
+A sample bundle profile file is described below. The file is in a JSON format. Specify the `name` of your bundle, the `version` of the bundle and the `ydk_version`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `name` of the bundle here is especially important as this will form part of the installation path of the bundle.
 
 ```
 {
+    "name":"cisco-ios-xr",
     "version": "0.1.0",
+    "ydk_version": "0.5.0",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
@@ -161,9 +177,41 @@ Only directory examples are shown below.
         ]
     },
 ```
-### Generating documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three bundles and the core. Note that this process could take a few hours due to the size of the cisco_ios_xr bundle:
+### Second step: Generate & install the core
+ 
+First, generate the core and install it:
+
+```
+$ ./generate.py --python --core
+$ pip install gen-api/python/ydk/dist/ydk*.tar.gz
+```
+ 
+### Third step: Generate & install your bundle
+Then, generate your bundle using a bundle profile and install it:
+ 
+```
+$ ./generate.py --python --bundle profiles/<name-of-profile>.json 
+$ pip install gen-api/python/<name-of-bundle>-bundle/dist/ydk*.tar.gz
+```
+ 
+Now, doing `pip list` should show the `ydk` (refering to the core package) and `ydk-<name-of-bundle>` packages installed:
+ 
+ ```
+$ pip list
+...
+ydk (0.5.2)
+ydk-models-<name-of-bundle> (0.5.1)
+...
+```
+
+### Fourth step: Writing your first app
+
+Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. See [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) for examples.
+
+### Documentation
+
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three bundles and the core. Note that this process could take a few hours due to the size of the `cisco_ios_xr` bundle:
 
 ```
 ./generate.py --python --bundle profiles/bundles/ietf_0_1_1.json
@@ -171,6 +219,7 @@ When generating the YDK documentation for several bundles and the core, it is re
 ./generate.py --python --bundle profiles/bundles/cisco_ios_xr_6_1_1.json
 ./generate.py --python --core --generate-doc
 ```
+Pre-generated documentation for [ydk-py](http://ydk.cisco.com/py/docs/) and [ydk-cpp](http://ydk.cisco.com/cpp/docs/) are available. 
 
 ## Notes
 
@@ -179,7 +228,7 @@ When generating the YDK documentation for several bundles and the core, it is re
 - If your environment has both python 2 and python 3 and uses python 2 by default, you may need to use 'python3' and 'pip3' instead of 'python' and 'pip' in the commands mentioned in this document.
 
 
-### Directory Structure
+### Directory structure
 
 ```
 README          - install and usage notes
@@ -191,7 +240,7 @@ generate.py     - script used to generate SDK for yang models
 profiles        - profile files used during generation
 yang            - some yang models used for testing
 requirements.txt- python dependencies used during installation
-sdk             - sdk core and stubs
+sdk             - sdk core and stubs for python and cpp
 test            - test code
 ```
 
@@ -207,7 +256,6 @@ Also, it may be a good idea to obtain a local copy of the yang models and compil
 cd /path/to/yang/models
 pyang *.yang
 ```
-
 
 ## Running Unit Tests
 

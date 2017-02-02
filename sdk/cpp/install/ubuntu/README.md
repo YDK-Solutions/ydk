@@ -49,9 +49,12 @@ gpg --fingerprint <EMAIL>
 ```
 Copy the Key Fingerprint (xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx) into the text box at <a href="https://launchpad.net/~/+editpgpkeys">https://launchpad.net/~/+editpgpkeys</a>
 
-Check your email account and read the email that Launchpad sent you and decrypt it using GPG
+Check your email account and read the email that Launchpad sent you and decrypt it using GPG. to decrypt on ubuntu, copy the email message beginning with `-----BEGIN PGP MESSAGE-----` and ending with `-----END PGP MESSAGE-----` to a file, e.g., test.txt and create and empty file out.txt and run the below command.
+```
+gpg --output out.txt --decrypt test.txt
+```
 
-Configure Bazaar
+## Configure Bazaar
 ```
 $ bzr whoami "<NAME> <<EMAIL>>"
 $ bzr launchpad-login <LAUNCHPAD ACCOUNT>
@@ -62,7 +65,7 @@ $ bzr whoami "Bob Bacon (BB) <BBacon@cisco.com>"
 $ bzr launchpad-login ydk
 ```
 
-Configure your shell
+Configure your shell. Make sure the email and name exactly matches the one on your GPG key (check using gpg --fingerprint)
 ```
 export DEBFULLNAME="<NAME>"
 export DEBEMAIL="<EMAIL>"
@@ -87,15 +90,11 @@ Download main package
 $ wget -O ydk-0.5.2.tar.gz "https://github.com/CiscoDevNet/ydk-cpp/archive/0.5.2.tar.gz"
 ```
 
-Make sure it works by following the guide at
-<a href="https://github.com/CiscoDevNet/ydk-cpp/blob/master/README.md">https://github.com/CiscoDevNet/ydk-cpp/blob/master/README.md</a>
-
-Start Package
+Start Package. Substitute ydk for bundle package names (ydk-ietf etc)
 ```
 $ bzr dh-make ydk 0.5.2 ydk-0.5.2.tar.gz
 ```
-Package type is l for library
-Verify information is correct
+Package type is l for library. Verify information is correct. This will create a directory `ydk`. In this, a few files under `ydk/debian` need to be customized.
 
 ##Customize Debian Files
 
@@ -104,8 +103,11 @@ Remove the optional example files
 $ cd ydk/debian
 $ rm *ex *EX
 ```
+See the example debian files for core and bundles under [ydk](ydk/debian), [ietf](ietf/debian) etc. For each new release, mostly only the control and changelog files need to be modified.
 
 ***Debian/changelog***
+
+This has to be updated to the current date and version.
 
 Ubuntu version is 0.5.2-0ubuntu1 (upstream version 0.5.2, Debian version 0, Ubuntu version 1)
 
@@ -115,7 +117,7 @@ Change unstable to current development release (xenial)
 
 first paragraph describes the source package
 
-second and following paragraphs describe the packages to be built
+second and following paragraphs describe the packages to be built and dependencies. For the ydk-ietf and other bundles, make sure to add ydk (core) plus any other interdependencies.
 ```
 Build-Depends: debhelper (>=9), libboost-all-dev, libcurl4-openssl-dev, libpcre3-dev, libssh-dev, libxml2-dev, libxslt1-dev, libtool-bin, cmake (>=3), git, pkg-config
 ```
@@ -152,14 +154,21 @@ Build Package
 ```
 $ bzr builddeb -- -us -uc
 ```
-
+Optionally, use the -d flag
+```
+$ bzr builddeb -- -us -uc -d
+```
 Generate source.changes File
 ```
 $ bzr builddeb -S
 ```
-packages and source.changes output to one directory above and thus outside the project
+If the above fails with any 'gpg' related error, the below should work
+```
+$ debuild -S -rfakeroot -k<key-id>
+```
+Packages and source.changes are output to one directory above and thus outside the project. 
 
-##Confirm Package
+##Confirm source (optional)
 
 View Contents
 ```
@@ -196,8 +205,12 @@ Set up a PPA in Launchpad
 https://launchpad.net/~<LP USERNAME>
 ```
 
+##Upload Package
+
 Upload PPA with dput
 ```
 $ dput ppa:<LP USERNAME>/<PPA NAME> <SOURCE.CHANGES>
 ```
-use -f or remove .upload file to push updates to this package
+use -f or remove .upload file to push updates to this package.
+
+*Note:* In case the build has some issues and you have to run 'dput' again and the package is rejected, make sure you edit the debian/changelog (see above). Increment the `*ubuntu<number>` number by 1. For example, if on the first upload, it was `0.5.2-0ubuntu1`, change it to `0.5.2-0ubuntu2`

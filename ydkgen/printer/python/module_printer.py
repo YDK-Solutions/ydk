@@ -39,7 +39,17 @@ class ModulePrinter(FilePrinter):
 
     def print_header(self, package):
         self._print_module_description(package)
-        self._print_imports(package)
+        # self._print_imports(package)
+
+        self.ctx.writeln('import re')
+        self.ctx.writeln('import collections')
+        self.ctx.bline()
+        self.ctx.writeln('from enum import Enum')
+        self.ctx.writeln('from ydk_ import get_relative_entity_path')
+        self.ctx.writeln('from ydk_.types import Entity, Identity, Enum, YType, YLeaf, EditOperation, Bits')
+        self.ctx.writeln('from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict')
+        self.ctx.writeln('from ydk.errors import YPYError, YPYModelError')
+        self.ctx.bline()
 
     def print_body(self, package):
         self._print_module_enums(package)
@@ -77,19 +87,14 @@ class ModulePrinter(FilePrinter):
         self.ctx.bline()
 
     def _print_static_imports(self):
-        self.ctx.str('''
-
-import re
-import collections
-
-from enum import Enum
-
-from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict
-
-from ydk.errors import YPYError, YPYModelError
-
-
-''')
+        self.ctx.writeln('import re')
+        self.ctx.writeln('import collections')
+        self.ctx.bline()
+        self.ctx.writeln('from enum import Enum')
+        self.ctx.writeln('from ydk_.types import Entity, Enum')
+        self.ctx.writeln('from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict')
+        self.ctx.writeln('from ydk.errors import YPYError, YPYModelError')
+        self.ctx.bline()
 
     def _print_module_enums(self, package):
         enumz = []
@@ -114,3 +119,4 @@ from ydk.errors import YPYError, YPYModelError
 
     def _print_enum(self, enum_class):
         EnumPrinter(self.ctx).print_enum(enum_class, False)
+

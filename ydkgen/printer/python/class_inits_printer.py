@@ -24,6 +24,19 @@ from pyang.types import UnionTypeSpec, PathTypeSpec
 from ydkgen.api_model import Bits, Class, Package, DataType, Enum
 from ydkgen.builder import TypesExtractor
 
+def get_leafs(clazz):
+    leafs = []
+    for child in clazz.owned_elements:
+        if child.stmt.keyword == 'leaf':
+            leafs.append(child)
+    return leafs
+
+def get_leaf_lists(clazz):
+    leaf_lists = []
+    for child in clazz.owned_elements:
+        if child.stmt.keyword == 'leaf-list':
+            leaf_lists.append(child)
+    return leaf_lists
 
 class ClassInitsPrinter(object):
 
@@ -45,16 +58,17 @@ class ClassInitsPrinter(object):
             line = 'super(%s, self).__init__(%s)' % (clazz.name, arg)
             self.ctx.writeln(line)
         else:
-            self.ctx.writeln('super(%s, self).__init__()' % clazz.name)
-            self._print_class_inits_body_helper(clazz, leafs, children)
+            self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())
+            self.ctx.bline()
             self.ctx.writeln('self.yang_name = "%s"' % clazz.stmt.arg)
             self.ctx.writeln('self.yang_parent_name = "%s"' % clazz.owner.stmt.arg)
+            self._print_init_leafs_and_leaflists(clazz, leafs)
+            self._print_init_children(children)
+        self._print_init_lists(clazz)
 
-    def _print_class_inits_body_helper(self, clazz, leafs, children):
-        yleafs = self._get_leafs(clazz)
-        yleaf_lists = self._get_leaf_lists(clazz)
-
-        output = []
+    def _print_init_leafs_and_leaflists(self, clazz, leafs):
+        yleafs = get_leafs(clazz)
+        yleaf_lists = get_leaf_lists(clazz)
 
         for prop in leafs:
             leaf_type = None
@@ -63,20 +77,34 @@ class ClassInitsPrinter(object):
             elif prop in yleaf_lists:
                 leaf_type = 'YLeafList'
 
-            output.append('self.%s = %s(YType.%s, "%s")' 
+            self.ctx.bline()
+            self.ctx.writeln('self.%s = %s(YType.%s, "%s")' 
                 % (prop.name, leaf_type, self._get_type_name(prop.property_type), prop.stmt.arg))
 
+    def _print_init_children(self, children):
         for child in children:
             if not child.is_many:
+                self.ctx.bline()
                 if (child.stmt.search_one('presence') is None):
-                    output.append('self.%s = %s()' % (child.name, child.property_type.qn()))
-                    output.append('self.%s.parent = self' % child.name)
+                    self.ctx.writeln('self.%s = %s()' % (child.name, child.property_type.qn()))
+                    self.ctx.writeln('self.%s.parent = self' % child.name)
+                    self.ctx.writeln('self.children["%s"] = self.%s' % (child.stmt.arg, child.name))
                 else:
-                    output.append('self.%s = None' % (child.name))
+                    self.ctx.writeln('self.%s = None' % (child.name))
 
+    def _print_init_lists(self, clazz):
+        if clazz.is_identity() and len(clazz.extends) == 0:
+            return
+
+        output = []
+        for prop in clazz.properties():
+            if (prop.is_many and 
+                isinstance(prop.property_type, Class) and 
+                not prop.property_type.is_identity()):
+                output.append('self.%s = []' % prop.name)
         if len(output) > 0:
-            for line in output:
-                self.ctx.writeln(line)
+            self.ctx.bline()
+            self.ctx.writelns(output)
 
     def _print_class_inits_trailer(self, clazz):
         self.ctx.lvl_dec()
@@ -105,42 +133,37 @@ class ClassInitsPrinter(object):
             return 'str'
         return prop_type.name
 
-    def _get_leafs(self, clazz):
-        leafs = []
-        for child in clazz.owned_elements:
-            if child.stmt.keyword == 'leaf':
-                leafs.append(child)
-        return leafs
-
-    def _get_leaf_lists(self, clazz):
-        leaf_lists = []
-        for child in clazz.owned_elements:
-            if child.stmt.keyword == 'leaf-list':
-                leaf_lists.append(child)
-        return leaf_lists
-
 class ClassSetAttrPrinter(object):
 
     def __init__(self, ctx):
         self.ctx = ctx
 
-    def print_setattr(self):
-        self._print_class_setattr_header()
-        self._print_class_setattr_body()
-        self._print_class_setattr_trailer()
+    def print_setattr(self, clazz, leafs):
+        yleafs = get_leafs(clazz)
+        yleaf_lists = get_leaf_lists(clazz)
+
+        if len(yleafs) + len(yleaf_lists) > 0:
+            self._print_class_setattr_header()
+            self._print_class_setattr_body(clazz, leafs)
+            self._print_class_setattr_trailer()
 
     def _print_class_setattr_header(self):
         self.ctx.writeln('def __setattr__(self, name, value):')
         self.ctx.lvl_inc()
 
-    def _print_class_setattr_body(self):
-        self.ctx.writeln('if name in ("name", "number") and name in self.__dict__:')
+    def _print_class_setattr_body(self, clazz, leafs):
+        leaf_names = [ '"%s"' % (leaf.name) for leaf in leafs ]
+        separator = ',\n%s%s' % (self.ctx.tab(), ' '*12)
+
+        self.ctx.writeln('if name in (%s) and name in self.__dict__:' % 
+            separator.join(leaf_names))
         self.ctx.lvl_inc()
         self.ctx.writeln('self.__dict__[name].set(value)')
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('self.__dict__[name] = value')
+        # self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())
+        self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()
 
     def _print_class_setattr_trailer(self):

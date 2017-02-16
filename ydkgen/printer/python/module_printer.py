@@ -46,9 +46,9 @@ class ModulePrinter(FilePrinter):
         self.ctx.bline()
         self.ctx.writeln('from enum import Enum')
         self.ctx.writeln('from ydk_ import get_relative_entity_path')
-        self.ctx.writeln('from ydk_.types import Entity, Identity, Enum, YType, YLeaf, EditOperation, Bits')
-        self.ctx.writeln('from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict')
-        self.ctx.writeln('from ydk.errors import YPYError, YPYModelError')
+        self.ctx.writeln('from ydk_.types import Entity, EntityPath, Identity, Enum, YType, YLeaf, YLeafList, LeafDataList, EditOperation, Bits, Empty, Decimal64')
+        # self.ctx.writeln('from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict')
+        self.ctx.writeln('from ydk_.errors import YPYError, YPYModelError')
         self.ctx.bline()
 
     def print_body(self, package):

@@ -24,7 +24,7 @@ from ydkgen.api_model import Class, Enum, Bits
 from ydkgen.common import sort_classes_at_same_level
 from ydkgen.printer.file_printer import FilePrinter
 
-from .bits_printer import BitsPrinter
+# from .bits_printer import BitsPrinter
 from .class_docstring_printer import ClassDocstringPrinter
 from .class_inits_printer import ClassInitsPrinter, ClassSetAttrPrinter
 from .class_has_data_printer import ClassHasDataPrinter
@@ -66,9 +66,9 @@ class ClassPrinter(FilePrinter):
         children = []
         self._get_class_members(clazz, leafs, children)
         self._print_class_inits(clazz, leafs, children)
-        # self._print_class_setattr()
+        self._print_class_setattr(clazz, leafs)
         self._print_child_enums(clazz)
-        self._print_child_bits(clazz)
+        # self._print_child_bits(clazz)
         self._print_child_classes(clazz)
         self._print_class_functions(clazz, leafs, children)
 
@@ -142,8 +142,8 @@ class ClassPrinter(FilePrinter):
     def _print_class_inits(self, clazz, leafs, children):
         ClassInitsPrinter(self.ctx).print_output(clazz, leafs, children)
 
-    def _print_class_setattr(self):
-        ClassSetAttrPrinter(self.ctx).print_setattr()
+    def _print_class_setattr(self, clazz, leafs):
+        ClassSetAttrPrinter(self.ctx).print_setattr(clazz, leafs)
 
     def _print_class_has_data(self, clazz, leafs, children):
         ClassHasDataPrinter(self.ctx).print_class_has_data(clazz, leafs, children)

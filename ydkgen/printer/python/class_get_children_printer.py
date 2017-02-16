@@ -42,19 +42,19 @@ class ClassGetChildrenPrinter(object):
         self.ctx.bline()
 
     def _print_class_get_child_many(self, child):
-        self.ctx.writeln('for c in %s:' % child.name)
+        self.ctx.writeln('for c in self.%s:' % child.name)
         self.ctx.lvl_inc()
-        self.ctx.writeln('if (self.children.get(c.get_segment_path()) is None):')
+        self.ctx.writeln('if (c.get_segment_path() in self.children):')
         self.ctx.lvl_inc()
-        self.ctx.writeln('self.children[c.get_segment_path()] = c.get()')
+        self.ctx.writeln('self.children[c.get_segment_path()] = c')
         self.ctx.lvl_dec()
         self.ctx.lvl_dec()
 
     def _print_class_get_child_unique(self, child):
-        self.ctx.writeln('if (self.children.get("%s") is None):' % child.stmt.arg)
+        self.ctx.writeln('if ("%s" not in self.children):' % child.stmt.arg)
         self.ctx.lvl_inc()
-        self.ctx.writeln('if(self.%s is not None)' % child.name)
+        self.ctx.writeln('if (self.%s is not None):' % child.name)
         self.ctx.lvl_inc()
-        self.ctx.writeln('self.children["%s"] = self.%s.get();' % (child.stmt.arg, child.name))
+        self.ctx.writeln('self.children["%s"] = self.%s' % (child.stmt.arg, child.name))
         self.ctx.lvl_dec()
         self.ctx.lvl_dec()

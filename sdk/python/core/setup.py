@@ -153,9 +153,9 @@ setup(
     keywords='yang, C++11, python bindings',
     packages=YDK_PACKAGES,
     install_requires=INSTALL_REQUIREMENTS,
-#    ext_modules=[CMakeExtension('ydk_')],
-#    cmdclass={
-#             'build_ext' :YdkBuildExtension
-#             },
+    ext_modules=[CMakeExtension('ydk_')],
+    cmdclass={
+             'build_ext' :YdkBuildExtension
+             },
     zip_safe=False,
 )

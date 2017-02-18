@@ -159,7 +159,6 @@ class SanityYang(unittest.TestCase):
         r_1.one_list.ldata.append(e_2)
 
         self.crud.create(self.ncc, r_1)
-
         r_2 = self.crud.read(self.ncc, r_2)
 
         self.assertEqual(r_1.one_list.ldata[0].name, r_2.one_list.ldata[0].name)
@@ -187,7 +186,6 @@ class SanityYang(unittest.TestCase):
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
-
         self.assertEqual(r_2, None)
 
     def test_twolist_pos(self):

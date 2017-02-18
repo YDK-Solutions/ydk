@@ -170,6 +170,29 @@ PYBIND11_PLUGIN(ydk_)
 
     bind_map<ChildrenMap>(types, "ChildrenMap");
 
+    bind_vector<LeafDataList>(types, "LeafDataList");
+
+
+    // bind_vector<EntityList>(types, "EntityList");
+
+    bind_vector<PyEntityList>(types, "EntityList")
+        .def(init<>())
+        .def("__getitem__", [](PyEntityList &l, int idx)
+                            {
+                                return l[idx];
+                            })
+        .def("append", [](PyEntityList &l, std::shared_ptr<ydk::Entity> e)
+                        {
+                            e->set_parent(l.parent.get());
+                            l.push_back(e);
+                        })
+        .def("set_parent", [](PyEntityList &l, std::shared_ptr<ydk::Entity> p)
+                        {
+                            l.parent = p;
+                        });
+
+    bind_map<ChildrenMap>(types, "ChildrenMap");
+
     class_<ydk::path::Capability>(path, "Capability")
         .def(init<const string &, const string &>());
 

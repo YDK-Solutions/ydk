@@ -13,17 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-""" providers.py 
- 
-   Service Providers module. Current implementation supports the NetconfServiceProvider which
-   uses ncclient (a Netconf client library) to provide CRUD services.
-   
-"""
-import logging
-from .provider import ServiceProvider
-from .netconf_provider import NetconfServiceProvider
-from .native_netconf_provider import NativeNetconfServiceProvider
-from .codec_provider import CodecServiceProvider
+
+from ydk_.providers import NetconfServiceProvider
+from ydk_.providers import RestconfServiceProvider
+from ydk_.providers import OpenDaylightServiceProvider
 
 
-logging.getLogger('ydk').addHandler(logging.NullHandler())
+__all__ = [ "NetconfServiceProvider",
+            "RestconfServiceProvider",
+            "OpenDaylightServiceProvider" ]

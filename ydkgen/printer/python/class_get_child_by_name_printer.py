@@ -73,9 +73,10 @@ class ClassGetChildByNamePrinter(object):
         self.ctx.lvl_dec()
         self.ctx.writeln('c = %s()' % (child.property_type.qn()))
         self.ctx.writeln('c.parent = self')
-        self.ctx.writeln('self.%s.append(c)' % child.name)
-        self.ctx.writeln('self.children[segment_path] = self.%s[-1]' % child.name)
-        self.ctx.writeln('return self.%s[-1]' % child.name)
+        self.ctx.writeln('local_reference_key = "%s%s" % (child_yang_name, segment_path)')
+        self.ctx.writeln('self._local_refs[local_reference_key] = c')
+        self.ctx.writeln('self.children[segment_path] = c')
+        self.ctx.writeln('return c')
 
     def _print_class_get_child_unique(self, child):
         self.ctx.writeln('if (self.%s is None):' % child.name)

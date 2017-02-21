@@ -59,12 +59,14 @@ class ClassInitsPrinter(object):
             self.ctx.writeln(line)
         else:
             self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())
+            if clazz.owner is not None and isinstance(clazz.owner, Package):
+                self.ctx.writeln('self._top_entity = None')
             self.ctx.bline()
             self.ctx.writeln('self.yang_name = "%s"' % clazz.stmt.arg)
             self.ctx.writeln('self.yang_parent_name = "%s"' % clazz.owner.stmt.arg)
             self._print_init_leafs_and_leaflists(clazz, leafs)
             self._print_init_children(children)
-        self._print_init_lists(clazz)
+            self._print_init_lists(clazz)
 
     def _print_init_leafs_and_leaflists(self, clazz, leafs):
         yleafs = get_leafs(clazz)
@@ -93,7 +95,7 @@ class ClassInitsPrinter(object):
                     self.ctx.writeln('self.%s = None' % (child.name))
 
     def _print_init_lists(self, clazz):
-        if clazz.is_identity() and len(clazz.extends) == 0:
+        if len(clazz.extends) == 0:
             return
 
         output = []
@@ -105,6 +107,8 @@ class ClassInitsPrinter(object):
         if len(output) > 0:
             self.ctx.bline()
             self.ctx.writelns(output)
+            self.ctx.bline()
+            self.ctx.writeln('self._local_refs = {}')
 
     def _print_class_inits_trailer(self, clazz):
         self.ctx.lvl_dec()

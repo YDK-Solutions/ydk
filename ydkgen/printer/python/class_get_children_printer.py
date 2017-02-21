@@ -44,7 +44,7 @@ class ClassGetChildrenPrinter(object):
     def _print_class_get_child_many(self, child):
         self.ctx.writeln('for c in self.%s:' % child.name)
         self.ctx.lvl_inc()
-        self.ctx.writeln('if (c.get_segment_path() in self.children):')
+        self.ctx.writeln('if (c.get_segment_path() not in self.children):')
         self.ctx.lvl_inc()
         self.ctx.writeln('self.children[c.get_segment_path()] = c')
         self.ctx.lvl_dec()

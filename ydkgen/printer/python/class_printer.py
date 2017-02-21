@@ -20,7 +20,7 @@ class_printer.py
  YANG model driven API, class emitter.
 
 """
-from ydkgen.api_model import Class, Enum, Bits
+from ydkgen.api_model import Class, Package, Enum, Bits
 from ydkgen.common import sort_classes_at_same_level
 from ydkgen.printer.file_printer import FilePrinter
 
@@ -82,6 +82,7 @@ class ClassPrinter(FilePrinter):
         self._print_class_get_child_by_name(clazz, children)
         self._print_class_get_children(clazz, children)
         self._print_class_set_value(clazz, leafs)
+        self._print_class_clone_ptr(clazz)
 
     def _print_child_enums(self, parent):
         enumz = []
@@ -165,6 +166,14 @@ class ClassPrinter(FilePrinter):
 
     def _print_class_set_value(self, clazz, leafs):
         ClassSetYLeafPrinter(self.ctx).print_class_set_value(clazz, leafs)
+
+    def _print_class_clone_ptr(self, clazz):
+        if clazz.owner is not None and isinstance(clazz.owner, Package):
+            self.ctx.writeln('def clone_ptr(self):')
+            self.ctx.lvl_inc()
+            self.ctx.writeln('self._top_entity = %s()' % clazz.qn())
+            self.ctx.writeln('return self._top_entity')
+            self.ctx.lvl_dec()
 
     def _print_bits(self, bits):
         BitsPrinter(self.ctx).print_bits(bits)

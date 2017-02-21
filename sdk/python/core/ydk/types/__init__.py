@@ -15,21 +15,21 @@
 # ------------------------------------------------------------------
 
 from .ylist import YList
-from ydk_.types import Bits
-from ydk_.types import ChildrenMap
-from ydk_.types import Decimal64
-from ydk_.types import EditOperation
-from ydk_.types import Empty
-from ydk_.types import EncodingFormat
-from ydk_.types import Entity
-from ydk_.types import EntityPath
-from ydk_.types import Enum
-from ydk_.types import Identity
-from ydk_.types import LeafData
-from ydk_.types import LeafDataList
-from ydk_.types import YLeaf
-from ydk_.types import YLeafList
-from ydk_.types import YType
+from ydk.ext.types import Bits
+from ydk.ext.types import ChildrenMap
+from ydk.ext.types import Decimal64
+from ydk.ext.types import EditOperation
+from ydk.ext.types import Empty
+from ydk.ext.types import EncodingFormat
+from ydk.ext.types import Entity
+from ydk.ext.types import EntityPath
+from ydk.ext.types import Enum
+from ydk.ext.types import Identity
+from ydk.ext.types import LeafData
+from ydk.ext.types import LeafDataList
+from ydk.ext.types import YLeaf
+from ydk.ext.types import YLeafList
+from ydk.ext.types import YType
 
 
 __all__ = [ "YList",

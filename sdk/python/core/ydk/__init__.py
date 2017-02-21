@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_ import get_relative_entity_path
+from ydk.ext.utils import get_relative_entity_path
 
 
 __all__ = [ "get_relative_entity_path" ]

@@ -14,9 +14,9 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.providers import NetconfServiceProvider
-from ydk_.providers import RestconfServiceProvider
-from ydk_.providers import OpenDaylightServiceProvider
+from ydk.ext.providers import NetconfServiceProvider
+from ydk.ext.providers import RestconfServiceProvider
+from ydk.ext.providers import OpenDaylightServiceProvider
 
 
 __all__ = [ "NetconfServiceProvider",

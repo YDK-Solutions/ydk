@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.services import CrudService
+from ydk.ext.services import CrudService
 
 
 __all__ = [ "CrudService" ]

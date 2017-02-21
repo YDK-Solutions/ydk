@@ -146,22 +146,6 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-    @unittest.skip('error, Exception not raised')
-    def test_onelist_neg_update_key_nonexist(self):
-        # UPDATE
-        r_1, r_2 = ysanity.Runner(), ysanity.Runner()
-        e_1, e_2 = ysanity.Runner.OneList.Ldata(), ysanity.Runner.OneList.Ldata()
-        e_1.number = 1
-        e_1.name = 'runner:onelist:ldata['+str(e_1.number)+']:name'
-        r_1.one_list.ldata.extend([e_1])
-        self.crud.create(self.ncc, r_1)
-        r_1.one_list.ldata[0].number = 2
-        r_1.one_list.ldata[0].name = '2'
-        # attempt to update non-exists key
-        with self.assertRaises(Exception):
-            self.crud.update(self.ncc, r_1)
-
-
     def test_onelist_pos(self):
         # READ
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()

@@ -66,7 +66,7 @@ class ClassInitsPrinter(object):
             self.ctx.writeln('self.yang_parent_name = "%s"' % clazz.owner.stmt.arg)
             self._print_init_leafs_and_leaflists(clazz, leafs)
             self._print_init_children(children)
-            self._print_init_lists(clazz)
+        self._print_init_lists(clazz)
 
     def _print_init_leafs_and_leaflists(self, clazz, leafs):
         yleafs = get_leafs(clazz)
@@ -95,7 +95,7 @@ class ClassInitsPrinter(object):
                     self.ctx.writeln('self.%s = None' % (child.name))
 
     def _print_init_lists(self, clazz):
-        if len(clazz.extends) == 0:
+        if clazz.is_identity() and len(clazz.extends) == 0:
             return
 
         output = []
@@ -103,7 +103,7 @@ class ClassInitsPrinter(object):
             if (prop.is_many and 
                 isinstance(prop.property_type, Class) and 
                 not prop.property_type.is_identity()):
-                output.append('self.%s = []' % prop.name)
+                output.append('self.%s = YList()' % prop.name)
         if len(output) > 0:
             self.ctx.bline()
             self.ctx.writelns(output)

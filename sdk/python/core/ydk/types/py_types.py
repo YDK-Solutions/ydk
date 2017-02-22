@@ -19,6 +19,7 @@
     Contains type definitions for:
         - YList
 """
+from ydk.ext.types import YLeafList as _YLeafList
 
 class YList(list):
     """ Represents a list with support for hanging a parent
@@ -34,7 +35,6 @@ class YList(list):
 
         A list entry is uniquely identified by the values of the list's keys,
         if defined.
-
     """
     def __init__(self, parent):
         super(YList, self).__init__()
@@ -47,3 +47,35 @@ class YList(list):
     def extend(self, items):
        for item in items:
            self.append(item)
+
+
+class YLeafList(_YLeafList):
+    """ Wrapper class for YLeafList, add __repr__ and get list slice
+    functionalities.
+    """
+    def __init__(self, ytype, leaf_name):
+        super(YLeafList, self).__init__(ytype, leaf_name)
+        self.ytype = ytype
+        self.leaf_name = leaf_name
+
+    def append(self, item):
+        super(YLeafList, self).append(item)
+
+    def extend(self, items):
+        for item in items:
+            self.append(item)
+
+    def __getitem__(self, arg):
+        if isinstance(arg, slice):
+            indices = arg.indices(len(self))
+            ret = YLeafList(self.ytype, self.leaf_name)
+            values = [self.__getitem__(i).get() for i in range(*indices)]
+            ret.extend(values)
+            return ret
+        else:
+            arg = len(self) + arg if arg < 0 else arg
+            return super(YLeafList, self).__getitem__(arg)
+
+    def __repr__(self):
+        rep = [i for i in self.getYLeafs()]
+        return '%s(%r)' % (self.__class__.__name__, rep)

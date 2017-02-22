@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from .ylist import YList
+from .py_types import YList, YLeafList
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
 from ydk.ext.types import Decimal64
@@ -28,7 +28,6 @@ from ydk.ext.types import Identity
 from ydk.ext.types import LeafData
 from ydk.ext.types import LeafDataList
 from ydk.ext.types import YLeaf
-from ydk.ext.types import YLeafList
 from ydk.ext.types import YType
 
 

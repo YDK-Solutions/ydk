@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import unittest
 
 from ydk.types import Empty
-import ydktest_sanity as ysanity
+from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CrudService
 
@@ -159,6 +159,7 @@ class SanityYang(unittest.TestCase):
         r_1.one_list.ldata.append(e_2)
 
         self.crud.create(self.ncc, r_1)
+
         r_2 = self.crud.read(self.ncc, r_2)
 
         self.assertEqual(r_1.one_list.ldata[0].name, r_2.one_list.ldata[0].name)

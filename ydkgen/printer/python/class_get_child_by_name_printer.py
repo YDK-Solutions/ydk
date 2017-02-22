@@ -75,6 +75,7 @@ class ClassGetChildByNamePrinter(object):
         self.ctx.writeln('c.parent = self')
         self.ctx.writeln('local_reference_key = "%s%s" % (child_yang_name, segment_path)')
         self.ctx.writeln('self._local_refs[local_reference_key] = c')
+        self.ctx.writeln('self.%s.append(c)' % child.name)
         self.ctx.writeln('self.children[segment_path] = c')
         self.ctx.writeln('return c')
 

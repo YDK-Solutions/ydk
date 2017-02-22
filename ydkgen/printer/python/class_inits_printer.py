@@ -103,7 +103,7 @@ class ClassInitsPrinter(object):
             if (prop.is_many and 
                 isinstance(prop.property_type, Class) and 
                 not prop.property_type.is_identity()):
-                output.append('self.%s = YList()' % prop.name)
+                output.append('self.%s = YList(self)' % prop.name)
         if len(output) > 0:
             self.ctx.bline()
             self.ctx.writelns(output)

@@ -16,9 +16,9 @@
 
 from __future__ import absolute_import
 import unittest
-from ydk_.providers import NetconfServiceProvider
-from ydk_.path import CodecService
-from ydk_.types import EncodingFormat
+from ydk.providers import NetconfServiceProvider
+from ydk.path import CodecService
+from ydk.types import EncodingFormat
 
 
 class SanityTest(unittest.TestCase):

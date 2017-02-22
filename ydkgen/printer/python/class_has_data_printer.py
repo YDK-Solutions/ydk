@@ -50,8 +50,8 @@ class ClassHasDataPrinter(object):
         conditions = self._init_has_data_conditions(leafs, children)
         for child in children:
             if child.is_many:
-                iter_stmt = 'for index in self.%s:'
-                access_stmt = 'if (self.%s[index].has_data()):' % child.name
+                iter_stmt = 'for c in self.%s:'
+                access_stmt = 'if (c.has_data()):'
                 self._print_class_has_many(child, iter_stmt, access_stmt)
         for leaf in leafs:
             if leaf.is_many:
@@ -73,8 +73,8 @@ class ClassHasDataPrinter(object):
         conditions = self._init_has_operation_conditions(leafs, children)
         for child in children:
             if child.is_many:
-                iter_stmt = 'for index in self.%s:'
-                access_stmt = 'if (self.%s[index].has_operation()):' % child.name
+                iter_stmt = 'for c in self.%s:'
+                access_stmt = 'if (c.has_operation()):'
                 self._print_class_has_many(child, iter_stmt, access_stmt)
         for leaf in leafs:
             if leaf.is_many:

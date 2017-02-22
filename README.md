@@ -48,13 +48,13 @@ The output of ydk-gen is either a core package, that defines services and provid
 ####Linux
 Ubuntu (Debian-based): The following packages must be present in your system before installing YDK-Py:
 ```
-$ sudo apt-get install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libssh-dev libcurl4-openssl-dev libtool-bin libpcre3-dev libpcre++-dev libtool pkg-config python3-dev python3-lxml cmake
+$ sudo apt-get install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libssh-dev libcurl4-openssl-dev libtool-bin libpcre3-dev libpcre++-dev libtool pkg-config python3-dev python3-lxml cmake clang
 ```
 
 Centos (Fedora-based): The following packages must be present in your system before installing YDK-Py:
 ```
 $ sudo yum install epel-release
-$ sudo yum install python-pip python-devel libxml2-devel libxslt-devel libssh-devel libcurl-devel libtool gcc-c++ cmake
+$ sudo yum install python-pip python-devel libxml2-devel libxslt-devel libssh-devel libcurl-devel libtool clang cmake
 ```
 
 ####Mac
@@ -114,7 +114,7 @@ Options:
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
-The below steps specify how to use `ydk-gen` to generate the python core and a python bundle. Similar steps can be followed for C++. Pre-generated bundles and core are available for python and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
+The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
 
 ### First step: choose your bundle profile
 
@@ -180,22 +180,29 @@ Only directory examples are shown below.
  
 First, generate the core and install it:
 
+For python:
 ```
 $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
 ```
+
+For C++:
+```
+$ ./generate.py --cpp --core
+$ cd gen-api/cpp/ydk/build && make && sudo make install
+```
  
 ### Third step: Generate & install your bundle
 Then, generate your bundle using a bundle profile and install it:
- 
+
+For python:
 ```
 $ ./generate.py --python --bundle profiles/<name-of-profile>.json 
 $ pip install gen-api/python/<name-of-bundle>-bundle/dist/ydk*.tar.gz
 ```
- 
+
 Now, doing `pip list` should show the `ydk` (refering to the core package) and `ydk-<name-of-bundle>` packages installed:
- 
- ```
+```
 $ pip list
 ...
 ydk (0.5.2)
@@ -203,13 +210,21 @@ ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
 
+For C++:
+```
+$ ./generate.py --cpp --bundle profiles/<name-of-profile>.json 
+$ cd gen-api/cpp/<name-of-bundle>-bundle/build && make && make install
+```
+
 ### Fourth step: Writing your first app
 
-Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. See [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) for examples. Also refer to the [documentation](http://ydk.cisco.com/py/docs/developer_guide.html).
+Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and [C++ samples](sdk/cpp/samples). Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html) and [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
 
 ### Documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three bundles and the core. Note that this process could take a few hours due to the size of the `cisco_ios_xr` bundle:
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three python bundles and the python core (for C++, use `--cpp` instead of `--python`).
+
+Note that the below process could take a few hours due to the size of the `cisco_ios_xr` bundle.
 
 ```
 ./generate.py --python --bundle profiles/bundles/ietf_0_1_1.json

@@ -24,7 +24,7 @@ import unittest
 from ydk.services import CrudService
 from ydk.providers import NetconfServiceProvider
 from ydk.errors import YPYError
-import ydktest_sanity as ysanity
+from ydk.models.ydktest import ydktest_sanity as ysanity
 
 
 class SanityYang(unittest.TestCase):

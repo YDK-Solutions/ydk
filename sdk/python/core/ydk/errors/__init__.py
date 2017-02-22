@@ -14,12 +14,12 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.errors import YPYError
-from ydk_.errors import YPYModelError
-from ydk_.errors import YPYServiceError
-from ydk_.errors import YPYServiceProviderError
-from ydk_.errors import YPYInvalidArgumentError
-from ydk_.errors import YPYOperationNotSupportedError
+from ydk.ext.errors import YPYError
+from ydk.ext.errors import YPYModelError
+from ydk.ext.errors import YPYServiceError
+from ydk.ext.errors import YPYServiceProviderError
+from ydk.ext.errors import YPYInvalidArgumentError
+from ydk.ext.errors import YPYOperationNotSupportedError
 
 
 __all__ = [ "YPYError",

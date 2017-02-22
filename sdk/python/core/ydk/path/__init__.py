@@ -14,16 +14,16 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.path import Annotation
-from ydk_.path import Capability
-from ydk_.path import CodecService
-from ydk_.path import DataNode
-from ydk_.path import Repository
-from ydk_.path import RootSchemaNode
-from ydk_.path import Rpc
-from ydk_.path import SchemaNode
-from ydk_.path import ServiceProvider
-from ydk_.path import Statement
+from ydk.ext.path import Annotation
+from ydk.ext.path import Capability
+from ydk.ext.path import CodecService
+from ydk.ext.path import DataNode
+from ydk.ext.path import Repository
+from ydk.ext.path import RootSchemaNode
+from ydk.ext.path import Rpc
+from ydk.ext.path import SchemaNode
+from ydk.ext.path import ServiceProvider
+from ydk.ext.path import Statement
 
 
 __all__ = [ "Annotation", 

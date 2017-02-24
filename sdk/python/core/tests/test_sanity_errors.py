@@ -155,19 +155,7 @@ Invoked with: , []"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('error, overflow, exception not raised')
     def test_uint64_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.u_number64 = -1
-            self.crud.create(self.ncc, runner)
-        except YPYModelError as err:
-            expected_msg = "Runner.Ytypes.BuiltInT.u_number64: (INVALID_VALUE, Value is invalid: -1 not in range (0, 18446744073709551615))"
-            self.assertEqual(err.message.strip(), expected_msg)
-        else:
-            raise Exception('YPYModelError not raised')
-
-    def test_uint64_invalid_2(self):
         try:
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number64 = 18446744073709551616
@@ -215,14 +203,13 @@ Invoked with: , ['name_str']"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('error, empty string implicitly converted to false, exception not raised')
     def test_boolean_invalid(self):
         try:
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = ''
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
-            expected_msg = "Runner.Ytypes.BuiltInT.bool_value: (INVALID_TYPE, Invalid type: 'str'. Expected type: 'bool')"
+            expected_msg = """Invalid value "" in "bool-value" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/bool-value'"""
             self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')

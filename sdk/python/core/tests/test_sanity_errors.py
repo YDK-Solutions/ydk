@@ -45,17 +45,9 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         self.crud.delete(self.ncc, runner)
 
-    def _create_runner(self):
-        runner = ysanity.Runner()
-        runner.ytypes = runner.Ytypes()
-        runner.ytypes.built_in_t = runner.ytypes.BuiltInT()
-
-        return runner
-
-    @unittest.skip('segfault')
     def test_int8_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number8 = 8.5
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -66,7 +58,7 @@ class SanityTest(unittest.TestCase):
 
     def test_int16_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number16 = {}
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -92,7 +84,7 @@ Invoked with: , {}"""
 
     def test_int32_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number32 = []
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -118,7 +110,7 @@ Invoked with: , []"""
 
     def test_int64_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number64 = 9223372036854775808
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -130,10 +122,9 @@ Invoked with: , []"""
         # runner.ytypes.built_in_t.number64 = 9223372036854775808
         # self.crud.create(self.ncc, runner)
 
-    @unittest.skip('segfault')
     def test_uint8_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number8 = -1
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -142,10 +133,9 @@ Invoked with: , []"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('segfault')
     def test_uint16_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number16 = 'not an uint'
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -154,10 +144,9 @@ Invoked with: , []"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('segfault')
     def test_uint32_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number32 = 4294967296
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -169,7 +158,7 @@ Invoked with: , []"""
     @unittest.skip('error, overflow, exception not raised')
     def test_uint64_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number64 = -1
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -178,10 +167,9 @@ Invoked with: , []"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('segfault')
     def test_uint64_invalid_2(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number64 = 18446744073709551616
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -192,7 +180,7 @@ Invoked with: , []"""
 
     def test_string_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.name = ['name_str']
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -216,10 +204,9 @@ Invoked with: , ['name_str']"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('segfault')
     def test_empty_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.emptee = '0'
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -231,7 +218,7 @@ Invoked with: , ['name_str']"""
     @unittest.skip('error, empty string implicitly converted to false, exception not raised')
     def test_boolean_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = ''
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -240,10 +227,9 @@ Invoked with: , ['name_str']"""
         else:
             raise Exception('YPYModelError not raised')
 
-    @unittest.skip('segfault')
     def test_enum_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.enum_value = 'not an enum'
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -254,7 +240,7 @@ Invoked with: , ['name_str']"""
 
     def test_yleaflist_assignment(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.llstring = ['invalid', 'leaf-list', 'assignment']
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
@@ -265,7 +251,7 @@ Invoked with: , ['name_str']"""
 
     def test_ylist_assignment(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             elems, n = [], 10
             for i in range(n):
                 l = ysanity.Runner.OneList.Ldata()

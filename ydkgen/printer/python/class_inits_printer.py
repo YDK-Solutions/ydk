@@ -24,6 +24,7 @@ from pyang.types import UnionTypeSpec, PathTypeSpec
 from ydkgen.api_model import Bits, Class, Package, DataType, Enum
 from ydkgen.builder import TypesExtractor
 
+
 def get_leafs(clazz):
     leafs = []
     for child in clazz.owned_elements:
@@ -31,12 +32,22 @@ def get_leafs(clazz):
             leafs.append(child)
     return leafs
 
+
 def get_leaf_lists(clazz):
     leaf_lists = []
     for child in clazz.owned_elements:
         if child.stmt.keyword == 'leaf-list':
             leaf_lists.append(child)
     return leaf_lists
+
+
+def get_lists(clazz):
+    lists = []
+    for child in clazz.owned_elements:
+        if child.stmt.keyword == 'list':
+            lists.append(child)
+    return lists
+
 
 class ClassInitsPrinter(object):
 
@@ -145,8 +156,9 @@ class ClassSetAttrPrinter(object):
     def print_setattr(self, clazz, leafs):
         yleafs = get_leafs(clazz)
         yleaf_lists = get_leaf_lists(clazz)
+        ylists = get_lists(clazz)
 
-        if len(yleafs) + len(yleaf_lists) > 0:
+        if len(yleafs) + len(yleaf_lists) + len(ylists)> 0:
             self._print_class_setattr_header()
             self._print_class_setattr_body(clazz, leafs)
             self._print_class_setattr_trailer()
@@ -154,22 +166,38 @@ class ClassSetAttrPrinter(object):
     def _print_class_setattr_header(self):
         self.ctx.writeln('def __setattr__(self, name, value):')
         self.ctx.lvl_inc()
+        self.ctx.writeln('with _handle_type_error():')
+        self.ctx.lvl_inc()
 
     def _print_class_setattr_body(self, clazz, leafs):
         leaf_names = [ '"%s"' % (leaf.name) for leaf in leafs ]
         separator = ',\n%s%s' % (self.ctx.tab(), ' '*12)
 
+        self.ctx.writeln('if name in self.__dict__ and isinstance(self.__dict__[name], YList):')
+        self.ctx.lvl_inc()
+        self.ctx.writeln("raise YPYModelError('"
+                         "Attempt to assign object of type list to YList ldata. "
+                         "Please use list append or extend method.')")
+        self.ctx.lvl_dec()
+
         self.ctx.writeln('if name in (%s) and name in self.__dict__:' % 
             separator.join(leaf_names))
         self.ctx.lvl_inc()
-        self.ctx.writeln('self.__dict__[name].set(value)')
+        self.ctx.writeln('if isinstance(value, (YLeaf, YLeafList)):')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
-        # self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())
+        self.ctx.writeln('self.__dict__[name].set(value)')
+        self.ctx.lvl_dec()
+        self.ctx.lvl_dec()
+        self.ctx.writeln('else:')
+        self.ctx.lvl_inc()
         self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()
 
     def _print_class_setattr_trailer(self):
+        self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.bline()

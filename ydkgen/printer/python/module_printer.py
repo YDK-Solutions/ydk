@@ -41,9 +41,10 @@ class ModulePrinter(FilePrinter):
         self._print_module_description(package)
         # self._print_imports(package)
 
-        self.ctx.writeln("from ydk.entity_utils import get_relative_entity_path")
+        self.ctx.writeln("from ydk.entity_utils import get_relative_entity_path as _get_relative_entity_path")
         self.ctx.writeln("from ydk.types import Entity, EntityPath, Identity, Enum, YType, YLeaf, YLeafList, YList, LeafDataList, EditOperation, Bits, Empty, Decimal64")
         self.ctx.writeln("from ydk.errors import YPYError, YPYModelError")
+        self.ctx.writeln("from ydk.errors.error_handler import handle_type_error as _handle_type_error")
         self.ctx.bline()
         self.ctx.bline()
 

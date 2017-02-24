@@ -14,18 +14,81 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.ext.errors import YPYError
-from ydk.ext.errors import YPYModelError
-from ydk.ext.errors import YPYServiceError
-from ydk.ext.errors import YPYServiceProviderError
-from ydk.ext.errors import YPYInvalidArgumentError
-from ydk.ext.errors import YPYOperationNotSupportedError
+""" errors
+
+   Contains types representing the Exception hierarchy in YDK
+
+"""
 
 
-__all__ = [ "YPYError",
-            "YPYModelError",
-            "YPYServiceError",
-            "YPYServiceProviderError"
-            "YPYInvalidArgumentError",
-            "YPYOperationNotSupportedError" ]
+class YPYError(Exception):
+    """Base class for YPY Errors.
 
+    The subclasses give a specialized view of the error that has occurred.
+    """
+    def __init__(self, error_msg):
+        self.message = error_msg
+
+    def __repr__(self):
+        return self.message
+
+    def __str__(self):
+        return self.__repr__()
+
+
+class YPYClientError(YPYError):
+    def __init__(self, error_msg):
+        super(YPYClientError, self).__init__(error_msg)
+
+
+class YPYServiceProviderError(YPYError):
+    """
+    Exception for Provider Side Validation
+    """
+    def __init__(self, error_msg):
+        super(YPYServiceProviderError, self).__init__(error_msg)
+
+
+class YPYServiceError(YPYError):
+    """
+    Exception for Service Side Validation
+    """
+    def __init__(self, error_msg):
+        super(YPYServiceError, self).__init__(error_msg)
+
+
+class YPYIllegalStateError(YPYError):
+    """Illegal State Error.
+
+    Thrown when an operation/service is invoked on an object that is not
+    in the right state. Use the error_msg for the error.
+    """
+    def __init__(self, error_msg):
+        super(YPYIllegalStateError, self).__init__(error_msg)
+
+
+class YPYInvalidArgumentError(YPYError):
+    """Invalid Argument.
+
+    Use the error_msg for the error.
+    """
+    def __init__(self, error_msg):
+        super(YPYInvalidArgumentError, self).__init__(error_msg)
+
+
+class YPYOperationNotSupportedError(YPYError):
+    """Operation Not Supported Error.
+
+    Thrown when an operation is not supported.
+    """
+    def __init__(self, error_msg):
+        super(YPYOperationNotSupportedError, self).__init__(error_msg)
+
+
+class YPYModelError(YPYError):
+    """Model Error.
+
+    Thrown when a model constraint is violated.
+    """
+    def __init__(self, error_msg):
+        super(YPYModelError, self).__init__(error_msg)

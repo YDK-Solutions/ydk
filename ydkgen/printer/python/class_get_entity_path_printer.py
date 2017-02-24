@@ -190,7 +190,7 @@ class GetEntityPathPrinter(object):
             self.ctx.writeln('else:')
             self.ctx.lvl_inc()
             
-            self.ctx.writeln("path_buffer = get_relative_entity_path(self, ancestor, path_buffer)")            
+            self.ctx.writeln("path_buffer = _get_relative_entity_path(self, ancestor, path_buffer)")            
 
             self.ctx.lvl_dec()
             self.ctx.bline()

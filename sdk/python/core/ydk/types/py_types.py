@@ -20,6 +20,8 @@
         - YList
 """
 from ydk.ext.types import YLeafList as _YLeafList
+from ydk.errors import YPYModelError as _YPYModelError
+
 
 class YList(list):
     """ Represents a list with support for hanging a parent
@@ -64,6 +66,15 @@ class YLeafList(_YLeafList):
     def extend(self, items):
         for item in items:
             self.append(item)
+
+    def set(self, other):
+        if not isinstance(other, YLeafList):
+            raise _YPYModelError("Invalid value '{0}' in '{1}'"
+                            .format(self.leaf_name, other))
+        else:
+            super(YLeafList, self).clear()
+            for item in other:
+                self.append(item)
 
     def __getitem__(self, arg):
         if isinstance(arg, slice):

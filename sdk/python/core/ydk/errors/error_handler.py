@@ -43,6 +43,9 @@ def handle_runtime_error():
         etype_str, msg = err.message.split(':', 1)
         etype = _ERRORS.get(etype_str)
         raise etype(msg)
+    except TypeError, err:
+        etype_str, msg = err.message.split(':', 1)
+        raise _YPYServiceError(msg)
 
 
 @contextlib.contextmanager

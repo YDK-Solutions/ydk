@@ -18,14 +18,12 @@ from __future__ import absolute_import
 import ydk.types as ytypes
 import unittest
 
-from ydk.services import CRUDService, ExecutorService
-from ydk.services.meta_service import MetaService
+from ydk.services import CrudService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.models.ydktest import ydktest_types as y_types
-from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
-from ydk.types import Empty, DELETE, Decimal64
-from compare import is_equal
+from ydk.providers import NetconfServiceProvider
+from ydk.types import Empty, Decimal64
 from ydk.errors import YPYServiceError
 try:
     from ydk.models.ydktest import ietf_netconf
@@ -177,27 +175,15 @@ class SanityCodec(unittest.TestCase):
             raise Exception('YPYServiceError not raised')
 
 class SanityCrud(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):
-        if SanityCrud.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
-        self.crud = CRUDService()
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.crud = CrudService()
 
     @classmethod
     def tearDownClass(self):
-        self.ncc.close()
+        pass
 
     def setUp(self):
         runner = ysanity.Runner()
@@ -207,15 +193,9 @@ class SanityCrud(unittest.TestCase):
         runner = ysanity.Runner()
         self.crud.delete(self.ncc, runner)
 
-    def _create_runner(self):
-        runner = ysanity.Runner()
-        runner.ytypes = runner.Ytypes()
-        runner.ytypes.built_in_t = runner.ytypes.BuiltInT()
-        return runner
-
     def test_crud_create_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number8 = 0
             self.crud.create(None, runner)
         except YPYServiceError as err:
@@ -226,7 +206,7 @@ class SanityCrud(unittest.TestCase):
 
     def test_crud_create_invalid_2(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number8 = 0
             self.crud.create(self.ncc, None)
         except YPYServiceError as err:
@@ -237,7 +217,7 @@ class SanityCrud(unittest.TestCase):
 
     def test_crud_create_invalid_3(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.number8 = 0
             self.crud.create(None, None)
         except YPYServiceError as err:
@@ -248,7 +228,7 @@ class SanityCrud(unittest.TestCase):
 
     def test_crud_delete_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             self.crud.delete(None, runner)
         except YPYServiceError as err:
             expected_msg = "'provider' and 'entity' cannot be None"
@@ -276,14 +256,14 @@ class SanityCrud(unittest.TestCase):
 
     def test_crud_read_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = True
             self.crud.create(self.ncc, runner)
             # Read into Runner2
             runner1 = ysanity.Runner()
             self.crud.read(None, runner1)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'read_filter' cannot be None"
+            expected_msg = "'provider' and 'filter' cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not Raised')
@@ -292,7 +272,7 @@ class SanityCrud(unittest.TestCase):
         try:
             self.crud.read(self.ncc, None)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'read_filter' cannot be None"
+            expected_msg = "'provider' and 'filter' cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not Raised')
@@ -301,14 +281,14 @@ class SanityCrud(unittest.TestCase):
         try:
             self.crud.read(None, None)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'read_filter' cannot be None"
+            expected_msg = "'provider' and 'filter' cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not Raised')
 
     def test_crud_update_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = True
             self.crud.create(self.ncc, runner)
 
@@ -317,10 +297,10 @@ class SanityCrud(unittest.TestCase):
             runner1 = self.crud.read(self.ncc, runner1)
 
             # Compare runners
-            result = is_equal(runner, runner1)
-            self.assertEqual(result, True)
+            self.assertEqual(runner.ytypes.built_in_t.bool_value,
+                             runner1.ytypes.built_in_t.bool_value)
 
-            runner = self._create_runner()
+            runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = False
             self.crud.update(None, runner)
         except YPYServiceError as err:
@@ -409,65 +389,6 @@ class SanityExecutor(unittest.TestCase):
             op = self.executor.execute_rpc(None, None)
         except YPYServiceError as err:
             expected_msg = "'provider' and 'rpc' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
-
-class SanityMeta(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
-
-    @classmethod
-    def setUpClass(self):
-        if SanityMeta.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
-
-    @classmethod
-    def tearDownClass(self):
-        self.ncc.close()
-
-    def setUp(self):
-        crud = CRUDService()
-        runner = ysanity.Runner()
-        crud.delete(self.ncc, runner)
-
-    def tearDown(self):
-        pass
-
-    def test_normalize_meta_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            MetaService.normalize_meta(None, runner)
-        except YPYServiceError as err:
-            expected_msg = "'capabilities' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
-
-    def test_normalize_meta_invalid_2(self):
-        try:
-            MetaService.normalize_meta(self.ncc._get_capabilities(), None)
-        except YPYServiceError as err:
-            expected_msg = "'capabilities' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
-
-    def test_normalize_meta_invalid_3(self):
-        try:
-            runner = ysanity.Runner()
-            MetaService.normalize_meta(None, None)
-        except YPYServiceError as err:
-            expected_msg = "'capabilities' and 'entity' cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not raised')

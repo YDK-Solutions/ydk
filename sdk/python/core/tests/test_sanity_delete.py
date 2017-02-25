@@ -15,20 +15,19 @@
 # ------------------------------------------------------------------
 """
     test_sanity_delete.py
-        Unittest for DELETE object.
 """
 from __future__ import absolute_import
-import ydk.types as ytypes
 import unittest
 
 from ydk.services import CrudService
 from ydk.providers import NetconfServiceProvider
 from ydk.errors import YPYError
+from ydk.types import EditOperation
 from ydk.models.ydktest import ydktest_sanity as ysanity
 
 
 class SanityYang(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
+
 
     @classmethod
     def setUpClass(self):
@@ -82,7 +81,6 @@ class SanityYang(unittest.TestCase):
 
         return runner_create, e_2, e_22
 
-    @unittest.skip("DELETE marker currently not supported")
     def test_delete_object_on_leaf(self):
         # create runner with two leaves, one and two
         runner_create = ysanity.Runner()
@@ -95,15 +93,16 @@ class SanityYang(unittest.TestCase):
 
         # use DELETE object to remove leaf one
         runner_delete = runner_read
-        runner_delete.one.name = DELETE()
+        runner_delete.one.name.operation = EditOperation.delete
         self.crud.update(self.ncc, runner_delete)
 
         # manually create remaining runner with leaf two
         runner_read = self.crud.read(self.ncc, runner_read_filter)
-        runner_left = runner_create
-        runner_left.one.name = None
+        runner_left = ysanity.Runner()
+        runner_left.two.name = 'two'
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(runner_left.one.name, runner_read.one.name)
+        self.assertEqual(runner_left.two.name, runner_read.two.name)
 
     @unittest.skip("error, delete whole list")
     def test_delete_on_leaflist_slice(self):

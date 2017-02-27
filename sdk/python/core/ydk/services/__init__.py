@@ -25,4 +25,3 @@ from ydk.ext.services import DataStore
 
 __all__ = [ "CodecService" "CrudService",
             "NetconfService", "DataStore" ]
-

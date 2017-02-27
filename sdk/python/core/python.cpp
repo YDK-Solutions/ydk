@@ -436,7 +436,6 @@ PYBIND11_PLUGIN(ydk_)
             arg("source"),
             arg("url") = std::string{""},
             return_value_policy::reference)
-
         .def("copy_config", (bool (ydk::NetconfService::*)(ydk::NetconfServiceProvider&,
             ydk::DataStore,
             ydk::Entity&)) &ydk::NetconfService::copy_config,
@@ -444,7 +443,6 @@ PYBIND11_PLUGIN(ydk_)
             arg("target"),
             arg("source_config"),
             return_value_policy::reference)
-
         .def("delete_config", &ydk::NetconfService::delete_config,
             arg("provider"), arg("target"), arg("url") = std::string{""},
             return_value_policy::reference)

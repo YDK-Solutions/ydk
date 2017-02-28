@@ -15,15 +15,12 @@
 # ------------------------------------------------------------------
 
 """ errors
-
    Contains types representing the Exception hierarchy in YDK
-
 """
 
 
 class YPYError(Exception):
     """Base class for YPY Errors.
-
     The subclasses give a specialized view of the error that has occurred.
     """
     def __init__(self, error_msg):
@@ -59,7 +56,6 @@ class YPYServiceError(YPYError):
 
 class YPYIllegalStateError(YPYError):
     """Illegal State Error.
-
     Thrown when an operation/service is invoked on an object that is not
     in the right state. Use the error_msg for the error.
     """
@@ -69,7 +65,6 @@ class YPYIllegalStateError(YPYError):
 
 class YPYInvalidArgumentError(YPYError):
     """Invalid Argument.
-
     Use the error_msg for the error.
     """
     def __init__(self, error_msg):
@@ -78,7 +73,6 @@ class YPYInvalidArgumentError(YPYError):
 
 class YPYOperationNotSupportedError(YPYError):
     """Operation Not Supported Error.
-
     Thrown when an operation is not supported.
     """
     def __init__(self, error_msg):
@@ -87,7 +81,6 @@ class YPYOperationNotSupportedError(YPYError):
 
 class YPYModelError(YPYError):
     """Model Error.
-
     Thrown when a model constraint is violated.
     """
     def __init__(self, error_msg):

@@ -14,12 +14,17 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-""" types.py
+""" py_types.py
 
-    Contains type definitions for:
+    Contains python-cpp glue code for:
         - YList
+        - YLeafList
+        - Entity
 """
+from ydk.ext.types import ChildrenMap
+from ydk.ext.types import YLeaf as _YLeaf
 from ydk.ext.types import YLeafList as _YLeafList
+from ydk.ext.types import Entity as _Entity
 from ydk.errors import YPYModelError as _YPYModelError
 
 
@@ -69,8 +74,8 @@ class YLeafList(_YLeafList):
 
     def set(self, other):
         if not isinstance(other, YLeafList):
-            raise _YPYModelError("Invalid value '{0}' in '{1}'"
-                            .format(self.leaf_name, other))
+            raise _YPYModelError("Invalid value '{}' in '{}'"
+                            .format(other, self.leaf_name))
         else:
             super(YLeafList, self).clear()
             for item in other:
@@ -87,6 +92,47 @@ class YLeafList(_YLeafList):
             arg = len(self) + arg if arg < 0 else arg
             return super(YLeafList, self).__getitem__(arg)
 
-    def __repr__(self):
+    def __str__(self):
         rep = [i for i in self.getYLeafs()]
-        return '%s(%r)' % (self.__class__.__name__, rep)
+        return "%s('%s', %r)" % (self.__class__.__name__, self.leaf_name, rep)
+
+
+class Entity(_Entity):
+    """ Entity wrapper class overrides get_children method.
+    """
+    def __init__(self):
+        super(Entity, self).__init__()
+        self._local_refs = {}
+        self._children_name_map = {}
+
+    def get_children(self):
+        children = ChildrenMap()
+        for name in self.__dict__:
+            value = self.__dict__[name]
+            if isinstance(value, Entity):
+                children[name] = value
+            elif isinstance(value, YList):
+                for v in value:
+                    if isinstance(v, Entity):
+                        children[v.get_segment_path()] = v
+        self._local_refs["ydk::children"] = children
+        return children
+
+    def _get_child_by_seg_name(self, segs):
+        for seg in segs:
+            for name in self._children_name_map:
+                if seg == self._children_name_map[name]:
+                    return self.__dict__[name]
+            for name in self._local_refs:
+                if seg == name.lstrip("ydk::seg::"):
+                    return self._local_refs[name]
+        return None
+
+    def _check_monkey_patching_error(self, name, value):
+        obj = self.__dict__.get(name)
+        if obj is None or isinstance(obj, (_YLeaf, YLeafList, YList)):
+            return
+        if not isinstance(value, obj.__class__):
+            raise _YPYModelError("Invalid value '{!s}' in '{}'"
+                                 .format(value, obj))
+

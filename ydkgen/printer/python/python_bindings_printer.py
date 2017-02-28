@@ -26,7 +26,6 @@ import os
 from ydkgen.api_model import Bits, Class, Enum
 from ydkgen.common import get_rst_file_name
 
-from .deviation_printer import DeviationPrinter
 from .import_test_printer import ImportTestPrinter
 from .module_printer import ModulePrinter
 from .module_meta_printer import ModuleMetaPrinter
@@ -146,18 +145,11 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
                             _EmitArgs(self.ypy_ctx, package, self.identity_subclasses))
 
     def _print_yang_ns_file(self):
-        packages = self.packages + self.deviation_packages
+        packages = self.packages
 
         self.print_file(get_yang_ns_file_name(self.models_dir),
                         emit_yang_ns,
                         _EmitArgs(self.ypy_ctx, packages))
-
-    def _print_deviate_file(self):
-        self._print_nmsp_declare_init(self.deviation_dir)
-        for package in self.deviation_packages:
-            self.print_file(get_meta_module_file_name(self.deviation_dir, package),
-                            emit_deviation,
-                            _EmitArgs(self.ypy_ctx, package, self.sort_clazz))
 
     def _print_import_tests_file(self):
         self.print_file(get_import_test_file_name(self.test_dir),
@@ -240,10 +232,6 @@ def emit_test_module(ctx, package, identity_subclasses):
 
 def emit_meta(ctx, package, sort_clazz):
     ModuleMetaPrinter(ctx, sort_clazz).print_output(package)
-
-
-def emit_deviation(ctx, package, sort_clazz):
-    DeviationPrinter(ctx, sort_clazz).print_deviation(package)
 
 
 def emit_nmsp_declare_init(ctx, package):

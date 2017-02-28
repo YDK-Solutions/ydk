@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
+import re
 import unittest
 
 from ydk.services import CrudService
@@ -231,7 +232,7 @@ Invoked with: , ['name_str']"""
             runner.ytypes.built_in_t.llstring = ['invalid', 'leaf-list', 'assignment']
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
-            expected_msg = """Invalid value 'llstring' in '['invalid', 'leaf-list', 'assignment']'"""
+            expected_msg = """Invalid value '['invalid', 'leaf-list', 'assignment']' in 'llstring'"""
             self.assertEqual(err.message.strip(), expected_msg)
         else:
             raise Exception('YPYModelError not raised')
@@ -248,8 +249,18 @@ Invoked with: , ['name_str']"""
             runner.one_list.ldata = elems
             self.crud.create(self.ncc, runner)
         except YPYModelError as err:
-            expected_msg = "Attempt to assign object of type list to YList ldata. Please use list append or extend method."
-            self.assertEqual(err.message.strip(), expected_msg)
+            expected_pattern = ''.join(["Attempt to assign value of '\[<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
+                                        "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>\]' to YList ldata. ",
+                                        "Please use list append or extend method."])
+            self.assertEqual(re.match(expected_pattern, err.message) is not None, True)
 
 if __name__ == '__main__':
     import sys

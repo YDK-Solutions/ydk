@@ -40,12 +40,19 @@ def handle_runtime_error():
     try:
         yield
     except RuntimeError, err:
-        etype_str, msg = err.message.split(':', 1)
-        etype = _ERRORS.get(etype_str)
+        if ':' in err.message:
+            etype_str, msg = err.message.split(':', 1)
+            etype = _ERRORS.get(etype_str)
+        else:
+            etype = _YPYError
+            msg = err.message
         raise etype(msg)
     except TypeError, err:
-        etype_str, msg = err.message.split(':', 1)
-        raise _YPYServiceError(msg)
+        if ':' in err.message:
+            etype_str, msg = err.message.split(':', 1)
+            raise _YPYServiceError(msg)
+        else:
+            raise _YPYError(err.message)
 
 
 @contextlib.contextmanager

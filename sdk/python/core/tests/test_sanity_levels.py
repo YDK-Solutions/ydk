@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-"""test_sanity_nested_containers.py
+"""test_sanity_levels.py
 sanity test for ydktest-sanity.yang
 """
 from __future__ import absolute_import
@@ -45,6 +45,12 @@ class SanityYang(unittest.TestCase):
     def tearDown(self):
         runner = ysanity.Runner()
         self.crud.delete(self.ncc, runner)
+
+    def _create_runner(self):
+        runner = ysanity.Runner()
+        runner.ytypes = runner.Ytypes()
+        runner.ytypes.built_in_t = runner.ytypes.BuiltInT()
+        return runner
 
     def test_one_level_pos(self):
         # READ
@@ -103,7 +109,7 @@ class SanityYang(unittest.TestCase):
 
     def test_three_level_pos(self):
         # READ
-        r_1 = ysanity.Runner()
+        r_1 = self._create_runner()
         r_1.three.number, r_1.three.name, \
             r_1.three.sub1.number, r_1.three.sub1.sub2.number = 3, 'runner:three:name', 31, 311
         self.crud.create(self.ncc, r_1)

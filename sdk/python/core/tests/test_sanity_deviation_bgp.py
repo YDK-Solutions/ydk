@@ -18,37 +18,24 @@ from __future__ import absolute_import
 import ydk.types as ytypes
 import unittest
 
-from ydk.services import CRUDService
-from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
-from ydk.types import Empty, DELETE, Decimal64
-from compare import is_equal
+from ydk.services import CrudService
+from ydk.providers import NetconfServiceProvider
+from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
 from ydk.models.deviation import bgp, bgp_types
 from ydk.models.deviation.routing_policy import DefaultPolicyTypeEnum, RoutingPolicy
 
 
 class SanityTest(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):
-        if SanityTest.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
-        self.crud = CRUDService()
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.crud = CrudService()
 
     @classmethod
     def tearDownClass(self):
-        self.ncc.close()
+        pass
 
     def setUp(self):
         pass
@@ -61,12 +48,10 @@ class SanityTest(unittest.TestCase):
         bgp_cfg = bgp.Bgp()
         ipv4_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
         ipv4_afsf.afi_safi_name = bgp_types.AfiSafiTypeIdentity()
-        ipv4_afsf.apply_policy.config.default_export_policy = \
-            DefaultPolicyTypeEnum.ACCEPT_ROUTE
+        ipv4_afsf.apply_policy.config.default_export_policy = DefaultPolicyTypeEnum.ACCEPT_ROUTE
         bgp_cfg.global_.afi_safis.afi_safi.append(ipv4_afsf)
 
-        self.assertRaises(YPYModelError,
-                          self.crud.create, self.ncc, bgp_cfg)
+        self.assertRaises(YPYModelError, self.crud.create, self.ncc, bgp_cfg)
 
 
 if __name__ == '__main__':

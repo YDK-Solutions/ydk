@@ -14,14 +14,13 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from .py_types import YList, YLeafList
+from .py_types import Entity, YList, YLeafList
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
 from ydk.ext.types import Decimal64
 from ydk.ext.types import EditOperation
 from ydk.ext.types import Empty
 from ydk.ext.types import EncodingFormat
-from ydk.ext.types import Entity
 from ydk.ext.types import EntityPath
 from ydk.ext.types import Enum
 from ydk.ext.types import Identity

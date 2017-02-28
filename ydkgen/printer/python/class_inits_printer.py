@@ -101,7 +101,7 @@ class ClassInitsPrinter(object):
                 if (child.stmt.search_one('presence') is None):
                     self.ctx.writeln('self.%s = %s()' % (child.name, child.property_type.qn()))
                     self.ctx.writeln('self.%s.parent = self' % child.name)
-                    self.ctx.writeln('self.children["%s"] = self.%s' % (child.stmt.arg, child.name))
+                    self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
                 else:
                     self.ctx.writeln('self.%s = None' % (child.name))
 
@@ -111,15 +111,14 @@ class ClassInitsPrinter(object):
 
         output = []
         for prop in clazz.properties():
-            if (prop.is_many and 
-                isinstance(prop.property_type, Class) and 
+            if (prop.is_many and
+                isinstance(prop.property_type, Class) and
                 not prop.property_type.is_identity()):
                 output.append('self.%s = YList(self)' % prop.name)
         if len(output) > 0:
             self.ctx.bline()
             self.ctx.writelns(output)
             self.ctx.bline()
-            self.ctx.writeln('self._local_refs = {}')
 
     def _print_class_inits_trailer(self, clazz):
         self.ctx.lvl_dec()
@@ -166,6 +165,7 @@ class ClassSetAttrPrinter(object):
     def _print_class_setattr_header(self):
         self.ctx.writeln('def __setattr__(self, name, value):')
         self.ctx.lvl_inc()
+        self.ctx.writeln('self._check_monkey_patching_error(name, value)')
         self.ctx.writeln('with _handle_type_error():')
         self.ctx.lvl_inc()
 
@@ -175,11 +175,14 @@ class ClassSetAttrPrinter(object):
 
         self.ctx.writeln('if name in self.__dict__ and isinstance(self.__dict__[name], YList):')
         self.ctx.lvl_inc()
-        self.ctx.writeln("raise YPYModelError('"
-                         "Attempt to assign object of type list to YList ldata. "
-                         "Please use list append or extend method.')")
+        self.ctx.writeln('raise YPYModelError("Attempt to assign value of \'{}\' to YList ldata. "')
+        self.ctx.writeln('                    "Please use list append or extend method."')
+        self.ctx.writeln('                    .format(value))')
         self.ctx.lvl_dec()
-
+        self.ctx.writeln('if isinstance(value, Enum.YLeaf):')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('value = value.name')
+        self.ctx.lvl_dec()
         self.ctx.writeln('if name in (%s) and name in self.__dict__:' % 
             separator.join(leaf_names))
         self.ctx.lvl_inc()

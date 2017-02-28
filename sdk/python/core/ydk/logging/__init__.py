@@ -14,25 +14,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.ext.path import Annotation
-from ydk.ext.path import Capability
-from ydk.ext.path import CodecService
-from ydk.ext.path import DataNode
-from ydk.ext.path import Repository
-from ydk.ext.path import RootSchemaNode
-from ydk.ext.path import Rpc
-from ydk.ext.path import SchemaNode
-from ydk.ext.path import ServiceProvider
-from ydk.ext.path import Statement
+from .stdout_handler import YDKStreamHandler
 
-
-__all__ = [ "Annotation",
-            "Capability",
-            "CodecService",
-            "DataNode",
-            "Repository",
-            "RootSchemaNode",
-            "Rpc",
-            "SchemaNode",
-            "ServiceProvider",
-            "Statement" ]
+__all__ = [ "YDKStreamHandler" ]

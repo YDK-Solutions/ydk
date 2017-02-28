@@ -1,8 +1,8 @@
 """
     ydk.exthook
 
-    The code below is taken from Flask <http://flask.pocoo.org> project, and
-    the original docstring is listed below.
+    The code below is modified and taken from Flask <http://flask.pocoo.org> project,
+    and the original docstring is listed below.
 
     Redirect imports for extensions.  This module basically makes it possible
     for us to transition from flaskext.foo to flask_foo without having to

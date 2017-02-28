@@ -13,26 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
-from ydk.ext.path import Annotation
-from ydk.ext.path import Capability
-from ydk.ext.path import CodecService
-from ydk.ext.path import DataNode
-from ydk.ext.path import Repository
-from ydk.ext.path import RootSchemaNode
-from ydk.ext.path import Rpc
-from ydk.ext.path import SchemaNode
-from ydk.ext.path import ServiceProvider
-from ydk.ext.path import Statement
+import logging
+from logging import StreamHandler
+from ydk.ext.logging import PystdoutLogger as _PystdoutLogger
 
 
-__all__ = [ "Annotation",
-            "Capability",
-            "CodecService",
-            "DataNode",
-            "Repository",
-            "RootSchemaNode",
-            "Rpc",
-            "SchemaNode",
-            "ServiceProvider",
-            "Statement" ]
+_TRACE_LEVEL_NUM = 5
+
+
+class YDKStreamHandler(StreamHandler):
+    """ Python wrapper for spdlog stdout logger.
+    """
+    def __init__(self, trace=False):
+        super(YDKStreamHandler, self).__init__()
+        self._spdlogger = _PystdoutLogger()
+        # disable logger by default
+        level = logging.getLogger('ydk').getEffectiveLevel()
+        super(YDKStreamHandler, self).setLevel(level)
+        if trace:
+            level = _TRACE_LEVEL_NUM
+        self._spdlogger.set_level(level)

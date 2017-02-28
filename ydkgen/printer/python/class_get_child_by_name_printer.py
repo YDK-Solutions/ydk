@@ -42,13 +42,10 @@ class ClassGetChildByNamePrinter(object):
             self.ctx.bline()
 
     def _print_class_get_child_common(self):
-        self.ctx.writeln('if (child_yang_name in self.children):')
+        self.ctx.writeln('child = self._get_child_by_seg_name([child_yang_name, segment_path])')
+        self.ctx.writeln('if child is not None:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('return self.children[child_yang_name]')
-        self.ctx.lvl_dec()
-        self.ctx.writeln('elif (segment_path in self.children):')
-        self.ctx.lvl_inc()
-        self.ctx.writeln('return self.children[segment_path]')
+        self.ctx.writeln('return child')
         self.ctx.lvl_dec()
         self.ctx.bline()
 
@@ -67,16 +64,14 @@ class ClassGetChildByNamePrinter(object):
         self.ctx.writeln('segment = c.get_segment_path()')
         self.ctx.writeln('if (segment_path == segment):')
         self.ctx.lvl_inc()
-        self.ctx.writeln('self.children[segment_path] = c')
-        self.ctx.writeln('return self.children[segment_path]')
+        self.ctx.writeln('return c')
         self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.writeln('c = %s()' % (child.property_type.qn()))
         self.ctx.writeln('c.parent = self')
-        self.ctx.writeln('local_reference_key = "%s%s" % (child_yang_name, segment_path)')
+        self.ctx.writeln('local_reference_key = "ydk::seg::%s" % segment_path')
         self.ctx.writeln('self._local_refs[local_reference_key] = c')
         self.ctx.writeln('self.%s.append(c)' % child.name)
-        self.ctx.writeln('self.children[segment_path] = c')
         self.ctx.writeln('return c')
 
     def _print_class_get_child_unique(self, child):
@@ -84,8 +79,8 @@ class ClassGetChildByNamePrinter(object):
         self.ctx.lvl_inc()
         self.ctx.writeln('self.%s = %s()' % (child.name, child.property_type.qn()))
         self.ctx.writeln('self.%s.parent = self' % child.name)
+        self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
         self.ctx.lvl_dec()
-        self.ctx.writeln('self.children["%s"] = self.%s' % (child.stmt.arg, child.name))
         self.ctx.writeln('return self.%s' % child.name)
 
     def _print_class_get_child_trailer(self, clazz):

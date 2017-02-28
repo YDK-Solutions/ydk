@@ -57,7 +57,6 @@ class LanguageBindingsPrinter(object):
 
         self.packages = packages
         self.packages = sorted(self.packages, key=lambda package: package.name)
-        self.deviation_packages = [p for p in self.packages if p.is_deviation is True]
         self.packages = [p for p in self.packages if p.is_deviation is not True]
         self.identity_subclasses = self._get_identity_subclasses_map()
         self.packages = self._filter_bundle_pkgs()
@@ -77,13 +76,9 @@ class LanguageBindingsPrinter(object):
             self.models_dir = self.initialize_output_directory(
                 os.path.join(self.models_dir, self.bundle_name), True)
             self.sub_dir = self.models_dir
-            self.aug_dir = self.initialize_output_directory(
-                self.sub_dir + '/_aug', True)
-            self.sub_dir = self.models_dir
 
         self.test_dir = self.initialize_output_directory(
             os.path.join(self.models_dir, 'test'), False)
-
 
     def initialize_printer_context(self):
         self.ypy_ctx = printer_context.PrinterContext()

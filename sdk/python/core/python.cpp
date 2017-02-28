@@ -170,7 +170,6 @@ PYBIND11_PLUGIN(ydk_)
 
     bind_map<ChildrenMap>(types, "ChildrenMap");
 
-
     class_<ydk::path::Capability>(path, "Capability")
         .def(init<const string &, const string &>());
 

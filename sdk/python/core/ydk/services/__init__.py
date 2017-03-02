@@ -15,7 +15,8 @@
 # ------------------------------------------------------------------
 
 from .crud_service import CrudService
-from ydk.ext.services NetconfService, DataStore
+from .netconf_service import NetconfService
+from ydk.ext.services import DataStore
 
 
 __all__ = [ "CrudService", "NetconfService", "DataStore" ]

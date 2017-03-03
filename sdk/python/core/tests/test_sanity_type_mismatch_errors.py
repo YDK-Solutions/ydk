@@ -68,8 +68,6 @@ class SanityYang(unittest.TestCase):
                 try:
                     func(self)
                 except YPYModelError as error:
-                    print pattern
-                    print error.message
                     res = re.match(pattern, error.message)
                     self.assertEqual(res is not None, True)
             return helper

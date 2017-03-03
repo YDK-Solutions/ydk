@@ -91,8 +91,12 @@ class ClassInitsPrinter(object):
                 leaf_type = 'YLeafList'
 
             self.ctx.bline()
+            if prop.stmt.top.arg != clazz.stmt.top.arg:
+                name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
+            else:
+                name = prop.stmt.arg
             self.ctx.writeln('self.%s = %s(YType.%s, "%s")' 
-                % (prop.name, leaf_type, self._get_type_name(prop.property_type), prop.stmt.arg))
+                % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
 
     def _print_init_children(self, children):
         for child in children:

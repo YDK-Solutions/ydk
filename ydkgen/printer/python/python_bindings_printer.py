@@ -167,12 +167,6 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
                         emit_nmsp_declare_init,
                         _EmitArgs(self.ypy_ctx, self.packages))
 
-    def _print_nmsp_augment_finder_init(self, path, is_meta=False):
-        file_name = get_init_file_name(path)
-        self.print_file(file_name,
-                        emit_nmsp_augment_finder_init,
-                        _EmitArgs(self.ypy_ctx, self.packages, is_meta))
-
 
 def get_init_file_name(path):
     return path + '/__init__.py'
@@ -236,7 +230,3 @@ def emit_meta(ctx, package, sort_clazz):
 
 def emit_nmsp_declare_init(ctx, package):
     InitPrinter(ctx).print_nmsp_declare_init(package)
-
-
-def emit_nmsp_augment_finder_init(ctx, package, is_meta):
-    InitPrinter(ctx).print_nmsp_augment_finder_init(package, is_meta)

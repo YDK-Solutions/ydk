@@ -14,7 +14,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 import inspect
-from ydk.models.ydktest.ydktest_sanity import Runner
 from ydk.ext.services import DataStore, NetconfService as _NetconfService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error

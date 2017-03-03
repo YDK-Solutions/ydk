@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 import unittest
 
-from ydk.services import CRUDService
+from ydk.services import CrudService
 from ydk.providers import NetconfServiceProvider
 from ydk.models.augmentation import ietf_aug_base_1
 from ydk.models.augmentation import ietf_aug_base_2
@@ -30,12 +30,8 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                          username='admin',
-                                          password='admin',
-                                          protocol='ssh',
-                                          port=12022)
-        self.crud = CRUDService()
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.crud = CrudService()
 
     @classmethod
     def tearDownClass(self):

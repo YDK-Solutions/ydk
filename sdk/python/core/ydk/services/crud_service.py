@@ -17,6 +17,7 @@ import inspect
 from ydk.ext.services import CrudService as _CrudService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
+from ydk.errors.error_handler import check_argument as _check_argument
 
 
 class CrudService(_CrudService):
@@ -24,15 +25,6 @@ class CrudService(_CrudService):
     """
     def __init__(self):
         self._crud = _CrudService()
-
-    def _check_argument(func):
-        def helper(self, provider, entity):
-            _, pname, ename = inspect.getargspec(func).args
-            if provider is None or entity is None:
-                raise _YPYServiceError("'{0}' and '{1}' cannot be None"
-                                       .format(pname, ename))
-            return func(self, provider, entity)
-        return helper
 
     @_check_argument
     def create(self, provider, entity):

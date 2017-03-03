@@ -14,9 +14,12 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
+from .codec_service import CodecService
 from .crud_service import CrudService
 from .netconf_service import NetconfService
 from ydk.ext.services import DataStore
 
 
-__all__ = [ "CrudService", "NetconfService", "DataStore" ]
+__all__ = [ "CodecService" "CrudService",
+            "NetconfService", "DataStore" ]
+

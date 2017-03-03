@@ -19,20 +19,22 @@ sanity test for CodecService
 """
 from __future__ import absolute_import
 import unittest
-from compare import is_equal
 
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import oc_pattern
 from ydk.providers import CodecServiceProvider
 from ydk.services import CodecService
 from ydk.errors import YPYServiceError
+from ydk.types import EncodingFormat
+from test_utils import assert_with_error
 
 
 class SanityYang(unittest.TestCase):
+
     @classmethod
     def setUpClass(self):
         self.codec = CodecService()
-        self.provider = CodecServiceProvider(type='xml')
+        self.provider = CodecServiceProvider(EncodingFormat.XML)
 
         self._enum_payload_1 = '''<built-in-t xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <enum-value>local</enum-value>
@@ -114,6 +116,20 @@ class SanityYang(unittest.TestCase):
         r_1.two_list.ldata.extend([e_1, e_2])
         return r_1
 
+    def _compare_entities(self, r_1, r_2):
+        self.assertEqual(r_1.two_list.ldata[0].name, r_2.two_list.ldata[0].name)
+        self.assertEqual(r_1.two_list.ldata[0].number, r_2.two_list.ldata[0].number)
+        self.assertEqual(r_1.two_list.ldata[0].subl1[0].name, r_2.two_list.ldata[0].subl1[0].name)
+        self.assertEqual(r_1.two_list.ldata[0].subl1[0].number, r_2.two_list.ldata[0].subl1[0].number)
+        self.assertEqual(r_1.two_list.ldata[0].subl1[1].name, r_2.two_list.ldata[0].subl1[1].name)
+        self.assertEqual(r_1.two_list.ldata[0].subl1[1].number, r_2.two_list.ldata[0].subl1[1].number)
+        self.assertEqual(r_1.two_list.ldata[1].name, r_2.two_list.ldata[1].name)
+        self.assertEqual(r_1.two_list.ldata[1].number, r_2.two_list.ldata[1].number)
+        self.assertEqual(r_1.two_list.ldata[1].subl1[0].name, r_2.two_list.ldata[1].subl1[0].name)
+        self.assertEqual(r_1.two_list.ldata[1].subl1[0].number, r_2.two_list.ldata[1].subl1[0].number)
+        self.assertEqual(r_1.two_list.ldata[1].subl1[1].name, r_2.two_list.ldata[1].subl1[1].name)
+        self.assertEqual(r_1.two_list.ldata[1].subl1[1].number, r_2.two_list.ldata[1].subl1[1].number)
+
     def test_encode_1(self):
         r_1 = self._get_runner_entity()
         payload = self.codec.encode(self.provider, r_1)
@@ -127,75 +143,42 @@ class SanityYang(unittest.TestCase):
         payload = self.codec.encode(self.provider, r_1)
         self.assertEqual(self._enum_payload_1, payload)
 
+    @assert_with_error("'provider' and 'entity_holder' cannot be None", YPYServiceError)
     def test_encode_invalid_1(self):
-        try:
-            self.codec.encode(self.provider, None)
-        except YPYServiceError as err:
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.encode(self.provider, None)
 
+    @assert_with_error("'provider' and 'entity_holder' cannot be None", YPYServiceError)
     def test_encode_invalid_2(self):
-        try:
             self.codec.encode(None, self._get_runner_entity())
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
 
+    @assert_with_error("'provider' and 'entity_holder' cannot be None", YPYServiceError)
     def test_encode_invalid_3(self):
-        try:
             self.codec.encode(None, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
 
     def test_decode_1(self):
         entity = self.codec.decode(self.provider, self._enum_payload_2)
         self.assertEqual(
             self._enum_payload_2, self.codec.encode(self.provider, entity))
 
+    @assert_with_error("'provider' and 'payload_holder' cannot be None", YPYServiceError)
     def test_decode_invalid_1(self):
-        try:
             self.codec.decode(None, self._enum_payload_2)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
 
+    @assert_with_error("'provider' and 'payload_holder' cannot be None", YPYServiceError)
     def test_decode_invalid_2(self):
-        try:
-            self.codec.decode(self.provider, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.decode(self.provider, None)
 
+    @assert_with_error("'provider' and 'payload_holder' cannot be None", YPYServiceError)
     def test_decode_invalid_3(self):
-        try:
-            self.codec.decode(None, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.decode(None, None)
 
     def test_encode_decode(self):
         r_1 = self._get_runner_entity()
         payload = self.codec.encode(self.provider, r_1)
         entity = self.codec.decode(self.provider, payload)
-        self.assertEqual(is_equal(r_1, entity), True)
+
+        self._compare_entities(r_1, entity)
+
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_encode_decode_dict(self):
@@ -204,7 +187,7 @@ class SanityYang(unittest.TestCase):
         payload = self.codec.encode(self.provider, r_entity)
         entity = self.codec.decode(self.provider, payload)
         for module in entity:
-            self.assertEqual(is_equal(r_entity[module], entity[module]), True)
+            self._compare_entities(r_entity[module], entity[module])
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_decode_oc_pattern(self):
@@ -212,7 +195,8 @@ class SanityYang(unittest.TestCase):
         obj_A.a = 'Hello'
         entity = self.codec.decode(self.provider, self._oc_pattern_payload)
 
-        self.assertEqual(is_equal(obj_A, entity), True)
+        self.assertEqual(obj_A.a, entity.a)
+
 
 if __name__ == '__main__':
     import sys

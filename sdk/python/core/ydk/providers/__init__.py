@@ -14,11 +14,13 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
+from .codec_provider import CodecServiceProvider
 from ydk.ext.providers import NetconfServiceProvider
 from ydk.ext.providers import RestconfServiceProvider
 from ydk.ext.providers import OpenDaylightServiceProvider
 
 
-__all__ = [ "NetconfServiceProvider",
+__all__ = [ "CodecServiceProvider",
+            "NetconfServiceProvider",
             "RestconfServiceProvider",
             "OpenDaylightServiceProvider" ]

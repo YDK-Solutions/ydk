@@ -74,5 +74,6 @@ setup(
     keywords='yang, C++11, python bindings',
     packages=YDK_PACKAGES,
     namespace_packages=NMSP_PACKAGES,
-    install_requires=INSTALL_REQUIREMENTS
+    install_requires=INSTALL_REQUIREMENTS,
+    include_package_data=True
 )

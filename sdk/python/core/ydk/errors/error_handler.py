@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+import inspect
 import contextlib
+
 from ydk.errors import YPYError as _YPYError
 from ydk.errors import YPYClientError as _YPYClientError
 from ydk.errors import YPYIllegalStateError as _YPYIllegalStateError
@@ -62,3 +64,21 @@ def handle_type_error():
         yield
     except TypeError, err:
         raise _YPYModelError(err.message)
+
+
+@contextlib.contextmanager
+def handle_import_error(logger, level):
+    try:
+        yield
+    except ImportError, err:
+        logger.log(level, err.message)
+
+
+def check_argument(func):
+    def helper(self, provider, entity, *args):
+        _, pname, ename = inspect.getargspec(func).args[:3]
+        if provider is None or entity is None:
+            raise _YPYServiceError("'{0}' and '{1}' cannot be None"
+                                   .format(pname, ename))
+        return func(self, provider, entity)
+    return helper

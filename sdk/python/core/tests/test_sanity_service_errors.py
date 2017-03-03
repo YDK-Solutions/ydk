@@ -15,16 +15,15 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
-import ydk.types as ytypes
 import unittest
 
 from ydk.services import CrudService
 from ydk.models.ydktest import ydktest_sanity as ysanity
-from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
-from ydk.models.ydktest import ydktest_types as y_types
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYServiceError
+from test_utils import assert_with_error
+
 try:
     from ydk.models.ydktest import ietf_netconf
 except:
@@ -193,139 +192,63 @@ class SanityCrud(unittest.TestCase):
         runner = ysanity.Runner()
         self.crud.delete(self.ncc, runner)
 
+    _error_pattern_entity = "'provider' and 'entity' cannot be None"
+    _error_pattern_filter = "'provider' and 'filter' cannot be None"
+
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_create_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.number8 = 0
-            self.crud.create(None, runner)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
+        runner = ysanity.Runner()
+        runner.ytypes.built_in_t.number8 = 0
+        self.crud.create(None, runner)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_create_invalid_2(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.number8 = 0
-            self.crud.create(self.ncc, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.crud.create(self.ncc, None)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_create_invalid_3(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.number8 = 0
-            self.crud.create(None, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.crud.create(None, None)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_delete_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            self.crud.delete(None, runner)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        runner = ysanity.Runner()
+        self.crud.delete(None, runner)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_delete_invalid_2(self):
-        try:
-            self.crud.delete(self.ncc, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.delete(self.ncc, None)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_delete_invalid_3(self):
-        try:
-            self.crud.delete(None, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.delete(None, None)
 
+    @assert_with_error(_error_pattern_filter, YPYServiceError)
     def test_crud_read_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.bool_value = True
-            self.crud.create(self.ncc, runner)
-            # Read into Runner2
-            runner1 = ysanity.Runner()
-            self.crud.read(None, runner1)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'filter' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        runner_read = ysanity.Runner()
+        self.crud.read(None, runner_read)
 
+    @assert_with_error(_error_pattern_filter, YPYServiceError)
     def test_crud_read_invalid_2(self):
-        try:
-            self.crud.read(self.ncc, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'filter' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.read(self.ncc, None)
 
+    @assert_with_error(_error_pattern_filter, YPYServiceError)
     def test_crud_read_invalid_3(self):
-        try:
-            self.crud.read(None, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'filter' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.read(None, None)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_update_invalid_1(self):
-        try:
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.bool_value = True
-            self.crud.create(self.ncc, runner)
+        runner = ysanity.Runner()
+        runner.ytypes.built_in_t.bool_value = True
+        self.crud.update(None, runner)
 
-            # Read into Runner2
-            runner1 = ysanity.Runner()
-            runner1 = self.crud.read(self.ncc, runner1)
-
-            # Compare runners
-            self.assertEqual(runner.ytypes.built_in_t.bool_value,
-                             runner1.ytypes.built_in_t.bool_value)
-
-            runner = ysanity.Runner()
-            runner.ytypes.built_in_t.bool_value = False
-            self.crud.update(None, runner)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
-
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_update_invalid_2(self):
-        try:
-            self.crud.update(self.ncc, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.update(self.ncc, None)
 
+    @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_update_invalid_3(self):
-        try:
-            self.crud.update(None, None)
-        except YPYServiceError as err:
-            expected_msg = "'provider' and 'entity' cannot be None"
-            self.assertEqual(err.message, expected_msg)
-        else:
-            raise Exception('YPYServiceError not Raised')
+        self.crud.update(None, None)
+
 
 class SanityExecutor(unittest.TestCase):
     PROVIDER_TYPE = "non-native"

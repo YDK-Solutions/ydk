@@ -14,10 +14,19 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.ext.entity_utils import get_relative_entity_path
-from ydk.ext.entity_utils import get_data_node_from_entity
-from ydk.ext.entity_utils import get_entity_from_data_node
+"""test_utils.py
 
-__all__ = [ "get_relative_entity_path",
-            "get_data_node_from_entity",
-            "get_entity_from_data_node" ]
+Utility function for test cases.
+"""
+import re
+
+def assert_with_error(pattern, ErrorClass):
+    def assert_with_pattern(func):
+        def helper(self, *args, **kwargs):
+            try:
+                func(self)
+            except ErrorClass as error:
+                res = re.match(pattern, error.message.strip())
+                self.assertEqual(res is not None, True)
+        return helper
+    return assert_with_pattern

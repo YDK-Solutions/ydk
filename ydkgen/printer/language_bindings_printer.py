@@ -52,14 +52,12 @@ class LanguageBindingsPrinter(object):
         self.models_dir = ''
         self.test_dir = ''
         self.sub_dir = ''
-        self.aug_dir = ''
         self.classes_per_source_file = classes_per_source_file
 
         self.packages = packages
         self.packages = sorted(self.packages, key=lambda package: package.name)
         self.packages = [p for p in self.packages if p.is_deviation is not True]
         self.identity_subclasses = self._get_identity_subclasses_map()
-        self.packages = self._filter_bundle_pkgs()
         self.initialize_print_environment()
         return self.print_files()
 
@@ -69,14 +67,10 @@ class LanguageBindingsPrinter(object):
 
     def initialize_top_level_directories(self):
         self.models_dir = self.initialize_output_directory(
-            os.path.join(self.ydk_dir, 'models'), True)
-        self.deviation_dir = self.initialize_output_directory(
-            self.models_dir + '/_deviate', True)
-        if self.bundle:
-            self.models_dir = self.initialize_output_directory(
-                os.path.join(self.models_dir, self.bundle_name), True)
-            self.sub_dir = self.models_dir
-
+            self.ydk_dir + '/models', True)
+        if self.bundle_name:
+            self.sub_dir = self.initialize_output_directory(
+                self.models_dir + '/%s' % self.bundle_name, True)
         self.test_dir = self.initialize_output_directory(
             os.path.join(self.models_dir, 'test'), False)
 
@@ -142,22 +136,3 @@ class LanguageBindingsPrinter(object):
                 else:
                     identity_subclasses.extend(self._get_identity_subclasses_for_package(subelement))
         return identity_subclasses
-
-    def _filter_bundle_pkgs(self):
-        bundle_pkgs = {}
-        for pkg in self.packages:
-            if pkg.bundle_name == self.bundle_name:
-                # we have multiple models being augmented.
-                if hasattr(pkg.stmt, 'i_aug_targets'):
-                    for target in pkg.stmt.i_aug_targets:
-                        aug_pkg = target.i_package
-                        if aug_pkg.bundle_name != self.bundle_name:
-                            # augmenting models in existing bundle.
-                            aug_pkg.aug_bundle_name = aug_pkg.bundle_name
-                            aug_pkg.bundle_name = self.bundle_name
-                            bundle_pkgs[id(aug_pkg)] = aug_pkg
-
-                bundle_pkgs[id(pkg)] = pkg
-
-        return list(bundle_pkgs.values())
-

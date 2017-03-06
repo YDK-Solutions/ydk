@@ -30,24 +30,41 @@ _USER_PROVIDED_REPO = "ydk-user-provider-repo"
 
 class CodecServiceProvider(object):
     """Python CodecServiceProvider wrapper.
+
+    Args:
+        encoding (ydk.types.EncodingFormat): Codec encoding format.
+            Currently support XML or JSON.
+        repo (ydk.path.Repository, optional): A user provided repository.
+    Attributes:
+        logger (logging.Logger): CodecServiceProvider logger.
+        encoding (ydk.types.EncodingFormat): Codec encoding format.
+        _root_schema_table (dict(str, ydk.path.RootSchemaNode)): A dictionary
+            of root schemas, key is bundle name or _USER_PROVIDED_REPO, value
+            is corresponding repository.
     """
 
     def __init__(self, encoding, repo=None):
         self.logger = logging.getLogger(__name__)
-        self.m_encoding = encoding
-        self._m_root_schema_table = {}
+        self.encoding = encoding
+        self._root_schema_table = {}
         if repo is None:
             self._user_provided_repo = False
-            self._m_repo = None
+            self._repo = None
         else:
             self._user_provided_repo = True
-            self._m_repo = repo
+            self._repo = repo
 
     def initialize(self, bundle_name, models_path):
-        if self._user_provided_repo:
-            self._initialize_root_schema(_USER_PROVIDED_REPO, self._m_repo, bundle_name)
+        """Initialize provider with bundle name and path for local YANG models.
 
-        if bundle_name in self._m_root_schema_table:
+        Args:
+            bundle_name (str): bundle name.
+            models_path (str): location for local YANG models.
+        """
+        if self._user_provided_repo:
+            self._initialize_root_schema(bundle_name, self._repo, True)
+
+        if bundle_name in self._root_schema_table:
             return
 
         self.logger.log(_TRACE_LEVEL_NUM, "Creating repo in path {}".format(models_path))
@@ -55,23 +72,45 @@ class CodecServiceProvider(object):
         self._initialize_root_schema(bundle_name, repo)
 
     def get_root_schema(self, bundle_name):
-        if self._user_provided_repo:
-            return self._m_root_schema_table[_USER_PROVIDED_REPO]
+        """Return root_schema for bundle_name.
 
-        if bundle_name not in self._m_root_schema_table:
+        Args:
+            bundle_name (str): bundle name.
+        """
+        if self._user_provided_repo:
+            return self._root_schema_table[_USER_PROVIDED_REPO]
+
+        if bundle_name not in self._root_schema_table:
             self.logger.error("Root schema not created")
             raise YPYServiceProviderError("Root schema not created")
 
-        return self._m_root_schema_table[bundle_name]
+        return self._root_schema_table[bundle_name]
 
-    def _initialize_root_schema(self, repo_name, repo, bundle_name=''):
-        bundle_name = repo_name if bundle_name == '' else bundle_name
-        self.logger.log(_TRACE_LEVEL_NUM, "Initializing root schema for {}".format(repo_name))
+    def _initialize_root_schema(self, bundle_name, repo, user_provided_repo=False):
+        """Update root schema table entry.
+
+        Args:
+            name (str): bundle name.
+            repo (ydk.path.Repository): default repository or repository provided by the user.
+            user_provided_repo (bool, optional): Defaults to False.
+
+        """
+        name = bundle_name if not user_provided_repo else _USER_PROVIDED_REPO
+        self.logger.log(_TRACE_LEVEL_NUM, "Initializing root schema for {}".format(name))
         # TODO: turn on and off libyang logging
         capabilities = self._get_bundle_capabilities(bundle_name)
-        self._m_root_schema_table[repo_name] = repo.create_root_schema(capabilities)
+        self._root_schema_table[name] = repo.create_root_schema(capabilities)
 
     def _get_bundle_capabilities(self, bundle_name):
+        """Search installed local ydk-models python packages, and return corresponding
+        capabilities.
+
+        Args:
+            bundle_name (str): bundle name.
+
+        Returns:
+            capabilities (list): List of ydk.path.Capability available for this bundle.
+        """
         capabilities = []
         capability_map = {}
         for (_, name, ispkg) in pkgutil.iter_modules(models.__path__):

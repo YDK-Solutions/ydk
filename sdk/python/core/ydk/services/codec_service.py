@@ -39,12 +39,31 @@ _PAYLOAD_ERROR_MSG = "Codec service only supports one entity per payload, please
 
 
 class CodecService(object):
+    """CodecService wrapper.
+
+    Attributes:
+        logger (logging.Logger): CodecService logger.
+    """
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
     @_check_argument
     def encode(self, provider, entity_holder, pretty=True):
+        """Encode entities from entity_holder to string payload(s).
+
+        Args:
+            provider (ydk.provider.CodecServiceProvider): Codec provider.
+            entity_holder (ydk.types.Entity or a dict(str, ydk.types.Entity)):
+                Encoding target(s).
+            pretty (bool, optional): Pretty formatting, defaults to True.
+
+        Returns:
+            A single string payload or a dictionary of payloads.
+
+        Raises:
+            Instance of YPYError is encoding fails.
+        """
         if isinstance(entity_holder, dict):
             payload_map = {}
             for key in entity_holder:
@@ -54,6 +73,19 @@ class CodecService(object):
             return self._encode(provider, entity_holder, pretty)
 
     def _encode(self, provider, entity, pretty):
+        """Encode a YDK entity to string payload.
+
+        Args:
+            provider (ydk.providers.CodecServiceProvider): Codec provider.
+            entity (ydk.types.Entity) : Encoding target.
+            pretty (bool): Pretty formatting if True.
+
+        Returns:
+            Encoded payload if success.
+
+        Raises:
+            Instance of YPYError is encoding fails.
+        """
         bundle_name = _get_bundle_name(entity)
         provider.initialize(bundle_name, _get_yang_path(entity))
         root_schema = provider.get_root_schema(bundle_name)
@@ -61,14 +93,25 @@ class CodecService(object):
         with _handle_error():
             data_node = _get_data_node_from_entity(entity, root_schema)
             codec_service = _CodecService()
-            result = codec_service.encode(data_node, provider.m_encoding, pretty)
+            result = codec_service.encode(data_node, provider.encoding, pretty)
             self.logger.debug("Performing encode operation, resulting in {}", result)
             return result
 
-        return ''
-
     @_check_argument
     def decode(self, provider, payload_holder):
+        """Decode payload from payload holder to YDK entities.
+
+        Args:
+            provider (ydk.providers.CodecServiceProvider): Codec provider.
+            payload_holder (str or dict(str, str)): A single string payload or
+                a dictionary of payload.
+
+        Returns:
+            A YDK entity instance or a dictionary of string and YDK entities.
+
+        Raises:
+            YPYServiceProviderError, see documentation for `_decode`.
+        """
         if isinstance(payload_holder, dict):
             entities = {}
             for key in payload_holder:
@@ -79,7 +122,22 @@ class CodecService(object):
             return self._decode(provider, payload_holder)
 
     def _decode(self, provider, payload):
-        entity = _get_top_entity(payload, provider.m_encoding, self.logger)
+        """Decode payload to a YDK entity instance.
+
+        Args:
+            provider (ydk.providers.CodecServiceProvider): Codec provider.
+            payload (str): Incoming payload, formatted in XML or JSON.
+
+        Returns:
+            A YDK entity (ydk.types.Entity) instance with children populated.
+
+        Raises:
+            - YPYServiceProviderError with _PAYLOAD_ERROR_MSG if payload
+              contains more than one top level containers.
+            - YPYServiceProviderError with _ENTITY_ERROR_MSG if no such entity
+              could be found in local installed YDK model packages.
+        """
+        entity = self._get_top_entity(payload, provider.encoding)
 
         bundle_name = _get_bundle_name(entity)
         provider.initialize(bundle_name, _get_yang_path(entity))
@@ -89,7 +147,7 @@ class CodecService(object):
         self.logger.debug("Performing decode operation on {}", payload)
 
         codec_service = _CodecService()
-        root_data_node = codec_service.decode(root_schema, payload, provider.m_encoding)
+        root_data_node = codec_service.decode(root_schema, payload, provider.encoding)
 
         if len(root_data_node.children()) != 1:
             self.logger.debug(_PAYLOAD_ERROR_MSG)
@@ -99,8 +157,43 @@ class CodecService(object):
                 _get_entity_from_data_node(data_node, entity)
         return entity
 
+    def _get_top_entity(self, payload, encoding):
+        """Return top level entity from payload.
+
+        Namespace and entity name are extracted from payload. Then we use this
+        tuple of namespace and entity name as a key and search for local
+        installed YDK model packages, and return top level entity instance if
+        such key matches entry in the `ENTITY_LOOKUP` for local installed YDK
+        model packages.
+
+        Args:
+            payload (str): Incoming payload.
+            encoding (ydk.types.EncodingFormat): Payload encoding format.
+
+        Returns:
+            A YDK entity instance (ydk.types.Entity) if the key for namespace
+            and top level entity name extracted from payload exists in local
+            installed YDK model packages.
+
+        Raises:
+            YPYServiceProviderError if search fails.
+        """
+        top_entity = None
+        ns_ename = _get_ns_ename(payload, encoding)
+        ydk_models = importlib.import_module('ydk.models')
+        for (_, name, ispkg) in pkgutil.iter_modules(ydk_models.__path__):
+            if ispkg:
+                yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
+                entity_lookup = yang_ns.__dict__['ENTITY_LOOKUP']
+                if ns_ename in entity_lookup:
+                    return entity_lookup[ns_ename].clone_ptr()
+
+        self.logger.debug(_ENTITY_ERROR_MSG, ename)
+        raise _YPYServiceProviderError(_ENTITY_ERROR_MSG.format(ename))
+
 
 def _get_string(string):
+    """Convert unicode string to str."""
     # TODO: check in python3 env
     if isinstance(string, unicode):
         return string.encode('utf-8')
@@ -109,6 +202,15 @@ def _get_string(string):
 
 
 def _get_ns_ename(payload, encoding):
+    """Return namespace and entity name from incoming payload.
+
+    Args:
+        payload (str): Incoming payload.
+        encoding (ydk.types.EncodingFormat): Payload encoding format.
+
+    Returns:
+        A tuple of namespace and entity name (tuple(str, str)).
+    """
     ns, ename = None, None
     if encoding == EncodingFormat.XML:
         payload_root = xml.etree.ElementTree.fromstring(payload)
@@ -121,28 +223,30 @@ def _get_ns_ename(payload, encoding):
 
     return (ns, ename)
 
-def _get_top_entity(payload, encoding, logger):
-    top_entity = None
-    ns_ename = _get_ns_ename(payload, encoding)
-    ydk_models = importlib.import_module('ydk.models')
-    for (_, name, ispkg) in pkgutil.iter_modules(ydk_models.__path__):
-        if ispkg:
-            yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
-            entity_lookup = yang_ns.__dict__['ENTITY_LOOKUP']
-            if ns_ename in entity_lookup:
-                return entity_lookup[ns_ename].clone_ptr()
-
-    logger.debug(_ENTITY_ERROR_MSG, ename)
-    raise _YPYServiceProviderError(_ENTITY_ERROR_MSG.format(ename))
-
 
 def _get_yang_path(entity):
+    """Return YANG models install location for entity.
+
+    Args:
+        entity (ydk.types.Entity): YDK entity instance.
+
+    Returns:
+        Path for installed YANG models location (str).
+    """
     m = entity.__module__.rsplit('.', 1)[0]
     m = importlib.import_module(m)
     return os.path.join(m.__path__[0], '_yang')
 
 
 def _get_bundle_name(entity):
+    """Return bundle name for entity.
+
+    Args:
+        entity (ydk.types.Entity): YDK entity instance.
+
+    Returns:
+        bundle name.
+    """
     m = entity.__module__.rsplit('.', 1)[0]
     m = importlib.import_module('.'.join([m, '_yang_ns']))
     return m.__dict__['BUNDLE_NAME']

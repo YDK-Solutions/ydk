@@ -20,7 +20,7 @@ import unittest
 from ydk.services import CrudService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
-from ydk.types import Empty, Decimal64
+from ydk.types import Empty, Decimal64, EncodingFormat
 from ydk.errors import YPYServiceError
 from test_utils import assert_with_error
 
@@ -37,7 +37,7 @@ class SanityCodec(unittest.TestCase):
         from ydk.providers import CodecServiceProvider
         from ydk.services import CodecService
         self.codec = CodecService()
-        self.provider = CodecServiceProvider(type='xml')
+        self.provider = CodecServiceProvider(EncodingFormat.XML)
 
         self._enum_payload_1 = """<built-in-t xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <enum-value>local</enum-value>
@@ -114,64 +114,32 @@ class SanityCodec(unittest.TestCase):
         r_1.two_list.ldata.extend([e_1, e_2])
         return r_1
 
+    _entity_pattern = "'provider' and 'entity_holder' cannot be None"
+    _payload_pattern = "'provider' and 'payload_holder' cannot be None"
+
+    @assert_with_error(_entity_pattern, YPYServiceError)
     def test_encode_invalid_1(self):
-        try:
-            self.codec.encode(self.provider, None)
-        except YPYServiceError as err:
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.encode(self.provider, None)
 
+    @assert_with_error(_entity_pattern, YPYServiceError)
     def test_encode_invalid_2(self):
-        try:
             self.codec.encode(None, self._get_runner_entity())
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
 
+    @assert_with_error(_entity_pattern, YPYServiceError)
     def test_encode_invalid_3(self):
-        try:
             self.codec.encode(None, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'encoder' and 'entity' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
 
+    @assert_with_error(_payload_pattern, YPYServiceError)
     def test_decode_invalid_1(self):
-        try:
-            self.codec.decode(None, self._enum_payload_2)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.decode(None, self._enum_payload_2)
 
+    @assert_with_error(_payload_pattern, YPYServiceError)
     def test_decode_invalid_2(self):
-        try:
-            self.codec.decode(self.provider, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.decode(self.provider, None)
 
+    @assert_with_error(_payload_pattern, YPYServiceError)
     def test_decode_invalid_3(self):
-        try:
-            self.codec.decode(None, None)
-        except YPYServiceError as e:
-            err = e
-            self.assertEqual(
-                err.message, "'decoder' and 'payload' cannot be None")
-        else:
-            raise Exception('YPYServiceError not raised')
+        self.codec.decode(None, None)
 
 class SanityCrud(unittest.TestCase):
 

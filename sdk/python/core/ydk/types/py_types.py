@@ -22,7 +22,7 @@
         - Entity
 """
 from ydk.ext.types import ChildrenMap
-from ydk.ext.types import YLeaf as _YLeaf
+from ydk.ext.types import Bits, YLeaf as _YLeaf
 from ydk.ext.types import YLeafList as _YLeafList
 from ydk.ext.types import Entity as _Entity
 from ydk.errors import YPYModelError as _YPYModelError
@@ -55,6 +55,20 @@ class YList(list):
        for item in items:
            self.append(item)
 
+class YLeaf(_YLeaf):
+    """ Wrapper class for YLeaf.
+    """
+    def __init__(self, ytype, leaf_name):
+        super(YLeaf, self).__init__(ytype, leaf_name)
+        self.ytype = ytype
+        self.leaf_name = leaf_name
+        self.bits_value = Bits()
+
+    def __setitem__(self, key, item):
+        self.bits_value[key] = item
+
+    def __getitem__(self, key):
+        return self.bits_value[key]
 
 class YLeafList(_YLeafList):
     """ Wrapper class for YLeafList, add __repr__ and get list slice

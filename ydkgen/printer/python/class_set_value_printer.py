@@ -50,9 +50,9 @@ class ClassSetYLeafPrinter(object):
             if leaf.is_many:
                 self.ctx.writeln('bits_value = Bits()')
                 self.ctx.writeln('bits_value[value] = True')
-                self.ctx.writeln('%s.append(bits_value)' % leaf.name)
+                self.ctx.writeln('self.%s.append(bits_value)' % leaf.name)
             else:
-                self.ctx.writeln('%s[value] = True' % leaf.name)
+                self.ctx.writeln('self.%s[value] = True' % leaf.name)
         elif(leaf.is_many):
             self.ctx.writeln('self.%s.append(value)' % leaf.name)
         else:

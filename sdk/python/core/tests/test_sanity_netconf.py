@@ -178,11 +178,11 @@ class SanityNetconf(unittest.TestCase):
 
     # Failing - NetconfService glue code needed
     def test_delete_config_fail(self):
-        self.assertRaises(YPYServiceError,
+        self.assertRaises(YPYModelError,
                           self.netconf_service.delete_config,
                           self.ncc,
                           DataStore.running)
-        self.assertRaises(YPYServiceError,
+        self.assertRaises(YPYModelError,
                           self.netconf_service.delete_config,
                           self.ncc,
                           DataStore.candidate)

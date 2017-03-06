@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------
 
 import os
+import json
 import logging
 import pkgutil
 import importlib
@@ -28,6 +29,7 @@ from ydk.errors import YPYServiceProviderError as _YPYServiceProviderError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import handle_import_error as _handle_import_error
 from ydk.errors.error_handler import check_argument as _check_argument
+from ydk.types import EncodingFormat
 
 
 _TRACE_LEVEL_NUM = 5
@@ -77,7 +79,7 @@ class CodecService(object):
             return self._decode(provider, payload_holder)
 
     def _decode(self, provider, payload):
-        entity = _get_top_entity(payload, self.logger)
+        entity = _get_top_entity(payload, provider.m_encoding, self.logger)
 
         bundle_name = _get_bundle_name(entity)
         provider.initialize(bundle_name, _get_yang_path(entity))
@@ -98,18 +100,37 @@ class CodecService(object):
         return entity
 
 
-def _get_top_entity(payload, logger):
+def _get_string(string):
+    # TODO: check in python3 env
+    if isinstance(string, unicode):
+        return string.encode('utf-8')
+    else:
+        return string
+
+
+def _get_ns_ename(payload, encoding):
+    ns, ename = None, None
+    if encoding == EncodingFormat.XML:
+        payload_root = xml.etree.ElementTree.fromstring(payload)
+        ns, ename = payload_root.tag.rsplit('}')
+        ns = ns.strip('{')
+    else:
+        ns, ename = json.loads(payload).keys()[0].split(':')
+        ns = _get_string(ns)
+        ename = _get_string(ename)
+
+    return (ns, ename)
+
+def _get_top_entity(payload, encoding, logger):
     top_entity = None
-    payload_root = xml.etree.ElementTree.fromstring(payload)
-    ns, ename = payload_root.tag.rsplit('}')
-    ns = ns.strip('{')
+    ns_ename = _get_ns_ename(payload, encoding)
     ydk_models = importlib.import_module('ydk.models')
     for (_, name, ispkg) in pkgutil.iter_modules(ydk_models.__path__):
         if ispkg:
             yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
             entity_lookup = yang_ns.__dict__['ENTITY_LOOKUP']
-            if (ns, ename) in entity_lookup:
-                return entity_lookup[(ns, ename)].clone_ptr()
+            if ns_ename in entity_lookup:
+                return entity_lookup[ns_ename].clone_ptr()
 
     logger.debug(_ENTITY_ERROR_MSG, ename)
     raise _YPYServiceProviderError(_ENTITY_ERROR_MSG.format(ename))

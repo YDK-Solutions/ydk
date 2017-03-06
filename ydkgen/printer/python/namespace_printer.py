@@ -75,6 +75,9 @@ class NamespacePrinter(FilePrinter):
                         e.stmt.keyword in ('container', 'list'))):
                     self.ctx.writeln('("{}", "{}"): {}(),'
                                      .format(ns.arg, e.stmt.arg, e.fqn()))
+                    self.ctx.writeln('("{}", "{}"): {}(),'
+                                     .format(p.stmt.arg, e.stmt.arg, e.fqn()))
+
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()

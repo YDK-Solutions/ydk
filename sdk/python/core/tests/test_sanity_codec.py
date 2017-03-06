@@ -79,6 +79,43 @@ class SanityYang(unittest.TestCase):
   </two-list>
 </runner>
 '''
+        self._runner_json_payload = """{
+  "ydktest-sanity:runner": {
+    "two-list": {
+      "ldata": [
+        {
+          "number": 21,
+          "name": "runner:twolist:ldata[21]:name",
+          "subl1": [
+            {
+              "number": 211,
+              "name": "runner:twolist:ldata[21]:subl1[211]:name"
+            },
+            {
+              "number": 212,
+              "name": "runner:twolist:ldata[21]:subl1[212]:name"
+            }
+          ]
+        },
+        {
+          "number": 22,
+          "name": "runner:twolist:ldata[22]:name",
+          "subl1": [
+            {
+              "number": 221,
+              "name": "runner:twolist:ldata[22]:subl1[221]:name"
+            },
+            {
+              "number": 222,
+              "name": "runner:twolist:ldata[22]:subl1[222]:name"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+"""
         self._oc_pattern_payload = '''<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
   <a>Hello</a>
 </oc-A>
@@ -178,7 +215,6 @@ class SanityYang(unittest.TestCase):
         entity = self.codec.decode(self.provider, payload)
 
         self._compare_entities(r_1, entity)
-
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_encode_decode_dict(self):
@@ -196,6 +232,27 @@ class SanityYang(unittest.TestCase):
         entity = self.codec.decode(self.provider, self._oc_pattern_payload)
 
         self.assertEqual(obj_A.a, entity.a)
+
+    def test_json_encode(self):
+        provider = CodecServiceProvider(EncodingFormat.JSON)
+        entity = self._get_runner_entity()
+        payload = self.codec.encode(provider, entity)
+        self.assertEqual(self._runner_json_payload, payload)
+
+    def test_json_decode(self):
+        provider = CodecServiceProvider(EncodingFormat.JSON)
+        entity = self.codec.decode(provider, self._runner_json_payload)
+        self.assertEqual(self._runner_json_payload,
+                         self.codec.encode(provider, entity))
+
+    def test_json_encode_decode(self):
+        provider = CodecServiceProvider(EncodingFormat.JSON)
+        runner = self._get_runner_entity()
+        payload = self.codec.encode(provider, runner)
+        entity = self.codec.decode(provider, payload)
+
+        self._compare_entities(runner, entity)
+        self.assertEqual(payload, self.codec.encode(provider, entity))
 
 
 if __name__ == '__main__':

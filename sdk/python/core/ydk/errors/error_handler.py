@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+import sys
 import inspect
 import contextlib
 
@@ -24,6 +25,10 @@ from ydk.errors import YPYModelError as _YPYModelError
 from ydk.errors import YPYOperationNotSupportedError as _YPYOperationNotSupportedError
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors import YPYServiceProviderError as _YPYServiceProviderError
+
+
+if sys.version_info > (3, 0):
+    inspect.getargspec = inspect.getfullargspec
 
 
 _ERRORS = { "YCPPError": _YPYError,
@@ -41,20 +46,22 @@ _ERRORS = { "YCPPError": _YPYError,
 def handle_runtime_error():
     try:
         yield
-    except RuntimeError, err:
-        if ':' in err.message:
-            etype_str, msg = err.message.split(':', 1)
+    except RuntimeError as err:
+        msg = str(err)
+        if ':' in msg:
+            etype_str, msg = msg.split(':', 1)
             etype = _ERRORS.get(etype_str)
         else:
             etype = _YPYError
-            msg = err.message
+            msg = msg
         raise etype(msg)
-    except TypeError, err:
-        if ':' in err.message:
-            etype_str, msg = err.message.split(':', 1)
+    except TypeError as err:
+        msg = str(err)
+        if ':' in msg:
+            etype_str, msg = msg.split(':', 1)
             raise _YPYServiceError(msg)
         else:
-            raise _YPYError(err.message)
+            raise _YPYError(msg)
 
 
 @contextlib.contextmanager
@@ -62,16 +69,16 @@ def handle_type_error():
     """Rethrow TypeError as YPYModelError"""
     try:
         yield
-    except TypeError, err:
-        raise _YPYModelError(err.message)
+    except TypeError as err:
+        raise _YPYModelError(str(err))
 
 
 @contextlib.contextmanager
 def handle_import_error(logger, level):
     try:
         yield
-    except ImportError, err:
-        logger.log(level, err.message)
+    except ImportError as err:
+        logger.log(level, str(err))
 
 
 def check_argument(func):
@@ -80,5 +87,5 @@ def check_argument(func):
         if provider is None or entity is None:
             raise _YPYServiceError("'{0}' and '{1}' cannot be None"
                                    .format(pname, ename))
-        return func(self, provider, entity)
+        return func(self, provider, entity, *args)
     return helper

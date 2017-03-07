@@ -39,7 +39,7 @@ test_int16_invalid_pattern =  """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: unicode\) -> None
+    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
     12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
 
@@ -55,7 +55,7 @@ test_int32_invalid_patern = """set\(\): incompatible function arguments. The fol
     8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: unicode\) -> None
+    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
     12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
 
@@ -76,7 +76,7 @@ test_string_invalid_pattern = """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: unicode\) -> None
+    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
     12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
 
@@ -85,16 +85,16 @@ test_empty_invalid_pattern = """Invalid value "0" in "emptee" element. Path: '/y
 test_boolean_invalid_pattern = """Invalid value "" in "bool-value" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/bool-value'"""
 test_enum_invalid_pattern = """Invalid value "not an enum" in "enum-value" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/enum-value'"""
 test_yleaflist_assignment_pattern = """Invalid value '\['invalid', 'leaf-list', 'assignment'\]' in 'llstring'"""
-test_ylist_assignment_pattern = ''.join(["Attempt to assign value of '\[<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>, ",
-                                         "<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>\]' to YList ldata. ",
+test_ylist_assignment_pattern = ''.join(["Attempt to assign value of '\[<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>, ",
+                                         "<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>\]' to YList ldata. ",
                                          "Please use list append or extend method."])
 
 

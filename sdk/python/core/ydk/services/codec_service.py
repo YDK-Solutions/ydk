@@ -15,6 +15,7 @@
 # ------------------------------------------------------------------
 
 import os
+import sys
 import json
 import logging
 import pkgutil
@@ -193,12 +194,10 @@ class CodecService(object):
 
 
 def _get_string(string):
-    """Convert unicode string to str."""
-    # TODO: check in python3 env
-    if isinstance(string, unicode):
+    """Convert unicode to str if running under Python 2 environment."""
+    if sys.version_info < (3, 0):
         return string.encode('utf-8')
-    else:
-        return string
+    return string
 
 
 def _get_ns_ename(payload, encoding):
@@ -217,7 +216,10 @@ def _get_ns_ename(payload, encoding):
         ns, ename = payload_root.tag.rsplit('}')
         ns = ns.strip('{')
     else:
-        ns, ename = json.loads(payload).keys()[0].split(':')
+        keys = json.loads(payload).keys()
+        # for Python 3
+        keys = list(keys)
+        ns, ename = keys[0].split(':')
         ns = _get_string(ns)
         ename = _get_string(ename)
 

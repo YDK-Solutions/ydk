@@ -127,7 +127,7 @@ class SanityYang(unittest.TestCase):
   <a>Hello</a>
 </oc-A>
 '''
-        self._json_oc_pattern_payload = """test_json_decode_oc_pattern (__main__.SanityYang) ... {
+        self._json_oc_pattern_payload = """{
   "oc-pattern:a": "Hello"
 }
 """
@@ -246,6 +246,7 @@ class SanityYang(unittest.TestCase):
         self.provider.encoding = EncodingFormat.XML
         obj_A = oc_pattern.OcA()
         obj_A.a = 'Hello'
+
         entity = self.codec.decode(self.provider, self._xml_oc_pattern_payload)
 
         self.assertEqual(obj_A.a, entity.a)
@@ -298,8 +299,8 @@ class SanityYang(unittest.TestCase):
         self.provider.encoding = EncodingFormat.JSON
         obj_A = oc_pattern.OcA()
         obj_A.a = 'Hello'
-        entity = self.codec.decode(self.provider, self._xml_oc_pattern_payload)
 
+        entity = self.codec.decode(self.provider, self._xml_oc_pattern_payload)
         self.assertEqual(obj_A.a, entity.a)
 
 

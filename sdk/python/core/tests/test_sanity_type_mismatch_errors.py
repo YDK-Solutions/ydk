@@ -29,17 +29,17 @@ from ydk.errors import YPYModelError
 from test_utils import assert_with_error
 
 
-test_invalid_class_assignment_int_pattern = "Invalid value '1' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>'"
-test_invalid_class_assignment_str_pattern = "Invalid value 'haha' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>'"
-test_invalid_class_assignment_identity_pattern = "Invalid value '<ydk.models.ydktest.ydktest_sanity_types.AnotherOneIdentity object at [0-9a-z]+>' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>'"
-test_invalid_class_assignment_enum_pattern = "Invalid value 'ydk.types.Enum.YLeaf\(none\)' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>'"
-test_invalid_class_assignment_ylist_pattern = "Invalid value '\[<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>\]' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>"
-test_invalid_class_assignment_yleaflist_pattern = "Invalid value 'YLeafList\('llstring', \[0, 1, 2, 3, 4\]\)' in '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>'"
+test_invalid_class_assignment_int_pattern = "Invalid value '1' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
+test_invalid_class_assignment_str_pattern = "Invalid value 'haha' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
+test_invalid_class_assignment_identity_pattern = "Invalid value '<ydk.models.ydktest.ydktest_sanity_types.AnotherOneIdentity object at [0-9a-z]+>' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
+test_invalid_class_assignment_enum_pattern = "Invalid value 'ydk.types.Enum.YLeaf\(none\)' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
+test_invalid_class_assignment_ylist_pattern = "Invalid value '\[<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>\]' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>"
+test_invalid_class_assignment_yleaflist_pattern = "Invalid value 'YLeafList\('llstring', \[0, 1, 2, 3, 4\]\)' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
 test_invalid_list_assignment_int_pattern = "Attempt to assign value of '1' to YList ldata. Please use list append or extend method."
-test_invalid_list_assignment_entity_pattern = "Attempt to assign value of '<ydk.models.ydktest.ydktest_sanity.One object at [0-9a-z]+>' to YList ldata. Please use list append or extend method."
+test_invalid_list_assignment_entity_pattern = "Attempt to assign value of '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>' to YList ldata. Please use list append or extend method."
 test_invalid_list_assignment_llist_pattern = "Attempt to assign value of 'YLeafList\('llstring', \[0, 1, 2, 3, 4\]\)' to YList ldata. Please use list append or extend method."
 test_invalid_llist_assignment_int_pattern = "Invalid value '1' in 'llstring'"
-test_invalid_llist_assignment_list_pattern = "Invalid value '\[<ydk.models.ydktest.ydktest_sanity.Ldata object at [0-9a-z]+>\]' in 'llstring'"
+test_invalid_llist_assignment_list_pattern = "Invalid value '\[<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>\]' in 'llstring'"
 
 
 class SanityYang(unittest.TestCase):

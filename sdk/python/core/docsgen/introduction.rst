@@ -107,6 +107,6 @@ YDK uses common Python logging.  All modules are based on the "ydk" log::
 
  import logging
  log = logging.getLogger('ydk')
- log.setLevel(logging.DEBUG)
+ log.setLevel(logging.INFO)
  ch = logging.StreamHandler()
  log.addHandler(ch)

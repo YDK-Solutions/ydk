@@ -14,6 +14,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from .stdout_handler import YDKStreamHandler
+from ydk.ext.logging import EnableLogging
 
-__all__ = [ "YDKStreamHandler" ]
+__all__ = [ "EnableLogging" ]

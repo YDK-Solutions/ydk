@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+from ydk.ext.logging import EnableLogging
+EnableLogging()
+del EnableLogging
 
 from .codec_service import CodecService
 from .crud_service import CrudService

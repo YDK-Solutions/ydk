@@ -95,7 +95,7 @@ class CodecService(object):
             data_node = _get_data_node_from_entity(entity, root_schema)
             codec_service = _CodecService()
             result = codec_service.encode(data_node, provider.encoding, pretty)
-            self.logger.debug("Performing encode operation, resulting in {}", result)
+            self.logger.debug("Performing encode operation, resulting in {}".format(result))
             return result
 
     @_check_argument
@@ -145,7 +145,7 @@ class CodecService(object):
 
         root_schema = provider.get_root_schema(bundle_name)
 
-        self.logger.debug("Performing decode operation on {}", payload)
+        self.logger.debug("Performing decode operation on {}".format(payload))
 
         codec_service = _CodecService()
         root_data_node = codec_service.decode(root_schema, payload, provider.encoding)
@@ -189,7 +189,7 @@ class CodecService(object):
                 if ns_ename in entity_lookup:
                     return entity_lookup[ns_ename].clone_ptr()
 
-        self.logger.debug(_ENTITY_ERROR_MSG, ename)
+        self.logger.debug(_ENTITY_ERROR_MSG.format(ename))
         raise _YPYServiceProviderError(_ENTITY_ERROR_MSG.format(ename))
 
 

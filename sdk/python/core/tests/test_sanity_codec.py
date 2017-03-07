@@ -128,9 +128,15 @@ class SanityYang(unittest.TestCase):
 </oc-A>
 '''
         self._json_oc_pattern_payload = """{
-  "oc-pattern:a": "Hello"
-}
-"""
+  "oc-pattern:oc-A": [
+    {
+      "a": "Hello",
+      "B": {
+        "b": "Hello"
+      }
+    }
+  ]
+}"""
 
     @classmethod
     def tearDownClass(self):
@@ -295,13 +301,20 @@ class SanityYang(unittest.TestCase):
                              self.codec.encode(self.provider, entities[module]))
 
     @unittest.skip('encodes to "oc-pattern:a": "(!error!)"')
-    def test_json_decode_oc_pattern(self):
+    def test_json_encode_oc_pattern(self):
         self.provider.encoding = EncodingFormat.JSON
         obj_A = oc_pattern.OcA()
         obj_A.a = 'Hello'
+        obj_A.b.b = 'Hello'
 
-        entity = self.codec.decode(self.provider, self._xml_oc_pattern_payload)
-        self.assertEqual(obj_A.a, entity.a)
+        self.assertEqual(self.codec.encode(self.provider, obj_A),
+                         self._json_oc_pattern_payload)
+
+    def test_json_decode_oc_pattern(self):
+        self.provider.encoding = EncodingFormat.JSON
+        entity = self.codec.decode(self.provider, self._json_oc_pattern_payload)
+        self.assertEqual(entity.a.get(), 'Hello')
+        self.assertEqual(entity.b.b.get(), 'Hello')
 
 
 if __name__ == '__main__':

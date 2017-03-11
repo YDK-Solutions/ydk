@@ -71,7 +71,7 @@ class FixturePrinter(Printer):
         self._writeln("import logging")
         self._writeln("import unittest")
         self._writeln('')
-        self._writeln("from ydk.services import CRUDService")
+        self._writeln("from ydk.services import CrudService")
         self._writeln("from ydk.types import Decimal64, Empty")
         self._writeln("from ydk.providers import NetconfServiceProvider")
 
@@ -92,10 +92,14 @@ class FixturePrinter(Printer):
 
     def _print_py_common_stmts(self):
         """Print Python common statements."""
-        self._writeln('')
-        self._writeln("logger = logging.getLogger('ydk')")
-        self._writeln("# logger.setLevel(logging.DEBUG)")
+        self._bline()
+        self._writeln('# logger = logging.getLogger("ydk")')
+        self._writeln('# logger.setLevel(logging.DEBUG)')
         self._writeln('# handler = logging.StreamHandler()')
+        self._writeln('# formatter = logging.Formatter(fmt="[%(asctime)s.%(msecs)03d] [%(name)s] "')
+        self._writeln('#                                      "[%(levelname)s] %(message)s",')
+        self._writeln('#                               datefmt=\'%Y-%m-%d %H:%M:%S\')')
+        self._writeln('# handler.setFormatter(formatter)')
         self._writeln('# logger.addHandler(handler)')
 
     def _print_cpp_common_stmts(self):
@@ -118,11 +122,10 @@ class FixturePrinter(Printer):
         self._writeln('def setUpClass(cls):')
         self._lvl_inc()
         self._writeln("cls.ncc = NetconfServiceProvider("
-                      "address='{0}', username='{1}', "
-                      "password='{2}', port={3})"
+                      "'{0}', '{1}', '{2}', {3})"
                       .format(self.address, self.username,
                               self.password, self.port))
-        self._writeln('cls.crud = CRUDService()')
+        self._writeln('cls.crud = CrudService()')
         self._lvl_dec()
 
     def _print_py_teardown_class(self):
@@ -131,7 +134,7 @@ class FixturePrinter(Printer):
         self._writeln('@classmethod')
         self._writeln('def tearDownClass(cls):')
         self._lvl_inc()
-        self._writeln('cls.ncc.close()')
+        self._writeln('pass')
         self._bline()
         self._lvl_dec()
 

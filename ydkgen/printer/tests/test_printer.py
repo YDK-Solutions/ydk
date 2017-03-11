@@ -215,7 +215,7 @@ class TestPrinter(FixturePrinter):
     def _print_logging(self, msg):
         self._bline()
         if self.lang == 'py':
-            self._write_end('logger.info("{}")'.format(msg))
+            self._write_end('# logger.info("{}")'.format(msg))
 
     def get_assignment_fmt(self, path):
         fmt = '{} = {}'

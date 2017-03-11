@@ -41,9 +41,19 @@ _ERRORS = { "YCPPError": _YPYError,
             "YCPPServiceProviderError": _YPYServiceProviderError,
 }
 
+def _raise(exc):
+    """Suppress old exception context for Python > 3.3,
+    Use exec to avoid SyntaxError under Python 2 environment.
+    """
+    if sys.version_info >= (3,3):
+        exec("raise exc from None")
+    else:
+        raise exc
+
 
 @contextlib.contextmanager
 def handle_runtime_error():
+    _exc = None
     try:
         yield
     except RuntimeError as err:
@@ -54,23 +64,30 @@ def handle_runtime_error():
         else:
             etype = _YPYError
             msg = msg
-        raise etype(msg)
+        _exc = etype(msg)
     except TypeError as err:
         msg = str(err)
         if ':' in msg:
             etype_str, msg = msg.split(':', 1)
-            raise _YPYServiceError(msg)
+            _exc = _YPYServiceError(msg)
         else:
-            raise _YPYError(msg)
+            _exc = _YPYError(msg)
+    finally:
+        if _exc:
+            _raise(_exc)
 
 
 @contextlib.contextmanager
 def handle_type_error():
     """Rethrow TypeError as YPYModelError"""
+    _exc = None
     try:
         yield
     except TypeError as err:
-        raise _YPYModelError(str(err))
+        _exc = _YPYModelError(str(err))
+    finally:
+        if _exc:
+            _raise(_exc)
 
 
 @contextlib.contextmanager

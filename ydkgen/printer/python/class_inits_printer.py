@@ -91,10 +91,13 @@ class ClassInitsPrinter(object):
                 leaf_type = 'YLeafList'
 
             self.ctx.bline()
-            if prop.stmt.top.arg != clazz.stmt.top.arg:
+            if all((prop.stmt.top.arg != clazz.stmt.top.arg,
+                    hasattr(prop.stmt.top, 'i_aug_targets') and
+                    clazz.stmt.top in prop.stmt.top.i_aug_targets)):
                 name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
             else:
                 name = prop.stmt.arg
+
             self.ctx.writeln('self.%s = %s(YType.%s, "%s")' 
                 % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
 
@@ -190,17 +193,28 @@ class ClassSetAttrPrinter(object):
         self.ctx.writeln('if name in (%s) and name in self.__dict__:' % 
             separator.join(leaf_names))
         self.ctx.lvl_inc()
-        self.ctx.writeln('if isinstance(value, (YLeaf, YLeafList)):')
+        self.ctx.writeln('if isinstance(value, YLeaf):')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('self.__dict__[name].set(value.get())')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('elif isinstance(value, YLeafList):')
         self.ctx.lvl_inc()
         self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()
+
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
         self.ctx.writeln('self.__dict__[name].set(value)')
         self.ctx.lvl_dec()
+
+
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
+        self.ctx.writeln('if hasattr(value, "parent") and value.parent is None:')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('value.parent = self.parent')
+        self.ctx.lvl_dec()
         self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()
 

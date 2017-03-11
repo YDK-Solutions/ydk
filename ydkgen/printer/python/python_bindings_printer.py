@@ -52,8 +52,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         # Sub package
         if self.sub_dir != '':
-            self._print_nmsp_declare_init(self.ydk_dir)
-            self._print_nmsp_declare_init(self.models_dir)
+            self._print_nmsp_declare_init_files()
 
         # RST Documentation
         if self.ydk_doc_dir is not None:
@@ -79,14 +78,14 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         sub = package.sub_name
 
-        test_output_dir = self.initialize_output_directory(
-            '%s/%s' % (self.test_dir, sub))
+        test_output_dir = self.initialize_output_directory(self.test_dir)
 
         # RST Documentation
-        self._print_python_module(package, index, module_dir, size, sub)
+        self._print_python_module(package, index, self.models_dir, size, sub)
 
         if self.generate_tests:
             self._print_tests(package, test_output_dir)
+
         if self.ydk_doc_dir is not None:
             self._print_python_rst_module(package)
 
@@ -151,15 +150,19 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         if not os.path.isfile(file_name):
             self.print_file(file_name)
 
-    def _print_nmsp_declare_init(self, path):
+    def _print_nmsp_declare_init_files(self):
+        self._print_nmsp_decalre_init(self.ydk_dir)
+        self._print_nmsp_decalre_init(os.path.join(self.ydk_dir, 'models'))
+        self._print_nmsp_decalre_init(self.models_dir)
+
+    def _print_nmsp_decalre_init(self, path):
         file_name = get_init_file_name(path)
         self.print_file(file_name,
                         emit_nmsp_declare_init,
                         _EmitArgs(self.ypy_ctx, self.packages))
 
     def _print_yang_files(self):
-        sub = self.bundle.name
-        yang_files_dir = os.path.sep.join([self.models_dir, sub, '_yang'])
+        yang_files_dir = os.path.sep.join([self.models_dir, '_yang'])
         os.mkdir(yang_files_dir)
         dir_util.copy_tree(self.bundle.resolved_models_dir, yang_files_dir)
 

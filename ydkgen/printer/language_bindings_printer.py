@@ -67,10 +67,12 @@ class LanguageBindingsPrinter(object):
 
     def initialize_top_level_directories(self):
         self.models_dir = self.initialize_output_directory(
-            self.ydk_dir + '/models', True)
-        if self.bundle_name:
-            self.sub_dir = self.initialize_output_directory(
-                self.models_dir + '/%s' % self.bundle_name, True)
+            os.path.join(self.ydk_dir, 'models'), True)
+        if self.bundle:
+            self.models_dir = self.initialize_output_directory(
+                os.path.join(self.models_dir, self.bundle_name), True)
+            self.sub_dir = self.models_dir
+
         self.test_dir = self.initialize_output_directory(
             os.path.join(self.models_dir, 'test'), False)
 

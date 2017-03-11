@@ -66,6 +66,8 @@ class YLeafList(_YLeafList):
         self.leaf_name = leaf_name
 
     def append(self, item):
+        if isinstance(item, _YLeaf):
+            item = item.get()
         super(YLeafList, self).append(item)
 
     def extend(self, items):
@@ -135,4 +137,3 @@ class Entity(_Entity):
         if not isinstance(value, obj.__class__):
             raise _YPYModelError("Invalid value '{!s}' in '{}'"
                                  .format(value, obj))
-

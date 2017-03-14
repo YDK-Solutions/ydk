@@ -18,6 +18,9 @@
 #define _LOGGER_H_
 
 #include <memory>
+#include <string>
+#include "Python.h"
+
 #include "spdlog/spdlog.h"
 
 namespace spdlog
@@ -28,11 +31,105 @@ class logger;
 namespace ydk
 {
 
+
+class PyLogger
+{
+public:
+    PyLogger()
+    {
+        Py_Initialize();
+
+        py_logging  = PyImport_ImportModule("logging");
+
+        PyObject* ydk_arg = Py_BuildValue("s", "ydk");
+        const char* method = "getLogger";
+        const char* fmt = "O";
+        py_logger = PyObject_CallMethod(py_logging, (char *)method, (char *)fmt, ydk_arg);
+        Py_DECREF(ydk_arg);
+    }
+    ~PyLogger()
+    {
+        Py_DECREF(py_logging);
+        Py_DECREF(py_logger);
+    }
+
+    template <typename... Args> void py_fmt_log(const std::string& name, const char* fmt, spdlog::level::level_enum lvl, const char* py_lvl, const Args&... args)
+    {
+        spdlog::details::log_msg log_msg(&name, lvl);
+        log_msg.raw.write(fmt, args...);
+        py_log(log_msg.raw.c_str(), py_lvl);
+    }
+
+    template <typename... Args> void trace(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "debug";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void debug(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "debug";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void info(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "info";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void warn(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "warn";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void error(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "error";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void critical(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "critical";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+
+    template <typename T> void py_log(const T& msg, const char* py_lvl)
+    {
+        PyObject* py_msg_arg = Py_BuildValue("s", msg);
+        const char* fmt = "O";
+        PyObject_CallMethod(py_logger, (char *)py_lvl, (char *)fmt, py_msg_arg);
+        Py_DECREF(py_msg_arg);
+    }
+
+    template <typename T> void trace(const T& msg) {
+        const char* py_lvl = "debug";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void debug(const T& msg) {
+        const char* py_lvl = "debug";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void info(const T& msg) {
+        const char* py_lvl = "info";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void warn(const T& msg) {
+        const char* py_lvl = "warn";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void error(const T& msg) {
+        const char* py_lvl = "error";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void critical(const T& msg) {
+        const char* py_lvl = "critical";
+        py_log(msg, py_lvl);
+    }
+
+
+private:
+    PyObject* py_logging = nullptr;
+    PyObject* py_logger = nullptr;
+};
+
 class Logger
 {
-	public:
+    public:
         Logger()
-	        : internal_logger{ spdlog::get("ydk") }
+            : internal_logger{ spdlog::get("ydk") },
+              py_logger{ std::make_shared<PyLogger>() }
         {
         }
 
@@ -46,6 +143,7 @@ class Logger
         { \
             if(!lazy_check()) { return; } \
             internal_logger->loglevel<Args...>(fmt, args...); \
+            py_logger->loglevel<Args...>(internal_logger->name(), fmt, args...); \
         }
 
         #define YDKLOGLEVELNOARGS(loglevel) \
@@ -54,6 +152,7 @@ class Logger
         { \
             if(!lazy_check()) { return; } \
             internal_logger->loglevel<T>(msg); \
+            py_logger->loglevel<T>(msg); \
         }
 
         YDKLOGLEVELARGS(trace)
@@ -73,27 +172,28 @@ class Logger
         #undef YDKLOGLEVELARGS
         #undef YDKLOGLEVELNOARGS
 
-	private:
-		bool lazy_check()
-		{
-		    if (!is_logger_found())
-		    {
-		        internal_logger = spdlog::get("ydk");
-		        if (!is_logger_found())
-		        {
-		            return false;
-		        }
-		    }
-		    return true;
-		}
+    private:
+        bool lazy_check()
+        {
+            if (!is_logger_found())
+            {
+                internal_logger = spdlog::get("ydk");
+                if (!is_logger_found())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-		bool is_logger_found()
-		{
-		    return (internal_logger && internal_logger != nullptr);
-		}
+        bool is_logger_found()
+        {
+            return (internal_logger && internal_logger != nullptr);
+        }
 
-	private:
-		std::shared_ptr<spdlog::logger> internal_logger;
+    private:
+        std::shared_ptr<spdlog::logger> internal_logger;
+        std::shared_ptr<PyLogger> py_logger;
 };
 
 static Logger logger{};

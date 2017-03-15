@@ -44,6 +44,7 @@ PYBIND11_MAKE_OPAQUE(LeafDataList)
 typedef map<std::string, std::shared_ptr<ydk::Entity>> ChildrenMap;
 PYBIND11_MAKE_OPAQUE(ChildrenMap)
 
+
 class PyEntity: public ydk::Entity {
 public:
 
@@ -345,6 +346,11 @@ PYBIND11_PLUGIN(ydk_)
                           {
                                return yl.get();
                           })
+        .def("__getitem__", &ydk::YLeaf::operator[], return_value_policy::reference)
+        .def("__setitem__", []( ydk::YLeaf &yl, std::string key, bool value)
+                              {
+                                  yl[key] = value;
+                              })
         .def("set", (void (ydk::YLeaf::*)(ydk::uint8)) &ydk::YLeaf::set, return_value_policy::reference)
         .def("set", (void (ydk::YLeaf::*)(ydk::uint32)) &ydk::YLeaf::set, return_value_policy::reference)
         .def("set", (void (ydk::YLeaf::*)(ydk::uint64)) &ydk::YLeaf::set, return_value_policy::reference)
@@ -358,7 +364,6 @@ PYBIND11_PLUGIN(ydk_)
         .def("set", (void (ydk::YLeaf::*)(std::string)) &ydk::YLeaf::set, return_value_policy::reference)
         .def("set", (void (ydk::YLeaf::*)(ydk::Enum::YLeaf)) &ydk::YLeaf::set, return_value_policy::reference)
         .def("set", (void (ydk::YLeaf::*)(ydk::Decimal64)) &ydk::YLeaf::set, return_value_policy::reference)
-        .def("[]", &ydk::YLeaf::operator[], return_value_policy::reference)
         .def_readonly("is_set", &ydk::YLeaf::is_set, return_value_policy::reference)
         .def_readwrite("operation", &ydk::YLeaf::operation);
 

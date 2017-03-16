@@ -58,13 +58,6 @@ class NetconfService(_NetconfService):
             else:
                 return self._ns.copy_config(provider, target, source)
 
-    # def copy_config(self, provider, target, source, url=""):
-    #     with _handle_error():
-    #         return self._ns.copy_config(provider, target, source, url)
-    # def copy_config(self, provider, target, source_config):
-    #     with _handle_error():
-    #         return self._ns.copy_config(provider, target, source_config)
-
     def delete_config(self, provider, target, url=""):
         if None in (provider, target):
             raise _YPYServiceError("provider and target cannot be None")
@@ -104,7 +97,7 @@ class NetconfService(_NetconfService):
             return self._ns.get(provider, filter)
 
     def kill_session(self, provider, session_id):
-        if None in (provider, persist_id):
+        if None in (provider, session_id):
             raise _YPYServiceError("provider and session_id cannot be None")
 
         with _handle_error():
@@ -135,10 +128,3 @@ class NetconfService(_NetconfService):
                 return self._ns.validate(provider, source_config)
             else:
                 return self._ns.validate(provider, source)
-
-    # def validate(self, provider, source, url=""):
-    #     with _handle_error():
-    #         return self._ns.validate(provider, source, url)
-    # def validate(self, provider, source_config):
-    #     with _handle_error():
-    #         return self._ns.validate(provider, source_config)

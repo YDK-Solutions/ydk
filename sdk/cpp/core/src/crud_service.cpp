@@ -105,11 +105,12 @@ static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
 static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
         const string & operation, const string & data_tag, bool set_config_flag)
 {
-//    if(data_tag == "entity")
-//    {
-//        ValidationService validation{}; //TODO
-//        validation.validate(provider, entity, ValidationService::Option::DATASTORE);
-//    }
+    if(data_tag == "entity")
+    {
+        //ValidationService validation{};
+        //validation.validate(provider, entity, ValidationService::Option::DATASTORE);
+    }
+
     path::RootSchemaNode& root_schema = provider.get_root_schema();
     shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(operation) };
     string data = get_data_payload(entity, provider);

@@ -19,7 +19,7 @@ import ydk.types as ytypes
 import unittest
 
 from ydk.providers import NetconfServiceProvider
-from ydk.services import CrudService
+from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.models.ydktest import ydktest_types as y_types

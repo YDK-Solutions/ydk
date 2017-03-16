@@ -14,13 +14,13 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 import inspect
-from ydk.ext.services import CrudService as _CrudService
+from ydk.ext.services import CRUDService as _CrudService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
 
 
-class CrudService(_CrudService):
+class CRUDService(_CrudService):
     """ Python wrapper for CrudService
     """
     def __init__(self):

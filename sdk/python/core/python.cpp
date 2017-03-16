@@ -413,7 +413,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_node_provider", &ydk::OpenDaylightServiceProvider::get_node_provider, return_value_policy::reference)
         .def("get_node_ids", &ydk::OpenDaylightServiceProvider::get_node_ids, return_value_policy::reference);
 
-    class_<ydk::CrudService>(services, "CrudService")
+    class_<ydk::CrudService>(services, "CRUDService")
         .def(init<>())
         .def("create", &ydk::CrudService::create, return_value_policy::reference)
         .def("read", &ydk::CrudService::read)

@@ -18,10 +18,10 @@ EnableLogging()
 del EnableLogging
 
 from .codec_service import CodecService
-from .crud_service import CrudService
+from .crud_service import CRUDService
 from .netconf_service import NetconfService
 from ydk.ext.services import DataStore
 
 
-__all__ = [ "CodecService" "CrudService",
+__all__ = [ "CodecService" "CRUDService",
             "NetconfService", "DataStore" ]

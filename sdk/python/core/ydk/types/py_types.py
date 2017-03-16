@@ -25,6 +25,7 @@ from ydk.ext.types import ChildrenMap
 from ydk.ext.types import Bits, YLeaf as _YLeaf
 from ydk.ext.types import YLeafList as _YLeafList
 from ydk.ext.types import Entity as _Entity
+from ydk.ext.types import EditOperation as _EditOperation
 from ydk.errors import YPYModelError as _YPYModelError
 
 
@@ -46,6 +47,13 @@ class YList(list):
     def __init__(self, parent):
         super(YList, self).__init__()
         self.parent = parent
+
+    def __setattr__(self, name, value):
+        if name == 'operation' and isinstance(value, _EditOperation):
+            for e in self:
+                e.operation = value
+        else:
+            super(YList, self).__setattr__(name, value)
 
     def append(self, item):
         item.parent = self.parent

@@ -51,10 +51,5 @@ bool LeafData::operator == (const LeafData & other) const
     return value == other.value && operation == other.operation && is_set == other.is_set;
 }
 
-std::ostream& operator<< (std::ostream& stream, const LeafData& value)
-{
-    stream<<value.value;
-    return stream;
-}
 
 }

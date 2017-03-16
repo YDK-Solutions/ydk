@@ -92,19 +92,18 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_read_filter)
 
         # use DELETE object to remove leaf one
-        runner_delete = runner_read
-        runner_delete.one.name.operation = EditOperation.delete
-        self.crud.update(self.ncc, runner_delete)
+        runner_update = runner_read
+        runner_update.one.name.operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_update)
 
         # manually create remaining runner with leaf two
         runner_read = self.crud.read(self.ncc, runner_read_filter)
-        runner_left = ysanity.Runner()
-        runner_left.two.name = 'two'
+        runner_compare = ysanity.Runner()
+        runner_compare.two.name = 'two'
 
-        self.assertEqual(runner_left.one.name, runner_read.one.name)
-        self.assertEqual(runner_left.two.name, runner_read.two.name)
+        self.assertEqual(runner_compare.one.name, runner_read.one.name)
+        self.assertEqual(runner_compare.two.name, runner_read.two.name)
 
-    @unittest.skip("error, delete whole list")
     def test_delete_on_leaflist_slice(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
@@ -112,56 +111,61 @@ class SanityYang(unittest.TestCase):
 
         self.crud.create(self.ncc, runner_create)
 
-        runner_delete = ysanity.Runner()
-        elements_to_delete = runner_create.ytypes.built_in_t.llstring[0:2]
-        runner_delete.ytypes.built_in_t.llstring = elements_to_delete
+        runner_update = ysanity.Runner()
+        # specify the leaflist value to be deleted
+        runner_update.ytypes.built_in_t.llstring.append('0')
+        runner_update.ytypes.built_in_t.llstring.append('3')
+        # set operation
+        runner_update.ytypes.built_in_t.llstring.operation = EditOperation.delete
 
-        self.crud.delete(self.ncc, runner_delete)
-
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
 
         self.assertEqual(runner_create.one.name, runner_read.one.name)
-        self.assertEqual(runner_create.ytypes.built_in_t.llstring, runner_read.ytypes.built_in_t.llstring)
+        self.assertEqual(len(runner_read.ytypes.built_in_t.llstring), 3)
 
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
     def test_delete_on_leaflist(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-        runner_create.ytypes.built_in_t.llstring.extend([str(i) for i in range(5)])
+        runner_create.ytypes.built_in_t.llstring.extend(['0', '1', '2', '3', '4'])
 
         self.crud.create(self.ncc, runner_create)
 
-        self.crud.delete(self.ncc, runner_create.ytypes.built_in_t.llstring[3])
+        runner_update = ysanity.Runner()
+        runner_update.ytypes.built_in_t.llstring.append('3')
+        runner_update.ytypes.built_in_t.llstring.operation = EditOperation.delete
 
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        del runner_left.ytypes.built_in_t.llstring[3]
 
-    @unittest.skip("AttributeError: 'ChildIdentityIdentity' object has no attribute 'has_operation'")
+        runner_compare = ysanity.Runner()
+        runner_compare.ytypes.built_in_t.llstring.extend(['0', '1', '2', '4'])
+
+        self.assertEqual(runner_read.ytypes.built_in_t.llstring, runner_compare.ytypes.built_in_t.llstring)
+
     def test_delete_on_list_with_identitykey(self):
         runner = ysanity.Runner()
-
         a1 = ysanity.Runner.OneList.IdentityList()
         a1.config.id = ysanity.ChildIdentityIdentity()
         a1.id_ref =  a1.config.id.get()
         runner.one_list.identity_list.append(a1)
-
         self.crud.create(self.ncc, runner)
 
         empty_runner = ysanity.Runner()
+
+        runner_update = ysanity.Runner()
+        k = ysanity.Runner.OneList.IdentityList()
+        k.config.id = ysanity.ChildIdentityIdentity()
+        k.id_ref = k.config.id.get()
+        k.operation = EditOperation.delete
+        runner_update.one_list.identity_list.append(k)
+
+        self.crud.update(self.ncc, runner_update)
+
         runner_read = self.crud.read(self.ncc, empty_runner)
+        self.assertEqual(runner_read, None)
 
-        runner_delete = ysanity.Runner()
-        k = ysanity.ChildIdentityIdentity()
-        runner_delete.one_list.identity_list.append(k)
-        self.crud.delete(self.ncc, runner_delete)
-
-        runner_read = self.crud.read(self.ncc, empty_runner)
-
-        self.assertEqual(len(runner_read.one_list.identity_list), 0)
-
-    @unittest.skip("currently not support delete on non-top level container")
-    def test_delete_operation_on_container(self):
+    def test_delete_on_container(self):
         # create runner with a container
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
@@ -172,67 +176,60 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_read_filter)
 
         # delete contianer two
-        self.crud.delete(self.ncc, runner_read.two)
+        runner_update = ysanity.Runner()
+        runner_update.two.operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_update)
 
         runner_read = self.crud.read(self.ncc, runner_read_filter)
-        runner_left = runner_create
-        runner_left.two.name = None
+        runner_compare = ysanity.Runner()
+        runner_compare.one.name = 'one'
 
-        self.assertEqual(runner_read.one.name, runner_left.one.name)
+        self.assertEqual(runner_compare.one.name, runner_read.one.name)
 
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
-    def test_delete_operation_on_nested_list(self):
+    def test_delete_on_nested_list(self):
         runner_create, _, e_22 = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_read.inbtw_list.ldata[1].subc.subc_subl1)
-        # get object after a crud delete operation
+        runner_read.inbtw_list.ldata[1].subc.subc_subl1.operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_read)
+
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        del runner_left.inbtw_list.ldata[1].subc.subc_subl1[:]
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(len(runner_read.inbtw_list.ldata[1].subc.subc_subl1), 0)
 
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
-    def test_delete_operation_on_nested_list_with_key(self):
+    def test_delete_on_nested_list(self):
         runner_create, _, e_22 = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
-        runner_read = self.read_from_empty_filter()
+        runner_update = self.read_from_empty_filter()
+        runner_update.inbtw_list.ldata[1].subc.subc_subl1[1].operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_update)
 
-        self.crud.delete(self.ncc, runner_create.inbtw_list.ldata[1].subc.subc_subl1[1])
         # get object after a crud delete operation
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        runner_left.inbtw_list.ldata[1].subc.subc_subl1.remove(e_22)
+        self.assertEqual(len(runner_read.inbtw_list.ldata[1].subc.subc_subl1), 1)
+        self.assertEqual(runner_read.inbtw_list.ldata[1].subc.subc_subl1[0].name.get(), 'runner:inbtwlist:[12]:subc:subcsubl1[121]:name')
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
-
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
-    def test_delete_operation_on_list_with_key(self):
+    def test_delete_on_list_element(self):
         runner_create, e_2, _ = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_read.inbtw_list.ldata[1])
-        # get object after a crud delete operation
+        runner_update = runner_create
+        runner_update.inbtw_list.ldata[1].operation = EditOperation.delete
+
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        runner_left.inbtw_list.ldata.remove(e_2)
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(len(runner_read.inbtw_list.ldata), 1)
+        self.assertEqual(runner_read.inbtw_list.ldata[0].name.get(), 'runner:inbtwlist:[11]:name')
 
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
-    def test_delete_operation_on_list_slice(self):
+    def test_delete_on_list_elements(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-
         foo = ysanity.Runner.OneList.Ldata()
         bar = ysanity.Runner.OneList.Ldata()
         baz = ysanity.Runner.OneList.Ldata()
@@ -243,27 +240,21 @@ class SanityYang(unittest.TestCase):
         baz.number = 3
         baz.name = 'baz'
         runner_create.one_list.ldata.extend([foo, bar, baz])
-
         self.crud.create(self.ncc, runner_create)
 
-        runner_read = self.read_from_empty_filter()
-
-        elements_to_delete = runner_read.one_list.ldata[:1]
-        self.crud.delete(self.ncc, elements_to_delete)
+        runner_update = self.read_from_empty_filter()
+        runner_update.one_list.ldata[1].operation = EditOperation.delete
+        runner_update.one_list.ldata[2].operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_update)
 
         # read after a crud delete operation
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete entire list
-        del runner_left.one_list.ldata[:1]
+        self.assertEqual(len(runner_read.one_list.ldata), 1)
+        self.assertEqual(runner_read.one_list.ldata[0].name.get(), 'foo')
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
-
-    @unittest.skip("currently not support crud delete on leaf and leaf-list level")
-    def test_delete_operation_on_list(self):
+    def test_delete_on_list(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-
         foo = ysanity.Runner.OneList.Ldata()
         bar = ysanity.Runner.OneList.Ldata()
         foo.number = 1
@@ -271,19 +262,14 @@ class SanityYang(unittest.TestCase):
         bar.number = 2
         bar.name = 'bar'
         runner_create.one_list.ldata.extend([foo, bar])
-
         self.crud.create(self.ncc, runner_create)
 
+        runner_update = self.read_from_empty_filter()
+        runner_update.one_list.ldata.operation = EditOperation.delete
+        self.crud.update(self.ncc, runner_update)
+
         runner_read = self.read_from_empty_filter()
-
-        self.crud.delete(self.ncc, runner_read.one_list.ldata)
-
-        runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-
-        del runner_left.one_list.ldata[:]
-
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(len(runner_read.one_list.ldata), 0)
 
 
 if __name__ == '__main__':

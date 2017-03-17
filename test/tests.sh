@@ -49,6 +49,7 @@ function run_test_no_coverage {
 }
 
 function run_test {
+    print_msg "executing $@"
     coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@ > /dev/null
     local status=$?
     if [ $status -ne 0 ]; then
@@ -137,6 +138,7 @@ function py_sanity_ydktest_test {
 
     cd $YDKGEN_HOME && cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
+    print_msg "running import tests"
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
 
     print_msg "deactivate virtualenv to gather coverage"

@@ -71,6 +71,8 @@ class BundleDefinition(object):
             name (str): bundle name.
             _version (Version): bundle version.
             _ydk_version (Version): ydk core library version.
+            _description (str): description for bundle package
+            _long_description (str): long description for bundle package
 
         Raises:
             KeyError if data is malformed.
@@ -80,6 +82,8 @@ class BundleDefinition(object):
         self._name = data['name'].replace('-', '_')
         self._version = Version(*tuple(data['version'].split('.')))
         self._ydk_version = Version(*tuple(data['ydk-version'].split('.')))
+        self._description = data['description'] if 'description' in data else str()
+        self._long_description = data['long-description'] if 'long-description' in data else str()
 
     @property
     def name(self):
@@ -109,6 +113,16 @@ class BundleDefinition(object):
     def str_ydk_version(self):
         """ Return string representation of ydk version."""
         return "%s.%s.%s" % self.ydk_version
+
+    @property
+    def description(self):
+        """ Return bundle description."""
+        return self._description
+
+    @property
+    def long_description(self):
+        """ Return bundle long description."""
+        return self._long_description
 
 
 class BundleDependency(BundleDefinition):

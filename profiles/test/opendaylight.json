@@ -2,9 +2,9 @@
     "name": "network-topology",
     "version": "0.0.1",
     "ydk_version":"0.5.3",
-    "Author": "Cisco",
-    "Copyright": "Cisco",
-    "Description": "YDK Test Profile",
+    "author": "Cisco",
+    "copyright": "Cisco",
+    "description": "YDK Test Profile",
     "models": {
         "git": [
           {

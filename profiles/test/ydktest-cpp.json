@@ -1,10 +1,10 @@
 {
     "name": "ydktest",
-   "version":"0.1.0",
-   "ydk_version":"0.5.0",
-    "Author": "Cisco",
-    "Copyright": "Cisco",
-    "Description": "YDK Test Profile",
+    "version":"0.1.0",
+    "ydk_version":"0.5.0",
+    "author": "Cisco",
+    "copyright": "Cisco",
+    "description": "YDK Test Profile",
     "models": {
 	"file": [
             "sdk/cpp/core/tests/models/ietf-interfaces@2014-05-08.yang",

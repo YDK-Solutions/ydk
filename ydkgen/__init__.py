@@ -223,7 +223,9 @@ class YdkGenerator(object):
             _modify_python_setup(gen_api_root,
                                  'ydk-models-%s' % bundle.name,
                                  bundle.str_version,
-                                 bundle.dependencies)
+                                 bundle.dependencies,
+                                 bundle.description,
+                                 bundle.long_description)
             _modify_python_manifest(gen_api_root, bundle.name)
 
         # write init file for bundle models directory.
@@ -295,7 +297,7 @@ def _set_original_bundle_name_for_packages(bundles, packages, curr_bundle):
                     pkg.bundle_name = bundle.name
 
 
-def _modify_python_setup(gen_api_root, package_name, version, dependencies):
+def _modify_python_setup(gen_api_root, package_name, version, dependencies, description, long_description):
     """ Modify setup.py template for python packages. Replace package name
         and version number in setup.py located in <gen_api_root>/setup.py.
         If dependencies are specified, $DEPENDENCY$ in setup.py will be replaced.
@@ -305,11 +307,16 @@ def _modify_python_setup(gen_api_root, package_name, version, dependencies):
         gen_api_root (str): Root directory for generated APIs.
         package_name (str): Package name for generated APIs.
         version (str): Package version for generated APIs.
+        dependencies (list): bundle dependencies
+        description (str): description for bundle package
+        long_description (str): long description for bundle package
     """
     setup_file = os.path.join(gen_api_root, 'setup.py')
     replaced_package = False
     replaced_version = False
     replaced_dependencies = False
+    replaced_description = False
+    replaced_long_description = False
     for line in fileinput.input(setup_file, inplace=True):
         if not replaced_package and "$PACKAGE$" in line:
             replaced_package = True
@@ -325,6 +332,12 @@ def _modify_python_setup(gen_api_root, package_name, version, dependencies):
                 print(line.replace("'$DEPENDENCY$'", ", ".join(additional_requires)))
             else:
                 print(line.replace("'$DEPENDENCY$'", ""))
+        elif not replaced_description and "$DESCRIPTION$" in line:
+            replaced_description = True
+            print(line.replace("$DESCRIPTION$", description), end='')
+        elif not replaced_long_description and "$LONG_DESCRIPTION$" in line:
+            replaced_long_description = True
+            print(line.replace("$LONG_DESCRIPTION$", long_description), end='')
         else:
             print(line, end='')
 

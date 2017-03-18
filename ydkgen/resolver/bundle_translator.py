@@ -32,6 +32,7 @@ from git import Repo
 from shutil import rmtree
 from collections import namedtuple
 from jinja2 import Environment
+from ..common import YdkGenException
 
 
 logger = logging.getLogger('ydkgen')
@@ -42,7 +43,7 @@ Local_URI = namedtuple('Local_URI', ['url'])
 Remote = namedtuple('Remote', ['url', 'commitid'])
 Remote_URI = namedtuple('RemoteURI', ['url', 'commitid', 'path'])
 
-Bundle = namedtuple('Bundle', ['name', 'version', 'ydk_version'])
+Bundle = namedtuple('Bundle', ['name', 'version', 'ydk_version', 'description', 'long_description'])
 BundleDependency = namedtuple('BundleDependency', ['name', 'version', 'ydk_version', 'uri'])
 
 TEMPLATE = """{% set comma = joiner(",") %}
@@ -59,7 +60,9 @@ TEMPLATE = """{% set comma = joiner(",") %}
     "bundle" : {
         "name" : "{{ definition.name }}",
         "version" : "{{ definition.version}}",
-        "ydk-version" : "{{ definition.ydk_version }}"{% if dependency is not none %},
+        "ydk-version" : "{{ definition.ydk_version }}",
+        "description" : "{{ definition.description }}",
+        "long-description" : "{{ definition.long_description }}"{% if dependency is not none %},
         "dependencies" : [{% for d in dependency %}
             {
                 "name" : "{{ d.name }}",
@@ -194,9 +197,15 @@ def translate(in_file, out_file, root_dir):
             get_fun = 'get_%s_attrs' % source
             modules.extend(globals()[get_fun](data['models'][source],ydk_root))
 
-    version = data['version']
+    try:
+        version = data['version']
+        description = data['description']
+    except KeyError:
+        raise YdkGenException('Bundle file requires version and description.')
+
     ydk_version = data['ydk_version'] if 'ydk_version' in data else version
-    definition = Bundle(load_profile_attr(in_file, 'name'), version, ydk_version)
+    long_description = data['long_description'] if 'long_description' in data else str()
+    definition = Bundle(load_profile_attr(in_file, 'name'), version, ydk_version, description, long_description)
     dependency = load_profile_attr(in_file, 'dependency')
 
     output = Environment().from_string(TEMPLATE).render(

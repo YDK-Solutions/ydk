@@ -54,6 +54,18 @@ public:
         const char* method = "getLogger";
         const char* fmt = "O";
         py_logger = PyObject_CallMethod(py_logging, (char *)method, (char *)fmt, ydk_arg);
+
+        // Add null handler suppress
+        // `No handlers could be found for logger "ydk"` error message.
+        // This check is added after Python 2.7.4rc1.
+        #if 0x02070000 <= PY_VERSION_HEX
+        const char* null_method = "NullHandler";
+        PyObject* null_handler = PyObject_CallMethod(py_logging, (char *)null_method, NULL);
+        const char* append_method = "addHandler";
+        PyObject_CallMethod(py_logger, (char *)append_method, (char *)fmt, null_handler);
+        Py_DECREF(null_handler);
+        #endif
+
         Py_DECREF(ydk_arg);
         Py_DECREF(py_logging);
     }

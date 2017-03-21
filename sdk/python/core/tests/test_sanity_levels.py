@@ -24,7 +24,7 @@ import unittest
 from ydk.types import Empty
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
-from ydk.services import CrudService
+from ydk.services import CRUDService
 
 
 class SanityYang(unittest.TestCase):
@@ -32,7 +32,7 @@ class SanityYang(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CrudService()
+        self.crud = CRUDService()
 
     @classmethod
     def tearDownClass(self):

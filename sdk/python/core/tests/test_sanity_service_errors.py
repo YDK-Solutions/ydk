@@ -17,7 +17,7 @@
 from __future__ import absolute_import
 import unittest
 
-from ydk.services import CrudService
+from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64, EncodingFormat
@@ -141,12 +141,12 @@ class SanityCodec(unittest.TestCase):
     def test_decode_invalid_3(self):
         self.codec.decode(None, None)
 
-class SanityCrud(unittest.TestCase):
+class SanityCRUD(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
         self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CrudService()
+        self.crud = CRUDService()
 
     @classmethod
     def tearDownClass(self):
@@ -530,7 +530,7 @@ if __name__ == '__main__':
 
     loader = unittest.TestLoader()
     testCaseList = []
-    for testCase in [SanityCrud, SanityExecutor, SanityMeta, SanityNetconf]:
+    for testCase in [SanityCRUD, SanityExecutor, SanityMeta, SanityNetconf]:
         testCase.PROVIDER_TYPE = provider_type
         testCaseList.append(loader.loadTestsFromTestCase(testCase))
     suite = unittest.TestSuite(testCaseList)

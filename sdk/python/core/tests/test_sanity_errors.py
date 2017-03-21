@@ -17,7 +17,7 @@
 from __future__ import absolute_import
 import unittest
 
-from ydk.services import CrudService
+from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.providers import NetconfServiceProvider
@@ -103,7 +103,7 @@ class SanityTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CrudService()
+        self.crud = CRUDService()
 
     @classmethod
     def tearDownClass(self):

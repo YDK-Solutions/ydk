@@ -187,7 +187,10 @@ class CodecService(object):
                 yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
                 entity_lookup = yang_ns.__dict__['ENTITY_LOOKUP']
                 if ns_ename in entity_lookup:
-                    return entity_lookup[ns_ename].clone_ptr()
+                    mod, entity = entity_lookup[ns_ename].split('.', 1)
+                    mod = importlib.import_module('ydk.models.{}.{}'.format(name, mod))
+                    entity = getattr(mod, entity)()
+                    return entity.clone_ptr()
 
         self.logger.debug(_ENTITY_ERROR_MSG.format(ename))
         raise _YPYServiceProviderError(_ENTITY_ERROR_MSG.format(ename))

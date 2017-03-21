@@ -40,8 +40,8 @@ class SanityNetconf(unittest.TestCase):
         pass
 
     def setUp(self):
-        from ydk.services import CrudService
-        crud = CrudService()
+        from ydk.services import CRUDService
+        crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
 

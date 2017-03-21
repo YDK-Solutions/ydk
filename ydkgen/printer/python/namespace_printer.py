@@ -29,7 +29,6 @@ class NamespacePrinter(FilePrinter):
 
     def print_output(self, packages, bundle_name):
         self.packages = packages
-        self._print_imports(packages)
         self._print_bundle_name(bundle_name)
         self._print_capabilities(packages)
         self._print_entity_lookup(packages)
@@ -41,13 +40,6 @@ class NamespacePrinter(FilePrinter):
                 if e.stmt.keyword in ('container', 'list'):
                     imports.add(e.get_py_mod_name())
         return imports
-
-    def _print_imports(self, packages):
-        imports = self._get_imports(packages)
-        for imp in imports:
-            root, elem = imp.rsplit('.', 1)
-            self.ctx.writeln('from {} import {}'.format(root, elem))
-        self.ctx.bline()
 
     def _print_bundle_name(self, bundle_name):
         self.ctx.writeln('BUNDLE_NAME = "{}"'.format(bundle_name))
@@ -73,9 +65,9 @@ class NamespacePrinter(FilePrinter):
             for e in p.owned_elements:
                 if all((hasattr(e, 'stmt'), e.stmt is not None,
                         e.stmt.keyword in ('container', 'list'))):
-                    self.ctx.writeln('("{}", "{}"): {}(),'
+                    self.ctx.writeln('("{}", "{}"): "{}",'
                                      .format(ns.arg, e.stmt.arg, e.fqn()))
-                    self.ctx.writeln('("{}", "{}"): {}(),'
+                    self.ctx.writeln('("{}", "{}"): "{}",'
                                      .format(p.stmt.arg, e.stmt.arg, e.fqn()))
 
         self.ctx.lvl_dec()

@@ -404,7 +404,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 
     class_<ydk::RestconfServiceProvider>(providers, "RestconfServiceProvider", base<ydk::path::ServiceProvider>())
-        .def(init<ydk::path::Repository&, string, string, string, int>())
+        .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>())
         .def("invoke", &ydk::RestconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::RestconfServiceProvider::get_root_schema, return_value_policy::reference);
 

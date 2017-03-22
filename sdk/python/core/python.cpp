@@ -399,7 +399,27 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("operation", &ydk::YLeafList::operation);
 
     class_<ydk::NetconfServiceProvider>(providers, "NetconfServiceProvider", base<ydk::path::ServiceProvider>())
-        .def(init<ydk::path::Repository&, string, string, string, int>())
+        .def("__init__",
+            [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, string address, string username, string password, int port, string protocol) {
+                    // use default protocol at the moment
+                    new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port);
+            },
+            arg("repo"),
+            arg("address"),
+            arg("username"),
+            arg("password"),
+            arg("port")=830,
+            arg("protocol")=string("ssh"))
+        .def("__init__",
+            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port, string protocol) {
+                    // use default protocol at the moment
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
+            },
+            arg("address"),
+            arg("username"),
+            arg("password"),
+            arg("port")=830,
+            arg("protocol")=string("ssh"))
         .def(init<string, string, string, int>())
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);

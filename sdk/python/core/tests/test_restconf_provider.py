@@ -19,6 +19,7 @@ RestconfServiceProvider test
 """
 from __future__ import absolute_import
 
+import os
 import unittest
 
 from ydk.providers import RestconfServiceProvider
@@ -34,7 +35,9 @@ class SanityTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         # Need to keep a local reference for repo to keep it alive
-        self.repo = Repository('../../../cpp/core/tests/models')
+        repo_path = os.path.dirname(__file__)
+        repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
+        self.repo = Repository(repo_path)
         self.restconf_provider = RestconfServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
 
     @classmethod

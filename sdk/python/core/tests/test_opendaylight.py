@@ -19,6 +19,7 @@ test ODL
 """
 from __future__ import absolute_import
 
+import os
 import unittest
 
 from ydk.models.ydktest import openconfig_bgp as oc_bgp
@@ -37,7 +38,9 @@ class SanityTest(unittest.TestCase):
         # Need to keep a local reference for repo to keep it alive,
         # as the first argument for OpenDaylightServiceProvider in libydk
         # is a reference.
-        self.repo = Repository('../../../cpp/core/tests/models')
+        repo_path = os.path.dirname(__file__)
+        repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
+        self.repo = Repository(repo_path)
         self.odl = OpenDaylightServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
         self.crud = CRUDService()
 

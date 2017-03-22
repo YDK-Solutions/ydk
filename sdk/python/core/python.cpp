@@ -23,6 +23,7 @@
 #include <ydk/crud_service.hpp>
 #include <ydk/entity_util.hpp>
 #include <ydk/entity_data_node_walker.hpp>
+#include <ydk/executor_service.hpp>
 #include <ydk/netconf_service.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/opendaylight_provider.hpp>
@@ -420,6 +421,10 @@ PYBIND11_PLUGIN(ydk_)
         .def("read_config", &ydk::CrudService::read_config)
         .def("update", &ydk::CrudService::update, return_value_policy::reference)
         .def("delete", &ydk::CrudService::delete_, return_value_policy::reference);
+
+    class_<ydk::ExecutorService>(services, "ExecutorService")
+        .def(init<>())
+        .def("execute_rpc", &ydk::ExecutorService::execute_rpc, arg("provider"), arg("entity"));
 
     class_<ydk::NetconfService>(services, "NetconfService")
         .def(init<>())

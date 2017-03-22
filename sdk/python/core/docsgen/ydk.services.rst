@@ -440,12 +440,12 @@ ExecutorService: Provides API to execute RPCs
 
         Executor Service class for supporting execution of RPCs.
 
-        .. py:method:: execute_rpc(self, provider, rpc):
+        .. py:method:: execute_rpc(self, provider, entity):
 
                 Create the entity
 
                 :param provider: An instance of ydk.providers.ServiceProvider
-                :param rpc: An instance of an RPC class defined under the ydk.models package or subpackages
+                :param entity: An instance of an RPC class defined under the ydk.models package or subpackages
 
                 :return: None
 

@@ -13,16 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-from ydk.ext.logging import EnableLogging
-EnableLogging()
-del EnableLogging
-
-from .codec_service import CodecService
-from .crud_service import CRUDService
-from .netconf_service import NetconfService
-from .executor_service import ExecutorService
-from ydk.ext.services import DataStore
+import inspect
+from ydk.ext.services import ExecutorService as _ExecutorService
+from ydk.errors import YPYServiceError as _YPYServiceError
+from ydk.errors.error_handler import handle_runtime_error as _handle_error
 
 
-__all__ = [ "CodecService" "CRUDService",
-            "ExecutorService", "NetconfService", "DataStore" ]
+class ExecutorService(_ExecutorService):
+    """ Python wrapper for ExecutorService
+    """
+    def __init__(self):
+        self._es = _ExecutorService()
+
+    def execute_rpc(self, provider, entity):
+        if None in (provider, entity):
+            raise _YPYServiceError("provider and entity cannot be None")
+
+        with _handle_error():
+            return self._es.execute_rpc(provider, entity)

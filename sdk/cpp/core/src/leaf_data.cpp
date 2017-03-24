@@ -32,7 +32,7 @@ using namespace std;
 
 namespace ydk
 {
-LeafData::LeafData(std::string value, EditOperation operation, bool is_set)
+LeafData::LeafData(std::string value, YOperation operation, bool is_set)
 	: value(value), operation(operation), is_set(is_set)
 {
 

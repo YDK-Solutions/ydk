@@ -43,9 +43,9 @@ The C++ types present in ydk namespace corresponding to YANG types. See below fo
 
 Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
 
-    .. cpp:member:: EditOperation operation
+    .. cpp:member:: YOperation operation
     
-        Optional attribute of the Entity class which can be set to perform various :cpp:class:`operations<EditOperation>`
+        Optional attribute of the Entity class which can be set to perform various :cpp:class:`operations<YOperation>`
 
 
 YANG container and list
@@ -55,9 +55,9 @@ YANG container and list
 
 Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
 
-    .. cpp:member:: EditOperation operation
+    .. cpp:member:: YOperation operation
     
-        Optional attribute of the Entity class which can be set to perform various :cpp:class:`operations<EditOperation>`
+        Optional attribute of the Entity class which can be set to perform various :cpp:class:`operations<YOperation>`
 
 YANG leaf and leaf-list
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,17 +66,17 @@ YANG leaf and leaf-list
 
 Concrete class that represents a YANG leaf to which data can be assigned.
 
-    .. cpp:member:: EditOperation operation
+    .. cpp:member:: YOperation operation
     
-        Optional attribute of the YLeaf class which can be set to perform various :cpp:class:`operations<EditOperation>`
+        Optional attribute of the YLeaf class which can be set to perform various :cpp:class:`operations<YOperation>`
 
 .. cpp:class:: YLeafList
 
 Concrete class that represents a YANG leaf-list to which multiple instances of data can be appended to.
 
-    .. cpp:member:: EditOperation operation
+    .. cpp:member:: YOperation operation
     
-        Optional attribute of the YLeafList class which can be set to perform various :cpp:class:`operations<EditOperation>`
+        Optional attribute of the YLeafList class which can be set to perform various :cpp:class:`operations<YOperation>`
 
 YANG type
 ~~~~~~~~~~

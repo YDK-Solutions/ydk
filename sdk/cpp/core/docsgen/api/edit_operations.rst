@@ -1,11 +1,11 @@
-Edit Operations
+YDK Operations
 =================
 
 .. cpp:namespace:: ydk
 
-.. cpp:enum-class:: EditOperation
+.. cpp:enum-class:: YOperation
 
-Operations as defined under netconf edit-config operation attribute in `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ to be used with various :cpp:class:`YDK services<Service>` and :cpp:class:`entities<Entity>`.
+Operations as defined under netconf edit-config operation attribute in `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and for filtering read operations by leaf to be used with various :cpp:class:`YDK services<Service>` and :cpp:class:`entities<Entity>`.
 
         .. cpp:enumerator:: merge
         
@@ -52,7 +52,11 @@ Operations as defined under netconf edit-config operation attribute in `RFC 6241
             <copy-config> operation, which replaces the entire target
             configuration, only the configuration actually present in
             the <config> parameter is affected.
-            
+
+        .. cpp:enumerator:: read
+        
+            When reading configuration or operational data from a network device and a specific leaf is desired to be read, the operation can be set to `read` on that leaf. See example below
+
         .. cpp:enumerator:: not_set
 
             Default value to which all configuration data is initialized to, indicating no operation has been selected. If no operation is selected, ``merge`` is performed
@@ -65,25 +69,45 @@ An example of setting the operation for an :cpp:class:`entity<Entity>` (address 
 .. code-block:: c++
   :linenos:
 
-  // Instantiate a bgp smart pointer object representing the bgp container from the openconfig-bgp YANG model
-  auto bgp = std::make_unique<ydk::openconfig_bgp::Bgp>();
+  // Instantiate a bgp object representing the bgp container from the openconfig-bgp YANG model
+  ydk::openconfig_bgp::Bgp bgp{};
   
   // Instantiate an af-safi object representing the af-safi list from the openconfig-bgp YANG model
-  auto afi_safi = make_unique<ydk::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
-
-  // Set the operation to delete, which will delete this instance of the address family
-  afi_safi->operation = EditOperation::delete_;
+  auto afi_safi = make_shared<ydk::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
 
   // Set the key
   afi_safi->afi_safi_name = L3VpnIpv4UnicastIdentity();
-  // Set afi-safis as the parent of the list instance
-  afi_safi->parent = bgp->global->afi_safis.get();
+
+  // Set the operation to delete, which will delete this instance of the address family
+  afi_safi->operation = YOperation::delete_;
+
   //Append the list instance to afi-safis's afi-safi field
-  bgp->global->afi_safis->afi_safi.push_back(std::move(afi_safi));
+  bgp.global->afi_safis->afi_safi.push_back(afi_safi);
 
   // Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1
   CrudService crud_service{};
   NetconfServiceProvider provider{"10.0.0.1", "test", "test", 830};
   
   // Invoke the CRUD Update method
-  crud_service.update(provider, *bgp);
+  crud_service.update(provider, bgp);
+
+
+An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifically, the `as number` leaf) under :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` is shown below
+
+.. code-block:: c++
+  :linenos:
+
+  // Instantiate a bgp object representing the bgp container from the openconfig-bgp YANG model
+  ydk::openconfig_bgp::Bgp bgp{};
+  
+  // Indicate that the `as number` is desried to be read
+  bgp.config->as->operation = YOperation::read;
+
+
+  // Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1
+  CrudService crud_service{};
+  NetconfServiceProvider provider{"10.0.0.1", "test", "test", 830};
+  
+  // Invoke the CRUD Read method
+  crud_service.read(provider, bgp);
+  

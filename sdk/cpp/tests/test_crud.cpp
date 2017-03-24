@@ -191,12 +191,10 @@ TEST_CASE("bgp_read_non_top")
     auto d = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     d->neighbor_address = "1.2.3.4";
     d->config->neighbor_address = "1.2.3.4";
-    d->parent = bgp_set->neighbors.get();
     bgp_set->neighbors->neighbor.push_back(move(d));
     auto q = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     q->neighbor_address = "1.2.3.5";
     q->config->neighbor_address = "1.2.3.5";
-    q->parent = bgp_set->neighbors.get();
     bgp_set->neighbors->neighbor.push_back(move(q));
 	reply = crud.create(provider, *bgp_set);
 	REQUIRE(reply);

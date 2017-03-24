@@ -29,9 +29,9 @@
 
 namespace ydk
 {
-std::string to_string(EditOperation operation)
+std::string to_string(YOperation operation)
 {
-    #define TOSTR(a) case EditOperation::a: return #a;
+    #define TOSTR(a) case YOperation::a: return #a;
     switch(operation)
     {
         TOSTR(merge)
@@ -39,7 +39,8 @@ std::string to_string(EditOperation operation)
         TOSTR(remove)
         TOSTR(replace)
         TOSTR(not_set)
-        case EditOperation::delete_:
+        TOSTR(read)
+        case YOperation::delete_:
             return "delete";
     }
     #undef TOSTR

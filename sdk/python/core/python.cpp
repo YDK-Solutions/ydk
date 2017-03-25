@@ -195,9 +195,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("schema", &ydk::path::DataNode::schema, return_value_policy::reference)
         .def("path", &ydk::path::DataNode::path, return_value_policy::reference)
         .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create, return_value_policy::reference)
-        .def("create_filter", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create_filter, return_value_policy::reference)
         .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create, return_value_policy::reference)
-        .def("create_filter", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create_filter, return_value_policy::reference)
         .def("get", &ydk::path::DataNode::get, return_value_policy::reference)
         .def("set", &ydk::path::DataNode::set, return_value_policy::reference)
         .def("children", &ydk::path::DataNode::children, return_value_policy::reference)
@@ -398,7 +396,7 @@ PYBIND11_PLUGIN(ydk_)
                         })
         .def_readwrite("operation", &ydk::YLeafList::operation);
 
-    class_<ydk::NetconfServiceProvider>(providers, "NetconfServiceProvider", base<ydk::path::ServiceProvider>())
+    class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, string address, string username, string password, int port, string protocol) {
                     // use default protocol at the moment
@@ -424,7 +422,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 
-    class_<ydk::RestconfServiceProvider>(providers, "RestconfServiceProvider", base<ydk::path::ServiceProvider>())
+    class_<ydk::RestconfServiceProvider, ydk::path::ServiceProvider>(providers, "RestconfServiceProvider")
         .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>())
         .def("invoke", &ydk::RestconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::RestconfServiceProvider::get_root_schema, return_value_policy::reference);

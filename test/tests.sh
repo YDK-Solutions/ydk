@@ -411,7 +411,7 @@ function test_gen_tests {
 
     init_env "python" "python"
     cd $YDKGEN_HOME && source gen_env/bin/activate
-    git clone https://github.com/abhikeshav/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
+    git clone https://github.com/psykokwak4/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
 
     py_test_gen
     cpp_test_gen

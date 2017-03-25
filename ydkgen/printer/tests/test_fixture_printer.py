@@ -71,7 +71,7 @@ class FixturePrinter(Printer):
         self._writeln("import logging")
         self._writeln("import unittest")
         self._writeln('')
-        self._writeln("from ydk.services import CrudService")
+        self._writeln("from ydk.services import CRUDService")
         self._writeln("from ydk.types import Decimal64, Empty")
         self._writeln("from ydk.providers import NetconfServiceProvider")
 
@@ -125,7 +125,7 @@ class FixturePrinter(Printer):
                       "'{0}', '{1}', '{2}', {3})"
                       .format(self.address, self.username,
                               self.password, self.port))
-        self._writeln('cls.crud = CrudService()')
+        self._writeln('cls.crud = CRUDService()')
         self._lvl_dec()
 
     def _print_py_teardown_class(self):
@@ -156,7 +156,7 @@ class FixturePrinter(Printer):
         self._bline()
         self._writeln('m_crud = CrudService{};')
         self._writeln("m_provider = "
-                      "std::make_unique<NetconfServiceProvider>"
+                      "std::make_shared<NetconfServiceProvider>"
                       "(\"{0}\", \"{1}\", \"{2}\", {3});"
                       .format(self.address, self.username,
                               self.password, self.port))
@@ -164,7 +164,7 @@ class FixturePrinter(Printer):
         self._writeln('}')
         self._writeln('~ConnectionFixture() {}')
         self._writeln('CrudService m_crud;')
-        self._writeln("std::unique_ptr<NetconfServiceProvider> "
+        self._writeln("std::shared_ptr<NetconfServiceProvider> "
                       "m_provider;")
         self._lvl_dec()
         self._writeln('};')

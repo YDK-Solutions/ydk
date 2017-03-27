@@ -418,7 +418,33 @@ PYBIND11_PLUGIN(ydk_)
             arg("password"),
             arg("port")=830,
             arg("protocol")=string("ssh"))
-        .def(init<string, string, string, int>())
+        .def("__init__",
+            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, void* port, string protocol) {
+                    // use default protocol at the moment
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830);
+            },
+            arg("address"),
+            arg("username"),
+            arg("password"),
+            arg("port")=nullptr,
+            arg("protocol")=string("ssh"))
+        .def("__init__",
+            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port) {
+                    // use default protocol at the moment
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
+            },
+            arg("address"),
+            arg("username"),
+            arg("password"),
+            arg("port")=830)
+        .def("__init__",
+            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password) {
+                    // use default protocol at the moment
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password);
+            },
+            arg("address"),
+            arg("username"),
+            arg("password"))
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 

@@ -117,9 +117,12 @@ class Entity(_Entity):
 
     def get_children(self):
         children = ChildrenMap()
+
         for name in self.__dict__:
             value = self.__dict__[name]
             if isinstance(value, Entity) and name != '_top_entity':
+                if name not in self._children_name_map:
+                    continue
                 children[name] = value
             elif isinstance(value, YList):
                 for v in value:

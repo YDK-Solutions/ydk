@@ -38,7 +38,7 @@ class SanityCodec(unittest.TestCase):
         from ydk.providers import CodecServiceProvider
         from ydk.services import CodecService
         self.codec = CodecService()
-        self.provider = CodecServiceProvider(EncodingFormat.XML)
+        self.provider = CodecServiceProvider(type=EncodingFormat.XML)
 
         self._enum_payload_1 = """<built-in-t xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <enum-value>local</enum-value>

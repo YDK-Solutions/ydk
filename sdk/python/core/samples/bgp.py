@@ -100,7 +100,7 @@ def bgp_run(crud_service, session):
 
 
     routing_policy.policy_definitions.policy_definition.append(pass_all_policy_defn)
-    pass_all_policy_defn._parent = routing_policy.policy_definitions
+    pass_all_policy_defn.parent = routing_policy.policy_definitions
 
 
     bgp_cfg.global_.config.as_ = 65001

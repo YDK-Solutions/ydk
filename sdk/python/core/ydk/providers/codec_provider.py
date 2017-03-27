@@ -32,7 +32,7 @@ class CodecServiceProvider(object):
     """Python CodecServiceProvider wrapper.
 
     Args:
-        encoding (ydk.types.EncodingFormat): Codec encoding format.
+        type (ydk.types.EncodingFormat or str): Codec encoding format.
             Currently support XML or JSON.
         repo (ydk.path.Repository, optional): A user provided repository.
     Attributes:
@@ -43,16 +43,26 @@ class CodecServiceProvider(object):
             is corresponding repository.
     """
 
-    def __init__(self, encoding, repo=None):
+    def __init__(self, **kwargs):
         self.logger = logging.getLogger(__name__)
-        self.encoding = encoding
         self._root_schema_table = {}
+
+
+        repo = kwargs.get('repo', None)
         if repo is None:
             self._user_provided_repo = False
             self._repo = None
         else:
             self._user_provided_repo = True
             self._repo = repo
+
+        encoding = kwargs.get('type', EncodingFormat.XML)
+        if isinstance(encoding, str) and encoding == 'xml':
+            encoding = EncodingFormat.XML
+        elif isinstance(encoding, str) and encoding == 'json':
+            encoding = EncodingFormat.JSON
+        encoding = kwargs.get('encoding', encoding)
+        self.encoding = encoding
 
     def initialize(self, bundle_name, models_path):
         """Initialize provider with bundle name and path for local YANG models.

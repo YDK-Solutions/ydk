@@ -66,7 +66,7 @@ def _get_routing_cfg():
     pass_all_policy_defn.name = 'PASS-ALL'
 
     routing_policy.policy_definitions.policy_definition.append(pass_all_policy_defn)
-    pass_all_policy_defn._parent = routing_policy.policy_definitions
+    pass_all_policy_defn.parent = routing_policy.policy_definitions
 
     comm_set = RoutingPolicy.DefinedSets.BgpDefinedSets.CommunitySets.CommunitySet()
     comm_set.community_set_name = 'testing'

@@ -34,7 +34,7 @@ class SanityYang(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.codec = CodecService()
-        self.provider = CodecServiceProvider(EncodingFormat.XML)
+        self.provider = CodecServiceProvider(type=EncodingFormat.XML)
 
         self._xml_enum_payload_1 = '''<built-in-t xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <enum-value>local</enum-value>

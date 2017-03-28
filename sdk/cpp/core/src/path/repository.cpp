@@ -51,8 +51,8 @@ static void create_if_does_not_exist(const std::string & path)
     {
         if(mkdir(path.c_str(), 0700) != 0)
         {
-            YLOG_ERROR("Could not create repository");
-            throw(YCPPIllegalStateError{"Could not create repository"});
+            YLOG_ERROR("Could not create repository: {}", path);
+            throw(YCPPIllegalStateError{"Could not create repository: "+path});
         }
     }
 }

@@ -145,7 +145,6 @@ file(MAKE_DIRECTORY ${libydk_yang_dir})
 
 add_custom_command(OUTPUT ${libydk_YANG_FILES}  
   COMMAND ${CMAKE_COMMAND} -E tar xzf "${CMAKE_SOURCE_DIR}/${YDK_YANG_ARCHIVE}.tar.gz"
-  #COMMAND ${CMAKE_COMMAND} -E touch ${libydk_YANG_FILES}
   WORKING_DIRECTORY ${libydk_yang_dir}
   DEPENDS ${CMAKE_SOURCE_DIR}/${YDK_YANG_ARCHIVE}.tar.gz
   COMMENT "Unpacking ${YDK_YANG_ARCHIVE}.tar.gz"

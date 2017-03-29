@@ -102,6 +102,9 @@ ydk::path::Repository::Repository()
 ydk::path::Repository::Repository(const std::string& search_dir)
   : path{search_dir}, using_temp_directory(false)
 {
+ //     auto console = spdlog::stdout_color_mt("ydk");
+ //     console->set_level(spdlog::level::debug);
+
     if (!file_exists(path))
     {
         YLOG_ERROR("Path {} is not a valid directory.", search_dir);

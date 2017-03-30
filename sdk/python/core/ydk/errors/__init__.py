@@ -34,6 +34,9 @@ class YPYError(Exception):
 
 
 class YPYClientError(YPYError):
+    """
+    Exception for Client Side Validation
+    """
     def __init__(self, error_msg):
         super(YPYClientError, self).__init__(error_msg)
 

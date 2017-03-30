@@ -31,7 +31,7 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12023)
         self.crud = CRUDService()
 
     @classmethod

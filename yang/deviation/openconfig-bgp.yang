@@ -1,4 +1,4 @@
-module bgp {
+module openconfig-bgp {
 
   yang-version "1";
 
@@ -9,10 +9,11 @@ module bgp {
 
   // import some basic inet types
   import ietf-inet-types { prefix inet; }
-  import bgp-multiprotocol { prefix bgp-mp; }
-  import routing-policy { prefix rpol; }
-  import bgp-types { prefix bgp-types; }
-  import bgp-operational { prefix bgp-op; }
+  import openconfig-bgp-multiprotocol { prefix bgp-mp; }
+  import openconfig-routing-policy { prefix rpol; }
+  import openconfig-bgp-types { prefix bgp-types; }
+  import openconfig-bgp-operational { prefix bgp-op; }
+  import openconfig-extensions { prefix oc-ext; }
 
   // meta
   organization
@@ -47,10 +48,18 @@ module bgp {
           +-> [ optional pointer to peer-group ]
           +-> AFI / SAFI [ per-AFI overrides ]";
 
+  oc-ext:openconfig-version "1.1.0";
+
+  revision "2015-10-09" {
+    description
+      "Initial OpenConfig public release";
+    reference "1.1.0";
+  }
+
   revision "2015-05-15" {
       description
-        "";
-      reference "TBD";
+        "Refactored BGP module";
+      reference "Pre-release";
   }
 
   grouping bgp-global_config {
@@ -992,32 +1001,42 @@ module bgp {
     uses bgp-op:bgp-neighbor-afi-safi-graceful-restart_state;
   }
 
-  // ************************************************************
+  grouping bgp-top {
+    description
+      "Top-level grouping for the BGP model data";
+
+    container bgp {
+      presence "Container for BGP protocol hierarchy";
+      description
+        "Top-level configuration and state for the BGP router";
+
+      container global {
+        description
+          "Global configuration for the BGP router";
+          uses bgp-global-base;
+          uses rpol:apply-policy-group;
+      }
+
+      container neighbors {
+        description
+          "Configuration for BGP neighbors";
+        uses bgp-neighbors;
+      }
+
+      container peer-groups {
+        description
+          "Configuration for BGP peer-groups";
+        uses bgp-peer-group;
+      }
+    }
+  }
+
+   // ************************************************************
   // *              module structure containers                 *
   // ************************************************************
 
-  container bgp {
-    presence "Container for BGP protocol hierarchy";
-    description
-      "Top-level configuration and state for the BGP router";
+  uses bgp-top;
 
-    container global {
-      description
-        "Global configuration for the BGP router";
-        uses bgp-global-base;
-        uses rpol:apply-policy-group;
-    }
-
-    container neighbors {
-      description
-        "Configuration for BGP neighbors";
-      uses bgp-neighbors;
-    }
-
-    container peer-groups {
-      description
-        "Configuration for BGP peer-groups";
-      uses bgp-peer-group;
-    }
-  }
 }
+
+

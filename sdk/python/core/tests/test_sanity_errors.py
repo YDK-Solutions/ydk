@@ -29,35 +29,35 @@ from test_utils import assert_with_error
 
 test_int8_invalid_pattern = """Invalid value "8.5" in "number8" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/number8'"""
 test_int16_invalid_pattern =  """set\(\): incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    2. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    3. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    4. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    5. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    6. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    7. \(self: ydk_.types.YLeaf, arg0: float\) -> None
-    8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
-    9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
-    10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
-    13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
+    1. \(self: ydk_.types.YLeaf, value: int\) -> None
+    2. \(self: ydk_.types.YLeaf, value: int\) -> None
+    3. \(self: ydk_.types.YLeaf, value: int\) -> None
+    4. \(self: ydk_.types.YLeaf, value: int\) -> None
+    5. \(self: ydk_.types.YLeaf, value: int\) -> None
+    6. \(self: ydk_.types.YLeaf, value: int\) -> None
+    7. \(self: ydk_.types.YLeaf, value: float\) -> None
+    8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
+    9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
+    10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
+    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , {}"""
 test_int32_invalid_patern = """set\(\): incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    2. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    3. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    4. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    5. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    6. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    7. \(self: ydk_.types.YLeaf, arg0: float\) -> None
-    8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
-    9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
-    10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
-    13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
+    1. \(self: ydk_.types.YLeaf, value: int\) -> None
+    2. \(self: ydk_.types.YLeaf, value: int\) -> None
+    3. \(self: ydk_.types.YLeaf, value: int\) -> None
+    4. \(self: ydk_.types.YLeaf, value: int\) -> None
+    5. \(self: ydk_.types.YLeaf, value: int\) -> None
+    6. \(self: ydk_.types.YLeaf, value: int\) -> None
+    7. \(self: ydk_.types.YLeaf, value: float\) -> None
+    8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
+    9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
+    10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
+    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , \[\]"""
 test_int64_invalid_pattern = """Invalid value "9223372036854775808" in "number64" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/number64'"""
@@ -66,19 +66,19 @@ test_uint16_invalid_pattern = """Invalid value "not an uint" in "u_number16" ele
 test_uint32_invalid_pattern = """Invalid value "4294967296" in "u_number32" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/u_number32'"""
 test_uint64_invalid_pattern = """Invalid value "1.84467e\+19" in "u_number64" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/u_number64'"""
 test_string_invalid_pattern = """set\(\): incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    2. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    3. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    4. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    5. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    6. \(self: ydk_.types.YLeaf, arg0: int\) -> None
-    7. \(self: ydk_.types.YLeaf, arg0: float\) -> None
-    8. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Empty\) -> None
-    9. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Identity\) -> None
-    10. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, arg0: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, arg0: ydk_.types.YLeaf\) -> None
-    13. \(self: ydk_.types.YLeaf, arg0: ydk_.types.Decimal64\) -> None
+    1. \(self: ydk_.types.YLeaf, value: int\) -> None
+    2. \(self: ydk_.types.YLeaf, value: int\) -> None
+    3. \(self: ydk_.types.YLeaf, value: int\) -> None
+    4. \(self: ydk_.types.YLeaf, value: int\) -> None
+    5. \(self: ydk_.types.YLeaf, value: int\) -> None
+    6. \(self: ydk_.types.YLeaf, value: int\) -> None
+    7. \(self: ydk_.types.YLeaf, value: float\) -> None
+    8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
+    9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
+    10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
+    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , \['name_str'\]"""
 test_empty_invalid_pattern = """Invalid value "0" in "emptee" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/emptee'"""

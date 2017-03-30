@@ -88,7 +88,6 @@ test_delete_leaflist_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
 
 
 class SanityTest(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):

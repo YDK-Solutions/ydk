@@ -38,7 +38,7 @@ def init_logging():
     logger.setLevel(logging.INFO)
     # create file handler
     fh = logging.FileHandler('bgp.log')
-    fh.setLevel(logging.INFO)
+    fh.setLevel(logging.DEBUG)
     # create a console logger too
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)

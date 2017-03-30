@@ -22,15 +22,15 @@ from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
-from ydk.models.deviation import bgp, bgp_types
-from ydk.models.deviation.routing_policy import DefaultPolicyTypeEnum, RoutingPolicy
+from ydk.models.deviation import openconfig_bgp, openconfig_bgp_types
+from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyTypeEnum, RoutingPolicy
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12023)
         self.crud = CRUDService()
 
     @classmethod
@@ -45,9 +45,9 @@ class SanityTest(unittest.TestCase):
 
     def test_bgp(self):
         # Bgp.Global.AfiSafis.AfiSafi.ApplyPolicy is not supported
-        bgp_cfg = bgp.Bgp()
+        bgp_cfg = openconfig_bgp.Bgp()
         ipv4_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
-        ipv4_afsf.afi_safi_name = bgp_types.AfiSafiTypeIdentity()
+        ipv4_afsf.afi_safi_name = openconfig_bgp_types.AfiSafiTypeIdentity()
         ipv4_afsf.apply_policy.config.default_export_policy = DefaultPolicyTypeEnum.ACCEPT_ROUTE
         bgp_cfg.global_.afi_safis.afi_safi.append(ipv4_afsf)
 

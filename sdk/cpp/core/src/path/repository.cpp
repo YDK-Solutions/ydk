@@ -282,7 +282,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
                 YLOG_DEBUG("Cache hit deviation module name: {}", d);
             }
             if (!res) {
-                YLOG_DEBUG("Unable to parse deviation module: {}", d);
+                YLOG_ERROR("Unable to parse deviation module: {}", d);
                 continue;
             }
         }
@@ -299,7 +299,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
         }
 
         if (!p) {
-            YLOG_DEBUG("Unable to parse module: {}", c.module);
+            YLOG_ERROR("Unable to parse module: {}", c.module);
             continue;
         }
         for (auto f : c.features)

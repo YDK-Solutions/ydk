@@ -53,6 +53,7 @@ set(libydk_src
     src/executor_service.cpp
     src/ietf_parser.cpp
     src/leaf_data.cpp
+    src/logging_callback.cpp
     src/netconf_client.cpp    
     src/netconf_model_provider.cpp
     src/netconf_provider.cpp
@@ -100,6 +101,7 @@ set(libydk_install_headers
     src/entity_util.hpp
     src/errors.hpp
     src/executor_service.hpp
+    src/logging_callback.hpp
     src/netconf_provider.hpp
     src/network_topology.hpp
     src/netconf_service.hpp

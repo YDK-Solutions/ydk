@@ -24,6 +24,7 @@
 #include <ydk/entity_util.hpp>
 #include <ydk/entity_data_node_walker.hpp>
 #include <ydk/executor_service.hpp>
+#include <ydk/logging_callback.hpp>
 #include <ydk/netconf_service.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/opendaylight_provider.hpp>
@@ -45,6 +46,122 @@ PYBIND11_MAKE_OPAQUE(LeafDataList)
 typedef map<std::string, std::shared_ptr<ydk::Entity>> ChildrenMap;
 PYBIND11_MAKE_OPAQUE(ChildrenMap)
 
+//TODO
+
+class PyLogger
+{
+public:
+    PyLogger()
+    {
+    }
+
+    ~PyLogger()
+    {
+        if (py_logger != nullptr)
+        {
+           Py_DECREF(py_logger);
+        }
+    }
+
+    void set_logger()
+    {
+        PyObject* py_logging  = PyImport_ImportModule("logging");
+        PyObject* ydk_arg = Py_BuildValue("s", "ydk");
+        const char* method = "getLogger";
+        const char* fmt = "O";
+        py_logger = PyObject_CallMethod(py_logging, (char *)method, (char *)fmt, ydk_arg);
+
+        // Add null handler suppress
+        // `No handlers could be found for logger "ydk"` error message.
+        // This check is added after Python 2.7.4rc1.
+        #if 0x02070000 <= PY_VERSION_HEX
+        const char* null_method = "NullHandler";
+        PyObject* null_handler = PyObject_CallMethod(py_logging, (char *)null_method, NULL);
+        const char* append_method = "addHandler";
+        PyObject_CallMethod(py_logger, (char *)append_method, (char *)fmt, null_handler);
+        Py_DECREF(null_handler);
+        #endif
+
+        Py_DECREF(ydk_arg);
+        Py_DECREF(py_logging);
+    }
+
+    template <typename... Args> void py_fmt_log(const std::string& name, const char* fmt, spdlog::level::level_enum lvl, const char* py_lvl, const Args&... args)
+    {
+        spdlog::details::log_msg log_msg(&name, lvl);
+        log_msg.raw.write(fmt, args...);
+        py_log(log_msg.raw.c_str(), py_lvl);
+    }
+
+    template <typename... Args> void trace(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "debug";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void debug(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "debug";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void info(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "info";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void warn(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "warn";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void error(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "error";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+    template <typename... Args> void critical(const std::string& name, const char* fmt, const Args&... args) {
+        const char* py_lvl = "critical";
+        py_fmt_log(name, fmt, spdlog::level::trace, py_lvl, args...);
+    }
+
+    template <typename T> void py_log(const T& msg, const char* py_lvl)
+    {
+        PyObject* py_msg_arg = Py_BuildValue("s", msg);
+        const char* fmt = "O";
+        if (Py_IsInitialized())
+        {
+            if (py_logger == nullptr)
+            {
+                set_logger();
+            }
+            PyObject_CallMethod(py_logger, (char *)py_lvl, (char *)fmt, py_msg_arg);
+        }
+        Py_DECREF(py_msg_arg);
+    }
+
+    template <typename T> void trace(const T& msg) {
+        const char* py_lvl = "debug";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void debug(const T& msg) {
+        const char* py_lvl = "debug";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void info(const T& msg) {
+        const char* py_lvl = "info";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void warn(const T& msg) {
+        const char* py_lvl = "warn";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void error(const T& msg) {
+        const char* py_lvl = "error";
+        py_log(msg, py_lvl);
+    }
+    template <typename T> void critical(const T& msg) {
+        const char* py_lvl = "critical";
+        py_log(msg, py_lvl);
+    }
+
+
+private:
+    PyObject* py_logger = nullptr;
+};
 
 using ListCasterBase = pybind11::detail::list_caster<std::vector<ydk::path::SchemaNode *>, ydk::path::SchemaNode *>;
 namespace pybind11{ namespace detail {
@@ -554,13 +671,8 @@ PYBIND11_PLUGIN(ydk_)
     logging.def("EnableLogging", []()
                                  {
                                     Py_Initialize();
-                                    // throw away cpp logging records
-                                    auto ydk_logger = spdlog::get("ydk");
-                                    if (ydk_logger == nullptr)
-                                    {
-                                        auto null_sink = make_shared<spdlog::sinks::null_sink_st>();
-                                        spdlog::details::registry::instance().create("ydk", null_sink);
-                                    }
+                                    // initialize ydk logging callback TODO
+                                     ydk::set_logging_callback(log_python);
                                  });
 
     entity_utils.def("get_relative_entity_path", &ydk::get_relative_entity_path);

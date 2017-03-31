@@ -33,14 +33,12 @@ using namespace std;
 
 namespace ydk{
 
-string get_netconf_payload(path::DataNode* input, string data_value, string data_tag);
 static void walk_children(std::shared_ptr<Entity> entity, path::DataNode & rpc_input,
     path::RootSchemaNode & root_schema, std::string path);
 static void create_from_entity_path(std::shared_ptr<Entity> entity,
     path::DataNode & rpc_input, std::string path);
 static void create_from_children(std::map<string, std::shared_ptr<Entity>> & children,
     path::DataNode & rpc_input, path::RootSchemaNode & root_schema);
-static std::string get_data_payload(Entity& entity, path::RootSchemaNode& root_schema);
 shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 
 ExecutorService::ExecutorService()
@@ -84,7 +82,7 @@ static void walk_children(std::shared_ptr<Entity> entity, path::DataNode & rpc_i
 {
     if (entity != nullptr)
     {
-        std::map<string, std::shared_ptr<Entity>> & children = entity->get_children();
+        std::map<string, std::shared_ptr<Entity>> children = entity->get_children();
         auto entity_path = entity->get_entity_path(entity->parent);
         YLOG_DEBUG("Children count for: {} : {}", entity_path.path, children.size());
 
@@ -137,13 +135,6 @@ static void create_from_children(std::map<string, std::shared_ptr<Entity>> & chi
             rpc_input.create(child.first);
         }
     }
-}
-
-static std::string get_data_payload(Entity & entity, path::RootSchemaNode & root_schema)
-{
-    path::DataNode& data_node = get_data_node_from_entity(entity, root_schema);
-    path::CodecService codec{};
-    return codec.encode(data_node, ydk::EncodingFormat::XML, true);
 }
 
 shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)

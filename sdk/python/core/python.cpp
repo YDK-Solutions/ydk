@@ -72,7 +72,7 @@ public:
         );
     }
 
-    ydk::EntityPath get_entity_path(ydk::Entity* ancestor) const override {
+    const ydk::EntityPath get_entity_path(ydk::Entity* ancestor) const override {
         PYBIND11_OVERLOAD_PURE(
             ydk::EntityPath,
             ydk::Entity,
@@ -125,7 +125,7 @@ public:
         );
     }
 
-    ChildrenMap & get_children() override {
+    ChildrenMap get_children() const override {
         PYBIND11_OVERLOAD_PURE(
             ChildrenMap &,
             ydk::Entity,

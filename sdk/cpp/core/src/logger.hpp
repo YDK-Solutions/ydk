@@ -18,7 +18,7 @@
 #define _LOGGER_H_
 
 #include <memory>
-#include <string>
+#include <sstream>
 
 #include "spdlog/spdlog.h"
 #include "logging_callback.hpp"
@@ -43,17 +43,23 @@ class Logger
         ~Logger()
         {
         }
-
+        #define _STRINGIFY(x) #x
+        #define STRINGIFY(x) _STRINGIFY(x)
         #define YDKLOGLEVELARGS(loglevel) \
         template <typename... Args> \
         void loglevel(const char* fmt, const Args&... args) \
         { \
-            logging_callback func = get_logging_callback();\
+            logging_callback func = get_logging_callback(STRINGIFY(loglevel)); \
             if(func != nullptr) \
-            { \
-                (*func)(1, fmt); //TODO the level needs to be set correctly and formatted string needs to be passed \
-                return;\
-            } \
+                { \
+                    std::stringstream buffer; \
+                    write_fmt_msg<Args...>(internal_logger->name(), \
+                                           STRINGIFY(loglevel), \
+                                           fmt, \
+                                           buffer, \
+                                           args...); \
+                    func(buffer.str().c_str()); \
+                } \
             if(!lazy_check()) { return; } \
             internal_logger->loglevel<Args...>(fmt, args...); \
         }
@@ -62,12 +68,8 @@ class Logger
         template <typename T> \
         void loglevel(const T& msg) \
         { \
-            logging_callback func = get_logging_callback();\
-            if(func != nullptr) \
-            { \
-                (*func)(1, msg.c_str()); //TODO the level needs to be set correctly and formatted string needs to be passed\
-                return;\
-            } \
+            logging_callback func = get_logging_callback(STRINGIFY(loglevel)); \
+            if(func != nullptr) { func(msg); } \
             if(!lazy_check()) { return; } \
             internal_logger->loglevel<T>(msg); \
         }
@@ -88,6 +90,8 @@ class Logger
 
         #undef YDKLOGLEVELARGS
         #undef YDKLOGLEVELNOARGS
+        #undef _STRINGIFY
+        #undef STRINGIFY
 
     private:
         bool lazy_check()

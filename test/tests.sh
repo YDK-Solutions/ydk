@@ -426,7 +426,7 @@ init_rest_server
 
 py_tests
 cpp_tests
-test_gen_tests
+# test_gen_tests
 cd $YDKGEN_HOME
 print_msg "gathering cpp coverage"
 print_msg "combining python coverage"

@@ -238,7 +238,6 @@ find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_package(LibXml2 REQUIRED)
 find_package(LibSSH REQUIRED)
-find_package(PythonLibs REQUIRED)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)
@@ -324,7 +323,6 @@ include_directories(
     ${libyang_headers_location}
     ${libyang_location}/headers
     ${PROJECT_SOURCE_DIR}/src
-    ${PYTHON_INCLUDE_PATH}
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -342,7 +340,6 @@ target_link_libraries(ydk
     ${dl_location}
     libnetconf
     libyang
-    ${PYTHON_LIBRARIES}
 )
 
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)

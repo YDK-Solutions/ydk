@@ -25,9 +25,9 @@ class ExecutorService(_ExecutorService):
     def __init__(self):
         self._es = _ExecutorService()
 
-    def execute_rpc(self, provider, entity):
+    def execute_rpc(self, provider, entity, top_entity=None):
         if None in (provider, entity):
             raise _YPYServiceError("provider and entity cannot be None")
 
         with _handle_error():
-            return self._es.execute_rpc(provider, entity)
+            return self._es.execute_rpc(provider, entity, top_entity)

@@ -28,7 +28,7 @@ from ydkgen.builder import TypesExtractor
 def get_leafs(clazz):
     leafs = []
     for child in clazz.owned_elements:
-        if child.stmt.keyword == 'leaf':
+        if child.stmt.keyword in ('leaf', 'anyxml'):
             leafs.append(child)
     return leafs
 

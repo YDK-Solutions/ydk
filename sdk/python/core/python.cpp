@@ -486,7 +486,8 @@ PYBIND11_PLUGIN(ydk_)
 
     class_<ydk::ExecutorService>(services, "ExecutorService")
         .def(init<>())
-        .def("execute_rpc", &ydk::ExecutorService::execute_rpc, arg("provider"), arg("entity"));
+        .def("execute_rpc", &ydk::ExecutorService::execute_rpc, arg("provider"), arg("entity"),
+            arg("top_entity") = nullptr);
 
     class_<ydk::NetconfService>(services, "NetconfService")
         .def(init<>())

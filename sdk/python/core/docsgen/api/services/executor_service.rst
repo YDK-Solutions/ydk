@@ -12,12 +12,13 @@ YDK Executor service provides functionality to execute RPCs
 
         Executor Service class for supporting execution of RPCs.
 
-        .. py:method:: execute_rpc(self, provider, entity):
+        .. py:method:: execute_rpc(self, provider, rpc_entity, top_entity=None):
 
                 Create the entity
 
                 :param provider: An instance of ydk.providers.ServiceProvider
-                :param entity: An instance of an RPC class defined under the ydk.models package or subpackages
+                :param rpc_entity: An instance of an RPC class defined under the ydk.models package or subpackages
+                :param top_entity: Optional arg that should be provided when expecting data to be returned
 
                 :return: None
 

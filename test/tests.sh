@@ -172,7 +172,7 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_sanity_levels.py
     run_test sdk/python/core/tests/test_sanity_netconf.py
     run_test sdk/python/core/tests/test_sanity_path.py
-#    run_test sdk/python/core/tests/test_sanity_rpc.py
+    run_test sdk/python/core/tests/test_sanity_executor_rpc.py
 #    run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py

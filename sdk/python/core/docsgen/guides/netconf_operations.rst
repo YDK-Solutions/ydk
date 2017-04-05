@@ -3,7 +3,7 @@
 NETCONF operations
 ==================
 
-This document explains how to use :py:class:`EditOperation<ydk.types.EditOperation>` as defined under netconf
+This document explains how to use :py:class:`YOperation<ydk.types.YOperation>` as defined under netconf
 edit-config operation attribute in
 `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_. This guide
 assumes you have ``core`` and ``openconfig`` bundle installed(see :ref:`howto-install`).
@@ -15,7 +15,7 @@ Let's instantiate an instance of the service provider that creates a NETCONF ses
 .. code-block:: python
     :linenos:
 
-    from ydk.types import EditOperation
+    from ydk.types import YOperation
     from ydk.services import CRUDService
     from ydk.providers import NetconfServiceProvider
     from ydk.models.openconfig import openconfig_bgp as oc_bgp
@@ -78,7 +78,7 @@ Let's use :py:meth:`CRUDService<ydk.services.CRUDService.create>` to create conf
     config_bgp(bgp_cfg)
     crud.create(provider, bgp_cfg)
 
-After configuration is created, let's use :py:attr:`EditOperation.replace<ydk.types.EditOperation.replace>` and :py:meth:`CRUDService<ydk.services.CRUDService.update>` to udpate configuration:
+After configuration is created, let's use :py:attr:`YOperation.replace<ydk.types.YOperation.replace>` and :py:meth:`CRUDService<ydk.services.CRUDService.update>` to udpate configuration:
 
 .. code-block:: python
     :linenos:
@@ -86,7 +86,7 @@ After configuration is created, let's use :py:attr:`EditOperation.replace<ydk.ty
 
     bgp_cfg.neighbors.neighbor[0].config.neighbor_address = "172.16.255.3"
     bgp_cfg.neighbors.neighbor[0].neighbor_address = "172.16.255.3"
-    bgp_cfg.neighbors.neighbor[0].operation = EditOperation.replace
+    bgp_cfg.neighbors.neighbor[0].operation = YOperation.replace
     crud.update(provider, bgp_cfg)
 
 

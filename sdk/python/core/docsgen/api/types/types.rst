@@ -102,11 +102,15 @@ and :class:`~YType`.
 YDK types
 ---------
 
-.. class:: EditOperation
+.. class:: YOperation
 
     Represents edit operation for YDK objects as specified in
     `NETCONF RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_,
-    defaults to ``not_set``.
+    defaults to ``not_set``, and  ``read`` operation providing functionality
+    to read a singal leaf.
+    Operations as defined under netconf edit-config operation attribute in
+    `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and for
+    filtering read operations by leaf to be used with various :py:class:`YDK services<ydk.services>` and :py:class:`entities<ydk.path.Entity>`.
 
     .. attribute:: create
 
@@ -154,6 +158,12 @@ YDK types
         parameter.  If no such configuration data exists in the
         configuration datastore, it is created.
 
+    .. attribute:: read
+
+        When reading configuration or operational data from a network
+        device and a specific leaf is desired to be read, the operation can
+        be set to ``read`` on that leaf. See example :ref:`below<read-filter>`.
+
 .. class:: EncodingFormat
 
     Enum class for encoding format.
@@ -172,7 +182,7 @@ YDK types
 
     .. py:attribute:: operation
 
-        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.EditOperation>`, see :ref:`netconf-operations`.
+        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
 
 .. class:: YLeaf
 
@@ -180,7 +190,7 @@ YDK types
 
     .. py:attribute:: operation
 
-        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.EditOperation>`, see :ref:`netconf-operations`.
+        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
 
     .. py:method:: __init__(self, leaf_type, name)
 
@@ -368,3 +378,24 @@ Examples of appending values to leaf-lists are shown below:
     bits_value["first-position"] = True                                     # bits
     bits_value["first-position"] = False                                    # bits
     node.bits_values.append(bits_value)                                     # bits, node is a dummy container
+
+.. _read-filter:
+
+An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifically, the `as number` leaf) under :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` is shown below
+
+.. code-block:: c++
+  :linenos:
+  :lineno-start: 1
+
+  # Instantiate a bgp object representing the bgp container from the openconfig-bgp YANG model
+  bgp = ydk.models.openconfig_bgp.Bgp()
+
+  # Indicate that the `as number` is desried to be read
+  bgp.config.as_.operation = YOperation.read
+
+  # Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1
+  CrudService crud_service{};
+  NetconfServiceProvider provider{"10.0.0.1", "test", "test", 830};
+
+  # Invoke the CRUD Read method
+  crud_service.read(provider, bgp);

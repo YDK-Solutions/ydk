@@ -325,20 +325,21 @@ PYBIND11_PLUGIN(ydk_)
         .value("bits", ydk::YType::bits)
         .value("decimal64", ydk::YType::decimal64);
 
-    enum_<ydk::EditOperation>(types, "EditOperation")
-        .value("merge", ydk::EditOperation::merge)
-        .value("create", ydk::EditOperation::create)
-        .value("remove", ydk::EditOperation::remove)
-        .value("delete", ydk::EditOperation::delete_)
-        .value("replace", ydk::EditOperation::replace)
-        .value("not_set", ydk::EditOperation::not_set);
+    enum_<ydk::YOperation>(types, "YOperation")
+        .value("merge", ydk::YOperation::merge)
+        .value("create", ydk::YOperation::create)
+        .value("remove", ydk::YOperation::remove)
+        .value("delete", ydk::YOperation::delete_)
+        .value("replace", ydk::YOperation::replace)
+        .value("read", ydk::YOperation::read)
+        .value("not_set", ydk::YOperation::not_set);
 
     class_<ydk::Empty>(types, "Empty")
         .def(init<>())
         .def_readwrite("set", &ydk::Empty::set);
 
     class_<ydk::LeafData>(types, "LeafData")
-        .def(init<string, ydk::EditOperation, bool>())
+        .def(init<string, ydk::YOperation, bool>())
         .def_readonly("value", &ydk::LeafData::value, return_value_policy::reference)
         .def_readonly("operation", &ydk::LeafData::operation, return_value_policy::reference)
         .def_readonly("is_set", &ydk::LeafData::is_set, return_value_policy::reference)
@@ -607,8 +608,12 @@ PYBIND11_PLUGIN(ydk_)
                                  });
 
     entity_utils.def("get_relative_entity_path", &ydk::get_relative_entity_path);
-    entity_utils.def("get_data_node_from_entity", &ydk::get_data_node_from_entity, return_value_policy::reference);
     entity_utils.def("get_entity_from_data_node", &ydk::get_entity_from_data_node);
+    #if defined(PYBIND11_OVERLOAD_CAST)
+    entity_utils.def("get_data_node_from_entity", overload_cast<ydk::Entity&, ydk::path::RootSchemaNode&>(&ydk::get_data_node_from_entity), return_value_policy::reference);
+    #else
+    entity_utils.def("get_data_node_from_entity", static_cast<ydk::path::DataNode& (*)(ydk::Entity&, ydk::path::RootSchemaNode&)>(&ydk::get_data_node_from_entity), return_value_policy::reference);
+    #endif
 
     ydk.def("is_set", &ydk::is_set);
 

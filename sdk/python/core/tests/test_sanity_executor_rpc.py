@@ -32,7 +32,6 @@ from ydk.services import ExecutorService, CodecService
 from ydk.types import Empty, EncodingFormat
 
 class SanityTest(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):
@@ -131,10 +130,11 @@ class SanityTest(unittest.TestCase):
     def test_get_config_rpc(self):
         get_config_rpc = ietf_netconf.GetConfigRpc()
         get_config_rpc.input.source.candidate = Empty()
+        filter_xml = self.cs.encode(self.csp, ysanity.Runner())
+        get_config_rpc.input.filter = filter_xml
 
         runner = ysanity.Runner()
         initial_candidate_data = self.es.execute_rpc(self.ncc, get_config_rpc, runner)
-        self.assertIsNotNone(initial_candidate_data)
 
         runner = ysanity.Runner()
         runner.two.number = 2
@@ -150,7 +150,7 @@ class SanityTest(unittest.TestCase):
         self.assertIsNotNone(final_candidate_data)
 
         self.assertNotEqual(initial_candidate_data, final_candidate_data)
-        self.assertFalse(initial_candidate_data.two.name.is_set)
+        self.assertEqual(initial_candidate_data, None)
         self.assertEqual(runner.two.name, final_candidate_data.two.name)
 
     @unittest.skip('YCPPServiceProviderError')
@@ -220,9 +220,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityNetconf.PROVIDER_TYPE = sys.argv.pop()
-
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityNetconf)
+    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

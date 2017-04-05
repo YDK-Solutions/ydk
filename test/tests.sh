@@ -52,6 +52,7 @@ function run_test {
     print_msg "executing $@"
     coverage run --source=ydkgen,sdk,generate --branch --parallel-mode $@ > /dev/null
     local status=$?
+    print_msg "status is ${status}"
     if [ $status -ne 0 ]; then
         exit $status
     fi
@@ -172,10 +173,10 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_sanity_levels.py
     run_test sdk/python/core/tests/test_sanity_netconf.py
     run_test sdk/python/core/tests/test_sanity_path.py
-    run_test sdk/python/core/tests/test_sanity_executor_rpc.py
 #    run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
+    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 }
 
 function py_sanity_deviation {

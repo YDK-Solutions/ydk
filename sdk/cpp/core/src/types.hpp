@@ -29,6 +29,7 @@
 #define _TYPES_HPP_
 
 #include <map>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -80,6 +81,8 @@ class LeafData
 
     bool operator == (LeafData & other) const;
     bool operator == (const LeafData & other) const;
+    friend std::ostream& operator<<(std::ostream& stream, const LeafData& value);
+
 
   public:
     std::string value;

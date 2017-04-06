@@ -127,32 +127,6 @@ class SanityTest(unittest.TestCase):
         self.assertEqual(reply.one.number, runner.one.number)
         self.assertEqual(reply.one.name, runner.one.name)
 
-    def test_get_config_rpc(self):
-        get_config_rpc = ietf_netconf.GetConfigRpc()
-        get_config_rpc.input.source.candidate = Empty()
-        filter_xml = self.cs.encode(self.csp, ysanity.Runner())
-        get_config_rpc.input.filter = filter_xml
-
-        runner = ysanity.Runner()
-        initial_candidate_data = self.es.execute_rpc(self.ncc, get_config_rpc, runner)
-
-        runner = ysanity.Runner()
-        runner.two.number = 2
-        runner.two.name = 'runner:two:name'
-        runner_xml = self.cs.encode(self.csp, runner)
-
-        edit_rpc = ietf_netconf.EditConfigRpc()
-        edit_rpc.input.target.candidate = Empty()
-        edit_rpc.input.config = runner_xml
-        reply = self.es.execute_rpc(self.ncc, edit_rpc)
-
-        final_candidate_data = self.es.execute_rpc(self.ncc, get_config_rpc, runner)
-        self.assertIsNotNone(final_candidate_data)
-
-        self.assertNotEqual(initial_candidate_data, final_candidate_data)
-        self.assertEqual(initial_candidate_data, None)
-        self.assertEqual(runner.two.name, final_candidate_data.two.name)
-
     @unittest.skip('YCPPServiceProviderError')
     def test_kill_session(self):
         rpc = ietf_netconf.KillSessionRpc()

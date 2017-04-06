@@ -247,6 +247,8 @@ TEST_CASE("delete_leaf")
 
 	//DELETE
 	ydktest_sanity::Runner r_2{};
+	// need to specify a value to construct correct NETCONF payload
+	r_2.ytypes->built_in_t->number8 = 10;
 	r_2.ytypes->built_in_t->number8.operation = YOperation::delete_;
 	reply = crud.update(provider, r_2);
 	REQUIRE(reply);

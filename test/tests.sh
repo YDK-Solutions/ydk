@@ -168,12 +168,12 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_restconf_provider.py
     run_test sdk/python/core/tests/test_sanity_delete.py
     run_test sdk/python/core/tests/test_sanity_errors.py
-#    run_test sdk/python/core/tests/test_sanity_filter_read.py
-#    run_test sdk/python/core/tests/test_sanity_filters.py
+    run_test sdk/python/core/tests/test_sanity_filter_read.py
+    run_test sdk/python/core/tests/test_sanity_filters.py
     run_test sdk/python/core/tests/test_sanity_levels.py
     run_test sdk/python/core/tests/test_sanity_netconf.py
     run_test sdk/python/core/tests/test_sanity_path.py
-#    run_test sdk/python/core/tests/test_sanity_service_errors.py
+    run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py

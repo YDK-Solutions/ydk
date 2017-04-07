@@ -274,8 +274,6 @@ class SanityYang(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityYang.PROVIDER_TYPE = sys.argv.pop()
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

@@ -18,9 +18,9 @@ from __future__ import absolute_import
 import re
 import unittest
 
-from ydk.services import CRUDService, DataStore
+from ydk.services import CRUDService, DataStore, ExecutorService, CodecService, NetconfService
 from ydk.models.ydktest import ydktest_sanity as ysanity
-from ydk.providers import NetconfServiceProvider
+from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.types import Empty, Decimal64, EncodingFormat
 from ydk.errors import YPYServiceError
 from test_utils import assert_with_error
@@ -35,8 +35,6 @@ from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnu
 class SanityCodec(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        from ydk.providers import CodecServiceProvider
-        from ydk.services import CodecService
         self.codec = CodecService()
         self.provider = CodecServiceProvider(type=EncodingFormat.XML)
 
@@ -220,30 +218,23 @@ class SanityCRUD(unittest.TestCase):
 
 
 class SanityExecutor(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):
-        if SanityExecutor.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
+        self.ncc = NetconfServiceProvider(address='127.0.0.1',
+                                          username='admin',
+                                          password='admin',
+                                          protocol='ssh',
+                                          port=12022)
         self.executor = ExecutorService()
+        self.codec = CodecService()
+        self.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
 
     @classmethod
     def tearDownClass(self):
-        self.ncc.close()
+        pass
 
     def setUp(self):
-        from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
@@ -258,11 +249,12 @@ class SanityExecutor(unittest.TestCase):
 
         edit_rpc = ietf_netconf.EditConfigRpc()
         edit_rpc.input.target.candidate = Empty()
-        edit_rpc.input.config = runner
+        runner_xml = self.codec.encode(self.codec_provider, runner)
+        edit_rpc.input.config = runner_xml
         try:
             op = self.executor.execute_rpc(None, edit_rpc)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'rpc' cannot be None"
+            expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not raised')
@@ -271,7 +263,7 @@ class SanityExecutor(unittest.TestCase):
         try:
             op = self.executor.execute_rpc(self.ncc, None)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'rpc' cannot be None"
+            expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not raised')
@@ -280,7 +272,7 @@ class SanityExecutor(unittest.TestCase):
         try:
             op = self.executor.execute_rpc(None, None)
         except YPYServiceError as err:
-            expected_msg = "'provider' and 'rpc' cannot be None"
+            expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not raised')
@@ -289,9 +281,6 @@ class SanityNetconf(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        from ydk.providers import NetconfServiceProvider
-        from ydk.services import NetconfService
-
         self.ncc = NetconfServiceProvider(address='127.0.0.1',
                                           username='admin',
                                           password='admin',
@@ -304,7 +293,6 @@ class SanityNetconf(unittest.TestCase):
         pass
 
     def setUp(self):
-        from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
@@ -352,7 +340,7 @@ class SanityNetconf(unittest.TestCase):
                 self.ncc, target=DataStore.candidate, source=DataStore.running, with_defaults_option=1)
         except TypeError as err:
             expected_msg = "copy_config() got an unexpected keyword argument 'with_defaults_option'"
-            self.assertEqual(err.message, expected_msg)
+            self.assertEqual(err.args[0], expected_msg)
         else:
             raise Exception('YPYServiceError not raised')
 
@@ -399,7 +387,7 @@ class SanityNetconf(unittest.TestCase):
             op = self.netconf_service.edit_config(self.ncc, DataStore.candidate, runner, default_operation=1)
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: unicode=u'', test_option: unicode=u'', error_option: unicode=u''\) -> bool
+    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, DataStore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, 1, '', ''"""
             res = re.match(expected_msg, err.message.strip())
@@ -413,7 +401,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             op = self.netconf_service.edit_config(self.ncc, DataStore.candidate, runner, error_option=1)
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: unicode=u'', test_option: unicode=u'', error_option: unicode=u''\) -> bool
+    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, DataStore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', '', 1"""
             res = re.match(expected_msg, err.message.strip())
@@ -427,7 +415,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             op = self.netconf_service.edit_config(self.ncc, DataStore.candidate, runner, test_option=1)
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
-    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: unicode=u'', test_option: unicode=u'', error_option: unicode=u''\) -> bool
+    1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.DataStore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, DataStore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', 1, ''"""
             res = re.match(expected_msg, err.message.strip())
@@ -457,7 +445,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             result = self.netconf_service.get_config(self.ncc, DataStore.candidate, get_filter, with_defaults_option=1)
         except TypeError as err:
             expected_msg = "get_config() got an unexpected keyword argument 'with_defaults_option'"
-            self.assertEqual(err.message, expected_msg)
+            self.assertEqual(err.args[0], expected_msg)
         else:
             raise Exception('TypeError not raised')
 
@@ -482,7 +470,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             self.assertEqual(is_equal(runner, result), True)
         except TypeError as err:
             expected_msg = "get() got an unexpected keyword argument 'with_defaults_option'"
-            self.assertEqual(err.message, expected_msg)
+            self.assertEqual(err.args[0], expected_msg)
         else:
             raise Exception('TypeError not raised')
 
@@ -517,16 +505,17 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        provider_type = sys.argv.pop()
-    else:
-        provider_type = "non-native"
-
     loader = unittest.TestLoader()
+    suite = unittest.TestSuite()
     testCaseList = []
-    for testCase in [SanityCRUD, SanityExecutor, SanityMeta, SanityNetconf]:
-        testCase.PROVIDER_TYPE = provider_type
+    for testCase in [SanityCRUD, SanityExecutor, SanityNetconf, SanityCodec]:
         testCaseList.append(loader.loadTestsFromTestCase(testCase))
     suite = unittest.TestSuite(testCaseList)
-    ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
-    sys.exit(ret)
+    res=unittest.TextTestRunner(verbosity=2).run(suite)
+    # sys.exit expects an integer, will throw libc++ abi error if use:
+    # ret = res.wasSuccessful() # <-- ret is a bool
+    # sys.exit(ret)
+    if not res.wasSuccessful():
+        sys.exit(1)
+    else:
+        sys.exit(0)

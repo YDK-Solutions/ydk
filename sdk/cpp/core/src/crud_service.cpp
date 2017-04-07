@@ -138,6 +138,7 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
         ostringstream os{};
         xmlNodePtr n = node;
         xmlXPathContextPtr xpathCtx = xmlXPathNewContext((xmlDocPtr)node);
+        os<<leaf_name<<"/";
         while(n && n->parent)
         {
             os<<n->name<<"/";
@@ -173,12 +174,19 @@ static string get_data_payload(Entity & entity, path::ServiceProvider & provider
         for(auto & leaf_operation : leaf_operations)
         {
             modify_xml_tree(root, leaf_operation.first, leaf_operation.second.first, leaf_operation.second.second);
-            xmlChar *s;
-            int size;
-            xmlDocDumpMemory(doc, &s, &size);
-            string path{reinterpret_cast<char*>(s)};
+        }
+        xmlBufferPtr buf = xmlBufferCreate();
+        if (buf != NULL)
+        {
+            xmlNodeDump(buf, doc, root, 0, 1);
+            payload.clear();
+            string path{reinterpret_cast<char*>(buf->content)};
             payload = path;
-            xmlFree(s);
+            xmlBufferFree(buf);
+        }
+        else
+        {
+            YLOG_ERROR("Error creating the xml buffer");
         }
 	}
 	return payload;

@@ -129,6 +129,7 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path, 
         else if(is_set(leaf_data.operation))
         {
             ostringstream os{};
+            os<<name_value.first<<"/";
             const path::DataNode* n = &data_node;
             while(n && n->parent())
             {
@@ -144,17 +145,26 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path, 
 static void add_annotation_to_datanode(const Entity & entity, path::DataNode & data_node)
 {
 	YLOG_DEBUG("Got operation '{}' for {}", to_string(entity.operation), entity.yang_name);
-	data_node.add_annotation(
-							 get_annotation(entity.operation)
-							 );
+	if (entity.operation != YOperation::read)
+	{
+		data_node.add_annotation(
+								 get_annotation(entity.operation)
+								 );
+		YLOG_DEBUG("Set operation '{}' for {}", to_string(entity.operation), entity.yang_name);
+
+	}
 }
 
 static void add_annotation_to_datanode(const std::pair<std::string, LeafData> & name_value, path::DataNode & data_node)
 {
 	YLOG_DEBUG("Got operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
-	data_node.add_annotation(
-							 get_annotation(name_value.second.operation)
-							 );
+	if (name_value.second.operation != YOperation::read)
+	{
+		data_node.add_annotation(
+								 get_annotation(name_value.second.operation)
+								 );
+		YLOG_DEBUG("Set operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
+	}
 }
 
 static path::Annotation get_annotation(YOperation operation)

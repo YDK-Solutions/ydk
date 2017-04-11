@@ -33,10 +33,7 @@ NMSP_PKG_DEPENDENCIES = ["$DEPENDENCY$"]
 # Namespace packages are share same prefix: "ydk-models"
 NAME = 'ydk'
 VERSION = '0.5.4'
-INSTALL_REQUIREMENTS = ['enum34==1.1.3',
-                        'lxml==3.4.4',
-                        'ncclient>=0.4.7',
-                        'pybind11>=2.1.0']
+INSTALL_REQUIREMENTS = ['pybind11>=2.1.0']
 
 
 LONG_DESCRIPTION = '''

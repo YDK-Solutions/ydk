@@ -137,7 +137,6 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
     {
         ostringstream os{};
         xmlNodePtr n = node;
-        xmlXPathContextPtr xpathCtx = xmlXPathNewContext((xmlDocPtr)node);
         os<<leaf_name<<"/";
         while(n && n->parent)
         {

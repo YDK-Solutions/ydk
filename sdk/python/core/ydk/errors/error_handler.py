@@ -102,7 +102,7 @@ def check_argument(func):
     def helper(self, provider, entity, *args):
         _, pname, ename = inspect.getargspec(func).args[:3]
         if provider is None or entity is None:
-            raise _YPYServiceError("'{0}' and '{1}' cannot be None"
-                                   .format(pname, ename))
+            err_msg = "'{0}' and '{1}' cannot be None".format(pname, ename)
+            raise _YPYServiceError(error_msg=err_msg)
         return func(self, provider, entity, *args)
     return helper

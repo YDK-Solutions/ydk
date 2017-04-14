@@ -92,7 +92,7 @@ class CodecServiceProvider(object):
 
         if bundle_name not in self._root_schema_table:
             self.logger.error("Root schema not created")
-            raise YPYServiceProviderError("Root schema not created")
+            raise YPYServiceProviderError(error_msg="Root schema not created")
 
         return self._root_schema_table[bundle_name]
 

@@ -50,4 +50,3 @@ class CRUDService(_CrudService):
     def delete(self, provider, entity):
         with _handle_error():
             return self._crud.delete(provider, entity)
-

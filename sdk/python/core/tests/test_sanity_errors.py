@@ -102,7 +102,10 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
+                                                    username='admin',
+                                                    password='admin',
+                                                    protocol='ssh',
         self.crud = CRUDService()
 
     @classmethod

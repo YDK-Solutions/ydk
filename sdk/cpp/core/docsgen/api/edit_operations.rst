@@ -1,11 +1,11 @@
-YDK Operations
+YDK Filters
 =================
 
 .. cpp:namespace:: ydk
 
-.. cpp:enum-class:: YOperation
+.. cpp:enum-class:: YFilter
 
-Operations as defined under netconf edit-config operation attribute in `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and for filtering read operations by leaf to be used with various :cpp:class:`YDK services<Service>` and :cpp:class:`entities<Entity>`.
+Filters as defined under netconf edit-config operation attribute in `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and read filters by leaf to be used with various :cpp:class:`YDK services<Service>` and :cpp:class:`entities<Entity>`.
 
         .. cpp:enumerator:: merge
         
@@ -59,12 +59,12 @@ Operations as defined under netconf edit-config operation attribute in `RFC 6241
 
         .. cpp:enumerator:: not_set
 
-            Default value to which all configuration data is initialized to, indicating no operation has been selected. If no operation is selected, ``merge`` is performed
+            Default value to which all configuration data is initialized to, indicating no filter has been selected. If no operation is selected, ``merge`` is performed
 
 Example usage
 ~~~~~~~~~~~~~~~
 
-An example of setting the operation for an :cpp:class:`entity<Entity>` (address family) under :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` is shown below
+An example of setting the filter for an :cpp:class:`entity<Entity>` (address family) under :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` is shown below
 
 .. code-block:: c++
   :linenos:
@@ -78,8 +78,8 @@ An example of setting the operation for an :cpp:class:`entity<Entity>` (address 
   // Set the key
   afi_safi->afi_safi_name = L3VpnIpv4UnicastIdentity();
 
-  // Set the operation to delete, which will delete this instance of the address family
-  afi_safi->operation = YOperation::delete_;
+  // Set the filter to delete, which will delete this instance of the address family
+  afi_safi->filter = YFilter::delete_;
 
   //Append the list instance to afi-safis's afi-safi field
   bgp.global->afi_safis->afi_safi.push_back(afi_safi);
@@ -101,7 +101,7 @@ An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifica
   ydk::openconfig_bgp::Bgp bgp{};
   
   // Indicate that the `as number` is desried to be read
-  bgp.config->as->operation = YOperation::read;
+  bgp.config->as->filter = YFilter::read;
 
 
   // Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1

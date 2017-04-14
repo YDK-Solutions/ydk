@@ -100,7 +100,7 @@ An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifica
   // Instantiate a bgp object representing the bgp container from the openconfig-bgp YANG model
   ydk::openconfig_bgp::Bgp bgp{};
   
-  // Indicate that the `as number` is desried to be read
+  // Indicate that the `as number` is desired to be read
   bgp.config->as->filter = YFilter::read;
 
 
@@ -110,4 +110,4 @@ An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifica
   
   // Invoke the CRUD Read method
   crud_service.read(provider, bgp);
-  
+

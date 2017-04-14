@@ -282,7 +282,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
                 YLOG_DEBUG("Cache hit deviation module name: {}", d);
             }
             if (!res) {
-                YLOG_WARNING("Unable to parse deviation module: {}. This model cannot be used with YDK.", d);
+                YLOG_WARN("Unable to parse deviation module: {}. This model cannot be used with YDK.", d);
                 continue;
             }
         }
@@ -299,7 +299,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
         }
 
         if (!p) {
-            YLOG_WARNING("Unable to parse module: {}. This model cannot be used with YDK", c.module);
+            YLOG_WARN("Unable to parse module: {}. This model cannot be used with YDK", c.module);
             continue;
         }
         for (auto f : c.features)

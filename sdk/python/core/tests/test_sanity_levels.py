@@ -31,7 +31,7 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
+        self.ncc = NetconfServiceProvider(address='127.0.0.1',
                                                     username='admin',
                                                     password='admin',
                                                     protocol='ssh',

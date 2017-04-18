@@ -13,7 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-from pkgutil import extend_path
 
-__path__ = extend_path(__path__, __name__)
+from ydk.ext.filters import YFilter
+
+merge = YFilter.merge
+create = YFilter.create
+remove = YFilter.remove
+delete = YFilter.delete
+replace = YFilter.replace
+read = YFilter.read
+not_set = YFilter.not_set
+
+__all__ = [ "merge",
+            "create",
+            "remove",
+            "delete",
+            "replace",
+            "read",
+            "not_set" ]
 

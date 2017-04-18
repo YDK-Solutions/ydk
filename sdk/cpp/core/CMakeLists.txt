@@ -101,6 +101,7 @@ set(libydk_install_headers
     src/entity_util.hpp
     src/errors.hpp
     src/executor_service.hpp
+    src/filters.hpp
     src/logging_callback.hpp
     src/netconf_provider.hpp
     src/network_topology.hpp

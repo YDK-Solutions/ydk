@@ -69,9 +69,9 @@ std::string get_relative_entity_path(const Entity* current_node, const Entity* a
 
 }
 
-bool is_set(const YOperation & operation)
+bool is_set(const YFilter & operation)
 {
-    return operation != YOperation::not_set;
+    return operation != YFilter::not_set;
 }
 
 }

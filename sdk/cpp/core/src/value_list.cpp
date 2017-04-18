@@ -57,17 +57,17 @@ std::string to_string(YType t)
 }
 
 YLeafList::YLeafList(YType type, std::string name)
-    : operation(YOperation::not_set), type(type), name(name)
+    : operation(YFilter::not_set), type(type), name(name)
 {
 }
 
 YLeafList::YLeafList(const YLeafList& other)
-    : operation(YOperation::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
+    : operation(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
 {
 }
 
 YLeafList::YLeafList(YLeafList&& other)
-    : operation(YOperation::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
+    : operation(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
 {
 }
 

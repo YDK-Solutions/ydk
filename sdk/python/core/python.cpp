@@ -24,6 +24,7 @@
 #include <ydk/entity_util.hpp>
 #include <ydk/entity_data_node_walker.hpp>
 #include <ydk/executor_service.hpp>
+#include <ydk/filters.hpp>
 #include <ydk/logging_callback.hpp>
 #include <ydk/netconf_service.hpp>
 #include <ydk/netconf_provider.hpp>
@@ -220,6 +221,7 @@ PYBIND11_PLUGIN(ydk_)
     module ydk("ydk_", "YDK module");
     module providers = ydk.def_submodule("providers", "providers module");
     module services = ydk.def_submodule("services", "services module");
+    module filters = ydk.def_submodule("filters", "filters module");
     module types = ydk.def_submodule("types", "types module");
     module path = ydk.def_submodule("path", "path module");
     module entity_utils = ydk.def_submodule("entity_utils", "path module");
@@ -304,6 +306,15 @@ PYBIND11_PLUGIN(ydk_)
         .value("startup", ydk::DataStore::startup)
         .value("url", ydk::DataStore::url);
 
+    enum_<ydk::YFilter>(filters, "YFilter")
+        .value("merge", ydk::YFilter::merge)
+        .value("create", ydk::YFilter::create)
+        .value("remove", ydk::YFilter::remove)
+        .value("delete", ydk::YFilter::delete_)
+        .value("replace", ydk::YFilter::replace)
+        .value("read", ydk::YFilter::read)
+        .value("not_set", ydk::YFilter::not_set);
+
     enum_<ydk::EncodingFormat>(types, "EncodingFormat")
         .value("XML", ydk::EncodingFormat::XML)
         .value("JSON", ydk::EncodingFormat::JSON);
@@ -325,21 +336,12 @@ PYBIND11_PLUGIN(ydk_)
         .value("bits", ydk::YType::bits)
         .value("decimal64", ydk::YType::decimal64);
 
-    enum_<ydk::YOperation>(types, "YOperation")
-        .value("merge", ydk::YOperation::merge)
-        .value("create", ydk::YOperation::create)
-        .value("remove", ydk::YOperation::remove)
-        .value("delete", ydk::YOperation::delete_)
-        .value("replace", ydk::YOperation::replace)
-        .value("read", ydk::YOperation::read)
-        .value("not_set", ydk::YOperation::not_set);
-
     class_<ydk::Empty>(types, "Empty")
         .def(init<>())
         .def_readwrite("set", &ydk::Empty::set);
 
     class_<ydk::LeafData>(types, "LeafData")
-        .def(init<string, ydk::YOperation, bool>())
+        .def(init<string, ydk::YFilter, bool>())
         .def_readonly("value", &ydk::LeafData::value, return_value_policy::reference)
         .def_readonly("operation", &ydk::LeafData::operation, return_value_policy::reference)
         .def_readonly("is_set", &ydk::LeafData::is_set, return_value_policy::reference)

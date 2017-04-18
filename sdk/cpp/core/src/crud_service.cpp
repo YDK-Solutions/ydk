@@ -127,7 +127,7 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 }
 
 static void modify_xml_tree(xmlNodePtr root, const string & data_path,
-        const string & leaf_name, YOperation operation)
+        const string & leaf_name, YFilter operation)
 {
     int i;
     xmlNodePtr node = NULL;
@@ -146,7 +146,7 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
         {
             YLOG_INFO("Setting leaf {} to operation {}", leaf_name, to_string(operation));
             xmlNodePtr child = xmlNewChild(node, NULL, (const unsigned char *)leaf_name.c_str(), NULL);
-            if(operation!=YOperation::read)
+            if(operation!=YFilter::read)
             {
                 xmlNewProp(child, (const unsigned char *)"operation", (const unsigned char *)(to_string(operation)).c_str());
             }
@@ -157,7 +157,7 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
 
 static string get_data_payload(Entity & entity, path::ServiceProvider & provider)
 {
-    map<string, pair<string, YOperation>> leaf_operations;
+    map<string, pair<string, YFilter>> leaf_operations;
 	const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema(), leaf_operations);
 
     const path::DataNode* dn = &datanode;

@@ -1,4 +1,8 @@
-/// YANG Development Kit
+//
+// @file types.hpp
+// @brief Header for ydk entity
+//
+// YANG Development Kit
 // Copyright 2016 Cisco Systems. All rights reserved
 //
 ////////////////////////////////////////////////////////////////
@@ -20,19 +24,23 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#ifndef ENTITY_UTIL_HPP
-#define ENTITY_UTIL_HPP
 
-#include <sstream>
-#include "types.hpp"
+#ifndef _FILTERS_HPP_
+#define _FILTERS_HPP_
 
 namespace ydk
 {
-class Entity;
-
-std::string get_relative_entity_path(const Entity* current_node, const Entity* ancestor, std::string path);
-bool is_set(const YFilter & operation);
-
+enum class YFilter
+{
+    merge,
+    create,
+    remove,
+    delete_,
+    replace,
+    read,
+    not_set
+};
 }
 
-#endif /* ENTITY_UTIL_HPP */
+#endif /* _FILTERS_HPP_ */
+

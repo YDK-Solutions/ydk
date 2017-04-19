@@ -18,7 +18,6 @@ from .py_types import Entity, YList, YLeafList
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
 from ydk.ext.types import Decimal64
-from ydk.ext.types import YOperation
 from ydk.ext.types import Empty
 from ydk.ext.types import EncodingFormat
 from ydk.ext.types import EntityPath
@@ -34,7 +33,6 @@ __all__ = [ "YList",
             "Bits",
             "ChildrenMap",
             "Decimal64",
-            "YOperation",
             "Empty",
             "EncodingFormat",
             "Entity",

@@ -24,7 +24,7 @@ import unittest
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
-from ydk.types import YOperation
+from ydk.filters import YFilter
 
 
 class SanityYang(unittest.TestCase):
@@ -56,7 +56,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
 
-        r_2.one.operation = YOperation.read
+        r_2.one.operation = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.one.number, r_2.one.number)
         self.assertEqual(r_1.one.name, r_2.one.name)
@@ -66,7 +66,7 @@ class SanityYang(unittest.TestCase):
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
-        r_2.one.number.operation = YOperation.read
+        r_2.one.number.operation = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_2.one.number, r_1.one.number)
 
@@ -89,7 +89,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value.operation = YOperation.read
+        r_2.enum_value.operation = YFilter.read
         # r_2 = self.crud.read(self.ncc, r_2)
         # self.assertEqual(r_1.enum_value, r_2.enum_value)
         # TODO: CRUD read using non top entity for YANG enum
@@ -118,7 +118,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner.OneList()
-        # r_2.ldata.operation = YOperation.read
+        # r_2.ldata.operation = YFilter.read
         # r_2 = self.crud.read(self.ncc, r_2)
         # TODO: CRUD read using non top entity for YANG list
         runner_read = self.crud.read(self.ncc, ysanity.Runner())
@@ -175,11 +175,11 @@ class SanityYang(unittest.TestCase):
         r_1.identity_ref_value = ysanity.ChildIdentityIdentity()
         self.crud.create(self.ncc, r_1)
         # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # r_2.identity_ref_value.operation = YOperation.read
+        # r_2.identity_ref_value.operation = YFilter.read
         # r_2 = self.crud.read(self.ncc, r_2)
         # TODO: CRUD read using non top entity for identity ref class
         runner_read = ysanity.Runner()
-        runner_read.ytypes.built_in_t.identity_ref_value.operation = YOperation.read
+        runner_read.ytypes.built_in_t.identity_ref_value.operation = YFilter.read
         runner_read = self.crud.read(self.ncc, runner_read)
         self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
@@ -197,8 +197,8 @@ class SanityYang(unittest.TestCase):
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2, r_3 = ysanity.Runner(), ysanity.Runner()
-        r_2.one.number.operation = YOperation.read
-        r_3.one.number.operation = YOperation.read
+        r_2.one.number.operation = YFilter.read
+        r_3.one.number.operation = YFilter.read
 
         r_2 = self.crud.read_config(self.ncc, r_2)
         r_3 = self.crud.read(self.ncc, r_3)

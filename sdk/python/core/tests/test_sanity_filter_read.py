@@ -20,7 +20,7 @@ read API according to discussion
 from __future__ import absolute_import
 
 import unittest
-from ydk.types import YOperation
+from ydk.filters import YFilter
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_filterread as ysanity
 from ydk.models.ydktest import oc_pattern
@@ -132,7 +132,7 @@ class SanityYang(unittest.TestCase):
     def test_CASE3(self):
         """Assign a READ object to `a.a1` should only return data on this leaf."""
         a = ysanity.A()
-        a.a1.operation = YOperation.read
+        a.a1.operation = YFilter.read
         a_read = self.crud.read(self.ncc, a)
         preconfig_a = ysanity.A()
         preconfig_a.a1 = "some value"

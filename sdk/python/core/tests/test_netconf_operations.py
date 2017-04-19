@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------
 
 """test_netconf_operations.py
-test YOperation
+test YFilter
 """
 from __future__ import absolute_import
 
@@ -25,7 +25,7 @@ from ydk.errors import YPYServiceProviderError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService, DataStore
-from ydk.types import YOperation
+from ydk.filters import YFilter
 
 from test_utils import assert_with_error
 
@@ -120,7 +120,7 @@ class SanityTest(unittest.TestCase):
         # REPLACE
         runner = runner_create
         runner.ytypes.built_in_t.number8 = 25
-        runner.operation = YOperation.replace
+        runner.operation = YFilter.replace
         self.crud.update(self.ncc, runner)
 
         runner_read = self.crud.read(self.ncc, runner_empty)
@@ -134,10 +134,10 @@ class SanityTest(unittest.TestCase):
         e_2 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
         e_1.name = 'foo'
-        e_1.operation = YOperation.create
+        e_1.operation = YFilter.create
         e_2.number = 2
         e_2.name = 'bar'
-        e_2.operation = YOperation.create
+        e_2.operation = YFilter.create
         runner.one_list.ldata.extend([e_1, e_2])
         self.crud.update(self.ncc, runner)
 
@@ -151,10 +151,10 @@ class SanityTest(unittest.TestCase):
         e_2 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
         e_1.name = 'foo'
-        e_1.operation = YOperation.create
+        e_1.operation = YFilter.create
         e_2.number = 2
         e_2.name = 'bar'
-        e_2.operation = YOperation.create
+        e_2.operation = YFilter.create
         runner.one_list.ldata.extend([e_1, e_2])
         self.crud.update(self.ncc, runner)
 
@@ -162,7 +162,7 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         e_1 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
-        e_1.operation = YOperation.delete
+        e_1.operation = YFilter.delete
         runner.one_list.ldata.append(e_1)
         self.crud.update(self.ncc, runner)
 
@@ -172,12 +172,12 @@ class SanityTest(unittest.TestCase):
     def test_remove(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number8 = 25
-        runner.operation = YOperation.merge
+        runner.operation = YFilter.merge
         self.crud.update(self.ncc, runner)
 
         # REMOVE
         runner = ysanity.Runner()
-        runner.operation = YOperation.remove
+        runner.operation = YFilter.remove
         self.crud.update(self.ncc, runner)
 
         # REMOVE AGAIN WITH NO ERROR
@@ -190,7 +190,7 @@ class SanityTest(unittest.TestCase):
 
         # MERGE
         runner.ytypes.built_in_t.number8 = 32
-        runner.operation = YOperation.merge
+        runner.operation = YFilter.merge
         self.crud.update(self.ncc, runner)
 
         runner_empty = ysanity.Runner()
@@ -205,7 +205,7 @@ class SanityTest(unittest.TestCase):
         self.crud.create(self.ncc, runner)
 
         # DELETE
-        runner.ytypes.built_in_t.number8.operation = YOperation.delete
+        runner.ytypes.built_in_t.number8.operation = YFilter.delete
         self.crud.update(self.ncc, runner)
 
         # DELETE AGAIN WITH ERROR
@@ -218,7 +218,7 @@ class SanityTest(unittest.TestCase):
         self.crud.create(self.ncc, runner)
 
         # DELETE
-        runner.ytypes.built_in_t.enum_llist.operation = YOperation.delete
+        runner.ytypes.built_in_t.enum_llist.operation = YFilter.delete
         self.crud.update(self.ncc, runner)
 
         # DELETE AGAIN WITH ERROR

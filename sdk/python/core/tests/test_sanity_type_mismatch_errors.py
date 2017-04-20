@@ -31,7 +31,7 @@ from test_utils import assert_with_error
 
 test_invalid_class_assignment_int_pattern = "Invalid value '1' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
 test_invalid_class_assignment_str_pattern = "Invalid value 'haha' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
-test_invalid_class_assignment_identity_pattern = "Invalid value '<ydk.models.ydktest.ydktest_sanity_types.AnotherOneIdentity object at [0-9a-z]+>' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
+test_invalid_class_assignment_identity_pattern = "Invalid value '<ydk.models.ydktest.ydktest_sanity_types.AnotherOne object at [0-9a-z]+>' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
 test_invalid_class_assignment_enum_pattern = "Invalid value 'ydk.types.Enum.YLeaf\(none\)' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
 test_invalid_class_assignment_ylist_pattern = "Invalid value '\[<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*Ldata object at [0-9a-z]+>\]' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>"
 test_invalid_class_assignment_yleaflist_pattern = "Invalid value 'YLeafList\('llstring', \[0, 1, 2, 3, 4\]\)' in '<ydk.models.ydktest.ydktest_sanity.[a-zA-Z\.]*One object at [0-9a-z]+>'"
@@ -76,13 +76,13 @@ class SanityYang(unittest.TestCase):
     @assert_with_error(test_invalid_class_assignment_identity_pattern, YPYModelError)
     def test_invalid_class_assignment_identity(self):
         runner = ysanity.Runner()
-        runner.one = ytypes.AnotherOneIdentity()
+        runner.one = ytypes.AnotherOne()
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_enum_pattern, YPYModelError)
     def test_invalid_class_assignment_enum(self):
         runner = ysanity.Runner()
-        runner.one = ysanity.YdkEnumTestEnum.none
+        runner.one = ysanity.YdkEnumTest.none
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_ylist_pattern, YPYModelError)

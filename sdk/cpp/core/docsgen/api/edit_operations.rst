@@ -76,7 +76,7 @@ An example of setting the filter for an :cpp:class:`entity<Entity>` (address fam
   auto afi_safi = make_shared<ydk::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
 
   // Set the key
-  afi_safi->afi_safi_name = L3VpnIpv4UnicastIdentity();
+  afi_safi->afi_safi_name = L3VpnIpv4Unicast();
 
   // Set the filter to delete, which will delete this instance of the address family
   afi_safi->filter = YFilter::delete_;

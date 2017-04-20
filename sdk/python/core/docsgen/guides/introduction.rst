@@ -88,8 +88,8 @@ Next, create a :py:class:`Bgp<ydk.models.openconfig.openconfig_bgp.Bgp>` configu
 
     # Create an AFI SAFI config
     ipv4_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
-    ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
-    ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
+    ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
+    ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
     ipv4_afsf.config.enabled = True
 
     # Add the AFI SAFI config to the global AFI SAFI list

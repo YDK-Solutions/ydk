@@ -496,14 +496,8 @@ class Class(NamedElement):
     @stmt.setter
     def stmt(self, stmt):
         name = escape_name(stmt.arg)
-        if stmt.keyword == 'grouping':
-            name = '%sGrouping' % camel_case(name)
-        elif stmt.keyword == 'identity':
-            name = '%sIdentity' % camel_case(name)
-        elif stmt.keyword == 'rpc':
-            name = camel_case(name) + 'Rpc'
-        else:
-            name = camel_case(name)
+        name = camel_case(name)
+
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
         self.name = name
@@ -753,7 +747,7 @@ class Enum(DataType):
         while leaf_or_typedef.parent is not None and not leaf_or_typedef.keyword in ('leaf', 'leaf-list', 'typedef'):
             leaf_or_typedef = leaf_or_typedef.parent
 
-        name = '%sEnum' % camel_case(escape_name(leaf_or_typedef.arg))
+        name = camel_case(escape_name(leaf_or_typedef.arg))
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
 

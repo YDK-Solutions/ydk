@@ -55,13 +55,13 @@ class SanityTest(unittest.TestCase):
         pass
 
     def test_zclose_session_rpc(self):
-        rpc = ietf_netconf.CloseSessionRpc()
+        rpc = ietf_netconf.CloseSession()
 
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
 
     def test_commit_rpc(self):
-        rpc = ietf_netconf.CommitRpc()
+        rpc = ietf_netconf.Commit()
         rpc.input.confirmed = Empty()
         rpc.input.confirm_timeout = 5
 
@@ -69,7 +69,7 @@ class SanityTest(unittest.TestCase):
         self.assertIsNone(reply)
 
     def test_copy_config_rpc(self):
-        rpc = ietf_netconf.CopyConfigRpc()
+        rpc = ietf_netconf.CopyConfig()
         rpc.input.target.candidate = Empty()
         rpc.input.source.running = Empty()
 
@@ -78,14 +78,14 @@ class SanityTest(unittest.TestCase):
 
     @unittest.skip('Issues in netsim')
     def test_delete_config_rpc(self):
-        rpc = ietf_netconf.DeleteConfigRpc()
+        rpc = ietf_netconf.DeleteConfig()
         rpc.input.target.url = "http://test"
 
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
 
     def test_discard_changes_rpc(self):
-        rpc = ietf_netconf.DiscardChangesRpc()
+        rpc = ietf_netconf.DiscardChanges()
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
 
@@ -99,14 +99,14 @@ class SanityTest(unittest.TestCase):
         filter_xml = self.cs.encode(self.csp, ysanity.Runner())
 
         # Edit Config
-        edit_rpc = ietf_netconf.EditConfigRpc()
+        edit_rpc = ietf_netconf.EditConfig()
         edit_rpc.input.target.candidate = Empty()
         edit_rpc.input.config = runner_xml
         reply = self.es.execute_rpc(self.ncc, edit_rpc)
         self.assertIsNone(reply)
 
         # Get Config
-        get_config_rpc = ietf_netconf.GetConfigRpc()
+        get_config_rpc = ietf_netconf.GetConfig()
         get_config_rpc.input.source.candidate = Empty()
         get_config_rpc.input.filter = filter_xml
         reply = self.es.execute_rpc(self.ncc, get_config_rpc, runner)
@@ -115,12 +115,12 @@ class SanityTest(unittest.TestCase):
         self.assertEqual(reply.one.name, runner.one.name)
 
         # Commit
-        commit_rpc = ietf_netconf.CommitRpc()
+        commit_rpc = ietf_netconf.Commit()
         reply = self.es.execute_rpc(self.ncc, commit_rpc)
         self.assertIsNone(reply)
 
         # Get
-        get_rpc = ietf_netconf.GetRpc()
+        get_rpc = ietf_netconf.Get()
         get_rpc.input.filter = filter_xml
         reply = self.es.execute_rpc(self.ncc, get_rpc, runner)
         self.assertIsNotNone(reply)
@@ -129,30 +129,30 @@ class SanityTest(unittest.TestCase):
 
     @unittest.skip('YCPPServiceProviderError')
     def test_kill_session(self):
-        rpc = ietf_netconf.KillSessionRpc()
+        rpc = ietf_netconf.KillSession()
         rpc.input.session_id = 3
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
 
     # test lock, unlock rpc
     def test_lock_rpc(self):
-        lock_rpc = ietf_netconf.LockRpc()
+        lock_rpc = ietf_netconf.Lock()
         lock_rpc.input.target.candidate = Empty()
         reply = self.es.execute_rpc(self.ncc, lock_rpc)
         self.assertIsNone(reply)
 
-        unlock_rpc = ietf_netconf.UnlockRpc()
+        unlock_rpc = ietf_netconf.Unlock()
         unlock_rpc.input.target.candidate = Empty()
         reply = self.es.execute_rpc(self.ncc, unlock_rpc)
         self.assertIsNone(reply)
 
     def test_unlock_rpc_fail(self):
-        lock_rpc = ietf_netconf.LockRpc()
+        lock_rpc = ietf_netconf.Lock()
         lock_rpc.input.target.candidate = Empty()
         reply = self.es.execute_rpc(self.ncc, lock_rpc)
         self.assertIsNone(reply)
 
-        unlock_rpc = ietf_netconf.UnlockRpc()
+        unlock_rpc = ietf_netconf.Unlock()
         unlock_rpc.input.target.running = Empty()
         try:
             reply = self.es.execute_rpc(self.ncc, unlock_rpc)
@@ -160,7 +160,7 @@ class SanityTest(unittest.TestCase):
             self.assertIsInstance(e, YPYError)
 
     def test_validate_rpc_1(self):
-        rpc = ietf_netconf.ValidateRpc()
+        rpc = ietf_netconf.Validate()
         rpc.input.source.candidate = Empty()
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
@@ -172,7 +172,7 @@ class SanityTest(unittest.TestCase):
 
         runner_xml = self.cs.encode(self.csp, runner)
 
-        rpc = ietf_netconf.ValidateRpc()
+        rpc = ietf_netconf.Validate()
         rpc.input.source.config = runner_xml
         reply = self.es.execute_rpc(self.ncc, rpc)
         self.assertIsNone(reply)
@@ -187,7 +187,7 @@ class SanityTest(unittest.TestCase):
 
     @unittest.skip('TODO: get-schema rpc is not yet supported on netsim')
     def test_execute_get_schema(self):
-        get_schema_rpc = ietf_netconf_monitoring.GetSchemaRpc()
+        get_schema_rpc = ietf_netconf_monitoring.GetSchema()
         get_schema_rpc.input.identifier = 'ietf-netconf-monitoring'
         get_schema_rpc.input.format = ietf_netconf_monitoring.Yang_Identity()
         reply = self.executor.execute_rpc(self.ncc, get_schema_rpc)

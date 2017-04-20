@@ -24,7 +24,7 @@ from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
 
-from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
+from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
 
 
 class SanityTest(unittest.TestCase):
@@ -161,9 +161,9 @@ class SanityTest(unittest.TestCase):
                          runner_read.ytypes.built_in_t.name)
 
     def test_boolean(self):
-        # changed to type YdkEnumTestEnum
+        # changed to type YdkEnumTest
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.bool_value = YdkEnumTestEnum.none
+        runner.ytypes.built_in_t.bool_value = YdkEnumTest.none
         self.crud.create(self.ncc, runner)
 
         runner_read = ysanity.Runner()

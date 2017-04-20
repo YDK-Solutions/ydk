@@ -157,14 +157,22 @@ class DocPrinter(object):
 
     def _print_toctree(self, elements, is_package=False):
         if not is_package:
+            # Data Classes
             elements.reverse()
             data_classes = [elem for elem in elements if (isinstance(elem, Class) and not elem.is_identity())]
             self._print_toctree_section(data_classes, 'Data Classes')
+            
+            # Type Classes
+            if self.lang == 'py':
+                bits_classes = [elem for elem in elements if (isinstance(elem, Bits))]
+                self._print_toctree_section(bits_classes, 'Bits Classes')
 
-            type_classes = [elem for elem in elements if any((isinstance(elem, Class) and elem.is_identity(),
-                                                    isinstance(elem, Enum),
-                                                    isinstance(elem, Bits) and self.lang == 'py'))]
-            self._print_toctree_section(type_classes, 'Type Classes')
+            enum_classes = [elem for elem in elements if (isinstance(elem, Enum))]
+            self._print_toctree_section(enum_classes, 'Enum Classes')
+
+            idty_classes = [elem for elem in elements if (isinstance(elem, Class) and elem.is_identity())]
+            self._print_toctree_section(idty_classes, 'Identity Classes')
+
         else:
             self._print_toctree_section(elements, '')
 

@@ -192,9 +192,9 @@ class SanityYang(unittest.TestCase):
 
     def test_xml_encode_2(self):
         self.provider.encoding = EncodingFormat.XML
-        from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
+        from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.enum_value = YdkEnumTestEnum.local
+        r_1.enum_value = YdkEnumTest.local
 
         payload = self.codec.encode(self.provider, r_1)
         self.assertEqual(self._xml_enum_payload_1, payload)
@@ -267,9 +267,9 @@ class SanityYang(unittest.TestCase):
 
     def test_json_encode_2(self):
         self.provider.encoding = EncodingFormat.JSON
-        from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
+        from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.enum_value = YdkEnumTestEnum.local
+        r_1.enum_value = YdkEnumTest.local
 
         payload = self.codec.encode(self.provider, r_1)
         self.assertEqual(self._json_enum_payload_1, payload)

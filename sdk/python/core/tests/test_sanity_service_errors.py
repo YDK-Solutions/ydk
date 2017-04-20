@@ -30,7 +30,7 @@ try:
 except:
     pass
 
-from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
+from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
 
 class SanityCodec(unittest.TestCase):
     @classmethod
@@ -247,7 +247,7 @@ class SanityExecutor(unittest.TestCase):
         runner.one.number = 1
         runner.one.name = 'runner:one:name'
 
-        edit_rpc = ietf_netconf.EditConfigRpc()
+        edit_rpc = ietf_netconf.EditConfig()
         edit_rpc.input.target.candidate = Empty()
         runner_xml = self.codec.encode(self.codec_provider, runner)
         edit_rpc.input.config = runner_xml

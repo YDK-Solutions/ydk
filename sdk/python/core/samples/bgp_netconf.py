@@ -55,9 +55,9 @@ def bgp_run(netconf_service, session):
     nbr_ipv6.config.peer_as = 65002
 
     nbr_ipv6_afsf = nbr_ipv6.afi_safis.AfiSafi()
-    nbr_ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
+    nbr_ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
     nbr_ipv6_afsf.config.peer_as = 65002
-    nbr_ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
+    nbr_ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
     nbr_ipv6_afsf.config.enabled = True
 
     nbr_ipv6.afi_safis.afi_safi.append(nbr_ipv6_afsf)

@@ -83,9 +83,9 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(r_2, None)
 
     def test_read_on_ref_enum_class(self):
-        from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
+        from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.enum_value = YdkEnumTestEnum.local
+        r_1.enum_value = YdkEnumTest.local
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
@@ -97,7 +97,7 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = YdkEnumTestEnum.local
+        r_2.enum_value = YdkEnumTest.local
         # r_2 = self.crud.read(self.ncc, r_2)
         # self.assertEqual(r_1.enum_value, r_2.enum_value)
         # TODO: CRUD read using non top entity for YANG enum
@@ -106,7 +106,7 @@ class SanityYang(unittest.TestCase):
 
         # no such value, nothing returned
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = YdkEnumTestEnum.remote
+        r_2.enum_value = YdkEnumTest.remote
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_2, None)
 
@@ -172,7 +172,7 @@ class SanityYang(unittest.TestCase):
 
     def test_read_on_identity_ref(self):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.identity_ref_value = ysanity.ChildIdentityIdentity()
+        r_1.identity_ref_value = ysanity.ChildIdentity()
         self.crud.create(self.ncc, r_1)
         # r_2 = ysanity.Runner.Ytypes.BuiltInT()
         # r_2.identity_ref_value.operation = YFilter.read
@@ -184,11 +184,11 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
         # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # r_2.identity_ref_value = ysanity.ChildIdentityIdentity()
+        # r_2.identity_ref_value = ysanity.ChildIdentity()
         # r_2 = self.crud.read(self.ncc, r_2)
         # TODO: CRUD read using non top entity for identity ref class
         r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.identity_ref_value = ysanity.ChildIdentityIdentity()
+        r_2.ytypes.built_in_t.identity_ref_value = ysanity.ChildIdentity()
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.identity_ref_value, r_2.ytypes.built_in_t.identity_ref_value)
 

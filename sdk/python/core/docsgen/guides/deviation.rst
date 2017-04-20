@@ -28,14 +28,14 @@ When using YDK to program a device which has some unsupported features, YDK will
     >>> from ydk.services import CRUDService
     >>> from ydk.providers import NetconfServiceProvider
     >>> from ydk.models.openconfig.openconfig_bgp import Bgp
-    >>> from ydk.models.openconfig.openconfig_bgp_types import Ipv4UnicastIdentity
+    >>> from ydk.models.openconfig.openconfig_bgp_types import Ipv4Unicast
     >>> from ydk.models.openconfig.openconfig_routing_policy import DefaultPolicyTypeEnum, RoutingPolicy
     >>> provider = NetconfServiceProvider(address='127.0.0.1', username='admin', password='admin')
     >>> crud = CRUDService()
     >>> bgp_cfg = Bgp()
     >>> ipv4_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
-    >>> ipv4_afsf.afi_safi_name = Ipv4UnicastIdentity()
-    >>> ipv4_afsf.config.afi_safi_name = Ipv4UnicastIdentity()
+    >>> ipv4_afsf.afi_safi_name = Ipv4Unicast()
+    >>> ipv4_afsf.config.afi_safi_name = Ipv4Unicast()
     >>> ipv4_afsf.config.enabled = True
     >>> ipv4_afsf.apply_policy.config.default_export_policy = DefaultPolicyTypeEnum.ACCEPT_ROUTE
     >>> bgp_cfg.global_.afi_safis.afi_safi.append(ipv4_afsf)

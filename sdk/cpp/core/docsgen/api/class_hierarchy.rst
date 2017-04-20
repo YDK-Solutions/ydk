@@ -7,6 +7,7 @@ YDK API
 
    services/service.rst
    providers/provider.rst
+   edit_operations.rst
    types.rst
    exceptions/exception.rst
 

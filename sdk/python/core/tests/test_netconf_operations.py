@@ -214,7 +214,7 @@ class SanityTest(unittest.TestCase):
     @assert_with_error(test_delete_leaflist_pattern, YPYServiceProviderError)
     def test_delete_leaflist(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTestEnum.local)
+        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.local)
         self.crud.create(self.ncc, runner)
 
         # DELETE

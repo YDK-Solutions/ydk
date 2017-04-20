@@ -26,7 +26,7 @@ from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64, YType, YLeaf, Bits
 from ydk.errors import YPYError, YPYModelError, YPYServiceProviderError
 
-from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
+from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
 
 
 class SanityTest(unittest.TestCase):
@@ -277,7 +277,7 @@ class SanityTest(unittest.TestCase):
 
     def test_embedded_enum(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.embeded_enum = ysanity.Runner.Ytypes.BuiltInT.EmbededEnumEnum.zero
+        runner.ytypes.built_in_t.embeded_enum = ysanity.Runner.Ytypes.BuiltInT.EmbededEnum.zero
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -291,7 +291,7 @@ class SanityTest(unittest.TestCase):
 
     def test_enum(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_value = YdkEnumTestEnum.none
+        runner.ytypes.built_in_t.enum_value = YdkEnumTest.none
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -305,7 +305,7 @@ class SanityTest(unittest.TestCase):
 
     def test_union(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.younion = YdkEnumTestEnum.none
+        runner.ytypes.built_in_t.younion = YdkEnumTest.none
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -319,7 +319,7 @@ class SanityTest(unittest.TestCase):
 
     def test_union_enum(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_int_value = YdkEnumIntTestEnum.any
+        runner.ytypes.built_in_t.enum_int_value = YdkEnumIntTest.any
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -396,8 +396,8 @@ class SanityTest(unittest.TestCase):
 
     def test_enum_leaflist(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_llist.append(YdkEnumTestEnum.local)
-        runner.ytypes.built_in_t.enum_llist.append(YdkEnumTestEnum.remote)
+        runner.ytypes.built_in_t.enum_llist.append(YdkEnumTest.local)
+        runner.ytypes.built_in_t.enum_llist.append(YdkEnumTest.remote)
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -411,8 +411,8 @@ class SanityTest(unittest.TestCase):
 
     def test_identity_leaflist(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.identity_llist.append(ysanity.ChildIdentityIdentity())
-        runner.ytypes.built_in_t.identity_llist.append(ysanity.ChildChildIdentityIdentity())
+        runner.ytypes.built_in_t.identity_llist.append(ysanity.ChildIdentity())
+        runner.ytypes.built_in_t.identity_llist.append(ysanity.ChildChildIdentity())
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -441,7 +441,7 @@ class SanityTest(unittest.TestCase):
     def test_identityref(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.identity_ref_value = \
-            ysanity.ChildIdentityIdentity()
+            ysanity.ChildIdentity()
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -455,7 +455,7 @@ class SanityTest(unittest.TestCase):
 
     def test_status_enum(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.status = runner.ytypes.built_in_t.StatusEnum.not_connected
+        runner.ytypes.built_in_t.status = runner.ytypes.built_in_t.Status.not_connected
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -507,7 +507,7 @@ class SanityTest(unittest.TestCase):
     def test_identity_from_other_module(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.identity_ref_value = \
-            ysanity_types.YdktestTypeIdentity()
+            ysanity_types.YdktestType()
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1

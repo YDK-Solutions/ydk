@@ -146,7 +146,7 @@ class SanityYang(unittest.TestCase):
     def test_delete_on_list_with_identitykey(self):
         runner = ysanity.Runner()
         a1 = ysanity.Runner.OneList.IdentityList()
-        a1.config.id = ysanity.ChildIdentityIdentity()
+        a1.config.id = ysanity.ChildIdentity()
         a1.id_ref =  a1.config.id.get()
         runner.one_list.identity_list.append(a1)
         self.crud.create(self.ncc, runner)
@@ -155,7 +155,7 @@ class SanityYang(unittest.TestCase):
 
         runner_update = ysanity.Runner()
         k = ysanity.Runner.OneList.IdentityList()
-        k.config.id = ysanity.ChildIdentityIdentity()
+        k.config.id = ysanity.ChildIdentity()
         k.id_ref = k.config.id.get()
         k.operation = YFilter.delete
         runner_update.one_list.identity_list.append(k)

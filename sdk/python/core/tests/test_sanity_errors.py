@@ -23,7 +23,7 @@ from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError, YPYServiceError
-from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum, YdkEnumIntTestEnum
+from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
 from test_utils import assert_with_error
 
 

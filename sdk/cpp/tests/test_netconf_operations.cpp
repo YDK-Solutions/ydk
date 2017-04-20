@@ -270,7 +270,7 @@ TEST_CASE("delete_leaflist")
     REQUIRE(reply);
 
     //CREATE
-    r_1->ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTestEnum::local);
+    r_1->ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::local);
 	reply = crud.create(provider, *r_1);
 	REQUIRE(reply);
 

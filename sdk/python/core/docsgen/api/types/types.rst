@@ -94,7 +94,7 @@ and :class:`~YType`.
     Represents a YANG built-in identity type, a base type for all YDK identities::
 
         >>> from ydk.models.openconfig import openconfig_bgp_types
-        >>> identity = openconfig_bgp_types.L3VpnIpv6MulticastIdentity()
+        >>> identity = openconfig_bgp_types.L3VpnIpv6Multicast()
 
 
 .. _types-ydk:
@@ -346,7 +346,7 @@ Examples of assigning values to leafs are shown below:
 
     bgp.global_.config.as_ = 65172                                          # uint32
     bgp.global_.config.router_id = '1.2.3.4'                                # string
-    afi_safi.afi_safi_name = oc_bgp_types.L3VpnIpv4UnicastIdentity()        # identityref
+    afi_safi.afi_safi_name = oc_bgp_types.L3VpnIpv4Unicast()        # identityref
     afi_safi.config.enabled = True                                          # bool
     neighbor.config.peer_type = oc_bgp_types.PeerTypeEnum.INTERNAL          # enum
     neighbor.timers.config.hold_time = Decimal64('90.00')                   # decimal64
@@ -370,7 +370,7 @@ Examples of appending values to leaf-lists are shown below:
     id = oc_bgp_types.L3VpnIpv4UnicastIdentity                              # identityref
     config.types_list.append(id)                                            # identityref, config is a dummy container
     config.enabled_list.append(false)                                       # bool, config is a dummy container
-    config.peer_types.append(PeerTypeEnum::INTERNAL)                        # enum, config is a dummy container
+    config.peer_types.append(PeerType::INTERNAL)                        # enum, config is a dummy container
     deci = Decimal64("1.2")
     node.decimal_values.append(deci)                                        # decimal64, node is a dummy container
 

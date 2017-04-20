@@ -106,13 +106,13 @@ def bgp_run(crud_service, session):
     bgp_cfg.global_.config.as_ = 65001
 
     ipv4_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
-    ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
-    ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
+    ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
+    ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
     ipv4_afsf.config.enabled = True
 
     ipv6_afsf = bgp_cfg.global_.afi_safis.AfiSafi()
-    ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
-    ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
+    ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
+    ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
     ipv6_afsf.config.enabled = True
 
     bgp_cfg.global_.afi_safis.afi_safi.append(ipv4_afsf)
@@ -126,9 +126,9 @@ def bgp_run(crud_service, session):
     nbr_ipv4.config.peer_as = 65002
 
     nbr_ipv4_afsf = nbr_ipv4.afi_safis.AfiSafi()
-    nbr_ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
+    nbr_ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
     nbr_ipv4_afsf.config.peer_as = 65002
-    nbr_ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4UnicastIdentity()
+    nbr_ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
     nbr_ipv4_afsf.config.enabled = True
 
     # Create afi-safi policy instances
@@ -161,9 +161,9 @@ def bgp_run(crud_service, session):
     nbr_ipv6.config.peer_as = 65002
 
     nbr_ipv6_afsf = nbr_ipv6.afi_safis.AfiSafi()
-    nbr_ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
+    nbr_ipv6_afsf.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
     nbr_ipv6_afsf.config.peer_as = 65002
-    nbr_ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6UnicastIdentity()
+    nbr_ipv6_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv6Unicast()
     nbr_ipv6_afsf.config.enabled = True
 
     # Create afi-safi policy instances

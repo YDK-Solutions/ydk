@@ -1,5 +1,5 @@
-:class:`ydk.path.Statement` --- Path API's Statement
-====================================================
+Statement
+=========
 
 .. module:: ydk.path
     :synopsis: Path API' Statement

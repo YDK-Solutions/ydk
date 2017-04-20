@@ -1,5 +1,5 @@
-:class:`ydk.path.ServiceProvider` --- Path API's ServiceProvider
-================================================================
+ServiceProvider
+===============
 
 .. module:: ydk.path
     :synopsis: Path API' ServiceProvider

@@ -1,5 +1,5 @@
-:class:`ydk.path.Capability` --- Path API's Capability
-======================================================
+Capability
+==========
 
 .. module:: ydk.path
     :synopsis: Path API' Capability

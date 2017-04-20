@@ -4,28 +4,23 @@ Executor Service
 .. module:: ydk.services
     :synopsis: YDK Executor service
 
-YDK Executor service provides functionality to execute RPCs
-
 .. py:class:: ExecutorService
 
-        Bases: :class:`ydk.services.Service`
+    Provides the functionality to execute RPCs
+\
+    .. py:method:: execute_rpc(self, provider, rpc_entity, top_entity=None):
 
-        Executor Service class for supporting execution of RPCs.
+        Create the entity
 
-        .. py:method:: execute_rpc(self, provider, rpc_entity, top_entity=None):
+        :param provider: An instance of :py:class:`ServiceProvider<ydk.path.ServiceProvider>`.
+        :param rpc_entity: An instance of an RPC class defined under the ydk.models package or any of its subpackages
+        :param top_entity: Optional arg: Provide an instance of :py:class:`Entity<ydk.types.Entity>` only when expecting data to be returned
 
-                Create the entity
+        :return: An instance of :py:class:`Entity<ydk.types.Entity>` when provided top_entity or None otherwise
 
-                :param provider: An instance of ydk.providers.ServiceProvider
-                :param rpc_entity: An instance of an RPC class defined under the ydk.models package or subpackages
-                :param top_entity: Optional arg that should be provided when expecting data to be returned
+        :raises ydk.errors.YPYDataValidationError: if validation error has occurred
+        :raises ydk.errors.YPYError: if other error has occurred
 
-                :return: None
-
-                :raises ydk.errors.YPYDataValidationError: if validation error has occurred
-                :raises ydk.errors.YPYError: if other error has occurred
-
-                Possible Errors:
-
-                * a server side error
-                * there isn't enough information in the entity to prepare the message (eg. missing keys)
+        Possible Errors:
+        * a server side error
+        * there isn't enough information in the entity to prepare the message (eg. missing keys)

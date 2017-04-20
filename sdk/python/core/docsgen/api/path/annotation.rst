@@ -1,5 +1,5 @@
-:class:`ydk.path.Annotation` --- Path API's Annotation
-======================================================
+Annotation
+==========
 
 .. module:: ydk.path
     :synopsis: Path API' Annotation

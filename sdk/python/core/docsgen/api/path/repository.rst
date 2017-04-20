@@ -1,5 +1,5 @@
-:class:`ydk.path.Repositoy` --- Path API's Repository
-=====================================================
+Repository
+==========
 
 .. module:: ydk.path
     :synopsis: Path API' Repository

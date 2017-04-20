@@ -1,11 +1,8 @@
 API Guide
 =========
 
-
 .. toctree::
+    :maxdepth: 3
 
-    api/errors/errors.rst
-    api/providers/providers.rst
-    api/services/services.rst
-    api/types/types.rst
+    api/class_hierarchy.rst
     api/path/path.rst

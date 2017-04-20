@@ -1,5 +1,5 @@
-:mod:`ydk.types` --- YDK Datatypes
-==================================
+YDK Types --- Datatypes
+=======================
 
 .. module:: ydk.types
     :synopsis: YDK Datatypes
@@ -24,21 +24,21 @@ and :class:`~YType`.
 .. class:: Bits
 
     Represents a YANG built-in bits type.
-
-    .. method:: __init__(self)
+\
+    .. method:: \__init\__(self)
 
         Instantiate a bit object::
 
             >>> from ydk.types import Bits
             >>> bits = Bits()
 
-    .. method:: __setitem__(name, value)
+    .. method:: \__setitem\__(name, value)
 
         Called to implement assignment to ``self[name]``. Assign boolean value for ``name``::
 
             >>> bits['disable-nagle'] = False
 
-    .. method:: __getitem__(name)
+    .. method:: \__getitem\__(name)
 
         Called to implement evaluation of ``self[name]``. Return boolean value for ``name``::
 
@@ -55,8 +55,8 @@ and :class:`~YType`.
 .. class:: Decimal64(value)
 
     Represents a YANG built-in decimal64 type.
-
-    .. method:: __init__(self, value)
+\
+    .. method:: \__init\__(self, value)
 
         Instantiate a decimal64 object::
 
@@ -73,8 +73,8 @@ and :class:`~YType`.
 .. class:: Empty
 
     Represents a YANG built-in empty type.
-
-    .. method:: __init__(self)
+\
+    .. method:: \__init\__(self)
 
         Instantiate an empty object::
 
@@ -85,16 +85,16 @@ and :class:`~YType`.
 
     Represents a YANG built-in enum type, a base type for all YDK enums.
     The usage is the same as a Python enum::
-
+\
         >>> from ydk.models.openconfig import openconfig_bgp_types
         >>> e = openconfig_bgp_types.BgpSessionDirectionEnum.INBOUND
 
 .. class:: Identity
 
     Represents a YANG built-in identity type, a base type for all YDK identities::
-
+\
         >>> from ydk.models.openconfig import openconfig_bgp_types
-        >>> identity = openconfig_bgp_types.L3VpnIpv6Multicast()
+        >>> identity = openconfig_bgp_types.L3VpnIpv6MulticastIdentity()
 
 
 .. _types-ydk:
@@ -102,72 +102,10 @@ and :class:`~YType`.
 YDK types
 ---------
 
-.. class:: YOperation
-
-    Represents edit operation for YDK objects as specified in
-    `NETCONF RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_,
-    defaults to ``not_set``, and  ``read`` operation providing functionality
-    to read a singal leaf.
-    Operations as defined under netconf edit-config operation attribute in
-    `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and for
-    filtering read operations by leaf to be used with various :py:class:`YDK services<ydk.services>` and :py:class:`entities<ydk.path.Entity>`.
-
-    .. attribute:: create
-
-        The configuration data identified by the element
-        containing this attribute is added to the configuration if
-        and only if the configuration data does not already exist in
-        the configuration datastore. If the configuration data
-        exists, an :class:`ydk.errors.YPYServiceProviderError` will be thrown
-        with XML error message.
-
-    .. attribute:: delete
-
-        The configuration data identified by the element
-        containing this attribute is deleted from the configuration
-        if and only if the configuration data currently exists in
-        the configuration datastore. If the configuration data does
-        not exist, an :class:`ydk.errors.YPYServiceProviderError` will be
-        thrown with XML error message.
-
-    .. attribute:: merge
-
-        The configuration data identified by the element
-        containing this attribute is merged with the configuration
-        at the corresponding level in the configuration datastore
-        identified by the target.
-
-    .. attribute:: not_set
-
-        This is the default behavior. No operation tag is attached to the
-        payload.
-
-    .. attribute:: remove
-
-        The configuration data identified by the element
-        containing this attribute is deleted from the configuration
-        if the configuration data currently exists in the
-        configuration datastore.  If the configuration data does not
-        exist, the ``remove`` operation is silently ignored by the server.
-
-    .. attribute:: replace
-
-        The configuration data identified by the element
-        containing this attribute replaces any related configuration
-        in the configuration datastore identified by the target
-        parameter.  If no such configuration data exists in the
-        configuration datastore, it is created.
-
-    .. attribute:: read
-
-        When reading configuration or operational data from a network
-        device and a specific leaf is desired to be read, the operation can
-        be set to ``read`` on that leaf. See example :ref:`below<read-filter>`.
-
 .. class:: EncodingFormat
 
     Enum class for encoding format.
-
+\
     .. py:data:: XML
 
         XML format.
@@ -179,7 +117,7 @@ YDK types
 .. class:: Entity
 
     Super class of all classes that represents containers in YANG. YANG lists are represented as :py:class:`YList` of ``Entity`` objects, with support for hanging a parent.
-
+\
     .. py:attribute:: operation
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
@@ -187,12 +125,12 @@ YDK types
 .. class:: YLeaf
 
     Concrete class that represents a YANG ``leaf`` to which data can be assigned.
-
+\
     .. py:attribute:: operation
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
 
-    .. py:method:: __init__(self, leaf_type, name)
+    .. py:method:: \__init\__(self, leaf_type, name)
 
         Create a ``YLeaf`` instance.
 
@@ -220,7 +158,7 @@ YDK types
 .. class:: YLeafList
 
     Concrete class that represents a YANG ``leaf-list`` to which multiple instances of data can be appended to.
-
+\
     .. py:method:: __init__(self, leaflist_type, name):
 
         Create a ``YLeafList`` instance.
@@ -236,7 +174,7 @@ YDK types
 .. class:: YList
 
     Concrete class that represents a YANG ``list``, with pointer to its parent.
-
+\
     .. py:method:: __init__(self, parent)
 
         Create a ``YList`` instance.
@@ -261,7 +199,7 @@ YDK types
 .. class:: YType
 
     Enum class representing YANG types.
-
+\
     .. py:data:: YType.bits
 
         bits type.
@@ -346,7 +284,7 @@ Examples of assigning values to leafs are shown below:
 
     bgp.global_.config.as_ = 65172                                          # uint32
     bgp.global_.config.router_id = '1.2.3.4'                                # string
-    afi_safi.afi_safi_name = oc_bgp_types.L3VpnIpv4Unicast()        # identityref
+    afi_safi.afi_safi_name = oc_bgp_types.L3VpnIpv4UnicastIdentity()        # identityref
     afi_safi.config.enabled = True                                          # bool
     neighbor.config.peer_type = oc_bgp_types.PeerTypeEnum.INTERNAL          # enum
     neighbor.timers.config.hold_time = Decimal64('90.00')                   # decimal64
@@ -370,7 +308,7 @@ Examples of appending values to leaf-lists are shown below:
     id = oc_bgp_types.L3VpnIpv4UnicastIdentity                              # identityref
     config.types_list.append(id)                                            # identityref, config is a dummy container
     config.enabled_list.append(false)                                       # bool, config is a dummy container
-    config.peer_types.append(PeerType::INTERNAL)                        # enum, config is a dummy container
+    config.peer_types.append(PeerTypeEnum::INTERNAL)                        # enum, config is a dummy container
     deci = Decimal64("1.2")
     node.decimal_values.append(deci)                                        # decimal64, node is a dummy container
 

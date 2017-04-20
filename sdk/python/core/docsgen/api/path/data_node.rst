@@ -1,5 +1,5 @@
-:class:`ydk.path.DataNode` --- Path API's DataNode
-==================================================
+DataNode
+========
 
 .. module:: ydk.path
     :synopsis: Path API' DataNode

@@ -1,5 +1,5 @@
-:class:`ydk.path.CodecService` --- Path API's CodecService
-==========================================================
+Codec Service
+=============
 
 .. module:: ydk.path
     :synopsis: Path API' CodecService

@@ -1,5 +1,5 @@
-:mod:`ydk.path` --- YDK Path API
-================================
+YDK Path API
+============
 
 .. module:: ydk.path
     :synopsis: YDK Path API
@@ -8,9 +8,6 @@ This module contains YDK Python Path API.
 
 YDK Python provides a new interface in the form of Path API, which can be used to write apps using a generic API, using xpath-like path expression to create and access YANG data nodes. Internally, the nodes created using the YDK model API are converted to Path API data nodes for validation and encoding to respective protocol payloads.
 
-
-Path API
---------
 
 .. toctree::
    :maxdepth: 2

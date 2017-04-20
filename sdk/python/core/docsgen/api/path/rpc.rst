@@ -1,5 +1,5 @@
-:class:`ydk.path.Rpc` --- Path API's Rpc
-========================================
+Rpc
+===
 
 .. module:: ydk.path
     :synopsis: Path API' Rpc

@@ -1,5 +1,5 @@
-:class:`ydk.path.RootSchemaNode` --- Path API's RootSchemaNode
-==============================================================
+RootSchemaNode
+==============
 
 .. module:: ydk.path
     :synopsis: Path API' RootSchemaNode

@@ -7,7 +7,7 @@ Codec Service Provider
 .. py:class:: CodecServiceProvider(type=EncodingFormat.XML, repo=None)
 
     A provider to be used with :py:class:`CodecService<ydk.services.CodecService>` for performing encoding and decoding.
-
+\
     :param type: An argument specifies encoding format, could be a Python string (``xml`` or ``json``) or an instance of :py:class:`EncodingFormat<ydk.types.EncodingFormat>`.
     :type type: ``string`` or :py:class:`EncodingFormat<ydk.types.EncodingFormat>`
     :param repo: User provided repository stores cached models.

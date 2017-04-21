@@ -459,6 +459,15 @@ class SanityYang(unittest.TestCase):
         r_2 = self.crud.read(self.ncc, r_1)
         self.assertEqual(r_2, None)
 
+    def test_nested_naming(self):
+        n_1 = ysanity.Runner.NestedNaming.NestedNaming()
+        n_2 = ysanity.Runner.NestedNaming()
+
+        n_1.nested_naming = 1
+        n_2.NestedNaming.nested_naming = 1
+
+        self.assertEqual(n_1.nested_naming, n_2.NestedNaming.nested_naming)
+        self.assertEqual(n_1.yang_name, n_2.yang_name)
 
     def test_inbtw_list_pos(self):
         # READ

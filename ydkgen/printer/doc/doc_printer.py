@@ -159,18 +159,32 @@ class DocPrinter(object):
         if not is_package:
             # Data Classes
             elements.reverse()
-            data_classes = [elem for elem in elements if (isinstance(elem, Class) and not elem.is_identity())]
+
+            data_classes = []
+            rpc_classes = []
+            bits_classes = []
+            enum_classes = []
+            idty_classes = []
+
+            for elem in elements:
+                if isinstance(elem, Enum):
+                    enum_classes.append(elem)
+
+                if self.lang == 'py' and isinstance(elem, Bits):
+                    bits_classes.append(elem)
+
+                if (isinstance(elem, Class)):
+                    if elem.is_identity():
+                        idty_classes.append(elem)
+                    elif elem.is_rpc():
+                        rpc_classes.append(elem)
+                    else:
+                        data_classes.append(elem)
+
             self._print_toctree_section(data_classes, 'Data Classes')
-            
-            # Type Classes
-            if self.lang == 'py':
-                bits_classes = [elem for elem in elements if (isinstance(elem, Bits))]
-                self._print_toctree_section(bits_classes, 'Bits Classes')
-
-            enum_classes = [elem for elem in elements if (isinstance(elem, Enum))]
+            self._print_toctree_section(rpc_classes, 'RPC Classes')
+            self._print_toctree_section(bits_classes, 'Bits Classes')
             self._print_toctree_section(enum_classes, 'Enum Classes')
-
-            idty_classes = [elem for elem in elements if (isinstance(elem, Class) and elem.is_identity())]
             self._print_toctree_section(idty_classes, 'Identity Classes')
 
         else:

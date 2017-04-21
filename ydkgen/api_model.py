@@ -545,6 +545,11 @@ class Class(NamedElement):
         self._owner = owner
         self.name = _modify_nested_container_with_same_name(self)
 
+    def set_owner(self, owner, language):
+        self._owner = owner
+        if language == 'cpp':
+            self.name = _modify_nested_container_with_same_name(self)
+
     __hash__ = NamedElement.__hash__
 
 

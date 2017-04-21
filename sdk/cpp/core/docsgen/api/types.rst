@@ -1,7 +1,7 @@
 .. _ref-types:
 
 Types
-============
+=====
 
 .. contents::
 .. toctree::
@@ -144,7 +144,7 @@ Examples of appending values to leaf-lists are shown below
 
   config->as_list.append(65172); // uint32
   config->router_id.append("1.2.3.4"); //ip-address   
-  L3VpnIpv4UnicastIdentity id{}; //identityref
+  L3VpnIpv4Unicast id{}; //identityref
   config->types_list.append(id); //identityref
   config->enabled_list.append(false); //boolean
   config->peer_types.append(PeerType::INTERNAL) // enum

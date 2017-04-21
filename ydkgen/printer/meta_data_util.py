@@ -481,8 +481,8 @@ def get_primitive_type_tag(typ, language):
         ('py', 'bool'): 'bool',
         ('py', 'Decimal64'): ':py:class:`Decimal64<ydk.types.Decimal64>`',
         ('py', 'Empty'): ':py:class:`Empty<ydk.types.Empty>`',
-        ('py', 'Enum'): ':py:class:`enum.Enum`',
-        ('py', 'Identity'): ':py:class:`object`',
+        ('py', 'Enum'): ':py:class:`Enum<ydk.types.Enum>`',
+        ('py', 'Identity'): ':py:class:`Identity<ydk.types.Identity>`',
 
         ('cpp', 'int'): '``int``',
         ('cpp', 'str'): '``std::string``',

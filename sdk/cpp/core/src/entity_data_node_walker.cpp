@@ -72,7 +72,7 @@ path::DataNode& get_data_node_from_entity(Entity & entity, ydk::path::RootSchema
 
 static void walk_children(Entity & entity, path::DataNode & data_node)
 {
-	std::map<string, shared_ptr<Entity>> & children = entity.get_children();
+	std::map<string, shared_ptr<Entity>> children = entity.get_children();
 	YLOG_DEBUG("Children count for: {} : {}",entity.get_entity_path(entity.parent).path, children.size());
 	for(auto const& child : children)
 	{
@@ -177,6 +177,7 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 			{
 				child_entity = entity->get_child_by_name(child_name);
 			}
+			child_entity->parent = entity.get();
 
 			if(child_entity == nullptr)
 			{

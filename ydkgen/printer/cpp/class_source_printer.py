@@ -40,7 +40,6 @@ class ClassSourcePrinter(object):
         leafs = []
         children = []
         self._get_class_members(clazz, leafs, children)
-
         self._print_class_constructor(clazz, leafs, children)
         self._print_class_destructor(clazz)
         self._print_class_method_definitions(clazz, leafs, children)
@@ -112,7 +111,7 @@ class ClassSourcePrinter(object):
     def _get_class_members(self, clazz, leafs, children):
         for prop in clazz.properties():
             ptype = prop.property_type
-            if isinstance(prop.property_type, Class) and not prop.property_type.is_identity():
+            if isinstance(ptype, Class) and not ptype.is_identity():
                 children.append(prop)
             elif ptype is not None:
                 leafs.append(prop)
@@ -131,6 +130,9 @@ class ClassSourcePrinter(object):
 
     def _print_class_get_path(self, clazz, leafs):
         GetEntityPathPrinter(self.ctx).print_output(clazz, leafs)
+
+    def _print_class_create_child(self, clazz, children):
+        ClassCreateChildPrinter(self.ctx).print_class_create_child(clazz, children)
 
     def _print_class_set_child(self, clazz, children):
         ClassGetChildPrinter(self.ctx).print_class_get_child(clazz, children)

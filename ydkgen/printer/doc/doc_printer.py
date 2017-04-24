@@ -158,7 +158,7 @@ class DocPrinter(object):
     def _print_toctree(self, elements, is_package=False):
         if not is_package:
             # Data Classes
-            elements.reverse()
+            elements = sorted(elements, key=attrgetter('name'))
 
             data_classes = []
             rpc_classes = []

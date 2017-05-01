@@ -16,8 +16,18 @@ set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
+if(CMAKE_BUILD_TYPE STREQUAL debug)
+    option(ENABLE_BUILD_TESTS "Build tests" ON)
+    option(ENABLE_VALGRIND_TESTS "Build tests with valgrind" ON)
+else()
+    option(ENABLE_BUILD_TESTS "Build tests" OFF)
+    option(ENABLE_VALGRIND_TESTS "Build tests with valgrind" OFF)
+endif()
+
 # Set LibYDK_c variables
 set(libydk_c_src golang.cpp)
+
+set(test_src golang_test.cpp)
 
 add_library(ydk_c STATIC ${libydk_c_src})
 
@@ -27,7 +37,7 @@ set_property(TARGET ydk_c PROPERTY CXX_STANDARD_REQUIRED ON)
 set(go_src path_sample.go)
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/path_sample
-  COMMAND go build -o ${CMAKE_BINARY_DIR}/path_sample ${go_src}
+  COMMAND go build -o ${CMAKE_BINARY_DIR}/path_sample -gcflags="-N" ${go_src}
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   DEPENDS ydk_c ${go_src}
   COMMENT "Go build ${go_src}"
@@ -35,3 +45,8 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/path_sample
 )
 
 add_custom_target(path ALL DEPENDS ${CMAKE_BINARY_DIR}/path_sample)
+
+if(ENABLE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif(ENABLE_BUILD_TESTS)

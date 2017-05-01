@@ -251,11 +251,9 @@ ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& 
     struct lyd_node *root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(), scheme, LYD_OPT_TRUSTED |  LYD_OPT_GET);
     if( root == nullptr || ly_errno )
     {
-
         YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
         throw(YCPPCodecError{YCPPCodecError::Error::XML_INVAL});
     }
-
 
     YLOG_DEBUG("Performing decode operation");
     RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};

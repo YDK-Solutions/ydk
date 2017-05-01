@@ -37,22 +37,52 @@ using namespace std;
 typedef struct RpcWrapper
 {
     RpcWrapper(shared_ptr<ydk::path::Rpc> rpc)
-        : private_rpc(rpc)
+        : priv(rpc)
     {
     }
 
-    shared_ptr<ydk::path::Rpc> private_rpc;
+    shared_ptr<ydk::path::Rpc> priv;
 } RpcWrapper;
 
 typedef struct DataNodeWrapper
 {
     DataNodeWrapper(shared_ptr<ydk::path::DataNode> data)
-        : private_datanode(data)
+        : priv(data)
     {
     }
 
-    shared_ptr<ydk::path::DataNode> private_datanode;
+    shared_ptr<ydk::path::DataNode> priv;
 } DataNodeWrapper;
+
+DataNodeWrapper* wrap(ydk::path::DataNode* datanode)
+{
+    return (new DataNodeWrapper(shared_ptr<ydk::path::DataNode>(datanode)));
+}
+
+DataNodeWrapper* wrap(shared_ptr<ydk::path::DataNode> datanode)
+{
+    return (new DataNodeWrapper(datanode));
+}
+
+ydk::path::DataNode* unwrap(DataNodeWrapper* datanode_wrapper)
+{
+    return datanode_wrapper->priv.get();
+}
+
+RpcWrapper* wrap(ydk::path::Rpc* rpc)
+{
+    return (new RpcWrapper(shared_ptr<ydk::path::Rpc>(rpc)));
+}
+
+RpcWrapper* wrap(shared_ptr<ydk::path::Rpc> rpc)
+{
+    return (new RpcWrapper(rpc));
+}
+
+ydk::path::Rpc* unwrap(RpcWrapper* rpc_wrapper)
+{
+    return rpc_wrapper->priv.get();
+}
 
 static ydk::EncodingFormat get_real_encoding(EncodingFormat encoding)
 {
@@ -79,7 +109,7 @@ Repository RepositoryInit()
 
 void RepositoryFree(Repository repo)
 {
-    ydk::path::Repository* real_repo = new ydk::path::Repository();
+    ydk::path::Repository* real_repo = (ydk::path::Repository*)repo;
     delete real_repo;
 }
 
@@ -103,7 +133,6 @@ RootSchemaNode NetconfServiceProviderGetRootSchema(NetconfServiceProvider provid
     return (void*)root_schema;
 }
 
-
 CodecService CodecServiceInit(void)
 {
     ydk::path::CodecService * codec = new ydk::path::CodecService();
@@ -119,9 +148,13 @@ void CodecServiceFree(CodecService codec)
 const char* CodecServiceEncode(CodecService codec, DataNode datanode, EncodingFormat encoding, int pretty)
 {
     ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
-    ydk::path::DataNode * real_datanode = (ydk::path::DataNode *)datanode;
+    DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
+    ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
+
     std::string payload = real_codec->encode(*real_datanode, get_real_encoding(encoding), pretty);
-    return payload.c_str();
+    char * cstr = new char [payload.length()+1];
+    std::strcpy (cstr, payload.c_str());
+    return cstr;
 }
 
 DataNode CodecServiceDecode(CodecService codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
@@ -129,46 +162,54 @@ DataNode CodecServiceDecode(CodecService codec, RootSchemaNode root_schema, cons
     ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
     ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
     shared_ptr<ydk::path::DataNode> datanode = real_codec->decode(*real_root_schema, payload, get_real_encoding(encoding));
-    DataNodeWrapper * datanode_wrapper = new DataNodeWrapper(datanode);
-    return (void*)datanode_wrapper;
+
+    return (void*)(wrap(datanode));
 }
 
 DataNode RootSchemaNodeCreate(RootSchemaNode root_schema, const char* path)
 {
     ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
     ydk::path::DataNode * datanode = &real_root_schema->create(path);
-    return (void*)datanode;
+
+    return (void*)(wrap(datanode));
 }
 
 Rpc RootSchemaNodeRpc(RootSchemaNode root_schema, const char* path)
 {
     ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
     shared_ptr<ydk::path::Rpc> rpc = real_root_schema->rpc(path);
-    RpcWrapper * rpc_wrapper = new RpcWrapper(rpc);
-    return (void*)rpc_wrapper;
+
+    return (void*)(wrap(rpc));
 }
 
 DataNode RpcInput(Rpc rpc)
 {
-    RpcWrapper* real_rpc = (RpcWrapper*)rpc;
-    ydk::path::DataNode * input = &real_rpc->private_rpc->input();
-    return (void*)input;
+    RpcWrapper* rpc_wrapper = (RpcWrapper*)rpc;
+    ydk::path::Rpc* real_rpc = unwrap(rpc_wrapper);
+
+    ydk::path::DataNode * input = &real_rpc->input();
+
+    return (void*)(wrap(input));
 }
 
 DataNode RpcExecute(Rpc rpc, ServiceProvider provider)
 {
-    RpcWrapper* real_rpc = (RpcWrapper*)rpc;
+    RpcWrapper* rpc_wrapper = (RpcWrapper*)rpc;
+    ydk::path::Rpc* real_rpc = unwrap(rpc_wrapper);
+
     ydk::path::ServiceProvider * real_provider = (ydk::path::ServiceProvider *) provider;
-    std::shared_ptr<ydk::path::DataNode> result = (*real_rpc->private_rpc)(*real_provider);
-    DataNodeWrapper * datanode_wrapper = new DataNodeWrapper(result);
-    return (void*)datanode_wrapper;
+    std::shared_ptr<ydk::path::DataNode> result = (*real_rpc)(*real_provider);
+
+    return (void*)(wrap(result));
 }
 
 DataNode DataNodeCreate(DataNode datanode, const char* path, const char* value)
 {
-    ydk::path::DataNode * real_datanode = (ydk::path::DataNode *)datanode;
+    DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
+    ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
     ydk::path::DataNode * result = &real_datanode->create(path, value);
-    return (void*)result;
+
+    return (void*)(wrap(result));
 }
 
 void EnableLogging(void)

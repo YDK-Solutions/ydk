@@ -75,6 +75,8 @@ class ClassInitsPrinter(object):
             self.ctx.bline()
             self.ctx.writeln('self.yang_name = "%s"' % clazz.stmt.arg)
             self.ctx.writeln('self.yang_parent_name = "%s"' % clazz.owner.stmt.arg)
+            if clazz.stmt.search_one('presence') is not None:
+                self.ctx.writeln('self.is_presence_container = True')
             self._print_init_leafs_and_leaflists(clazz, leafs)
             self._print_init_children(children)
         self._print_init_lists(clazz)
@@ -98,7 +100,7 @@ class ClassInitsPrinter(object):
             else:
                 name = prop.stmt.arg
 
-            self.ctx.writeln('self.%s = %s(YType.%s, "%s")' 
+            self.ctx.writeln('self.%s = %s(YType.%s, "%s")'
                 % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
 
     def _print_init_children(self, children):
@@ -108,9 +110,9 @@ class ClassInitsPrinter(object):
                 if (child.stmt.search_one('presence') is None):
                     self.ctx.writeln('self.%s = %s()' % (child.name, child.property_type.qn()))
                     self.ctx.writeln('self.%s.parent = self' % child.name)
-                    self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
                 else:
                     self.ctx.writeln('self.%s = None' % (child.name))
+                self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
 
     def _print_init_lists(self, clazz):
         if clazz.is_identity() and len(clazz.extends) == 0:
@@ -190,7 +192,7 @@ class ClassSetAttrPrinter(object):
         self.ctx.lvl_inc()
         self.ctx.writeln('value = value.name')
         self.ctx.lvl_dec()
-        self.ctx.writeln('if name in (%s) and name in self.__dict__:' % 
+        self.ctx.writeln('if name in (%s) and name in self.__dict__:' %
             separator.join(leaf_names))
         self.ctx.lvl_inc()
         self.ctx.writeln('if isinstance(value, YLeaf):')
@@ -207,13 +209,19 @@ class ClassSetAttrPrinter(object):
         self.ctx.writeln('self.__dict__[name].set(value)')
         self.ctx.lvl_dec()
 
-
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('if hasattr(value, "parent") and value.parent is None:')
+        self.ctx.writeln('if hasattr(value, "parent"):')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('if hasattr(value, "is_presence_container") and value.is_presence_container:')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('value.parent = self')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('elif value.parent is None and value.yang_name == self.yang_name:')
         self.ctx.lvl_inc()
         self.ctx.writeln('value.parent = self.parent')
+        self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())
         self.ctx.lvl_dec()

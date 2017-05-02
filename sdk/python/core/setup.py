@@ -33,7 +33,7 @@ NMSP_PKG_DEPENDENCIES = ["$DEPENDENCY$"]
 # Namespace packages are share same prefix: "ydk-models"
 NAME = 'ydk'
 VERSION = '0.5.4'
-INSTALL_REQUIREMENTS = ['pybind11>=2.1.0']
+INSTALL_REQUIREMENTS = ['pybind11>=2.1.1']
 
 
 LONG_DESCRIPTION = '''
@@ -73,7 +73,7 @@ class YdkBuildExtension(build_ext):
             import pybind11
         except ImportError:
             import pip
-            pip.main(['install', 'pybind11>=2.1.0'])
+            pip.main(['install', 'pybind11>=2.1.1'])
             import pybind11
 
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))

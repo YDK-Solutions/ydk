@@ -52,6 +52,8 @@ static object log_warn;
 static object log_error;
 static object log_critical;
 static bool added_nullhandler = false;
+static bool enabled_logging = false;
+
 
 void add_null_handler(object logger)
 {
@@ -72,23 +74,34 @@ void add_null_handler(object logger)
     }
 }
 
-void setup_logging()
-{
-    object get_logger = module::import("logging").attr("getLogger");
-    object logger = get_logger("ydk");
-    add_null_handler(logger);
-    log_debug = logger.attr("debug");
-    log_info = logger.attr("info");
-    log_warn = logger.attr("warn");
-    log_error = logger.attr("error");
-    log_critical = logger.attr("critical");
-}
-
 void debug(const char* msg) { log_debug(msg); }
 void info(const char* msg) { log_info(msg); }
 void warn(const char* msg) { log_warn(msg); }
 void error(const char* msg) { log_error(msg); }
 void critical(const char* msg) { log_critical(msg); }
+
+void setup_logging()
+{
+    if (!enabled_logging)
+    {
+        object get_logger = module::import("logging").attr("getLogger");
+        object logger = get_logger("ydk");
+
+        add_null_handler(logger);
+        log_debug = logger.attr("debug");
+        log_info = logger.attr("info");
+        log_warn = logger.attr("warn");
+        log_error = logger.attr("error");
+        log_critical = logger.attr("critical");
+
+        ydk::set_logging_callback("debug", debug);
+        ydk::set_logging_callback("info", info);
+        ydk::set_logging_callback("warn", warn);
+        ydk::set_logging_callback("error", error);
+        ydk::set_logging_callback("critical", critical);
+        enabled_logging = true;
+    }
+}
 
 
 using ListCasterBase = detail::list_caster<std::vector<ydk::path::SchemaNode *>, ydk::path::SchemaNode *>;
@@ -360,6 +373,7 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("operation", &ydk::Entity::operation)
         .def_readwrite("yang_name", &ydk::Entity::yang_name, return_value_policy::reference)
         .def_readwrite("yang_parent_name", &ydk::Entity::yang_parent_name, return_value_policy::reference)
+        .def_readwrite("is_presence_container", &ydk::Entity::is_presence_container, return_value_policy::reference)
         .def_property("parent", &ydk::Entity::get_parent, &ydk::Entity::set_parent);
 
     class_<ydk::EntityPath>(types, "EntityPath")
@@ -598,17 +612,6 @@ PYBIND11_PLUGIN(ydk_)
             arg("source_config"),
             return_value_policy::reference);
 
-    logging.def("EnableLogging", []()
-                                 {
-                                    setup_logging();
-                                    ydk::set_logging_callback("trace", debug);
-                                    ydk::set_logging_callback("debug", debug);
-                                    ydk::set_logging_callback("info", info);
-                                    ydk::set_logging_callback("warn", warn);
-                                    ydk::set_logging_callback("error", error);
-                                    ydk::set_logging_callback("critical", critical);
-                                 });
-
     entity_utils.def("get_relative_entity_path", &ydk::get_relative_entity_path);
     entity_utils.def("get_entity_from_data_node", &ydk::get_entity_from_data_node);
     #if defined(PYBIND11_OVERLOAD_CAST)
@@ -618,6 +621,8 @@ PYBIND11_PLUGIN(ydk_)
     #endif
 
     ydk.def("is_set", &ydk::is_set);
+
+    setup_logging();
 
     return ydk.ptr();
 };

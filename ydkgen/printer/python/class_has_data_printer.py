@@ -58,7 +58,7 @@ class ClassHasDataPrinter(object):
                 iter_stmt = 'for leaf in self.%s.getYLeafs():'
                 access_stmt = 'if (leaf.operation != YFilter.not_set):'
                 self._print_class_has_many(leaf, iter_stmt, access_stmt)
-        
+
         if len(conditions) == 0:
             self.ctx.writeln('return False')
         elif len(conditions) == 1:
@@ -81,7 +81,7 @@ class ClassHasDataPrinter(object):
                 iter_stmt = 'for leaf in self.%s.getYLeafs():'
                 access_stmt = 'if (leaf.is_set):'
                 self._print_class_has_many(leaf, iter_stmt, access_stmt)
-        
+
         if len(conditions) == 1:
             self.ctx.writeln('return %s' % ''.join(conditions))
         else:
@@ -96,9 +96,12 @@ class ClassHasDataPrinter(object):
 
     def _init_has_data_conditions(self, leafs, children):
         conditions = [ 'self.%s.is_set' % (prop.name) for prop in leafs if not prop.is_many]
-        conditions.extend([ ('(self.%s is not None and self.%s.has_data())' 
-            % (prop.name, prop.name)) for prop in children if not prop.is_many ])
-        
+        conditions.extend([ ('(self.%s is not None and self.%s.has_data())'
+            % (prop.name, prop.name)) for prop in children
+            if not prop.is_many and not prop.stmt.search_one('presence')])
+        conditions.extend(['(self.%s is not None)' % prop.name for prop in children
+                        if prop.stmt.search_one('presence')])
+
         if len(conditions) > 0:
             temp = ' or,'.join(conditions)
             conditions = temp.split(',')
@@ -107,9 +110,9 @@ class ClassHasDataPrinter(object):
 
     def _init_has_operation_conditions(self, leafs, children):
         conditions = ['self.operation != YFilter.not_set']
-        conditions.extend([ 'self.%s.operation != YFilter.not_set' 
+        conditions.extend([ 'self.%s.operation != YFilter.not_set'
             % (prop.name) for prop in leafs])
-        conditions.extend([('(self.%s is not None and self.%s.has_operation())' 
+        conditions.extend([('(self.%s is not None and self.%s.has_operation())'
             % (prop.name, prop.name)) for prop in children if not prop.is_many])
 
         if len(conditions) > 0:

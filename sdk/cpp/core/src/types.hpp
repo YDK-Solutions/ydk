@@ -155,6 +155,7 @@ class Entity {
     std::string yang_name;
     std::string yang_parent_name;
     YFilter operation;
+    bool is_presence_container;
 };
 
 class Bits {

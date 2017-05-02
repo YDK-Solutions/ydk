@@ -83,7 +83,7 @@ static void walk_children(Entity & entity, path::DataNode & data_node, map<strin
     {
         YLOG_DEBUG("==================");
         YLOG_DEBUG("Looking at child '{}': {}",child.first, child.second->get_entity_path(child.second->parent).path);
-        if(child.second->has_operation() || child.second->has_data())
+        if(child.second->has_operation() || child.second->has_data() || child.second->is_presence_container)
             populate_data_node(*(child.second), data_node, leaf_operations);
         else
             YLOG_DEBUG("Child has no data and no operations");

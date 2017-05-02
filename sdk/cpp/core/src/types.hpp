@@ -361,8 +361,8 @@ std::string to_string(YFilter operation);
 
 enum class Protocol
 {
-	restconf,
-	netconf
+    restconf,
+    netconf
 };
 }
 

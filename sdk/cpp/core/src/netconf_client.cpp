@@ -115,34 +115,34 @@ nc_rpc* NetconfClient::build_rpc_request(const string & payload)
 {
     nc_rpc* rpc = nc_rpc_build(payload.c_str(), session);
 
-	if (rpc == NULL)
-	{
+    if (rpc == NULL)
+    {
           YLOG_ERROR("Could not build rpc payload: {}", payload );
-	      throw(YCPPClientError{"Could not build payload"});
-	}
-	else if(NC_RPC_UNKNOWN==nc_rpc_get_type(rpc))
-	{
-		nc_rpc_free(rpc);
+          throw(YCPPClientError{"Could not build payload"});
+    }
+    else if(NC_RPC_UNKNOWN==nc_rpc_get_type(rpc))
+    {
+        nc_rpc_free(rpc);
         YLOG_ERROR("Rpc type is unknown");
-		throw(YCPPClientError{"Could not build payload"});
-	}
-	return rpc;
+        throw(YCPPClientError{"Could not build payload"});
+    }
+    return rpc;
 }
 
 string NetconfClient::process_rpc_reply(int reply_type, const nc_reply* reply)
 {
-	switch (reply_type)
-	{
-		case NC_MSG_REPLY:
-			return nc_reply_dump(reply);
+    switch (reply_type)
+    {
+        case NC_MSG_REPLY:
+            return nc_reply_dump(reply);
 
-		default:
-		case NC_MSG_NONE:
-		case NC_MSG_UNKNOWN:
+        default:
+        case NC_MSG_NONE:
+        case NC_MSG_UNKNOWN:
             YLOG_ERROR("RPC error occurred");
-			throw(YCPPClientError{"RPC error occured"});
-	}
-	return {};
+            throw(YCPPClientError{"RPC error occured"});
+    }
+    return {};
 }
 
 StringVec NetconfClient::get_capabilities()
@@ -152,17 +152,17 @@ StringVec NetconfClient::get_capabilities()
 
 void NetconfClient::clb_print(NC_VERB_LEVEL level, const char* msg)
 {
-	switch (level)
-	{
-	case NC_VERB_ERROR:
+    switch (level)
+    {
+    case NC_VERB_ERROR:
          YLOG_ERROR("libnetconf ERROR: {}", msg);
-		break;
-	case NC_VERB_WARNING:
-	case NC_VERB_VERBOSE:
-	case NC_VERB_DEBUG:
-	    YLOG_DEBUG("libnetconf TRACE: {}", msg);
-		break;
-	}
+        break;
+    case NC_VERB_WARNING:
+    case NC_VERB_VERBOSE:
+    case NC_VERB_DEBUG:
+        YLOG_DEBUG("libnetconf TRACE: {}", msg);
+        break;
+    }
 }
 
 char* NetconfClient::clb_set_password(const char* user_name,
@@ -210,11 +210,11 @@ int NetconfClient::clb_ssh_host_authenticity_check(const char *hostname,
 
 void NetconfClient::perform_session_check(string message)
 {
-	if (session == NULL)
-	{
+    if (session == NULL)
+    {
         YLOG_ERROR(message.c_str());
-		throw(YCPPClientError{message});
-	}
+        throw(YCPPClientError{message});
+    }
 }
 
 

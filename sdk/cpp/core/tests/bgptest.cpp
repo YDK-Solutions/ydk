@@ -46,19 +46,19 @@ public:
         return *root_schema;
     }
 
-	ydk::EncodingFormat get_encoding() const
-	{
-		return ydk::EncodingFormat::XML;
-	}
+    ydk::EncodingFormat get_encoding() const
+    {
+        return ydk::EncodingFormat::XML;
+    }
 
-	std::shared_ptr<ydk::path::DataNode> invoke(ydk::path::Rpc& rpc) const
-	{
+    std::shared_ptr<ydk::path::DataNode> invoke(ydk::path::Rpc& rpc) const
+    {
         ydk::path::CodecService s{};
 
         std::cout << s.encode(rpc.input(), ydk::EncodingFormat::XML, true) << std::endl;
 
-		return nullptr;
-	}
+        return nullptr;
+    }
 private:
     std::string m_searchdir;
     std::vector<ydk::path::Capability> m_capabilities;

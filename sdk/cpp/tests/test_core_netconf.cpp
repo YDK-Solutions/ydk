@@ -79,7 +79,7 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
         child_indent+="  ";
         std::cout << indent << "<" << s.arg << ">" << std::endl;
         for(auto c : dn->children())
-	    print_tree(c.get(), child_indent);
+        print_tree(c.get(), child_indent);
         std::cout << indent << "</" << s.arg << ">" << std::endl;
 
     }
@@ -180,11 +180,11 @@ TEST_CASE("bits")
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
-	auto & runner = schema.create("ydktest-sanity:runner", "");
+    auto & runner = schema.create("ydktest-sanity:runner", "");
 
-	auto & ysanity = runner.create("ytypes/built-in-t/bits-value", "disable-nagle");
+    auto & ysanity = runner.create("ytypes/built-in-t/bits-value", "disable-nagle");
 
-	ydk::path::CodecService s{};
+    ydk::path::CodecService s{};
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
     CHECK( !xml.empty());
@@ -259,7 +259,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
     auto res = (*create_rpc)(sp);
 
-	//call read
+    //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & bgp_read = schema.create("openconfig-bgp:bgp", "");
 
@@ -298,14 +298,14 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //
 //    auto & vrf = four_instance_as->create("vrfs/vrf[vrf-name='red']");
 //
-//	std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
-//	auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
-//	REQUIRE( !xml.empty() );
-//	create_rpc->input().create("entity", xml);
+//  std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
+//  auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
+//  REQUIRE( !xml.empty() );
+//  create_rpc->input().create("entity", xml);
 //
-//	auto res = (*create_rpc)(sp);
+//  auto res = (*create_rpc)(sp);
 //
-//	//call read
+//  //call read
 //    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
 //    auto & bgp_read = schema.create("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
 //    std::shared_ptr<const ydk::path::DataNode> data_root2{&bgp_read.root()};

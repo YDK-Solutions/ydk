@@ -38,16 +38,16 @@ public:
                                const std::string & username,
                                const std::string & password,
                                int port = 80,
-							   EncodingFormat encoding = EncodingFormat::JSON,
-							   const std::string & config_url_root = "/data",
-							   const std::string & state_url_root = "/data");
+                               EncodingFormat encoding = EncodingFormat::JSON,
+                               const std::string & config_url_root = "/data",
+                               const std::string & state_url_root = "/data");
 
         RestconfServiceProvider(std::unique_ptr<RestconfClient> client,
-        						std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
-								const std::string & edit_method,
-								const std::string & config_url_root,
-								const std::string & state_url_root,
-								EncodingFormat encoding);
+                                std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
+                                const std::string & edit_method,
+                                const std::string & config_url_root,
+                                const std::string & state_url_root,
+                                EncodingFormat encoding);
 
         ~RestconfServiceProvider();
 

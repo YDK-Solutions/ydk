@@ -110,7 +110,7 @@ TEST_CASE("discard_changes")
 // edit_config, get_config
 TEST_CASE("edit_config")
 {
-	// provider
+    // provider
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};

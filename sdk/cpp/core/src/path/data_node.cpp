@@ -46,7 +46,7 @@ ydk::path::DataNode::create(const std::string& path)
 //////////////////////////////////////////////////////////////////////////
 ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_parent{parent}, m_node{node}
 {
-	//add the children
+    //add the children
     if(m_node && m_node->child && !(m_node->schema->nodetype == LYS_LEAF ||
                           m_node->schema->nodetype == LYS_LEAFLIST ||
                           m_node->schema->nodetype == LYS_ANYXML))
@@ -93,7 +93,7 @@ ydk::path::DataNodeImpl::path() const
 ydk::path::DataNode&
 ydk::path::DataNodeImpl::create(const std::string& path, const std::string& value)
 {
-	return create_helper(path, value);
+    return create_helper(path, value);
 }
 
 ydk::path::DataNode&
@@ -112,7 +112,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
     lyd_node* root_node = m_node;
     while(root_node->parent)
     {
-    	root_node = root_node->parent;
+        root_node = root_node->parent;
     }
     std::ostringstream os;
     os << root_node->schema->module->name << ":" << root_node->schema->name;
@@ -126,12 +126,12 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
     while (iter != segments.end())
     {
-    	if((*iter) == top_container_path || (*iter) == m_node->schema->name)
-    	{
-    		YLOG_DEBUG("Skipping segment same as {}", top_container_path);
-    		++iter;
-    		continue;
-    	}
+        if((*iter) == top_container_path || (*iter) == m_node->schema->name)
+        {
+            YLOG_DEBUG("Skipping segment same as {}", top_container_path);
+            ++iter;
+            continue;
+        }
         auto r = dn->find(*iter);
         if(r.empty())
         {
@@ -175,35 +175,35 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
     for(size_t i=start_index; i< segments.size(); i++)
     {
-    	if(segments[i] == top_container_path || segments[i] == m_node->schema->name)
-		{
-    		YLOG_DEBUG("Skipping segment same as {}", top_container_path);
-			continue;
-		}
-
-    	auto child_segment = segments[i];
-    	if (i != segments.size() - 1)
+        if(segments[i] == top_container_path || segments[i] == m_node->schema->name)
         {
-    		YLOG_DEBUG("Creating new data path '{}' in '{}'", child_segment, cn->schema->name);
-			cn = lyd_new_path(cn, nullptr, child_segment.c_str(), nullptr, LYD_ANYDATA_SXML, 0);
-		}
+            YLOG_DEBUG("Skipping segment same as {}", top_container_path);
+            continue;
+        }
+
+        auto child_segment = segments[i];
+        if (i != segments.size() - 1)
+        {
+            YLOG_DEBUG("Creating new data path '{}' in '{}'", child_segment, cn->schema->name);
+            cn = lyd_new_path(cn, nullptr, child_segment.c_str(), nullptr, LYD_ANYDATA_SXML, 0);
+        }
         else
         {
-        	YLOG_DEBUG("Creating new data path '{}' with value '{}' in '{}'", child_segment, value, cn->schema->name);
-			cn = lyd_new_path(cn, nullptr, child_segment.c_str(), (void*)value.c_str(), LYD_ANYDATA_SXML, 0);
-		}
+            YLOG_DEBUG("Creating new data path '{}' with value '{}' in '{}'", child_segment, value, cn->schema->name);
+            cn = lyd_new_path(cn, nullptr, child_segment.c_str(), (void*)value.c_str(), LYD_ANYDATA_SXML, 0);
+        }
 
-		if (cn == nullptr)
-		{
+        if (cn == nullptr)
+        {
             if(first_node_created)
             {
-				lyd_unlink(first_node_created);
-				lyd_free(first_node_created);
+                lyd_unlink(first_node_created);
+                lyd_free(first_node_created);
             }
             YLOG_ERROR("Invalid path: {}", segments[i]);
             throw(YCPPModelError{"Invalid path: " + segments[i]});
         }
-		else if (!first_node_created)
+        else if (!first_node_created)
         {
             first_node_created = cn;
         }
@@ -291,7 +291,7 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
 
     if(found_snode)
     {
-    	YLOG_DEBUG("Getting data nodes with path '{}'", path);
+        YLOG_DEBUG("Getting data nodes with path '{}'", path);
         ly_set* result_set = lyd_find_xpath(m_node, path.c_str());
         if( result_set )
         {
@@ -351,13 +351,13 @@ ydk::path::DataNodeImpl::root() const
 std::string
 ydk::path::DataNodeImpl::xml() const
 {
-	std::string ret;
-	char* xml = nullptr;
-	if(!lyd_print_mem(&xml, m_node,LYD_XML, LYP_FORMAT)) {
-		ret = xml;
-		std::free(xml);
-	}
-	return ret;
+    std::string ret;
+    char* xml = nullptr;
+    if(!lyd_print_mem(&xml, m_node,LYD_XML, LYP_FORMAT)) {
+        ret = xml;
+        std::free(xml);
+    }
+    return ret;
 }
 
 std::shared_ptr<ydk::path::DataNode>
@@ -365,63 +365,63 @@ ydk::path::DataNodeImpl::get_dn_for_desc_node(lyd_node* desc_node) const
 {
     std::shared_ptr<DataNode> dn;
 
-	//create DataNode wrappers
-	std::vector<lyd_node*> nodes{};
-	lyd_node* node = desc_node;
+    //create DataNode wrappers
+    std::vector<lyd_node*> nodes{};
+    lyd_node* node = desc_node;
 
-	while (node != nullptr && node != m_node)
-	{
-		nodes.push_back(node);
-		node = node->parent;
-	}
+    while (node != nullptr && node != m_node)
+    {
+        nodes.push_back(node);
+        node = node->parent;
+    }
 
-	//reverse
-	std::reverse(nodes.begin(), nodes.end());
+    //reverse
+    std::reverse(nodes.begin(), nodes.end());
 
-	const DataNodeImpl* parent = this;
+    const DataNodeImpl* parent = this;
 
-	if(nodes[0] == m_node)
-	{
-		nodes.erase(nodes.begin());
-	}
+    if(nodes[0] == m_node)
+    {
+        nodes.erase(nodes.begin());
+    }
 
-	for( auto p : nodes)
-	{
+    for( auto p : nodes)
+    {
        auto res = parent->child_map.find(p);
-	   if(res != parent->child_map.end())
-	   {
-		   //DataNode is already present
-		   dn = res->second;
-	   }
-	   else
-	   {
-		   if(!m_node->parent)
-		   {
-			   //special case the root is the first node
-			   parent = dynamic_cast<DataNodeImpl*>(child_map.begin()->second.get());
+       if(res != parent->child_map.end())
+       {
+           //DataNode is already present
+           dn = res->second;
+       }
+       else
+       {
+           if(!m_node->parent)
+           {
+               //special case the root is the first node
+               parent = dynamic_cast<DataNodeImpl*>(child_map.begin()->second.get());
                auto r = parent->child_map.find(p);
 
-			   if(r != parent->child_map.end())
-			   {
+               if(r != parent->child_map.end())
+               {
                    res = r;
-				   dn = res->second;
-			   }
-			   else
-			   {
-				   YLOG_ERROR("Cannot find child DataNode");
-				   throw(YCPPCoreError{"Cannot find child!"});
-			   }
-		   }
-		   else
-		   {
-			   YLOG_ERROR("Parent is nullptr");
-			   throw(YCPPCoreError{"Parent is nullptr"});
-		   }
+                   dn = res->second;
+               }
+               else
+               {
+                   YLOG_ERROR("Cannot find child DataNode");
+                   throw(YCPPCoreError{"Cannot find child!"});
+               }
+           }
+           else
+           {
+               YLOG_ERROR("Parent is nullptr");
+               throw(YCPPCoreError{"Parent is nullptr"});
+           }
        }
-	   parent = dynamic_cast<DataNodeImpl*>(dn.get());
-	}
+       parent = dynamic_cast<DataNodeImpl*>(dn.get());
+    }
 
-	return dn;
+    return dn;
 }
 
 

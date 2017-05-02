@@ -6,9 +6,9 @@
     "copyright": "Cisco",
     "description": "YDK Test Profile",
     "models": {
-	"dir": [
-	    "/yang/ydktest",
-	    "/yang/ietf"
+    "dir": [
+        "/yang/ydktest",
+        "/yang/ietf"
         ]
     }
 }

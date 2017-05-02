@@ -26,23 +26,23 @@ using namespace std;
 
 TEST_CASE("CreateDelRead")
 {
-	ydk::path::Repository repo{TEST_HOME};
-	RestconfServiceProvider provider{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
+    ydk::path::Repository repo{TEST_HOME};
+    RestconfServiceProvider provider{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
 
-	ydk::path::RootSchemaNode& schema = provider.get_root_schema();
+    ydk::path::RootSchemaNode& schema = provider.get_root_schema();
 
-	ydk::path::CodecService s{};
+    ydk::path::CodecService s{};
 
-	auto & runner = schema.create("ydktest-sanity:runner", "");
+    auto & runner = schema.create("ydktest-sanity:runner", "");
 
-	//first delete
-	std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.rpc("ydk:delete") };
-	auto json = s.encode(runner, EncodingFormat::JSON, false);
-	delete_rpc->input().create("entity", json);
-	//call delete
-	(*delete_rpc)(provider);
+    //first delete
+    std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.rpc("ydk:delete") };
+    auto json = s.encode(runner, EncodingFormat::JSON, false);
+    delete_rpc->input().create("entity", json);
+    //call delete
+    (*delete_rpc)(provider);
 
-	auto & number8 = runner.create("ytypes/built-in-t/number8", "3");
+    auto & number8 = runner.create("ytypes/built-in-t/number8", "3");
 
     json = s.encode(runner, EncodingFormat::JSON, false);
     CHECK( !json.empty());
@@ -53,23 +53,23 @@ TEST_CASE("CreateDelRead")
 
     //read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
-	auto & runner_read = schema.create("ydktest-sanity:runner", "");
+    auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-	json = s.encode(runner_read, EncodingFormat::JSON, false);
-	REQUIRE( !json.empty() );
-	read_rpc->input().create("filter", json);
+    json = s.encode(runner_read, EncodingFormat::JSON, false);
+    REQUIRE( !json.empty() );
+    read_rpc->input().create("filter", json);
 
-	auto read_result = (*read_rpc)(provider);
+    auto read_result = (*read_rpc)(provider);
 
-	runner = schema.create("ydktest-sanity:runner", "");
+    runner = schema.create("ydktest-sanity:runner", "");
     number8 = runner.create("ytypes/built-in-t/number8", "5");
 
-	json = s.encode(runner, EncodingFormat::JSON, false);
-	CHECK( !json.empty());
-	//call update
-	std::shared_ptr<ydk::path::Rpc> update_rpc { schema.rpc("ydk:update") };
-	update_rpc->input().create("entity", json);
-	(*update_rpc)(provider);
+    json = s.encode(runner, EncodingFormat::JSON, false);
+    CHECK( !json.empty());
+    //call update
+    std::shared_ptr<ydk::path::Rpc> update_rpc { schema.rpc("ydk:update") };
+    update_rpc->input().create("entity", json);
+    (*update_rpc)(provider);
 
 
 }

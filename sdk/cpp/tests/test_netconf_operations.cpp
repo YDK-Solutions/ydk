@@ -66,28 +66,28 @@ TEST_CASE("test_replace")
 
     //CREATE
     r_1->ytypes->built_in_t->number8 = 10;
-	reply = crud.create(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
 
-	//READ
-	auto filter = make_unique<ydktest_sanity::Runner>();
-	auto r_read = crud.read(provider, *filter);
-	REQUIRE(r_read!=nullptr);
-	ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-	REQUIRE(r_1->ytypes->built_in_t->number8 == r_2->ytypes->built_in_t->number8);
+    //READ
+    auto filter = make_unique<ydktest_sanity::Runner>();
+    auto r_read = crud.read(provider, *filter);
+    REQUIRE(r_read!=nullptr);
+    ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+    REQUIRE(r_1->ytypes->built_in_t->number8 == r_2->ytypes->built_in_t->number8);
 
-	//REPLACE
-	r_1->ytypes->built_in_t->number8 = 25;
-	r_1->operation = YFilter::replace;
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    //REPLACE
+    r_1->ytypes->built_in_t->number8 = 25;
+    r_1->operation = YFilter::replace;
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//READ AGAIN
-	filter = make_unique<ydktest_sanity::Runner>();
-	r_read = crud.read(provider, *filter);
-	REQUIRE(r_read!=nullptr);
-	r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-	REQUIRE(r_1->ytypes->built_in_t->number8 == r_2->ytypes->built_in_t->number8);
+    //READ AGAIN
+    filter = make_unique<ydktest_sanity::Runner>();
+    r_read = crud.read(provider, *filter);
+    REQUIRE(r_read!=nullptr);
+    r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+    REQUIRE(r_1->ytypes->built_in_t->number8 == r_2->ytypes->built_in_t->number8);
 }
 
 TEST_CASE("test_create")
@@ -102,26 +102,26 @@ TEST_CASE("test_create")
     REQUIRE(reply);
 
     //CREATE
-	auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-	auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-	e_1->number = 1;
-	e_1->name = "foo";
-	e_2->number = 2;
-	e_2->name = "bar";
+    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    e_1->number = 1;
+    e_1->name = "foo";
+    e_2->number = 2;
+    e_2->name = "bar";
 
-	e_1->parent = r_1->one_list.get();
-	e_1->operation = YFilter::create;
-	r_1->one_list->ldata.push_back(move(e_1));
+    e_1->parent = r_1->one_list.get();
+    e_1->operation = YFilter::create;
+    r_1->one_list->ldata.push_back(move(e_1));
 
     e_2->parent = r_1->one_list.get();
     e_2->operation = YFilter::create;
-	r_1->one_list->ldata.push_back(move(e_2));
+    r_1->one_list->ldata.push_back(move(e_2));
 
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//CREATE AGAIN WITH ERROR
-	CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
+    //CREATE AGAIN WITH ERROR
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }
 
 TEST_CASE("test_delete")
@@ -136,45 +136,45 @@ TEST_CASE("test_delete")
     REQUIRE(reply);
 
     //CREATE
-	auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-	auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-	e_1->number = 1;
-	e_1->name = "foo";
-	e_2->number = 2;
-	e_2->name = "bar";
+    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    e_1->number = 1;
+    e_1->name = "foo";
+    e_2->number = 2;
+    e_2->name = "bar";
 
-	e_1->parent = r_1->one_list.get();
-	e_1->operation = YFilter::create;
-	r_1->one_list->ldata.push_back(move(e_1));
+    e_1->parent = r_1->one_list.get();
+    e_1->operation = YFilter::create;
+    r_1->one_list->ldata.push_back(move(e_1));
 
     e_2->parent = r_1->one_list.get();
     e_2->operation = YFilter::create;
-	r_1->one_list->ldata.push_back(move(e_2));
+    r_1->one_list->ldata.push_back(move(e_2));
 
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//DELETE
-	r_1 = make_unique<ydktest_sanity::Runner>();
-	e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    //DELETE
+    r_1 = make_unique<ydktest_sanity::Runner>();
+    e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
 
-	e_1->parent = r_1->one_list.get();
-	e_1->number = 1;
-	e_1->operation = YFilter::delete_;
-	r_1->one_list->ldata.push_back(move(e_1));
+    e_1->parent = r_1->one_list.get();
+    e_1->number = 1;
+    e_1->operation = YFilter::delete_;
+    r_1->one_list->ldata.push_back(move(e_1));
 
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//DELETE AGAIN WITH ERROR
-	r_1 = make_unique<ydktest_sanity::Runner>();
-	e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    //DELETE AGAIN WITH ERROR
+    r_1 = make_unique<ydktest_sanity::Runner>();
+    e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
 
-	e_1->parent = r_1->one_list.get();
-	e_1->number = 1;
-	e_1->operation = YFilter::delete_;
-	r_1->one_list->ldata.push_back(move(e_1));
-	CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
+    e_1->parent = r_1->one_list.get();
+    e_1->number = 1;
+    e_1->operation = YFilter::delete_;
+    r_1->one_list->ldata.push_back(move(e_1));
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }
 
 TEST_CASE("test_remove")
@@ -189,21 +189,21 @@ TEST_CASE("test_remove")
     REQUIRE(reply);
 
     //MERGE
-	r_1->ytypes->built_in_t->number8 = 25;
-	r_1->operation = YFilter::merge;
-	reply = crud.create(provider, *r_1);
-	REQUIRE(reply);
+    r_1->ytypes->built_in_t->number8 = 25;
+    r_1->operation = YFilter::merge;
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
 
-	//REMOVE
-	r_1 = make_unique<ydktest_sanity::Runner>();
-	r_1->operation = YFilter::remove;
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    //REMOVE
+    r_1 = make_unique<ydktest_sanity::Runner>();
+    r_1->operation = YFilter::remove;
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//REMOVE AGAIN WITH NO ERROR
-	r_1->operation = YFilter::remove;
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    //REMOVE AGAIN WITH NO ERROR
+    r_1->operation = YFilter::remove;
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 }
 
 TEST_CASE("test_merge")
@@ -218,15 +218,15 @@ TEST_CASE("test_merge")
     REQUIRE(reply);
 
     //CREATE
-	r_1->ytypes->built_in_t->number8 = 25;
-	reply = crud.create(provider, *r_1);
-	REQUIRE(reply);
+    r_1->ytypes->built_in_t->number8 = 25;
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
 
-	//MERGE
-	r_1->ytypes->built_in_t->number8 = 32;
-	r_1->operation = YFilter::merge;
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    //MERGE
+    r_1->ytypes->built_in_t->number8 = 32;
+    r_1->operation = YFilter::merge;
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 }
 
 TEST_CASE("delete_leaf")
@@ -242,19 +242,19 @@ TEST_CASE("delete_leaf")
 
     //CREATE
     r_1->ytypes->built_in_t->number8 = 10;
-	reply = crud.create(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
 
-	//DELETE
-	ydktest_sanity::Runner r_2{};
-	// need to specify a value to construct correct NETCONF payload
-	r_2.ytypes->built_in_t->number8 = 10;
-	r_2.ytypes->built_in_t->number8.operation = YFilter::delete_;
-	reply = crud.update(provider, r_2);
-	REQUIRE(reply);
+    //DELETE
+    ydktest_sanity::Runner r_2{};
+    // need to specify a value to construct correct NETCONF payload
+    r_2.ytypes->built_in_t->number8 = 10;
+    r_2.ytypes->built_in_t->number8.operation = YFilter::delete_;
+    reply = crud.update(provider, r_2);
+    REQUIRE(reply);
 
-	//DELETE AGAIN WITH ERROR
-	CHECK_THROWS_AS(crud.update(provider, r_2), YCPPServiceProviderError);
+    //DELETE AGAIN WITH ERROR
+    CHECK_THROWS_AS(crud.update(provider, r_2), YCPPServiceProviderError);
 }
 
 
@@ -271,14 +271,14 @@ TEST_CASE("delete_leaflist")
 
     //CREATE
     r_1->ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::local);
-	reply = crud.create(provider, *r_1);
-	REQUIRE(reply);
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
 
-	//DELETE
-	r_1->ytypes->built_in_t->enum_llist.operation = YFilter::delete_;
-	reply = crud.update(provider, *r_1);
-	REQUIRE(reply);
+    //DELETE
+    r_1->ytypes->built_in_t->enum_llist.operation = YFilter::delete_;
+    reply = crud.update(provider, *r_1);
+    REQUIRE(reply);
 
-	//DELETE AGAIN WITH ERROR
-	CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
+    //DELETE AGAIN WITH ERROR
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }

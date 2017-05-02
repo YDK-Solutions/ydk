@@ -255,8 +255,8 @@ Pre-generated documentation for [ydk-py](http://ydk.cisco.com/py/docs/) and [ydk
 ```
 README          - install and usage notes
 gen-api         - generated bundle/core
-					- python (Python SDK)
-					- cpp (C++ SDK)
+                    - python (Python SDK)
+                    - cpp (C++ SDK)
 
 generate.py     - script used to generate SDK for yang models
 profiles        - profile files used during generation

@@ -30,9 +30,9 @@ typedef struct nc_msg nc_reply;
 typedef struct ssh_session_struct* ssh_session;
 
 typedef struct capabilities {
-	capabilities(std::vector<std::string> cas){caps=cas;}
+    capabilities(std::vector<std::string> cas){caps=cas;}
 
-	std::vector<std::string> caps;
+    std::vector<std::string> caps;
 } capabilities;
 
 namespace ydk
@@ -42,44 +42,44 @@ class NetconfClient
 {
 
 public:
-	static std::map<std::pair<std::string, std::string>, std::string> password_lookup;
+    static std::map<std::pair<std::string, std::string>, std::string> password_lookup;
 
 public:
-	NetconfClient(std::string  username, std::string  password,
-			std::string  server_ip, int port);
+    NetconfClient(std::string  username, std::string  password,
+            std::string  server_ip, int port);
 
-	~NetconfClient();
+    ~NetconfClient();
 
-	int connect();
-	std::string execute_payload(const std::string & payload);
-	std::vector<std::string> get_capabilities();
-	std::string get_hostname_port();
-
-private:
-
-	static void clb_print(NC_VERB_LEVEL level, const char* msg);
-	static void clb_error_print(const char* tag, const char* type,
-			const char* severity, const char* apptag, const char* path,
-			const char* message, const char* attribute, const char* element,
-			const char* ns, const char* sid);
-	static char* clb_set_password(const char* username, const char* hostname);
-	static char* clb_set_interactive(const char *name, const char *instruction, const char *prompt, int echo);
-	static char* clb_set_passphrase(const char *username, const char *hostname, const char *priv_key_file);
-	static int clb_ssh_host_authenticity_check(const char *hostname,
-			ssh_session session);
-
-	nc_rpc* build_rpc_request(const std::string & payload);
-	std::string process_rpc_reply(int reply_type, const nc_reply* reply);
-	void init_capabilities();
-	void perform_session_check(std::string message);
+    int connect();
+    std::string execute_payload(const std::string & payload);
+    std::vector<std::string> get_capabilities();
+    std::string get_hostname_port();
 
 private:
-	struct nc_session *session;
 
-	std::string username;
-	std::string hostname;
-	int port;
-	std::vector<std::string> capabilities;
+    static void clb_print(NC_VERB_LEVEL level, const char* msg);
+    static void clb_error_print(const char* tag, const char* type,
+            const char* severity, const char* apptag, const char* path,
+            const char* message, const char* attribute, const char* element,
+            const char* ns, const char* sid);
+    static char* clb_set_password(const char* username, const char* hostname);
+    static char* clb_set_interactive(const char *name, const char *instruction, const char *prompt, int echo);
+    static char* clb_set_passphrase(const char *username, const char *hostname, const char *priv_key_file);
+    static int clb_ssh_host_authenticity_check(const char *hostname,
+            ssh_session session);
+
+    nc_rpc* build_rpc_request(const std::string & payload);
+    std::string process_rpc_reply(int reply_type, const nc_reply* reply);
+    void init_capabilities();
+    void perform_session_check(std::string message);
+
+private:
+    struct nc_session *session;
+
+    std::string username;
+    std::string hostname;
+    int port;
+    std::vector<std::string> capabilities;
 };
 
 

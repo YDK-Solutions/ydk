@@ -52,7 +52,7 @@ NetconfService::~NetconfService()
 //cancel_commit
 bool NetconfService::cancel_commit(NetconfServiceProvider & provider, int persist_id)
 {
-	YLOG_INFO("Executing cancel-commit RPC");
+    YLOG_INFO("Executing cancel-commit RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:cancel-commit");
@@ -69,7 +69,7 @@ bool NetconfService::cancel_commit(NetconfServiceProvider & provider, int persis
 //close_session
 bool NetconfService::close_session(NetconfServiceProvider & provider)
 {
-	YLOG_INFO("Executing close-session RPC");
+    YLOG_INFO("Executing close-session RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:close-session");
@@ -82,7 +82,7 @@ bool NetconfService::close_session(NetconfServiceProvider & provider)
 bool NetconfService::commit(NetconfServiceProvider & provider, bool confirmed,
     int confirm_timeout, int persist, int persist_id)
 {
-	YLOG_INFO("Executing commit RPC");
+    YLOG_INFO("Executing commit RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:commit");
@@ -114,7 +114,7 @@ bool NetconfService::commit(NetconfServiceProvider & provider, bool confirmed,
 //copy_config
 bool NetconfService::copy_config(NetconfServiceProvider & provider, DataStore target, DataStore source, string url)
 {
-	YLOG_INFO("Executing copy-config RPC");
+    YLOG_INFO("Executing copy-config RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:copy-config");
@@ -129,7 +129,7 @@ bool NetconfService::copy_config(NetconfServiceProvider & provider, DataStore ta
 
 bool NetconfService::copy_config(NetconfServiceProvider & provider, DataStore target, Entity& source)
 {
-	YLOG_INFO("Executing copy-config RPC");
+    YLOG_INFO("Executing copy-config RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:copy-config");
@@ -148,7 +148,7 @@ bool NetconfService::copy_config(NetconfServiceProvider & provider, DataStore ta
 //delete_config
 bool NetconfService::delete_config(NetconfServiceProvider & provider, DataStore target, std::string url)
 {
-	YLOG_INFO("Executing delete-config RPC");
+    YLOG_INFO("Executing delete-config RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:delete-config");
@@ -163,7 +163,7 @@ bool NetconfService::delete_config(NetconfServiceProvider & provider, DataStore 
 //discard_changes
 bool NetconfService::discard_changes(NetconfServiceProvider & provider)
 {
-	YLOG_INFO("Executing discard-changes RPC");
+    YLOG_INFO("Executing discard-changes RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:discard-changes");
@@ -176,9 +176,9 @@ bool NetconfService::discard_changes(NetconfServiceProvider & provider)
 bool NetconfService::edit_config(NetconfServiceProvider & provider, DataStore target,
     Entity& config, std::string default_operation, std::string test_option, std::string error_option)
 {
-	YLOG_INFO("Executing edit-config RPC");
-//	ValidationService validation{}; //TODO
-//	validation.validate(provider, config, ValidationService::Option::DATASTORE);
+    YLOG_INFO("Executing edit-config RPC");
+//  ValidationService validation{}; //TODO
+//  validation.validate(provider, config, ValidationService::Option::DATASTORE);
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:edit-config");
@@ -212,7 +212,7 @@ bool NetconfService::edit_config(NetconfServiceProvider & provider, DataStore ta
 //get_config
 shared_ptr<Entity> NetconfService::get_config(NetconfServiceProvider & provider, DataStore source, Entity& filter)
 {
-	YLOG_INFO("Executing get-config RPC");
+    YLOG_INFO("Executing get-config RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:get-config");
@@ -237,7 +237,7 @@ shared_ptr<Entity> NetconfService::get_config(NetconfServiceProvider & provider,
 //get
 shared_ptr<Entity> NetconfService::get(NetconfServiceProvider & provider, Entity& filter)
 {
-	YLOG_INFO("Executing get RPC");
+    YLOG_INFO("Executing get RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:get");
@@ -257,7 +257,7 @@ shared_ptr<Entity> NetconfService::get(NetconfServiceProvider & provider, Entity
 //kill_session
 bool NetconfService::kill_session(NetconfServiceProvider & provider, int session_id)
 {
-	YLOG_INFO("Executing kill-session RPC");
+    YLOG_INFO("Executing kill-session RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:kill-session");
@@ -272,7 +272,7 @@ bool NetconfService::kill_session(NetconfServiceProvider & provider, int session
 //lock
 bool NetconfService::lock(NetconfServiceProvider & provider, DataStore target)
 {
-	YLOG_INFO("Executing lock RPC");
+    YLOG_INFO("Executing lock RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:lock");
@@ -287,7 +287,7 @@ bool NetconfService::lock(NetconfServiceProvider & provider, DataStore target)
 //unlock
 bool NetconfService::unlock(NetconfServiceProvider & provider, DataStore target)
 {
-	YLOG_INFO("Executing unlock RPC");
+    YLOG_INFO("Executing unlock RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:unlock");
@@ -302,7 +302,7 @@ bool NetconfService::unlock(NetconfServiceProvider & provider, DataStore target)
 //validate
 bool NetconfService::validate(NetconfServiceProvider & provider, DataStore source, string url)
 {
-	YLOG_INFO("Executing validate RPC");
+    YLOG_INFO("Executing validate RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:validate");
@@ -316,7 +316,7 @@ bool NetconfService::validate(NetconfServiceProvider & provider, DataStore sourc
 
 bool NetconfService::validate(NetconfServiceProvider & provider, Entity& source)
 {
-	YLOG_INFO("Executing validate RPC");
+    YLOG_INFO("Executing validate RPC");
 
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:validate");
@@ -331,10 +331,10 @@ bool NetconfService::validate(NetconfServiceProvider & provider, Entity& source)
 
 static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && operation)
 {
-	path::RootSchemaNode & root_schema = provider.get_root_schema();
-	auto rpc =  root_schema.rpc(operation);
-	if (rpc == nullptr)
-		throw(YCPPServiceProviderError{"Unable to create rpc"});
+    path::RootSchemaNode & root_schema = provider.get_root_schema();
+    auto rpc =  root_schema.rpc(operation);
+    if (rpc == nullptr)
+        throw(YCPPServiceProviderError{"Unable to create rpc"});
 
     return rpc;
 }

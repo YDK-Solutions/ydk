@@ -68,8 +68,8 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
     std::vector<std::string> segments = segmentalize(path);
     if(segments.size()<=0)
     {
-		YLOG_ERROR("Could not segmentalize");
-		throw(YCPPInvalidArgumentError{"Could not segmentalize"});
+        YLOG_ERROR("Could not segmentalize");
+        throw(YCPPInvalidArgumentError{"Could not segmentalize"});
     }
 
     std::string start_seg = m_path + segments[0];

@@ -77,17 +77,17 @@ path::DataNode& get_data_node_from_entity(Entity & entity, ydk::path::RootSchema
 
 static void walk_children(Entity & entity, path::DataNode & data_node, map<string, pair<string, YFilter>> & leaf_operations)
 {
-	std::map<string, shared_ptr<Entity>> children = entity.get_children();
-	YLOG_DEBUG("Children count for: {} : {}",entity.get_entity_path(entity.parent).path, children.size());
-	for(auto const& child : children)
-	{
-		YLOG_DEBUG("==================");
-		YLOG_DEBUG("Looking at child '{}': {}",child.first, child.second->get_entity_path(child.second->parent).path);
-		if(child.second->has_operation() || child.second->has_data())
-			populate_data_node(*(child.second), data_node, leaf_operations);
-		else
-			YLOG_DEBUG("Child has no data and no operations");
-	}
+    std::map<string, shared_ptr<Entity>> children = entity.get_children();
+    YLOG_DEBUG("Children count for: {} : {}",entity.get_entity_path(entity.parent).path, children.size());
+    for(auto const& child : children)
+    {
+        YLOG_DEBUG("==================");
+        YLOG_DEBUG("Looking at child '{}': {}",child.first, child.second->get_entity_path(child.second->parent).path);
+        if(child.second->has_operation() || child.second->has_data())
+            populate_data_node(*(child.second), data_node, leaf_operations);
+        else
+            YLOG_DEBUG("Child has no data and no operations");
+    }
 }
 
 static void populate_data_node(Entity & entity, path::DataNode & parent_data_node, map<string, pair<string, YFilter>> & leaf_operations)
@@ -108,13 +108,13 @@ static void populate_data_node(Entity & entity, path::DataNode & parent_data_nod
 
 static void populate_name_values(path::DataNode & data_node, EntityPath & path, map<string, pair<string, YFilter>> & leaf_operations)
 {
-	YLOG_DEBUG("Leaf count: {}", path.value_paths.size());
-	for(const std::pair<std::string, LeafData> & name_value : path.value_paths)
-	{
-		path::DataNode* result = nullptr;
-		LeafData leaf_data = name_value.second;
-		YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.path(),
-				leaf_data.value, leaf_data.is_set);
+    YLOG_DEBUG("Leaf count: {}", path.value_paths.size());
+    for(const std::pair<std::string, LeafData> & name_value : path.value_paths)
+    {
+        path::DataNode* result = nullptr;
+        LeafData leaf_data = name_value.second;
+        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.path(),
+                leaf_data.value, leaf_data.is_set);
 
         if(leaf_data.is_set)
         {
@@ -144,34 +144,34 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path, 
 
 static void add_annotation_to_datanode(const Entity & entity, path::DataNode & data_node)
 {
-	YLOG_DEBUG("Got operation '{}' for {}", to_string(entity.operation), entity.yang_name);
-	if (entity.operation != YFilter::read)
-	{
-		data_node.add_annotation(
-								 get_annotation(entity.operation)
-								 );
-		YLOG_DEBUG("Set operation '{}' for {}", to_string(entity.operation), entity.yang_name);
+    YLOG_DEBUG("Got operation '{}' for {}", to_string(entity.operation), entity.yang_name);
+    if (entity.operation != YFilter::read)
+    {
+        data_node.add_annotation(
+                                 get_annotation(entity.operation)
+                                 );
+        YLOG_DEBUG("Set operation '{}' for {}", to_string(entity.operation), entity.yang_name);
 
-	}
+    }
 }
 
 static void add_annotation_to_datanode(const std::pair<std::string, LeafData> & name_value, path::DataNode & data_node)
 {
-	YLOG_DEBUG("Got operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
-	if (name_value.second.operation != YFilter::read)
-	{
-		data_node.add_annotation(
-								 get_annotation(name_value.second.operation)
-								 );
-		YLOG_DEBUG("Set operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
-	}
+    YLOG_DEBUG("Got operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
+    if (name_value.second.operation != YFilter::read)
+    {
+        data_node.add_annotation(
+                                 get_annotation(name_value.second.operation)
+                                 );
+        YLOG_DEBUG("Set operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
+    }
 }
 
 static path::Annotation get_annotation(YFilter operation)
 {
-	if(operation == YFilter::not_set)
-		throw(YCPPInvalidArgumentError{"Invalid operation"});
-	return {IETF_NETCONF_MODULE_NAME, "operation", to_string(operation)};
+    if(operation == YFilter::not_set)
+        throw(YCPPInvalidArgumentError{"Invalid operation"});
+    return {IETF_NETCONF_MODULE_NAME, "operation", to_string(operation)};
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -179,39 +179,39 @@ static path::Annotation get_annotation(YFilter operation)
 //////////////////////////////////////////////////////////////////////////
 void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> entity)
 {
-	if (entity == nullptr || node == nullptr)
-		return;
+    if (entity == nullptr || node == nullptr)
+        return;
 
-	for(auto & child_data_node:node->children())
-	{
-		std::string child_name = child_data_node->schema().statement().arg;
-		if(data_node_is_leaf(*child_data_node))
-		{
-			YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
-					child_data_node->get(), node->path());
-			entity->set_value(child_name, child_data_node->get());
-		}
-		else
-		{
-			YLOG_DEBUG("Going into child {} in parent {}", child_name, node->path());
-			std::shared_ptr<Entity> child_entity;
-			if(data_node_is_list(*child_data_node))
-			{
-				child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->path()));
-			}
-			else
-			{
-				child_entity = entity->get_child_by_name(child_name);
-			}
-			child_entity->parent = entity.get();
+    for(auto & child_data_node:node->children())
+    {
+        std::string child_name = child_data_node->schema().statement().arg;
+        if(data_node_is_leaf(*child_data_node))
+        {
+            YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
+                    child_data_node->get(), node->path());
+            entity->set_value(child_name, child_data_node->get());
+        }
+        else
+        {
+            YLOG_DEBUG("Going into child {} in parent {}", child_name, node->path());
+            std::shared_ptr<Entity> child_entity;
+            if(data_node_is_list(*child_data_node))
+            {
+                child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->path()));
+            }
+            else
+            {
+                child_entity = entity->get_child_by_name(child_name);
+            }
+            child_entity->parent = entity.get();
 
-			if(child_entity == nullptr)
-			{
-				YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->path());
-			}
-			get_entity_from_data_node(child_data_node.get(), child_entity);
-		}
-	}
+            if(child_entity == nullptr)
+            {
+                YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->path());
+            }
+            get_entity_from_data_node(child_data_node.get(), child_entity);
+        }
+    }
 }
 
 static bool data_node_is_leaf(path::DataNode & data_node)

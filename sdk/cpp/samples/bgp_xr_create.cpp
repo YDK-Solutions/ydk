@@ -84,27 +84,27 @@ void config_bgp(Bgp* bgp)
 
 int main(int argc, char* argv[])
 {
-	vector<string> args = parse_args(argc, argv);
-	if(args.empty()) return 1;
-	string host, username, password;
-	int port;
+    vector<string> args = parse_args(argc, argv);
+    if(args.empty()) return 1;
+    string host, username, password;
+    int port;
 
-	username = args[0]; password = args[1]; host = args[2]; port = stoi(args[3]);
+    username = args[0]; password = args[1]; host = args[2]; port = stoi(args[3]);
 
-	bool verbose=(args[4]=="--verbose");
-	if(verbose)
-	{
+    bool verbose=(args[4]=="--verbose");
+    if(verbose)
+    {
             auto logger = spdlog::stdout_color_mt("ydk");
             logger->set_level(spdlog::level::info);
-	}
+    }
 
-	NetconfServiceProvider provider{host, username, password, port};
-	CrudService crud{};
+    NetconfServiceProvider provider{host, username, password, port};
+    CrudService crud{};
 
-	auto bgp = make_unique<Bgp>();
-	config_bgp(bgp.get());
-	bool reply = crud.create(provider, *bgp);
+    auto bgp = make_unique<Bgp>();
+    config_bgp(bgp.get());
+    bool reply = crud.create(provider, *bgp);
 
-	if(reply) cout << "Create operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+    if(reply) cout << "Create operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
 
 }

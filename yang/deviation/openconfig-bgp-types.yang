@@ -1,15 +1,15 @@
 module openconfig-bgp-types {
-	yang-version "1";
+    yang-version "1";
 
-	namespace "http://openconfig.net/yang/bgp-types";
+    namespace "http://openconfig.net/yang/bgp-types";
 
-	prefix "bgp-types";
+    prefix "bgp-types";
 
-	import ietf-inet-types { prefix inet; }
+    import ietf-inet-types { prefix inet; }
     import openconfig-types { prefix oc-types; }
 
-	// meta
-	organization
+    // meta
+    organization
     "OpenConfig working group";
 
   contact

@@ -141,18 +141,18 @@ namespace ydk {
 
         char* get_enlarged_data(const std::string & buffer, const std::string & model_name)
         {
-        	char *enlarged_data = nullptr;
-			/* enlarge data by 2 bytes for flex */
-			auto data = buffer.c_str();
-			auto len = std::strlen(data);
-			enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
-			if (!enlarged_data) {
-			    YLOG_ERROR("Could not get model: {}", model_name);
-				throw(std::bad_alloc{});
-			}
-			memcpy(enlarged_data, data, len);
-			enlarged_data[len] = enlarged_data[len + 1] = '\0';
-			return enlarged_data;
+            char *enlarged_data = nullptr;
+            /* enlarge data by 2 bytes for flex */
+            auto data = buffer.c_str();
+            auto len = std::strlen(data);
+            enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
+            if (!enlarged_data) {
+                YLOG_ERROR("Could not get model: {}", model_name);
+                throw(std::bad_alloc{});
+            }
+            memcpy(enlarged_data, data, len);
+            enlarged_data[len] = enlarged_data[len + 1] = '\0';
+            return enlarged_data;
         }
 
         extern "C" char* get_module_callback(const char* module_name, const char* module_rev, const char *submod_name, const char *sub_rev,

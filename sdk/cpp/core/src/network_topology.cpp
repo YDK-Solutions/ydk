@@ -108,7 +108,7 @@ NetworkTopology::Topology::Topology()
     :
     topology_id{YType::str, "topology-id"},
     server_provided{YType::boolean, "server-provided"}
-    	,
+        ,
     topology_types(std::make_shared<NetworkTopology::Topology::TopologyTypes>())
 {
     topology_types->parent = this;
@@ -138,8 +138,8 @@ bool NetworkTopology::Topology::has_data() const
             return true;
     }
     return topology_id.is_set
-	|| server_provided.is_set
-	|| (topology_types !=  nullptr && topology_types->has_data());
+    || server_provided.is_set
+    || (topology_types !=  nullptr && topology_types->has_data());
 }
 
 bool NetworkTopology::Topology::has_operation() const
@@ -160,9 +160,9 @@ bool NetworkTopology::Topology::has_operation() const
             return true;
     }
     return is_set(operation)
-	|| is_set(topology_id.operation)
-	|| is_set(server_provided.operation)
-	|| (topology_types !=  nullptr && topology_types->has_operation());
+    || is_set(topology_id.operation)
+    || is_set(server_provided.operation)
+    || (topology_types !=  nullptr && topology_types->has_operation());
 }
 
 std::string NetworkTopology::Topology::get_segment_path() const
@@ -318,7 +318,7 @@ bool NetworkTopology::Topology::TopologyTypes::has_data() const
 bool NetworkTopology::Topology::TopologyTypes::has_operation() const
 {
     return is_set(operation)
-	|| (topology_netconf !=  nullptr && topology_netconf->has_operation());
+    || (topology_netconf !=  nullptr && topology_netconf->has_operation());
 }
 
 std::string NetworkTopology::Topology::TopologyTypes::get_segment_path() const
@@ -463,7 +463,7 @@ bool NetworkTopology::Topology::UnderlayTopology::has_data() const
 bool NetworkTopology::Topology::UnderlayTopology::has_operation() const
 {
     return is_set(operation)
-	|| is_set(topology_ref.operation);
+    || is_set(topology_ref.operation);
 }
 
 std::string NetworkTopology::Topology::UnderlayTopology::get_segment_path() const
@@ -536,13 +536,13 @@ NetworkTopology::Topology::Node::Node()
     sleep_factor{YType::str, "netconf-node-topology:sleep-factor"},
     tcp_only{YType::boolean, "netconf-node-topology:tcp-only"},
     username{YType::str, "netconf-node-topology:username"}
-    	,
+        ,
     available_capabilities(std::make_shared<NetworkTopology::Topology::Node::AvailableCapabilities>())
-	,clustered_connection_status(std::make_shared<NetworkTopology::Topology::Node::ClusteredConnectionStatus>())
-	,pass_through(std::make_shared<NetworkTopology::Topology::Node::PassThrough>())
-	,unavailable_capabilities(std::make_shared<NetworkTopology::Topology::Node::UnavailableCapabilities>())
-	,yang_library(std::make_shared<NetworkTopology::Topology::Node::YangLibrary>())
-	,yang_module_capabilities(std::make_shared<NetworkTopology::Topology::Node::YangModuleCapabilities>())
+    ,clustered_connection_status(std::make_shared<NetworkTopology::Topology::Node::ClusteredConnectionStatus>())
+    ,pass_through(std::make_shared<NetworkTopology::Topology::Node::PassThrough>())
+    ,unavailable_capabilities(std::make_shared<NetworkTopology::Topology::Node::UnavailableCapabilities>())
+    ,yang_library(std::make_shared<NetworkTopology::Topology::Node::YangLibrary>())
+    ,yang_module_capabilities(std::make_shared<NetworkTopology::Topology::Node::YangModuleCapabilities>())
 {
     available_capabilities->parent = this;
 
@@ -576,29 +576,29 @@ bool NetworkTopology::Topology::Node::has_data() const
             return true;
     }
     return node_id.is_set
-	|| between_attempts_timeout_millis.is_set
-	|| concurrent_rpc_limit.is_set
-	|| connected_message.is_set
-	|| connection_status.is_set
-	|| connection_timeout_millis.is_set
-	|| default_request_timeout_millis.is_set
-	|| host.is_set
-	|| keepalive_delay.is_set
-	|| max_connection_attempts.is_set
-	|| password.is_set
-	|| port.is_set
-	|| reconnect_on_changed_schema.is_set
-	|| schema_cache_directory.is_set
-	|| schemaless.is_set
-	|| sleep_factor.is_set
-	|| tcp_only.is_set
-	|| username.is_set
-	|| (available_capabilities !=  nullptr && available_capabilities->has_data())
-	|| (clustered_connection_status !=  nullptr && clustered_connection_status->has_data())
-	|| (pass_through !=  nullptr && pass_through->has_data())
-	|| (unavailable_capabilities !=  nullptr && unavailable_capabilities->has_data())
-	|| (yang_library !=  nullptr && yang_library->has_data())
-	|| (yang_module_capabilities !=  nullptr && yang_module_capabilities->has_data());
+    || between_attempts_timeout_millis.is_set
+    || concurrent_rpc_limit.is_set
+    || connected_message.is_set
+    || connection_status.is_set
+    || connection_timeout_millis.is_set
+    || default_request_timeout_millis.is_set
+    || host.is_set
+    || keepalive_delay.is_set
+    || max_connection_attempts.is_set
+    || password.is_set
+    || port.is_set
+    || reconnect_on_changed_schema.is_set
+    || schema_cache_directory.is_set
+    || schemaless.is_set
+    || sleep_factor.is_set
+    || tcp_only.is_set
+    || username.is_set
+    || (available_capabilities !=  nullptr && available_capabilities->has_data())
+    || (clustered_connection_status !=  nullptr && clustered_connection_status->has_data())
+    || (pass_through !=  nullptr && pass_through->has_data())
+    || (unavailable_capabilities !=  nullptr && unavailable_capabilities->has_data())
+    || (yang_library !=  nullptr && yang_library->has_data())
+    || (yang_module_capabilities !=  nullptr && yang_module_capabilities->has_data());
 }
 
 bool NetworkTopology::Topology::Node::has_operation() const
@@ -614,30 +614,30 @@ bool NetworkTopology::Topology::Node::has_operation() const
             return true;
     }
     return is_set(operation)
-	|| is_set(node_id.operation)
-	|| is_set(between_attempts_timeout_millis.operation)
-	|| is_set(concurrent_rpc_limit.operation)
-	|| is_set(connected_message.operation)
-	|| is_set(connection_status.operation)
-	|| is_set(connection_timeout_millis.operation)
-	|| is_set(default_request_timeout_millis.operation)
-	|| is_set(host.operation)
-	|| is_set(keepalive_delay.operation)
-	|| is_set(max_connection_attempts.operation)
-	|| is_set(password.operation)
-	|| is_set(port.operation)
-	|| is_set(reconnect_on_changed_schema.operation)
-	|| is_set(schema_cache_directory.operation)
-	|| is_set(schemaless.operation)
-	|| is_set(sleep_factor.operation)
-	|| is_set(tcp_only.operation)
-	|| is_set(username.operation)
-	|| (available_capabilities !=  nullptr && available_capabilities->has_operation())
-	|| (clustered_connection_status !=  nullptr && clustered_connection_status->has_operation())
-	|| (pass_through !=  nullptr && pass_through->has_operation())
-	|| (unavailable_capabilities !=  nullptr && unavailable_capabilities->has_operation())
-	|| (yang_library !=  nullptr && yang_library->has_operation())
-	|| (yang_module_capabilities !=  nullptr && yang_module_capabilities->has_operation());
+    || is_set(node_id.operation)
+    || is_set(between_attempts_timeout_millis.operation)
+    || is_set(concurrent_rpc_limit.operation)
+    || is_set(connected_message.operation)
+    || is_set(connection_status.operation)
+    || is_set(connection_timeout_millis.operation)
+    || is_set(default_request_timeout_millis.operation)
+    || is_set(host.operation)
+    || is_set(keepalive_delay.operation)
+    || is_set(max_connection_attempts.operation)
+    || is_set(password.operation)
+    || is_set(port.operation)
+    || is_set(reconnect_on_changed_schema.operation)
+    || is_set(schema_cache_directory.operation)
+    || is_set(schemaless.operation)
+    || is_set(sleep_factor.operation)
+    || is_set(tcp_only.operation)
+    || is_set(username.operation)
+    || (available_capabilities !=  nullptr && available_capabilities->has_operation())
+    || (clustered_connection_status !=  nullptr && clustered_connection_status->has_operation())
+    || (pass_through !=  nullptr && pass_through->has_operation())
+    || (unavailable_capabilities !=  nullptr && unavailable_capabilities->has_operation())
+    || (yang_library !=  nullptr && yang_library->has_operation())
+    || (yang_module_capabilities !=  nullptr && yang_module_capabilities->has_operation());
 }
 
 std::string NetworkTopology::Topology::Node::get_segment_path() const
@@ -916,14 +916,14 @@ NetworkTopology::Topology::Node::SupportingNode::~SupportingNode()
 bool NetworkTopology::Topology::Node::SupportingNode::has_data() const
 {
     return node_ref.is_set
-	|| topology_ref.is_set;
+    || topology_ref.is_set;
 }
 
 bool NetworkTopology::Topology::Node::SupportingNode::has_operation() const
 {
     return is_set(operation)
-	|| is_set(node_ref.operation)
-	|| is_set(topology_ref.operation);
+    || is_set(node_ref.operation)
+    || is_set(topology_ref.operation);
 }
 
 std::string NetworkTopology::Topology::Node::SupportingNode::get_segment_path() const
@@ -1011,8 +1011,8 @@ bool NetworkTopology::Topology::Node::TerminationPoint::has_operation() const
             return true;
     }
     return is_set(operation)
-	|| is_set(tp_id.operation)
-	|| is_set(tp_ref.operation);
+    || is_set(tp_id.operation)
+    || is_set(tp_ref.operation);
 }
 
 std::string NetworkTopology::Topology::Node::TerminationPoint::get_segment_path() const
@@ -1101,8 +1101,8 @@ bool NetworkTopology::Topology::Node::YangModuleCapabilities::has_operation() co
             return true;
     }
     return is_set(operation)
-	|| is_set(capability.operation)
-	|| is_set(override.operation);
+    || is_set(capability.operation)
+    || is_set(override.operation);
 }
 
 std::string NetworkTopology::Topology::Node::YangModuleCapabilities::get_segment_path() const
@@ -1190,7 +1190,7 @@ bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::has_operation()
             return true;
     }
     return is_set(operation)
-	|| is_set(netconf_master_node.operation);
+    || is_set(netconf_master_node.operation);
 }
 
 std::string NetworkTopology::Topology::Node::ClusteredConnectionStatus::get_segment_path() const
@@ -1279,14 +1279,14 @@ NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::~NodeSta
 bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::has_data() const
 {
     return node.is_set
-	|| status.is_set;
+    || status.is_set;
 }
 
 bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::has_operation() const
 {
     return is_set(operation)
-	|| is_set(node.operation)
-	|| is_set(status.operation);
+    || is_set(node.operation)
+    || is_set(status.operation);
 }
 
 std::string NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::get_segment_path() const
@@ -1454,14 +1454,14 @@ NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::~Av
 bool NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::has_data() const
 {
     return capability.is_set
-	|| capability_origin.is_set;
+    || capability_origin.is_set;
 }
 
 bool NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::has_operation() const
 {
     return is_set(operation)
-	|| is_set(capability.operation)
-	|| is_set(capability_origin.operation);
+    || is_set(capability.operation)
+    || is_set(capability_origin.operation);
 }
 
 std::string NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::get_segment_path() const
@@ -1629,14 +1629,14 @@ NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability:
 bool NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability::has_data() const
 {
     return capability.is_set
-	|| failure_reason.is_set;
+    || failure_reason.is_set;
 }
 
 bool NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability::has_operation() const
 {
     return is_set(operation)
-	|| is_set(capability.operation)
-	|| is_set(failure_reason.operation);
+    || is_set(capability.operation)
+    || is_set(failure_reason.operation);
 }
 
 std::string NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability::get_segment_path() const
@@ -1774,16 +1774,16 @@ NetworkTopology::Topology::Node::YangLibrary::~YangLibrary()
 bool NetworkTopology::Topology::Node::YangLibrary::has_data() const
 {
     return password.is_set
-	|| username.is_set
-	|| yang_library_url.is_set;
+    || username.is_set
+    || yang_library_url.is_set;
 }
 
 bool NetworkTopology::Topology::Node::YangLibrary::has_operation() const
 {
     return is_set(operation)
-	|| is_set(password.operation)
-	|| is_set(username.operation)
-	|| is_set(yang_library_url.operation);
+    || is_set(password.operation)
+    || is_set(username.operation)
+    || is_set(yang_library_url.operation);
 }
 
 std::string NetworkTopology::Topology::Node::YangLibrary::get_segment_path() const
@@ -1849,9 +1849,9 @@ void NetworkTopology::Topology::Node::YangLibrary::set_value(const std::string &
 NetworkTopology::Topology::Link::Link()
     :
     link_id{YType::str, "link-id"}
-    	,
+        ,
     destination(std::make_shared<NetworkTopology::Topology::Link::Destination>())
-	,source(std::make_shared<NetworkTopology::Topology::Link::Source>())
+    ,source(std::make_shared<NetworkTopology::Topology::Link::Source>())
 {
     destination->parent = this;
 
@@ -1872,8 +1872,8 @@ bool NetworkTopology::Topology::Link::has_data() const
             return true;
     }
     return link_id.is_set
-	|| (destination !=  nullptr && destination->has_data())
-	|| (source !=  nullptr && source->has_data());
+    || (destination !=  nullptr && destination->has_data())
+    || (source !=  nullptr && source->has_data());
 }
 
 bool NetworkTopology::Topology::Link::has_operation() const
@@ -1884,9 +1884,9 @@ bool NetworkTopology::Topology::Link::has_operation() const
             return true;
     }
     return is_set(operation)
-	|| is_set(link_id.operation)
-	|| (destination !=  nullptr && destination->has_operation())
-	|| (source !=  nullptr && source->has_operation());
+    || is_set(link_id.operation)
+    || (destination !=  nullptr && destination->has_operation())
+    || (source !=  nullptr && source->has_operation());
 }
 
 std::string NetworkTopology::Topology::Link::get_segment_path() const
@@ -2003,14 +2003,14 @@ NetworkTopology::Topology::Link::Source::~Source()
 bool NetworkTopology::Topology::Link::Source::has_data() const
 {
     return source_node.is_set
-	|| source_tp.is_set;
+    || source_tp.is_set;
 }
 
 bool NetworkTopology::Topology::Link::Source::has_operation() const
 {
     return is_set(operation)
-	|| is_set(source_node.operation)
-	|| is_set(source_tp.operation);
+    || is_set(source_node.operation)
+    || is_set(source_tp.operation);
 }
 
 std::string NetworkTopology::Topology::Link::Source::get_segment_path() const
@@ -2083,14 +2083,14 @@ NetworkTopology::Topology::Link::Destination::~Destination()
 bool NetworkTopology::Topology::Link::Destination::has_data() const
 {
     return dest_node.is_set
-	|| dest_tp.is_set;
+    || dest_tp.is_set;
 }
 
 bool NetworkTopology::Topology::Link::Destination::has_operation() const
 {
     return is_set(operation)
-	|| is_set(dest_node.operation)
-	|| is_set(dest_tp.operation);
+    || is_set(dest_node.operation)
+    || is_set(dest_tp.operation);
 }
 
 std::string NetworkTopology::Topology::Link::Destination::get_segment_path() const
@@ -2167,7 +2167,7 @@ bool NetworkTopology::Topology::Link::SupportingLink::has_data() const
 bool NetworkTopology::Topology::Link::SupportingLink::has_operation() const
 {
     return is_set(operation)
-	|| is_set(link_ref.operation);
+    || is_set(link_ref.operation);
 }
 
 std::string NetworkTopology::Topology::Link::SupportingLink::get_segment_path() const

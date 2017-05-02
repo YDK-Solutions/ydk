@@ -8,11 +8,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(YDK_YANG_ARCHIVE @BRIEF_NAME@\@@VERSION@)
 
 if(NOT LIB_INSTALL_DIR)
-	set(LIB_INSTALL_DIR lib)
+    set(LIB_INSTALL_DIR lib)
 endif()
 
 if(NOT INCLUDE_INSTALL_DIR)
-	set(INCLUDE_INSTALL_DIR include/ydk_@BRIEF_NAME@)
+    set(INCLUDE_INSTALL_DIR include/ydk_@BRIEF_NAME@)
 endif()
 
 if(NOT YANG_INSTALL_DIR)
@@ -21,7 +21,7 @@ endif()
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE release)
+    set(CMAKE_BUILD_TYPE release)
 endif()
 
 if(SHOW_WARNINGS)
@@ -87,19 +87,19 @@ install(FILES ${libydk_YANG_FILES} DESTINATION ${YANG_INSTALL_DIR})
 # generate doxygen documentation for ydk_core API
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-	set(DOXYGEN_SKIP_DOT TRUE)
-	add_custom_target(doc
-			COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-	configure_file(Doxyfile.in Doxyfile)
+    set(DOXYGEN_SKIP_DOT TRUE)
+    add_custom_target(doc
+            COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    configure_file(Doxyfile.in Doxyfile)
 endif()
 
 
 # clean cmake cache
 add_custom_target(cclean
-		COMMAND make clean
-		COMMAND find . -iname '*cmake*' -not -name CMakeLists.txt -not -path './CMakeModules*' -exec rm -rf {} +
-		COMMAND rm -rf Makefile Doxyfile
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+        COMMAND make clean
+        COMMAND find . -iname '*cmake*' -not -name CMakeLists.txt -not -path './CMakeModules*' -exec rm -rf {} +
+        COMMAND rm -rf Makefile Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 

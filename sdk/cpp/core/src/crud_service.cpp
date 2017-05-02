@@ -39,7 +39,7 @@ namespace ydk {
 
 static string get_data_payload(Entity & entity, path::ServiceProvider & provider);
 static std::shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
-		const string & operation, const string & data_tag, bool set_config_flag);
+        const string & operation, const string & data_tag, bool set_config_flag);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 static bool operation_succeeded(shared_ptr<path::DataNode> node);
 
@@ -49,38 +49,38 @@ CrudService::CrudService()
 
 bool CrudService::create(path::ServiceProvider & provider, Entity & entity)
 {
-	YLOG_INFO("Executing CRUD create operation");
-	return operation_succeeded(
-			execute_rpc(provider, entity, "ydk:create", "entity", false)
-			);
+    YLOG_INFO("Executing CRUD create operation");
+    return operation_succeeded(
+            execute_rpc(provider, entity, "ydk:create", "entity", false)
+            );
 }
 
 bool CrudService::update(path::ServiceProvider & provider, Entity & entity)
 {
-	YLOG_INFO("Executing CRUD update operation");
-	return operation_succeeded(
-			execute_rpc(provider, entity, "ydk:update", "entity", false)
-			);
+    YLOG_INFO("Executing CRUD update operation");
+    return operation_succeeded(
+            execute_rpc(provider, entity, "ydk:update", "entity", false)
+            );
 }
 
 bool CrudService::delete_(path::ServiceProvider & provider, Entity & entity)
 {
-	YLOG_INFO("Executing CRUD delete operation");
-	return operation_succeeded(
-			execute_rpc(provider, entity, "ydk:delete", "entity", false)
-			);
+    YLOG_INFO("Executing CRUD delete operation");
+    return operation_succeeded(
+            execute_rpc(provider, entity, "ydk:delete", "entity", false)
+            );
 }
 
 shared_ptr<Entity> CrudService::read(path::ServiceProvider & provider, Entity & filter)
 {
-	YLOG_INFO("Executing CRUD read operation");
-	return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", false));
+    YLOG_INFO("Executing CRUD read operation");
+    return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", false));
 }
 
 shared_ptr<Entity> CrudService::read_config(path::ServiceProvider & provider, Entity & filter)
 {
-	YLOG_INFO("Executing CRUD config read operation");
-	return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", true));
+    YLOG_INFO("Executing CRUD config read operation");
+    return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", true));
 }
 
 shared_ptr<Entity> CrudService::read_datanode(Entity & filter, shared_ptr<path::DataNode> read_data_node)
@@ -94,8 +94,8 @@ shared_ptr<Entity> CrudService::read_datanode(Entity & filter, shared_ptr<path::
 
 static bool operation_succeeded(shared_ptr<path::DataNode> node)
 {
-	YLOG_INFO("Operation {}", ((node == nullptr)?"succeeded":"failed"));
-	return node == nullptr;
+    YLOG_INFO("Operation {}", ((node == nullptr)?"succeeded":"failed"));
+    return node == nullptr;
 }
 
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
@@ -158,15 +158,15 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
 static string get_data_payload(Entity & entity, path::ServiceProvider & provider)
 {
     map<string, pair<string, YFilter>> leaf_operations;
-	const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema(), leaf_operations);
+    const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema(), leaf_operations);
 
     const path::DataNode* dn = &datanode;
     while(dn!= nullptr && dn->parent()!=nullptr)
         dn = dn->parent();
     path::CodecService codec{};
-	string payload = codec.encode(*dn, provider.get_encoding(), false);
-	if(provider.get_encoding() == EncodingFormat::XML && leaf_operations.size()>0)
-	{
+    string payload = codec.encode(*dn, provider.get_encoding(), false);
+    if(provider.get_encoding() == EncodingFormat::XML && leaf_operations.size()>0)
+    {
         xmlDocPtr doc = xmlParseDoc((const unsigned char *)payload.c_str());
         xmlNodePtr root = xmlDocGetRootElement(doc);
         for(auto & leaf_operation : leaf_operations)
@@ -186,8 +186,8 @@ static string get_data_payload(Entity & entity, path::ServiceProvider & provider
         {
             YLOG_ERROR("Error creating the xml buffer");
         }
-	}
-	return payload;
+    }
+    return payload;
 }
 
 }

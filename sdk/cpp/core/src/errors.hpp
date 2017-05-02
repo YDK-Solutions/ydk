@@ -49,7 +49,7 @@ struct YCPPError : public std::exception
 
 struct YCPPClientError : public YCPPError
 {
-	YCPPClientError(const std::string& msg);
+    YCPPClientError(const std::string& msg);
 };
 
 struct YCPPServiceProviderError : public YCPPError

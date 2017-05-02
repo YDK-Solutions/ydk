@@ -98,7 +98,7 @@ CodecService::decode(CodecServiceProvider & provider, const std::string & payloa
 
     if (root_data_node->children().size() != 1)
     {
-    	YLOG_ERROR(PAYLOAD_ERROR_MSG);
+        YLOG_ERROR(PAYLOAD_ERROR_MSG);
         throw(YCPPServiceProviderError(PAYLOAD_ERROR_MSG));
     }
     else
@@ -115,7 +115,7 @@ CodecService::decode(CodecServiceProvider & provider, const std::string & payloa
 
 std::map<std::string, std::shared_ptr<Entity>>
 CodecService::decode(CodecServiceProvider & provider, std::map<std::string, std::string> & payload_map,
-		std::map<std::string, std::shared_ptr<Entity>> entity_map)
+        std::map<std::string, std::shared_ptr<Entity>> entity_map)
 {
     for (auto it: payload_map)
     {

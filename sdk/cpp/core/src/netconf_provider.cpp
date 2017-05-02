@@ -64,16 +64,16 @@ const char* CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 
 NetconfServiceProvider::NetconfServiceProvider(string address, string username, string password, int port)
     : client(make_unique<NetconfClient>(username, password, address, port)),
-	  model_provider(make_unique<NetconfModelProvider>(*client))
+      model_provider(make_unique<NetconfModelProvider>(*client))
 {
-	path::Repository repo;
+    path::Repository repo;
     initialize(repo);
     YLOG_INFO("Connected to {} on port {} using ssh", address, port);
 }
 
 NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo, string address, string username, string password, int port)
     : client(make_unique<NetconfClient>(username, password, address, port)),
-	  model_provider(make_unique<NetconfModelProvider>(*client))
+      model_provider(make_unique<NetconfModelProvider>(*client))
 {
     initialize(repo);
     YLOG_INFO("Connected to {} on port {} using ssh", address, port);
@@ -85,31 +85,31 @@ void NetconfServiceProvider::initialize(path::Repository & repo)
     client->connect();
     server_capabilities = client->get_capabilities();
 
-	for(std::string c : server_capabilities )
-	{
-		if(c.find("ietf-netconf-monitoring") != std::string::npos)
-		{
-			repo.add_model_provider(model_provider.get());
-		}
-	}
+    for(std::string c : server_capabilities )
+    {
+        if(c.find("ietf-netconf-monitoring") != std::string::npos)
+        {
+            repo.add_model_provider(model_provider.get());
+        }
+    }
 
-	root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
+    root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
 
-	if(root_schema.get() == nullptr)
-	{
-		YLOG_ERROR("Root schema cannot be obtained");
-		throw(YCPPIllegalStateError{"Root schema cannot be obtained"});
-	}
+    if(root_schema.get() == nullptr)
+    {
+        YLOG_ERROR("Root schema cannot be obtained");
+        throw(YCPPIllegalStateError{"Root schema cannot be obtained"});
+    }
 }
 
 NetconfServiceProvider::~NetconfServiceProvider()
 {
-	YLOG_INFO("Disconnected from device");
+    YLOG_INFO("Disconnected from device");
 }
 
 EncodingFormat NetconfServiceProvider::get_encoding() const
 {
-	return EncodingFormat::XML;
+    return EncodingFormat::XML;
 }
 
 path::RootSchemaNode& NetconfServiceProvider::get_root_schema() const
@@ -127,7 +127,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_read(path::Rpc& y
     std::string filter_value = get_filter_payload(ydk_rpc);
 
     string netconf_payload = get_netconf_payload(input, "filter", filter_value);
-    return handle_read_reply(execute_payload(netconf_payload), *root_schema	);
+    return handle_read_reply(execute_payload(netconf_payload), *root_schema );
 }
 
 std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_edit(path::Rpc& ydk_rpc, path::Annotation annotation) const
@@ -182,7 +182,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::invoke(path::Rpc& rpc) c
 
     //for now we only support crud rpc's
     path::SchemaNode* rpc_schema = &(rpc.schema());
-	std::shared_ptr<path::DataNode> datanode = nullptr;
+    std::shared_ptr<path::DataNode> datanode = nullptr;
 
     if(rpc_schema == create_schema || rpc_schema == delete_schema || rpc_schema == update_schema)
     {
@@ -259,7 +259,7 @@ static void create_input_target(path::DataNode & input, bool candidate_supported
 
 static void create_input_error_option(path::DataNode & input)
 {
-	input.create("error-option", "rollback-on-error");
+    input.create("error-option", "rollback-on-error");
 }
 
 static void create_input_source(path::DataNode & input, bool config)
@@ -295,10 +295,10 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
 
     for(auto const & child : datanode->children())
     {
-    	if((child->annotations()).size()==0)
-    	{
-    		child->add_annotation(annotation);
-    	}
+        if((child->annotations()).size()==0)
+        {
+            child->add_annotation(annotation);
+        }
         config_payload += codec_service.encode(*child, EncodingFormat::XML, true);
     }
     return config_payload;
@@ -338,10 +338,10 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
         throw(YCPPServiceProviderError{reply});
     }
 
-	if(candidate_supported)
-	{
-		//need to send the commit request
-		string commit_payload = get_commit_rpc_payload();
+    if(candidate_supported)
+    {
+        //need to send the commit request
+        string commit_payload = get_commit_rpc_payload();
 
         YLOG_INFO( "Executing commit RPC: {}", commit_payload);
         reply = client.execute_payload(commit_payload);
@@ -386,7 +386,7 @@ static std::shared_ptr<path::DataNode> handle_read_reply(string reply, path::Roo
 
     string data = reply.substr(data_start, data_end-data_start);
 
-	auto datanode = std::shared_ptr<path::DataNode>(codec_service.decode(root_schema, data, EncodingFormat::XML));
+    auto datanode = std::shared_ptr<path::DataNode>(codec_service.decode(root_schema, data, EncodingFormat::XML));
 
     if(!datanode){
         YLOG_ERROR( "Codec service failed to decode datanode");
@@ -415,13 +415,13 @@ static bool is_config(path::Rpc & rpc)
 
 static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, string operation)
 {
-	auto c = root_schema.find(operation);
-	if(c.empty())
-	{
-		YLOG_ERROR("CRUD create rpc schema not found!");
-		throw(YCPPIllegalStateError{"CRUD create rpc schema not found!"});
-	}
-	return c[0];
+    auto c = root_schema.find(operation);
+    if(c.empty())
+    {
+        YLOG_ERROR("CRUD create rpc schema not found!");
+        throw(YCPPIllegalStateError{"CRUD create rpc schema not found!"});
+    }
+    return c[0];
 }
 
 }

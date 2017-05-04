@@ -35,9 +35,7 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
         self.csp = CodecServiceProvider(type=EncodingFormat.XML)
-
         self.es = ExecutorService()
         self.cs = CodecService()
 
@@ -46,15 +44,19 @@ class SanityTest(unittest.TestCase):
         pass
 
     def setUp(self):
+        # start a brand new session for every single test case
+        # so test_close_session_rpc will not interfere with other test cases
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
         from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
 
     def tearDown(self):
-        pass
+        # close session by deleting NetconfServiceProvider instance
+        del self.ncc
 
-    def test_zclose_session_rpc(self):
+    def test_close_session_rpc(self):
         rpc = ietf_netconf.CloseSession()
 
         reply = self.es.execute_rpc(self.ncc, rpc)

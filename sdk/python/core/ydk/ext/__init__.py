@@ -18,6 +18,8 @@
     :copyright: (c) 2015 by Armin Ronacher.
     :license: BSD, see LICENSE for more details.
 """
+import atexit
+import importlib
 
 
 def setup():
@@ -25,6 +27,16 @@ def setup():
     importer = ExtensionImporter(['ydk_.%s'], __name__)
     importer.install()
 
+def register_exit():
 
+    def exit_handler():
+        # allow sys.exit with logging for main block
+        main = importlib.import_module('__main__')
+        main.__dict__.clear()
+
+    atexit.register(exit_handler)
+
+register_exit()
 setup()
+
 del setup

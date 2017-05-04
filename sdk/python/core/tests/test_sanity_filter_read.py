@@ -45,15 +45,7 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        # The sys.exit is supposed to be executed at the end of this script.
-        # However, without explicitly specified here, the C++ implementation
-        # of NetconfServiceProvider, the destroctor, will be executed
-        # **after** exiting python interpreter(thus after sys.exit).
-        # And if logging is enabled for NetconfServiceProvider, the logging
-        # attempt in the destroctor of NetconfServiceProvider will cause abort
-        # and raise libc++abi.dylib error.
-        del self.crud
-        del self.ncc
+        pass
 
     def setUp(self):
         pass

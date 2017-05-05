@@ -113,6 +113,7 @@ class ClassInitsPrinter(object):
                 else:
                     self.ctx.writeln('self.%s = None' % (child.name))
                 self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
+                self.ctx.writeln('self._children_yang_names.add("%s")' % (child.stmt.arg))
 
     def _print_init_lists(self, clazz):
         if clazz.is_identity() and len(clazz.extends) == 0:
@@ -218,9 +219,9 @@ class ClassSetAttrPrinter(object):
         self.ctx.lvl_inc()
         self.ctx.writeln('value.parent = self')
         self.ctx.lvl_dec()
-        self.ctx.writeln('elif value.parent is None and value.yang_name == self.yang_name:')
+        self.ctx.writeln('elif value.parent is None and value.yang_name in self._children_yang_names:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('value.parent = self.parent')
+        self.ctx.writeln('value.parent = self')
         self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.writeln('super(%s, self).__setattr__(name, value)' % clazz.qn())

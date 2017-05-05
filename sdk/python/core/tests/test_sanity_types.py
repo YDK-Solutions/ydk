@@ -67,9 +67,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.number8, 
-            runner1.ytypes.built_in_t.number8)
+        self.assertEqual(runner, runner1)
 
     def test_int16(self):
         runner = ysanity.Runner()
@@ -81,9 +79,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.number16, 
-            runner1.ytypes.built_in_t.number16)
+        self.assertEqual(runner, runner1)
 
     def test_int32(self):
         runner = ysanity.Runner()
@@ -95,9 +91,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.number32, 
-            runner1.ytypes.built_in_t.number32)
+        self.assertEqual(runner, runner1)
 
     def test_bits(self):
         runner = ysanity.Runner()
@@ -109,9 +103,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.bits_value, 
-            runner1.ytypes.built_in_t.bits_value)
+        self.assertEqual(runner, runner1)
 
     def test_int64(self):
         runner = ysanity.Runner()
@@ -123,9 +115,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.number64, 
-            runner1.ytypes.built_in_t.number64)
+        self.assertEqual(runner, runner1)
 
     def test_uint8(self):
         runner = ysanity.Runner()
@@ -137,9 +127,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.u_number8, 
-            runner1.ytypes.built_in_t.u_number8)
+        self.assertEqual(runner, runner1)
 
     def test_uint16(self):
         runner = ysanity.Runner()
@@ -151,9 +139,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.u_number16, 
-            runner1.ytypes.built_in_t.u_number16)
+        self.assertEqual(runner, runner1)
 
     def test_uint32(self):
         runner = ysanity.Runner()
@@ -165,9 +151,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.u_number32, 
-            runner1.ytypes.built_in_t.u_number32)
+        self.assertEqual(runner, runner1)
 
     def test_uint64(self):
         runner = ysanity.Runner()
@@ -179,9 +163,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.u_number64, 
-            runner1.ytypes.built_in_t.u_number64)
+        self.assertEqual(runner, runner1)
 
     def test_decimal64(self):
         runner = ysanity.Runner()
@@ -193,9 +175,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.deci64, 
-            runner1.ytypes.built_in_t.deci64)
+        self.assertEqual(runner, runner1)
 
     def test_string_1(self):
         runner = ysanity.Runner()
@@ -207,10 +187,9 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.name, 
-            runner1.ytypes.built_in_t.name)
+        self.assertEqual(runner, runner1)
 
+    @unittest.skip("bytes currently not supported by pybind11, see #49")
     def test_string_2(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.name = b'name_str'
@@ -222,9 +201,7 @@ class SanityTest(unittest.TestCase):
 
         # Compare runners
         runner.ytypes.built_in_t.name = 'name_str'
-        self.assertEqual(
-            runner.ytypes.built_in_t.name, 
-            runner1.ytypes.built_in_t.name)
+        self.assertEqual(runner, runner1)
 
     def test_empty(self):
         runner = ysanity.Runner()
@@ -236,17 +213,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.emptee, 
-            runner1.ytypes.built_in_t.emptee)
-
-        # explicit DELETE not support at the moment
-        # runner1.ytypes.built_in_t.emptee = DELETE()
-        # self.crud.update(self.ncc, runner1)
-
-        # runner2 = self.crud.read(self.ncc, ysanity.Runner())
-
-        # self.assertEqual(runner2.ytypes.built_in_t.emptee, None)
+        self.assertEqual(runner, runner1)
 
     def test_boolean(self):
         runner = ysanity.Runner()
@@ -258,9 +225,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.bool_value, 
-            runner1.ytypes.built_in_t.bool_value)
+        self.assertEqual(runner, runner1)
 
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.bool_value = False
@@ -271,9 +236,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.bool_value, 
-            runner1.ytypes.built_in_t.bool_value)
+        self.assertEqual(runner, runner1)
 
     def test_embedded_enum(self):
         runner = ysanity.Runner()
@@ -285,9 +248,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.embeded_enum, 
-            runner1.ytypes.built_in_t.embeded_enum)
+        self.assertEqual(runner, runner1)
 
     def test_enum(self):
         runner = ysanity.Runner()
@@ -299,9 +260,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.enum_value, 
-            runner1.ytypes.built_in_t.enum_value)
+        self.assertEqual(runner, runner1)
 
     def test_union(self):
         runner = ysanity.Runner()
@@ -313,9 +272,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.younion, 
-            runner1.ytypes.built_in_t.younion)
+        self.assertEqual(runner, runner1)
 
     def test_union_enum(self):
         runner = ysanity.Runner()
@@ -327,9 +284,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.enum_int_value,
-            runner1.ytypes.built_in_t.enum_int_value)
+        self.assertEqual(runner, runner1)
 
     def test_union_int(self):
         runner = ysanity.Runner()
@@ -341,9 +296,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.enum_int_value,
-            runner1.ytypes.built_in_t.enum_int_value)
+        self.assertEqual(runner, runner1)
 
     def test_union_recursive(self):
         runner = ysanity.Runner()
@@ -355,9 +308,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.younion_recursive,
-            runner1.ytypes.built_in_t.younion_recursive)
+        self.assertEqual(runner, runner1)
 
     def test_union_list(self):
         runner = ysanity.Runner()
@@ -370,9 +321,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.llunion,
-            runner1.ytypes.built_in_t.llunion)
+        self.assertEqual(runner, runner1)
 
     @unittest.skip('ConfD internal error.')
     def test_bits_leaflist(self):
@@ -390,9 +339,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.bits_llist,
-            runner1.ytypes.built_in_t.bits_llist)
+        self.assertEqual(runner, runner1)
 
     def test_enum_leaflist(self):
         runner = ysanity.Runner()
@@ -405,9 +352,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.enum_llist,
-            runner1.ytypes.built_in_t.enum_llist)
+        self.assertEqual(runner, runner1)
 
     def test_identity_leaflist(self):
         runner = ysanity.Runner()
@@ -420,9 +365,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.identity_llist,
-            runner1.ytypes.built_in_t.identity_llist)
+        self.assertEqual(runner, runner1)
 
     def test_union_complex_list(self):
         runner = ysanity.Runner()
@@ -434,9 +377,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.younion_list,
-            runner1.ytypes.built_in_t.younion_list)
+        self.assertEqual(runner, runner1)
 
     def test_identityref(self):
         runner = ysanity.Runner()
@@ -449,9 +390,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.identity_ref_value,
-            runner1.ytypes.built_in_t.identity_ref_value)
+        self.assertEqual(runner, runner1)
 
     def test_status_enum(self):
         runner = ysanity.Runner()
@@ -463,9 +402,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.status,
-            runner1.ytypes.built_in_t.status)
+        self.assertEqual(runner, runner1)
 
     @unittest.skip('No unique check')
     def test_leaflist_unique(self):
@@ -496,13 +433,7 @@ class SanityTest(unittest.TestCase):
         subtest1 = self.crud.read(self.ncc, ysanity.SubTest())
 
         # Compare runners
-        self.assertEqual(
-            subtest.one_aug.name,
-            subtest1.one_aug.name)
-
-        self.assertEqual(
-            subtest.one_aug.number,
-            subtest1.one_aug.number)
+        self.assertEqual(subtest, subtest1)
 
     def test_identity_from_other_module(self):
         runner = ysanity.Runner()
@@ -515,9 +446,7 @@ class SanityTest(unittest.TestCase):
         runner1 = self.crud.read(self.ncc, runner1)
 
         # Compare runners
-        self.assertEqual(
-            runner.ytypes.built_in_t.identity_ref_value,
-            runner1.ytypes.built_in_t.identity_ref_value)
+        self.assertEqual(runner, runner1)
 
     # def test_binary(self):
     #     pass
@@ -527,9 +456,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityTest.PROVIDER_TYPE = sys.argv.pop()
-
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

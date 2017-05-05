@@ -68,12 +68,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, cpython)
         cpython_read = self.crud.read(self.ncc, ietf_aug_base_1.Cpython())
 
-        self.assertEqual(cpython.doc.ydktest_aug_1.aug_one, cpython_read.doc.ydktest_aug_1.aug_one)
-        self.assertEqual(cpython.doc.ydktest_aug_2.aug_two, cpython_read.doc.ydktest_aug_2.aug_two)
-        self.assertEqual(cpython.doc.ydktest_aug_4.aug_four, cpython_read.doc.ydktest_aug_4.aug_four)
-        self.assertEqual(cpython.lib.ydktest_aug_1.ydktest_aug_nested_1.aug_one, cpython_read.lib.ydktest_aug_1.ydktest_aug_nested_1.aug_one)
-        self.assertEqual(cpython.lib.ydktest_aug_2.ydktest_aug_nested_2.aug_two, cpython_read.lib.ydktest_aug_2.ydktest_aug_nested_2.aug_two)
-        self.assertEqual(cpython.lib.ydktest_aug_4.ydktest_aug_nested_4.aug_four, cpython_read.lib.ydktest_aug_4.ydktest_aug_nested_4.aug_four)
+        self.assertEqual(cpython, cpython_read)
 
     def test_aug_base_2(self):
         cpython = ietf_aug_base_2.Cpython()
@@ -82,7 +77,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, cpython)
         cpython_read = self.crud.read(self.ncc, ietf_aug_base_2.Cpython())
 
-        self.assertEqual(cpython.tools.aug_four, cpython_read.tools.aug_four)
+        self.assertEqual(cpython, cpython_read)
 
 
 if __name__ == '__main__':

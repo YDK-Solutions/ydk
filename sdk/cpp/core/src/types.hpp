@@ -338,6 +338,7 @@ class YLeafList {
 
     virtual std::vector<std::pair<std::string, LeafData> > get_name_leafdata() const;
     virtual std::vector<YLeaf> getYLeafs() const;
+    virtual void clear();
 
   public:
     YFilter operation;

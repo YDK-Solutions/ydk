@@ -114,8 +114,7 @@ class SanityTest(unittest.TestCase):
         runner_empty = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_empty)
 
-        self.assertEqual(runner_create.ytypes.built_in_t.number8,
-                         runner_read.ytypes.built_in_t.number8)
+        self.assertEqual(runner_create, runner_read)
 
         # REPLACE
         runner = runner_create
@@ -124,8 +123,7 @@ class SanityTest(unittest.TestCase):
         self.crud.update(self.ncc, runner)
 
         runner_read = self.crud.read(self.ncc, runner_empty)
-        self.assertEqual(runner.ytypes.built_in_t.number8,
-                         runner_read.ytypes.built_in_t.number8)
+        self.assertEqual(runner, runner_read)
 
     @assert_with_error(test_create_pattern, YPYServiceProviderError)
     def test_create(self):
@@ -195,8 +193,7 @@ class SanityTest(unittest.TestCase):
 
         runner_empty = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_empty)
-        self.assertEqual(runner.ytypes.built_in_t.number8,
-                         runner_read.ytypes.built_in_t.number8)
+        self.assertEqual(runner, runner_read)
 
     @assert_with_error(test_delete_leaf_pattern, YPYServiceProviderError)
     def test_delete_leaf(self):
@@ -227,9 +224,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityNetconf.PROVIDER_TYPE = sys.argv.pop()
-
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

@@ -63,8 +63,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.number, r_2.one.number)
-        self.assertEqual(r_1.one.name, r_2.one.name)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -72,8 +71,7 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.number, r_2.one.number)
-        self.assertEqual(r_1.one.name, r_2.one.name)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
@@ -90,9 +88,7 @@ class SanityYang(unittest.TestCase):
         r_2 = ysanity.Runner()
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.two.name, r_2.two.name)
-        self.assertEqual(r_1.two.number, r_2.two.number)
-        self.assertEqual(r_1.two.sub1.number, r_2.two.sub1.number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -100,9 +96,7 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.two.name, r_2.two.name)
-        self.assertEqual(r_1.two.number, r_2.two.number)
-        self.assertEqual(r_1.two.sub1.number, r_2.two.sub1.number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
@@ -120,10 +114,7 @@ class SanityYang(unittest.TestCase):
         r_2 = ysanity.Runner()
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.three.name, r_2.three.name)
-        self.assertEqual(r_1.three.number, r_2.three.number)
-        self.assertEqual(r_1.three.sub1.number, r_2.three.sub1.number)
-        self.assertEqual(r_1.three.sub1.sub2.number, r_2.three.sub1.sub2.number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -132,10 +123,7 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.three.name, r_2.three.name)
-        self.assertEqual(r_1.three.number, r_2.three.number)
-        self.assertEqual(r_1.three.sub1.number, r_2.three.sub1.number)
-        self.assertEqual(r_1.three.sub1.sub2.number, r_2.three.sub1.sub2.number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
@@ -171,10 +159,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one_list.ldata[0].name, r_2.one_list.ldata[0].name)
-        self.assertEqual(r_1.one_list.ldata[1].name, r_2.one_list.ldata[1].name)
-        self.assertEqual(r_1.one_list.ldata[0].number, r_2.one_list.ldata[0].number)
-        self.assertEqual(r_1.one_list.ldata[1].number, r_2.one_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -187,15 +172,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one_list.ldata[0].name, r_2.one_list.ldata[0].name)
-        self.assertEqual(r_1.one_list.ldata[1].name, r_2.one_list.ldata[1].name)
-        self.assertEqual(r_1.one_list.ldata[0].number, r_2.one_list.ldata[0].number)
-        self.assertEqual(r_1.one_list.ldata[1].number, r_2.one_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     def test_twolist_pos(self):
@@ -227,19 +210,7 @@ class SanityYang(unittest.TestCase):
 
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.two_list.ldata[0].name, r_2.two_list.ldata[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].number, r_2.two_list.ldata[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].name, r_2.two_list.ldata[0].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].number, r_2.two_list.ldata[0].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].name, r_2.two_list.ldata[0].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].number, r_2.two_list.ldata[0].subl1[1].number)
-
-        self.assertEqual(r_1.two_list.ldata[1].name, r_2.two_list.ldata[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].number, r_2.two_list.ldata[1].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].name, r_2.two_list.ldata[1].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].number, r_2.two_list.ldata[1].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].name, r_2.two_list.ldata[1].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].number, r_2.two_list.ldata[1].subl1[1].number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -264,24 +235,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.two_list.ldata[0].name, r_2.two_list.ldata[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].number, r_2.two_list.ldata[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].name, r_2.two_list.ldata[0].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].number, r_2.two_list.ldata[0].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].name, r_2.two_list.ldata[0].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].number, r_2.two_list.ldata[0].subl1[1].number)
-
-        self.assertEqual(r_1.two_list.ldata[1].name, r_2.two_list.ldata[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].number, r_2.two_list.ldata[1].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].name, r_2.two_list.ldata[1].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].number, r_2.two_list.ldata[1].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].name, r_2.two_list.ldata[1].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].number, r_2.two_list.ldata[1].subl1[1].number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     def test_threelist_pos(self):
@@ -339,35 +299,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[0].name, r_2.three_list.ldata[0].subl1[0].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[0].number, r_2.three_list.ldata[0].subl1[0].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[1].name, r_2.three_list.ldata[0].subl1[0].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[1].number, r_2.three_list.ldata[0].subl1[0].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].name, r_2.three_list.ldata[0].subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].number, r_2.three_list.ldata[0].subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[0].name, r_2.three_list.ldata[0].subl1[1].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[0].number, r_2.three_list.ldata[0].subl1[1].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[1].name, r_2.three_list.ldata[0].subl1[1].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[1].number, r_2.three_list.ldata[0].subl1[1].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].name, r_2.three_list.ldata[0].subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].number, r_2.three_list.ldata[0].subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].name, r_2.three_list.ldata[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].number, r_2.three_list.ldata[0].number)
-
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[0].name, r_2.three_list.ldata[1].subl1[0].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[0].number, r_2.three_list.ldata[1].subl1[0].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[1].name, r_2.three_list.ldata[1].subl1[0].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[1].number, r_2.three_list.ldata[1].subl1[0].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].name, r_2.three_list.ldata[1].subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].number, r_2.three_list.ldata[1].subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[0].name, r_2.three_list.ldata[1].subl1[1].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[0].number, r_2.three_list.ldata[1].subl1[1].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[1].name, r_2.three_list.ldata[1].subl1[1].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[1].number, r_2.three_list.ldata[1].subl1[1].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].name, r_2.three_list.ldata[1].subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].number, r_2.three_list.ldata[1].subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].name, r_2.three_list.ldata[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].number, r_2.three_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -423,40 +355,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[0].name, r_2.three_list.ldata[0].subl1[0].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[0].number, r_2.three_list.ldata[0].subl1[0].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[1].name, r_2.three_list.ldata[0].subl1[0].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].sub_subl1[1].number, r_2.three_list.ldata[0].subl1[0].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].name, r_2.three_list.ldata[0].subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[0].number, r_2.three_list.ldata[0].subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[0].name, r_2.three_list.ldata[0].subl1[1].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[0].number, r_2.three_list.ldata[0].subl1[1].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[1].name, r_2.three_list.ldata[0].subl1[1].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].sub_subl1[1].number, r_2.three_list.ldata[0].subl1[1].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].name, r_2.three_list.ldata[0].subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[0].subl1[1].number, r_2.three_list.ldata[0].subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[0].name, r_2.three_list.ldata[0].name)
-        self.assertEqual(r_1.three_list.ldata[0].number, r_2.three_list.ldata[0].number)
-
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[0].name, r_2.three_list.ldata[1].subl1[0].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[0].number, r_2.three_list.ldata[1].subl1[0].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[1].name, r_2.three_list.ldata[1].subl1[0].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].sub_subl1[1].number, r_2.three_list.ldata[1].subl1[0].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].name, r_2.three_list.ldata[1].subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[0].number, r_2.three_list.ldata[1].subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[0].name, r_2.three_list.ldata[1].subl1[1].sub_subl1[0].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[0].number, r_2.three_list.ldata[1].subl1[1].sub_subl1[0].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[1].name, r_2.three_list.ldata[1].subl1[1].sub_subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].sub_subl1[1].number, r_2.three_list.ldata[1].subl1[1].sub_subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].name, r_2.three_list.ldata[1].subl1[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].subl1[1].number, r_2.three_list.ldata[1].subl1[1].number)
-        self.assertEqual(r_1.three_list.ldata[1].name, r_2.three_list.ldata[1].name)
-        self.assertEqual(r_1.three_list.ldata[1].number, r_2.three_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     def test_nested_naming(self):
@@ -500,23 +405,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[0].name, r_2.inbtw_list.ldata[0].subc.subc_subl1[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[0].number, r_2.inbtw_list.ldata[0].subc.subc_subl1[0].number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[1].name, r_2.inbtw_list.ldata[0].subc.subc_subl1[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[1].number, r_2.inbtw_list.ldata[0].subc.subc_subl1[1].number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.name, r_2.inbtw_list.ldata[0].subc.name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.number, r_2.inbtw_list.ldata[0].subc.number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].name, r_2.inbtw_list.ldata[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].number, r_2.inbtw_list.ldata[0].number)
-
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].name, r_2.inbtw_list.ldata[1].subc.subc_subl1[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].number, r_2.inbtw_list.ldata[1].subc.subc_subl1[0].number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[1].name, r_2.inbtw_list.ldata[1].subc.subc_subl1[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[1].number, r_2.inbtw_list.ldata[1].subc.subc_subl1[1].number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.name, r_2.inbtw_list.ldata[1].subc.name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.number, r_2.inbtw_list.ldata[1].subc.number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].name, r_2.inbtw_list.ldata[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].number, r_2.inbtw_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -548,28 +437,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[0].name, r_2.inbtw_list.ldata[0].subc.subc_subl1[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[0].number, r_2.inbtw_list.ldata[0].subc.subc_subl1[0].number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[1].name, r_2.inbtw_list.ldata[0].subc.subc_subl1[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.subc_subl1[1].number, r_2.inbtw_list.ldata[0].subc.subc_subl1[1].number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.name, r_2.inbtw_list.ldata[0].subc.name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].subc.number, r_2.inbtw_list.ldata[0].subc.number)
-        self.assertEqual(r_1.inbtw_list.ldata[0].name, r_2.inbtw_list.ldata[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[0].number, r_2.inbtw_list.ldata[0].number)
-
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].name, r_2.inbtw_list.ldata[1].subc.subc_subl1[0].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].number, r_2.inbtw_list.ldata[1].subc.subc_subl1[0].number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[1].name, r_2.inbtw_list.ldata[1].subc.subc_subl1[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[1].number, r_2.inbtw_list.ldata[1].subc.subc_subl1[1].number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.name, r_2.inbtw_list.ldata[1].subc.name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.number, r_2.inbtw_list.ldata[1].subc.number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].name, r_2.inbtw_list.ldata[1].name)
-        self.assertEqual(r_1.inbtw_list.ldata[1].number, r_2.inbtw_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     def test_leafref_simple_pos(self):
@@ -581,8 +455,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.ytypes.built_in_t.number8, r_2.ytypes.built_in_t.number8)
-        self.assertEqual(r_1.ytypes.built_in_t.leaf_ref, r_2.ytypes.built_in_t.leaf_ref)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -591,13 +464,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.ytypes.built_in_t.number8, r_2.ytypes.built_in_t.number8)
-        self.assertEqual(r_1.ytypes.built_in_t.leaf_ref, r_2.ytypes.built_in_t.leaf_ref)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     @unittest.skip('Libyang Error')
@@ -642,11 +515,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.name, r_2.leaf_ref.ref_one_name)
-        self.assertEqual(r_1.two.sub1.number, r_2.leaf_ref.ref_two_sub1_number)
-        self.assertEqual(r_1.three.sub1.sub2.number, r_2.leaf_ref.ref_three_sub1_sub2_number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].name, r_2.leaf_ref.ref_inbtw)
-        self.assertEqual(r_1.leaf_ref.ref_one_name, r_2.leaf_ref.one.two.self_ref_one_name)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -688,11 +557,7 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.name, r_2.leaf_ref.ref_one_name)
-        self.assertEqual(r_1.two.sub1.number, r_2.leaf_ref.ref_two_sub1_number)
-        self.assertEqual(r_1.three.sub1.sub2.number, r_2.leaf_ref.ref_three_sub1_sub2_number)
-        self.assertEqual(r_1.inbtw_list.ldata[1].subc.subc_subl1[0].name, r_2.leaf_ref.ref_inbtw)
-        self.assertEqual(r_1.leaf_ref.ref_one_name, r_2.leaf_ref.one.two.self_ref_one_name)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
@@ -709,8 +574,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.one_aug.name, r_2.one.one_aug.name)
-        self.assertEqual(r_1.one.one_aug.number, r_2.one.one_aug.number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -719,13 +583,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one.one_aug.name, r_2.one.one_aug.name)
-        self.assertEqual(r_1.one.one_aug.number, r_2.one.one_aug.number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_1)
+
         self.assertEqual(r_2, None)
 
     def test_aug_onelist_pos(self):
@@ -742,11 +606,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one_list.one_aug_list.enabled, r_2.one_list.one_aug_list.enabled)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[0].name, r_2.one_list.one_aug_list.ldata[0].name)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[0].number, r_2.one_list.one_aug_list.ldata[0].number)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[1].name, r_2.one_list.one_aug_list.ldata[1].name)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[1].number, r_2.one_list.one_aug_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # UPDATE
         r_1, r_2 = ysanity.Runner(), ysanity.Runner()
@@ -761,16 +621,13 @@ class SanityYang(unittest.TestCase):
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(r_1.one_list.one_aug_list.enabled, r_2.one_list.one_aug_list.enabled)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[0].name, r_2.one_list.one_aug_list.ldata[0].name)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[0].number, r_2.one_list.one_aug_list.ldata[0].number)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[1].name, r_2.one_list.one_aug_list.ldata[1].name)
-        self.assertEqual(r_1.one_list.one_aug_list.ldata[1].number, r_2.one_list.one_aug_list.ldata[1].number)
+        self.assertEqual(r_1, r_2)
 
         # DELETE
         r_1 = ysanity.Runner()
         self.crud.delete(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
+
         self.assertEqual(r_2, None)
 
     def test_parent_empty(self):
@@ -782,15 +639,11 @@ class SanityYang(unittest.TestCase):
 
         runner_read = self.crud.read(self.ncc, ysanity.Runner())
 
-        self.assertEqual(runner.ytypes.enabled, runner_read.ytypes.enabled)
-        self.assertEqual(runner.ytypes.built_in_t.emptee, runner_read.ytypes.built_in_t.emptee)
+        self.assertEqual(runner, runner_read)
 
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityYang.PROVIDER_TYPE = sys.argv.pop()
-
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

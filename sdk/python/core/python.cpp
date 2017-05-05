@@ -370,11 +370,16 @@ PYBIND11_PLUGIN(ydk_)
         .def("has_operation", &ydk::Entity::has_operation, return_value_policy::reference)
         .def("get_children", &ydk::Entity::get_children, return_value_policy::reference)
         .def("clone_ptr", &ydk::Entity::clone_ptr)
+        .def("__eq__", [](ydk::Entity& left, ydk::Entity& right)
+                         {
+                            return left.operator==(right);
+                         })
         .def_readwrite("operation", &ydk::Entity::operation)
         .def_readwrite("yang_name", &ydk::Entity::yang_name, return_value_policy::reference)
         .def_readwrite("yang_parent_name", &ydk::Entity::yang_parent_name, return_value_policy::reference)
         .def_readwrite("is_presence_container", &ydk::Entity::is_presence_container, return_value_policy::reference)
         .def_property("parent", &ydk::Entity::get_parent, &ydk::Entity::set_parent);
+
 
     class_<ydk::EntityPath>(types, "EntityPath")
         .def(init<string, vector<pair<std::string, ydk::LeafData> > >())
@@ -469,7 +474,7 @@ PYBIND11_PLUGIN(ydk_)
                           })
         .def("clear", []( ydk::YLeafList &l)
                         {
-                            l.getYLeafs().clear();
+                            l.clear();
                         })
         .def_readwrite("operation", &ydk::YLeafList::operation);
 

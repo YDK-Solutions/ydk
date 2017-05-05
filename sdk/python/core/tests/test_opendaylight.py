@@ -89,18 +89,8 @@ class SanityTest(unittest.TestCase):
         self.crud.create(node_provider, bgp)
 
         bgp_read = self.crud.read_config(node_provider, oc_bgp.Bgp())
+        self.assertEqual(bgp_read, bgp)
 
-        self.assertEqual(bgp_read.neighbors.neighbor[0].neighbor_address.get(), '6.7.8.9')
-        self.assertEqual(bgp_read.neighbors.neighbor[0].config.neighbor_address.get(), '6.7.8.9')
-        self.assertEqual(bgp_read.neighbors.neighbor[0].config.peer_as.get(), '65001')
-        self.assertEqual(bgp_read.neighbors.neighbor[0].config.local_as.get(), '65001')
-        self.assertEqual(bgp_read.neighbors.neighbor[0].config.peer_group.get(), 'IBGP')
-
-        self.assertEqual(bgp_read.peer_groups.peer_group[0].peer_group_name.get(), 'IBGP')
-        self.assertEqual(bgp_read.peer_groups.peer_group[0].config.peer_group_name.get(), 'IBGP')
-        self.assertEqual(bgp_read.peer_groups.peer_group[0].config.description.get(), 'test description')
-        self.assertEqual(bgp_read.peer_groups.peer_group[0].config.peer_as.get(), '65001')
-        self.assertEqual(bgp_read.peer_groups.peer_group[0].config.local_as.get(), '65001')
 
 if __name__ == '__main__':
     import sys

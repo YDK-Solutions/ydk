@@ -19,7 +19,6 @@ read API according to discussion
 """
 from __future__ import absolute_import
 
-import sys
 import unittest
 from ydk.filters import YFilter
 from ydk.services import CRUDService
@@ -118,27 +117,7 @@ class SanityYang(unittest.TestCase):
         a_read = self.crud.read(self.ncc, a)
         preconfig_a = self.getInitEntity()
 
-        self.assertEqual(a_read.a1, preconfig_a.a1)
-        self.assertEqual(a_read.a2, preconfig_a.a2)
-        self.assertEqual(a_read.a3, preconfig_a.a3)
-        self.assertEqual(a_read.b.b1, preconfig_a.b.b1)
-        self.assertEqual(a_read.b.b2, preconfig_a.b.b2)
-        self.assertEqual(a_read.b.b3, preconfig_a.b.b3)
-        self.assertEqual(a_read.b.f.f1, preconfig_a.b.f.f1)
-        # compare error
-        # self.assertEqual(a_read.b.c, preconfig_a.b.c)
-        self.assertEqual(a_read.b.c is None, False)
-        self.assertEqual(a_read.b.d.d1, preconfig_a.b.d.d1)
-        self.assertEqual(a_read.b.d.d2, preconfig_a.b.d.d2)
-        self.assertEqual(a_read.b.d.d3, preconfig_a.b.d.d3)
-        self.assertEqual(a_read.b.d.e.e1, preconfig_a.b.d.e.e1)
-        self.assertEqual(a_read.b.d.e.e2, preconfig_a.b.d.e.e2)
-        self.assertEqual(a_read.lst[0].number, preconfig_a.lst[0].number)
-        self.assertEqual(a_read.lst[0].value, preconfig_a.lst[0].value)
-        self.assertEqual(a_read.lst[1].number, preconfig_a.lst[1].number)
-        self.assertEqual(a_read.lst[1].value, preconfig_a.lst[1].value)
-        self.assertEqual(a_read.lst[2].number, preconfig_a.lst[2].number)
-        self.assertEqual(a_read.lst[2].value, preconfig_a.lst[2].value)
+        a_read == preconfig_a
 
     def test_CASE2(self):
         """ According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
@@ -149,27 +128,7 @@ class SanityYang(unittest.TestCase):
         a_read = self.crud.read(self.ncc, a)
         preconfig_a = self.getInitEntity()
 
-        self.assertEqual(a_read.a1, preconfig_a.a1)
-        self.assertEqual(a_read.a2, preconfig_a.a2)
-        self.assertEqual(a_read.a3, preconfig_a.a3)
-        self.assertEqual(a_read.b.b1, preconfig_a.b.b1)
-        self.assertEqual(a_read.b.b2, preconfig_a.b.b2)
-        self.assertEqual(a_read.b.b3, preconfig_a.b.b3)
-        self.assertEqual(a_read.b.f.f1, preconfig_a.b.f.f1)
-        # compare error
-        # self.assertEqual(a_read.b.c, preconfig_a.b.c)
-        self.assertEqual(a_read.b.c is None, False)
-        self.assertEqual(a_read.b.d.d1, preconfig_a.b.d.d1)
-        self.assertEqual(a_read.b.d.d2, preconfig_a.b.d.d2)
-        self.assertEqual(a_read.b.d.d3, preconfig_a.b.d.d3)
-        self.assertEqual(a_read.b.d.e.e1, preconfig_a.b.d.e.e1)
-        self.assertEqual(a_read.b.d.e.e2, preconfig_a.b.d.e.e2)
-        self.assertEqual(a_read.lst[0].number, preconfig_a.lst[0].number)
-        self.assertEqual(a_read.lst[0].value, preconfig_a.lst[0].value)
-        self.assertEqual(a_read.lst[1].number, preconfig_a.lst[1].number)
-        self.assertEqual(a_read.lst[1].value, preconfig_a.lst[1].value)
-        self.assertEqual(a_read.lst[2].number, preconfig_a.lst[2].number)
-        self.assertEqual(a_read.lst[2].value, preconfig_a.lst[2].value)
+        a_read == preconfig_a
 
     def test_CASE3(self):
         """Assign a READ object to `a.a1` should only return data on this leaf."""
@@ -179,7 +138,7 @@ class SanityYang(unittest.TestCase):
         preconfig_a = ysanity.A()
         preconfig_a.a1 = "some value"
 
-        self.assertEqual(a_read.a1, preconfig_a.a1)
+        a_read == preconfig_a
 
     def test_CASE4(self):
         """Now `a.b.b1` serves as a content match node."""
@@ -200,18 +159,7 @@ class SanityYang(unittest.TestCase):
         preconfig_a.b.d.e.e1 = "some value e1"
         preconfig_a.b.d.e.e2 = "value of e2"
 
-        self.assertEqual(a_read.b.b1, preconfig_a.b.b1)
-        self.assertEqual(a_read.b.b2, preconfig_a.b.b2)
-        self.assertEqual(a_read.b.b3, preconfig_a.b.b3)
-        self.assertEqual(a_read.b.f.f1, preconfig_a.b.f.f1)
-        # compare error
-        # self.assertEqual(a_read.b.c, preconfig_a.b.c)
-        self.assertEqual(a_read.b.c is None, False)
-        self.assertEqual(a_read.b.d.d1, preconfig_a.b.d.d1)
-        self.assertEqual(a_read.b.d.d2, preconfig_a.b.d.d2)
-        self.assertEqual(a_read.b.d.d3, preconfig_a.b.d.d3)
-        self.assertEqual(a_read.b.d.e.e1, preconfig_a.b.d.e.e1)
-        self.assertEqual(a_read.b.d.e.e2, preconfig_a.b.d.e.e2)
+        a_read == preconfig_a
 
     def test_CASE5(self):
         """Now `a.b.d.e` serves as a content match node."""
@@ -223,8 +171,7 @@ class SanityYang(unittest.TestCase):
         preconfig_a.b.d.e.e1 = "some value e1"
         preconfig_a.b.d.e.e2 = "value of e2"
 
-        self.assertEqual(a_read.b.d.e.e1, preconfig_a.b.d.e.e1)
-        self.assertEqual(a_read.b.d.e.e2, preconfig_a.b.d.e.e2)
+        a_read == preconfig_a
 
     def test_CASE6(self):
         """Assign `a.b.c` serves as an empty presence container."""
@@ -234,9 +181,7 @@ class SanityYang(unittest.TestCase):
         preconfig_a = ysanity.A()
         preconfig_a.b.c = preconfig_a.b.C()
 
-        # compare error
-        # self.assertEqual(a_read.b.c, preconfig_a.b.c)
-        self.assertEqual(a_read.b.c is None, False)
+        a_read == preconfig_a
 
     def test_CASE7(self):
         """`item1.number` and `item2.number` serves as content match nodes."""
@@ -249,10 +194,7 @@ class SanityYang(unittest.TestCase):
         item1.value, item2.value = "one", "two"
         preconfig_a.lst.extend([item1, item2])
 
-        self.assertEqual(a_read.lst[0].number, preconfig_a.lst[0].number)
-        self.assertEqual(a_read.lst[0].value, preconfig_a.lst[0].value)
-        self.assertEqual(a_read.lst[1].number, preconfig_a.lst[1].number)
-        self.assertEqual(a_read.lst[1].value, preconfig_a.lst[1].value)
+        a_read == preconfig_a
 
     def test_CASE8(self):
         """Assign presence class F to `a.b.f`."""
@@ -262,7 +204,7 @@ class SanityYang(unittest.TestCase):
         a_read = self.crud.read(self.ncc, a)
         preconfig_a = a
 
-        self.assertEqual(a_read.b.f.f1, preconfig_a.b.f.f1)
+        a_read == preconfig_a
 
     @unittest.skip("Libyang ERROR: Schema node not found. Path: 'B'")
     def test_read_oc_pattern(self):
@@ -275,6 +217,7 @@ class SanityYang(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    import sys
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
     res = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(res)

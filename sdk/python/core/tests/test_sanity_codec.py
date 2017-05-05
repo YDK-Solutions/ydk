@@ -170,20 +170,6 @@ class SanityYang(unittest.TestCase):
         r_1.two_list.ldata.extend([e_1, e_2])
         return r_1
 
-    def _compare_entities(self, r_1, r_2):
-        self.assertEqual(r_1.two_list.ldata[0].name, r_2.two_list.ldata[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].number, r_2.two_list.ldata[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].name, r_2.two_list.ldata[0].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[0].number, r_2.two_list.ldata[0].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].name, r_2.two_list.ldata[0].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[0].subl1[1].number, r_2.two_list.ldata[0].subl1[1].number)
-        self.assertEqual(r_1.two_list.ldata[1].name, r_2.two_list.ldata[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].number, r_2.two_list.ldata[1].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].name, r_2.two_list.ldata[1].subl1[0].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[0].number, r_2.two_list.ldata[1].subl1[0].number)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].name, r_2.two_list.ldata[1].subl1[1].name)
-        self.assertEqual(r_1.two_list.ldata[1].subl1[1].number, r_2.two_list.ldata[1].subl1[1].number)
-
     def test_xml_encode_1(self):
         self.provider.encoding = EncodingFormat.XML
         r_1 = self._get_runner_entity()
@@ -235,7 +221,7 @@ class SanityYang(unittest.TestCase):
         payload = self.codec.encode(self.provider, r_1)
         entity = self.codec.decode(self.provider, payload)
 
-        self._compare_entities(r_1, entity)
+        self.assertEqual(r_1, entity)
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_xml_encode_decode_dict(self):
@@ -245,7 +231,7 @@ class SanityYang(unittest.TestCase):
         payload = self.codec.encode(self.provider, r_entity)
         entity = self.codec.decode(self.provider, payload)
         for module in entity:
-            self._compare_entities(r_entity[module], entity[module])
+            self.assertEqual(r_entity[module], entity[module])
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_xml_decode_oc_pattern(self):
@@ -285,8 +271,7 @@ class SanityYang(unittest.TestCase):
         runner = self._get_runner_entity()
         payload = self.codec.encode(self.provider, runner)
         entity = self.codec.decode(self.provider, payload)
-
-        self._compare_entities(runner, entity)
+        self.assertEqual(runner, entity)
         self.assertEqual(payload, self.codec.encode(self.provider, entity))
 
     def test_json_encode_decode_dict(self):
@@ -296,7 +281,7 @@ class SanityYang(unittest.TestCase):
         payload_holder = self.codec.encode(self.provider, entity_holder)
         entities = self.codec.decode(self.provider, payload_holder)
         for module in entities:
-            self._compare_entities(entities[module], entities[module])
+            self.assertEqual(entities[module], entities[module])
             self.assertEqual(payload_holder[module],
                              self.codec.encode(self.provider, entities[module]))
 
@@ -313,6 +298,7 @@ class SanityYang(unittest.TestCase):
     def test_json_decode_oc_pattern(self):
         self.provider.encoding = EncodingFormat.JSON
         entity = self.codec.decode(self.provider, self._json_oc_pattern_payload)
+
         self.assertEqual(entity.a.get(), 'Hello')
         self.assertEqual(entity.b.b.get(), 'Hello')
 

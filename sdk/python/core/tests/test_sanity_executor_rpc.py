@@ -53,7 +53,12 @@ class SanityTest(unittest.TestCase):
         crud.delete(self.ncc, runner)
 
     def tearDown(self):
-        # close session by deleting NetconfServiceProvider instance
+        # close session by close session rpc
+        try:
+            rpc = ietf_netconf.CloseSession()
+            self.es.execute_rpc(self.ncc, rpc)
+        except YPYError:
+            pass
         del self.ncc
 
     def test_close_session_rpc(self):
@@ -113,8 +118,7 @@ class SanityTest(unittest.TestCase):
         get_config_rpc.input.filter = filter_xml
         reply = self.es.execute_rpc(self.ncc, get_config_rpc, runner)
         self.assertIsNotNone(reply)
-        self.assertEqual(reply.one.number, runner.one.number)
-        self.assertEqual(reply.one.name, runner.one.name)
+        self.assertEqual(reply, runner)
 
         # Commit
         commit_rpc = ietf_netconf.Commit()
@@ -126,8 +130,7 @@ class SanityTest(unittest.TestCase):
         get_rpc.input.filter = filter_xml
         reply = self.es.execute_rpc(self.ncc, get_rpc, runner)
         self.assertIsNotNone(reply)
-        self.assertEqual(reply.one.number, runner.one.number)
-        self.assertEqual(reply.one.name, runner.one.name)
+        self.assertEqual(reply, runner)
 
     @unittest.skip('YCPPServiceProviderError')
     def test_kill_session(self):

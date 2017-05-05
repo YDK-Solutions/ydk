@@ -114,6 +114,12 @@ class Entity(_Entity):
         super(Entity, self).__init__()
         self._local_refs = {}
         self._children_name_map = {}
+        self._children_yang_names = set()
+
+    def __eq__(self, other):
+        if not isinstance(other, Entity):
+            return False
+        return super(Entity, self).__eq__(other)
 
     def get_children(self):
         children = ChildrenMap()

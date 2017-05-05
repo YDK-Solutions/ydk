@@ -145,7 +145,7 @@ class GetEntityPathPrinter(object):
 
         if clazz.owner is not None and isinstance(clazz.owner, Package):
             # the ancestor is irrelevant here
-            self.ctx.writeln('if (ancestor != None):')
+            self.ctx.writeln('if (not ancestor is None):')
             self.ctx.lvl_inc()
             self.ctx.writeln('raise YPYModelError("ancestor has to be None for top-level node")')
             self.ctx.lvl_dec()
@@ -154,7 +154,7 @@ class GetEntityPathPrinter(object):
         else:
             #this is not a top level 
             # is nullptr a valid parameter here
-            self.ctx.writeln('if (ancestor == None):')
+            self.ctx.writeln('if (ancestor is None):')
             self.ctx.lvl_inc()
             
             if self._is_parent_needed_for_abs_path(clazz):

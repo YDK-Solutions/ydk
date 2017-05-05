@@ -71,7 +71,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

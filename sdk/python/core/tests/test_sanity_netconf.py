@@ -28,7 +28,6 @@ from ydk.services import NetconfService, DataStore
 
 
 class SanityNetconf(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
     def setUpClass(self):
@@ -59,15 +58,13 @@ class SanityNetconf(unittest.TestCase):
         self.assertTrue(op)
 
         result = self.netconf_service.get_config(self.ncc, DataStore.candidate, get_filter)
-        self.assertEqual(runner.one.number, result.one.number)
-        self.assertEqual(runner.one.name, result.one.name)
+        self.assertEqual(runner, result)
 
         op = self.netconf_service.commit(self.ncc)
         self.assertTrue(op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
-        self.assertEqual(runner.one.number, result.one.number)
-        self.assertEqual(runner.one.name, result.one.name)
+        self.assertEqual(runner, result)
 
     def test_lock_unlock(self):
         op = self.netconf_service.lock(self.ncc, DataStore.running)
@@ -119,8 +116,7 @@ class SanityNetconf(unittest.TestCase):
         self.assertTrue(op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
-        self.assertEqual(runner.two.number, result.two.number)
-        self.assertEqual(runner.two.name, result.two.name)
+        self.assertEqual(runner, result)
 
     @unittest.skip('No message id in cancel commit payload')
     def test_confirmed_commit(self):
@@ -136,8 +132,7 @@ class SanityNetconf(unittest.TestCase):
         self.assertTrue(op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
-        self.assertEqual(runner.two.number, result.two.number)
-        self.assertEqual(runner.two.name, result.two.name)
+        self.assertEqual(runner, result)
 
         op = self.netconf_service.cancel_commit(self.ncc)
         self.assertTrue(op)
@@ -158,8 +153,7 @@ class SanityNetconf(unittest.TestCase):
         self.assertTrue(op)
 
         result = self.netconf_service.get_config(self.ncc, DataStore.running, get_filter)
-        self.assertEqual(runner.two.number, result.two.number)
-        self.assertEqual(runner.two.name, result.two.name)
+        self.assertEqual(runner, result)
 
         runner.two.name = '%smodified' % runner.two.name
 
@@ -167,8 +161,7 @@ class SanityNetconf(unittest.TestCase):
         self.assertTrue(op)
 
         result = self.netconf_service.get_config(self.ncc, DataStore.running, get_filter)
-        self.assertEqual(runner.two.number, result.two.number)
-        self.assertEqual(runner.two.name, result.two.name)
+        self.assertEqual(runner, result)
 
     def test_delete_config(self):
         pass

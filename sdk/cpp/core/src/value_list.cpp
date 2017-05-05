@@ -245,6 +245,11 @@ std::vector<YLeaf> YLeafList::getYLeafs() const
     return values;
 }
 
+void YLeafList::clear()
+{
+    values.clear();
+}
+
 std::vector<std::pair<std::string, LeafData> > YLeafList::get_name_leafdata() const
 {
     std::vector<std::pair<std::string, LeafData> > name_values;

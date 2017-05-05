@@ -55,8 +55,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.number8,
-                         runner_read.ytypes.built_in_t.number8)
+        self.assertEqual(runner, runner_read)
 
     def test_int16(self):
         # type changed to int32
@@ -67,8 +66,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.number16,
-                         runner_read.ytypes.built_in_t.number16)
+        self.assertEqual(runner, runner_read)
 
     def test_int32(self):
         # type changed to int64
@@ -79,8 +77,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.number32,
-                         runner_read.ytypes.built_in_t.number32)
+        self.assertEqual(runner, runner_read)
 
     def test_int64(self):
         # type changed to type uint8
@@ -97,8 +94,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.u_number8,
-                         runner_read.ytypes.built_in_t.u_number8)
+        self.assertEqual(runner, runner_read)
 
     def test_uint16(self):
         # changed to type uint32
@@ -109,8 +105,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.u_number16,
-                         runner_read.ytypes.built_in_t.u_number16)
+        self.assertEqual(runner, runner_read)
 
     def test_uint32(self):
         # changed to type uint64
@@ -121,8 +116,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.u_number32,
-                         runner_read.ytypes.built_in_t.u_number32)
+        self.assertEqual(runner, runner_read)
 
     def test_decimal64(self):
         # changed to type string
@@ -133,8 +127,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.deci64,
-                         runner_read.ytypes.built_in_t.deci64)
+        self.assertEqual(runner, runner_read)
 
     def test_leafref(self):
         # changed to tye decimal64
@@ -145,8 +138,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.leaf_ref,
-                         runner_read.ytypes.built_in_t.leaf_ref)
+        self.assertEqual(runner, runner_read)
 
     def test_string(self):
         # changed to type empty
@@ -157,8 +149,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.name,
-                         runner_read.ytypes.built_in_t.name)
+        self.assertEqual(runner, runner_read)
 
     def test_boolean(self):
         # changed to type YdkEnumTest
@@ -169,8 +160,7 @@ class SanityTest(unittest.TestCase):
         runner_read = ysanity.Runner()
         runner_read = self.crud.read(self.ncc, runner_read)
 
-        self.assertEqual(runner.ytypes.built_in_t.bool_value,
-                         runner_read.ytypes.built_in_t.bool_value)
+        self.assertEqual(runner, runner_read)
 
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.bool_value = False
@@ -218,8 +208,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    if len(sys.argv) > 1:
-        SanityTest.PROVIDER_TYPE = sys.argv.pop()
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

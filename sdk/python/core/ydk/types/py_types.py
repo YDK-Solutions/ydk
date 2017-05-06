@@ -121,6 +121,11 @@ class Entity(_Entity):
             return False
         return super(Entity, self).__eq__(other)
 
+    def __ne__(self, other):
+        if not isinstance(other, Entity):
+            return True
+        return super(Entity, self).__ne__(other)
+
     def get_children(self):
         children = ChildrenMap()
 

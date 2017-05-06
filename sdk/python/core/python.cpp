@@ -374,6 +374,10 @@ PYBIND11_PLUGIN(ydk_)
                          {
                             return left.operator==(right);
                          })
+        .def("__ne__", [](ydk::Entity& left, ydk::Entity& right)
+                         {
+                            return left.operator!=(right);
+                         })
         .def_readwrite("operation", &ydk::Entity::operation)
         .def_readwrite("yang_name", &ydk::Entity::yang_name, return_value_policy::reference)
         .def_readwrite("yang_parent_name", &ydk::Entity::yang_parent_name, return_value_policy::reference)

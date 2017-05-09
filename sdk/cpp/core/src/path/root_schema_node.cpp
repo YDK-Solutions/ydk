@@ -88,9 +88,8 @@ ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx) : m_ctx{ct
 
 ydk::path::RootSchemaNodeImpl::~RootSchemaNodeImpl()
 {
-    // need to release before destroy context
-    for (auto & r: m_root_data_nodes)
-        r.release();
+    // need to release data ndoe resource before destroy context
+    m_root_data_nodes.clear();
 
     if(m_ctx){
         ly_ctx_destroy(m_ctx, nullptr);

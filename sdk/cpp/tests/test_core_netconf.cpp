@@ -232,7 +232,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
     auto & bgp = schema.create("openconfig-bgp:bgp", "");
     //get the root
-    std::shared_ptr<const ydk::path::DataNode> data_root{&bgp.root()};
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&bgp.root());
 
     REQUIRE( data_root != nullptr );
 
@@ -264,7 +264,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
     auto & bgp_read = schema.create("openconfig-bgp:bgp", "");
 
 
-    std::shared_ptr<const ydk::path::DataNode> data_root2{&bgp_read.root()};
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.root());
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );

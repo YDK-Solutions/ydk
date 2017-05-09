@@ -61,14 +61,10 @@ ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_paren
 
 ydk::path::DataNodeImpl::~DataNodeImpl()
 {
-    // if(m_node){
-    //     if(m_parent) {
-    //         lyd_free(m_node);
-    //     } else {
-    //         lyd_free_withsiblings(m_node);
-    //     }
-    //     m_node = nullptr;
-    // }
+    if (!m_parent)
+    {
+        lyd_free_withsiblings(m_node);
+    }
 }
 
 const ydk::path::SchemaNode&

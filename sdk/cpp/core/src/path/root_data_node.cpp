@@ -35,7 +35,6 @@ ydk::path::RootDataImpl::RootDataImpl(const SchemaNode& schema, struct ly_ctx* c
 
 ydk::path::RootDataImpl::~RootDataImpl()
 {
-    m_node = nullptr;
 }
 
 const ydk::path::SchemaNode&

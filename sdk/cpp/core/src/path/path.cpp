@@ -78,11 +78,17 @@ static void escape_slashes(std::string& data)
            {
                replace(data, original, s);
            }
+           if(psubStrMatchStr != NULL)
+           {
+                pcre_free_substring(psubStrMatchStr);
+                psubStrMatchStr = NULL;
+           }
        }
        offset = offsets[1];
     }
     if(psubStrMatchStr != NULL)
         pcre_free_substring(psubStrMatchStr);
+    free(re);
 }
 }
 

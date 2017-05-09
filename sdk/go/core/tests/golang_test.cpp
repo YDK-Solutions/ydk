@@ -36,7 +36,7 @@ TEST_CASE( "codec_encode"  )
 {
     CodecService c = CodecServiceInit();
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
-    NetconfServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
+    ServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
 
     RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
 
@@ -56,7 +56,7 @@ TEST_CASE( "codec_decode"  )
 {
     CodecService c = CodecServiceInit();
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
-    NetconfServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
+    ServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
 
     RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
 
@@ -75,7 +75,7 @@ TEST_CASE( "codec_decode"  )
 TEST_CASE( "provider_withpath"  )
 {
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
-    NetconfServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
+    ServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
 
     REQUIRE(repo!=NULL);
     REQUIRE(provider!=NULL);
@@ -87,7 +87,7 @@ TEST_CASE( "provider_withpath"  )
 TEST_CASE( "provider"  )
 {
     Repository repo = RepositoryInit();
-    NetconfServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
+    ServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
 
     REQUIRE(repo!=NULL);
     REQUIRE(provider!=NULL);
@@ -102,7 +102,7 @@ TEST_CASE( "rpc" )
 
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
 
-    NetconfServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
+    ServiceProvider provider = NetconfServiceProviderInit(repo, "localhost", "admin", "admin", 12022);
     RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
 
     DataNode runner = RootSchemaNodeCreate(root_schema, "ydktest-sanity:runner");

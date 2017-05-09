@@ -113,20 +113,20 @@ void RepositoryFree(Repository repo)
     delete real_repo;
 }
 
-NetconfServiceProvider NetconfServiceProviderInit(Repository repo, const char * address, const char * username, const char * password, int port)
+ServiceProvider NetconfServiceProviderInit(Repository repo, const char * address, const char * username, const char * password, int port)
 {
     ydk::path::Repository* real_repo = (ydk::path::Repository*)repo;
     ydk::NetconfServiceProvider * real_provider = new ydk::NetconfServiceProvider(*real_repo, address, username, password, port);
     return (void*)real_provider;
 }
 
-void NetconfServiceProviderFree(NetconfServiceProvider provider)
+void NetconfServiceProviderFree(ServiceProvider provider)
 {
     ydk::NetconfServiceProvider * real_provider = (ydk::NetconfServiceProvider*)provider;
     delete real_provider;
 }
 
-RootSchemaNode NetconfServiceProviderGetRootSchema(NetconfServiceProvider provider)
+RootSchemaNode NetconfServiceProviderGetRootSchema(ServiceProvider provider)
 {
     ydk::NetconfServiceProvider * real_provider = (ydk::NetconfServiceProvider*)provider;
     ydk::path::RootSchemaNode* root_schema = &real_provider->get_root_schema();

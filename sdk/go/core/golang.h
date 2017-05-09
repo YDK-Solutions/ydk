@@ -37,7 +37,6 @@ typedef void* SchemaNode;
 typedef void* RootSchemaNode;
 typedef void* CodecService;
 typedef void* ServiceProvider;
-typedef void* NetconfServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
 
@@ -51,9 +50,9 @@ Repository RepositoryInitWithPath(const char*);
 Repository RepositoryInit();
 void RepositoryFree(Repository);
 
-NetconfServiceProvider NetconfServiceProviderInit(Repository repo, const char * address, const char * username, const char * password, int port);
-void NetconfServiceProviderFree(NetconfServiceProvider);
-RootSchemaNode NetconfServiceProviderGetRootSchema(NetconfServiceProvider);
+ServiceProvider NetconfServiceProviderInit(Repository repo, const char * address, const char * username, const char * password, int port);
+void NetconfServiceProviderFree(ServiceProvider);
+RootSchemaNode NetconfServiceProviderGetRootSchema(ServiceProvider);
 
 CodecService CodecServiceInit(void);
 void CodecServiceFree(CodecService);

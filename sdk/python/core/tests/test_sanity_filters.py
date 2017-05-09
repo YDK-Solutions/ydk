@@ -88,20 +88,14 @@ class SanityYang(unittest.TestCase):
         r_1.enum_value = YdkEnumTest.local
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value.operation = YFilter.read
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # self.assertEqual(r_1.enum_value, r_2.enum_value)
-        # TODO: CRUD read using non top entity for YANG enum
-        runner_read = self.crud.read(self.ncc, ysanity.Runner())
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.enum_value.operation = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = YdkEnumTest.local
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # self.assertEqual(r_1.enum_value, r_2.enum_value)
-        # TODO: CRUD read using non top entity for YANG enum
-        runner_read = self.crud.read(self.ncc, ysanity.Runner())
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.enum_value = YdkEnumTest.local
+        runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
         # no such value, nothing returned
@@ -117,11 +111,9 @@ class SanityYang(unittest.TestCase):
         r_1.ldata.extend([l_1, l_2])
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.OneList()
-        # r_2.ldata.operation = YFilter.read
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # TODO: CRUD read using non top entity for YANG list
-        runner_read = self.crud.read(self.ncc, ysanity.Runner())
+        r_2 = ysanity.Runner()
+        r_2.one_list.ldata.operation = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
 
         self.assertEqual(runner_read.one_list.ldata[0].number, r_1.ldata[0].number)
         self.assertEqual(runner_read.one_list.ldata[1].number, r_1.ldata[1].number)
@@ -133,38 +125,22 @@ class SanityYang(unittest.TestCase):
         r_1.ldata.extend([l_1, l_2])
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.OneList()
-        r_2.ldata.extend([l_1])
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # TODO: CRUD read using non top entity for YANG list
-        runner_read = ysanity.Runner()
-        runner_read.one_list.ldata.extend([l_1])
-        runner_read = self.crud.read(self.ncc, runner_read)
+        r_2 = ysanity.Runner()
+        r_2.one_list.ldata.extend([l_1])
+        runner_read = self.crud.read(self.ncc, r_2)
 
-        # r_3 = ysanity.Runner.OneList()
-        # r_3.ldata.extend([l_1])
-        # TODO: not able to reuse l_1 using non top entity
-        r_3 = ysanity.Runner()
-        r_3.one_list.ldata.extend([l_1])
-        self.assertEqual(runner_read.one_list.ldata[0].number, r_3.one_list.ldata[0].number)
+        self.assertEqual(runner_read.one_list.ldata[0].number, r_2.one_list.ldata[0].number)
 
     def test_read_on_leaflist(self):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
         r_1.llstring.extend(['1', '2', '3'])
         self.crud.create(self.ncc, r_1)
-        # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # r_2.llstring.extend(['1', '2', '3'])
-        # TODO: not able to use non top entity for YANG list
+
         r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.llstring.extend(['1','2','3'])
+        r_2.ytypes.built_in_t.llstring.extend(['1', '2', '3'])
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(runner_read.ytypes.built_in_t.llstring, r_1.llstring)
 
-        # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # invalid input, user should use READ()
-        # or the same data on device
-        # r_2.llstring.extend(['something else'])
-        # TODO: not able to use non top entity for YANG list
         r_2 = ysanity.Runner()
         r_2.ytypes.built_in_t.llstring.extend(['something else'])
         runner_read = self.crud.read(self.ncc, r_2)
@@ -174,23 +150,16 @@ class SanityYang(unittest.TestCase):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
         r_1.identity_ref_value = ysanity.ChildIdentity()
         self.crud.create(self.ncc, r_1)
-        # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # r_2.identity_ref_value.operation = YFilter.read
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # TODO: CRUD read using non top entity for identity ref class
-        runner_read = ysanity.Runner()
-        runner_read.ytypes.built_in_t.identity_ref_value.operation = YFilter.read
-        runner_read = self.crud.read(self.ncc, runner_read)
+        
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.identity_ref_value.operation = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
-        # r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # r_2.identity_ref_value = ysanity.ChildIdentity()
-        # r_2 = self.crud.read(self.ncc, r_2)
-        # TODO: CRUD read using non top entity for identity ref class
         r_2 = ysanity.Runner()
         r_2.ytypes.built_in_t.identity_ref_value = ysanity.ChildIdentity()
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1.identity_ref_value, r_2.ytypes.built_in_t.identity_ref_value)
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
     def test_read_only_config(self):
         r_1 = ysanity.Runner()
@@ -216,8 +185,10 @@ class SanityYang(unittest.TestCase):
 
         self.crud.create(self.ncc, runner)
 
-        # self.crud.read(self.ncc, ysanity.Runner.OneList.Ldata())
-        # TODO: CRUD read using non top entity for YANG list
+        r_2 = ysanity.Runner()
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(runner.one_list.ldata[0].number, runner_read.one_list.ldata[0].number)
+        self.assertEqual(runner.one_list.ldata[0].name, runner_read.one_list.ldata[0].name)
 
 
 if __name__ == '__main__':

@@ -64,6 +64,7 @@ set(libydk_src
     src/value.cpp
     src/value_list.cpp
     src/ydk_operation.cpp
+    src/ydk.cpp
     src/ydk_yang.cpp
     src/path/annotation.cpp
     src/path/capability.cpp
@@ -108,7 +109,8 @@ set(libydk_install_headers
     src/service.hpp
     src/service.hpp
     src/types.hpp
-    src/validation_service.hpp)
+    src/validation_service.hpp
+    src/ydk.h)
 
 # Set LibNetconf variables
 set(libnetconf_location ${CMAKE_CURRENT_BINARY_DIR}/project_libnetconf/src/project_libnetconf)

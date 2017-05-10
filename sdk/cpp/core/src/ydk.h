@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////
-// @file golang.h
+// @file ydk.h
 //
 // YANG Development Kit
 // Copyright 2017 Cisco Systems. All rights reserved
@@ -40,6 +40,14 @@ typedef void* ServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
 
+typedef struct DataNodeChildren
+{
+    DataNode* datanodes;
+    int count;
+} DataNodeChildren;
+
+typedef int boolean;
+
 typedef enum EncodingFormat
 {
     XML   = 0,
@@ -50,13 +58,14 @@ Repository RepositoryInitWithPath(const char*);
 Repository RepositoryInit();
 void RepositoryFree(Repository);
 
-ServiceProvider NetconfServiceProviderInit(Repository repo, const char * address, const char * username, const char * password, int port);
+ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
+ServiceProvider NetconfServiceProviderInit(const char * address, const char * username, const char * password, int port);
+RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
-RootSchemaNode NetconfServiceProviderGetRootSchema(ServiceProvider);
 
 CodecService CodecServiceInit(void);
 void CodecServiceFree(CodecService);
-const char* CodecServiceEncode(CodecService, DataNode, EncodingFormat, int);
+const char* CodecServiceEncode(CodecService, DataNode, EncodingFormat, boolean);
 DataNode CodecServiceDecode(CodecService, RootSchemaNode, const char*, EncodingFormat);
 
 DataNode RootSchemaNodeCreate(RootSchemaNode, const char*);
@@ -66,6 +75,13 @@ DataNode RpcInput(Rpc);
 DataNode RpcExecute(Rpc, ServiceProvider);
 
 DataNode DataNodeCreate(DataNode, const char*, const char*);
+const char* DataNodeGetArgument(DataNode);
+const char* DataNodeGetKeyword(DataNode);
+const char* DataNodeGetPath(DataNode);
+const char* DataNodeGetValue(DataNode);
+DataNode DataNodeGetParent(DataNode);
+void DataNodeAddAnnotation(const char*, DataNode);
+DataNodeChildren DataNodeGetChildren(DataNode);
 
 void EnableLogging(void);
 

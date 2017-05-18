@@ -371,8 +371,25 @@ DataNode DataNodeGetParent(DataNode datanode)
     return static_cast<void*>(wrap(parent));
 }
 
-void EnableLogging(void)
+void EnableLogging(LogLevel level)
 {
     auto console = spdlog::stdout_color_mt("ydk");
-    console->set_level(spdlog::level::info);
+    switch(level)
+    {
+        case DEBUG:
+            console->set_level(spdlog::level::debug);
+            return;
+
+        case INFO:
+            console->set_level(spdlog::level::info);
+            return;
+
+        case WARNING:
+            console->set_level(spdlog::level::warn);
+            return;
+
+        case ERROR:
+            console->set_level(spdlog::level::err);
+            return;
+    }
 }

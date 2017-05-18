@@ -29,32 +29,15 @@ import (
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
     "github.com/CiscoDevNet/ydk-go/ydk/services"
 )
-
-func config_bgp(bgp *oc_bgp.Bgp) {
-	bgp.Global.Config.As = 65001
-	bgp.Global.Config.RouterId = "1.2.3.4"
-
-	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv6_afisafi.AfiSafiName = oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.AfiSafiName = oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
-
-	ipv4_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv4_afisafi.AfiSafiName = oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.AfiSafiName = oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
-}
 
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("\nError occured!!\n ", r)
+            fmt.Println("\nError occured!!\n ", r)
 		}
 	}()
 
@@ -66,6 +49,7 @@ func main() {
     }
 
 	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
+		Repo:     types.Repository{"/usr/local/share/ydktest@0.1.0/"},
 		Address:  "127.0.0.1",
 		Username: "admin",
 		Password: "admin",
@@ -76,51 +60,13 @@ func main() {
     crud := services.CrudService{}
 
 	bgp := oc_bgp.Bgp{}
-	config_bgp(&bgp)
 
-	result := crud.Create(&provider, &bgp)
+	data := crud.Read(&provider, &bgp)
 
 	provider.Disconnect()
 
-    if result == true {
-        fmt.Println("\nOperation succeeded!\n")
-    } else {
-        fmt.Println("\nOperation failed!\n")
+    if data != nil {
+        fmt.Println("\nData read successfully!\n")
     }
 
-}
-
-func config_bgp_alternative() {
-    //
-	//b := bgp.BgpAlternative{}
-	//b.Global.Config.RouterId = "1.2.3.4"
-	//b.Global.Config.As = 123
-    //
-	//b.Global.AfiSafis.AfiSafi = append(b.Global.AfiSafis.AfiSafi, struct {
-	//	Operation types.EditOperation
-    //
-	//	Config struct {
-	//		parent    types.Entity
-	//		Operation types.EditOperation
-    //
-	//		As       interface{} // uint32
-	//		RouterId interface{} //string
-	//	}
-	//	AfiSafis struct {
-	//		Operation types.EditOperation
-    //
-	//		AfiSafi []struct {
-	//			Operation types.EditOperation
-    //
-	//			AfiSafiName interface{}
-    //
-	//			Config struct {
-	//				Operation types.EditOperation
-    //
-	//				AfiSafiName interface{}
-	//				Enabled     interface{}
-	//			}
-	//		}
-	//	}
-	//}{})
 }

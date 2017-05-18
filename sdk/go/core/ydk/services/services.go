@@ -24,93 +24,45 @@
  */
 package services
 
-// #cgo CXXFLAGS: -g -std=c++11
-// #cgo LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #include <ydk/ydk.h>
-import "C"
-
 import (
-    "github.com/CiscoDevNet/ydk-go/providers"
-    "github.com/CiscoDevNet/ydk-go/types"
-    "unsafe"
+    "github.com/CiscoDevNet/ydk-go/ydk/path"
+    "github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 type CrudService struct {
 }
 
-func (c *CrudService) Create(provider providers.ServiceProvider, entity types.Entity) bool {
-
-    return operationSucceeded( executeRpc(provider, entity, "ydk:create", "entity", false) )
+func (c *CrudService) Create(provider types.ServiceProvider, entity types.Entity) bool {
+    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:create", "entity", false) )
 }
 
-func (c *CrudService) Update(provider providers.ServiceProvider, entity types.Entity) bool {
-    return operationSucceeded( executeRpc(provider, entity, "ydk:update", "entity", false) )
+func (c *CrudService) Update(provider types.ServiceProvider, entity types.Entity) bool {
+    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:update", "entity", false) )
 }
 
-func (c *CrudService) Delete(provider providers.ServiceProvider, entity types.Entity) bool {
-    return operationSucceeded( executeRpc(provider, entity, "ydk:delete", "entity", false) )
+func (c *CrudService) Delete(provider types.ServiceProvider, entity types.Entity) bool {
+    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:delete", "entity", false) )
 }
 
-
-func (c *CrudService) Read(provider providers.ServiceProvider, filter types.Entity) types.Entity {
-    return readDatanode( filter, executeRpc(provider, filter, "ydk:read", "filter", true) )
+func (c *CrudService) Read(provider types.ServiceProvider, filter types.Entity) types.Entity {
+    return path.ReadDatanode( filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", true) )
 }
 
-func (c *CrudService) ReadConfig(provider providers.ServiceProvider, filter types.Entity) types.Entity {
-    return readDatanode( filter, executeRpc(provider, filter, "ydk:read", "filter", false) )
+func (c *CrudService) ReadConfig(provider types.ServiceProvider, filter types.Entity) types.Entity {
+    return path.ReadDatanode( filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", false) )
 }
 
-func readDatanode(filter types.Entity, read_data_node C.DataNode) types.Entity {
-    if (read_data_node == nil) {
-        return nil
-    }
-
-    top_entity := getTopEntityFromFilter(filter);
-    children := C.DataNodeGetChildren(read_data_node)
-
-    types.GetEntityFromDataNode(children, top_entity)
-    return top_entity
+func operationSucceeded(node types.DataNode) bool {
+    return node.Private != nil
 }
 
-func operationSucceeded(node C.DataNode) bool {
-    return node == nil
+type CodecService struct {
 }
 
-func getTopEntityFromFilter(filter types.Entity) types.Entity {
-    if(filter.GetParent() == nil) {
-        return filter
-    }
-
-    return getTopEntityFromFilter(filter.GetParent())
+func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.Entity) string {
+    return ""
 }
 
-func executeRpc(provider C.ServiceProvider, entity types.Entity, operation string, data_tag string, set_config_flag bool) C.DataNode {
-    root_schema := C.ServiceProviderGetRootSchema(provider)
-
-    ydk_rpc := C.RootSchemaNodeRpc(root_schema, C.CString(operation))
-    data := getDataPayload(entity, provider)
-    input := C.RpcInput(ydk_rpc)
-
-    if(set_config_flag) {
-        C.DataNodeCreate(input, C.CString("only-config"), C.CString(""))
-    }
-
-    C.DataNodeCreate(input, C.CString(data_tag), C.CString(data))
-    return C.RpcExecute(ydk_rpc, provider)
-}
-
-func getDataPayload(entity types.Entity, provider C.ServiceProvider) string {
-    root_schema := C.ServiceProviderGetRootSchema(provider)
-    datanode := types.GetDataNodeFromEntity(entity, root_schema)
-
-    for datanode!= nil && datanode.GetParent() != nil {
-        datanode = datanode.GetParent()
-    }
-
-    codec := C.CodecServiceInit()
-    defer C.CodecServiceFree(codec)
-    var data *C.char = C.CodecServiceEncode(codec, datanode, C.XML, 1)
-    defer C.free(unsafe.Pointer(data))
-
-    return data
+func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
+    return nil
 }

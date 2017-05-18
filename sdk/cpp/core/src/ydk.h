@@ -54,6 +54,14 @@ typedef enum EncodingFormat
     JSON
 } EncodingFormat;
 
+typedef enum LogLevel
+{
+    DEBUG   = 0,
+    INFO,
+    WARNING,
+    ERROR
+} LogLevel;
+
 Repository RepositoryInitWithPath(const char*);
 Repository RepositoryInit();
 void RepositoryFree(Repository);
@@ -83,7 +91,7 @@ DataNode DataNodeGetParent(DataNode);
 void DataNodeAddAnnotation(const char*, DataNode);
 DataNodeChildren DataNodeGetChildren(DataNode);
 
-void EnableLogging(void);
+void EnableLogging(LogLevel);
 
 #ifdef __cplusplus
 }

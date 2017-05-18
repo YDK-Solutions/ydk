@@ -22,43 +22,34 @@
  * under the License.
  *----------------------------------------------
  */
-package providers
+package ydk
 
+// #cgo CXXFLAGS: -g -std=c++11
+// #cgo LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
+//#include <ydk/ydk.h>
+import "C"
 
-import (
-    "github.com/CiscoDevNet/ydk-go/ydk/path"
-    "github.com/CiscoDevNet/ydk-go/ydk/types"
+type LogLevel int
+
+const (
+    Debug LogLevel = iota
+    Info
+    Warning
+    Error
 )
 
-type NetconfServiceProvider struct {
-	Repo     types.Repository
-	Address  string
-	Username string
-	Password string
-	Port     int
+func EnableLogging(level LogLevel) {
+    switch(level) {
+        case Debug:
+            C.EnableLogging(C.DEBUG)
 
-	Private types.CServiceProvider
-}
+        case Info:
+            C.EnableLogging(C.INFO)
 
-type RestconfServiceProvider struct {
-    Repo     types.Repository
-    Address  string
-    Username string
-    Password string
-    Port     int
-    Encoding types.EncodingFormat
+        case Warning:
+            C.EnableLogging(C.WARNING)
 
-    Private types.CServiceProvider
-}
-
-func (provider *NetconfServiceProvider) GetPrivate() interface{} {
-    return provider.Private
-}
-
-func (provider *NetconfServiceProvider) Connect() {
-    provider.Private = path.ConnectToProvider(provider.Repo, provider.Address, provider.Username, provider.Password, provider.Port)
-}
-
-func (provider *NetconfServiceProvider) Disconnect() {
-	path.DisconnectFromProvider(provider.Private)
+        case Error:
+            C.EnableLogging(C.ERROR)
+    }
 }

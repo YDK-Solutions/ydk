@@ -41,7 +41,7 @@ func main() {
 	flag.Parse()
 
 	if *verbosePtr {
-		C.EnableLogging()
+		C.EnableLogging(C.INFO)
 	}
 
 	var address *C.char = C.CString("localhost")
@@ -73,7 +73,7 @@ func main() {
 	defer C.RepositoryFree(repo)
 	provider := C.NetconfServiceProviderInitWithRepo(repo, address, username, password, 12022)
 	defer C.NetconfServiceProviderFree(provider)
-	root_schema := C.NetconfServiceProviderGetRootSchema(provider)
+	root_schema := C.ServiceProviderGetRootSchema(provider)
 
 	runner := C.RootSchemaNodeCreate(root_schema, runner_path)
 

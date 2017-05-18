@@ -24,16 +24,9 @@
  */
 package types
 
-// #cgo CXXFLAGS: -g -std=c++11
-// #cgo LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #include <ydk/ydk.h>
-// #include <stdlib.h>
-import "C"
-
 import (
     "fmt"
     "sort"
-    "unsafe"
 )
 
 type EditOperation int
@@ -67,7 +60,7 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
-type AugmentCapabilitiesFunction func()
+type AugmentCapabilitiesFunction func() map[string]string
 
 type Entity interface {
 	GetEntityPath(Entity) EntityPath
@@ -135,20 +128,17 @@ const (
 
 type YLeaf struct {
 	name  string
-	value string
 
-	is_set     bool
-	operation  EditOperation
 	leaf_type  YType
 	bits_value Bits
-}
 
-func (y *YLeaf) Get() string {
-	return y.value
+    Value string
+    IsSet      bool
+    Operation  EditOperation
 }
 
 func (y *YLeaf) GetNameLeafdata() NameLeafData {
-	return NameLeafData{y.name, LeafData{y.value, y.operation, y.is_set}}
+	return NameLeafData{y.name, LeafData{y.Value, y.Operation, y.IsSet}}
 }
 
 type YLeafList struct {
@@ -166,7 +156,7 @@ func (y *YLeafList) GetYLeafs() []YLeaf {
 func (y *YLeafList) GetNameLeafdata() [](NameLeafData) {
 	result := make([]NameLeafData, len(y.values))
 	for i := 0; i < len(y.values); i++ {
-		result = append(result, NameLeafData{y.values[i].name, LeafData{y.values[i].value, y.values[i].operation, y.values[i].is_set}})
+		result = append(result, NameLeafData{y.values[i].name, LeafData{y.values[i].Value, y.values[i].Operation, y.values[i].IsSet}})
 	}
 	return result
 }
@@ -182,6 +172,16 @@ func (e EditOperation) String() string {
 	return fmt.Sprintf("%v", e)
 }
 
+type ServiceProvider interface {
+    GetPrivate() interface{}
+    Connect()
+    Disconnect()
+}
+
+type CodecServiceProvider struct {
+    Encoding EncodingFormat
+}
+
 type Protocol int
 
 const (
@@ -189,13 +189,21 @@ const (
 	Netconf
 )
 
+type DataNode struct {
+    Private interface{}
+}
+
+type CServiceProvider struct {
+    Private interface{}
+}
+
+type Repository struct {
+    Path string
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Exported utility functions
 //////////////////////////////////////////////////////////////////////////
-
-func segmentalize(path string) []string {
-    return make([]string, 2)
-}
 
 type EntitySlice []Entity
 
@@ -251,124 +259,3 @@ func IsSet(operation EditOperation) bool {
     return operation != NotSet
 }
 
-//////////////////////////////////////////////////////////////////////////
-// DataNode from Entity
-//////////////////////////////////////////////////////////////////////////
-func GetDataNodeFromEntity(entity Entity, root_schema C.RootSchemaNode)  C.DataNode {
-    root_path := entity.GetEntityPath(nil)
-    path := C.CString(root_path.Path)
-    defer C.free(unsafe.Pointer(path))
-
-    root_data_node := C.RootSchemaNodeCreate(root_schema, path)
-    //if IsSet(entity.GetOperation()) {
-    //    p1 := C.CString(entity.GetOperation())
-    //    defer C.free(unsafe.Pointer(p1))
-    //    //C.DataNodeAddAnnotation(p1, root_data_node)
-    //}
-
-    populateNameValues(root_data_node, root_path)
-    walkChildren(entity, root_data_node)
-    return root_data_node
-}
-
-func walkChildren(entity Entity, data_node C.DataNode) {
-    children := entity.GetChildren()
-
-    for child_name := range children {
-
-        if (children[child_name].HasOperation() || children[child_name].HasData()) {
-            populateDataNode(children[child_name], data_node)
-        }
-    }
-}
-
-func populateDataNode(entity Entity, parent_data_node C.DataNode) {
-    path := entity.GetEntityPath(entity.GetParent())
-    p := C.CString(path.Path)
-    defer C.free(unsafe.Pointer(p))
-    ep := C.CString("")
-    defer C.free(unsafe.Pointer(ep))
-
-    data_node := C.DataNodeCreate(parent_data_node, p, ep)
-
-    //if(IsSet(entity.GetOperation())) {
-    //    p1 := C.CString(entity.GetOperation())
-    //    defer C.free(unsafe.Pointer(p1))
-    //    //C.DataNodeAddAnnotation(p1, data_node)
-    //}
-
-    populateNameValues(data_node, path)
-    walkChildren(entity, data_node)
-}
-
-func populateNameValues(data_node C.DataNode, path EntityPath) {
-    for _, name_value := range path.ValuePaths {
-        //var result C.DataNode
-        leaf_data := name_value.Data
-        p := C.CString(name_value.Name)
-        defer C.free(unsafe.Pointer(p))
-
-        if(leaf_data.IsSet) {
-            p1 := C.CString(leaf_data.Value)
-            defer C.free(unsafe.Pointer(p1))
-            //result = C.DataNodeCreate(data_node, p, p1)
-            C.DataNodeCreate(data_node, p, p1)
-        }
-
-        //if(IsSet(leaf_data.Operation)) {
-        //    p1 := C.CString(name_value.Data.Operation)
-        //    defer C.free(unsafe.Pointer(p1))
-        //    //C.DataNodeAddAnnotation(p1, result)
-        //}
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Entity from DataNode
-//////////////////////////////////////////////////////////////////////////
-func GetEntityFromDataNode(node C.DataNode, entity Entity) {
-
-    if entity == nil || node == nil {
-        return
-    }
-
-    //c_children := C.DataNodeGetChildren(node)
-    //children := []C.DataNode{unsafe.Pointer(c_children.datanodes)}
-    children := []C.DataNode{}
-
-    for _, child_data_node := range children {
-        child_name := C.DataNodeGetArgument(child_data_node)
-
-        if(dataNodeIsLeaf(child_data_node)) {
-            //C.DataNodeGetValue(child_data_node), C.DataNodeGetPath(node)
-            entity.SetValue(C.GoString(child_name), C.GoString(C.DataNodeGetValue(child_data_node)))
-
-        } else {
-
-            var child_entity Entity
-            if(dataNodeIsList(child_data_node)) {
-                child_entity = entity.GetChildByName(C.GoString(child_name),
-                                                        getSegmentPath(C.GoString(
-                                                                        C.DataNodeGetPath(child_data_node))))
-            } else {
-                child_entity = entity.GetChildByName(C.GoString(child_name), "")
-            }
-            child_entity.SetParent(entity)
-            GetEntityFromDataNode(child_data_node, child_entity)
-        }
-    }
-}
-
-func dataNodeIsLeaf(data_node C.DataNode) bool {
-    return C.GoString(C.DataNodeGetKeyword(data_node)) == "leaf" ||
-        C.GoString(C.DataNodeGetKeyword(data_node)) == "leaf-list"
-}
-
-func dataNodeIsList(data_node C.DataNode) bool {
-    return C.GoString(C.DataNodeGetKeyword(data_node)) == "list"
-}
-
-func getSegmentPath(path string) string {
-    segments := segmentalize(path)
-    return segments[len(segments)-1]
-}

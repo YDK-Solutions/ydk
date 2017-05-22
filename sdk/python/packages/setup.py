@@ -24,7 +24,7 @@ from setuptools import setup, find_packages
 
 HERE = path.abspath(path.dirname(__file__))
 
-INSTALL_REQUIREMENTS = ['ydk>=0.5.2']
+INSTALL_REQUIREMENTS = ['ydk>=0.6.0']
 
 NMSP_PKG_NAME = "$PACKAGE$"
 NMSP_PKG_VERSION = "$VERSION$"

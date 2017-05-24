@@ -30,7 +30,6 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
-	"github.com/CiscoDevNet/ydk-go/ydk/types"
     "github.com/CiscoDevNet/ydk-go/ydk/services"
 )
 
@@ -49,7 +48,6 @@ func main() {
     }
 
 	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
-		Repo:     types.Repository{"/usr/local/share/ydktest@0.1.0/"},
 		Address:  "127.0.0.1",
 		Username: "admin",
 		Password: "admin",

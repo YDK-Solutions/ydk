@@ -29,15 +29,15 @@ import (
     "sort"
 )
 
-type EditOperation int
+type YFilter int
 
 const (
-	Merge EditOperation = iota
+	NotSet YFilter = iota
+    Merge
 	Create
 	Remove
 	Delete_
 	Replace
-	NotSet
 )
 
 type Empty struct {
@@ -45,9 +45,9 @@ type Empty struct {
 }
 
 type LeafData struct {
-	Value     string
-	Operation EditOperation
-	IsSet     bool
+    Value  string
+    Filter YFilter
+    IsSet  bool
 }
 
 type NameLeafData struct {
@@ -84,17 +84,13 @@ type Entity interface {
     GetYangName() string
     GetParentYangName() string
 
-    GetOperation() EditOperation
+    GetOperation() YFilter
 }
 
 type Bits map[string]bool
 
 type Decimal64 struct {
 	value string
-}
-
-type Identity interface {
-	to_string() string
 }
 
 type EnumYLeaf struct {
@@ -127,14 +123,14 @@ const (
 )
 
 type YLeaf struct {
-	name  string
+	name       string
 
 	leaf_type  YType
 	bits_value Bits
 
-    Value string
+    Value      string
     IsSet      bool
-    Operation  EditOperation
+    Operation  YFilter
 }
 
 func (y *YLeaf) GetNameLeafdata() NameLeafData {
@@ -142,10 +138,10 @@ func (y *YLeaf) GetNameLeafdata() NameLeafData {
 }
 
 type YLeafList struct {
-	name   string
-	values []YLeaf
+	name      string
+	values    []YLeaf
 
-	operation EditOperation
+	operation YFilter
 	leaf_type YType
 }
 
@@ -168,7 +164,7 @@ const (
 	JSON
 )
 
-func (e EditOperation) String() string {
+func (e YFilter) String() string {
 	return fmt.Sprintf("%v", e)
 }
 
@@ -236,7 +232,7 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
         return ""
     }
 
-    sort.Reverse(parents)
+    parents = sort.Reverse(parents).(EntitySlice)
 
     p = nil
     for _, p1 := range parents {
@@ -255,7 +251,6 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 
 }
 
-func IsSet(operation EditOperation) bool {
+func IsSet(operation YFilter) bool {
     return operation != NotSet
 }
-

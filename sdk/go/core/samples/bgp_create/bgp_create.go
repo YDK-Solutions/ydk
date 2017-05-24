@@ -39,14 +39,14 @@ func config_bgp(bgp *oc_bgp.Bgp) {
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv6_afisafi.AfiSafiName = oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.AfiSafiName = oc_bgp_types.Ipv6UnicastIdentity{}
+	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
+	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
 	ipv6_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
 
 	ipv4_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv4_afisafi.AfiSafiName = oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.AfiSafiName = oc_bgp_types.Ipv4UnicastIdentity{}
+	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
+	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
 }
@@ -62,7 +62,7 @@ func main() {
     flag.Parse()
 
     if *vPtr {
-        ydk.EnableLogging(ydk.Info)
+        ydk.EnableLogging(ydk.Debug)
     }
 
 	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
@@ -88,39 +88,4 @@ func main() {
         fmt.Println("\nOperation failed!\n")
     }
 
-}
-
-func config_bgp_alternative() {
-    //
-	//b := bgp.BgpAlternative{}
-	//b.Global.Config.RouterId = "1.2.3.4"
-	//b.Global.Config.As = 123
-    //
-	//b.Global.AfiSafis.AfiSafi = append(b.Global.AfiSafis.AfiSafi, struct {
-	//	Operation types.EditOperation
-    //
-	//	Config struct {
-	//		parent    types.Entity
-	//		Operation types.EditOperation
-    //
-	//		As       interface{} // uint32
-	//		RouterId interface{} //string
-	//	}
-	//	AfiSafis struct {
-	//		Operation types.EditOperation
-    //
-	//		AfiSafi []struct {
-	//			Operation types.EditOperation
-    //
-	//			AfiSafiName interface{}
-    //
-	//			Config struct {
-	//				Operation types.EditOperation
-    //
-	//				AfiSafiName interface{}
-	//				Enabled     interface{}
-	//			}
-	//		}
-	//	}
-	//}{})
 }

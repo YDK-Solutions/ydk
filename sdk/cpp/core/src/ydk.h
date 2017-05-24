@@ -56,14 +56,15 @@ typedef enum EncodingFormat
 
 typedef enum LogLevel
 {
-    DEBUG   = 0,
+    OFF    = 0,
+    DEBUG,
     INFO,
     WARNING,
     ERROR
 } LogLevel;
 
 Repository RepositoryInitWithPath(const char*);
-Repository RepositoryInit();
+Repository RepositoryInit(void);
 void RepositoryFree(Repository);
 
 ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
@@ -88,10 +89,11 @@ const char* DataNodeGetKeyword(DataNode);
 const char* DataNodeGetPath(DataNode);
 const char* DataNodeGetValue(DataNode);
 DataNode DataNodeGetParent(DataNode);
-void DataNodeAddAnnotation(const char*, DataNode);
+void DataNodeAddAnnotation(DataNode, const char*);
 DataNodeChildren DataNodeGetChildren(DataNode);
 
 void EnableLogging(LogLevel);
+LogLevel GetLoggingLevel(void);
 
 #ifdef __cplusplus
 }

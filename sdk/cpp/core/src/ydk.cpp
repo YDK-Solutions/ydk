@@ -357,6 +357,11 @@ DataNodeChildren DataNodeGetChildren(DataNode datanode)
 
 void DataNodeAddAnnotation(DataNode datanode, const char* operation)
 {
+    string oper{operation};
+    if(oper.size() == 0)
+    {
+        return;
+    }
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
     ydk::path::Annotation annotation{"ietf-netconf", "operation", operation};
@@ -391,5 +396,38 @@ void EnableLogging(LogLevel level)
         case ERROR:
             console->set_level(spdlog::level::err);
             return;
+
+        case OFF:
+            console->set_level(spdlog::level::off);
+            return;
+    }
+}
+
+LogLevel GetLoggingLevel(void)
+{
+    auto console = spdlog::get("ydk");
+    if(console == nullptr)
+    {
+        return OFF;
+    }
+
+    auto level = console->level();
+    switch(level)
+    {
+        case spdlog::level::off:
+            return OFF;
+        case spdlog::level::trace:
+        case spdlog::level::debug:
+            return DEBUG;
+
+        case spdlog::level::info:
+            return INFO;
+
+        case spdlog::level::warn:
+            return WARNING;
+
+        case spdlog::level::critical:
+        case spdlog::level::err:
+            return ERROR;
     }
 }

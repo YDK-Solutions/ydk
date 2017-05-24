@@ -31,6 +31,7 @@ package path
 import "C"
 
 import (
+    "fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"unsafe"
 )
@@ -40,20 +41,13 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, operation s
 	real_provider := wrapped_provider.Private.(C.ServiceProvider)
 	root_schema := C.ServiceProviderGetRootSchema(real_provider)
 
-    //fmt.Println("got root & prov", root_schema, real_provider, operation, data_tag, &entity)
-
 	ydk_rpc := C.RootSchemaNodeRpc(root_schema, C.CString(operation))
-    if root_schema == nil {
-        panic(1)
-    }
-    var data *C.char
-    if data_tag == "entity" {
-        data = getDataPayload(entity, root_schema)
-    } else {
-        data = C.CString("<bgp xmlns=\"http://openconfig.net/yang/bgp\"/>")
-    }
+	if root_schema == nil {
+		panic(1)
+	}
 
-    //fmt.Println("deeee!", C.GoString(data))
+	data := getDataPayload(entity, root_schema)
+    defer C.free(unsafe.Pointer(data))
 
 	input := C.RpcInput(ydk_rpc)
 
@@ -68,8 +62,6 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, operation s
 func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode) *C.char {
 	datanode := getDataNodeFromEntity(entity, root_schema)
 
-    //fmt.Println("hoooo>> ", entity.GetSegmentPath(), datanode)
-
 	if datanode == nil {
 		return nil
 	}
@@ -81,7 +73,6 @@ func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode) *C.char {
 	codec := C.CodecServiceInit()
 	defer C.CodecServiceFree(codec)
 	var data *C.char = C.CodecServiceEncode(codec, datanode, C.XML, 1)
-	//defer C.free(unsafe.Pointer(data))
 
 	return (data)
 }
@@ -124,10 +115,10 @@ func ConnectToProvider(repo types.Repository, Address, Username, Password string
 	} else {
 		p = C.NetconfServiceProviderInit(address, username, password, cport)
 	}
-    if p == nil {
-        panic("Could not connect to " + Address)
-    }
-    cprovider := types.CServiceProvider{Private:p}
+	if p == nil {
+		panic("Could not connect to " + Address)
+	}
+	cprovider := types.CServiceProvider{Private: p}
 	return cprovider
 }
 
@@ -149,49 +140,31 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 
 	root_data_node := C.RootSchemaNodeCreate(root_schema, path)
 
-    /*
-    HACK!!!
-     */
-    res := C.DataNodeCreate(root_data_node, C.CString("global/config/as"), C.CString("65001"))
-    res = C.DataNodeCreate(root_data_node, C.CString("global/config/router-id"), C.CString("1.2.3.4"))
+	if types.IsSet(entity.GetOperation()) {
+		p1 := C.CString(string(entity.GetOperation()))
+		defer C.free(unsafe.Pointer(p1))
+		C.DataNodeAddAnnotation(root_data_node, p1)
+	}
 
-    res = C.DataNodeCreate(root_data_node, C.CString("global/afi-safis/afi-safi[afi-safi-name=\"openconfig-bgp-types:IPV6_UNICAST\"]/config/afi-safi-name"), C.CString("openconfig-bgp-types:IPV6_UNICAST"))
-    res = C.DataNodeCreate(root_data_node, C.CString("global/afi-safis/afi-safi[afi-safi-name=\"openconfig-bgp-types:IPV6_UNICAST\"]/config/enabled"), C.CString("true"))
-
-    res = C.DataNodeCreate(root_data_node, C.CString("global/afi-safis/afi-safi[afi-safi-name=\"openconfig-bgp-types:IPV4_UNICAST\"]/config/afi-safi-name"), C.CString("openconfig-bgp-types:IPV4_UNICAST"))
-    res = C.DataNodeCreate(root_data_node, C.CString("global/afi-safis/afi-safi[afi-safi-name=\"openconfig-bgp-types:IPV4_UNICAST\"]/config/enabled"), C.CString("true"))
-
-    if(res == nil) {
-        panic("Could not create data!")
-    }
-
-    /*
-    HACK!!!
-     */
-
-    //fmt.Println("gooo ", root_path.Path, root_data_node)
-	//if IsSet(entity.GetOperation()) {
-	//    p1 := C.CString(entity.GetOperation())
-	//    defer C.free(unsafe.Pointer(p1))
-	//    //C.DataNodeAddAnnotation(p1, root_data_node)
-	//}
-
-	//populateNameValues(root_data_node, root_path) TODO
-	//walkChildren(entity, root_data_node)
+	populateNameValues(root_data_node, root_path) //TODO
+	walkChildren(entity, root_data_node)
 	return root_data_node
 }
 
 func walkChildren(entity types.Entity, data_node C.DataNode) {
 	children := entity.GetChildren()
 
-    //fmt.Println("yikes. getchildren!1", len(children))
+    fmt.Printf("Got %d children\n", len(children))
 
 	for child_name := range children {
+
+        fmt.Printf("Lookin at %v\n", children[child_name].GetSegmentPath())
 
 		if children[child_name].HasOperation() || children[child_name].HasData() {
 			populateDataNode(children[child_name], data_node)
 		}
 	}
+    fmt.Println()
 }
 
 func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
@@ -202,14 +175,15 @@ func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
 	defer C.free(unsafe.Pointer(ep))
 
 	data_node := C.DataNodeCreate(parent_data_node, p, ep)
+    if data_node == nil {
+        panic("Datanode could not be created for: " + path.Path)
+    }
 
-    //fmt.Println("yeee populate", path.Path)
-
-	//if(IsSet(entity.GetOperation())) {
-	//    p1 := C.CString(entity.GetOperation())
-	//    defer C.free(unsafe.Pointer(p1))
-	//    //C.DataNodeAddAnnotation(p1, data_node)
-	//}
+	if(types.IsSet(entity.GetOperation())) {
+	    p1 := C.CString(string(entity.GetOperation()))
+	    defer C.free(unsafe.Pointer(p1))
+	    C.DataNodeAddAnnotation(data_node, p1)
+	}
 
 	populateNameValues(data_node, path)
 	walkChildren(entity, data_node)
@@ -217,22 +191,23 @@ func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
 
 func populateNameValues(data_node C.DataNode, path types.EntityPath) {
 	for _, name_value := range path.ValuePaths {
-		//var result C.DataNode
+		var result C.DataNode
 		leaf_data := name_value.Data
 		p := C.CString(name_value.Name)
+        fmt.Printf("got leaf {%s: %s}\n",name_value.Name, name_value.Data.Value)
 
 		if leaf_data.IsSet {
 			p1 := C.CString(leaf_data.Value)
-			//result = C.DataNodeCreate(data_node, p, p1)
+			result = C.DataNodeCreate(data_node, p, p1)
 			C.DataNodeCreate(data_node, p, p1)
 			C.free(unsafe.Pointer(p1))
 		}
 
-		//if(IsSet(leaf_data.Operation)) {
-		//    p1 := C.CString(name_value.Data.Operation)
-		//    defer C.free(unsafe.Pointer(p1))
-		//    //C.DataNodeAddAnnotation(p1, result)
-		//}
+		if(types.IsSet(leaf_data.Filter)) {
+		    p1 := C.CString(string(name_value.Data.Filter))
+		    defer C.free(unsafe.Pointer(p1))
+		    C.DataNodeAddAnnotation(result, p1)
+		}
 		C.free(unsafe.Pointer(p))
 	}
 }

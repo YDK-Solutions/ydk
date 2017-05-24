@@ -60,5 +60,8 @@ func (provider *NetconfServiceProvider) Connect() {
 }
 
 func (provider *NetconfServiceProvider) Disconnect() {
+    if provider.Private.Private == nil {
+        return
+    }
 	path.DisconnectFromProvider(provider.Private)
 }

@@ -131,7 +131,7 @@ class GetEntityPathPrinter(object):
         self.ctx.bline()
         for prop in leafs:
             if not prop.is_many:
-                self.ctx.writeln('if (%s.is_set || is_set(%s.operation)) leaf_name_data.push_back(%s.get_name_leafdata());' % (prop.name, prop.name, prop.name))
+                self.ctx.writeln('if (%s.is_set || is_set(%s.yfilter)) leaf_name_data.push_back(%s.get_name_leafdata());' % (prop.name, prop.name, prop.name))
         self._print_get_entity_path_leaflists(leafs)
         self.ctx.bline()
         self.ctx.writeln('EntityPath entity_path {path_buffer.str(), leaf_name_data};')

@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
             cout << "=================================================="<<endl;
             return 0;
         }
-        cout << "Read operation success" << endl;
+        cout << "Read yfilter success" << endl;
 
         CodecService codec_service{};
         CodecServiceProvider codec_provider{EncodingFormat::JSON};

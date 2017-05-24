@@ -56,7 +56,7 @@ class ClassHasDataPrinter(object):
         for leaf in leafs:
             if leaf.is_many:
                 iter_stmt = 'for leaf in self.%s.getYLeafs():'
-                access_stmt = 'if (leaf.operation != YFilter.not_set):'
+                access_stmt = 'if (leaf.yfilter != YFilter.not_set):'
                 self._print_class_has_many(leaf, iter_stmt, access_stmt)
 
         if len(conditions) == 0:
@@ -109,8 +109,8 @@ class ClassHasDataPrinter(object):
         return conditions
 
     def _init_has_operation_conditions(self, leafs, children):
-        conditions = ['self.operation != YFilter.not_set']
-        conditions.extend([ 'self.%s.operation != YFilter.not_set'
+        conditions = ['self.yfilter != YFilter.not_set']
+        conditions.extend([ 'self.%s.yfilter != YFilter.not_set'
             % (prop.name) for prop in leafs])
         conditions.extend([('(self.%s is not None and self.%s.has_operation())'
             % (prop.name, prop.name)) for prop in children if not prop.is_many])

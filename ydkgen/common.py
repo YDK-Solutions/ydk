@@ -123,7 +123,7 @@ def merge_file_path_segments(segs):
 
 
 def ispythonkeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'operation', 'exec', 'entity')
+    return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'yfilter', 'exec', 'entity')
 
 
 def iscppkeyword(word):
@@ -133,7 +133,7 @@ def iscppkeyword(word):
                     'do', 'new', 'delete', 'private', 'public', 'export',
                     'for', 'break', 'case', 'catch', 'float', 'long', 'return',
                     'explicit', 'class', 'if', 'try', 'while', 'and', 'const',
-                    'continue', 'double', 'else', 'value', 'namespace', 'operation')
+                    'continue', 'double', 'else', 'value', 'namespace', 'yfilter')
 
 
 def get_sphinx_ref_label(named_element):

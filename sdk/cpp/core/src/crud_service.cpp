@@ -39,7 +39,7 @@ namespace ydk {
 
 static string get_data_payload(Entity & entity, path::ServiceProvider & provider);
 static std::shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
-        const string & operation, const string & data_tag, bool set_config_flag);
+        const string & yfilter, const string & data_tag, bool set_config_flag);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 static bool operation_succeeded(shared_ptr<path::DataNode> node);
 
@@ -49,7 +49,7 @@ CrudService::CrudService()
 
 bool CrudService::create(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD create operation");
+    YLOG_INFO("Executing CRUD create yfilter");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:create", "entity", false)
             );
@@ -57,7 +57,7 @@ bool CrudService::create(path::ServiceProvider & provider, Entity & entity)
 
 bool CrudService::update(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD update operation");
+    YLOG_INFO("Executing CRUD update yfilter");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:update", "entity", false)
             );
@@ -65,7 +65,7 @@ bool CrudService::update(path::ServiceProvider & provider, Entity & entity)
 
 bool CrudService::delete_(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD delete operation");
+    YLOG_INFO("Executing CRUD delete yfilter");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:delete", "entity", false)
             );
@@ -73,13 +73,13 @@ bool CrudService::delete_(path::ServiceProvider & provider, Entity & entity)
 
 shared_ptr<Entity> CrudService::read(path::ServiceProvider & provider, Entity & filter)
 {
-    YLOG_INFO("Executing CRUD read operation");
+    YLOG_INFO("Executing CRUD read yfilter");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", false));
 }
 
 shared_ptr<Entity> CrudService::read_config(path::ServiceProvider & provider, Entity & filter)
 {
-    YLOG_INFO("Executing CRUD config read operation");
+    YLOG_INFO("Executing CRUD config read yfilter");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", true));
 }
 
@@ -107,7 +107,7 @@ static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
 }
 
 static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
-        const string & operation, const string & data_tag, bool set_config_flag)
+        const string & yfilter, const string & data_tag, bool set_config_flag)
 {
 //    if(data_tag == "entity")
 //    {
@@ -115,7 +115,7 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 //        validation.validate(provider, entity, ValidationService::Option::DATASTORE);
 //    }
     path::RootSchemaNode& root_schema = provider.get_root_schema();
-    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(operation) };
+    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(yfilter) };
     string data = get_data_payload(entity, provider);
 
     if(set_config_flag)
@@ -127,7 +127,7 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 }
 
 static void modify_xml_tree(xmlNodePtr root, const string & data_path,
-        const string & leaf_name, YFilter operation)
+        const string & leaf_name, YFilter yfilter)
 {
     int i;
     xmlNodePtr node = NULL;
@@ -144,14 +144,14 @@ static void modify_xml_tree(xmlNodePtr root, const string & data_path,
         }
         if(os.str() == data_path)
         {
-            YLOG_INFO("Setting leaf {} to operation {}", leaf_name, to_string(operation));
+            YLOG_INFO("Setting leaf {} to yfilter {}", leaf_name, to_string(yfilter));
             xmlNodePtr child = xmlNewChild(node, NULL, (const unsigned char *)leaf_name.c_str(), NULL);
-            if(operation!=YFilter::read)
+            if(yfilter!=YFilter::read)
             {
-                xmlNewProp(child, (const unsigned char *)"operation", (const unsigned char *)(to_string(operation)).c_str());
+                xmlNewProp(child, (const unsigned char *)"yfilter", (const unsigned char *)(to_string(yfilter)).c_str());
             }
         }
-        modify_xml_tree(node->children, data_path, leaf_name, operation);
+        modify_xml_tree(node->children, data_path, leaf_name, yfilter);
     }
 }
 

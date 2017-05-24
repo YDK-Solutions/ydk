@@ -79,7 +79,7 @@ class Entity;
 class LeafData
 {
   public:
-    LeafData(std::string value, YFilter operation, bool is_set);
+    LeafData(std::string value, YFilter yfilter, bool is_set);
     ~LeafData();
 
     bool operator == (LeafData & other) const;
@@ -89,7 +89,7 @@ class LeafData
 
   public:
     std::string value;
-    YFilter operation;
+    YFilter yfilter;
     bool is_set;
 };
 
@@ -154,7 +154,7 @@ class Entity {
     Entity* parent;
     std::string yang_name;
     std::string yang_parent_name;
-    YFilter operation;
+    YFilter yfilter;
     bool is_presence_container;
 };
 
@@ -292,7 +292,7 @@ class YLeaf
 
   public:
     bool is_set;
-    YFilter operation;
+    YFilter yfilter;
 
   private:
     void store_value(std::string && val);
@@ -341,7 +341,7 @@ class YLeafList {
     virtual void clear();
 
   public:
-    YFilter operation;
+    YFilter yfilter;
 
   private:
     std::vector<YLeaf> values;
@@ -359,7 +359,7 @@ enum class EncodingFormat {
     JSON
 };
 
-std::string to_string(YFilter operation);
+std::string to_string(YFilter yfilter);
 
 enum class Protocol
 {

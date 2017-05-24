@@ -49,9 +49,9 @@ class YList(list):
         self.parent = parent
 
     def __setattr__(self, name, value):
-        if name == 'operation' and isinstance(value, _YFilter):
+        if name == 'yfilter' and isinstance(value, _YFilter):
             for e in self:
-                e.operation = value
+                e.yfilter = value
         else:
             super(YList, self).__setattr__(name, value)
 

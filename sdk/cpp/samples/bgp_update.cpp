@@ -51,5 +51,5 @@ int main(int argc, char* argv[])
 
     bool reply = crud.update(provider, *bgp);
 
-    if(reply) cout << "Update operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+    if(reply) cout << "Update yfilter success" << endl << endl; else cout << "Operation failed" << endl << endl;
 }

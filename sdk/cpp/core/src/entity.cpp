@@ -38,7 +38,7 @@ namespace ydk
 /// Entity
 //////////////////////////////////////////////////////////////////
 Entity::Entity()
-  : parent(nullptr), operation(YFilter::not_set), is_presence_container(false)
+  : parent(nullptr), yfilter(YFilter::not_set), is_presence_container(false)
 {
 }
 

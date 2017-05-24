@@ -198,12 +198,12 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 
     if(format == ydk::EncodingFormat::JSON)
     {
-        YLOG_DEBUG("Performing encode operation on JSON");
+        YLOG_DEBUG("Performing encode yfilter on JSON");
         scheme = LYD_JSON;
     }
     else
     {
-        YLOG_DEBUG("Performing encode operation on XML");
+        YLOG_DEBUG("Performing encode yfilter on XML");
     }
 
     struct lyd_node* m_node = nullptr;
@@ -238,12 +238,12 @@ ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::s
     LYD_FORMAT scheme = LYD_XML;
     if (format == EncodingFormat::JSON)
     {
-        YLOG_DEBUG("Performing decode operation on JSON");
+        YLOG_DEBUG("Performing decode yfilter on JSON");
         scheme = LYD_JSON;
     }
     else
     {
-        YLOG_DEBUG("Performing decode operation on XML");
+        YLOG_DEBUG("Performing decode yfilter on XML");
     }
 
     const RootSchemaNodeImpl & rs_impl = dynamic_cast<const RootSchemaNodeImpl &>(root_schema);
@@ -257,7 +257,7 @@ ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::s
     }
 
 
-    YLOG_DEBUG("Performing decode operation");
+    YLOG_DEBUG("Performing decode yfilter");
     RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
     rd->m_node = root;
 

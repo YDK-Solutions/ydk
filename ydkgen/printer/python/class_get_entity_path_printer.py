@@ -198,7 +198,7 @@ class GetEntityPathPrinter(object):
         self.ctx.writeln('leaf_name_data = LeafDataList()')
         for prop in leafs:
             if not prop.is_many:
-                self.ctx.writeln('if (self.%s.is_set or self.%s.operation != YFilter.not_set):' % (prop.name, prop.name))
+                self.ctx.writeln('if (self.%s.is_set or self.%s.yfilter != YFilter.not_set):' % (prop.name, prop.name))
                 self.ctx.lvl_inc()
                 self.ctx.writeln('leaf_name_data.append(self.%s.get_name_leafdata())' % (prop.name))
                 self.ctx.lvl_dec()

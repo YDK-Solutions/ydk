@@ -51,5 +51,5 @@ int main(int argc, char* argv[])
 
     auto bgp = make_unique<Bgp>();
     bool reply = crud.delete_(provider, *bgp);
-    if(reply) cout << "Delete operation success" << endl; else cout << "Operation failed" << endl;
+    if(reply) cout << "Delete yfilter success" << endl; else cout << "Operation failed" << endl;
 }

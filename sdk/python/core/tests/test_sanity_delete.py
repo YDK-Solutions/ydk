@@ -93,7 +93,7 @@ class SanityYang(unittest.TestCase):
 
         # use DELETE object to remove leaf one
         runner_update = runner_read
-        runner_update.one.name.operation = YFilter.delete
+        runner_update.one.name.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
         # manually create remaining runner with leaf two
@@ -114,8 +114,8 @@ class SanityYang(unittest.TestCase):
         # specify the leaflist value to be deleted
         runner_update.ytypes.built_in_t.llstring.append('0')
         runner_update.ytypes.built_in_t.llstring.append('3')
-        # set operation
-        runner_update.ytypes.built_in_t.llstring.operation = YFilter.delete
+        # set yfilter
+        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -137,7 +137,7 @@ class SanityYang(unittest.TestCase):
 
         runner_update = ysanity.Runner()
         runner_update.ytypes.built_in_t.llstring.append('3')
-        runner_update.ytypes.built_in_t.llstring.operation = YFilter.delete
+        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -162,7 +162,7 @@ class SanityYang(unittest.TestCase):
         k = ysanity.Runner.OneList.IdentityList()
         k.config.id = ysanity.ChildIdentity()
         k.id_ref = k.config.id.get()
-        k.operation = YFilter.delete
+        k.yfilter = YFilter.delete
         runner_update.one_list.identity_list.append(k)
 
         self.crud.update(self.ncc, runner_update)
@@ -183,7 +183,7 @@ class SanityYang(unittest.TestCase):
 
         # delete contianer two
         runner_update = ysanity.Runner()
-        runner_update.two.operation = YFilter.delete
+        runner_update.two.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
         runner_read = self.crud.read(self.ncc, runner_read_filter)
@@ -198,7 +198,7 @@ class SanityYang(unittest.TestCase):
 
         runner_read = self.read_from_empty_filter()
 
-        runner_read.inbtw_list.ldata[1].subc.subc_subl1.operation = YFilter.delete
+        runner_read.inbtw_list.ldata[1].subc.subc_subl1.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_read)
 
         runner_read = self.read_from_empty_filter()
@@ -214,10 +214,10 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, runner_create)
 
         runner_update = self.read_from_empty_filter()
-        runner_update.inbtw_list.ldata[1].subc.subc_subl1[1].operation = YFilter.delete
+        runner_update.inbtw_list.ldata[1].subc.subc_subl1[1].yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
-        # get object after a crud delete operation
+        # get object after a crud delete yfilter
         runner_read = self.read_from_empty_filter()
 
         runner_compare = runner_create
@@ -232,7 +232,7 @@ class SanityYang(unittest.TestCase):
         runner_read = self.read_from_empty_filter()
 
         runner_update = runner_create
-        runner_update.inbtw_list.ldata[1].operation = YFilter.delete
+        runner_update.inbtw_list.ldata[1].yfilter = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -258,11 +258,11 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, runner_create)
 
         runner_update = self.read_from_empty_filter()
-        runner_update.one_list.ldata[1].operation = YFilter.delete
-        runner_update.one_list.ldata[2].operation = YFilter.delete
+        runner_update.one_list.ldata[1].yfilter = YFilter.delete
+        runner_update.one_list.ldata[2].yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
-        # read after a crud delete operation
+        # read after a crud delete yfilter
         runner_read = self.read_from_empty_filter()
 
         runner_compare = runner_create
@@ -284,7 +284,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, runner_create)
 
         runner_update = self.read_from_empty_filter()
-        runner_update.one_list.ldata.operation = YFilter.delete
+        runner_update.one_list.ldata.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
         runner_read = self.read_from_empty_filter()

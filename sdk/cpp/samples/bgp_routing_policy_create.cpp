@@ -90,6 +90,6 @@ int main(int argc, char* argv[])
 
     bool reply = crud.create(provider, *bgp );
 
-    if(reply) cout << "Create operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+    if(reply) cout << "Create yfilter success" << endl << endl; else cout << "Operation failed" << endl << endl;
 
 }

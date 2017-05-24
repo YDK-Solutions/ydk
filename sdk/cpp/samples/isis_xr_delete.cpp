@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
         auto isis = make_unique<Isis>();
         bool reply = crud.delete_(provider, *isis);
-        if(reply) cout << "Delete operation success" << endl << endl; else cout << "Operation failed" << endl << endl;
+        if(reply) cout << "Delete yfilter success" << endl << endl; else cout << "Operation failed" << endl << endl;
     }
     catch(YCPPError & e)
     {

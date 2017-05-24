@@ -29,10 +29,10 @@
 
 namespace ydk
 {
-std::string to_string(YFilter operation)
+std::string to_string(YFilter yfilter)
 {
     #define TOSTR(a) case YFilter::a: return #a;
-    switch(operation)
+    switch(yfilter)
     {
         TOSTR(merge)
         TOSTR(create)

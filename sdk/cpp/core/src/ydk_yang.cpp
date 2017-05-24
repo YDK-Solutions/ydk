@@ -851,7 +851,7 @@ namespace ydk {
        and <get-config> protocol operations, then the
        following unqualified XML attribute is supported
        within the <filter> element, within a <get> or
-       <get-config> protocol operation:
+       <get-config> protocol yfilter:
        type : optional attribute with allowed
           value strings 'subtree' and 'xpath'.
           If missing, the default value is 'subtree'.
@@ -999,7 +999,7 @@ namespace ydk {
        }
        enum access-denied {
        description
-         "Access to the requested protocol operation or
+         "Access to the requested protocol yfilter or
         data model is denied because authorization failed.";
        }
        enum lock-denied {
@@ -1022,25 +1022,25 @@ namespace ydk {
        description
          "Request could not be completed because the relevant
         data model content already exists.  For example,
-        a 'create' operation was attempted on data that
+        a 'create' yfilter was attempted on data that
         already exists.";
        }
        enum data-missing {
        description
          "Request could not be completed because the relevant
         data model content does not exist.  For example,
-        a 'delete' operation was attempted on
+        a 'delete' yfilter was attempted on
         data that does not exist.";
        }
        enum operation-not-supported {
        description
          "Request could not be completed because the requested
-        operation is not supported by this implementation.";
+        yfilter is not supported by this implementation.";
        }
        enum operation-failed {
        description
          "Request could not be completed because the requested
-        operation failed for some reason not covered by
+        yfilter failed for some reason not covered by
         any other error condition.";
        }
        enum partial-operation {
@@ -1088,7 +1088,7 @@ namespace ydk {
          identified by the target parameter.  If no such
          configuration data exists in the configuration
          datastore, it is created.  Unlike a
-         <copy-config> operation, which replaces the
+         <copy-config> yfilter, which replaces the
          entire target configuration, only the configuration
          actually present in the config parameter is affected.";
       }
@@ -1119,12 +1119,12 @@ namespace ydk {
          configuration if the configuration
          data currently exists in the configuration
          datastore.  If the configuration data does not
-         exist, the 'remove' operation is silently ignored
+         exist, the 'remove' yfilter is silently ignored
          by the server.";
       }
     }
     default "merge";
-    description "NETCONF 'operation' attribute values";
+    description "NETCONF 'yfilter' attribute values";
     reference "RFC 6241, Section 7.2";
     }
     // NETCONF Standard Protocol Operations
@@ -1179,7 +1179,7 @@ namespace ydk {
     }
     rpc edit-config {
     description
-      "The <edit-config> operation loads all or part of a specified
+      "The <edit-config> yfilter loads all or part of a specified
        configuration to the specified target configuration.";
     reference "RFC 6241, Section 7.2";
     input {
@@ -1208,20 +1208,20 @@ namespace ydk {
       type enumeration {
         enum merge {
         description
-          "The default operation is merge.";
+          "The default yfilter is merge.";
         }
         enum replace {
         description
-          "The default operation is replace.";
+          "The default yfilter is replace.";
         }
         enum none {
         description
-          "There is no default operation.";
+          "There is no default yfilter.";
         }
       }
       default "merge";
       description
-        "The default operation to use.";
+        "The default yfilter to use.";
       }
       leaf test-option {
       if-feature validate;
@@ -1268,7 +1268,7 @@ namespace ydk {
       choice edit-content {
       mandatory true;
       description
-        "The content for the edit operation.";
+        "The content for the edit yfilter.";
       anyxml config {
         description
         "Inline Config content.";
@@ -1294,7 +1294,7 @@ namespace ydk {
       choice config-target {
         mandatory true;
         description
-        "The configuration target of the copy operation.";
+        "The configuration target of the copy yfilter.";
         leaf candidate {
         if-feature candidate;
         type empty;
@@ -1328,7 +1328,7 @@ namespace ydk {
       choice config-source {
         mandatory true;
         description
-        "The configuration source for the copy operation.";
+        "The configuration source for the copy yfilter.";
         leaf candidate {
         if-feature candidate;
         type empty;
@@ -1392,7 +1392,7 @@ namespace ydk {
     }
     rpc lock {
     description
-      "The lock operation allows the client to lock the configuration
+      "The lock yfilter allows the client to lock the configuration
        system of a device.";
     reference "RFC 6241, Section 7.5";
     input {
@@ -1426,8 +1426,8 @@ namespace ydk {
     }
     rpc unlock {
     description
-      "The unlock operation is used to release a configuration lock,
-       previously obtained with the 'lock' operation.";
+      "The unlock yfilter is used to release a configuration lock,
+       previously obtained with the 'lock' yfilter.";
     reference "RFC 6241, Section 7.6";
     input {
       container target {
@@ -1531,7 +1531,7 @@ namespace ydk {
          persistent.  A persistent confirmed commit is not aborted
          if the NETCONF session terminates.  The only way to abort
          a persistent confirmed commit is to let the timer expire,
-         or to use the <cancel-commit> operation.
+         or to use the <cancel-commit> yfilter.
          The value of this parameter is a token that must be given
          in the 'persist-id' parameter of <commit> or
          <cancel-commit> operations in order to confirm or cancel
@@ -1545,8 +1545,8 @@ namespace ydk {
       description
         "This parameter is given in order to commit a persistent
          confirmed commit.  The value must be equal to the value
-         given in the 'persist' parameter to the <commit> operation.
-         If it does not match, the operation fails with an
+         given in the 'persist' parameter to the <commit> yfilter.
+         If it does not match, the yfilter fails with an
         'invalid-value' error.";
       reference "RFC 6241, Section 8.3.4.1";
       }
@@ -1562,7 +1562,7 @@ namespace ydk {
     rpc cancel-commit {
     if-feature confirmed-commit;
     description
-      "This operation is used to cancel an ongoing confirmed commit.
+      "This yfilter is used to cancel an ongoing confirmed commit.
        If the confirmed commit is persistent, the parameter
        'persist-id' must be given, and it must match the value of the
        'persist' parameter.";
@@ -1573,8 +1573,8 @@ namespace ydk {
       description
         "This parameter is given in order to cancel a persistent
          confirmed commit.  The value must be equal to the value
-         given in the 'persist' parameter to the <commit> operation.
-         If it does not match, the operation fails with an
+         given in the 'persist' parameter to the <commit> yfilter.
+         If it does not match, the yfilter fails with an
         'invalid-value' error.";
       }
     }

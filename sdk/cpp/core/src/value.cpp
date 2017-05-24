@@ -63,7 +63,7 @@ std::string to_str(YType t)
 
 YLeaf::YLeaf(YType type, std::string name):
         is_set(false),
-        operation(YFilter::not_set),
+        yfilter(YFilter::not_set),
         name(name),
         value(""),
         type(type)
@@ -72,7 +72,7 @@ YLeaf::YLeaf(YType type, std::string name):
 
 YLeaf::YLeaf(const YLeaf& val):
     is_set{val.is_set},
-    operation(YFilter::not_set),
+    yfilter(YFilter::not_set),
     name{val.name},
     value{val.value},
     type{val.type},
@@ -84,7 +84,7 @@ YLeaf::YLeaf(const YLeaf& val):
 
 YLeaf::YLeaf(YLeaf&& val):
     is_set{val.is_set},
-    operation(YFilter::not_set),
+    yfilter(YFilter::not_set),
     name{std::move(val.name)},
     value{std::move(val.value)},
     type{val.type},
@@ -108,7 +108,7 @@ const std::string  YLeaf::get() const
 
 std::pair<std::string, LeafData> YLeaf::get_name_leafdata() const
 {
-    return {name, {get(), operation, is_set}};
+    return {name, {get(), yfilter, is_set}};
 }
 
 void YLeaf::operator = (uint8 val)

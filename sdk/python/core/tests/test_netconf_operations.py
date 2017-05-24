@@ -119,7 +119,7 @@ class SanityTest(unittest.TestCase):
         # REPLACE
         runner = runner_create
         runner.ytypes.built_in_t.number8 = 25
-        runner.operation = YFilter.replace
+        runner.yfilter = YFilter.replace
         self.crud.update(self.ncc, runner)
 
         runner_read = self.crud.read(self.ncc, runner_empty)
@@ -132,10 +132,10 @@ class SanityTest(unittest.TestCase):
         e_2 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
         e_1.name = 'foo'
-        e_1.operation = YFilter.create
+        e_1.yfilter = YFilter.create
         e_2.number = 2
         e_2.name = 'bar'
-        e_2.operation = YFilter.create
+        e_2.yfilter = YFilter.create
         runner.one_list.ldata.extend([e_1, e_2])
         self.crud.update(self.ncc, runner)
 
@@ -149,10 +149,10 @@ class SanityTest(unittest.TestCase):
         e_2 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
         e_1.name = 'foo'
-        e_1.operation = YFilter.create
+        e_1.yfilter = YFilter.create
         e_2.number = 2
         e_2.name = 'bar'
-        e_2.operation = YFilter.create
+        e_2.yfilter = YFilter.create
         runner.one_list.ldata.extend([e_1, e_2])
         self.crud.update(self.ncc, runner)
 
@@ -160,7 +160,7 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         e_1 = ysanity.Runner.OneList.Ldata()
         e_1.number = 1
-        e_1.operation = YFilter.delete
+        e_1.yfilter = YFilter.delete
         runner.one_list.ldata.append(e_1)
         self.crud.update(self.ncc, runner)
 
@@ -170,12 +170,12 @@ class SanityTest(unittest.TestCase):
     def test_remove(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number8 = 25
-        runner.operation = YFilter.merge
+        runner.yfilter = YFilter.merge
         self.crud.update(self.ncc, runner)
 
         # REMOVE
         runner = ysanity.Runner()
-        runner.operation = YFilter.remove
+        runner.yfilter = YFilter.remove
         self.crud.update(self.ncc, runner)
 
         # REMOVE AGAIN WITH NO ERROR
@@ -188,7 +188,7 @@ class SanityTest(unittest.TestCase):
 
         # MERGE
         runner.ytypes.built_in_t.number8 = 32
-        runner.operation = YFilter.merge
+        runner.yfilter = YFilter.merge
         self.crud.update(self.ncc, runner)
 
         runner_empty = ysanity.Runner()
@@ -202,7 +202,7 @@ class SanityTest(unittest.TestCase):
         self.crud.create(self.ncc, runner)
 
         # DELETE
-        runner.ytypes.built_in_t.number8.operation = YFilter.delete
+        runner.ytypes.built_in_t.number8.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner)
 
         # DELETE AGAIN WITH ERROR
@@ -215,7 +215,7 @@ class SanityTest(unittest.TestCase):
         self.crud.create(self.ncc, runner)
 
         # DELETE
-        runner.ytypes.built_in_t.enum_llist.operation = YFilter.delete
+        runner.ytypes.built_in_t.enum_llist.yfilter = YFilter.delete
         self.crud.update(self.ncc, runner)
 
         # DELETE AGAIN WITH ERROR

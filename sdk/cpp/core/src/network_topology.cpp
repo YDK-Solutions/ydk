@@ -33,7 +33,7 @@ bool NetworkTopology::has_operation() const
         if(topology[index]->has_operation())
             return true;
     }
-    return is_set(operation);
+    return is_set(yfilter);
 }
 
 std::string NetworkTopology::get_segment_path() const
@@ -159,9 +159,9 @@ bool NetworkTopology::Topology::has_operation() const
         if(underlay_topology[index]->has_operation())
             return true;
     }
-    return is_set(operation)
-    || is_set(topology_id.operation)
-    || is_set(server_provided.operation)
+    return is_set(yfilter)
+    || is_set(topology_id.yfilter)
+    || is_set(server_provided.yfilter)
     || (topology_types !=  nullptr && topology_types->has_operation());
 }
 
@@ -188,8 +188,8 @@ const EntityPath NetworkTopology::Topology::get_entity_path(Entity* ancestor) co
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (topology_id.is_set || is_set(topology_id.operation)) leaf_name_data.push_back(topology_id.get_name_leafdata());
-    if (server_provided.is_set || is_set(server_provided.operation)) leaf_name_data.push_back(server_provided.get_name_leafdata());
+    if (topology_id.is_set || is_set(topology_id.yfilter)) leaf_name_data.push_back(topology_id.get_name_leafdata());
+    if (server_provided.is_set || is_set(server_provided.yfilter)) leaf_name_data.push_back(server_provided.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -317,7 +317,7 @@ bool NetworkTopology::Topology::TopologyTypes::has_data() const
 
 bool NetworkTopology::Topology::TopologyTypes::has_operation() const
 {
-    return is_set(operation)
+    return is_set(yfilter)
     || (topology_netconf !=  nullptr && topology_netconf->has_operation());
 }
 
@@ -396,7 +396,7 @@ bool NetworkTopology::Topology::TopologyTypes::TopologyNetconf::has_data() const
 
 bool NetworkTopology::Topology::TopologyTypes::TopologyNetconf::has_operation() const
 {
-    return is_set(operation);
+    return is_set(yfilter);
 }
 
 std::string NetworkTopology::Topology::TopologyTypes::TopologyNetconf::get_segment_path() const
@@ -462,8 +462,8 @@ bool NetworkTopology::Topology::UnderlayTopology::has_data() const
 
 bool NetworkTopology::Topology::UnderlayTopology::has_operation() const
 {
-    return is_set(operation)
-    || is_set(topology_ref.operation);
+    return is_set(yfilter)
+    || is_set(topology_ref.yfilter);
 }
 
 std::string NetworkTopology::Topology::UnderlayTopology::get_segment_path() const
@@ -489,7 +489,7 @@ const EntityPath NetworkTopology::Topology::UnderlayTopology::get_entity_path(En
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (topology_ref.is_set || is_set(topology_ref.operation)) leaf_name_data.push_back(topology_ref.get_name_leafdata());
+    if (topology_ref.is_set || is_set(topology_ref.yfilter)) leaf_name_data.push_back(topology_ref.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -613,25 +613,25 @@ bool NetworkTopology::Topology::Node::has_operation() const
         if(termination_point[index]->has_operation())
             return true;
     }
-    return is_set(operation)
-    || is_set(node_id.operation)
-    || is_set(between_attempts_timeout_millis.operation)
-    || is_set(concurrent_rpc_limit.operation)
-    || is_set(connected_message.operation)
-    || is_set(connection_status.operation)
-    || is_set(connection_timeout_millis.operation)
-    || is_set(default_request_timeout_millis.operation)
-    || is_set(host.operation)
-    || is_set(keepalive_delay.operation)
-    || is_set(max_connection_attempts.operation)
-    || is_set(password.operation)
-    || is_set(port.operation)
-    || is_set(reconnect_on_changed_schema.operation)
-    || is_set(schema_cache_directory.operation)
-    || is_set(schemaless.operation)
-    || is_set(sleep_factor.operation)
-    || is_set(tcp_only.operation)
-    || is_set(username.operation)
+    return is_set(yfilter)
+    || is_set(node_id.yfilter)
+    || is_set(between_attempts_timeout_millis.yfilter)
+    || is_set(concurrent_rpc_limit.yfilter)
+    || is_set(connected_message.yfilter)
+    || is_set(connection_status.yfilter)
+    || is_set(connection_timeout_millis.yfilter)
+    || is_set(default_request_timeout_millis.yfilter)
+    || is_set(host.yfilter)
+    || is_set(keepalive_delay.yfilter)
+    || is_set(max_connection_attempts.yfilter)
+    || is_set(password.yfilter)
+    || is_set(port.yfilter)
+    || is_set(reconnect_on_changed_schema.yfilter)
+    || is_set(schema_cache_directory.yfilter)
+    || is_set(schemaless.yfilter)
+    || is_set(sleep_factor.yfilter)
+    || is_set(tcp_only.yfilter)
+    || is_set(username.yfilter)
     || (available_capabilities !=  nullptr && available_capabilities->has_operation())
     || (clustered_connection_status !=  nullptr && clustered_connection_status->has_operation())
     || (pass_through !=  nullptr && pass_through->has_operation())
@@ -663,24 +663,24 @@ const EntityPath NetworkTopology::Topology::Node::get_entity_path(Entity* ancest
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (node_id.is_set || is_set(node_id.operation)) leaf_name_data.push_back(node_id.get_name_leafdata());
-    if (between_attempts_timeout_millis.is_set || is_set(between_attempts_timeout_millis.operation)) leaf_name_data.push_back(between_attempts_timeout_millis.get_name_leafdata());
-    if (concurrent_rpc_limit.is_set || is_set(concurrent_rpc_limit.operation)) leaf_name_data.push_back(concurrent_rpc_limit.get_name_leafdata());
-    if (connected_message.is_set || is_set(connected_message.operation)) leaf_name_data.push_back(connected_message.get_name_leafdata());
-    if (connection_status.is_set || is_set(connection_status.operation)) leaf_name_data.push_back(connection_status.get_name_leafdata());
-    if (connection_timeout_millis.is_set || is_set(connection_timeout_millis.operation)) leaf_name_data.push_back(connection_timeout_millis.get_name_leafdata());
-    if (default_request_timeout_millis.is_set || is_set(default_request_timeout_millis.operation)) leaf_name_data.push_back(default_request_timeout_millis.get_name_leafdata());
-    if (host.is_set || is_set(host.operation)) leaf_name_data.push_back(host.get_name_leafdata());
-    if (keepalive_delay.is_set || is_set(keepalive_delay.operation)) leaf_name_data.push_back(keepalive_delay.get_name_leafdata());
-    if (max_connection_attempts.is_set || is_set(max_connection_attempts.operation)) leaf_name_data.push_back(max_connection_attempts.get_name_leafdata());
-    if (password.is_set || is_set(password.operation)) leaf_name_data.push_back(password.get_name_leafdata());
-    if (port.is_set || is_set(port.operation)) leaf_name_data.push_back(port.get_name_leafdata());
-    if (reconnect_on_changed_schema.is_set || is_set(reconnect_on_changed_schema.operation)) leaf_name_data.push_back(reconnect_on_changed_schema.get_name_leafdata());
-    if (schema_cache_directory.is_set || is_set(schema_cache_directory.operation)) leaf_name_data.push_back(schema_cache_directory.get_name_leafdata());
-    if (schemaless.is_set || is_set(schemaless.operation)) leaf_name_data.push_back(schemaless.get_name_leafdata());
-    if (sleep_factor.is_set || is_set(sleep_factor.operation)) leaf_name_data.push_back(sleep_factor.get_name_leafdata());
-    if (tcp_only.is_set || is_set(tcp_only.operation)) leaf_name_data.push_back(tcp_only.get_name_leafdata());
-    if (username.is_set || is_set(username.operation)) leaf_name_data.push_back(username.get_name_leafdata());
+    if (node_id.is_set || is_set(node_id.yfilter)) leaf_name_data.push_back(node_id.get_name_leafdata());
+    if (between_attempts_timeout_millis.is_set || is_set(between_attempts_timeout_millis.yfilter)) leaf_name_data.push_back(between_attempts_timeout_millis.get_name_leafdata());
+    if (concurrent_rpc_limit.is_set || is_set(concurrent_rpc_limit.yfilter)) leaf_name_data.push_back(concurrent_rpc_limit.get_name_leafdata());
+    if (connected_message.is_set || is_set(connected_message.yfilter)) leaf_name_data.push_back(connected_message.get_name_leafdata());
+    if (connection_status.is_set || is_set(connection_status.yfilter)) leaf_name_data.push_back(connection_status.get_name_leafdata());
+    if (connection_timeout_millis.is_set || is_set(connection_timeout_millis.yfilter)) leaf_name_data.push_back(connection_timeout_millis.get_name_leafdata());
+    if (default_request_timeout_millis.is_set || is_set(default_request_timeout_millis.yfilter)) leaf_name_data.push_back(default_request_timeout_millis.get_name_leafdata());
+    if (host.is_set || is_set(host.yfilter)) leaf_name_data.push_back(host.get_name_leafdata());
+    if (keepalive_delay.is_set || is_set(keepalive_delay.yfilter)) leaf_name_data.push_back(keepalive_delay.get_name_leafdata());
+    if (max_connection_attempts.is_set || is_set(max_connection_attempts.yfilter)) leaf_name_data.push_back(max_connection_attempts.get_name_leafdata());
+    if (password.is_set || is_set(password.yfilter)) leaf_name_data.push_back(password.get_name_leafdata());
+    if (port.is_set || is_set(port.yfilter)) leaf_name_data.push_back(port.get_name_leafdata());
+    if (reconnect_on_changed_schema.is_set || is_set(reconnect_on_changed_schema.yfilter)) leaf_name_data.push_back(reconnect_on_changed_schema.get_name_leafdata());
+    if (schema_cache_directory.is_set || is_set(schema_cache_directory.yfilter)) leaf_name_data.push_back(schema_cache_directory.get_name_leafdata());
+    if (schemaless.is_set || is_set(schemaless.yfilter)) leaf_name_data.push_back(schemaless.get_name_leafdata());
+    if (sleep_factor.is_set || is_set(sleep_factor.yfilter)) leaf_name_data.push_back(sleep_factor.get_name_leafdata());
+    if (tcp_only.is_set || is_set(tcp_only.yfilter)) leaf_name_data.push_back(tcp_only.get_name_leafdata());
+    if (username.is_set || is_set(username.yfilter)) leaf_name_data.push_back(username.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -921,9 +921,9 @@ bool NetworkTopology::Topology::Node::SupportingNode::has_data() const
 
 bool NetworkTopology::Topology::Node::SupportingNode::has_operation() const
 {
-    return is_set(operation)
-    || is_set(node_ref.operation)
-    || is_set(topology_ref.operation);
+    return is_set(yfilter)
+    || is_set(node_ref.yfilter)
+    || is_set(topology_ref.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::SupportingNode::get_segment_path() const
@@ -949,8 +949,8 @@ const EntityPath NetworkTopology::Topology::Node::SupportingNode::get_entity_pat
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (node_ref.is_set || is_set(node_ref.operation)) leaf_name_data.push_back(node_ref.get_name_leafdata());
-    if (topology_ref.is_set || is_set(topology_ref.operation)) leaf_name_data.push_back(topology_ref.get_name_leafdata());
+    if (node_ref.is_set || is_set(node_ref.yfilter)) leaf_name_data.push_back(node_ref.get_name_leafdata());
+    if (topology_ref.is_set || is_set(topology_ref.yfilter)) leaf_name_data.push_back(topology_ref.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1007,12 +1007,12 @@ bool NetworkTopology::Topology::Node::TerminationPoint::has_operation() const
 {
     for (auto const & leaf : tp_ref.getYLeafs())
     {
-        if(is_set(leaf.operation))
+        if(is_set(leaf.yfilter))
             return true;
     }
-    return is_set(operation)
-    || is_set(tp_id.operation)
-    || is_set(tp_ref.operation);
+    return is_set(yfilter)
+    || is_set(tp_id.yfilter)
+    || is_set(tp_ref.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::TerminationPoint::get_segment_path() const
@@ -1038,7 +1038,7 @@ const EntityPath NetworkTopology::Topology::Node::TerminationPoint::get_entity_p
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (tp_id.is_set || is_set(tp_id.operation)) leaf_name_data.push_back(tp_id.get_name_leafdata());
+    if (tp_id.is_set || is_set(tp_id.yfilter)) leaf_name_data.push_back(tp_id.get_name_leafdata());
 
     auto tp_ref_name_datas = tp_ref.get_name_leafdata();
     leaf_name_data.insert(leaf_name_data.end(), tp_ref_name_datas.begin(), tp_ref_name_datas.end());
@@ -1097,12 +1097,12 @@ bool NetworkTopology::Topology::Node::YangModuleCapabilities::has_operation() co
 {
     for (auto const & leaf : capability.getYLeafs())
     {
-        if(is_set(leaf.operation))
+        if(is_set(leaf.yfilter))
             return true;
     }
-    return is_set(operation)
-    || is_set(capability.operation)
-    || is_set(override.operation);
+    return is_set(yfilter)
+    || is_set(capability.yfilter)
+    || is_set(override.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::YangModuleCapabilities::get_segment_path() const
@@ -1128,7 +1128,7 @@ const EntityPath NetworkTopology::Topology::Node::YangModuleCapabilities::get_en
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (override.is_set || is_set(override.operation)) leaf_name_data.push_back(override.get_name_leafdata());
+    if (override.is_set || is_set(override.yfilter)) leaf_name_data.push_back(override.get_name_leafdata());
 
     auto capability_name_datas = capability.get_name_leafdata();
     leaf_name_data.insert(leaf_name_data.end(), capability_name_datas.begin(), capability_name_datas.end());
@@ -1189,8 +1189,8 @@ bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::has_operation()
         if(node_status[index]->has_operation())
             return true;
     }
-    return is_set(operation)
-    || is_set(netconf_master_node.operation);
+    return is_set(yfilter)
+    || is_set(netconf_master_node.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::ClusteredConnectionStatus::get_segment_path() const
@@ -1216,7 +1216,7 @@ const EntityPath NetworkTopology::Topology::Node::ClusteredConnectionStatus::get
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (netconf_master_node.is_set || is_set(netconf_master_node.operation)) leaf_name_data.push_back(netconf_master_node.get_name_leafdata());
+    if (netconf_master_node.is_set || is_set(netconf_master_node.yfilter)) leaf_name_data.push_back(netconf_master_node.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1284,9 +1284,9 @@ bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::has
 
 bool NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::has_operation() const
 {
-    return is_set(operation)
-    || is_set(node.operation)
-    || is_set(status.operation);
+    return is_set(yfilter)
+    || is_set(node.yfilter)
+    || is_set(status.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::ClusteredConnectionStatus::NodeStatus::get_segment_path() const
@@ -1312,8 +1312,8 @@ const EntityPath NetworkTopology::Topology::Node::ClusteredConnectionStatus::Nod
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (node.is_set || is_set(node.operation)) leaf_name_data.push_back(node.get_name_leafdata());
-    if (status.is_set || is_set(status.operation)) leaf_name_data.push_back(status.get_name_leafdata());
+    if (node.is_set || is_set(node.yfilter)) leaf_name_data.push_back(node.get_name_leafdata());
+    if (status.is_set || is_set(status.yfilter)) leaf_name_data.push_back(status.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1370,7 +1370,7 @@ bool NetworkTopology::Topology::Node::AvailableCapabilities::has_operation() con
         if(available_capability[index]->has_operation())
             return true;
     }
-    return is_set(operation);
+    return is_set(yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::AvailableCapabilities::get_segment_path() const
@@ -1459,9 +1459,9 @@ bool NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability
 
 bool NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::has_operation() const
 {
-    return is_set(operation)
-    || is_set(capability.operation)
-    || is_set(capability_origin.operation);
+    return is_set(yfilter)
+    || is_set(capability.yfilter)
+    || is_set(capability_origin.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::AvailableCapabilities::AvailableCapability::get_segment_path() const
@@ -1487,8 +1487,8 @@ const EntityPath NetworkTopology::Topology::Node::AvailableCapabilities::Availab
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (capability.is_set || is_set(capability.operation)) leaf_name_data.push_back(capability.get_name_leafdata());
-    if (capability_origin.is_set || is_set(capability_origin.operation)) leaf_name_data.push_back(capability_origin.get_name_leafdata());
+    if (capability.is_set || is_set(capability.yfilter)) leaf_name_data.push_back(capability.get_name_leafdata());
+    if (capability_origin.is_set || is_set(capability_origin.yfilter)) leaf_name_data.push_back(capability_origin.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1545,7 +1545,7 @@ bool NetworkTopology::Topology::Node::UnavailableCapabilities::has_operation() c
         if(unavailable_capability[index]->has_operation())
             return true;
     }
-    return is_set(operation);
+    return is_set(yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::UnavailableCapabilities::get_segment_path() const
@@ -1634,9 +1634,9 @@ bool NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapabi
 
 bool NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability::has_operation() const
 {
-    return is_set(operation)
-    || is_set(capability.operation)
-    || is_set(failure_reason.operation);
+    return is_set(yfilter)
+    || is_set(capability.yfilter)
+    || is_set(failure_reason.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::UnavailableCapabilities::UnavailableCapability::get_segment_path() const
@@ -1662,8 +1662,8 @@ const EntityPath NetworkTopology::Topology::Node::UnavailableCapabilities::Unava
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (capability.is_set || is_set(capability.operation)) leaf_name_data.push_back(capability.get_name_leafdata());
-    if (failure_reason.is_set || is_set(failure_reason.operation)) leaf_name_data.push_back(failure_reason.get_name_leafdata());
+    if (capability.is_set || is_set(capability.yfilter)) leaf_name_data.push_back(capability.get_name_leafdata());
+    if (failure_reason.is_set || is_set(failure_reason.yfilter)) leaf_name_data.push_back(failure_reason.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1710,7 +1710,7 @@ bool NetworkTopology::Topology::Node::PassThrough::has_data() const
 
 bool NetworkTopology::Topology::Node::PassThrough::has_operation() const
 {
-    return is_set(operation);
+    return is_set(yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::PassThrough::get_segment_path() const
@@ -1780,10 +1780,10 @@ bool NetworkTopology::Topology::Node::YangLibrary::has_data() const
 
 bool NetworkTopology::Topology::Node::YangLibrary::has_operation() const
 {
-    return is_set(operation)
-    || is_set(password.operation)
-    || is_set(username.operation)
-    || is_set(yang_library_url.operation);
+    return is_set(yfilter)
+    || is_set(password.yfilter)
+    || is_set(username.yfilter)
+    || is_set(yang_library_url.yfilter);
 }
 
 std::string NetworkTopology::Topology::Node::YangLibrary::get_segment_path() const
@@ -1809,9 +1809,9 @@ const EntityPath NetworkTopology::Topology::Node::YangLibrary::get_entity_path(E
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (password.is_set || is_set(password.operation)) leaf_name_data.push_back(password.get_name_leafdata());
-    if (username.is_set || is_set(username.operation)) leaf_name_data.push_back(username.get_name_leafdata());
-    if (yang_library_url.is_set || is_set(yang_library_url.operation)) leaf_name_data.push_back(yang_library_url.get_name_leafdata());
+    if (password.is_set || is_set(password.yfilter)) leaf_name_data.push_back(password.get_name_leafdata());
+    if (username.is_set || is_set(username.yfilter)) leaf_name_data.push_back(username.get_name_leafdata());
+    if (yang_library_url.is_set || is_set(yang_library_url.yfilter)) leaf_name_data.push_back(yang_library_url.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -1883,8 +1883,8 @@ bool NetworkTopology::Topology::Link::has_operation() const
         if(supporting_link[index]->has_operation())
             return true;
     }
-    return is_set(operation)
-    || is_set(link_id.operation)
+    return is_set(yfilter)
+    || is_set(link_id.yfilter)
     || (destination !=  nullptr && destination->has_operation())
     || (source !=  nullptr && source->has_operation());
 }
@@ -1912,7 +1912,7 @@ const EntityPath NetworkTopology::Topology::Link::get_entity_path(Entity* ancest
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (link_id.is_set || is_set(link_id.operation)) leaf_name_data.push_back(link_id.get_name_leafdata());
+    if (link_id.is_set || is_set(link_id.yfilter)) leaf_name_data.push_back(link_id.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -2008,9 +2008,9 @@ bool NetworkTopology::Topology::Link::Source::has_data() const
 
 bool NetworkTopology::Topology::Link::Source::has_operation() const
 {
-    return is_set(operation)
-    || is_set(source_node.operation)
-    || is_set(source_tp.operation);
+    return is_set(yfilter)
+    || is_set(source_node.yfilter)
+    || is_set(source_tp.yfilter);
 }
 
 std::string NetworkTopology::Topology::Link::Source::get_segment_path() const
@@ -2036,8 +2036,8 @@ const EntityPath NetworkTopology::Topology::Link::Source::get_entity_path(Entity
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (source_node.is_set || is_set(source_node.operation)) leaf_name_data.push_back(source_node.get_name_leafdata());
-    if (source_tp.is_set || is_set(source_tp.operation)) leaf_name_data.push_back(source_tp.get_name_leafdata());
+    if (source_node.is_set || is_set(source_node.yfilter)) leaf_name_data.push_back(source_node.get_name_leafdata());
+    if (source_tp.is_set || is_set(source_tp.yfilter)) leaf_name_data.push_back(source_tp.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -2088,9 +2088,9 @@ bool NetworkTopology::Topology::Link::Destination::has_data() const
 
 bool NetworkTopology::Topology::Link::Destination::has_operation() const
 {
-    return is_set(operation)
-    || is_set(dest_node.operation)
-    || is_set(dest_tp.operation);
+    return is_set(yfilter)
+    || is_set(dest_node.yfilter)
+    || is_set(dest_tp.yfilter);
 }
 
 std::string NetworkTopology::Topology::Link::Destination::get_segment_path() const
@@ -2116,8 +2116,8 @@ const EntityPath NetworkTopology::Topology::Link::Destination::get_entity_path(E
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (dest_node.is_set || is_set(dest_node.operation)) leaf_name_data.push_back(dest_node.get_name_leafdata());
-    if (dest_tp.is_set || is_set(dest_tp.operation)) leaf_name_data.push_back(dest_tp.get_name_leafdata());
+    if (dest_node.is_set || is_set(dest_node.yfilter)) leaf_name_data.push_back(dest_node.get_name_leafdata());
+    if (dest_tp.is_set || is_set(dest_tp.yfilter)) leaf_name_data.push_back(dest_tp.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};
@@ -2166,8 +2166,8 @@ bool NetworkTopology::Topology::Link::SupportingLink::has_data() const
 
 bool NetworkTopology::Topology::Link::SupportingLink::has_operation() const
 {
-    return is_set(operation)
-    || is_set(link_ref.operation);
+    return is_set(yfilter)
+    || is_set(link_ref.yfilter);
 }
 
 std::string NetworkTopology::Topology::Link::SupportingLink::get_segment_path() const
@@ -2193,7 +2193,7 @@ const EntityPath NetworkTopology::Topology::Link::SupportingLink::get_entity_pat
 
     std::vector<std::pair<std::string, LeafData> > leaf_name_data {};
 
-    if (link_ref.is_set || is_set(link_ref.operation)) leaf_name_data.push_back(link_ref.get_name_leafdata());
+    if (link_ref.is_set || is_set(link_ref.yfilter)) leaf_name_data.push_back(link_ref.get_name_leafdata());
 
 
     EntityPath entity_path {path_buffer.str(), leaf_name_data};

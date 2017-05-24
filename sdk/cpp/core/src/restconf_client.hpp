@@ -32,7 +32,7 @@ class RestconfClient
                     int port, const std::string & encoding);
         ~RestconfClient();
 
-        std::string execute(const std::string & operation, const std::string & url, const std::string & payload) const;
+        std::string execute(const std::string & yfilter, const std::string & url, const std::string & payload) const;
         std::string get_capabilities(const std::string & url, const std::string & encoding) const;
 
     private:

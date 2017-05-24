@@ -48,7 +48,7 @@ class ClassHasDataPrinter(object):
                 self._print_class_has_many(child, 'for (std::size_t index=0; index<%s.size(); index++)', 'if(%s[index]->has_operation())' % child.name)
         for leaf in leafs:
             if leaf.is_many:
-                self._print_class_has_many(leaf, 'for (auto const & leaf : %s.getYLeafs())', 'if(is_set(leaf.operation))')
+                self._print_class_has_many(leaf, 'for (auto const & leaf : %s.getYLeafs())', 'if(is_set(leaf.yfilter))')
 
         self.ctx.writeln('return %s;' % '\n\t|| '.join(conditions))
         self._print_function_trailer()
@@ -59,8 +59,8 @@ class ClassHasDataPrinter(object):
         return conditions
 
     def _init_has_operation_conditions(self, leafs, children):
-        conditions = ['is_set(operation)']
-        conditions.extend([ 'is_set(%s.operation)' % (prop.name) for prop in leafs])
+        conditions = ['is_set(yfilter)']
+        conditions.extend([ 'is_set(%s.yfilter)' % (prop.name) for prop in leafs])
         conditions.extend([('(%s !=  nullptr && %s->has_operation())' % (prop.name, prop.name)) for prop in children if not prop.is_many])
         return conditions
 

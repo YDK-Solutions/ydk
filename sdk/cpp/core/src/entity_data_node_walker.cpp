@@ -48,7 +48,7 @@ static bool data_node_is_list(path::DataNode & data_node);
 static string get_segment_path(const string & path);
 static void add_annotation_to_datanode(const Entity & entity, path::DataNode & data_node);
 static void add_annotation_to_datanode(const std::pair<std::string, LeafData> & name_value, path::DataNode & data_node);
-static path::Annotation get_annotation(YFilter operation);
+static path::Annotation get_annotation(YFilter yfilter);
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ path::DataNode& get_data_node_from_entity(Entity & entity, path::RootSchemaNode 
 {
     EntityPath root_path = entity.get_entity_path(nullptr);
     auto & root_data_node = root_schema.create(root_path.path);
-    if(is_set(entity.operation))
+    if(is_set(entity.yfilter))
     {
         add_annotation_to_datanode(entity, root_data_node);
     }
@@ -97,7 +97,7 @@ static void populate_data_node(Entity & entity, path::DataNode & parent_data_nod
 
     data_node = &parent_data_node.create(path.path);
 
-    if(is_set(entity.operation))
+    if(is_set(entity.yfilter))
     {
         add_annotation_to_datanode(entity, *data_node);
     }
@@ -121,12 +121,12 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path, 
             result = &data_node.create(name_value.first, leaf_data.value);
             YLOG_DEBUG("Result: {}", (result?"success":"failure"));
 
-            if(is_set(leaf_data.operation))
+            if(is_set(leaf_data.yfilter))
             {
                 add_annotation_to_datanode(name_value, *result);
             }
         }
-        else if(is_set(leaf_data.operation))
+        else if(is_set(leaf_data.yfilter))
         {
             ostringstream os{};
             os<<name_value.first<<"/";
@@ -136,42 +136,42 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path, 
                 os<<n->schema().statement().arg<<"/";
                 n = n->parent();
             }
-            leaf_operations[os.str()] = {name_value.first, leaf_data.operation};
-            YLOG_DEBUG("Storing operation '{}' for leaf {}{}", to_string(leaf_data.operation), os.str(), name_value.first);
+            leaf_operations[os.str()] = {name_value.first, leaf_data.yfilter};
+            YLOG_DEBUG("Storing yfilter '{}' for leaf {}{}", to_string(leaf_data.yfilter), os.str(), name_value.first);
         }
     }
 }
 
 static void add_annotation_to_datanode(const Entity & entity, path::DataNode & data_node)
 {
-    YLOG_DEBUG("Got operation '{}' for {}", to_string(entity.operation), entity.yang_name);
-    if (entity.operation != YFilter::read)
+    YLOG_DEBUG("Got yfilter '{}' for {}", to_string(entity.yfilter), entity.yang_name);
+    if (entity.yfilter != YFilter::read)
     {
         data_node.add_annotation(
-                                 get_annotation(entity.operation)
+                                 get_annotation(entity.yfilter)
                                  );
-        YLOG_DEBUG("Set operation '{}' for {}", to_string(entity.operation), entity.yang_name);
+        YLOG_DEBUG("Set yfilter '{}' for {}", to_string(entity.yfilter), entity.yang_name);
 
     }
 }
 
 static void add_annotation_to_datanode(const std::pair<std::string, LeafData> & name_value, path::DataNode & data_node)
 {
-    YLOG_DEBUG("Got operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
-    if (name_value.second.operation != YFilter::read)
+    YLOG_DEBUG("Got yfilter '{}' for {}", to_string(name_value.second.yfilter), name_value.first);
+    if (name_value.second.yfilter != YFilter::read)
     {
         data_node.add_annotation(
-                                 get_annotation(name_value.second.operation)
+                                 get_annotation(name_value.second.yfilter)
                                  );
-        YLOG_DEBUG("Set operation '{}' for {}", to_string(name_value.second.operation), name_value.first);
+        YLOG_DEBUG("Set yfilter '{}' for {}", to_string(name_value.second.yfilter), name_value.first);
     }
 }
 
-static path::Annotation get_annotation(YFilter operation)
+static path::Annotation get_annotation(YFilter yfilter)
 {
-    if(operation == YFilter::not_set)
-        throw(YCPPInvalidArgumentError{"Invalid operation"});
-    return {IETF_NETCONF_MODULE_NAME, "operation", to_string(operation)};
+    if(yfilter == YFilter::not_set)
+        throw(YCPPInvalidArgumentError{"Invalid yfilter"});
+    return {IETF_NETCONF_MODULE_NAME, "operation", to_string(yfilter)};
 }
 
 //////////////////////////////////////////////////////////////////////////

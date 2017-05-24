@@ -63,7 +63,7 @@ CodecService::encode(CodecServiceProvider & provider, Entity & entity, bool pret
             dn = dn->parent();
         path::CodecService core_codec_service{};
         std::string result = core_codec_service.encode(*dn, provider.m_encoding, pretty);
-        YLOG_INFO("Performing encode operation, resulting in {}", result);
+        YLOG_INFO("Performing encode yfilter, resulting in {}", result);
         return result;
     }
     catch (const YCPPInvalidArgumentError& e)
@@ -91,7 +91,7 @@ CodecService::decode(CodecServiceProvider & provider, const std::string & payloa
 {
     path::RootSchemaNode& root_schema = get_root_schema(provider, *entity);
 
-    YLOG_INFO("Performing decode operation on {}", payload);
+    YLOG_INFO("Performing decode yfilter on {}", payload);
 
     path::CodecService core_codec_service{};
     auto root_data_node = core_codec_service.decode(root_schema, payload, provider.m_encoding);

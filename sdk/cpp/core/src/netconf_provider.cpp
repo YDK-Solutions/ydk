@@ -41,7 +41,7 @@ using namespace ydk;
 
 namespace ydk
 {
-static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_schema, string operation);
+static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_schema, string yfilter);
 
 static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name);
 static path::DataNode& create_rpc_input(path::Rpc & netconf_rpc);
@@ -413,9 +413,9 @@ static bool is_config(path::Rpc & rpc)
     return false;
 }
 
-static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, string operation)
+static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, string yfilter)
 {
-    auto c = root_schema.find(operation);
+    auto c = root_schema.find(yfilter);
     if(c.empty())
     {
         YLOG_ERROR("CRUD create rpc schema not found!");

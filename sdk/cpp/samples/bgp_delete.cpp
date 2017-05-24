@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     try
     {
         bool reply = crud.delete_(provider, *bgp);
-        if(reply) cout << "Delete operation success" << endl; else cout << "Operation failed" << endl;
+        if(reply) cout << "Delete yfilter success" << endl; else cout << "Operation failed" << endl;
     }
     catch(YCPPError & e)
     {

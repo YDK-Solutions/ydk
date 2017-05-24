@@ -193,8 +193,8 @@ TEST_CASE("read_leaves")
     REQUIRE(reply);
 
     auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
-    bgp_filter->global->config->as.operation = YFilter::read;
-    bgp_filter->global->config->router_id.operation = YFilter::read;
+    bgp_filter->global->config->as.yfilter = YFilter::read;
+    bgp_filter->global->config->router_id.yfilter = YFilter::read;
 
     auto bgp_read = crud.read(provider, *bgp_filter);
     REQUIRE(*(bgp_read) == *(bgp_create));
@@ -220,7 +220,7 @@ TEST_CASE("read_leaf")
     bgp_cfg->global->config->as = 65001;
 
     auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
-    bgp_filter->global->config->as.operation = YFilter::read;
+    bgp_filter->global->config->as.yfilter = YFilter::read;
 
     auto bgp_read = crud.read(provider, *bgp_filter);
     REQUIRE(*(bgp_read) == *(bgp_cfg));

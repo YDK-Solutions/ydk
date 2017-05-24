@@ -37,7 +37,7 @@ namespace ydk {
 
 static std::string get_data_payload(Entity& entity, path::RootSchemaNode& root_schema);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
-static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && operation);
+static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && yfilter);
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string, string & url);
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string);
 
@@ -329,10 +329,10 @@ bool NetconfService::validate(NetconfServiceProvider & provider, Entity& source)
     return read_datanode == nullptr;
 }
 
-static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && operation)
+static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && yfilter)
 {
     path::RootSchemaNode & root_schema = provider.get_root_schema();
-    auto rpc =  root_schema.rpc(operation);
+    auto rpc =  root_schema.rpc(yfilter);
     if (rpc == nullptr)
         throw(YCPPServiceProviderError{"Unable to create rpc"});
 

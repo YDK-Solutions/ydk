@@ -32,8 +32,8 @@ using namespace std;
 
 namespace ydk
 {
-LeafData::LeafData(std::string value, YFilter operation, bool is_set)
-    : value(value), operation(operation), is_set(is_set)
+LeafData::LeafData(std::string value, YFilter yfilter, bool is_set)
+    : value(value), yfilter(yfilter), is_set(is_set)
 {
 
 }
@@ -44,12 +44,12 @@ LeafData::~LeafData()
 
 bool LeafData::operator == (LeafData & other) const
 {
-    return value == other.value && operation == other.operation && is_set == other.is_set;
+    return value == other.value && yfilter == other.yfilter && is_set == other.is_set;
 }
 
 bool LeafData::operator == (const LeafData & other) const
 {
-    return value == other.value && operation == other.operation && is_set == other.is_set;
+    return value == other.value && yfilter == other.yfilter && is_set == other.is_set;
 }
 
 std::ostream& operator<< (std::ostream& stream, const LeafData& value)

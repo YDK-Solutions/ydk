@@ -76,7 +76,7 @@ class YPYInvalidArgumentError(YPYError):
 
 class YPYOperationNotSupportedError(YPYError):
     """Operation Not Supported Error.
-    Thrown when an operation is not supported.
+    Thrown when an yfilter is not supported.
     """
     def __init__(self, error_msg):
         super(YPYOperationNotSupportedError, self).__init__(error_msg)

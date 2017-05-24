@@ -366,7 +366,7 @@ struct YCPPPathError : public YCPPCoreError
 
         XPATH_INTOK,  /// unexpected XPath token
         XPATH_EOF,    /// unexpected end of an XPath expression
-        XPATH_INOP,   /// invalid XPath operation operands
+        XPATH_INOP,   /// invalid XPath yfilter operands
         /* */
         XPATH_INCTX,  /// invalid XPath context type
 

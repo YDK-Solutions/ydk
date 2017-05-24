@@ -356,7 +356,7 @@ PYBIND11_PLUGIN(ydk_)
     class_<ydk::LeafData>(types, "LeafData")
         .def(init<string, ydk::YFilter, bool>())
         .def_readonly("value", &ydk::LeafData::value, return_value_policy::reference)
-        .def_readonly("operation", &ydk::LeafData::operation, return_value_policy::reference)
+        .def_readonly("yfilter", &ydk::LeafData::yfilter, return_value_policy::reference)
         .def_readonly("is_set", &ydk::LeafData::is_set, return_value_policy::reference)
         .def(self == self, return_value_policy::reference);
 
@@ -378,7 +378,7 @@ PYBIND11_PLUGIN(ydk_)
                          {
                             return left.operator!=(right);
                          })
-        .def_readwrite("operation", &ydk::Entity::operation)
+        .def_readwrite("yfilter", &ydk::Entity::yfilter)
         .def_readwrite("yang_name", &ydk::Entity::yang_name, return_value_policy::reference)
         .def_readwrite("yang_parent_name", &ydk::Entity::yang_parent_name, return_value_policy::reference)
         .def_readwrite("is_presence_container", &ydk::Entity::is_presence_container, return_value_policy::reference)
@@ -450,7 +450,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("set", (void (ydk::YLeaf::*)(ydk::Enum::YLeaf)) &ydk::YLeaf::set, arg("value"))
         .def("set", (void (ydk::YLeaf::*)(ydk::Decimal64)) &ydk::YLeaf::set, arg("value"))
         .def_readonly("is_set", &ydk::YLeaf::is_set, return_value_policy::reference)
-        .def_readwrite("operation", &ydk::YLeaf::operation);
+        .def_readwrite("yfilter", &ydk::YLeaf::yfilter);
 
     class_<ydk::YLeafList, PyYLeafList>(types, "YLeafList")
         .def(init<ydk::YType, string>(), arg("leaflist_type"), arg("name"))
@@ -480,7 +480,7 @@ PYBIND11_PLUGIN(ydk_)
                         {
                             l.clear();
                         })
-        .def_readwrite("operation", &ydk::YLeafList::operation);
+        .def_readwrite("yfilter", &ydk::YLeafList::yfilter);
 
     class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",

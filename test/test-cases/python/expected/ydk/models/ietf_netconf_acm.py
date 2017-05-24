@@ -85,7 +85,7 @@ class Nacm(object):
     
     .. attribute:: denied_data_writes
     
-        Number of times since the server last restarted that a protocol operation request to alter a configuration datastore was denied
+        Number of times since the server last restarted that a protocol yfilter request to alter a configuration datastore was denied
         **type**\:  int
     
         **range:** 0..4294967295
@@ -103,7 +103,7 @@ class Nacm(object):
     
     .. attribute:: denied_operations
     
-        Number of times since the server last restarted that a protocol operation request was denied
+        Number of times since the server last restarted that a protocol yfilter request was denied
         **type**\:  int
     
         **range:** 0..4294967295
@@ -122,7 +122,7 @@ class Nacm(object):
     
     .. attribute:: exec_default
     
-        Controls whether exec access is granted if no appropriate rule is found for a particular protocol operation request
+        Controls whether exec access is granted if no appropriate rule is found for a particular protocol yfilter request
         **type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
     
     .. attribute:: groups
@@ -349,7 +349,7 @@ class Nacm(object):
             
             .. attribute:: access_operations
             
-                Access operations associated with this rule.  This leaf matches if it has the value '\*' or if the bit corresponding to the requested operation is set
+                Access operations associated with this rule.  This leaf matches if it has the value '\*' or if the bit corresponding to the requested yfilter is set
                 **type**\: one of the below types:
             
                 **type**\:  str
@@ -413,7 +413,7 @@ class Nacm(object):
             
             .. attribute:: rpc_name
             
-                This leaf matches if it has the value '\*' or if its value equals the requested protocol operation name
+                This leaf matches if it has the value '\*' or if its value equals the requested protocol yfilter name
                 **type**\: one of the below types:
             
                 **type**\:  str

@@ -57,17 +57,17 @@ std::string to_string(YType t)
 }
 
 YLeafList::YLeafList(YType type, std::string name)
-    : operation(YFilter::not_set), type(type), name(name)
+    : yfilter(YFilter::not_set), type(type), name(name)
 {
 }
 
 YLeafList::YLeafList(const YLeafList& other)
-    : operation(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
+    : yfilter(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
 {
 }
 
 YLeafList::YLeafList(YLeafList&& other)
-    : operation(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
+    : yfilter(YFilter::not_set), values(other.getYLeafs()), type(other.type), name(other.name)
 {
 }
 
@@ -77,7 +77,7 @@ YLeafList::operator=(const YLeafList& other)
     type = other.type;
     name = other.name;
     values = other.getYLeafs();
-    operation = other.operation;
+    yfilter = other.yfilter;
     return *this;
 }
 
@@ -87,7 +87,7 @@ YLeafList::operator=(YLeafList&& other)
     type = other.type;
     name = other.name;
     values = other.getYLeafs();
-    operation = other.operation;
+    yfilter = other.yfilter;
     return *this;
 }
 
@@ -258,7 +258,7 @@ std::vector<std::pair<std::string, LeafData> > YLeafList::get_name_leafdata() co
         name_values.push_back(
                             {
                                 (value.get_name_leafdata().first+"[.='"+value.get()+"']"),
-                                {"", operation, value.is_set}
+                                {"", yfilter, value.is_set}
                             }
                             );
     }

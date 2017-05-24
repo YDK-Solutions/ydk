@@ -56,7 +56,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
 
-        r_2.one.operation = YFilter.read
+        r_2.one.yfilter = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.one.number, r_2.one.number)
         self.assertEqual(r_1.one.name, r_2.one.name)
@@ -66,7 +66,7 @@ class SanityYang(unittest.TestCase):
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
-        r_2.one.number.operation = YFilter.read
+        r_2.one.number.yfilter = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_2.one.number, r_1.one.number)
 
@@ -89,7 +89,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.enum_value.operation = YFilter.read
+        r_2.ytypes.built_in_t.enum_value.yfilter = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
@@ -112,7 +112,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner()
-        r_2.one_list.ldata.operation = YFilter.read
+        r_2.one_list.ldata.yfilter = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
 
         self.assertEqual(runner_read.one_list.ldata[0].number, r_1.ldata[0].number)
@@ -152,7 +152,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         
         r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.identity_ref_value.operation = YFilter.read
+        r_2.ytypes.built_in_t.identity_ref_value.yfilter = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
@@ -166,8 +166,8 @@ class SanityYang(unittest.TestCase):
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2, r_3 = ysanity.Runner(), ysanity.Runner()
-        r_2.one.number.operation = YFilter.read
-        r_3.one.number.operation = YFilter.read
+        r_2.one.number.yfilter = YFilter.read
+        r_3.one.number.yfilter = YFilter.read
 
         r_2 = self.crud.read_config(self.ncc, r_2)
         r_3 = self.crud.read(self.ncc, r_3)

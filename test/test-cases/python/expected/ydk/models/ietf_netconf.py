@@ -34,7 +34,7 @@ class EditOperationTypeEnum(Enum):
     """
     EditOperationTypeEnum
 
-    NETCONF 'operation' attribute values
+    NETCONF 'yfilter' attribute values
 
     .. data:: MERGE = 0
 
@@ -62,7 +62,7 @@ class EditOperationTypeEnum(Enum):
 
         datastore, it is created.  Unlike a
 
-        <copy-config> operation, which replaces the
+        <copy-config> yfilter, which replaces the
 
         entire target configuration, only the configuration
 
@@ -112,7 +112,7 @@ class EditOperationTypeEnum(Enum):
 
         datastore.  If the configuration data does not
 
-        exist, the 'remove' operation is silently ignored
+        exist, the 'remove' yfilter is silently ignored
 
         by the server.
 
@@ -220,7 +220,7 @@ class ErrorTagTypeEnum(Enum):
 
     .. data:: ACCESS_DENIED = 10
 
-        Access to the requested protocol operation or
+        Access to the requested protocol yfilter or
 
         data model is denied because authorization failed.
 
@@ -250,7 +250,7 @@ class ErrorTagTypeEnum(Enum):
 
         data model content already exists.  For example,
 
-        a 'create' operation was attempted on data that
+        a 'create' yfilter was attempted on data that
 
         already exists.
 
@@ -260,7 +260,7 @@ class ErrorTagTypeEnum(Enum):
 
         data model content does not exist.  For example,
 
-        a 'delete' operation was attempted on
+        a 'delete' yfilter was attempted on
 
         data that does not exist.
 
@@ -268,13 +268,13 @@ class ErrorTagTypeEnum(Enum):
 
         Request could not be completed because the requested
 
-        operation is not supported by this implementation.
+        yfilter is not supported by this implementation.
 
     .. data:: OPERATION_FAILED = 17
 
         Request could not be completed because the requested
 
-        operation failed for some reason not covered by
+        yfilter failed for some reason not covered by
 
         any other error condition.
 
@@ -344,7 +344,7 @@ class ErrorTagTypeEnum(Enum):
 
 class CancelCommitRpc(object):
     """
-    This operation is used to cancel an ongoing confirmed commit.
+    This yfilter is used to cancel an ongoing confirmed commit.
     If the confirmed commit is persistent, the parameter
     'persist\-id' must be given, and it must match the value of the
     'persist' parameter.
@@ -374,7 +374,7 @@ class CancelCommitRpc(object):
         
         .. attribute:: persist_id
         
-            This parameter is given in order to cancel a persistent confirmed commit.  The value must be equal to the value given in the 'persist' parameter to the <commit> operation. If it does not match, the operation fails with an 'invalid\-value' error
+            This parameter is given in order to cancel a persistent confirmed commit.  The value must be equal to the value given in the 'persist' parameter to the <commit> yfilter. If it does not match, the yfilter fails with an 'invalid\-value' error
             **type**\:  str
         
         
@@ -512,12 +512,12 @@ class CommitRpc(object):
         
         .. attribute:: persist
         
-            This parameter is used to make a confirmed commit persistent.  A persistent confirmed commit is not aborted if the NETCONF session terminates.  The only way to abort a persistent confirmed commit is to let the timer expire, or to use the <cancel\-commit> operation.  The value of this parameter is a token that must be given in the 'persist\-id' parameter of <commit> or <cancel\-commit> operations in order to confirm or cancel the persistent confirmed commit.  The token should be a random string
+            This parameter is used to make a confirmed commit persistent.  A persistent confirmed commit is not aborted if the NETCONF session terminates.  The only way to abort a persistent confirmed commit is to let the timer expire, or to use the <cancel\-commit> yfilter.  The value of this parameter is a token that must be given in the 'persist\-id' parameter of <commit> or <cancel\-commit> operations in order to confirm or cancel the persistent confirmed commit.  The token should be a random string
             **type**\:  str
         
         .. attribute:: persist_id
         
-            This parameter is given in order to commit a persistent confirmed commit.  The value must be equal to the value given in the 'persist' parameter to the <commit> operation. If it does not match, the operation fails with an 'invalid\-value' error
+            This parameter is given in order to commit a persistent confirmed commit.  The value must be equal to the value given in the 'persist' parameter to the <commit> yfilter. If it does not match, the yfilter fails with an 'invalid\-value' error
             **type**\:  str
         
         
@@ -1037,7 +1037,7 @@ class DiscardChangesRpc(object):
 
 class EditConfigRpc(object):
     """
-    The <edit\-config> operation loads all or part of a specified
+    The <edit\-config> yfilter loads all or part of a specified
     configuration to the specified target configuration.
     
     .. attribute:: input
@@ -1070,7 +1070,7 @@ class EditConfigRpc(object):
         
         .. attribute:: default_operation
         
-            The default operation to use
+            The default yfilter to use
             **type**\:  :py:class:`DefaultOperationEnum <ydk.models.ietf_netconf.EditConfigRpc.Input.DefaultOperationEnum>`
         
         .. attribute:: error_option
@@ -1114,19 +1114,19 @@ class EditConfigRpc(object):
             """
             DefaultOperationEnum
 
-            The default operation to use.
+            The default yfilter to use.
 
             .. data:: MERGE = 0
 
-                The default operation is merge.
+                The default yfilter is merge.
 
             .. data:: REPLACE = 1
 
-                The default operation is replace.
+                The default yfilter is replace.
 
             .. data:: NONE = 2
 
-                There is no default operation.
+                There is no default yfilter.
 
             """
 
@@ -1808,7 +1808,7 @@ class KillSessionRpc(object):
 
 class LockRpc(object):
     """
-    The lock operation allows the client to lock the configuration
+    The lock yfilter allows the client to lock the configuration
     system of a device.
     
     .. attribute:: input
@@ -1963,8 +1963,8 @@ class LockRpc(object):
 
 class UnlockRpc(object):
     """
-    The unlock operation is used to release a configuration lock,
-    previously obtained with the 'lock' operation.
+    The unlock yfilter is used to release a configuration lock,
+    previously obtained with the 'lock' yfilter.
     
     .. attribute:: input
     

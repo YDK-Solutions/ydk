@@ -56,7 +56,7 @@ public:
         EncodingFormat get_encoding() const;
 
 private:
-        std::shared_ptr<path::DataNode> handle_edit(path::Rpc& rpc, const std::string & operation) const;
+        std::shared_ptr<path::DataNode> handle_edit(path::Rpc& rpc, const std::string & yfilter) const;
         std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc) const;
         void initialize(path::Repository & repo);
 

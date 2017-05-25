@@ -114,12 +114,14 @@ class NetconfService(_NetconfService):
         if None in (provider, target):
             raise _YPYServiceError("provider and target cannot be None")
 
-        with _handle_error():
-            return self._ns.unlock(provider, target)
+        Args:
+            provider (ydk.providers.ServiceProvider): A provider instance.
+            target (Datastore): Particular configuration to unlock. Valid
+            options are Datastore.candidate, Datastore.running, and
+            Datastore.startup if the device has such feature advertised.
 
-    def validate(self, provider, source=None, url="", source_config=None):
-        if provider is None or (source is None and source_config is None):
-            raise _YPYServiceError("provider and source/source_config cannot be None")
+        Returns:
+            An ok reply string if operation succeeds.
 
         with _handle_error():
             if type(source) == DataStore:

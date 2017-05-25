@@ -472,17 +472,17 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             runner = self._create_runner()
             get_filter = ysanity.Runner()
 
-            op = self.netconf_service.edit_config(self.ncc, DataStore.candidate, runner)
-            self.assertEqual(op, True)
+            op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
+            self.assertEqual(None, op)
 
             op = self.netconf_service.discard_changes(self.ncc)
-            self.assertEqual(op, True)
+            self.assertEqual(None, op)
 
-            op = self.netconf_service.edit_config(self.ncc, DataStore.candidate, runner)
-            self.assertEqual(op, True)
+            op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
+            self.assertEqual(None, op)
 
             op = self.netconf_service.commit(self.ncc)
-            self.assertEqual(op, True)
+            self.assertEqual(None, op)
 
             result = self.netconf_service.get(self.ncc, get_filter, with_defaults_option=1)
             self.assertEqual(is_equal(runner, result), True)

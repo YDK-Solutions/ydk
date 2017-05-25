@@ -24,10 +24,10 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <ydk/crud_service.hpp>
-#include <ydk/netconf_provider.hpp>
-#include <ydk/path_api.hpp>
-#include <ydk/types.hpp>
+#include "crud_service.hpp"
+#include "netconf_provider.hpp"
+#include "path_api.hpp"
+#include "types.hpp"
 
 #include <iostream>
 #include <spdlog/spdlog.h>

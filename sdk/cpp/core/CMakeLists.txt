@@ -23,8 +23,6 @@ endif()
 
 set(HOME_DIRECTORY $ENV{HOME})
 
-configure_file("${CMAKE_SOURCE_DIR}/core_info.hpp.in" "${CMAKE_SOURCE_DIR}/src/path/core_info.hpp" ESCAPE_QUOTES @ONLY)
-
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")

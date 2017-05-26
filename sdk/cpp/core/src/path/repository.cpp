@@ -20,16 +20,16 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#include <unistd.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <fstream>
 
 #include "path_private.hpp"
 #include "../ydk_yang.hpp"
-#include "core_info.hpp"
 #include "../logger.hpp"
 
 
@@ -43,6 +43,22 @@ static bool file_exists(const std::string & path)
     struct stat st = {0};
 
     return stat(path.c_str(), &st) == 0;
+}
+
+static std::string get_models_download_path()
+{
+    const char *homeDir = getenv("HOME");
+
+    if (!homeDir) {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+           homeDir = pwd->pw_dir;
+    }
+
+    std::ostringstream models_path{};
+    models_path << homeDir << "/.ydk";
+
+    return models_path.str();
 }
 
 static void create_if_does_not_exist(const std::string & path)
@@ -94,7 +110,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
 ydk::path::Repository::Repository()
   : using_temp_directory(true)
 {
-    path = ydk_models_path;
+    path = get_models_download_path();
     ly_set_log_clb(libyang_log_callback, 1);
 }
 

@@ -37,7 +37,7 @@ YANG Development Kit (Generator)
 
 # Overview
 
-**ydk-gen** is a developer tool that can generate API's that are modeled in YANG.  Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
+**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
 
 Other tools and libraries are used to deliver `ydk-gen`'s functionality. In particular:
 

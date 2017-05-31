@@ -38,7 +38,7 @@ TEST_CASE( "codec_encode"  )
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(repo, "localhost", "admin", "admin", 12022);
 
-    RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
+    RootSchemaNode root_schema = ServiceProviderGetRootSchema(provider);
 
     DataNode runner = RootSchemaNodeCreate(root_schema, "ydktest-sanity:runner");
 
@@ -58,7 +58,7 @@ TEST_CASE( "codec_decode"  )
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(repo, "localhost", "admin", "admin", 12022);
 
-    RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
+    RootSchemaNode root_schema = ServiceProviderGetRootSchema(provider);
 
     DataNode runner = CodecServiceDecode(c, root_schema, test_string, XML);
 
@@ -103,7 +103,7 @@ TEST_CASE( "rpc" )
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
 
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(repo, "localhost", "admin", "admin", 12022);
-    RootSchemaNode root_schema = NetconfServiceProviderGetRootSchema(provider);
+    RootSchemaNode root_schema = ServiceProviderGetRootSchema(provider);
 
     DataNode runner = RootSchemaNodeCreate(root_schema, "ydktest-sanity:runner");
 

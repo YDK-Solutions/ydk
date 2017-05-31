@@ -52,7 +52,7 @@ class ClassHasDataPrinter(object):
         self.ctx.lvl_inc()
 
     def _print_has_data_functions_body(self, clazz):
-        self._print_has_data_function('not self.is_config()', 'False')
+        #self._print_has_data_function('not self.is_config()', 'False')
         if clazz.stmt.search_one('presence'):
             self._print_has_data_function('self._is_presence')
 

@@ -27,6 +27,7 @@
 #include "crud_service.hpp"
 #include "netconf_provider.hpp"
 #include "path_api.hpp"
+#include "path/path_private.hpp"
 #include "types.hpp"
 
 #include <iostream>
@@ -374,6 +375,15 @@ DataNode DataNodeGetParent(DataNode datanode)
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
     ydk::path::DataNode* parent = real_datanode->parent();
     return static_cast<void*>(wrap(parent));
+}
+
+const char* DataNodeGetSegmentPath(DataNode datanode)
+{
+    DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
+    ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
+    string path = real_datanode->path();
+    std::vector<std::string> segments = ydk::path::segmentalize(path);
+    return string_to_array(segments.back());
 }
 
 void EnableLogging(LogLevel level)

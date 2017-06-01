@@ -24,8 +24,8 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#ifndef _GOLANG_H_
-#define _GOLANG_H_
+#ifndef _YDK_H_
+#define _YDK_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,6 +91,7 @@ const char* DataNodeGetValue(DataNode);
 DataNode DataNodeGetParent(DataNode);
 void DataNodeAddAnnotation(DataNode, const char*);
 DataNodeChildren DataNodeGetChildren(DataNode);
+const char* DataNodeGetSegmentPath(DataNode);
 
 void EnableLogging(LogLevel);
 LogLevel GetLoggingLevel(void);
@@ -99,4 +100,4 @@ LogLevel GetLoggingLevel(void);
 }
 #endif
 
-#endif /* _GOLANG_H_ */
+#endif /* _YDK_H_ */

@@ -31,23 +31,23 @@ package path
 import "C"
 
 import (
-    "fmt"
+	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"unsafe"
 )
 
-func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, operation string, data_tag string, set_config_flag bool) types.DataNode {
+func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter string, data_tag string, set_config_flag bool) types.DataNode {
 	wrapped_provider := provider.GetPrivate().(types.CServiceProvider)
 	real_provider := wrapped_provider.Private.(C.ServiceProvider)
 	root_schema := C.ServiceProviderGetRootSchema(real_provider)
 
-	ydk_rpc := C.RootSchemaNodeRpc(root_schema, C.CString(operation))
+	ydk_rpc := C.RootSchemaNodeRpc(root_schema, C.CString(Filter))
 	if root_schema == nil {
 		panic(1)
 	}
 
 	data := getDataPayload(entity, root_schema)
-    defer C.free(unsafe.Pointer(data))
+	defer C.free(unsafe.Pointer(data))
 
 	input := C.RpcInput(ydk_rpc)
 
@@ -91,9 +91,11 @@ func ReadDatanode(filter types.Entity, read_data_node types.DataNode) types.Enti
 	}
 
 	top_entity := getTopEntityFromFilter(filter)
-	//children := C.DataNodeGetChildren(read_data_node)
+	fmt.Printf("Reading top entity: '%s'\n", top_entity.GetSegmentPath())
 
-	//types.getEntityFromDataNode(children, top_entity)
+	c_children := C.DataNodeGetChildren(read_data_node.Private.(C.DataNode))
+	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(c_children.datanodes))[:c_children.count:c_children.count]
+	getEntityFromDataNode(children[0], top_entity)
 	return top_entity
 }
 
@@ -140,13 +142,13 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 
 	root_data_node := C.RootSchemaNodeCreate(root_schema, path)
 
-	if types.IsSet(entity.GetOperation()) {
-		p1 := C.CString(string(entity.GetOperation()))
+	if types.IsSet(entity.GetFilter()) {
+		p1 := C.CString(string(entity.GetFilter()))
 		defer C.free(unsafe.Pointer(p1))
 		C.DataNodeAddAnnotation(root_data_node, p1)
 	}
 
-	populateNameValues(root_data_node, root_path) //TODO
+	populateNameValues(root_data_node, root_path)
 	walkChildren(entity, root_data_node)
 	return root_data_node
 }
@@ -154,17 +156,17 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 func walkChildren(entity types.Entity, data_node C.DataNode) {
 	children := entity.GetChildren()
 
-    fmt.Printf("Got %d children\n", len(children))
+	fmt.Printf("Got %d entity children\n", len(children))
 
 	for child_name := range children {
 
-        fmt.Printf("Lookin at %v\n", children[child_name].GetSegmentPath())
+		fmt.Printf("Lookin at entity child '%s'\n", children[child_name].GetSegmentPath())
 
-		if children[child_name].HasOperation() || children[child_name].HasData() {
+		if children[child_name].HasDataOrFilter() {
 			populateDataNode(children[child_name], data_node)
 		}
 	}
-    fmt.Println()
+	fmt.Println()
 }
 
 func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
@@ -175,14 +177,14 @@ func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
 	defer C.free(unsafe.Pointer(ep))
 
 	data_node := C.DataNodeCreate(parent_data_node, p, ep)
-    if data_node == nil {
-        panic("Datanode could not be created for: " + path.Path)
-    }
+	if data_node == nil {
+		panic("Datanode could not be created for: " + path.Path)
+	}
 
-	if(types.IsSet(entity.GetOperation())) {
-	    p1 := C.CString(string(entity.GetOperation()))
-	    defer C.free(unsafe.Pointer(p1))
-	    C.DataNodeAddAnnotation(data_node, p1)
+	if types.IsSet(entity.GetFilter()) {
+		p1 := C.CString(string(entity.GetFilter()))
+		defer C.free(unsafe.Pointer(p1))
+		C.DataNodeAddAnnotation(data_node, p1)
 	}
 
 	populateNameValues(data_node, path)
@@ -194,7 +196,7 @@ func populateNameValues(data_node C.DataNode, path types.EntityPath) {
 		var result C.DataNode
 		leaf_data := name_value.Data
 		p := C.CString(name_value.Name)
-        fmt.Printf("got leaf {%s: %s}\n",name_value.Name, name_value.Data.Value)
+		fmt.Printf("got leaf {%s: %s}\n", name_value.Name, name_value.Data.Value)
 
 		if leaf_data.IsSet {
 			p1 := C.CString(leaf_data.Value)
@@ -203,10 +205,10 @@ func populateNameValues(data_node C.DataNode, path types.EntityPath) {
 			C.free(unsafe.Pointer(p1))
 		}
 
-		if(types.IsSet(leaf_data.Filter)) {
-		    p1 := C.CString(string(name_value.Data.Filter))
-		    defer C.free(unsafe.Pointer(p1))
-		    C.DataNodeAddAnnotation(result, p1)
+		if types.IsSet(leaf_data.Filter) {
+			p1 := C.CString(string(name_value.Data.Filter))
+			defer C.free(unsafe.Pointer(p1))
+			C.DataNodeAddAnnotation(result, p1)
 		}
 		C.free(unsafe.Pointer(p))
 	}
@@ -216,33 +218,36 @@ func populateNameValues(data_node C.DataNode, path types.EntityPath) {
 // Entity from DataNode
 //////////////////////////////////////////////////////////////////////////
 func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
-
 	if entity == nil || node == nil {
 		return
 	}
 
-	//c_children := C.DataNodeGetChildren(node)
-	//children := []C.DataNode{unsafe.Pointer(c_children.datanodes)}
-	children := []C.DataNode{}
-	//real_data_node := node.private.(C.DataNode)
-	//c_children := C.DataNodeGetChildren(real_data_node)
+	c_children := C.DataNodeGetChildren(node)
+	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(c_children.datanodes))[:c_children.count:c_children.count]
+	fmt.Printf("Got %d datanode children\n", c_children.count)
 
 	for _, child_data_node := range children {
-		child_name := C.DataNodeGetArgument(child_data_node)
+		child_name := C.GoString(C.DataNodeGetArgument(child_data_node))
+		fmt.Printf("Lookin at child datanode: '%s'\n", child_name)
 
 		if dataNodeIsLeaf(child_data_node) {
-			//C.DataNodeGetValue(child_data_node), C.DataNodeGetPath(node)
-			entity.SetValue(C.GoString(child_name), C.GoString(C.DataNodeGetValue(child_data_node)))
 
+			value := C.GoString(C.DataNodeGetValue(child_data_node))
+			fmt.Printf("Creating leaf '%s' with value '%s'\n", child_name, value)
+			entity.SetValue(child_name, value)
 		} else {
 
 			var child_entity types.Entity
 			if dataNodeIsList(child_data_node) {
-				child_entity = entity.GetChildByName(C.GoString(child_name),
-					getSegmentPath(C.GoString(
-						C.DataNodeGetPath(child_data_node))))
+				segment_path := C.GoString(C.DataNodeGetSegmentPath(child_data_node))
+				fmt.Printf("Creating child list instance '%s'\n", segment_path)
+				child_entity = entity.GetChildByName(child_name, segment_path)
 			} else {
-				child_entity = entity.GetChildByName(C.GoString(child_name), "")
+				fmt.Printf("Creating child node '%s'\n", child_name)
+				child_entity = entity.GetChildByName(child_name, "")
+			}
+			if child_entity == nil {
+				panic("Could not create child entity!")
 			}
 			child_entity.SetParent(entity)
 			getEntityFromDataNode(child_data_node, child_entity)
@@ -257,13 +262,4 @@ func dataNodeIsLeaf(data_node C.DataNode) bool {
 
 func dataNodeIsList(data_node C.DataNode) bool {
 	return C.GoString(C.DataNodeGetKeyword(data_node)) == "list"
-}
-
-func getSegmentPath(path string) string {
-	segments := segmentalize(path)
-	return segments[len(segments)-1]
-}
-
-func segmentalize(path string) []string {
-	return make([]string, 2)
 }

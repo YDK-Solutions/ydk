@@ -25,44 +25,44 @@
 package services
 
 import (
-    "github.com/CiscoDevNet/ydk-go/ydk/path"
-    "github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/path"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 type CrudService struct {
 }
 
 func (c *CrudService) Create(provider types.ServiceProvider, entity types.Entity) bool {
-    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:create", "entity", false) )
+	return operationSucceeded(path.ExecuteRpc(provider, entity, "ydk:create", "entity", false))
 }
 
 func (c *CrudService) Update(provider types.ServiceProvider, entity types.Entity) bool {
-    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:update", "entity", false) )
+	return operationSucceeded(path.ExecuteRpc(provider, entity, "ydk:update", "entity", false))
 }
 
 func (c *CrudService) Delete(provider types.ServiceProvider, entity types.Entity) bool {
-    return operationSucceeded( path.ExecuteRpc(provider, entity, "ydk:delete", "entity", false) )
+	return operationSucceeded(path.ExecuteRpc(provider, entity, "ydk:delete", "entity", false))
 }
 
 func (c *CrudService) Read(provider types.ServiceProvider, filter types.Entity) types.Entity {
-    return path.ReadDatanode( filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", true) )
+	return path.ReadDatanode(filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", true))
 }
 
 func (c *CrudService) ReadConfig(provider types.ServiceProvider, filter types.Entity) types.Entity {
-    return path.ReadDatanode( filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", false) )
+	return path.ReadDatanode(filter, path.ExecuteRpc(provider, filter, "ydk:read", "filter", false))
 }
 
 func operationSucceeded(node types.DataNode) bool {
-    return node.Private != nil
+	return node.Private != nil
 }
 
 type CodecService struct {
 }
 
 func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.Entity) string {
-    return ""
+	return ""
 }
 
 func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
-    return nil
+	return nil
 }

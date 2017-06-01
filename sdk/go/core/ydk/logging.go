@@ -32,24 +32,24 @@ import "C"
 type LogLevel int
 
 const (
-    Debug LogLevel = iota
-    Info
-    Warning
-    Error
+	Debug LogLevel = iota
+	Info
+	Warning
+	Error
 )
 
 func EnableLogging(level LogLevel) {
-    switch(level) {
-        case Debug:
-            C.EnableLogging(C.DEBUG)
+	switch level {
+	case Debug:
+		C.EnableLogging(C.DEBUG)
 
-        case Info:
-            C.EnableLogging(C.INFO)
+	case Info:
+		C.EnableLogging(C.INFO)
 
-        case Warning:
-            C.EnableLogging(C.WARNING)
+	case Warning:
+		C.EnableLogging(C.WARNING)
 
-        case Error:
-            C.EnableLogging(C.ERROR)
-    }
+	case Error:
+		C.EnableLogging(C.ERROR)
+	}
 }

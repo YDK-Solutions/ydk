@@ -24,10 +24,9 @@
  */
 package providers
 
-
 import (
-    "github.com/CiscoDevNet/ydk-go/ydk/path"
-    "github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/path"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 type NetconfServiceProvider struct {
@@ -41,27 +40,27 @@ type NetconfServiceProvider struct {
 }
 
 type RestconfServiceProvider struct {
-    Repo     types.Repository
-    Address  string
-    Username string
-    Password string
-    Port     int
-    Encoding types.EncodingFormat
+	Repo     types.Repository
+	Address  string
+	Username string
+	Password string
+	Port     int
+	Encoding types.EncodingFormat
 
-    Private types.CServiceProvider
+	Private types.CServiceProvider
 }
 
 func (provider *NetconfServiceProvider) GetPrivate() interface{} {
-    return provider.Private
+	return provider.Private
 }
 
 func (provider *NetconfServiceProvider) Connect() {
-    provider.Private = path.ConnectToProvider(provider.Repo, provider.Address, provider.Username, provider.Password, provider.Port)
+	provider.Private = path.ConnectToProvider(provider.Repo, provider.Address, provider.Username, provider.Password, provider.Port)
 }
 
 func (provider *NetconfServiceProvider) Disconnect() {
-    if provider.Private.Private == nil {
-        return
-    }
+	if provider.Private.Private == nil {
+		return
+	}
 	path.DisconnectFromProvider(provider.Private)
 }

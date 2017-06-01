@@ -25,27 +25,28 @@
 package main
 
 import (
-    "flag"
+	"flag"
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
-    "github.com/CiscoDevNet/ydk-go/ydk/services"
+	"github.com/CiscoDevNet/ydk-go/ydk/services"
+	//"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 func main() {
 	defer func() {
 		if r := recover(); r != nil {
-            fmt.Println("\nError occured!!\n ", r)
+			fmt.Println("\nError occured!!\n ", r)
 		}
 	}()
 
-    vPtr := flag.Bool("v", false, "Enable verbose")
-    flag.Parse()
+	vPtr := flag.Bool("v", false, "Enable verbose")
+	flag.Parse()
 
-    if *vPtr {
-        ydk.EnableLogging(ydk.Info)
-    }
+	if *vPtr {
+		ydk.EnableLogging(ydk.Info)
+	}
 
 	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
 		Address:  "127.0.0.1",
@@ -55,16 +56,18 @@ func main() {
 
 	provider.Connect()
 
-    crud := services.CrudService{}
+	crud := services.CrudService{}
 
 	bgp := oc_bgp.Bgp{}
+	bgp.Global.Config.RouterId = "1.2.3.4"
+    bgp.Global.Config.As = 65172
 
 	data := crud.Read(&provider, &bgp)
 
 	provider.Disconnect()
 
-    if data != nil {
-        fmt.Println("\nData read successfully!\n")
-    }
+	if data != nil {
+		fmt.Println("\nData read successfully!\n")
+	}
 
 }

@@ -25,17 +25,18 @@
 package main
 
 import (
-    "flag"
+	"flag"
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
 	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
-    "github.com/CiscoDevNet/ydk-go/ydk/services"
+	"github.com/CiscoDevNet/ydk-go/ydk/services"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 func config_bgp(bgp *oc_bgp.Bgp) {
-	bgp.Global.Config.As = 65001
+	bgp.Global.Config.As = types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
@@ -58,12 +59,12 @@ func main() {
 		}
 	}()
 
-    vPtr := flag.Bool("v", false, "Enable verbose")
-    flag.Parse()
+	vPtr := flag.Bool("v", false, "Enable verbose")
+	flag.Parse()
 
-    if *vPtr {
-        ydk.EnableLogging(ydk.Debug)
-    }
+	if *vPtr {
+		ydk.EnableLogging(ydk.Debug)
+	}
 
 	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
 		Address:  "127.0.0.1",
@@ -73,7 +74,7 @@ func main() {
 
 	provider.Connect()
 
-    crud := services.CrudService{}
+	crud := services.CrudService{}
 
 	bgp := oc_bgp.Bgp{}
 	config_bgp(&bgp)
@@ -82,10 +83,10 @@ func main() {
 
 	provider.Disconnect()
 
-    if result == true {
-        fmt.Println("\nOperation succeeded!\n")
-    } else {
-        fmt.Println("\nOperation failed!\n")
-    }
+	if result == true {
+		fmt.Println("\nOperation succeeded!\n")
+	} else {
+		fmt.Println("\nOperation failed!\n")
+	}
 
 }

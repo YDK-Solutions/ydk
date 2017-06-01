@@ -25,18 +25,18 @@
 package types
 
 import (
-    "fmt"
-    "sort"
+	"sort"
 )
 
 type YFilter int
 
 const (
 	NotSet YFilter = iota
-    Merge
+	Read
+	Merge
 	Create
 	Remove
-	Delete_
+	Delete
 	Replace
 )
 
@@ -45,9 +45,9 @@ type Empty struct {
 }
 
 type LeafData struct {
-    Value  string
-    Filter YFilter
-    IsSet  bool
+	Value  string
+	Filter YFilter
+	IsSet  bool
 }
 
 type NameLeafData struct {
@@ -66,8 +66,7 @@ type Entity interface {
 	GetEntityPath(Entity) EntityPath
 	GetSegmentPath() string
 
-	HasData() bool
-	HasOperation() bool
+	HasDataOrFilter() bool
 
 	SetValue(string, string)
 	GetChildByName(string, string) Entity
@@ -81,10 +80,10 @@ type Entity interface {
 	GetBundleYangModelsLocation() string
 	GetBundleName() string
 
-    GetYangName() string
-    GetParentYangName() string
+	GetYangName() string
+	GetParentYangName() string
 
-    GetOperation() YFilter
+	GetFilter() YFilter
 }
 
 type Bits map[string]bool
@@ -123,25 +122,25 @@ const (
 )
 
 type YLeaf struct {
-	name       string
+	name string
 
 	leaf_type  YType
 	bits_value Bits
 
-    Value      string
-    IsSet      bool
-    Operation  YFilter
+	Value  string
+	IsSet  bool
+	Filter YFilter
 }
 
 func (y *YLeaf) GetNameLeafdata() NameLeafData {
-	return NameLeafData{y.name, LeafData{y.Value, y.Operation, y.IsSet}}
+	return NameLeafData{y.name, LeafData{y.Value, y.Filter, y.IsSet}}
 }
 
 type YLeafList struct {
-	name      string
-	values    []YLeaf
+	name   string
+	values []YLeaf
 
-	operation YFilter
+	Filter    YFilter
 	leaf_type YType
 }
 
@@ -152,7 +151,7 @@ func (y *YLeafList) GetYLeafs() []YLeaf {
 func (y *YLeafList) GetNameLeafdata() [](NameLeafData) {
 	result := make([]NameLeafData, len(y.values))
 	for i := 0; i < len(y.values); i++ {
-		result = append(result, NameLeafData{y.values[i].name, LeafData{y.values[i].Value, y.values[i].Operation, y.values[i].IsSet}})
+		result = append(result, NameLeafData{y.values[i].name, LeafData{y.values[i].Value, y.values[i].Filter, y.values[i].IsSet}})
 	}
 	return result
 }
@@ -165,17 +164,31 @@ const (
 )
 
 func (e YFilter) String() string {
-	return fmt.Sprintf("%v", e)
+	switch e {
+	case Read:
+		return "read"
+	case Replace:
+		return "replace"
+	case Delete:
+		return "delete"
+	case Merge:
+		return "merge"
+	case Create:
+		return "create"
+	case NotSet:
+		return ""
+	}
+	return ""
 }
 
 type ServiceProvider interface {
-    GetPrivate() interface{}
-    Connect()
-    Disconnect()
+	GetPrivate() interface{}
+	Connect()
+	Disconnect()
 }
 
 type CodecServiceProvider struct {
-    Encoding EncodingFormat
+	Encoding EncodingFormat
 }
 
 type Protocol int
@@ -186,15 +199,15 @@ const (
 )
 
 type DataNode struct {
-    Private interface{}
+	Private interface{}
 }
 
 type CServiceProvider struct {
-    Private interface{}
+	Private interface{}
 }
 
 type Repository struct {
-    Path string
+	Path string
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -204,53 +217,53 @@ type Repository struct {
 type EntitySlice []Entity
 
 func (s EntitySlice) Len() int {
-    return len(s)
+	return len(s)
 }
 
 func (s EntitySlice) Less(i, j int) bool {
-    return s[i].GetSegmentPath() < s[j].GetSegmentPath()
+	return s[i].GetSegmentPath() < s[j].GetSegmentPath()
 }
 
 func (s EntitySlice) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
+	s[i], s[j] = s[j], s[i]
 }
 
 func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) string {
-    path_buffer := path
+	path_buffer := path
 
-    if(ancestor == nil) {
-        return ""
-    }
-    p := current_node.GetParent()
-    parents := EntitySlice{}
-    for p != nil && p != ancestor {
-        //append(parents, p)
-        p = p.GetParent()
-    }
+	if ancestor == nil {
+		return ""
+	}
+	p := current_node.GetParent()
+	parents := EntitySlice{}
+	for p != nil && p != ancestor {
+		//append(parents, p)
+		p = p.GetParent()
+	}
 
-    if p == nil {
-        return ""
-    }
+	if p == nil {
+		return ""
+	}
 
-    parents = sort.Reverse(parents).(EntitySlice)
+	parents = sort.Reverse(parents).(EntitySlice)
 
-    p = nil
-    for _, p1 := range parents {
-    if p!=nil {
-        path_buffer += "/"
-    } else {
-        p = p1
-    }
-        path_buffer += p1.GetSegmentPath()
-    }
-    if(p != nil) {
-        path_buffer += "/"
-    }
-    path_buffer += current_node.GetSegmentPath()
-    return path_buffer
+	p = nil
+	for _, p1 := range parents {
+		if p != nil {
+			path_buffer += "/"
+		} else {
+			p = p1
+		}
+		path_buffer += p1.GetSegmentPath()
+	}
+	if p != nil {
+		path_buffer += "/"
+	}
+	path_buffer += current_node.GetSegmentPath()
+	return path_buffer
 
 }
 
-func IsSet(operation YFilter) bool {
-    return operation != NotSet
+func IsSet(Filter YFilter) bool {
+	return Filter != NotSet
 }

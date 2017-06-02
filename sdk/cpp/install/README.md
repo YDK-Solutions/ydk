@@ -3,7 +3,7 @@ We can use the CPack module in CMake to produce packages based off os.
 ```
 $ cd project_dir/ydk-gen/sdk/cpp/core
 $ mkdir build && cd build
-$ cmake ..
+$ cmake -DCMAKE_BUILD_TYPE=Release ..
 $ make project
 ```
 That's all for RPM/Debian packages. Please see the following section for creating packages for Mac OS.

@@ -90,7 +90,7 @@ void setup_logging()
         add_null_handler(logger);
         log_debug = logger.attr("debug");
         log_info = logger.attr("info");
-        log_warn = logger.attr("warn");
+        log_warn = logger.attr("warning");
         log_error = logger.attr("error");
         log_critical = logger.attr("critical");
 
@@ -485,8 +485,7 @@ PYBIND11_PLUGIN(ydk_)
     class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, string address, string username, string password, int port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port);
+                    new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port, protocol);
             },
             arg("repo"),
             arg("address"),
@@ -496,8 +495,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("protocol")=string("ssh"))
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol);
             },
             arg("address"),
             arg("username"),
@@ -506,8 +504,8 @@ PYBIND11_PLUGIN(ydk_)
             arg("protocol")=string("ssh"))
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, void* port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830);
+                    // in case the user passed a None as `port` to the Python wrapper
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol);
             },
             arg("address"),
             arg("username"),
@@ -516,7 +514,6 @@ PYBIND11_PLUGIN(ydk_)
             arg("protocol")=string("ssh"))
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port) {
-                    // use default protocol at the moment
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
             },
             arg("address"),
@@ -525,7 +522,6 @@ PYBIND11_PLUGIN(ydk_)
             arg("port")=830)
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password) {
-                    // use default protocol at the moment
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password);
             },
             arg("address"),

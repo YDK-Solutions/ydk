@@ -23,6 +23,7 @@
 #include <libnetconf/netconf.h>
 
 #include "errors.hpp"
+#include "netconf_client_base.hpp"
 
 struct nc_session;
 typedef struct nc_msg nc_rpc;
@@ -38,7 +39,7 @@ typedef struct capabilities {
 namespace ydk
 {
 
-class NetconfClient
+class NetconfClient : public NetconfClientBase
 {
 
 public:
@@ -48,12 +49,12 @@ public:
     NetconfClient(std::string  username, std::string  password,
             std::string  server_ip, int port);
 
-    ~NetconfClient();
+    virtual ~NetconfClient();
 
-    int connect();
-    std::string execute_payload(const std::string & payload);
-    std::vector<std::string> get_capabilities();
-    std::string get_hostname_port();
+    virtual int connect();
+    virtual std::string execute_payload(const std::string & payload);
+    virtual std::vector<std::string> get_capabilities();
+    virtual std::string get_hostname_port();
 
 private:
 

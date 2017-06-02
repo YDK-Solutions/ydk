@@ -28,7 +28,7 @@ class NetconfClient;
 
 class NetconfModelProvider : public path::ModelProvider {
 public:
-        NetconfModelProvider(NetconfClient & client);
+        NetconfModelProvider(NetconfClientBase & client);
 
         ~NetconfModelProvider();
 
@@ -36,7 +36,7 @@ public:
         std::string get_hostname_port();
 
 private:
-        NetconfClient & client;
+        NetconfClientBase & client;
 };
 }
 

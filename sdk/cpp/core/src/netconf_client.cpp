@@ -45,6 +45,7 @@ map<pair<string, string>, string> NetconfClient::password_lookup;
 
 NetconfClient::NetconfClient(string  username, string  password,
         string  hostname, int port) :
+        NetconfClientBase(),
         username(username), hostname(hostname), port(port)
 {
     nc_verbosity(NC_VERB_DEBUG);

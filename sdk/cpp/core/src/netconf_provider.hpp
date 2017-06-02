@@ -21,6 +21,7 @@
 #include <string>
 
 #include "path_api.hpp"
+#include "netconf_client_base.hpp"
 
 namespace ydk {
 
@@ -32,11 +33,13 @@ public:
                                 std::string address,
                                std::string username,
                                std::string password,
-                               int port = 830);
+                               int port = 830,
+                               std::string protocol = "ssh");
         NetconfServiceProvider(std::string address,
                                std::string username,
                                std::string password,
-                               int port = 830);
+                               int port = 830,
+                               std::string protocol = "ssh");
         ~NetconfServiceProvider();
         path::RootSchemaNode& get_root_schema() const;
         std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const;
@@ -47,10 +50,11 @@ private:
         std::shared_ptr<path::DataNode> handle_netconf_operation(path::Rpc& ydk_rpc) const;
         std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc) const;
         void initialize(path::Repository& repo);
+        void initialize_client(std::string address, std::string username, std::string password, int port, std::string protocol);
         std::string execute_payload(const std::string & payload) const;
 
 private:
-        std::unique_ptr<NetconfClient> client;
+        std::unique_ptr<NetconfClientBase> client;
         std::unique_ptr<path::ModelProvider> model_provider;
         std::shared_ptr<ydk::path::RootSchemaNode> root_schema;
 

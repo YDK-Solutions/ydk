@@ -144,7 +144,8 @@ set(libydk_src
     src/ietf_parser.cpp
     src/leaf_data.cpp
     src/logging_callback.cpp
-    src/netconf_client.cpp    
+    src/netconf_client.cpp
+    src/netconf_tcp_client.cpp
     src/netconf_model_provider.cpp
     src/netconf_provider.cpp
     src/netconf_service.cpp
@@ -195,6 +196,7 @@ set(libydk_install_headers
     src/logging_callback.hpp
     src/netconf_provider.hpp
     src/network_topology.hpp
+    src/netconf_client_base.hpp
     src/netconf_service.hpp
     src/opendaylight_parser.hpp
     src/opendaylight_provider.hpp

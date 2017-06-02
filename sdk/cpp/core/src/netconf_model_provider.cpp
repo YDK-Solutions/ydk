@@ -37,7 +37,7 @@ using namespace ydk;
 
 namespace ydk
 {
-NetconfModelProvider::NetconfModelProvider(NetconfClient & client)
+NetconfModelProvider::NetconfModelProvider(NetconfClientBase & client)
     : client(client)
 {
 }

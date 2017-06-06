@@ -18,6 +18,31 @@ from ydk.ext.services import DataStore, NetconfService as _NetconfService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 
+==== BASE ====
+   The Netconf Service class.
+
+"""
+from .executor_service import ExecutorService
+from .service import Service
+from enum import Enum
+from ydk.errors import YPYModelError, YPYServiceError
+from . import ietf_netconf
+from . import ietf_netconf_with_defaults
+
+from ydk.types import Empty
+import logging
+
+
+class Datastore(Enum):
+    """Type of datastore."""
+    candidate = 1
+    running = 2
+    startup = 3
+
+
+class NetconfService(Service):
+    """Netconf Service class for executing netconf operations."""
+==== BASE ====
 
 class NetconfService(_NetconfService):
     """ Python wrapper for NetconfService

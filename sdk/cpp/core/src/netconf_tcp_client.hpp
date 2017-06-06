@@ -17,6 +17,7 @@
 #ifndef _YDK_NETCONF_TCP_CLIENT_H_
 #define _YDK_NETCONF_TCP_CLIENT_H_
 
+#include <map>
 #include <string>
 #include <vector>
 #include <curl/curl.h>
@@ -44,23 +45,22 @@ private:
     void initialize(std::string address, int port);
     void initialize_curl(std::string address, int port);
     void init_capabilities();
+
     void check_ok(CURLcode res, const char* fmt);
     void check_timeout(CURLcode res, int for_recv, const char* fmt);
-    bool check_rpc_reply(std::string &reply);
 
     std::string add_message_id(const std::string &payload);
 
     void send(const std::string & payload);
-    std::string recv();
     void send_value(const char* value, size_t value_len);
+    std::string recv();
     std::string recv_value();
 
 private:
     CURL *curl;
     curl_socket_t sockfd;
     std::vector<std::string> server_capabilities;
-    // TODO: only xml?
-    // std::string encoding;
+
     std::string hello_msg;
     std::string username;
     std::string hostname;
@@ -69,7 +69,6 @@ private:
 
     long long unsigned int msgid;
     bool connected = false;
-
 };
 
 }

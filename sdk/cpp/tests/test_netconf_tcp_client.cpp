@@ -14,11 +14,6 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 
-/*
-    This is a test file target XR 6.3.1 release, modified from
-    test_netconf_client.cpp It test against XR image loaded in Vagrant with
-    NETCONF TCP port forwarded to 41631.
-*/
 
 #define TEST_MODULE NetconfTCPClientTest
 #include <string.h>
@@ -34,7 +29,7 @@ using namespace std;
 
 TEST_CASE("tcp_xr")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
@@ -68,7 +63,7 @@ TEST_CASE("tcp_xr")
 
 TEST_CASE("tcp_create")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
@@ -80,114 +75,87 @@ TEST_CASE("tcp_create")
 
 TEST_CASE("tcp_edit_get_config")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
     REQUIRE(result == OK);
 
-    string reply = client.execute_payload(
-     "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-     "<edit-config>"
-     "<target><candidate/></target>"
-     "<config>"
-     "<bgp xmlns=\"http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-bgp-cfg\">"
-     "<instance>"
-     "<instance-name>default</instance-name>"
-     "<instance-as>"
-     "<as>0</as>"
-     "<four-byte-as>"
-     "<as>65001</as>"
-     "<bgp-running></bgp-running>"
-     "<default-vrf>"
-     "<bgp-entity>"
-     "<neighbor-groups>"
-     "<neighbor-group>"
-     "<neighbor-group-name>IBGP</neighbor-group-name>"
-     "<create></create>"
-     "<neighbor-group-afs>"
-     "<neighbor-group-af>"
-     "<af-name>ipv4-unicast</af-name>"
-     "<activate></activate>"
-     "</neighbor-group-af>"
-     "</neighbor-group-afs>"
-     "<remote-as>"
-     "<as-xx>0</as-xx>"
-     "<as-yy>65001</as-yy>"
-     "</remote-as>"
-     "<update-source-interface>Loopback0</update-source-interface>"
-     "</neighbor-group>"
-     "</neighbor-groups>"
-     "<neighbors>"
-     "<neighbor>"
-     "<neighbor-address>172.16.255.2</neighbor-address>"
-     "<neighbor-group-add-member>IBGP</neighbor-group-add-member>"
-     "</neighbor>"
-     "</neighbors>"
-     "</bgp-entity>"
-     "<global>"
-     "<global-afs>"
-     "<global-af>"
-     "<af-name>ipv4-unicast</af-name>"
-     "<enable></enable>"
-     "</global-af>"
-     "</global-afs>"
-     "</global>"
-     "</default-vrf>"
-     "</four-byte-as>"
-     "</instance-as>"
-     "</instance>"
-     "</bgp>"
-     "</config>"
-     "</edit-config>"
-     "</rpc>");
+    std::string reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "  <edit-config>"
+        "    <target>"
+        "      <candidate />"
+        "    </target>"
+        "    <error-option>rollback-on-error</error-option>"
+        "    <config>"
+        "      <runner xmlns=\"http://cisco.com/ns/yang/ydktest-sanity\" xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"merge\">"
+        "        <two-list>"
+        "          <ldata>"
+        "            <number>21</number>"
+        "            <name>runner:twolist:ldata[21]:name</name>"
+        "            <subl1>"
+        "              <number>211</number>"
+        "              <name>runner:twolist:ldata[21]:subl1[211]:name</name>"
+        "            </subl1>"
+        "            <subl1>"
+        "              <number>212</number>"
+        "              <name>runner:twolist:ldata[21]:subl1[212]:name</name>"
+        "            </subl1>"
+        "          </ldata>"
+        "          <ldata>"
+        "            <number>22</number>"
+        "            <name>runner:twolist:ldata[22]:name</name>"
+        "            <subl1>"
+        "              <number>221</number>"
+        "              <name>runner:twolist:ldata[22]:subl1[221]:name</name>"
+        "            </subl1>"
+        "            <subl1>"
+        "              <number>222</number>"
+        "              <name>runner:twolist:ldata[22]:subl1[222]:name</name>"
+        "            </subl1>"
+        "          </ldata>"
+        "        </two-list>"
+        "      </runner>"
+        "    </config>"
+        "  </edit-config>"
+        "</rpc>"
+        );
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
-
-    // ?
-    // reply = client.execute_payload(
-    //  "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-    //  "<commit/>"
-    //  "</rpc>"
-    // );
-    // REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
-
-    // ?
-    // reply = client.execute_payload(
-    //  "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-    //  "<get-config>"
-    //  "<source><running/></source>"
-    //  "<filter>"
-    //  "<bgp xmlns=\"http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-bgp-cfg\"/>"
-    //  "</filter>"
-    //  "</get-config>"
-    //  "</rpc>");
-    // REQUIRE(NULL != strstr(reply.c_str(), "<neighbor-address>172.16.255.2</neighbor-address>"));
 
     reply = client.execute_payload(
-     "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-     "<edit-config>"
-     "<target><candidate/></target>"
-     "<config xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-     "<bgp xmlns=\"http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-bgp-cfg\" xc:operation=\"delete\"/>"
-     "</config>"
-     "</edit-config>"
-     "</rpc>");
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "  <commit/>"
+        "</rpc>"
+    );
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 
-    // ?
-    // reply = client.execute_payload(
-    //  "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-    //  "<commit/>"
-    //  "</rpc>"
-    // );
-    // REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
+    reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<get-config>"
+        "<source><candidate/></source>"
+        "<filter>"
+        "<runner xmlns=\"http://cisco.com/ns/yang/ydktest-sanity\"/>"
+        "</filter>"
+        "</get-config>"
+        "</rpc>");
+    REQUIRE(NULL != strstr(reply.c_str(), "<name>runner:twolist:ldata[22]:subl1[221]:name</name>"));
 
-    REQUIRE(result == OK);
+    reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<edit-config>"
+        "<target><candidate/></target>"
+        "<config xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<runner xmlns=\"http://cisco.com/ns/yang/ydktest-sanity\" xc:operation=\"delete\"/>"
+        "</config>"
+        "</edit-config>"
+        "</rpc>");
+    REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 }
 
 TEST_CASE("tcp_validate")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
@@ -208,132 +176,101 @@ TEST_CASE("tcp_validate")
 
 TEST_CASE("tcp_lock_unlock")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
     REQUIRE(result == OK);
 
     string reply = client.execute_payload(
-                                          "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-                                          "<discard-changes/>"
-                                          "</rpc>");
-
-    REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
-
-
-    reply = client.execute_payload(
-         "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-         "<lock>"
-         "<target><candidate/></target>"
-         "</lock>"
-         "</rpc>");
-
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<discard-changes/>"
+        "</rpc>");
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 
     reply = client.execute_payload(
-         "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-         "<unlock>"
-         "<target><candidate/></target>"
-         "</unlock>"
-         "</rpc>");
-
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<lock>"
+        "<target><candidate/></target>"
+        "</lock>"
+        "</rpc>");
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 
-    try
-    {
-        // throw exception for every rpc error
-        reply = client.execute_payload(
-             "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-             "<unlock>"
-             "<target><candidate/></target>"
-             "</unlock>"
-             "</rpc>");
-    }
-    catch (YCPPError & e)
-    {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
-    }
+    reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<unlock>"
+        "<target><candidate/></target>"
+        "</unlock>"
+        "</rpc>");
+    REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
+
+    reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "<unlock>"
+        "<target><candidate/></target>"
+        "</unlock>"
+        "</rpc>");
+    REQUIRE(NULL != strstr(reply.c_str(), "<rpc-error>"));
 
     REQUIRE(result == OK);
 }
 
 TEST_CASE("tcp_rpc_error")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
     REQUIRE(result == OK);
-    try
-    {
-        string reply = client.execute_payload(
-         "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-         "<edit-config>"
-         "<target><candidate/></target>"
-         "<config>"
-         "<bgp xmlns=\"http://cisco.com/ns/yang/Cisco-IOS-XR-ipv4-bgp-cfg\">"
-         "<instance>"
-         "<instance-name>default</instance-name>"
-         "<instance-as>"
-         "<as>0</as>"
-         "<four-byte-as>"
-         "<as>65001</as>"
-         "<bgp-running></bgp-running>"
-         "<default-vrf>"
-         "<bgp-entity>"
-         "<neighbor-groups>"
-         "<neighbor-group>"
-         "<neighbor-group-name>IBGP</neighbor-group-name>"
-         "<create></create>"
-         "<neighbor-group-afs>"
-         "<neighbor-group-af>"
-         "<af-name>ipv4-unicast</af-name>"
-         "<activate></activate>"
-         "</neighbor-group-af>"
-         "</neighbor-group-afs>"
-         "<remote-as>"
-         "<as-xx>0</as-xx>"
-         "<as-yy>WRONG STRING</as-yy>"
-         "</remote-as>"
-         "<update-source-interface>Loopback0</update-source-interface>"
-         "</neighbor-group>"
-         "</neighbor-groups>"
-         "<neighbors>"
-         "<neighbor>"
-         "<neighbor-address>172.16.255.2</neighbor-address>"
-         "<neighbor-group-add-member>IBGP</neighbor-group-add-member>"
-         "</neighbor>"
-         "</neighbors>"
-         "</bgp-entity>"
-         "<global>"
-         "<global-afs>"
-         "<global-af>"
-         "<af-name>ipv4-unicast</af-name>"
-         "<enable></enable>"
-         "</global-af>"
-         "</global-afs>"
-         "</global>"
-         "</default-vrf>"
-         "</four-byte-as>"
-         "</instance-as>"
-         "</instance>"
-         "</bgp>"
-         "</config>"
-         "</edit-config>"
-         "</rpc>");
-        REQUIRE(NULL != strstr(reply.c_str(), "<rpc-error>"));
-    }
-    catch (YCPPError & e)
-    {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
-    }
 
+    string reply = client.execute_payload(
+        "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+        "  <edit-config>"
+        "    <target>"
+        "      <candidate />"
+        "    </target>"
+        "    <error-option>rollback-on-error</error-option>"
+        "    <config>"
+        "      <runner xmlns=\"http://cisco.com/ns/yang/ydktest-sanity\" xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" nc:operation=\"merge\">"
+        "        <two-list>"
+        "          <ldata>"
+        "            <number>21</number>"
+        "            <name>runner:twolist:ldata[21]:name</name>"
+        "            <subl1>"
+        "              <number>WRONG VALUE</number>"
+        "              <name>runner:twolist:ldata[21]:subl1[211]:name</name>"
+        "            </subl1>"
+        "            <subl1>"
+        "              <number>212</number>"
+        "              <name>runner:twolist:ldata[21]:subl1[212]:name</name>"
+        "            </subl1>"
+        "          </ldata>"
+        "          <ldata>"
+        "            <number>22</number>"
+        "            <name>runner:twolist:ldata[22]:name</name>"
+        "            <subl1>"
+        "              <number>221</number>"
+        "              <name>runner:twolist:ldata[22]:subl1[221]:name</name>"
+        "            </subl1>"
+        "            <subl1>"
+        "              <number>222</number>"
+        "              <name>runner:twolist:ldata[22]:subl1[222]:name</name>"
+        "            </subl1>"
+        "          </ldata>"
+        "        </two-list>"
+        "      </runner>"
+        "    </config>"
+        "  </edit-config>"
+        "</rpc>"
+        );
+    REQUIRE(NULL != strstr(reply.c_str(), "<rpc-error>"));
+
+    REQUIRE(result == OK);
 }
 
 TEST_CASE("tcp_device_not_connected_execute")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     try
     {
         string s = client.execute_payload(
@@ -354,14 +291,13 @@ TEST_CASE("tcp_device_not_connected_execute")
 
 }
 
-
 TEST_CASE("tcp_rpc_invalid")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
-    int OK = 0;
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
+    int ok = 0;
 
     int result = client.connect();
-    REQUIRE(result == OK);
+    REQUIRE(result == ok);
 
     try
     {
@@ -371,71 +307,60 @@ TEST_CASE("tcp_rpc_invalid")
              "<source><candidate/></source>"
              "</lock>"
              "</rpc>");
-
         REQUIRE(NULL != strstr(reply.c_str(), ""));
-
     }
     catch (YCPPError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YCPPClientError: could not build payload");
     }
 
-
-    REQUIRE(result == OK);
+    REQUIRE(result == ok);
 }
 
-TEST_CASE("tcp_wrong_xml")
-{
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
-    int OK = 0;
+// TCP Client does not validate any input
+// TEST_CASE("tcp_wrong_xml")
+// {
+//     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
+//     int OK = 0;
 
-    int result = client.connect();
-    REQUIRE(result == OK);
+//     int result = client.connect();
+//     REQUIRE(result == OK);
 
-    try
-    {
-        string reply = client.execute_payload(
-                "<testing>"
-         );
-        REQUIRE(reply== "");
-    }
-    catch (YCPPError & e)
-    {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
-    }
+//     try
+//     {
+//         string reply = client.execute_payload(
+//                 "<testing>"
+//          );
+//         REQUIRE(reply== "");
+//     }
+//     catch (YCPPError & e)
+//     {
+//         REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+//     }
 
 
-    REQUIRE(result == OK);
-}
+//     REQUIRE(result == OK);
+// }
 
 TEST_CASE("tcp_correct_xml_wrong_rpc")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
     REQUIRE(result == OK);
 
-    try
-    {
-        string reply = client.execute_payload(
-                "<testing/>"
-        );
-        REQUIRE(reply== "");
-    }
-    catch (YCPPError & e)
-    {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
-    }
-
-
+    string reply = client.execute_payload(
+            "<testing/>"
+    );
+    REQUIRE(NULL != strstr(reply.c_str(), "<rpc-error>"));
 
     REQUIRE(result == OK);
 }
 
 TEST_CASE("tcp_empty_rpc")
 {
-    NetconfTCPClient client{"vagrant", "vagrant", "127.0.0.1", 41631};
+    NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
 
     int result = client.connect();
@@ -450,34 +375,32 @@ TEST_CASE("tcp_empty_rpc")
     {
         REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
     }
-
-
     REQUIRE(result == OK);
 }
 
 // Timeout error
-// TEST_CASE("tcp_MultipleClients")
-// {
-//     NetconfTCPClient client1{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client2{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client3{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client4{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client5{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client6{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client7{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client8{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client9{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client10{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client11{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client12{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client13{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client14{"vagrant", "vagrant", "127.0.0.1", 41631};
-//     NetconfTCPClient client15{"vagrant", "vagrant", "127.0.0.1", 41631};
+TEST_CASE("tcp_multiple_clients")
+{
+    NetconfTCPClient client1{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client2{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client3{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client4{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client5{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client6{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client7{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client8{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client9{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client10{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client11{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client12{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client13{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client14{"admin", "admin", "127.0.0.1", 12307};
+    NetconfTCPClient client15{"admin", "admin", "127.0.0.1", 12307};
 
-//     int result = client1.connect() && client2.connect() && client3.connect() && client4.connect() && client5.connect()
-//          && client6.connect() && client7.connect() && client8.connect() && client9.connect() && client10.connect()
-//          && client11.connect() && client12.connect() && client13.connect() && client14.connect() && client15.connect();
-//     REQUIRE(result == 0);
+    int result = client1.connect() && client2.connect() && client3.connect() && client4.connect() && client5.connect()
+         && client6.connect()
+         && client7.connect() && client8.connect() && client9.connect() && client10.connect()
+         && client11.connect() && client12.connect() && client13.connect() && client14.connect() && client15.connect();
+    REQUIRE(result == 0);
 
-// }
-
+}

@@ -14,10 +14,8 @@
  limitations under the License.
 ------------------------------------------------------------------*/
 
-#include <algorithm>
 #include <cstdio>
 #include <map>
-#include <regex>
 #include <string.h>
 #include <sstream>
 #include <string>
@@ -37,50 +35,39 @@
 
 namespace ydk
 {
-static const long TIMEOUT = 600L;
+static const long TIMEOUT = 6000L;
 static const int EIGHT_K = 8196;
 
-static const std::string RPC_ERROR_PATH("/rpc-reply/rpc-error");
-
-static const char FRAMING_11[] = "]]>]]>";
-static const char FRAMING_10[] = "\n##\n";
+static const char EOM_10[] = "]]>]]>";
+static const char EOM_11[] = "\n##\n";
 static const char LF_HASH[] = "\n#";
 static const char LF[] = "\n";
 
+
+static const std::map<const std::string, const std::string> PATTERN_MAP{{"&quot;", "\""},
+                                                                       {"&amp;", "&"},
+                                                                       {"&apos;", "'"},
+                                                                       {"&lt;", "<"},
+                                                                       {"&gt;", ">"},
+                                                                       {"\n##\n", ""}};
+
+static const std::string NETCONF_11("urn:ietf:params:netconf:base:1.1");
+
 static const char *HELLO_11 = "\n<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
-                                   "<capabilities>\n"
-                                   "<capability>urn:ietf:params:netconf:base:1.1</capability>\n"
-                                   "</capabilities>\n"
-                                   "</hello>\n"
-                                   "]]>]]>";
+                              "<capabilities>\n"
+                              "<capability>urn:ietf:params:netconf:base:1.1</capability>\n"
+                              "</capabilities>\n"
+                              "</hello>\n"
+                              "]]>]]>";
 
-static const std::regex QUOT_P("&quot;");
-static const std::regex AMP_P("&amp");
-static const std::regex APOS_P("&apos");
-static const std::regex LT_P("&lt");
-static const std::regex GT_P("&gt");
-static const std::regex CHUNK_START_P("\n#[0-9]*\n");
-static const std::regex FRAMING_10_P(FRAMING_10);
 
-static const std::string QUOT("\"");
-static const std::string AMP("&");
-static const std::string APOS("'");
-static const std::string LT("<");
-static const std::string GT(">");
-static const std::string EMPTY("");
-
-static const std::map<const std::string, const std::regex> PATTERN_MAP{{QUOT, QUOT_P},
-                                                                       {AMP, AMP_P},
-                                                                       {APOS, APOS_P},
-                                                                       {LT, LT_P},
-                                                                       {GT, GT_P},
-                                                                       {EMPTY, CHUNK_START_P}};
-
-static std::string trim_reply(std::string& str);
 static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms);
 static bool ends_with_framing(const char* buf, size_t nread, int version);
+static void xml_to_string(xmlDocPtr doc, xmlNodePtr root, std::string &out);
 static xmlDocPtr get_xml_doc(const std::string &payload);
-static bool check_xml_doc(xmlNodePtr root, std::string cur_path, int max_lvl);
+static std::string trim_chunk(std::string str);
+static std::string trim_reply(std::string str);
+static void replace(std::string& subject, const std::string& search, const std::string& replace);
 
 
 NetconfTCPClient::NetconfTCPClient(std::string username, std::string password,
@@ -89,7 +76,6 @@ NetconfTCPClient::NetconfTCPClient(std::string username, std::string password,
       username(username), hostname(address), password(password), port(port), msgid(0)
 {
     initialize(address, port);
-    YLOG_INFO("Ready to communicate with {} via TCP", address);
 }
 
 NetconfTCPClient::~NetconfTCPClient()
@@ -122,8 +108,48 @@ void NetconfTCPClient::initialize_curl(std::string address, int port)
     check_ok(res, "Connection failed: {}");
 
     // get socket descriptor
+    // CURLINFO_LASTSOCKET is deprecated after curl >= 7.45.0 (470272)
+    #if LIBCURL_VERSION_NUM >= 470272
     res = curl_easy_getinfo(curl, CURLINFO_ACTIVESOCKET, &sockfd);
+    #else
+    res = curl_easy_getinfo(curl, CURLINFO_LASTSOCKET, &sockfd);
+    #endif
+
     check_ok(res, "Unable to retrieve sockfd: {}");
+}
+
+void NetconfTCPClient::init_capabilities()
+{
+    IetfCapabilitiesXmlParser xml_parser{};
+    IetfCapabilitiesParser capabilities_parser{};
+    server_capabilities = xml_parser.parse(hello_msg);
+
+    bool found = false;
+    for(auto const& cap: server_capabilities)
+    {
+        if (cap == NETCONF_11)
+        {
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        YLOG_ERROR("The device need to support NETCONF 1.1");
+        throw(YCPPClientError{"The device need to support NETCONF 1.1"});
+    }
+}
+
+std::vector<std::string> NetconfTCPClient::get_capabilities()
+{
+    return server_capabilities;
+}
+
+std::string NetconfTCPClient::get_hostname_port()
+{
+    std::ostringstream os;
+    os << hostname << ":" << port;
+    return os.str();
 }
 
 int NetconfTCPClient::connect()
@@ -155,28 +181,20 @@ int NetconfTCPClient::connect()
 
             if (ends_with_framing(buf, nread, 11))
             {
-                // required, send hello request back to device
                 send_value(HELLO_11, strlen(HELLO_11));
-                auto found = hello_ss.str().find(FRAMING_11);
+                auto found = hello_ss.str().find(EOM_10);
                 hello_msg = hello_ss.str().substr(0, found);
                 YLOG_DEBUG("Received hello message from device:\n{}", hello_msg);
                 break;
             }
         }
     }
-    YLOG_INFO("Finished TCP connection.");
+    YLOG_INFO("Ready to communicate with {} via TCP", hostname);
     init_capabilities();
 
     connected = true;
 
     return EXIT_SUCCESS;
-}
-
-void NetconfTCPClient::init_capabilities()
-{
-    IetfCapabilitiesXmlParser xml_parser{};
-    IetfCapabilitiesParser capabilities_parser{};
-    server_capabilities = xml_parser.parse(hello_msg);
 }
 
 std::string NetconfTCPClient::execute_payload(const std::string & payload)
@@ -192,130 +210,64 @@ std::string NetconfTCPClient::execute_payload(const std::string & payload)
 
 std::string NetconfTCPClient::recv()
 {
-    // TODO: check and parse every reply?
-    // TODO: raise exception for every rpc-error?
-    auto reply = recv_value();
-
-    if (reply.empty())
-    {
-        return reply;
-    }
-
-    auto rpc_reply = trim_reply(reply);
-    if(!check_rpc_reply(rpc_reply))
-    {
-        return rpc_reply;
-    }
-    else
-    {
-        YLOG_ERROR("Could not build payload");
-        throw(YCPPClientError{"Could not build payload"});
-    }
-
+    auto reply = trim_reply(trim_chunk(recv_value()));
+    return reply;
 }
 
-bool NetconfTCPClient::check_rpc_reply(std::string &reply)
+std::string NetconfTCPClient::recv_value()
 {
-    bool ret = false;
-    auto doc = get_xml_doc(reply);
-    auto root = xmlDocGetRootElement(doc);
+    std::stringstream ss;
+    char buf[EIGHT_K];
+    CURLcode res;
+    size_t nread = 0;
+    size_t total_read = 0;
+    bool found = false;
 
-    // check doc
-    std::string root_path("");
-    ret = check_xml_doc(root, root_path, 2);
-    xmlFreeDoc(doc);
-    return ret;
-}
-
-static bool check_xml_doc(xmlNodePtr root, std::string cur_path, int max_lvl)
-{
-
-    bool ret = false;
-    if (max_lvl <= 0)
+    for(;;)
     {
-        return ret;
-    }
-
-    int i;
-    std::string path;
-    xmlNodePtr node = NULL;
-
-    for(node = root, i = 0; node; node = node->next, i = i + 1)
-    {
-        path = cur_path;
-        path += "/";
-        path += reinterpret_cast<const char*>(node->name);
-        if (path == RPC_ERROR_PATH)
+        do
         {
-            return true;
+            found = false;
+            bzero(&buf, sizeof(buf));
+            nread = 0;
+            res = curl_easy_recv(curl, buf, sizeof(buf)-1, &nread);
+            buf[nread] = '\0';
+            ss << buf;
+            total_read += nread;
+            found = ends_with_framing(ss.str().c_str(), total_read, 10);
+        } while(!found
+                && !wait_on_socket(sockfd, 1, TIMEOUT));
+
+        if (nread == 0 && ss.str().size() != 0)
+        {
+            break;
         }
-        ret |= check_xml_doc(node->children, path, max_lvl-1);
+
+        if (ss.str().size() == 0)
+        {
+            // wait on socket
+            unsigned int sleep_time = 1000;
+            usleep(sleep_time);
+        }
+        else
+        {
+            check_ok(res, "TCP client error: {}");
+        }
+        YLOG_DEBUG("libcurl read {} bytes.\n", (curl_off_t)nread);
     }
-    return ret;
-}
-
-static xmlDocPtr get_xml_doc(const std::string &payload)
-{
-    xmlDocPtr doc;
-    YLOG_INFO("get_xml_doc: payload = {}", payload);
-    doc = xmlReadMemory(payload.c_str(), strlen(payload.c_str()), "noname.xml", NULL, 0);
-    if (doc == NULL) {
-        YLOG_ERROR("Could not build payload");
-        throw(YCPPClientError{"Could not build payload"});
-    }
-    return doc;
-}
-
-static void xml_to_string(xmlDocPtr doc, xmlNodePtr root, std::string &out)
-{
-    xmlBufferPtr buf = xmlBufferCreate();
-    if (buf != NULL)
-    {
-        xmlNodeDump(buf, doc, root, 0, 1);
-        std::string tmp{reinterpret_cast<char*>(buf->content)};
-        out = tmp;
-        xmlBufferFree(buf);
-    }
-}
-
-std::string NetconfTCPClient::add_message_id(const std::string &payload)
-{
-    msgid++;
-    char msg_id_str[16];
-    sprintf(msg_id_str, "%llu", msgid);
-
-    auto doc = get_xml_doc(payload);
-    auto cur = xmlDocGetRootElement(doc);
-    xmlNewProp(cur, (const xmlChar *) "message-id", (const xmlChar *) msg_id_str);
-
-    std::string new_payload;
-    xml_to_string(doc, cur, new_payload);
-    xmlFreeDoc(doc);
-
-    return new_payload;
+    YLOG_DEBUG("TCP client received {} bytes:\n{}", ss.str().length(), ss.str());
+    return ss.str();
 }
 
 void NetconfTCPClient::send(const std::string &payload)
 {
-    // add message id property to payload
+    // add message id to payload
     auto new_payload = add_message_id(payload);
-    YLOG_DEBUG("TCP client send payload:\n{}", new_payload);
+    YLOG_DEBUG("TCP client sent payload:\n{}", new_payload);
     // add chunk size
     std::ostringstream ss;
-    ss << LF_HASH << new_payload.size() << LF << new_payload << FRAMING_10;
+    ss << LF_HASH << new_payload.size() << LF << new_payload << EOM_11;
     send_value(ss.str().c_str(), ss.str().size());
-}
-
-std::vector<std::string> NetconfTCPClient::get_capabilities()
-{
-    return server_capabilities;
-}
-
-std::string NetconfTCPClient::get_hostname_port()
-{
-    std::ostringstream os;
-    os << hostname << ":" << port;
-    return os.str();
 }
 
 void NetconfTCPClient::send_value(const char* value, size_t value_len)
@@ -334,56 +286,27 @@ void NetconfTCPClient::send_value(const char* value, size_t value_len)
         } while (res == CURLE_AGAIN);
 
         check_ok(res, "TCP client error: {}");
-        YLOG_DEBUG("Sent {} bytes.\n", (curl_off_t)nsent);
+        YLOG_DEBUG("libcurl sent {} bytes.\n", (curl_off_t)nsent);
 
     } while (nsent_total < value_len &&wait_on_socket(sockfd, 0, TIMEOUT));
     YLOG_DEBUG("TCP client sent total {} bytes:\n{}", nsent_total, value);
 }
 
-std::string NetconfTCPClient::recv_value()
+std::string NetconfTCPClient::add_message_id(const std::string &payload)
 {
-    // wait on socket
-    unsigned int usecs = 100000;
-    usleep(usecs);
+    msgid++;
+    char msg_id_str[16];
+    sprintf(msg_id_str, "%llu", msgid);
 
-    std::stringstream ss;
-    char buf[EIGHT_K];
-    size_t nread;
-    CURLcode res;
-    bool found;
+    auto doc = get_xml_doc(payload);
+    auto cur = xmlDocGetRootElement(doc);
+    xmlNewProp(cur, (const xmlChar *) "message-id", (const xmlChar *) msg_id_str);
 
-    for(;;)
-    {
-        do
-        {
-            found = false;
-            bzero(&buf, sizeof(buf));
-            nread = 0;
-            res = curl_easy_recv(curl, buf, sizeof(buf)-1, &nread);
-            buf[nread] = '\0';
-            ss << buf;
-            // curl_easy_recv is not the basic socket recv block,
-            // buf might contain multiple messages, for example
-            // a <ok> message and a <rpc-reply>
-            found = ends_with_framing(buf, nread, 10);
+    std::string new_payload;
+    xml_to_string(doc, cur, new_payload);
+    xmlFreeDoc(doc);
 
-            if(found)
-            {
-                break;
-            }
-
-        } while(!wait_on_socket(sockfd, 1, TIMEOUT));
-
-        if (found || !nread)
-        {
-            break;
-        }
-
-        check_ok(res, "TCP client error: {}");
-    } // timeout?
-
-    YLOG_DEBUG("TCP client received {} bytes:\n{}", ss.str().length(), ss.str());
-    return ss.str();
+    return new_payload;
 }
 
 void NetconfTCPClient::check_ok(CURLcode res, const char* fmt)
@@ -432,33 +355,6 @@ static int wait_on_socket(curl_socket_t sockfd, int for_recv, long timeout_ms)
     return res;
 }
 
-static std::string trim_reply(std::string& str)
-{
-    // drop <ok> message if necessary
-    int cnt = 0;
-    std::size_t pos = str.find(FRAMING_10, 0);
-    while (pos != std::string::npos)
-    {
-        cnt ++;
-        pos = str.find(FRAMING_10, pos+1);
-    }
-
-    if(cnt == 2)
-    {
-        YLOG_DEBUG("TCP client dropped <ok> message, raw msg:\n {}", str);
-        str = str.substr(str.find(FRAMING_10, 0));
-    }
-
-    for (auto val: PATTERN_MAP)
-    {
-        str = std::regex_replace(str, val.second, val.first);
-    }
-    str = std::regex_replace(str, FRAMING_10_P, EMPTY);
-
-    YLOG_DEBUG("TCP client received reply:\n{}", str);
-    return str;
-}
-
 static bool ends_with_framing(const char* buf, size_t nread, int version)
 {
     const char* last_several = NULL;
@@ -466,14 +362,83 @@ static bool ends_with_framing(const char* buf, size_t nread, int version)
     if (version == 10)
     {
         last_several = &buf[nread-4];
-        framing = FRAMING_10;
+        framing = EOM_11;
     }
     else if(version == 11)
     {
         last_several = &buf[nread-6];
-        framing = FRAMING_11;
+        framing = EOM_10;
     }
     return strcmp(last_several, framing) == 0;
+}
+
+static xmlDocPtr get_xml_doc(const std::string &payload)
+{
+    xmlDocPtr doc;
+    doc = xmlReadMemory(payload.c_str(), strlen(payload.c_str()), "noname.xml", NULL, 0);
+    if (doc == NULL) {
+        YLOG_ERROR("Could not build payload");
+        throw(YCPPClientError{"Could not build payload"});
+    }
+    return doc;
+}
+
+static void xml_to_string(xmlDocPtr doc, xmlNodePtr root, std::string &out)
+{
+    xmlBufferPtr buf = xmlBufferCreate();
+    if (buf != NULL)
+    {
+        xmlNodeDump(buf, doc, root, 0, 1);
+        std::string tmp{reinterpret_cast<char*>(buf->content)};
+        out = tmp;
+        xmlBufferFree(buf);
+    }
+}
+
+static std::string trim_chunk(std::string str)
+{
+    std::string ret;
+    size_t start = 0;
+    size_t end = 0;
+    while((start = str.find('#', start)) && start != std::string::npos)
+    {
+        std::size_t num_end = str.find_first_not_of("0123456789", start+1);
+        if (num_end == std::string::npos || str[num_end] != '\n')
+        {
+            start = num_end+1;
+            if (num_end != std::string::npos && str[num_end] == '#')
+                start += 1;
+            end = start;
+            continue;
+        }
+        auto len = std::stoi(str.substr(start+1, num_end-start-1));
+        if(len)
+        {
+            ret.append(str.substr(num_end+1, len));
+        }
+        end = num_end+1+len;
+        start = end;
+    }
+    return ret;
+}
+
+static std::string trim_reply(std::string str)
+{
+    for (auto val: PATTERN_MAP)
+    {
+        replace(str, val.first, val.second);
+    }
+    return str;
+}
+
+static void replace(std::string& subject, const std::string& search, const std::string& replace)
+{
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos)
+    {
+         subject.replace(pos, search.size(), replace);
+         pos += replace.size();
+    }
 }
 
 }

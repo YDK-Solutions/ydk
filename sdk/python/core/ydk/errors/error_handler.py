@@ -18,6 +18,8 @@ import inspect
 import contextlib
 
 from ydk.errors import YPYError as _YPYError
+from ydk.errors import YPYCoreError as _YPYCoreError
+from ydk.errors import YPYCodecError as _YPYCodecError
 from ydk.errors import YPYClientError as _YPYClientError
 from ydk.errors import YPYIllegalStateError as _YPYIllegalStateError
 from ydk.errors import YPYInvalidArgumentError as _YPYInvalidArgumentError
@@ -32,6 +34,8 @@ if sys.version_info > (3, 0):
 
 
 _ERRORS = { "YCPPError": _YPYError,
+            "YCPPCoreError": _YPYCoreError,
+            "YCPPCodecError": _YPYCodecError,
             "YCPPClientError": _YPYClientError,
             "YCPPIllegalStateError": _YPYIllegalStateError,
             "YCPPInvalidArgumentError": _YPYInvalidArgumentError,
@@ -58,9 +62,9 @@ def handle_runtime_error():
         yield
     except RuntimeError as err:
         msg = str(err)
-        if ':' in msg:
-            etype_str, msg = msg.split(':', 1)
-            etype = _ERRORS.get(etype_str)
+        if ":" in msg:
+            etype_str, msg = msg.split(":", 1)
+            etype = _ERRORS.get(etype_str, _YPYError)
         else:
             etype = _YPYError
             msg = msg

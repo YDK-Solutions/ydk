@@ -64,10 +64,21 @@ func main() {
 
 	data := crud.Read(&provider, &bgp)
 
-	provider.Disconnect()
+    b := data.(*oc_bgp.Bgp)
+    b.Global.Config.As = 65001
 
-	if data != nil {
-		fmt.Println("\nData read successfully!\n")
-	}
+    if data != nil {
+        fmt.Println("\nData read successfully!\n")
+    }
+
+    result := crud.Create(&provider, b)
+
+    if result == true {
+        fmt.Println("\nOperation succeeded!\n")
+    } else {
+        fmt.Println("\nOperation failed!\n")
+    }
+
+	provider.Disconnect()
 
 }

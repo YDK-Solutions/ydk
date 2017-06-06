@@ -32,11 +32,11 @@ import (
 	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
-	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	//"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
 func config_bgp(bgp *oc_bgp.Bgp) {
-	bgp.Global.Config.As = types.Delete
+	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}

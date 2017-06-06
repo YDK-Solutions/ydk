@@ -123,7 +123,7 @@ def merge_file_path_segments(segs):
 
 
 def ispythonkeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent')
+    return keyword.iskeyword(word) or word in ('None', 'parent', 'exec')
 
 
 def iscppkeyword(word):

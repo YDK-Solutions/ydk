@@ -175,6 +175,8 @@ func (e YFilter) String() string {
 		return "merge"
 	case Create:
 		return "create"
+    case Remove:
+        return "remove"
 	case NotSet:
 		return ""
 	}

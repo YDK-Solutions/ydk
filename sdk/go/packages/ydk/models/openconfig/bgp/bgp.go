@@ -10,7 +10,6 @@ import (
 // Bgp
 //////////////////////////////////////////////////////////////////////////
 type Bgp struct {
-	parent types.Entity
 	Filter types.YFilter
 
 	Global BgpGlobal
@@ -47,11 +46,11 @@ func (bgp *Bgp) GetChildren() map[string]types.Entity {
 }
 
 func (bgp *Bgp) SetParent(parent types.Entity) {
-	bgp.parent = parent
+
 }
 
 func (bgp *Bgp) GetParent() types.Entity {
-	return bgp.parent
+	return nil
 }
 
 func (bgp *Bgp) GetAugmentCapabilitiesFunction() types.AugmentCapabilitiesFunction {

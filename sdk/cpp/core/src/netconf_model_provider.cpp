@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "errors.hpp"
-#include "netconf_client_base.hpp"
+#include "netconf_client.hpp"
 #include "netconf_model_provider.hpp"
 #include "types.hpp"
 #include "ydk_yang.hpp"
@@ -37,7 +37,7 @@ using namespace ydk;
 
 namespace ydk
 {
-NetconfModelProvider::NetconfModelProvider(NetconfClientBase & client)
+NetconfModelProvider::NetconfModelProvider(NetconfClient & client)
     : client(client)
 {
 }

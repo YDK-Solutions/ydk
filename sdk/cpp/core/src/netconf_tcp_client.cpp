@@ -70,9 +70,9 @@ static std::string trim_reply(std::string str);
 static void replace(std::string& subject, const std::string& search, const std::string& replace);
 
 
-NetconfTCPClient::NetconfTCPClient(std::string username, std::string password,
-                                   std::string address, int port)
-    : NetconfClientBase(),
+NetconfTCPClient::NetconfTCPClient(const std::string& username, const std::string& password,
+                                   const std::string& address, int port)
+    : NetconfClient(),
       username(username), hostname(address), password(password), port(port), msgid(0)
 {
     initialize(address, port);
@@ -84,12 +84,12 @@ NetconfTCPClient::~NetconfTCPClient()
     curl_global_cleanup();
 }
 
-void NetconfTCPClient::initialize(std::string address, int port)
+void NetconfTCPClient::initialize(const std::string& address, int port)
 {
     initialize_curl(address, port);
 }
 
-void NetconfTCPClient::initialize_curl(std::string address, int port)
+void NetconfTCPClient::initialize_curl(const std::string& address, int port)
 {
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();

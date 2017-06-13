@@ -138,8 +138,6 @@ function py_sanity_ydktest_install {
 function py_sanity_ydktest_test {
     print_msg "py_sanity_ydktest_test"
 
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
-
     cd $YDKGEN_HOME && cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "running import tests"
@@ -157,8 +155,8 @@ function py_sanity_ydktest_test {
 
     run_test sdk/python/core/tests/test_sanity_codec.py
 
-    py_sanity_ydktest_test_ncclient
     py_sanity_ydktest_test_tcp
+    py_sanity_ydktest_test_ncclient
 
     git checkout .
     export PYTHONPATH=
@@ -169,6 +167,7 @@ function py_sanity_ydktest_test {
 
 function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
     run_test sdk/python/core/tests/test_netconf_operations.py
     run_test sdk/python/core/tests/test_opendaylight.py
     run_test sdk/python/core/tests/test_restconf_provider.py
@@ -177,7 +176,7 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_sanity_filter_read.py
     run_test sdk/python/core/tests/test_sanity_filters.py
     run_test sdk/python/core/tests/test_sanity_levels.py
-    run_test sdk/python/core/tests/test_sanity_netconf.py --port 12022 --protocol ssh
+    run_test sdk/python/core/tests/test_sanity_netconf.py
     run_test sdk/python/core/tests/test_sanity_path.py
     run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
@@ -187,7 +186,6 @@ function py_sanity_ydktest_test_ncclient {
 
 function py_sanity_ydktest_test_tcp {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
-    init_tcp_server
     run_test sdk/python/core/tests/test_sanity_netconf.py --port 12307 --protocol tcp
 }
 
@@ -436,6 +434,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 init_rest_server
+init_tcp_server
 
 py_tests
 cpp_tests

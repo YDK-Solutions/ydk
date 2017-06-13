@@ -23,17 +23,17 @@
 #include <curl/curl.h>
 
 #include "errors.hpp"
-#include "netconf_client_base.hpp"
+#include "netconf_client.hpp"
 
 namespace ydk
 {
 
-class NetconfTCPClient : public NetconfClientBase
+class NetconfTCPClient : public NetconfClient
 {
 
 public:
-    NetconfTCPClient(std::string username, std::string password,
-                     std::string address, int port);
+    NetconfTCPClient(const std::string& username, const std::string& password,
+                     const std::string& address, int port);
     virtual ~NetconfTCPClient();
 
     int connect();
@@ -42,8 +42,8 @@ public:
     virtual std::string get_hostname_port();
 
 private:
-    void initialize(std::string address, int port);
-    void initialize_curl(std::string address, int port);
+    void initialize(const std::string& address, int port);
+    void initialize_curl(const std::string& address, int port);
     void init_capabilities();
 
     void check_ok(CURLcode res, const char* fmt);

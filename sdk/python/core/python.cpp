@@ -484,7 +484,7 @@ PYBIND11_PLUGIN(ydk_)
 
     class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, string address, string username, string password, int port, string protocol) {
+            [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, const string& address, const string& username, const string& password, int port, const string& protocol) {
                     new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port, protocol);
             },
             arg("repo"),
@@ -494,7 +494,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("port")=830,
             arg("protocol")=string("ssh"))
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port, string protocol) {
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, const string& protocol) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol);
             },
             arg("address"),
@@ -503,7 +503,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("port")=830,
             arg("protocol")=string("ssh"))
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, void* port, string protocol) {
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, void* port, const string& protocol) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol);
             },
             arg("address"),
@@ -512,7 +512,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("port")=nullptr,
             arg("protocol")=string("ssh"))
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port) {
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
             },
             arg("address"),
@@ -520,7 +520,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("password"),
             arg("port")=830)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password) {
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password);
             },
             arg("address"),

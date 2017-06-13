@@ -165,7 +165,6 @@ class SimpleProxyServer(socketserver.TCPServer):
         last_chunk = ""
         while True:
             last_chunk = request.recv(FOUR_k).decode('utf-8')
-            data.append(last_chunk)
             if not last_chunk:
                 request.close()
                 self.reset_confd = True
@@ -173,6 +172,8 @@ class SimpleProxyServer(socketserver.TCPServer):
             elif last_chunk.endswith(eom):
                 data.append(last_chunk)
                 break
+            data.append(last_chunk)
+
         data = ''.join(data)
         self.logger.debug("Receiving...\n\t{}".format(data))
         return data

@@ -136,6 +136,10 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 	if entity == nil {
 		return nil
 	}
+    for parent := entity.GetParent(); parent != nil; parent = parent.GetParent() {
+        entity = parent
+    }
+
 	root_path := entity.GetEntityPath(nil)
 	path := C.CString(root_path.Path)
 	defer C.free(unsafe.Pointer(path))

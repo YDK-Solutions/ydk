@@ -187,6 +187,7 @@ function py_sanity_ydktest_test_ncclient {
 
 function py_sanity_ydktest_test_tcp {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    init_tcp_server
     run_test sdk/python/core/tests/test_sanity_netconf.py --port 12307 --protocol tcp
 }
 
@@ -435,7 +436,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 init_rest_server
-init_tcp_server
 
 py_tests
 cpp_tests

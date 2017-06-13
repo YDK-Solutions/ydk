@@ -224,8 +224,8 @@ class SanityNetconf(ParametrizedTestCase):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='NETCONF test')
-    parser.add_argument('--port', dest='port', help='port number')
-    parser.add_argument('--protocol', dest='protocol', help='protocol')
+    parser.add_argument('--port', dest='port', type=int, default=12022, help='port number')
+    parser.add_argument('--protocol', dest='protocol', default='ssh', help='protocol')
 
     args = parser.parse_args()
     port = int(args.port)

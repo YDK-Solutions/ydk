@@ -32,6 +32,20 @@ class YPYError(Exception):
     def __str__(self):
         return self.__repr__()
 
+class YPYCoreError(YPYError):
+    """
+    Exception for core error
+    """
+    def __init__(self, error_msg):
+        super(YPYCoreError, self).__init__(error_msg)
+
+
+class YPYCodecError(YPYError):
+    """
+    Exception for Codec Error
+    """
+    def __init__(self, error_msg):
+        super(YPYCodecError, self).__init__(error_msg)
 
 class YPYClientError(YPYError):
     """

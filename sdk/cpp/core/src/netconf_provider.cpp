@@ -29,7 +29,8 @@
 #include "entity_data_node_walker.hpp"
 #include "errors.hpp"
 #include "ietf_parser.hpp"
-#include "netconf_client.hpp"
+#include "netconf_ssh_client.hpp"
+#include "netconf_tcp_client.hpp"
 #include "netconf_provider.hpp"
 #include "netconf_model_provider.hpp"
 #include "types.hpp"
@@ -61,22 +62,40 @@ static string get_netconf_payload(path::DataNode & input, string data_tag, strin
 static std::shared_ptr<path::DataNode> handle_read_reply(string reply, path::RootSchemaNode & root_schema);
 
 const char* CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
+const string PROTOCOL_SSH = "ssh";
+const string PROTOCOL_TCP = "tcp";
 
-NetconfServiceProvider::NetconfServiceProvider(string address, string username, string password, int port)
-    : client(make_unique<NetconfClient>(username, password, address, port)),
-      model_provider(make_unique<NetconfModelProvider>(*client))
+NetconfServiceProvider::NetconfServiceProvider(const string& address, const string& username, const string& password, int port, const string& protocol)
 {
+    initialize_client(address, username, password, port, protocol);
     path::Repository repo;
     initialize(repo);
-    YLOG_INFO("Connected to {} on port {} using ssh", address, port);
+    YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }
 
-NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo, string address, string username, string password, int port)
-    : client(make_unique<NetconfClient>(username, password, address, port)),
-      model_provider(make_unique<NetconfModelProvider>(*client))
+NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo, const string& address, const string& username, const string& password, int port, const string& protocol)
 {
+    initialize_client(address, username, password, port, protocol);
     initialize(repo);
-    YLOG_INFO("Connected to {} on port {} using ssh", address, port);
+    YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
+}
+
+void NetconfServiceProvider::initialize_client(const string& address, const string& username, const string& password, int port, const string& protocol)
+{
+    if (protocol.compare(PROTOCOL_SSH) == 0)
+    {
+        client = make_unique<NetconfSSHClient>(username, password, address, port);
+    }
+    else if (protocol.compare(PROTOCOL_TCP) == 0)
+    {
+        client = make_unique<NetconfTCPClient>(username, password, address, port);
+    }
+    else
+    {
+        YLOG_ERROR("Protocol {} not supported.", protocol);
+        throw(YCPPOperationNotSupportedError{"Protocol is not supported!"});
+    }
+    model_provider = make_unique<NetconfModelProvider>(*client);
 }
 
 void NetconfServiceProvider::initialize(path::Repository & repo)

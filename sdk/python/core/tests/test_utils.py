@@ -19,6 +19,7 @@
 Utility function for test cases.
 """
 import re
+import unittest
 
 def assert_with_error(pattern, ErrorClass):
     def assert_with_pattern(func):
@@ -30,3 +31,27 @@ def assert_with_error(pattern, ErrorClass):
                 self.assertEqual(res is not None, True)
         return helper
     return assert_with_pattern
+
+
+class ParametrizedTestCase(unittest.TestCase):
+    """ TestCase classes that want to be parametrized should
+        inherit from this class.
+    """
+    def __init__(self, methodName='runTest', port=12022, protocol='ssh'):
+        super(ParametrizedTestCase, self).__init__(methodName)
+        self.port = port
+        self.protocol = protocol
+
+    @staticmethod
+    def parametrize(testcase_klass, port=12022, protocol='ssh'):
+        """ Create a suite containing all tests taken from the given
+            subclass, passing them the parameter 'param'.
+        """
+        testloader = unittest.TestLoader()
+        testcase_klass.port = port
+        testcase_klass.protocol = protocol
+        testnames = testloader.getTestCaseNames(testcase_klass)
+        suite = unittest.TestSuite()
+        for name in testnames:
+            suite.addTest(testcase_klass(name))
+        return suite

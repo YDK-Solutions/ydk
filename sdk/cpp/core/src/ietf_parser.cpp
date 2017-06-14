@@ -27,6 +27,18 @@ using namespace std;
 
 namespace ydk
 {
+
+static const xmlNodePtr drop_hello_tag(xmlNodePtr root)
+{
+    auto cur = root->xmlChildrenNode;
+    while (cur != NULL)
+    {
+        if ((!xmlStrcmp(cur->name, (const xmlChar *) "capabilities")))
+            return cur;
+        cur = cur->next;
+    }
+    return root;
+}
 //////////////////////////////////////////
 //// IetfCapabilitiesXmlParser
 //////////////////////////////////////////
@@ -59,6 +71,10 @@ vector<string> IetfCapabilitiesXmlParser::parse(const string & capabilities_buff
         YLOG_INFO("Empty capabilities");
         return {};
     }
+
+    // drop hello
+    cur = drop_hello_tag(cur);
+
     if (xmlStrcmp(cur->name, (const xmlChar *) "capabilities") != 0)
     {
         YLOG_INFO("Unexpected XML");

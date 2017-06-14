@@ -3,7 +3,7 @@
 NETCONF operations
 ==================
 
-This document explains how to use :py:class:`YOperation<ydk.types.YOperation>` as defined under netconf
+This document explains how to use :py:class:`YFilter<ydk.filters.YFilter>` as defined under netconf
 edit-config operation attribute in
 `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_. This guide
 assumes you have ``core`` and ``openconfig`` bundle installed(see :ref:`howto-install`).
@@ -15,7 +15,7 @@ Let's instantiate an instance of the service provider that creates a NETCONF ses
 .. code-block:: python
     :linenos:
 
-    from ydk.types import YOperation
+    from ydk.types import YFilter
     from ydk.services import CRUDService
     from ydk.providers import NetconfServiceProvider
     from ydk.models.openconfig import openconfig_bgp as oc_bgp
@@ -68,7 +68,7 @@ Then create a helper function to return YDK object with bgp configurations:
     The configuration above is truncated from one of `ydk-py sample apps <https://github.com/CiscoDevNet/ydk-py-samples/blob/5382b1dc4ae6998f34e702b37799d98cf4ede2c7/samples/basic/crud/models/openconfig/openconfig-bgp/nc-create-oc-bgp-40-ydk.py>`_,
     you can explore more than 500 apps at `ydk-py-samples <https://github.com/CiscoDevNet/ydk-py-samples>`_!
 
-Let's use :py:meth:`CRUDService<ydk.services.CRUDService.create>` to create configuration:
+Let's use :py:class:`CRUDService create<ydk.services.CRUDService>` to create configuration:
 
 .. code-block:: python
     :linenos:
@@ -78,7 +78,7 @@ Let's use :py:meth:`CRUDService<ydk.services.CRUDService.create>` to create conf
     config_bgp(bgp_cfg)
     crud.create(provider, bgp_cfg)
 
-After configuration is created, let's use :py:attr:`YOperation.replace<ydk.types.YOperation.replace>` and :py:meth:`CRUDService<ydk.services.CRUDService.update>` to udpate configuration:
+After configuration is created, let's use :py:attr:`YFilter.replace<ydk.filters.YFilter.replace>` and :py:class:`CRUDService update<ydk.services.CRUDService>` to udpate configuration:
 
 .. code-block:: python
     :linenos:
@@ -86,7 +86,7 @@ After configuration is created, let's use :py:attr:`YOperation.replace<ydk.types
 
     bgp_cfg.neighbors.neighbor[0].config.neighbor_address = "172.16.255.3"
     bgp_cfg.neighbors.neighbor[0].neighbor_address = "172.16.255.3"
-    bgp_cfg.neighbors.neighbor[0].operation = YOperation.replace
+    bgp_cfg.neighbors.neighbor[0].operation = YFilter.replace
     crud.update(provider, bgp_cfg)
 
 
@@ -154,3 +154,5 @@ With logging enabled(see :ref:`howto-logging`), we can see the CRUD update paylo
     </config>
     </edit-config>
     </rpc>
+
+To achieve functionalities other than ``replace``, check out documentation for :py:class:`YFilter<ydk.filters.YFilter>`.

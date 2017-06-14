@@ -120,7 +120,7 @@ YDK types
 \
     .. py:attribute:: operation
 
-        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
+        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
 
 .. class:: YLeaf
 
@@ -128,7 +128,7 @@ YDK types
 \
     .. py:attribute:: operation
 
-        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.types.YOperation>`, see :ref:`netconf-operations`.
+        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
 
     .. py:method:: \__init\__(self, leaf_type, name)
 
@@ -325,11 +325,13 @@ An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifica
   :linenos:
   :lineno-start: 1
 
+  from ydk.filters import YFilter
+
   # Instantiate a bgp object representing the bgp container from the openconfig-bgp YANG model
   bgp = ydk.models.openconfig_bgp.Bgp()
 
   # Indicate that the `as number` is desried to be read
-  bgp.config.as_.operation = YOperation.read
+  bgp.config.as_.operation = YFilter.read
 
   # Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1
   CrudService crud_service{};

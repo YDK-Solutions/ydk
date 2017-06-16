@@ -87,11 +87,12 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         test_output_dir = self.initialize_output_directory(
             '%s/%s' % (self.test_dir, sub))
 
-        # RST Documentation
         self._print_python_module(package, index, module_dir, size, sub)
         self._print_meta_module(package, meta_dir)
         if self.generate_tests:
             self._print_tests(package, test_output_dir)
+
+        # RST Documentation
         if self.ydk_doc_dir is not None:
             self._print_python_rst_module(package)
 

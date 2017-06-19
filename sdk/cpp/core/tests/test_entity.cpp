@@ -84,7 +84,16 @@ class TestEntity:public Entity
         return nullptr;
     }
 
-    void set_value(const std::string & name1, std::string value)
+    bool has_leaf_or_child_of_name(const std::string & name) const override
+    {
+        return false;
+    }
+
+    void set_filter(const std::string & name1, YFilter yfilter)
+    {
+    }
+
+    void set_value(const std::string & name1, const std::string & value, const std::string & value1, const std::string & value2)
     {
         if(name1 == "name")
         {
@@ -118,6 +127,11 @@ class TestEntity:public Entity
         bool has_data() const
         {
             return child_val.is_set;
+        }
+
+        bool has_leaf_or_child_of_name(const std::string & name) const override
+        {
+            return false;
         }
 
         bool has_operation() const
@@ -161,7 +175,11 @@ class TestEntity:public Entity
             return children;
         }
 
-        void set_value(const std::string & leaf_name, std::string value)
+        void set_filter(const std::string & name1, YFilter yfilter)
+        {
+        }
+
+        void set_value(const std::string & leaf_name, const std::string & value, const std::string & value1, const std::string & value2)
         {
             if(leaf_name == "child-val")
             {
@@ -191,6 +209,11 @@ class TestEntity:public Entity
                 return false;
             }
 
+            bool has_leaf_or_child_of_name(const std::string & name) const override
+            {
+                return false;
+            }
+
             std::string get_segment_path() const
             {
                 return "multi-child[child-key='"+child_key.get()+"']";
@@ -212,7 +235,11 @@ class TestEntity:public Entity
                 return children;
             }
 
-            void set_value(const std::string& leaf_name, std::string value)
+            void set_filter(const std::string & name1, YFilter yfilter)
+            {
+            }
+
+            void set_value(const std::string& leaf_name, const std::string & value, const std::string & value2, const std::string & value3)
             {
                 if(leaf_name == "child-key")
                 {
@@ -237,9 +264,9 @@ TEST_CASE("test_create")
     TestEntity test{};
     string test_value = "value for test";
     EntityPath expected {"test",
-                            {{"name", {test_value, YFilter::not_set, true}},
-                             {"enabled", {"true", YFilter::not_set, true}},
-                             {"bits-field", {"bit1 bit2", YFilter::not_set, true}}}};
+                            {{"name", {test_value, YFilter::not_set, true, "", ""}},
+                             {"enabled", {"true", YFilter::not_set, true, "", ""}},
+                             {"bits-field", {"bit1 bit2", YFilter::not_set, true, "", ""}}}};
 
     REQUIRE(test.get_entity_path(nullptr).path == "test");
     REQUIRE(test.has_data() == false);
@@ -353,13 +380,13 @@ TEST_CASE("test_read")
     REQUIRE(test.get_entity_path(nullptr).path == "test");
     REQUIRE(test.has_data() == false);
 
-    test.set_value("name", "test test");
+    test.set_value("name", "test test", "", "");
     REQUIRE(test.has_data() == true);
 
     auto child = test.get_child_by_name("child", "");
     REQUIRE(child != nullptr);
 
-    child->set_value("child-val", "123");
+    child->set_value("child-val", "123", "", "");
     REQUIRE(child->has_data() == true);
 }
 
@@ -370,7 +397,7 @@ TEST_CASE("test_multi_create")
     REQUIRE(test.get_entity_path(nullptr).path == "test");
     REQUIRE(test.has_data() == false);
 
-    test.set_value("name", "test test");
+    test.set_value("name", "test test", "", "");
     REQUIRE(test.has_data() == true);
 
     auto mchild = test.child->get_child_by_name("multi-child", "");
@@ -384,7 +411,7 @@ TEST_CASE("test_multi_read")
     REQUIRE(test.get_entity_path(nullptr).path == "test");
     REQUIRE(test.has_data() == false);
 
-    test.set_value("name", "test test");
+    test.set_value("name", "test test", "", "");
     REQUIRE(test.has_data() == true);
 
     auto mchild = make_shared<TestEntity::Child::MultiChild>();

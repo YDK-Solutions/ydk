@@ -258,7 +258,7 @@ std::vector<std::pair<std::string, LeafData> > YLeafList::get_name_leafdata() co
         name_values.push_back(
                             {
                                 (value.get_name_leafdata().first+"[.='"+value.get()+"']"),
-                                {"", yfilter, value.is_set}
+                                {"", yfilter, value.is_set, value.value_namespace, value.value_namespace_prefix}
                             }
                             );
     }

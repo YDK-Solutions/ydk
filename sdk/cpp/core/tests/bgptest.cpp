@@ -53,7 +53,7 @@ public:
 
     std::shared_ptr<ydk::path::DataNode> invoke(ydk::path::Rpc& rpc) const
     {
-        ydk::path::CodecService s{};
+        ydk::path::Codec s{};
 
         std::cout << s.encode(rpc.input(), ydk::EncodingFormat::XML, true) << std::endl;
 
@@ -233,7 +233,7 @@ TEST_CASE( "bgp" )
 
     auto & neighbor_enabled = neighbor_af.create("config/enabled","true");
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
 
     //XML Codec Test
@@ -333,7 +333,7 @@ TEST_CASE( "decode_remove_as" )
 
     auto & schema = sp.get_root_schema();
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     //XML Codec Test
     auto xml = "<bgp xmlns=\"http://openconfig.net/yang/bgp\"><neighbors><neighbor><neighbor-address>1.2.3.4</neighbor-address><config><neighbor-address>1.2.3.4</neighbor-address><remove-private-as xmlns:oc-bgp-types=\"http://openconfig.net/yang/bgp-types\">oc-bgp-types:PRIVATE_AS_REMOVE_ALL</remove-private-as></config></neighbor></neighbors></bgp>";
@@ -352,7 +352,7 @@ TEST_CASE( "bits_order" )
 {
     std::string searchdir{TEST_HOME};
     mock::MockServiceProvider sp{searchdir, test_openconfig};
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & schema = sp.get_root_schema();
 
@@ -372,7 +372,7 @@ TEST_CASE( "submodule" )
 {//TODO fix issue with submodule
 //    std::string searchdir{TEST_HOME};
 //    mock::MockServiceProvider sp{searchdir, test_openconfig};
-//    ydk::path::CodecService s{};
+//    ydk::path::Codec s{};
 //
 //    std::unique_ptr<ydk::path::RootSchemaNode> schema{sp.get_root_schema()};
 //

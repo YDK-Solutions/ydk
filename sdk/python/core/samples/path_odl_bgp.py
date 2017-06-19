@@ -16,7 +16,7 @@
 # ------------------------------------------------------------------
 
 from ydk_.providers import OpenDaylightServiceProvider
-from ydk_.path import Repository, CodecService
+from ydk_.path import Repository, Codec
 from ydk_.types import EncodingFormat
 
 
@@ -35,6 +35,6 @@ if __name__ == "__main__":
     repo = Repository("/Users/abhirame/Cisco/odl/distribution-karaf-0.5.2-Boron-SR2/cache/schema")
     o = OpenDaylightServiceProvider(repo,'127.0.0.1', 'admin','admin', 8181, EncodingFormat.XML)
     provider = o.get_node_provider('xr')
-    codec = CodecService()
+    codec = Codec()
     run(codec, provider)
 

@@ -65,8 +65,9 @@ class ClassInitsPrinter(object):
 
     def _print_class_inits_body(self, clazz, leafs, children):
         if clazz.is_identity():
-            arg = '"%s:%s"' % (clazz.module.arg, clazz.stmt.arg)
-            line = 'super(%s, self).__init__(%s)' % (clazz.name, arg)
+            ns = clazz.module.search_one('namespace')
+            assert ns is not None
+            line = 'super(%s, self).__init__("%s", "%s", "%s:%s")' % (clazz.name, ns.arg, clazz.module.arg, clazz.module.arg, clazz.stmt.arg)
             self.ctx.writeln(line)
         else:
             self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())

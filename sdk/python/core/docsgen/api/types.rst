@@ -321,7 +321,7 @@ Examples of appending values to leaf-lists are shown below:
 
 An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifically, the `as number` leaf) under :cpp:class:`openconfig BGP<ydk::openconfig_bgp::Bgp>` is shown below
 
-.. code-block:: c++
+.. code-block:: python
   :linenos:
   :lineno-start: 1
 

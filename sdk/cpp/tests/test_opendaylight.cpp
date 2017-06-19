@@ -24,9 +24,10 @@
 #include "catch.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
-using namespace ydk::openconfig_bgp;
+using namespace ydktest::openconfig_bgp;
 
 TEST_CASE("ReadODL")
 {

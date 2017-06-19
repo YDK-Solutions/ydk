@@ -28,7 +28,7 @@ using namespace std;
 namespace ydk
 {
 
-static const xmlNodePtr drop_hello_tag(xmlNodePtr root)
+static xmlNodePtr drop_hello_tag(xmlNodePtr root)
 {
     auto cur = root->xmlChildrenNode;
     while (cur != NULL)

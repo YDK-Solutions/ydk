@@ -25,7 +25,7 @@ import unittest
 from ydk.providers import RestconfServiceProvider
 from ydk.types import EncodingFormat
 from ydk.path import Repository
-from ydk.path import CodecService
+from ydk.path import Codec
 
 from test_utils import assert_with_error
 
@@ -55,7 +55,7 @@ class SanityTest(unittest.TestCase):
         runner = root_schema.create('ydktest-sanity:runner', '')
 
         delete_rpc = root_schema.rpc('ydk:delete')
-        codec_service = CodecService()
+        codec_service = Codec()
 
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         delete_rpc.input().create('entity', json)

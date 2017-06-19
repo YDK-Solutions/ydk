@@ -23,6 +23,7 @@
 
 using namespace ydk;
 using namespace std;
+
 #define NC_VERB_VERBOSE 2
 
 TEST_CASE("xr")

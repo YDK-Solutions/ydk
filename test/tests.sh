@@ -365,6 +365,7 @@ function py_tests {
 
 function cpp_tests {
     init_env "python" "python"
+    cpp_sanity_core_gen_install
     cpp_sanity_core_test
     cpp_sanity_ydktest
     teardown_env
@@ -436,8 +437,8 @@ cd $DIR/..
 init_rest_server
 init_tcp_server
 
-py_tests
 cpp_tests
+py_tests
 # test_gen_tests
 cd $YDKGEN_HOME
 print_msg "gathering cpp coverage"

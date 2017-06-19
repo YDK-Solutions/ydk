@@ -44,6 +44,7 @@ logging_callback get_logging_callback(const char* level)
     if(!strcmp(level, warn)) { return ydk_logging_warn_function; }
     if(!strcmp(level, error)) { return ydk_logging_error_function; }
     if(!strcmp(level, critical)) { return ydk_logging_critical_function; }
+    return nullptr;
 }
 
 }

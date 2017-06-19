@@ -10,7 +10,7 @@ using namespace ydk;
 class TestIdentity1 : public Identity
 {
   public:
-    TestIdentity1() : Identity("test-identity")
+    TestIdentity1() : Identity("http://test.com", "test", "test-identity")
     {
     }
 };
@@ -103,6 +103,8 @@ TEST_CASE("test_identity")
     test_value = TestIdentity1{};
     INFO(test_value.get());
     REQUIRE(test_value.get()=="test-identity");
+    REQUIRE(test_value.value_namespace=="http://test.com");
+    REQUIRE(test_value.value_namespace_prefix=="test");
 }
 
 TEST_CASE("test_enum_")

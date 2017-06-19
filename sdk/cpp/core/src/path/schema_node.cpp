@@ -105,7 +105,7 @@ ydk::path::SchemaNodeImpl::find(const std::string& path) const
     if(path.at(0) == '/')
     {
         YLOG_ERROR("path must be a relative path");
-    throw(YCPPInvalidArgumentError{"path must be a relative path"});
+        throw(YCPPInvalidArgumentError{"path must be a relative path"});
     }
 
     std::vector<SchemaNode*> ret;
@@ -151,11 +151,24 @@ ydk::path::SchemaNodeImpl::root() const noexcept
     }
 }
 
+static bool is_submodule(lys_node* node)
+{
+    return node->module->type;
+}
+
 ydk::path::Statement
 ydk::path::SchemaNodeImpl::statement() const
 {
     Statement s{};
     s.arg = m_node->name;
+    if(is_submodule(m_node))
+    {
+        s.name_space = ((lys_submodule*)m_node->module)->belongsto->ns;
+    }
+    else
+    {
+        s.name_space = m_node->module->ns;
+    }
 
     switch(m_node->nodetype) {
     case LYS_CONTAINER:

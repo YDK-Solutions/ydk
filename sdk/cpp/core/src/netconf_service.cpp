@@ -346,7 +346,7 @@ static std::string get_data_payload(Entity & entity, path::RootSchemaNode & root
     while(dn!= nullptr && dn->parent()!=nullptr)
         dn = dn->parent();
 
-    path::CodecService codec{};
+    path::Codec codec{};
     return codec.encode(*dn, ydk::EncodingFormat::XML, true);
 }
 

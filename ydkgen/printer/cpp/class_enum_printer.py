@@ -70,7 +70,7 @@ class EnumPrinter(object):
         self._print_enum_trailer(enum_class)
 
     def _print_enum_header(self, enum_class):
-        self.ctx.writeln('class %s : public Enum' % enum_class.qualified_cpp_name())
+        self.ctx.writeln('class %s : public ydk::Enum' % enum_class.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
         self.ctx.writeln('public:')
@@ -84,7 +84,7 @@ class EnumPrinter(object):
             self._print_enum_literal(enum_literal)
 
     def _print_enum_literal(self, enum_literal):
-        self.ctx.writeln('static const Enum::YLeaf %s;' % (enum_literal.name))
+        self.ctx.writeln('static const ydk::Enum::YLeaf %s;' % (enum_literal.name))
 
     def _print_enum_trailer(self, enum_class):
         self.ctx.lvl_dec()

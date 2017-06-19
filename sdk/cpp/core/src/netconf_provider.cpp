@@ -169,7 +169,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_edit(path::Rpc& y
 
 std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_netconf_operation(path::Rpc& ydk_rpc) const
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
     auto netconf_payload = codec_service.encode(ydk_rpc.input(), EncodingFormat::XML, true);
     std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"};
     netconf_payload = payload + netconf_payload + "</rpc>";
@@ -292,7 +292,7 @@ static void create_input_source(path::DataNode & input, bool config)
 static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
         path::Rpc & rpc, path::Annotation & annotation)
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
     auto entity = rpc.input().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
@@ -337,7 +337,7 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
 
 static string get_netconf_payload(path::DataNode & input, string data_tag, string data_value)
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
     input.create(data_tag, data_value);
 
     std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"};
@@ -381,7 +381,7 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
 
 static std::shared_ptr<path::DataNode> handle_read_reply(string reply, path::RootSchemaNode & root_schema)
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
     auto empty_data = reply.find("<data/>");
     if(empty_data != std::string::npos)
     {

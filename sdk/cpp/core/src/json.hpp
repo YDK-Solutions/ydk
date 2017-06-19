@@ -12147,7 +12147,7 @@ basic_json_parser_66:
     be resolved successfully in the current JSON value; example: `"key baz
     not found"`
     @throw invalid_argument if the JSON patch is malformed (e.g., mandatory
-    attributes are missing); example: `"yfilter add must have member path"`
+    attributes are missing); example: `"operation add must have member path"`
 
     @complexity Linear in the size of the JSON value and the length of the
     JSON patch. As usually only a fraction of the JSON value is affected by
@@ -12201,7 +12201,7 @@ basic_json_parser_66:
             return patch_operations::invalid;
         };
 
-        // wrapper for "add" yfilter; add value at ptr
+        // wrapper for "add" operation; add value at ptr
         const auto operation_add = [&result](json_pointer & ptr, basic_json val)
         {
             // adding to the root of the target document means replacing it
@@ -12265,7 +12265,7 @@ basic_json_parser_66:
             }
         };
 
-        // wrapper for "remove" yfilter; remove value at ptr
+        // wrapper for "remove" operation; remove value at ptr
         const auto operation_remove = [&result](json_pointer & ptr)
         {
             // get reference to parent of JSON pointer ptr
@@ -12303,7 +12303,7 @@ basic_json_parser_66:
         // iterate and apply th eoperations
         for (const auto& val : json_patch)
         {
-            // wrapper to get a value for an yfilter
+            // wrapper to get a value for an operation
             const auto get_value = [&val](const std::string & op,
                                           const std::string & member,
                                           bool string_type) -> basic_json&
@@ -12312,7 +12312,7 @@ basic_json_parser_66:
                 auto it = val.m_value.object->find(member);
 
                 // context-sensitive error message
-                const auto error_msg = (op == "op") ? "yfilter" : "yfilter '" + op + "'";
+                const auto error_msg = (op == "op") ? "operation" : "operation '" + op + "'";
 
                 // check if desired value is present
                 if (it == val.m_value.object->end())
@@ -12370,9 +12370,9 @@ basic_json_parser_66:
                     // the "from" location must exist - use at()
                     basic_json v = result.at(from_ptr);
 
-                    // The move yfilter is functionally identical to a
-                    // "remove" yfilter on the "from" location, followed
-                    // immediately by an "add" yfilter at the target
+                    // The move operation is functionally identical to a
+                    // "remove" operation on the "from" location, followed
+                    // immediately by an "add" operation at the target
                     // location with the value that was just removed.
                     operation_remove(from_ptr);
                     operation_add(ptr, v);
@@ -12416,7 +12416,7 @@ basic_json_parser_66:
                 {
                     // op must be "add", "remove", "replace", "move", "copy", or
                     // "test"
-                    JSON_THROW(std::invalid_argument("yfilter value '" + op + "' is invalid"));
+                    JSON_THROW(std::invalid_argument("operation value '" + op + "' is invalid"));
                 }
             }
         }

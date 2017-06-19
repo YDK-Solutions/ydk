@@ -56,9 +56,9 @@ void test_bgp_create()
     neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
     neighbor_af.create("config/enabled","true");
 
-    ydk::path::CodecService s {};
+    ydk::path::Codec s {};
     auto xml = s.encode(bgp, ydk::EncodingFormat::XML, true);
-    // auto json = s.encode(bgp, ydk::path::CodecService::Format::JSON, true);
+    // auto json = s.encode(bgp, ydk::path::Codec::Format::JSON, true);
 
     std::cout << "Testing encoding" << std::endl;
 

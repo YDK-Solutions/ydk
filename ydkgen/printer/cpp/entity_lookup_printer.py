@@ -20,6 +20,7 @@ entity_lookup_printer.py
  Prints top entity lookup map
 
 """
+from ydkgen.api_model import Class
 from ydkgen.common import snake_case, get_include_guard_name
 from ydkgen.printer.file_printer import FilePrinter
 
@@ -34,10 +35,14 @@ class EntityLookUpPrinter(FilePrinter):
     def print_header(self, bundle_name):
         self.bundle_name = bundle_name
         self._print_include_guard_header(get_include_guard_name('entity_lookup'))
-        self.ctx.writeln('namespace ydk')
+        self.ctx.writeln('#include <map>')
+        self.ctx.writeln('#include <string>')
+        self.ctx.bline()
+        self.ctx.writeln('namespace %s' % bundle_name)
         self.ctx.writeln('{')
         self.ctx.bline()
         self.ctx.writeln("void {}_augment_lookup_tables();".format(snake_case(self.bundle_name)))
+        self.ctx.writeln("extern std::map<std::pair<std::string, std::string>, std::string> {0}_namespace_identity_lookup;".format(snake_case(self.bundle_name)))
         self.ctx.bline()
         self.ctx.writeln('}')
         self._print_include_guard_trailer(get_include_guard_name('entity_lookup'))
@@ -50,6 +55,8 @@ class EntityLookUpPrinter(FilePrinter):
         self._init_insert_stmts(packages)
         self._print_headers()
         self._print_capabilities_lookup_func()
+        self._print_namespace_identity_lookup(packages)
+        self.ctx.writelns('}\n')
 
     def _init_headers(self, packages):
         unique_headers = set()
@@ -88,7 +95,7 @@ class EntityLookUpPrinter(FilePrinter):
 
     def _print_capabilities_lookup_func_header(self):
         self.ctx.bline()
-        self.ctx.writeln('namespace ydk')
+        self.ctx.writeln('namespace %s' % self.bundle_name)
         self.ctx.writeln('{')
         self.ctx.bline()
         self.ctx.writelns(["void {}_augment_lookup_tables()".format(snake_case(self.bundle_name)),
@@ -104,11 +111,39 @@ class EntityLookUpPrinter(FilePrinter):
         self.ctx.bline()
 
     def _print_push_back_statement(self, module_name, revision):
-        self.ctx.writeln("ydk_global_capabilities.push_back("
-                         "path::Capability{std::string{\"%s\"},"
+        self.ctx.writeln("ydk::ydk_global_capabilities.push_back("
+                         "ydk::path::Capability{std::string{\"%s\"},"
                          "\"%s\", {}, {}});"
                          % (module_name, revision))
 
     def _print_capabilities_lookup_func_trailer(self):
         self.ctx.lvl_dec()
-        self.ctx.writelns(['}\n'] * 2)
+        self.ctx.writelns('}\n')
+
+    def _print_namespace_identity_lookup(self, packages):
+        self.ctx.bline()
+        self.ctx.writeln(
+            "std::map<std::pair<std::string, std::string>, std::string> %s_namespace_identity_lookup {" % (
+                snake_case(self.bundle_name)))
+        self.ctx.lvl_inc()
+        for package in packages:
+            identities = self._get_identities(package)
+            for identity in identities:
+                self._print_namespace_identity_lookup_statement(identity)
+        self.ctx.lvl_dec()
+        self.ctx.writeln("};")
+        self.ctx.bline()
+
+    def _print_namespace_identity_lookup_statement(self, identity):
+        namespace = identity.module.search_one('namespace')
+        assert namespace is not None
+        self.ctx.writeln('{ {"%s", "%s"},  "%s"},' % (identity.stmt.arg, namespace.arg, identity.module.arg))
+
+    def _get_identities(self, element):
+        identities = set()
+        for child in element.owned_elements:
+            if isinstance(child, Class) and child.is_identity():
+                identities.add(child)
+            identities = identities.union(self._get_identities(child))
+        return identities
+

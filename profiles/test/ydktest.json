@@ -1,5 +1,5 @@
 {
-    "name": "ydktest",
+    "name": "openconfig",
     "version": "0.5.1",
     "ydk_version":"0.5.1",
     "author": "Cisco",
@@ -7,7 +7,7 @@
     "description": "YDK Test Profile",
     "models": {
 	"dir": [
-	    "/yang/ydktest",
+	    "/yang/oc-isis",
 	    "/yang/ietf"
         ]
     }

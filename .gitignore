@@ -44,3 +44,4 @@ sdk/cpp/ydk_client.so
 gen-api/
 *.sublime-project
 *.sublime-workspace
+*.idea

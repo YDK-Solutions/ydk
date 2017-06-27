@@ -28,7 +28,7 @@ import os, sys, shutil
 import tarfile
 import tempfile
 
-from .common import YdkGenException, iscppkeyword, ispythonkeyword
+from .common import YdkGenException, iscppkeyword, ispythonkeyword, isgokeyword
 from ydkgen.builder import (ApiModelBuilder, GroupingClassApiModelBuilder,
                             PyangModelBuilder, SubModuleBuilder)
 from .resolver import bundle_resolver, bundle_translator
@@ -75,8 +75,10 @@ class YdkGenerator(object):
         self.sort_clazz = sort_clazz
         if self.language == 'cpp':
             self.iskeyword = iscppkeyword
-        else:
+        elif self.language == 'python':
             self.iskeyword = ispythonkeyword
+        elif self.language == 'go':
+            self.iskeyword = isgokeyword
 
     def generate(self, description_file):
         """ Generate ydk bundle packages or ydk core library.
@@ -251,6 +253,11 @@ class YdkGenerator(object):
                 target_dir = os.path.join(target_dir, package_type)
             elif package_type == 'core':
                 target_dir = os.path.join(target_dir, 'core')
+        elif self.language == 'go':
+            if package_type == 'core':
+                target_dir = os.path.join(target_dir, 'core')
+            # todo: something ??
+
         shutil.rmtree(gen_api_root)
         logger.debug('Copying %s to %s' % (target_dir, gen_api_root))
         dir_util.copy_tree(target_dir, gen_api_root)
@@ -406,7 +413,7 @@ def _check_generator_args(output_dir, ydk_root, language, package_type):
     Raises:
         YdkGenException: If invalid arguments are passed in.
     """
-    if language != 'cpp' and language != 'python':
+    if language not in ('cpp', 'go', 'python'):
         raise YdkGenException('Language {0} not supported'.format(language))
 
     if output_dir is None or len(output_dir) == 0:

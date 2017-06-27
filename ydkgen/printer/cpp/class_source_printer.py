@@ -20,8 +20,7 @@ source_printer.py
  prints C++ classes
 
 """
-from ydkgen.api_model import Class, Package
-from ydkgen.common import snake_case
+from ydkgen.api_model import Class, Package, snake_case
 
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_has_data_printer import ClassHasDataPrinter

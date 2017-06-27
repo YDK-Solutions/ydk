@@ -38,6 +38,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install python pkg-config libssh xml2 curl pcre cmake
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk_0.6.0_Darwin.pkg
+   $ sudo installer -pkg libydk_0.6.0_Darwin.pkg -target /
 
 Windows
 -------

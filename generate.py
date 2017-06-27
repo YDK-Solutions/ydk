@@ -344,7 +344,7 @@ if __name__ == '__main__':
     elif options.go:
         # todo: implement go packaging with the output_directory
         pass
-    elif options.python:
+    else:
         create_pip_packages(output_directory)
 
     minutes_str, seconds_str = _get_time_taken(start_time)

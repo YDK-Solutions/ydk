@@ -12,7 +12,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http:www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -22,53 +22,24 @@
  * under the License.
  *----------------------------------------------
  */
-package main
+package registry
 
 import (
-	"flag"
 	"fmt"
-	"github.com/CiscoDevNet/ydk-go/ydk"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	"github.com/CiscoDevNet/ydk-go/ydk/providers"
-	"github.com/CiscoDevNet/ydk-go/ydk/services"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"reflect"
 )
 
-func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("\nError occured!!\n ", r)
-		}
-	}()
+var topEntityRegistry = make(map[string]reflect.Type)
 
-	vPtr := flag.Bool("v", false, "Enable verbose")
-	flag.Parse()
+func RegisterEntity(name string, entity_type reflect.Type) {
+	topEntityRegistry[name] = entity_type
+}
 
-	if *vPtr {
-		ydk.EnableLogging(ydk.Debug)
+func GetTopEntity(name string) types.Entity {
+	_, ok := topEntityRegistry[name]
+	if !ok {
+		panic(fmt.Sprintf("Top entity '%s' not registered!", name))
 	}
-
-	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
-		Address:  "127.0.0.1",
-		Username: "admin",
-		Password: "admin",
-		Port:     12022}
-
-	provider.Connect()
-
-	crud := services.CrudService{}
-
-	bgp := oc_bgp.Bgp{}
-	bgp.Global.SetParent(&bgp)
-	bgp.Global.Config.SetParent(&bgp.Global)
-
-	result := crud.Delete(&provider, &bgp.Global.Config)
-
-	provider.Disconnect()
-
-	if result == true {
-		fmt.Println("\nOperation succeeded!\n")
-	} else {
-		fmt.Println("\nOperation failed!\n")
-	}
-
+	return reflect.New(topEntityRegistry[name]).Elem().Addr().Interface().(types.Entity)
 }

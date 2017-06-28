@@ -7,7 +7,7 @@ $ export GOPATH=/your/path/to/install/go/packages
 $ mkdir -p $GOPATH/github.com/CiscoDevNet/ydk-go/ydk
 $ cp -r ydk/* $GOPATH/github.com/CiscoDevNet/ydk-go/ydk
 $ cd ../packages
-$ cp -r ydk/*  $GOPATH/github.com/CiscoDevNet/ydk-go/ydk 
+$ cp -r ydk/*  $GOPATH/github.com/CiscoDevNet/ydk-go/ydk
 ```
 
 Then execute the below to run the samples
@@ -19,4 +19,11 @@ $ cd samples/bgp_create && go run bgp_create
 ```
 ```
 $ cd samples/bgp_read && go run bgp_read
+```
+
+Behavioral tests could be executed after installing dependencies
+```bash
+$ go get gopkg.in/stretchr/testify.v1
+$ cd tests
+$ go test
 ```

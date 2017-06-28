@@ -60,24 +60,24 @@ func main() {
 
 	bgp := oc_bgp.Bgp{}
 	bgp.Global.Config.RouterId = "1.2.3.4"
-    bgp.Global.Config.As = 65172
+	bgp.Global.Config.As = 65172
 
 	data := crud.Read(&provider, &bgp)
 
-    b := data.(*oc_bgp.Bgp)
-    b.Global.Config.As = 65001
+	b := data.(*oc_bgp.Bgp)
+	b.Global.Config.As = 65001
 
-    if data != nil {
-        fmt.Println("\nData read successfully!\n")
-    }
+	if data != nil {
+		fmt.Println("\nData read successfully!\n")
+	}
 
-    result := crud.Create(&provider, b)
+	result := crud.Create(&provider, b)
 
-    if result == true {
-        fmt.Println("\nOperation succeeded!\n")
-    } else {
-        fmt.Println("\nOperation failed!\n")
-    }
+	if result == true {
+		fmt.Println("\nOperation succeeded!\n")
+	} else {
+		fmt.Println("\nOperation failed!\n")
+	}
 
 	provider.Disconnect()
 

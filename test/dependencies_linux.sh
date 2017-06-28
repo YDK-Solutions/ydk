@@ -62,6 +62,8 @@ function install_dependencies {
     sudo apt-get install clang-3.8 lldb-3.8 -y
     sudo ln -f -s /usr/bin/clang++-3.8 /usr/bin/clang++
     sudo ln -f -s /usr/bin/clang-3.8 /usr/bin/clang
+
+    go get github.com/stretchr/testify
 }
 
 function install_confd {

@@ -35,7 +35,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
-	"github.com/CiscoDevNet/ydk-go/ydk/registry"
+	"github.com/CiscoDevNet/ydk-go/ydk/entity_lookup"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
@@ -81,7 +81,7 @@ func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.
 func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
 	// 1. parse payload, get top_entity
 	nmsp := getEntityLookupKey(provider, payload)
-	top_entity := registry.GetTopEntity(nmsp)
+	top_entity := entity_lookup.GetTopEntity(nmsp)
 	// 2. initialize repository, fetch root_schema
 	provider.Initialize(top_entity)
 	root_schema := provider.GetRootSchemaNode(top_entity)

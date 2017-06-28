@@ -22,7 +22,7 @@
  * under the License.
  *----------------------------------------------
  */
-package registry
+package entity_lookup
 
 import (
 	"fmt"

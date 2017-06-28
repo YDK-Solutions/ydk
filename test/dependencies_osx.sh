@@ -39,6 +39,8 @@ function install_dependencies {
 
     brew install libssh
     brew link libssh
+
+    go get github.com/stretchr/testify
 }
 
 function install_confd {

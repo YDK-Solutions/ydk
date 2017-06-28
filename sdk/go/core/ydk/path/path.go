@@ -12,7 +12,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http:*www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -129,6 +129,83 @@ func DisconnectFromProvider(provider types.CServiceProvider) {
 	C.NetconfServiceProviderFree(real_provider)
 }
 
+func InitCodecServiceProvider(entity types.Entity, repo types.Repository) types.RootSchemaNode {
+	caps := entity.GetAugmentCapabilitiesFunction()()
+
+	var repo_path *C.char
+	if len(repo.Path) > 0 {
+		fmt.Printf("CodecServiceProvider using YANG models in %v\n", repo.Path)
+		repo_path = C.CString(repo.Path)
+	} else {
+		yang_path := entity.GetBundleYangModelsLocation()
+		fmt.Printf("CodecServiceProvider using YANG models in %v\n", yang_path)
+		repo_path = C.CString(yang_path)
+	}
+
+	real_caps := make([]C.Capability, 0)
+	var real_cap C.Capability
+	for mod, rev := range caps {
+		real_cap = C.CapabilityCreate(C.CString(mod), C.CString(rev))
+		defer C.CapabilityFree(real_cap)
+		real_caps = append(real_caps, real_cap)
+	}
+
+	real_repo := C.RepositoryInitWithPath(repo_path)
+
+	repo.Private = real_repo
+	root_schema_wrapper := C.RepositoryCreateRootSchemaWrapper(real_repo, &real_caps[0], C.int(len(real_caps)))
+
+	root_schema_node := types.RootSchemaNode{Private: root_schema_wrapper}
+	return root_schema_node
+}
+
+func CodecServiceEncode(entity types.Entity, root_schema types.RootSchemaNode, encoding types.EncodingFormat) string {
+	root_schema_wrapper := root_schema.Private.(C.RootSchemaWrapper)
+	real_root_schema := C.RootSchemaWrapperUnwrap(root_schema_wrapper)
+
+	data_node := getDataNodeFromEntity(entity, real_root_schema)
+
+	if data_node == nil {
+		return ""
+	}
+
+	codec := C.CodecServiceInit()
+	defer C.CodecServiceFree(codec)
+
+	var payload *C.char
+
+	switch encoding {
+	case types.XML:
+		payload = C.CodecServiceEncode(codec, data_node, C.XML, 1)
+	case types.JSON:
+		payload = C.CodecServiceEncode(codec, data_node, C.JSON, 1)
+	}
+
+	return C.GoString(payload)
+}
+
+func CodecServiceDecode(root_schema types.RootSchemaNode, payload string, encoding types.EncodingFormat, top_entity types.Entity) types.Entity {
+	root_schema_wrapper := root_schema.Private.(C.RootSchemaWrapper)
+	real_root_schema := C.RootSchemaWrapperUnwrap(root_schema_wrapper)
+
+	codec := C.CodecServiceInit()
+	defer C.CodecServiceFree(codec)
+
+	var real_payload = C.CString(payload)
+	var real_data_node C.DataNode
+
+	switch encoding {
+	case types.XML:
+		real_data_node = C.CodecServiceDecode(codec, real_root_schema, real_payload, C.XML)
+	case types.JSON:
+		real_data_node = C.CodecServiceDecode(codec, real_root_schema, real_payload, C.JSON)
+	}
+
+	var data_node = types.DataNode{Private: real_data_node}
+
+	return ReadDatanode(top_entity, data_node)
+}
+
 //////////////////////////////////////////////////////////////////////////
 // DataNode from Entity
 //////////////////////////////////////////////////////////////////////////
@@ -136,9 +213,9 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 	if entity == nil {
 		return nil
 	}
-    for parent := entity.GetParent(); parent != nil; parent = parent.GetParent() {
-        entity = parent
-    }
+	for parent := entity.GetParent(); parent != nil; parent = parent.GetParent() {
+		entity = parent
+	}
 
 	root_path := entity.GetEntityPath(nil)
 	path := C.CString(root_path.Path)

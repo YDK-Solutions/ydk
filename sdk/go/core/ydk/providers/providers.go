@@ -25,6 +25,7 @@
 package providers
 
 import (
+	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
@@ -63,4 +64,36 @@ func (provider *NetconfServiceProvider) Disconnect() {
 		return
 	}
 	path.DisconnectFromProvider(provider.Private)
+}
+
+type CodecServiceProvider struct {
+	Repo     types.Repository
+	Encoding types.EncodingFormat
+
+	RootSchemaTable map[string]types.RootSchemaNode
+}
+
+func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
+	bundle_name := entity.GetBundleName()
+	if len(provider.RootSchemaTable) == 0 {
+		provider.RootSchemaTable = make(map[string]types.RootSchemaNode)
+	}
+	_, ok := provider.RootSchemaTable[bundle_name]
+	if !ok {
+		fmt.Printf("CodecServiceProvider initialize with %v bundle\n", bundle_name)
+		root_schema_node := path.InitCodecServiceProvider(entity, provider.Repo)
+		provider.RootSchemaTable[bundle_name] = root_schema_node
+	}
+}
+
+func (provider *CodecServiceProvider) GetEncoding() types.EncodingFormat {
+	return provider.Encoding
+}
+
+func (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity) types.RootSchemaNode {
+	root_schema_node, ok := provider.RootSchemaTable[entity.GetBundleName()]
+	if !ok {
+		panic("Root schema node not found in provider!")
+	}
+	return root_schema_node
 }

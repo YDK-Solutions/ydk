@@ -60,6 +60,15 @@ typedef struct DataNodeWrapper
     shared_ptr<ydk::path::DataNode> priv;
 } DataNodeWrapper;
 
+typedef struct RootSchemaNodeWrapper
+{
+    RootSchemaNodeWrapper(shared_ptr<ydk::path::RootSchemaNode> node)
+        :priv(node)
+    {
+    }
+    shared_ptr<ydk::path::RootSchemaNode> priv;
+} RootSchemaNodeWrapper;
+
 //////////////////////////////////////////////////////////////////////////
 // Utility functions
 //////////////////////////////////////////////////////////////////////////
@@ -76,6 +85,21 @@ static DataNodeWrapper* wrap(shared_ptr<ydk::path::DataNode> datanode)
 static ydk::path::DataNode* unwrap(DataNodeWrapper* datanode_wrapper)
 {
     return datanode_wrapper->priv.get();
+}
+
+static RootSchemaNodeWrapper* wrap(ydk::path::RootSchemaNode* node)
+{
+    return (new RootSchemaNodeWrapper(shared_ptr<ydk::path::RootSchemaNode>(node)));
+}
+
+static RootSchemaNodeWrapper* wrap(shared_ptr<ydk::path::RootSchemaNode> node)
+{
+    return (new RootSchemaNodeWrapper(node));
+}
+
+static ydk::path::RootSchemaNode* unwrap(RootSchemaNodeWrapper* node_wrapper)
+{
+    return node_wrapper->priv.get();
 }
 
 static RpcWrapper* wrap(shared_ptr<ydk::path::Rpc> rpc)
@@ -122,12 +146,50 @@ Repository RepositoryInit()
     return static_cast<void*>(real_repo);
 }
 
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository repo, const Capability caps[], int caps_size) {
+    try
+    {
+        std::vector<ydk::path::Capability> real_caps;
+        for(int i = 0; i < caps_size; i++) {
+            real_caps.push_back(*static_cast<ydk::path::Capability*>(caps[i]));
+        }
+        ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
+        std::shared_ptr<ydk::path::RootSchemaNode> schema_node = real_repo->create_root_schema(real_caps);
+        return static_cast<void*>(wrap(schema_node));
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
 void RepositoryFree(Repository repo)
 {
     ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
     if(real_repo != NULL)
     {
         delete real_repo;
+    }
+}
+
+Capability CapabilityCreate(const char* mod, const char* rev) {
+    try
+    {
+        ydk::path::Capability * real_cap = new ydk::path::Capability(mod, rev);
+        return static_cast<void*>(real_cap);
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
+void CapabilityFree(Capability cap)
+{
+    ydk::path::Capability * real_cap = static_cast<ydk::path::Capability*>(cap);
+    if (real_cap != NULL)
+    {
+        delete real_cap;
     }
 }
 
@@ -242,6 +304,12 @@ DataNode RootSchemaNodeCreate(RootSchemaNode root_schema, const char* path)
     {
         return NULL;
     }
+}
+
+RootSchemaNode RootSchemaWrapperUnwrap(RootSchemaWrapper wrapper)
+{
+    RootSchemaNodeWrapper* real_wrapper = (RootSchemaNodeWrapper*) wrapper;
+    return static_cast<void*>(unwrap(real_wrapper));
 }
 
 Rpc RootSchemaNodeRpc(RootSchemaNode root_schema, const char* path)

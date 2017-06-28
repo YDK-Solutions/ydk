@@ -3,8 +3,16 @@ package bgp
 import (
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/models/openconfig"
+	"github.com/CiscoDevNet/ydk-go/ydk/entity_lookup"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"reflect"
 )
+
+func init() {
+	fmt.Println("Registering top level entities for package bgp...")
+	entity_lookup.RegisterEntity("{http://openconfig.net/yang/bgp bgp}", reflect.TypeOf(Bgp{}))
+	entity_lookup.RegisterEntity("openconfig-bgp:bgp", reflect.TypeOf(Bgp{}))
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Bgp

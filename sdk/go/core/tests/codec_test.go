@@ -6,6 +6,7 @@ import (
 	"fmt"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
 	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
+	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -52,6 +53,39 @@ const (
           }
         ]
       }
+    }
+  }
+}
+`
+
+	xml_runner_payload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <two-list>
+    <ldata>
+      <number>22</number>
+      <name>runner:twolist:ldata:22</name>
+      <subl1>
+        <number>222</number>
+        <name>runner:twolist:ldata:22:subl1:222</name>
+      </subl1>
+    </ldata>
+  </two-list>
+</runner>
+`
+	json_runner_payload = `{
+  "ydktest-sanity:runner": {
+    "two-list": {
+      "ldata": [
+        {
+          "number": 22,
+          "name": "runner:twolist:ldata:22",
+          "subl1": [
+            {
+              "number": 222,
+              "name": "runner:twolist:ldata:22:subl1:222"
+            }
+          ]
+        }
+      ]
     }
   }
 }
@@ -108,6 +142,42 @@ func config(bgp *oc_bgp.Bgp) {
 	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
+}
+
+func configRunner(runner *ysanity.Runner) {
+	elem1 := ysanity.Runner_TwoList_Ldata{}
+	elem2 := ysanity.Runner_TwoList_Ldata{}
+
+	elem1.Number = 21
+	elem1.Name = "runner:twolist:ldata:21"
+
+	elem2.Number = 22
+	elem2.Name = "runner:twolist:ldata:22"
+
+	elem11 := ysanity.Runner_TwoList_Ldata_Subl1{}
+	elem12 := ysanity.Runner_TwoList_Ldata_Subl1{}
+
+	elem11.Number = 211
+	elem11.Name = "runner:twolist:ldata:21:subl1:211"
+	elem12.Number = 212
+	elem12.Name = "runner:twolist:ldata:21:subl1:212"
+
+	elem1.Subl1 = append(elem1.Subl1, elem11)
+	elem1.Subl1 = append(elem1.Subl1, elem12)
+
+	elem21 := ysanity.Runner_TwoList_Ldata_Subl1{}
+	elem22 := ysanity.Runner_TwoList_Ldata_Subl1{}
+
+	elem21.Number = 221
+	elem21.Name = "runner:twolist:ldata:22:subl1:221"
+	elem22.Number = 222
+	elem22.Name = "runner:twolist:ldata:22:subl1:222"
+
+	elem2.Subl1 = append(elem2.Subl1, elem21)
+	elem2.Subl1 = append(elem2.Subl1, elem22)
+
+	runner.TwoList.Ldata = append(runner.TwoList.Ldata, elem1)
+	runner.TwoList.Ldata = append(runner.TwoList.Ldata, elem2)
 }
 
 func (suite *CodecTestSuite) TestXMLEncoding() {
@@ -167,6 +237,44 @@ func (suite *CodecTestSuite) TestJSONEncoding() {
 
 // 	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
 // }
+
+func (suite *CodecTestSuite) TestXMLEncode1() {
+	suite.Provider.Encoding = types.XML
+	runner := ysanity.Runner{}
+	configRunner(&runner)
+
+	payload := suite.Codec.Encode(&suite.Provider, &runner)
+
+	result, err := equalPayload(payload, xml_runner_payload, xml.Unmarshal)
+	if err != nil {
+		panic("JSONG mashalling failed!")
+	}
+
+	suite.Equal(result, true)
+}
+
+func (suite *CodecTestSuite) TestXMLEncode2() {
+	// TODO: enum support
+}
+
+func (suite *CodecTestSuite) TestJSONEncode1() {
+	suite.Provider.Encoding = types.JSON
+	runner := ysanity.Runner{}
+	configRunner(&runner)
+
+	payload := suite.Codec.Encode(&suite.Provider, &runner)
+
+	result, err := equalPayload(payload, json_runner_payload, json.Unmarshal)
+	if err != nil {
+		panic("JSONG mashalling failed!")
+	}
+
+	suite.Equal(result, true)
+}
+
+func (suite *CodecTestSuite) TestJSONEncode2() {
+	// TODO: enum support
+}
 
 func TestCodecTestSuite(t *testing.T) {
 	suite.Run(t, new(CodecTestSuite))

@@ -22,7 +22,7 @@
  * under the License.
  *----------------------------------------------
  */
-package entity_lookup
+package ydk
 
 import (
 	"fmt"

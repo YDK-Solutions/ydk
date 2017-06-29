@@ -25,7 +25,8 @@
 package services
 
 // #cgo CXXFLAGS: -g -std=c++11
-// #cgo LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
+// #cgo darwin LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
+// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
 // #include <ydk/ydk.h>
 // #include <stdlib.h>
 import "C"
@@ -34,8 +35,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
-	"github.com/CiscoDevNet/ydk-go/ydk/entity_lookup"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
@@ -81,7 +82,7 @@ func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.
 func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
 	// 1. parse payload, get top_entity
 	nmsp := getEntityLookupKey(provider, payload)
-	top_entity := entity_lookup.GetTopEntity(nmsp)
+	top_entity := ydk.GetTopEntity(nmsp)
 	// 2. initialize repository, fetch root_schema
 	provider.Initialize(top_entity)
 	root_schema := provider.GetRootSchemaNode(top_entity)

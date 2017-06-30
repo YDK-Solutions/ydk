@@ -243,6 +243,19 @@ Note that the below process could take a few hours due to the size of the `cisco
 ```
 Pre-generated documentation for [ydk-py](http://ydk.cisco.com/py/docs/) and [ydk-cpp](http://ydk.cisco.com/cpp/docs/) are available.
 
+# Generating an "Adhoc" YDK-Py Bundle
+
+The ability to generate an adhoc bundle directly from the command line and without creating a bundle file can be done something like this:
+
+```
+$ ./generate.py --adhoc-bundle-name test --adhoc-bundle \
+    /opt/git-repos/clean-yang/vendor/cisco/xr/621/Cisco-IOS-XR-ipv4-bgp-oper*.yang \
+    /opt/git-repos/clean-yang/vendor/cisco/xr/621/Cisco-IOS-XR-types.yang
+    /opt/git-repos/clean-yang/vendor/cisco/xr/621/Cisco-IOS-XR-ipv4-bgp-datatypes.yang
+```
+
+When run in this way, we will generate a bundle that only contains tje files specified with the `--adhoc-bundle` option, creating a pip package name by the `--adhoc-bundle-name`, with a version `0.1.0` and a dependency on the base IETF bundle. Note that **all** dependencies for the bundle must be listed, and as the expectation is that this option will typically be used for generating point YDK-Py bundles for specific testing, the `--verbose` option is automatically enabled to quickly and easily let a user see if dependencies have been satisfied.
+
 # Notes
 
 ## Python version

@@ -25,6 +25,7 @@ YANG Development Kit (Generator)
   - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
   - [Documentation](#documentation)
+- [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
 - [Notes](#notes)
   - [Python version](#python-version)
   - [Directory structure](#directory-structure)
@@ -32,6 +33,8 @@ YANG Development Kit (Generator)
 - [Running Unit Tests](#running-unit-tests)
   - [Python](#python)
   - [C++](#c)
+- [Support](#support)
+- [Release Notes](#release-notes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

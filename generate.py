@@ -18,7 +18,7 @@
 
 from __future__ import print_function
 from distutils import dir_util, file_util
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 import fileinput
 import logging
@@ -180,6 +180,36 @@ def create_pip_packages(output_directory):
         py_sdk_root,))
 
 
+def generate_adhoc_bundle(adhoc_bundle_name, adhoc_bundle_files):
+    adhoc_bundle = {
+        "name": adhoc_bundle_name,
+        "version": "0.1.0",
+        "core_version": "0.5.5",
+        "author": "Cisco",
+        "copyright": "Cisco",
+        "description": "Adhoc YDK bundle",
+        "long_description": "Adhoc YDK bundle",
+        "models": {
+            "description": "User-specified list of files.",
+            "file": [f for f in adhoc_bundle_files]
+        },
+        "dependency": [
+            {
+                "name": "ietf",
+                "version": "0.1.2",
+                "core_version": "0.5.5",
+                "uri": "file://profiles/bundles/ietf_0_1_2.json"
+            }
+        ]
+    }
+    import tempfile
+    import json
+    adhoc_bundle_file = tempfile.NamedTemporaryFile(mode='w', delete=False)
+    adhoc_bundle_file.write(json.dumps(adhoc_bundle, indent=2, sort_keys=True))
+    adhoc_bundle_file.close()
+    return adhoc_bundle_file.name
+
+
 def create_shared_libraries(output_directory):
     cpp_sdk_root = os.path.join(output_directory)
     cmake_build_dir = os.path.join(output_directory, 'build')
@@ -212,67 +242,79 @@ def _get_time_taken(start_time):
 if __name__ == '__main__':
     start_time = time.time()
 
-    parser = OptionParser(usage="usage: %prog [options]",
-                          version="%prog 0.4.0")
+    parser = ArgumentParser(description='Generate YDK artefacts:')
 
-    parser.add_option("--bundle",
-                      type=str,
-                      dest="bundle",
-                      help="Specify a bundle profile file to generate a bundle from")
+    parser.add_argument(
+        "--bundle",
+        type=str,
+        help="Specify a bundle profile file to generate a bundle from")
 
-    parser.add_option("--core",
-                      action='store_true',
-                      dest="core",
-                      help="Generate and/or install core library")
+    parser.add_argument(
+        "--adhoc-bundle-name",
+        type=str,
+        help="Name of the adhoc bundle")
 
-    parser.add_option("--output-directory",
-                      type=str,
-                      dest="output_directory",
-                      help="The output directory where the sdk will get created.")
+    parser.add_argument(
+        "--adhoc-bundle",
+        type=str,
+        nargs='+',
+        help="Generate an SDK from a specified list of files")
 
-    parser.add_option("-p", "--python",
-                      action="store_true",
-                      dest="python",
-                      default=True,
-                      help="Generate Python SDK")
+    parser.add_argument(
+        "--core",
+        action='store_true',
+        help="Generate and/or install core library")
 
-    parser.add_option("-c", "--cpp",
-                      action="store_true",
-                      dest="cpp",
-                      default=False,
-                      help="Generate C++ SDK")
+    parser.add_argument(
+        "--output-directory",
+        type=str,
+        help="The output directory where the sdk will get created.")
 
-    parser.add_option("-v", "--verbose",
-                      action="store_true",
-                      dest="verbose",
-                      default=False,
-                      help="Verbose mode")
+    parser.add_argument(
+        "-p", "--python",
+        action="store_true",
+        default=True,
+        help="Generate Python SDK")
 
-    parser.add_option("--generate-doc",
-                      action="store_true",
-                      dest="gendoc",
-                      default=False,
-                      help="Generate documentation")
+    parser.add_argument(
+        "-c", "--cpp",
+        action="store_true",
+        default=False,
+        help="Generate C++ SDK")
 
-    parser.add_option("--generate-tests",
-                      action="store_true",
-                      dest="gentests",
-                      default=False,
-                      help="Generate tests")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        default=False,
+        help="Verbose mode")
 
-    parser.add_option("--groupings-as-class",
-                      action="store_true",
-                      dest="groupings_as_class",
-                      default=False,
-                      help="Consider yang groupings as classes.")
+    parser.add_argument(
+        "--generate-doc",
+        action="store_true",
+        dest="gendoc",
+        default=False,
+        help="Generate documentation")
 
-    try:
-        arg = sys.argv[1]
-    except IndexError:
-        parser.print_help()
-        sys.exit(1)
+    parser.add_argument(
+        "--generate-tests",
+        action="store_true",
+        dest="gentests",
+        default=False,
+        help="Generate tests")
 
-    (options, args) = parser.parse_args()
+    parser.add_argument(
+        "--groupings-as-class",
+        action="store_true",
+        default=False,
+        help="Consider yang groupings as classes.")
+
+    # try:
+    #     arg = sys.argv[1]
+    # except IndexError:
+    #     parser.print_help()
+    #     sys.exit(1)
+
+    options = parser.parse_args()
 
     if options.verbose:
         init_verbose_logger()
@@ -296,6 +338,20 @@ if __name__ == '__main__':
         language = 'python'
 
     try:
+        if options.adhoc_bundle_name:
+            adhoc_bundle_file = generate_adhoc_bundle(
+                options.adhoc_bundle_name,
+                options.adhoc_bundle)
+            init_verbose_logger()
+            output_directory = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.groupings_as_class,
+                options.gentests,
+                language,
+                'bundle').generate(adhoc_bundle_file)
+            os.remove(adhoc_bundle_file)
+
         if options.bundle:
             output_directory = (YdkGenerator(
                                 output_directory,

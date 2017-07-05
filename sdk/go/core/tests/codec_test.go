@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
+	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/stretchr/testify/suite"
-	"reflect"
 	"testing"
 )
 
@@ -23,6 +22,13 @@ const (
       <router-id>1.2.3.4</router-id>
     </config>
     <afi-safis>
+      <afi-safi>
+        <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:IPV6_UNICAST</afi-safi-name>
+        <config>
+          <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:IPV6_UNICAST</afi-safi-name>
+          <enabled>true</enabled>
+        </config>
+      </afi-safi>
       <afi-safi>
         <afi-safi-name xmlns:oc-bgp-types="http://openconfig.net/yang/bgp-types">oc-bgp-types:IPV4_UNICAST</afi-safi-name>
         <config>
@@ -38,12 +44,15 @@ const (
 	json_bgp_payload = `{
   "openconfig-bgp:bgp": {
     "global": {
-      "config": {
-        "as": 65172,
-        "router-id": "1.2.3.4"
-      },
       "afi-safis": {
         "afi-safi": [
+          {
+            "afi-safi-name": "openconfig-bgp-types:IPV6_UNICAST",
+            "config": {
+              "afi-safi-name": "openconfig-bgp-types:IPV6_UNICAST",
+              "enabled": true
+            }
+          },
           {
             "afi-safi-name": "openconfig-bgp-types:IPV4_UNICAST",
             "config": {
@@ -52,6 +61,10 @@ const (
             }
           }
         ]
+      },
+      "config": {
+        "as": 65172,
+        "router-id": "1.2.3.4"
       }
     }
   }
@@ -61,8 +74,24 @@ const (
 	xml_runner_payload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <two-list>
     <ldata>
+      <number>21</number>
+      <name>runner:twolist:ldata:21</name>
+      <subl1>
+        <number>211</number>
+        <name>runner:twolist:ldata:21:subl1:211</name>
+      </subl1>
+      <subl1>
+        <number>212</number>
+        <name>runner:twolist:ldata:21:subl1:212</name>
+      </subl1>
+    </ldata>
+    <ldata>
       <number>22</number>
       <name>runner:twolist:ldata:22</name>
+      <subl1>
+        <number>221</number>
+        <name>runner:twolist:ldata:22:subl1:221</name>
+      </subl1>
       <subl1>
         <number>222</number>
         <name>runner:twolist:ldata:22:subl1:222</name>
@@ -76,9 +105,27 @@ const (
     "two-list": {
       "ldata": [
         {
+          "number": 21,
+          "name": "runner:twolist:ldata:21",
+          "subl1": [
+            {
+              "number": 211,
+              "name": "runner:twolist:ldata:21:subl1:211"
+            },
+            {
+              "number": 212,
+              "name": "runner:twolist:ldata:21:subl1:212"
+            }
+          ]
+        },
+        {
           "number": 22,
           "name": "runner:twolist:ldata:22",
           "subl1": [
+            {
+              "number": 221,
+              "name": "runner:twolist:ldata:22:subl1:221"
+            },
             {
               "number": 222,
               "name": "runner:twolist:ldata:22:subl1:222"
@@ -92,21 +139,35 @@ const (
 `
 )
 
-func equalPayload(s1, s2 string, cmp func([]uint8, interface{}) error) (bool, error) {
+func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(interface{}) ([]byte, error)) bool {
 	var o1 interface{}
 	var o2 interface{}
 
 	var err error
-	err = cmp([]byte(s1), &o1)
+	err = um([]byte(s1), &o1)
 	if err != nil {
-		return false, fmt.Errorf("Error mashalling string 1 :: %s", err.Error())
+		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
+		return false
 	}
-	err = cmp([]byte(s2), &o2)
+	err = um([]byte(s2), &o2)
 	if err != nil {
-		return false, fmt.Errorf("Error mashalling string 2 :: %s", err.Error())
+		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
+		return false
 	}
 
-	return reflect.DeepEqual(o1, o2), nil
+	// Unmarshal and Marshal the payload incase list items in payload are not sorted
+	p1, err := m(o1)
+	if err != nil {
+		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
+		return false
+	}
+	p2, err := m(o1)
+	if err != nil {
+		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
+		return false
+	}
+
+	return string(p1) == string(p2)
 }
 
 type CodecTestSuite struct {
@@ -127,19 +188,19 @@ func (suite *CodecTestSuite) BeforeTest(suiteName, testName string) {
 func (suite *CodecTestSuite) TearDownSuite() {
 }
 
-func config(bgp *oc_bgp.Bgp) {
+func config(bgp *ysanity_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
+	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
 	ipv6_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
 
-	ipv4_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
+	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
 }
@@ -180,63 +241,102 @@ func configRunner(runner *ysanity.Runner) {
 	runner.TwoList.Ldata = append(runner.TwoList.Ldata, elem2)
 }
 
-func (suite *CodecTestSuite) TestXMLEncoding() {
-	bgp := oc_bgp.Bgp{}
+func (suite *CodecTestSuite) TestXMLEncode() {
+	bgp := ysanity_bgp.Bgp{}
 	config(&bgp)
 
 	suite.Provider.Encoding = types.XML
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	fmt.Printf("In TestXMLEncoding, payload = %v", payload)
-
-	result, err := equalPayload(payload, xml_bgp_payload, xml.Unmarshal)
-	if err != nil {
-		panic("JSONG mashalling failed!")
-	}
-
+	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
-// func (suite *CodecTestSuite) TestXMLDecoding() {
-// 	bgp := oc_bgp.Bgp{}
-// 	config(&bgp)
+func (suite *CodecTestSuite) TestXMLDecode() {
+	bgp := ysanity_bgp.Bgp{}
+	config(&bgp)
 
-// 	suite.Provider.Encoding = types.XML
+	suite.Provider.Encoding = types.XML
 
-// 	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-// 	bgp_decoded := entity.(*oc_bgp.Bgp)
+	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
 
-// 	suite.Equal(types.EntityEqual(&bgp, bgp_decoded, ), true)
-// }
+	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+}
 
-func (suite *CodecTestSuite) TestJSONEncoding() {
-	bgp := oc_bgp.Bgp{}
+func (suite *CodecTestSuite) TestXMLEncodeDecode() {
+	bgp := ysanity_bgp.Bgp{}
+	config(&bgp)
+
+	suite.Provider.Encoding = types.XML
+
+	payload := suite.Codec.Encode(&suite.Provider, &bgp)
+	entity := suite.Codec.Decode(&suite.Provider, payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+
+	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+}
+
+func (suite *CodecTestSuite) TestXMLDecodeEncode() {
+	suite.Provider.Encoding = types.XML
+
+	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+
+	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
+	suite.Equal(result, true)
+}
+
+func (suite *CodecTestSuite) TestJSONEncode() {
+	bgp := ysanity_bgp.Bgp{}
 	config(&bgp)
 
 	suite.Provider.Encoding = types.JSON
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	fmt.Printf("In TestJSONEncoding, payload = %v", payload)
-
-	result, err := equalPayload(payload, json_bgp_payload, json.Unmarshal)
-	if err != nil {
-		panic("JSONG mashalling failed!")
-	}
-
+	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
-// func (suite *CodecTestSuite) TestJSONDecoding() {
-// 	bgp := oc_bgp.Bgp{}
-// 	config(&bgp)
+func (suite *CodecTestSuite) TestJSONDecode() {
+	bgp := ysanity_bgp.Bgp{}
+	config(&bgp)
 
-// 	suite.Provider.Encoding = types.JSON
+	suite.Provider.Encoding = types.JSON
 
-// 	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
-// 	bgp_decoded := entity.(*oc_bgp.Bgp)
+	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
 
-// 	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
-// }
+	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+}
+
+func (suite *CodecTestSuite) TestJSONDecodeEncode() {
+	bgp := ysanity_bgp.Bgp{}
+	config(&bgp)
+
+	suite.Provider.Encoding = types.JSON
+
+	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+
+	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
+	suite.Equal(result, true)
+}
+
+func (suite *CodecTestSuite) TestJSONEncodeDecode() {
+	bgp := ysanity_bgp.Bgp{}
+	config(&bgp)
+
+	suite.Provider.Encoding = types.JSON
+
+	payload := suite.Codec.Encode(&suite.Provider, &bgp)
+	entity := suite.Codec.Decode(&suite.Provider, payload)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+
+	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+}
 
 func (suite *CodecTestSuite) TestXMLEncode1() {
 	suite.Provider.Encoding = types.XML
@@ -245,16 +345,12 @@ func (suite *CodecTestSuite) TestXMLEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result, err := equalPayload(payload, xml_runner_payload, xml.Unmarshal)
-	if err != nil {
-		panic("JSONG mashalling failed!")
-	}
-
+	result := equalPayload(payload, xml_runner_payload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
 func (suite *CodecTestSuite) TestXMLEncode2() {
-	// TODO: enum support
+	// TODO: enum
 }
 
 func (suite *CodecTestSuite) TestJSONEncode1() {
@@ -264,16 +360,12 @@ func (suite *CodecTestSuite) TestJSONEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result, err := equalPayload(payload, json_runner_payload, json.Unmarshal)
-	if err != nil {
-		panic("JSONG mashalling failed!")
-	}
-
+	result := equalPayload(payload, json_runner_payload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
 func (suite *CodecTestSuite) TestJSONEncode2() {
-	// TODO: enum support
+	// TODO: enum
 }
 
 func TestCodecTestSuite(t *testing.T) {

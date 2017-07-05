@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
+	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -32,7 +32,7 @@ func (suite *NETCONFTestSuite) TearDownSuite() {
 }
 
 func (suite *NETCONFTestSuite) TearDownTest() {
-	bgp_delete := oc_bgp.Bgp{}
+	bgp_delete := ysanity_bgp.Bgp{}
 	suite.CRUD.Delete(&suite.Provider, &bgp_delete)
 }
 
@@ -45,27 +45,27 @@ func (suite *NETCONFTestSuite) TestTemplate() {
 }
 
 func (suite *NETCONFTestSuite) TestCreateRead() {
-	bgp_create := oc_bgp.Bgp{}
+	bgp_create := ysanity_bgp.Bgp{}
 	bgp_create.Global.Config.As = 65172 //types.Delete
 	bgp_create.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
+	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
 	ipv6_afisafi.Config.Enabled = true
 	bgp_create.Global.AfiSafis.AfiSafi = append(bgp_create.Global.AfiSafis.AfiSafi, ipv6_afisafi)
 
-	ipv4_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
+	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp_create.Global.AfiSafis.AfiSafi = append(bgp_create.Global.AfiSafis.AfiSafi, ipv4_afisafi)
 
 	create_result := suite.CRUD.Create(&suite.Provider, &bgp_create)
 	suite.Equal(create_result, true)
-	bgp_filter := oc_bgp.Bgp{}
+	bgp_filter := ysanity_bgp.Bgp{}
 	data := suite.CRUD.Read(&suite.Provider, &bgp_filter)
-	bgp_read := data.(*oc_bgp.Bgp)
+	bgp_read := data.(*ysanity_bgp.Bgp)
 
 	suite.Equal(types.EntityEqual(bgp_read, &bgp_create), true)
 }

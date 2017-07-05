@@ -299,7 +299,7 @@ func (afisafis *BgpGlobalAfiSafis) GetChildByName(child_yang_name, segment_path 
 		}
 		afi_safi := BgpGlobalAfiSafisAfiSafi{}
 		afisafis.AfiSafi = append(afisafis.AfiSafi, afi_safi)
-		return &afi_safi
+		return &afisafis.AfiSafi[len(afisafis.AfiSafi)-1]
 	}
 	return nil
 }

@@ -2553,15 +2553,15 @@ func (afiSafis *Bgp_Global_AfiSafis) GetChildByName(child_yang_name string, segm
 		}
 		child := Bgp_Global_AfiSafis_AfiSafi{}
 		afiSafis.AfiSafi = append(afiSafis.AfiSafi, child)
-		return &child
+		return &afiSafis.AfiSafi[len(afiSafis.AfiSafi)-1]
 	}
 	return nil
 }
 
 func (afiSafis *Bgp_Global_AfiSafis) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range afiSafis.AfiSafi {
-		children[child.GetSegmentPath()] = &child
+	for i := range afiSafis.AfiSafi {
+		children[afiSafis.AfiSafi[i].GetSegmentPath()] = &afiSafis.AfiSafi[i]
 	}
 
 	return children
@@ -9192,15 +9192,15 @@ func (neighbors *Bgp_Neighbors) GetChildByName(child_yang_name string, segment_p
 		}
 		child := Bgp_Neighbors_Neighbor{}
 		neighbors.Neighbor = append(neighbors.Neighbor, child)
-		return &child
+		return &neighbors.Neighbor[len(neighbors.Neighbor)-1]
 	}
 	return nil
 }
 
 func (neighbors *Bgp_Neighbors) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range neighbors.Neighbor {
-		children[child.GetSegmentPath()] = &child
+	for i := range neighbors.Neighbor {
+		children[neighbors.Neighbor[i].GetSegmentPath()] = &neighbors.Neighbor[i]
 	}
 
 	return children
@@ -13904,15 +13904,15 @@ func (afiSafis *Bgp_Neighbors_Neighbor_AfiSafis) GetChildByName(child_yang_name 
 		}
 		child := Bgp_Neighbors_Neighbor_AfiSafis_AfiSafi{}
 		afiSafis.AfiSafi = append(afiSafis.AfiSafi, child)
-		return &child
+		return &afiSafis.AfiSafi[len(afiSafis.AfiSafi)-1]
 	}
 	return nil
 }
 
 func (afiSafis *Bgp_Neighbors_Neighbor_AfiSafis) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range afiSafis.AfiSafi {
-		children[child.GetSegmentPath()] = &child
+	for i := range afiSafis.AfiSafi {
+		children[afiSafis.AfiSafi[i].GetSegmentPath()] = &afiSafis.AfiSafi[i]
 	}
 
 	return children
@@ -19687,15 +19687,15 @@ func (peerGroups *Bgp_PeerGroups) GetChildByName(child_yang_name string, segment
 		}
 		child := Bgp_PeerGroups_PeerGroup{}
 		peerGroups.PeerGroup = append(peerGroups.PeerGroup, child)
-		return &child
+		return &peerGroups.PeerGroup[len(peerGroups.PeerGroup)-1]
 	}
 	return nil
 }
 
 func (peerGroups *Bgp_PeerGroups) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range peerGroups.PeerGroup {
-		children[child.GetSegmentPath()] = &child
+	for i := range peerGroups.PeerGroup {
+		children[peerGroups.PeerGroup[i].GetSegmentPath()] = &peerGroups.PeerGroup[i]
 	}
 
 	return children
@@ -24076,15 +24076,15 @@ func (afiSafis *Bgp_PeerGroups_PeerGroup_AfiSafis) GetChildByName(child_yang_nam
 		}
 		child := Bgp_PeerGroups_PeerGroup_AfiSafis_AfiSafi{}
 		afiSafis.AfiSafi = append(afiSafis.AfiSafi, child)
-		return &child
+		return &afiSafis.AfiSafi[len(afiSafis.AfiSafi)-1]
 	}
 	return nil
 }
 
 func (afiSafis *Bgp_PeerGroups_PeerGroup_AfiSafis) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range afiSafis.AfiSafi {
-		children[child.GetSegmentPath()] = &child
+	for i := range afiSafis.AfiSafi {
+		children[afiSafis.AfiSafi[i].GetSegmentPath()] = &afiSafis.AfiSafi[i]
 	}
 
 	return children

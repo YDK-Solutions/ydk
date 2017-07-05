@@ -271,7 +271,7 @@ func (runner *Runner) GetChildByName(child_yang_name string, segment_path string
 		}
 		child := Runner_NotSupported2{}
 		runner.NotSupported2 = append(runner.NotSupported2, child)
-		return &child
+		return &runner.NotSupported2[len(runner.NotSupported2)-1]
 	}
 	if child_yang_name == "one" {
 		return &runner.One
@@ -305,8 +305,8 @@ func (runner *Runner) GetChildren() map[string]types.Entity {
 	children["inbtw-list"] = &runner.InbtwList
 	children["leaf-ref"] = &runner.LeafRef
 	children["not-supported-1"] = &runner.NotSupported1
-	for _, child := range runner.NotSupported2 {
-		children[child.GetSegmentPath()] = &child
+	for i := range runner.NotSupported2 {
+		children[runner.NotSupported2[i].GetSegmentPath()] = &runner.NotSupported2[i]
 	}
 	children["one"] = &runner.One
 	children["one-list"] = &runner.OneList
@@ -1796,7 +1796,7 @@ func (oneList *Runner_OneList) GetChildByName(child_yang_name string, segment_pa
 		}
 		child := Runner_OneList_IdentityList{}
 		oneList.IdentityList = append(oneList.IdentityList, child)
-		return &child
+		return &oneList.IdentityList[len(oneList.IdentityList)-1]
 	}
 	if child_yang_name == "ldata" {
 		for _, c := range oneList.Ldata {
@@ -1806,7 +1806,7 @@ func (oneList *Runner_OneList) GetChildByName(child_yang_name string, segment_pa
 		}
 		child := Runner_OneList_Ldata{}
 		oneList.Ldata = append(oneList.Ldata, child)
-		return &child
+		return &oneList.Ldata[len(oneList.Ldata)-1]
 	}
 	if child_yang_name == "one-aug-list" {
 		return &oneList.OneAugList
@@ -1816,11 +1816,11 @@ func (oneList *Runner_OneList) GetChildByName(child_yang_name string, segment_pa
 
 func (oneList *Runner_OneList) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range oneList.IdentityList {
-		children[child.GetSegmentPath()] = &child
+	for i := range oneList.IdentityList {
+		children[oneList.IdentityList[i].GetSegmentPath()] = &oneList.IdentityList[i]
 	}
-	for _, child := range oneList.Ldata {
-		children[child.GetSegmentPath()] = &child
+	for i := range oneList.Ldata {
+		children[oneList.Ldata[i].GetSegmentPath()] = &oneList.Ldata[i]
 	}
 	children["one-aug-list"] = &oneList.OneAugList
 
@@ -2182,15 +2182,15 @@ func (oneAugList *Runner_OneList_OneAugList) GetChildByName(child_yang_name stri
 		}
 		child := Runner_OneList_OneAugList_Ldata{}
 		oneAugList.Ldata = append(oneAugList.Ldata, child)
-		return &child
+		return &oneAugList.Ldata[len(oneAugList.Ldata)-1]
 	}
 	return nil
 }
 
 func (oneAugList *Runner_OneList_OneAugList) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range oneAugList.Ldata {
-		children[child.GetSegmentPath()] = &child
+	for i := range oneAugList.Ldata {
+		children[oneAugList.Ldata[i].GetSegmentPath()] = &oneAugList.Ldata[i]
 	}
 
 	return children
@@ -2369,15 +2369,15 @@ func (twoList *Runner_TwoList) GetChildByName(child_yang_name string, segment_pa
 		}
 		child := Runner_TwoList_Ldata{}
 		twoList.Ldata = append(twoList.Ldata, child)
-		return &child
+		return &twoList.Ldata[len(twoList.Ldata)-1]
 	}
 	return nil
 }
 
 func (twoList *Runner_TwoList) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range twoList.Ldata {
-		children[child.GetSegmentPath()] = &child
+	for i := range twoList.Ldata {
+		children[twoList.Ldata[i].GetSegmentPath()] = &twoList.Ldata[i]
 	}
 
 	return children
@@ -2480,15 +2480,15 @@ func (ldata *Runner_TwoList_Ldata) GetChildByName(child_yang_name string, segmen
 		}
 		child := Runner_TwoList_Ldata_Subl1{}
 		ldata.Subl1 = append(ldata.Subl1, child)
-		return &child
+		return &ldata.Subl1[len(ldata.Subl1)-1]
 	}
 	return nil
 }
 
 func (ldata *Runner_TwoList_Ldata) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range ldata.Subl1 {
-		children[child.GetSegmentPath()] = &child
+	for i := range ldata.Subl1 {
+		children[ldata.Subl1[i].GetSegmentPath()] = &ldata.Subl1[i]
 	}
 
 	return children
@@ -2670,15 +2670,15 @@ func (threeList *Runner_ThreeList) GetChildByName(child_yang_name string, segmen
 		}
 		child := Runner_ThreeList_Ldata{}
 		threeList.Ldata = append(threeList.Ldata, child)
-		return &child
+		return &threeList.Ldata[len(threeList.Ldata)-1]
 	}
 	return nil
 }
 
 func (threeList *Runner_ThreeList) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range threeList.Ldata {
-		children[child.GetSegmentPath()] = &child
+	for i := range threeList.Ldata {
+		children[threeList.Ldata[i].GetSegmentPath()] = &threeList.Ldata[i]
 	}
 
 	return children
@@ -2781,15 +2781,15 @@ func (ldata *Runner_ThreeList_Ldata) GetChildByName(child_yang_name string, segm
 		}
 		child := Runner_ThreeList_Ldata_Subl1{}
 		ldata.Subl1 = append(ldata.Subl1, child)
-		return &child
+		return &ldata.Subl1[len(ldata.Subl1)-1]
 	}
 	return nil
 }
 
 func (ldata *Runner_ThreeList_Ldata) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range ldata.Subl1 {
-		children[child.GetSegmentPath()] = &child
+	for i := range ldata.Subl1 {
+		children[ldata.Subl1[i].GetSegmentPath()] = &ldata.Subl1[i]
 	}
 
 	return children
@@ -2898,15 +2898,15 @@ func (subl1 *Runner_ThreeList_Ldata_Subl1) GetChildByName(child_yang_name string
 		}
 		child := Runner_ThreeList_Ldata_Subl1_SubSubl1{}
 		subl1.SubSubl1 = append(subl1.SubSubl1, child)
-		return &child
+		return &subl1.SubSubl1[len(subl1.SubSubl1)-1]
 	}
 	return nil
 }
 
 func (subl1 *Runner_ThreeList_Ldata_Subl1) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range subl1.SubSubl1 {
-		children[child.GetSegmentPath()] = &child
+	for i := range subl1.SubSubl1 {
+		children[subl1.SubSubl1[i].GetSegmentPath()] = &subl1.SubSubl1[i]
 	}
 
 	return children
@@ -3088,15 +3088,15 @@ func (inbtwList *Runner_InbtwList) GetChildByName(child_yang_name string, segmen
 		}
 		child := Runner_InbtwList_Ldata{}
 		inbtwList.Ldata = append(inbtwList.Ldata, child)
-		return &child
+		return &inbtwList.Ldata[len(inbtwList.Ldata)-1]
 	}
 	return nil
 }
 
 func (inbtwList *Runner_InbtwList) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range inbtwList.Ldata {
-		children[child.GetSegmentPath()] = &child
+	for i := range inbtwList.Ldata {
+		children[inbtwList.Ldata[i].GetSegmentPath()] = &inbtwList.Ldata[i]
 	}
 
 	return children
@@ -3303,15 +3303,15 @@ func (subc *Runner_InbtwList_Ldata_Subc) GetChildByName(child_yang_name string, 
 		}
 		child := Runner_InbtwList_Ldata_Subc_SubcSubl1{}
 		subc.SubcSubl1 = append(subc.SubcSubl1, child)
-		return &child
+		return &subc.SubcSubl1[len(subc.SubcSubl1)-1]
 	}
 	return nil
 }
 
 func (subc *Runner_InbtwList_Ldata_Subc) GetChildren() map[string]types.Entity {
 	children := make(map[string]types.Entity)
-	for _, child := range subc.SubcSubl1 {
-		children[child.GetSegmentPath()] = &child
+	for i := range subc.SubcSubl1 {
+		children[subc.SubcSubl1[i].GetSegmentPath()] = &subc.SubcSubl1[i]
 	}
 
 	return children

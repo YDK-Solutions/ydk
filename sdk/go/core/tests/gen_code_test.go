@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
-	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
+	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -50,25 +50,25 @@ func (suite *GenCodeTestSuite) BeforeTest(suiteName, testName string) {
 func (suite *GenCodeTestSuite) TearDownSuite() {
 }
 
-func configBgp(bgp *oc_bgp.Bgp) {
+func configBgp(bgp *ysanity_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6_Unicast{}
+	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
 	ipv6_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
 
-	ipv4_afisafi := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4_Unicast{}
+	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
-	bgp := oc_bgp.Bgp{}
+	bgp := ysanity_bgp.Bgp{}
 	configBgp(&bgp)
 
 	suite.Provider.Encoding = types.XML
@@ -79,7 +79,7 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
 	entity := suite.Codec.Decode(&suite.Provider, xml_payload)
-	bgp_decoded := entity.(*oc_bgp.Bgp)
+	bgp_decoded := entity.(*ysanity_bgp.Bgp)
 
 	p := suite.Codec.Encode(&suite.Provider, bgp_decoded)
 	fmt.Printf("In TestGenCodeXMlDecoding, payload = %v", p)

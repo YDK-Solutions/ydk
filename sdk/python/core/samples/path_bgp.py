@@ -35,7 +35,7 @@ def execute_path(provider, codec):
 
 
 if __name__ == "__main__":
-    repo = Repository("/Users/abhirame/.ydk/127.0.0.1:12022")
+    repo = Repository("/usr/local/share/ydktest@0.1.0")
     provider = RestconfServiceProvider(repo, '127.0.0.1', 'admin', 'admin', 12306, EncodingFormat.JSON)
     codec = Codec()
     execute_path(provider, codec)

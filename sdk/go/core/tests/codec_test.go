@@ -155,7 +155,7 @@ func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(int
 		return false
 	}
 
-	// Unmarshal and Marshal the payload incase list items in payload are not sorted
+	// Unmarshal and Marshal the payload in case list items in payload are not sorted
 	p1, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))

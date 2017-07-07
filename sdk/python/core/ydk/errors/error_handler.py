@@ -33,17 +33,18 @@ if sys.version_info > (3, 0):
     inspect.getargspec = inspect.getfullargspec
 
 
-_ERRORS = { "YCPPError": _YPYError,
-            "YCPPCoreError": _YPYCoreError,
-            "YCPPCodecError": _YPYCodecError,
-            "YCPPClientError": _YPYClientError,
-            "YCPPIllegalStateError": _YPYIllegalStateError,
-            "YCPPInvalidArgumentError": _YPYInvalidArgumentError,
-            "YCPPModelError": _YPYModelError,
-            "YCPPOperationNotSupportedError": _YPYOperationNotSupportedError,
-            "YCPPServiceError": _YPYServiceError,
-            "YCPPServiceProviderError": _YPYServiceProviderError,
+_ERRORS = {"YCPPError": _YPYError,
+           "YCPPCoreError": _YPYCoreError,
+           "YCPPCodecError": _YPYCodecError,
+           "YCPPClientError": _YPYClientError,
+           "YCPPIllegalStateError": _YPYIllegalStateError,
+           "YCPPInvalidArgumentError": _YPYInvalidArgumentError,
+           "YCPPModelError": _YPYModelError,
+           "YCPPOperationNotSupportedError": _YPYOperationNotSupportedError,
+           "YCPPServiceError": _YPYServiceError,
+           "YCPPServiceProviderError": _YPYServiceProviderError,
 }
+
 
 def _raise(exc):
     """Suppress old exception context for Python > 3.3,
@@ -103,10 +104,10 @@ def handle_import_error(logger, level):
 
 
 def check_argument(func):
-    def helper(self, provider, entity, *args):
+    def helper(self, provider, entity, *args, **kwargs):
         _, pname, ename = inspect.getargspec(func).args[:3]
         if provider is None or entity is None:
             err_msg = "'{0}' and '{1}' cannot be None".format(pname, ename)
             raise _YPYServiceError(error_msg=err_msg)
-        return func(self, provider, entity, *args)
+        return func(self, provider, entity, *args, **kwargs)
     return helper

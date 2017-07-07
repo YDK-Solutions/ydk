@@ -148,7 +148,7 @@ static bool is_config(path::Rpc & rpc)
 
 std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& rpc) const
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
 
     auto filter = rpc.input().find("filter");
     if(filter.empty()){
@@ -177,7 +177,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
 
 std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& rpc, const string & yfilter) const
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
     auto entity = rpc.input().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
@@ -198,7 +198,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& 
 
 static std::shared_ptr<path::DataNode> handle_read_reply(const string & reply, path::RootSchemaNode & root_schema, EncodingFormat encoding)
 {
-    path::CodecService codec_service{};
+    path::Codec codec_service{};
 
     auto datanode = std::shared_ptr<path::DataNode>(codec_service.decode(root_schema, reply, encoding));
 

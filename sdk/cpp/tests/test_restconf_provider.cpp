@@ -31,7 +31,7 @@ TEST_CASE("CreateDelRead")
 
     ydk::path::RootSchemaNode& schema = provider.get_root_schema();
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 

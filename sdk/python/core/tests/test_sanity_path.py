@@ -17,7 +17,7 @@
 from __future__ import absolute_import
 import unittest
 from ydk.providers import NetconfServiceProvider
-from ydk.path import CodecService
+from ydk.path import Codec
 from ydk.types import EncodingFormat
 
 
@@ -27,7 +27,7 @@ class SanityTest(unittest.TestCase):
     def setUpClass(self):
         self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
         self.root_schema = self.ncc.get_root_schema()
-        self.codec = CodecService()
+        self.codec = Codec()
 
     def _delete_runner(self):
         runner = self.root_schema.create("ydktest-sanity:runner")

@@ -25,6 +25,7 @@
 #include "catch.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
 TEST_CASE("test_types_int8")

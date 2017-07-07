@@ -34,7 +34,7 @@ class OpenDaylightCapabilitiesJsonParser
         OpenDaylightCapabilitiesJsonParser();
         ~OpenDaylightCapabilitiesJsonParser();
 
-        std::map<std::string, std::unique_ptr<network_topology::NetworkTopology::Topology::Node> > parse(const std::string & capabilities_xml);
+        std::map<std::string, std::unique_ptr<opendaylight::network_topology::NetworkTopology::Topology::Node> > parse(const std::string & capabilities_xml);
 
 };
 

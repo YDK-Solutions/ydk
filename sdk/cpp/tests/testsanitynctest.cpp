@@ -38,7 +38,7 @@ TEST_CASE("test_sanity_types_int8 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -106,7 +106,7 @@ TEST_CASE("test_sanity_types_int16 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -175,7 +175,7 @@ TEST_CASE("test_sanity_types_int32 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -240,7 +240,7 @@ TEST_CASE("test_sanity_types_int64 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -305,7 +305,7 @@ TEST_CASE("test_sanity_types_uint8 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -371,7 +371,7 @@ TEST_CASE("test_sanity_types_uint16 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -437,7 +437,7 @@ TEST_CASE("test_sanity_types_uint32 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -504,7 +504,7 @@ TEST_CASE("test_sanity_types_uint64 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -571,7 +571,7 @@ TEST_CASE("test_sanity_types_bits ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -637,7 +637,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -705,7 +705,7 @@ TEST_CASE("test_sanity_types_string")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -772,7 +772,7 @@ TEST_CASE("test_sanity_types_empty")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -837,7 +837,7 @@ TEST_CASE("test_sanity_types_boolean")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -903,7 +903,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -968,7 +968,7 @@ TEST_CASE("test_sanity_types_enum")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1034,7 +1034,7 @@ TEST_CASE("test_sanity_types_union")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1100,7 +1100,7 @@ TEST_CASE("test_sanity_types_union_enum")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1168,7 +1168,7 @@ TEST_CASE("test_sanity_types_union_int")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1236,7 +1236,7 @@ TEST_CASE("test_union_leaflist")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1303,7 +1303,7 @@ TEST_CASE("test_enum_leaflist")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1370,7 +1370,7 @@ TEST_CASE("test_identity_leaflist")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1438,7 +1438,7 @@ TEST_CASE("test_union_complex_list")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
@@ -1499,7 +1499,7 @@ TEST_CASE("test_identityref")
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 

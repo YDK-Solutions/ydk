@@ -24,6 +24,7 @@ set(bundle_tests_src
         test_netconf_service.cpp
         test_errors.cpp
         test_opendaylight.cpp
+        test_xml_subtree.cpp
         main.cpp)
 
 find_library(xml2_location xml2)

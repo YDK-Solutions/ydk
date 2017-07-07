@@ -158,6 +158,7 @@ set(libydk_src
     src/validation_service.cpp
     src/value.cpp
     src/value_list.cpp
+    src/xml_subtree_codec.cpp
     src/ydk_operation.cpp
     src/ydk_yang.cpp
     src/path/annotation.cpp
@@ -206,6 +207,7 @@ set(libydk_install_headers
     src/service.hpp
     src/service.hpp
     src/types.hpp
+    src/xml_subtree_codec.hpp
     src/validation_service.hpp)
 
 # Set LibNetconf variables

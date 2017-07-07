@@ -177,18 +177,18 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-// class ydk::CodecService
+// class ydk::Codec
 //////////////////////////////////////////////////////////////////////////
-ydk::path::CodecService::CodecService()
+ydk::path::Codec::Codec()
 {
 }
 
-ydk::path::CodecService::~CodecService()
+ydk::path::Codec::~Codec()
 {
 }
 
 std::string
-ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
+ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
 {
     std::string ret{};
 
@@ -198,12 +198,12 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 
     if(format == ydk::EncodingFormat::JSON)
     {
-        YLOG_DEBUG("Performing encode yfilter on JSON");
+        YLOG_DEBUG("Performing encode operation on JSON");
         scheme = LYD_JSON;
     }
     else
     {
-        YLOG_DEBUG("Performing encode yfilter on XML");
+        YLOG_DEBUG("Performing encode operation on XML");
     }
 
     struct lyd_node* m_node = nullptr;
@@ -233,17 +233,17 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
+ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
     LYD_FORMAT scheme = LYD_XML;
     if (format == EncodingFormat::JSON)
     {
-        YLOG_DEBUG("Performing decode yfilter on JSON");
+        YLOG_DEBUG("Performing decode operation on JSON");
         scheme = LYD_JSON;
     }
     else
     {
-        YLOG_DEBUG("Performing decode yfilter on XML");
+        YLOG_DEBUG("Performing decode operation on XML");
     }
 
     const RootSchemaNodeImpl & rs_impl = dynamic_cast<const RootSchemaNodeImpl &>(root_schema);
@@ -257,7 +257,7 @@ ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::s
     }
 
 
-    YLOG_DEBUG("Performing decode yfilter");
+    YLOG_DEBUG("Performing decode operation");
     RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
     rd->m_node = root;
 

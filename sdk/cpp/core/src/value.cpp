@@ -108,7 +108,7 @@ const std::string  YLeaf::get() const
 
 std::pair<std::string, LeafData> YLeaf::get_name_leafdata() const
 {
-    return {name, {get(), yfilter, is_set}};
+    return {name, {get(), yfilter, is_set, value_namespace, value_namespace_prefix }};
 }
 
 void YLeaf::operator = (uint8 val)
@@ -206,6 +206,8 @@ void YLeaf::operator = (Identity val)
 
     value_buffer << val.to_string();
     store_value(value_buffer.str());
+    value_namespace = val.name_space;
+    value_namespace_prefix = val.namespace_prefix;
 }
 
 void YLeaf::operator = (std::string val)

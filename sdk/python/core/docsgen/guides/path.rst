@@ -1,7 +1,7 @@
 .. _howto-path:
 
-How To Path
-===========
+Using the Path API
+==================
 
 .. module:: ydk.path
 
@@ -65,7 +65,7 @@ Example for using Path API is shown below(assuming you have openconfig-bgp avaia
     log.addHandler(ch)                                                      # enable logging
 
     from ydk.providers import NetconfServiceProvider
-    from ydk.path import CodecService
+    from ydk.path import Codec
     from ydk.types import EncodingFormat
 
     provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
@@ -83,7 +83,7 @@ Example for using Path API is shown below(assuming you have openconfig-bgp avaia
     neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST")
     neighbor_af.create("config/enabled","true")
 
-    codec_service = CodecService()
+    codec_service = Codec()
     xml = codec_service.encode(bgp, EncodingFormat.XML, True)               # get XML encoding
     create_rpc = root_schema.rpc('ydk:create')
     create_rpc.input().create('entity', xml)

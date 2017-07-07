@@ -28,6 +28,7 @@
 #include "catch.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
 // cancel_commit -- issues in netsim

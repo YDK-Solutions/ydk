@@ -50,7 +50,7 @@ namespace path {
 /// - Creation of DataNode Tree's for config and oper
 /// - Create and Invoke RPC's
 /// - ValidationService that validates DataNode Tree's based on criteria.
-/// - CodecService that can encode a DataNode to XML/JSON and decode from XML/JSON to a dataNode tree
+/// - Codec that can encode a DataNode to XML/JSON and decode from XML/JSON to a dataNode tree
 ///
 /// @section about-license License
 ///
@@ -222,7 +222,7 @@ namespace path {
 
 ///
 /// @page howtocodec Encoding and Decoding.
-/// A given DataNode Tree can be encoded and decoded into a variety of formats using the CodecService.
+/// A given DataNode Tree can be encoded and decoded into a variety of formats using the Codec.
 //
 /// DataNode Tree can be validated using the ValidationService
 ///
@@ -262,15 +262,15 @@ public:
 };
 
 ///
-/// @brief CodecService
+/// @brief Codec
 ///
 /// The Encode/Decode Service.
 ///
-class CodecService
+class Codec
 {
 public:
-    CodecService();
-    ~CodecService();
+    Codec();
+    ~Codec();
 
     ///
     /// @brief encode the given DataNode Tree
@@ -294,7 +294,6 @@ public:
     ///
     std::shared_ptr<DataNode> decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
 };
-
 
 ///
 /// @brief Base class for YCPP Errors
@@ -461,6 +460,8 @@ struct Statement {
     std::string keyword;
     /// the arg if any
     std::string  arg;
+    /// the namespace if any
+    std::string  name_space;
 
 };
 

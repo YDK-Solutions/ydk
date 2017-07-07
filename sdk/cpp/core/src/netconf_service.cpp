@@ -29,6 +29,7 @@
 #include "netconf_service.hpp"
 #include "path_api.hpp"
 #include "validation_service.hpp"
+#include "xml_subtree_codec.hpp"
 #include "logger.hpp"
 
 using namespace std;
@@ -40,6 +41,7 @@ static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && yfilter);
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string, string & url);
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string);
+static string get_xml_subtree_filter_payload(Entity & entity, path::ServiceProvider & provider);
 
 NetconfService::NetconfService()
 {
@@ -221,8 +223,8 @@ shared_ptr<Entity> NetconfService::get_config(NetconfServiceProvider & provider,
     create_input_leaf(rpc->input(), source, "source");
 
     // filter
-    std::string entity_string = get_data_payload(filter, provider.get_root_schema());
-    rpc->input().create("filter", entity_string);
+    std::string filter_string  = get_xml_subtree_filter_payload(filter, provider);
+    rpc->input().create("filter", filter_string);
 
     auto read_datanode = (*rpc)(provider);
     if (read_datanode == nullptr)
@@ -243,8 +245,8 @@ shared_ptr<Entity> NetconfService::get(NetconfServiceProvider & provider, Entity
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:get");
 
     // filter
-    std::string entity_string = get_data_payload(filter, provider.get_root_schema());
-    rpc->input().create("filter", entity_string);
+    std::string filter_string  = get_xml_subtree_filter_payload(filter, provider);
+    rpc->input().create("filter", filter_string);
 
     auto result_datanode = (*rpc)(provider);
     if (result_datanode == nullptr)
@@ -346,7 +348,7 @@ static std::string get_data_payload(Entity & entity, path::RootSchemaNode & root
     while(dn!= nullptr && dn->parent()!=nullptr)
         dn = dn->parent();
 
-    path::CodecService codec{};
+    path::Codec codec{};
     return codec.encode(*dn, ydk::EncodingFormat::XML, true);
 }
 
@@ -404,5 +406,11 @@ static void create_input_leaf(path::DataNode & input_datanode, DataStore datasto
     }
 
     input_datanode.create(os.str());
+}
+
+static string get_xml_subtree_filter_payload(Entity & entity, path::ServiceProvider & provider)
+{
+    XmlSubtreeCodec xml_subtree_codec{};
+    return xml_subtree_codec.encode(entity, provider.get_root_schema());
 }
 }

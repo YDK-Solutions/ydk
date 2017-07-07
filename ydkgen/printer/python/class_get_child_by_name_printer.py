@@ -20,7 +20,7 @@ source_printer.py
  prints python classes
 
 """
-
+from ydkgen.api_model import Class
 
 class ClassGetChildByNamePrinter(object):
     def __init__(self, ctx):
@@ -30,6 +30,26 @@ class ClassGetChildByNamePrinter(object):
         self._print_class_get_child_header(clazz)
         self._print_class_get_child_body(children)
         self._print_class_get_child_trailer(clazz)
+        leafs = []
+        for prop in clazz.properties():
+            ptype = prop.property_type
+            if ptype is not None and not isinstance(ptype, Class):
+                leafs.append(prop)
+        self._print_has_leaf_or_child_of_name(clazz, children, leafs)
+
+    def _print_has_leaf_or_child_of_name(self, clazz, children, leafs):
+        self.ctx.writeln('def has_leaf_or_child_of_name(self, name):')
+        self.ctx.lvl_inc()
+        if(len(children) > 0 or len(leafs) > 0):
+            props = children+leafs
+            if_condition = ' or '.join('name == "%s"'% x.stmt.arg for x in props)
+            self.ctx.writeln('if(%s):' % if_condition)
+            self.ctx.lvl_inc()
+            self.ctx.writeln('return True')
+            self.ctx.lvl_dec()
+        self.ctx.writeln('return False')
+        self.ctx.lvl_dec()
+        self.ctx.bline()
 
     def _print_class_get_child_header(self, clazz):
         self.ctx.writeln('def get_child_by_name(self, child_yang_name, segment_path):')

@@ -25,6 +25,7 @@
 
 using namespace ydk;
 using namespace std;
+using namespace ydktest;
 
 TEST_CASE("one_level_pos_set")
 {
@@ -104,7 +105,8 @@ TEST_CASE("two_level_pos")
     REQUIRE(reply);
 
     auto filter = make_unique<ydktest_sanity::Runner>();
-    auto r_2 = crud.read(provider, *filter->two);
+    filter->two->yfilter = YFilter::read;
+    auto r_2 = crud.read(provider, *filter);
     REQUIRE(r_2!=nullptr);
     ydktest_sanity::Runner * r_2_ptr = dynamic_cast<ydktest_sanity::Runner*>(r_2.get());
     REQUIRE(r_2_ptr!=nullptr);

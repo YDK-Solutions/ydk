@@ -21,17 +21,18 @@
 #include <ydk/codec_provider.hpp>
 #include <ydk/codec_service.hpp>
 #include <ydk/crud_service.hpp>
-#include <ydk/entity_util.hpp>
 #include <ydk/entity_data_node_walker.hpp>
+#include <ydk/entity_util.hpp>
 #include <ydk/executor_service.hpp>
 #include <ydk/filters.hpp>
 #include <ydk/logging_callback.hpp>
-#include <ydk/netconf_service.hpp>
 #include <ydk/netconf_provider.hpp>
+#include <ydk/netconf_service.hpp>
 #include <ydk/opendaylight_provider.hpp>
-#include <ydk/restconf_provider.hpp>
 #include <ydk/path_api.hpp>
+#include <ydk/restconf_provider.hpp>
 #include <ydk/types.hpp>
+#include <ydk/xml_subtree_codec.hpp>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/null_sink.h>
@@ -48,7 +49,7 @@ PYBIND11_MAKE_OPAQUE(ChildrenMap)
 
 static object log_debug;
 static object log_info;
-static object log_warn;
+static object log_warning;
 static object log_error;
 static object log_critical;
 static bool added_nullhandler = false;
@@ -76,7 +77,7 @@ void add_null_handler(object logger)
 
 void debug(const char* msg) { log_debug(msg); }
 void info(const char* msg) { log_info(msg); }
-void warn(const char* msg) { log_warn(msg); }
+void warning(const char* msg) { log_warning(msg); }
 void error(const char* msg) { log_error(msg); }
 void critical(const char* msg) { log_critical(msg); }
 
@@ -90,13 +91,13 @@ void setup_logging()
         add_null_handler(logger);
         log_debug = logger.attr("debug");
         log_info = logger.attr("info");
-        log_warn = logger.attr("warn");
+        log_warning = logger.attr("warning");
         log_error = logger.attr("error");
         log_critical = logger.attr("critical");
 
         ydk::set_logging_callback("debug", debug);
         ydk::set_logging_callback("info", info);
-        ydk::set_logging_callback("warn", warn);
+        ydk::set_logging_callback("warning", warning);
         ydk::set_logging_callback("error", error);
         ydk::set_logging_callback("critical", critical);
         enabled_logging = true;
@@ -163,13 +164,34 @@ public:
         );
     }
 
-    void set_value(const std::string & value_path, std::string value) override {
+    bool has_leaf_or_child_of_name(const std::string & name) const override {
+        PYBIND11_OVERLOAD_PURE(
+            bool,
+            ydk::Entity,
+            has_leaf_or_child_of_name,
+            name
+        );
+    }
+
+    void set_value(const std::string & value_path, const std::string & value, const std::string & name_space, const std::string & name_space_prefix) override {
         PYBIND11_OVERLOAD_PURE(
             void,
             ydk::Entity,
             set_value,
             value_path,
-            value
+            value,
+            name_space,
+            name_space_prefix
+        );
+    }
+
+    void set_filter(const std::string & value_path, ydk::YFilter yfilter) override {
+        PYBIND11_OVERLOAD_PURE(
+            void,
+            ydk::Entity,
+            set_filter,
+            value_path,
+            yfilter
         );
     }
 
@@ -237,7 +259,7 @@ PYBIND11_PLUGIN(ydk_)
     module filters = ydk.def_submodule("filters", "filters module");
     module types = ydk.def_submodule("types", "types module");
     module path = ydk.def_submodule("path", "path module");
-    module entity_utils = ydk.def_submodule("entity_utils", "path module");
+    module entity_utils = ydk.def_submodule("entity_utils", "entity utils module");
     module logging = ydk.def_submodule("logging", "logging");
 
     bind_vector<LeafDataList>(types, "LeafDataList");
@@ -306,12 +328,12 @@ PYBIND11_PLUGIN(ydk_)
         .def(init<const string&>())
         .def("create_root_schema", &ydk::path::Repository::create_root_schema, return_value_policy::move);
 
-    class_<ydk::path::CodecService> codec_service(path, "CodecService");
+    class_<ydk::path::Codec> codec(path, "Codec");
 
-    codec_service
+    codec
         .def(init<>())
-        .def("encode", &ydk::path::CodecService::encode, arg("data_node"), arg("encoding"), arg("pretty"))
-        .def("decode", &ydk::path::CodecService::decode, arg("root_schema_node"), arg("payload"), arg("encoding"));
+        .def("encode", &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
+        .def("decode", &ydk::path::Codec::decode, arg("root_schema_node"), arg("payload"), arg("encoding"));
 
     enum_<ydk::DataStore>(services, "DataStore")
         .value("candidate", ydk::DataStore::candidate)
@@ -354,10 +376,12 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("set", &ydk::Empty::set);
 
     class_<ydk::LeafData>(types, "LeafData")
-        .def(init<string, ydk::YFilter, bool>())
+        .def(init<const string &, ydk::YFilter, bool, const string &, const string &>())
         .def_readonly("value", &ydk::LeafData::value, return_value_policy::reference)
         .def_readonly("yfilter", &ydk::LeafData::yfilter, return_value_policy::reference)
         .def_readonly("is_set", &ydk::LeafData::is_set, return_value_policy::reference)
+        .def_readonly("name_space", &ydk::LeafData::name_space, return_value_policy::reference)
+        .def_readonly("name_space_prefix", &ydk::LeafData::name_space_prefix, return_value_policy::reference)
         .def(self == self, return_value_policy::reference);
 
     class_<ydk::Entity, PyEntity, shared_ptr<ydk::Entity>>(types, "Entity")
@@ -366,6 +390,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_segment_path", &ydk::Entity::get_segment_path, return_value_policy::reference)
         .def("get_child_by_name", &ydk::Entity::get_child_by_name, return_value_policy::reference)
         .def("set_value", &ydk::Entity::set_value, return_value_policy::reference)
+        .def("set_filter", &ydk::Entity::set_filter, return_value_policy::reference)
         .def("has_data", &ydk::Entity::has_data, return_value_policy::reference)
         .def("has_operation", &ydk::Entity::has_operation, return_value_policy::reference)
         .def("get_children", &ydk::Entity::get_children, return_value_policy::reference)
@@ -405,7 +430,7 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("value", &ydk::Decimal64::value);
 
     class_<ydk::Identity>(types, "Identity")
-        .def(init<string>())
+        .def(init<const std::string &, const std::string &, const std::string &>())
         .def("to_string", &ydk::Identity::to_string, return_value_policy::reference);
 
     class_<ydk::Enum> enum_(types, "Enum");
@@ -450,7 +475,9 @@ PYBIND11_PLUGIN(ydk_)
         .def("set", (void (ydk::YLeaf::*)(ydk::Enum::YLeaf)) &ydk::YLeaf::set, arg("value"))
         .def("set", (void (ydk::YLeaf::*)(ydk::Decimal64)) &ydk::YLeaf::set, arg("value"))
         .def_readonly("is_set", &ydk::YLeaf::is_set, return_value_policy::reference)
-        .def_readwrite("yfilter", &ydk::YLeaf::yfilter);
+        .def_readwrite("yfilter", &ydk::YLeaf::yfilter)
+        .def_readwrite("value_namespace", &ydk::YLeaf::value_namespace)
+        .def_readwrite("value_namespace_prefix", &ydk::YLeaf::value_namespace_prefix);
 
     class_<ydk::YLeafList, PyYLeafList>(types, "YLeafList")
         .def(init<ydk::YType, string>(), arg("leaflist_type"), arg("name"))
@@ -615,6 +642,11 @@ PYBIND11_PLUGIN(ydk_)
             arg("provider"),
             arg("source_config"),
             return_value_policy::reference);
+
+    class_<ydk::XmlSubtreeCodec>(entity_utils, "XmlSubtreeCodec")
+        .def(init<>())
+        .def("encode", &ydk::XmlSubtreeCodec::encode, return_value_policy::reference)
+        .def("decode", &ydk::XmlSubtreeCodec::decode);
 
     entity_utils.def("get_relative_entity_path", &ydk::get_relative_entity_path);
     entity_utils.def("get_entity_from_data_node", &ydk::get_entity_from_data_node);

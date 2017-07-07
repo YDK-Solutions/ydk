@@ -31,6 +31,7 @@
 #include "config.hpp"
 #include "catch.hpp"
 
+using namespace ydktest;
 
 TEST_CASE("validation_int8 ")
 {
@@ -40,7 +41,7 @@ TEST_CASE("validation_int8 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.number8 = static_cast<int8_t>(0);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -58,7 +59,7 @@ TEST_CASE("validation_int16 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.number16 = static_cast<int16_t>(126);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -75,7 +76,7 @@ TEST_CASE("validation_int32 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.number32 = 200000;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -92,7 +93,7 @@ TEST_CASE("validation_int64 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.number64 = -922337203685477580LL;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -109,7 +110,7 @@ TEST_CASE("validation_uint8 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.u_number8 =  static_cast<uint8_t>(0);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -126,7 +127,7 @@ TEST_CASE("validation_uint16 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.u_number16 = static_cast<uint16_t>(65535);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -144,7 +145,7 @@ TEST_CASE("validation_uint32 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.u_number32 = static_cast<uint32_t>(5927);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -161,7 +162,7 @@ TEST_CASE("validation_uint64 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.u_number64 = 18446744073709551615ULL;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -178,7 +179,7 @@ TEST_CASE("bits ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.bits_value["disable-nagle"] = true;
     builtInT.bits_value["auto-sense-speed"] = true;
     auto r = builtInT.get_entity_path(nullptr);
@@ -197,7 +198,7 @@ TEST_CASE("validation_decimal64 ")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.deci64 = ydk::Decimal64("3.12");
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -213,7 +214,7 @@ TEST_CASE("validation_string")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.name = "name_str";
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -232,7 +233,7 @@ TEST_CASE("validation_empty")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.emptee = empty;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -249,7 +250,7 @@ TEST_CASE("validation_boolean")
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.bool_value = true;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -267,9 +268,9 @@ TEST_CASE("validation_embedded_enum")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.embeded_enum = ydk::ydktest_sanity::Runner::Ytypes::BuiltInT::EmbededEnum::seven;
+    builtInT.embeded_enum = ydktest_sanity::Runner::Ytypes::BuiltInT::EmbededEnum::seven;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -287,9 +288,9 @@ TEST_CASE("validation_enum")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.enum_value = ydk::ydktest_sanity::YdkEnumTest::none;
+    builtInT.enum_value = ydktest_sanity::YdkEnumTest::none;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -307,9 +308,9 @@ TEST_CASE("validation_union")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.younion = ydk::ydktest_sanity::YdkEnumTest::none;
+    builtInT.younion = ydktest_sanity::YdkEnumTest::none;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -327,9 +328,9 @@ TEST_CASE("validation_union_enum")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.enum_int_value = ydk::ydktest_sanity::YdkEnumIntTest::any;
+    builtInT.enum_int_value = ydktest_sanity::YdkEnumIntTest::any;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -345,7 +346,7 @@ TEST_CASE("validation_union_int")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.enum_int_value = 2;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
@@ -364,7 +365,7 @@ TEST_CASE("test_v_union_leaflist")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
     builtInT.llunion.append( static_cast<uint16_t>(1));
     builtInT.llunion.append( static_cast<uint16_t>(2));
 
@@ -383,10 +384,10 @@ TEST_CASE("test_v_enum_leaflist")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.enum_llist.append(ydk::ydktest_sanity::YdkEnumTest::local);
-    builtInT.enum_llist.append(ydk::ydktest_sanity::YdkEnumTest::remote);
+    builtInT.enum_llist.append(ydktest_sanity::YdkEnumTest::local);
+    builtInT.enum_llist.append(ydktest_sanity::YdkEnumTest::remote);
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -402,10 +403,10 @@ TEST_CASE("test_v_identity_leaflist")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    builtInT.identity_llist.append(ydk::ydktest_sanity::ChildIdentity{});
-    builtInT.identity_llist.append(ydk::ydktest_sanity::ChildChildIdentity{});
+    builtInT.identity_llist.append(ydktest_sanity::ChildIdentity{});
+    builtInT.identity_llist.append(ydktest_sanity::ChildChildIdentity{});
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));
 
@@ -423,7 +424,7 @@ TEST_CASE("test_v_union_complex_list")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
     builtInT.younion_list.append("123:45");
 
@@ -442,9 +443,9 @@ TEST_CASE("test_v_identityref")
 
     ydk::ValidationService validation_service{};
 
-    ydk::ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
+    ydktest_sanity::Runner::Ytypes::BuiltInT builtInT{};
 
-    auto identity = ydk::ydktest_sanity::ChildChildIdentity{};
+    auto identity = ydktest_sanity::ChildChildIdentity{};
     builtInT.identity_ref_value = identity;
 
     CHECK_NOTHROW(validation_service.validate(sp, builtInT, ydk::ValidationService::Option::EDIT_CONFIG));

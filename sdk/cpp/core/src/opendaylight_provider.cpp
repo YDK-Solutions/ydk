@@ -26,7 +26,7 @@ using namespace std;
 
 namespace ydk
 {
-#define ODLNode network_topology::NetworkTopology::Topology::Node
+#define ODLNode opendaylight::network_topology::NetworkTopology::Topology::Node
 
 static string get_encoding_string(EncodingFormat encoding);
 

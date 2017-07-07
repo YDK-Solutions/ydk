@@ -27,6 +27,7 @@
 #include "config.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
 #define CONTAINS_ERROR_MESSAGE \

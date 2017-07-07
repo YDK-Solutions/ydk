@@ -1,12 +1,12 @@
-Codec Service
+Codec
 =============
 
 .. module:: ydk.path
-    :synopsis: Path API' CodecService
+    :synopsis: Path API Codec
 
-.. py:class:: CodecService()
+.. py:class:: Codec()
 
-    YDK Path CodecService, used by :py:class:`CodecService<ydk.services.CodecService>` internally.
+    YDK Path Codec used to encode and decode between payload and ``DataNode``.
 
     .. py:method:: encode(data_node, encoding, pretty)
 

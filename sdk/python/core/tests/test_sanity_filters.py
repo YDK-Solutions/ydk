@@ -137,14 +137,10 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
 
         r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.llstring.extend(['1', '2', '3'])
+        r_2.ytypes.built_in_t.llstring.yfilter = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(runner_read.ytypes.built_in_t.llstring, r_1.llstring)
 
-        r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.llstring.extend(['something else'])
-        runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(runner_read, None)
 
     def test_read_on_identity_ref(self):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
@@ -153,11 +149,6 @@ class SanityYang(unittest.TestCase):
         
         r_2 = ysanity.Runner()
         r_2.ytypes.built_in_t.identity_ref_value.yfilter = YFilter.read
-        runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
-
-        r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.identity_ref_value = ysanity.ChildIdentity()
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 

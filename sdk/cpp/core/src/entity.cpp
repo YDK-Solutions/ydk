@@ -25,6 +25,7 @@
 //
 //////////////////////////////////////////////////////////////////
 
+#include "logger.hpp"
 #include "types.hpp"
 #include <iostream>
 #include <iomanip>
@@ -76,6 +77,11 @@ std::string Entity::get_bundle_name() const
     return "";
 }
 
+std::map<std::pair<std::string, std::string>, std::string> Entity::get_namespace_identity_lookup() const
+{
+    return {};
+}
+
 bool Entity::operator == (Entity & other) const
 {
     if(!has_data() && !other.has_data())
@@ -97,6 +103,7 @@ bool Entity::operator == (Entity & other) const
             {
                 if(*(rit->second) != *(lit->second))
                 {
+                    YLOG_DEBUG("Children not equal {} and {}", rit->first, lit->first);
                     return false;
                 }
             }
@@ -104,6 +111,7 @@ bool Entity::operator == (Entity & other) const
     }
     else
     {
+        YLOG_DEBUG("Entity path not equal {} and {}", yang_name, other.yang_name);
         return false;
     }
 

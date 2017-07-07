@@ -26,6 +26,7 @@
 #include "config.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
 

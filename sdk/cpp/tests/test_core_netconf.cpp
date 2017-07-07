@@ -94,7 +94,7 @@ TEST_CASE( "bgp_netconf_create" )
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & bgp = schema.create("openconfig-bgp:bgp", "");
     //first delete
@@ -184,7 +184,7 @@ TEST_CASE("bits")
 
     auto & ysanity = runner.create("ytypes/built-in-t/bits-value", "disable-nagle");
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
     CHECK( !xml.empty());
@@ -207,7 +207,7 @@ TEST_CASE("core_validate")
 
     auto & ysanity = runner.create("source/candidate", "");
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
     CHECK( !xml.empty());
@@ -228,7 +228,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
-    ydk::path::CodecService s{};
+    ydk::path::Codec s{};
 
     auto & bgp = schema.create("openconfig-bgp:bgp", "");
     //get the root
@@ -285,7 +285,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //    ydk::NetconfServiceProvider sp{repo,"localhost", "admin", "admin",  1220};
 //    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 //
-//    ydk::path::CodecService s{};
+//    ydk::path::Codec s{};
 //
 //    auto & bgp = schema.create("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
 //

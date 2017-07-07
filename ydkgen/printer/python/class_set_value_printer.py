@@ -20,7 +20,7 @@ source_printer.py
 prints python classes
 
 """
-from ydkgen.api_model import Bits
+from ydkgen.api_model import Bits, Class
 
 
 class ClassSetYLeafPrinter(object):
@@ -33,7 +33,7 @@ class ClassSetYLeafPrinter(object):
         self._print_class_set_value_trailer(clazz)
 
     def _print_class_set_value_header(self, clazz):
-        self.ctx.writeln('def set_value(self, value_path, value):')
+        self.ctx.writeln('def set_value(self, value_path, value, name_space, name_space_prefix):')
         self.ctx.lvl_inc()
 
     def _print_class_set_value_body(self, leafs):
@@ -54,9 +54,15 @@ class ClassSetYLeafPrinter(object):
             else:
                 self.ctx.writeln('self.%s[value] = True' % leaf.name)
         elif(leaf.is_many):
-            self.ctx.writeln('self.%s.append(value)' % leaf.name)
+            if isinstance(leaf.property_type, Class) and leaf.property_type.is_identity():
+                self.ctx.writeln('identity = Identity(name_space, name_space_prefix, value)')
+                self.ctx.writeln('self.%s.append(identity)' % leaf.name)
+            else:
+                self.ctx.writeln('self.%s.append(value)' % leaf.name)
         else:
             self.ctx.writeln('self.%s = value' % leaf.name)
+            self.ctx.writeln('self.%s.value_namespace = name_space' % leaf.name)
+            self.ctx.writeln('self.%s.value_namespace_prefix = name_space_prefix' % leaf.name)
         self.ctx.lvl_dec()
 
     def _print_class_set_value_trailer(self, clazz):

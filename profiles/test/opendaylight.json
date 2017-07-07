@@ -1,5 +1,5 @@
 {
-    "name": "network-topology",
+    "name": "opendaylight",
     "version": "0.0.1",
     "ydk_version":"0.5.3",
     "author": "Cisco",

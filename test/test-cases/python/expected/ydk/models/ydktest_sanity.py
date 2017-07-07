@@ -32,7 +32,7 @@ class YdkEnumIntTestEnum(Enum):
 
     .. data:: ANY = 4096
 
-    	Any value
+        Any value
 
     """
 
@@ -53,19 +53,19 @@ class YdkEnumTestEnum(Enum):
 
     .. data:: NOT_SET = 0
 
-    	Not Set
+        Not Set
 
     .. data:: NONE = 1
 
-    	None
+        None
 
     .. data:: LOCAL = 2
 
-    	Local
+        Local
 
     .. data:: REMOTE = 3
 
-    	Remote
+        Remote
 
     """
 
@@ -111,63 +111,63 @@ class Runner(object):
     
     .. attribute:: inbtw_list
     
-    	config for one\_level list data
-    	**type**\:  :py:class:`InbtwList <ydk.models.ydktest_sanity.Runner.InbtwList>`
+        config for one\_level list data
+        **type**\:  :py:class:`InbtwList <ydk.models.ydktest_sanity.Runner.InbtwList>`
     
     .. attribute:: leaf_ref
     
-    	
-    	**type**\:  :py:class:`LeafRef <ydk.models.ydktest_sanity.Runner.LeafRef>`
+        
+        **type**\:  :py:class:`LeafRef <ydk.models.ydktest_sanity.Runner.LeafRef>`
     
     .. attribute:: not_supported_1
     
-    	
-    	**type**\:  :py:class:`NotSupported1 <ydk.models.ydktest_sanity.Runner.NotSupported1>`
+        
+        **type**\:  :py:class:`NotSupported1 <ydk.models.ydktest_sanity.Runner.NotSupported1>`
     
     .. attribute:: not_supported_2
     
-    	
-    	**type**\: list of  :py:class:`NotSupported2 <ydk.models.ydktest_sanity.Runner.NotSupported2>`
+        
+        **type**\: list of  :py:class:`NotSupported2 <ydk.models.ydktest_sanity.Runner.NotSupported2>`
     
     .. attribute:: one
     
-    	config for one\_level data
-    	**type**\:  :py:class:`One <ydk.models.ydktest_sanity.Runner.One>`
+        config for one\_level data
+        **type**\:  :py:class:`One <ydk.models.ydktest_sanity.Runner.One>`
     
     .. attribute:: one_list
     
-    	config for one\_level list data
-    	**type**\:  :py:class:`OneList <ydk.models.ydktest_sanity.Runner.OneList>`
+        config for one\_level list data
+        **type**\:  :py:class:`OneList <ydk.models.ydktest_sanity.Runner.OneList>`
     
     .. attribute:: runner_2
     
-    	
-    	**type**\:  :py:class:`Runner2 <ydk.models.ydktest_sanity.Runner.Runner2>`
+        
+        **type**\:  :py:class:`Runner2 <ydk.models.ydktest_sanity.Runner.Runner2>`
     
     .. attribute:: three
     
-    	config for one\_level data
-    	**type**\:  :py:class:`Three <ydk.models.ydktest_sanity.Runner.Three>`
+        config for one\_level data
+        **type**\:  :py:class:`Three <ydk.models.ydktest_sanity.Runner.Three>`
     
     .. attribute:: three_list
     
-    	config for one\_level list data
-    	**type**\:  :py:class:`ThreeList <ydk.models.ydktest_sanity.Runner.ThreeList>`
+        config for one\_level list data
+        **type**\:  :py:class:`ThreeList <ydk.models.ydktest_sanity.Runner.ThreeList>`
     
     .. attribute:: two
     
-    	config for one\_level data
-    	**type**\:  :py:class:`Two <ydk.models.ydktest_sanity.Runner.Two>`
+        config for one\_level data
+        **type**\:  :py:class:`Two <ydk.models.ydktest_sanity.Runner.Two>`
     
     .. attribute:: two_list
     
-    	config for one\_level list data
-    	**type**\:  :py:class:`TwoList <ydk.models.ydktest_sanity.Runner.TwoList>`
+        config for one\_level list data
+        **type**\:  :py:class:`TwoList <ydk.models.ydktest_sanity.Runner.TwoList>`
     
     .. attribute:: ytypes
     
-    	config for one\_level data types
-    	**type**\:  :py:class:`Ytypes <ydk.models.ydktest_sanity.Runner.Ytypes>`
+        config for one\_level data types
+        **type**\:  :py:class:`Ytypes <ydk.models.ydktest_sanity.Runner.Ytypes>`
     
     
 
@@ -209,8 +209,8 @@ class Runner(object):
         
         .. attribute:: ldata
         
-        	one list data
-        	**type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata>`
+            one list data
+            **type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata>`
         
         
 
@@ -232,20 +232,20 @@ class Runner(object):
             
             .. attribute:: number  <key>
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             .. attribute:: subc
             
-            	one list subcontainer data
-            	**type**\:  :py:class:`Subc <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc>`
+                one list subcontainer data
+                **type**\:  :py:class:`Subc <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc>`
             
             
 
@@ -268,20 +268,20 @@ class Runner(object):
                 
                 .. attribute:: name
                 
-                	this is string value
-                	**type**\:  str
+                    this is string value
+                    **type**\:  str
                 
                 .. attribute:: number
                 
-                	integer value type
-                	**type**\:  int
+                    integer value type
+                    **type**\:  int
                 
-                	**range:** \-2147483648..2147483647
+                    **range:** \-2147483648..2147483647
                 
                 .. attribute:: subc_subl1
                 
-                	one list data
-                	**type**\: list of  :py:class:`SubcSubl1 <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc.SubcSubl1>`
+                    one list data
+                    **type**\: list of  :py:class:`SubcSubl1 <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc.SubcSubl1>`
                 
                 
 
@@ -305,15 +305,15 @@ class Runner(object):
                     
                     .. attribute:: number  <key>
                     
-                    	integer value type
-                    	**type**\:  int
+                        integer value type
+                        **type**\:  int
                     
-                    	**range:** \-2147483648..2147483647
+                        **range:** \-2147483648..2147483647
                     
                     .. attribute:: name
                     
-                    	this is string value
-                    	**type**\:  str
+                        this is string value
+                        **type**\:  str
                     
                     
 
@@ -449,40 +449,40 @@ class Runner(object):
         
         .. attribute:: one
         
-        	
-        	**type**\:  :py:class:`One <ydk.models.ydktest_sanity.Runner.LeafRef.One>`
+            
+            **type**\:  :py:class:`One <ydk.models.ydktest_sanity.Runner.LeafRef.One>`
         
         .. attribute:: ref_inbtw
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
-        	**refers to**\: :py:class:`name <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc.SubcSubl1>`
+            **refers to**\: :py:class:`name <ydk.models.ydktest_sanity.Runner.InbtwList.Ldata.Subc.SubcSubl1>`
         
         .. attribute:: ref_one_name
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
-        	**refers to**\: :py:class:`name <ydk.models.ydktest_sanity.Runner.One>`
+            **refers to**\: :py:class:`name <ydk.models.ydktest_sanity.Runner.One>`
         
         .. attribute:: ref_three_sub1_sub2_number
         
-        	
-        	**type**\:  int
+            
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
-        	**refers to**\: :py:class:`number <ydk.models.ydktest_sanity.Runner.Three.Sub1.Sub2>`
+            **refers to**\: :py:class:`number <ydk.models.ydktest_sanity.Runner.Three.Sub1.Sub2>`
         
         .. attribute:: ref_two_sub1_number
         
-        	
-        	**type**\:  int
+            
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
-        	**refers to**\: :py:class:`number <ydk.models.ydktest_sanity.Runner.Two.Sub1>`
+            **refers to**\: :py:class:`number <ydk.models.ydktest_sanity.Runner.Two.Sub1>`
         
         
 
@@ -507,15 +507,15 @@ class Runner(object):
             
             .. attribute:: name_of_one
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
-            	**pattern:** (([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])\\.){3}([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])(%[\\p{N}\\p{L}]+)?
+                **pattern:** (([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])\\.){3}([0\\\-9]\\\|[1\\\-9][0\\\-9]\\\|1[0\\\-9][0\\\-9]\\\|2[0\\\-4][0\\\-9]\\\|25[0\\\-5])(%[\\p{N}\\p{L}]+)?
             
             .. attribute:: two
             
-            	
-            	**type**\:  :py:class:`Two <ydk.models.ydktest_sanity.Runner.LeafRef.One.Two>`
+                
+                **type**\:  :py:class:`Two <ydk.models.ydktest_sanity.Runner.LeafRef.One.Two>`
             
             
 
@@ -537,10 +537,10 @@ class Runner(object):
                 
                 .. attribute:: self_ref_one_name
                 
-                	
-                	**type**\:  str
+                    
+                    **type**\:  str
                 
-                	**refers to**\: :py:class:`ref_one_name <ydk.models.ydktest_sanity.Runner.LeafRef>`
+                    **refers to**\: :py:class:`ref_one_name <ydk.models.ydktest_sanity.Runner.LeafRef>`
                 
                 
 
@@ -641,13 +641,13 @@ class Runner(object):
         
         .. attribute:: not_supported_1_2
         
-        	
-        	**type**\:  :py:class:`NotSupported12 <ydk.models.ydktest_sanity.Runner.NotSupported1.NotSupported12>`
+            
+            **type**\:  :py:class:`NotSupported12 <ydk.models.ydktest_sanity.Runner.NotSupported1.NotSupported12>`
         
         .. attribute:: not_supported_leaf
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         
 
@@ -669,8 +669,8 @@ class Runner(object):
             
             .. attribute:: some_leaf
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
             
 
@@ -737,10 +737,10 @@ class Runner(object):
         
         .. attribute:: number  <key>
         
-        	Integer key for not supported list
-        	**type**\:  int
+            Integer key for not supported list
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         
 
@@ -784,20 +784,20 @@ class Runner(object):
         
         .. attribute:: name
         
-        	this is string value
-        	**type**\:  str
+            this is string value
+            **type**\:  str
         
         .. attribute:: number
         
-        	integer value type
-        	**type**\:  int
+            integer value type
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         .. attribute:: one_aug
         
-        	config for one\_level data
-        	**type**\:  :py:class:`OneAug <ydk.models.ydktest_sanity.Runner.One.OneAug>`
+            config for one\_level data
+            **type**\:  :py:class:`OneAug <ydk.models.ydktest_sanity.Runner.One.OneAug>`
         
         
 
@@ -820,15 +820,15 @@ class Runner(object):
             
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             .. attribute:: number
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             
 
@@ -902,13 +902,13 @@ class Runner(object):
         
         .. attribute:: ldata
         
-        	one list data
-        	**type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.OneList.Ldata>`
+            one list data
+            **type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.OneList.Ldata>`
         
         .. attribute:: one_aug_list
         
-        	config for one\_level list data
-        	**type**\:  :py:class:`OneAugList <ydk.models.ydktest_sanity.Runner.OneList.OneAugList>`
+            config for one\_level list data
+            **type**\:  :py:class:`OneAugList <ydk.models.ydktest_sanity.Runner.OneList.OneAugList>`
         
         
 
@@ -932,15 +932,15 @@ class Runner(object):
             
             .. attribute:: number  <key>
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             
 
@@ -988,13 +988,13 @@ class Runner(object):
             
             .. attribute:: enabled
             
-            	integer value type
-            	**type**\:  bool
+                integer value type
+                **type**\:  bool
             
             .. attribute:: ldata
             
-            	one list data
-            	**type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.OneList.OneAugList.Ldata>`
+                one list data
+                **type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.OneList.OneAugList.Ldata>`
             
             
 
@@ -1017,15 +1017,15 @@ class Runner(object):
                 
                 .. attribute:: number  <key>
                 
-                	integer value type
-                	**type**\:  int
+                    integer value type
+                    **type**\:  int
                 
-                	**range:** \-2147483648..2147483647
+                    **range:** \-2147483648..2147483647
                 
                 .. attribute:: name
                 
-                	this is string value
-                	**type**\:  str
+                    this is string value
+                    **type**\:  str
                 
                 
 
@@ -1127,13 +1127,13 @@ class Runner(object):
         
         .. attribute:: some_leaf
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         .. attribute:: _is_presence
         
-        	Is present if this instance represents presence container else not
-        	**type**\: bool
+            Is present if this instance represents presence container else not
+            **type**\: bool
         
         
 
@@ -1180,20 +1180,20 @@ class Runner(object):
         
         .. attribute:: name
         
-        	this is string value
-        	**type**\:  str
+            this is string value
+            **type**\:  str
         
         .. attribute:: number
         
-        	integer value type
-        	**type**\:  int
+            integer value type
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         .. attribute:: sub1
         
-        	subconfig1 for config container
-        	**type**\:  :py:class:`Sub1 <ydk.models.ydktest_sanity.Runner.Three.Sub1>`
+            subconfig1 for config container
+            **type**\:  :py:class:`Sub1 <ydk.models.ydktest_sanity.Runner.Three.Sub1>`
         
         
 
@@ -1216,15 +1216,15 @@ class Runner(object):
             
             .. attribute:: number
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: sub2
             
-            	subconfig2 for config container
-            	**type**\:  :py:class:`Sub2 <ydk.models.ydktest_sanity.Runner.Three.Sub1.Sub2>`
+                subconfig2 for config container
+                **type**\:  :py:class:`Sub2 <ydk.models.ydktest_sanity.Runner.Three.Sub1.Sub2>`
             
             
 
@@ -1246,10 +1246,10 @@ class Runner(object):
                 
                 .. attribute:: number
                 
-                	integer value type
-                	**type**\:  int
+                    integer value type
+                    **type**\:  int
                 
-                	**range:** \-2147483648..2147483647
+                    **range:** \-2147483648..2147483647
                 
                 
 
@@ -1344,8 +1344,8 @@ class Runner(object):
         
         .. attribute:: ldata
         
-        	one list data
-        	**type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata>`
+            one list data
+            **type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata>`
         
         
 
@@ -1367,20 +1367,20 @@ class Runner(object):
             
             .. attribute:: number  <key>
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             .. attribute:: subl1
             
-            	one list data
-            	**type**\: list of  :py:class:`Subl1 <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata.Subl1>`
+                one list data
+                **type**\: list of  :py:class:`Subl1 <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata.Subl1>`
             
             
 
@@ -1404,20 +1404,20 @@ class Runner(object):
                 
                 .. attribute:: number  <key>
                 
-                	integer value type
-                	**type**\:  int
+                    integer value type
+                    **type**\:  int
                 
-                	**range:** \-2147483648..2147483647
+                    **range:** \-2147483648..2147483647
                 
                 .. attribute:: name
                 
-                	this is string value
-                	**type**\:  str
+                    this is string value
+                    **type**\:  str
                 
                 .. attribute:: sub_subl1
                 
-                	one list data
-                	**type**\: list of  :py:class:`SubSubl1 <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata.Subl1.SubSubl1>`
+                    one list data
+                    **type**\: list of  :py:class:`SubSubl1 <ydk.models.ydktest_sanity.Runner.ThreeList.Ldata.Subl1.SubSubl1>`
                 
                 
 
@@ -1441,15 +1441,15 @@ class Runner(object):
                     
                     .. attribute:: number  <key>
                     
-                    	integer value type
-                    	**type**\:  int
+                        integer value type
+                        **type**\:  int
                     
-                    	**range:** \-2147483648..2147483647
+                        **range:** \-2147483648..2147483647
                     
                     .. attribute:: name
                     
-                    	this is string value
-                    	**type**\:  str
+                        this is string value
+                        **type**\:  str
                     
                     
 
@@ -1589,20 +1589,20 @@ class Runner(object):
         
         .. attribute:: name
         
-        	this is string value
-        	**type**\:  str
+            this is string value
+            **type**\:  str
         
         .. attribute:: number
         
-        	integer value type
-        	**type**\:  int
+            integer value type
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         .. attribute:: sub1
         
-        	subconfig1 for config container
-        	**type**\:  :py:class:`Sub1 <ydk.models.ydktest_sanity.Runner.Two.Sub1>`
+            subconfig1 for config container
+            **type**\:  :py:class:`Sub1 <ydk.models.ydktest_sanity.Runner.Two.Sub1>`
         
         
 
@@ -1625,10 +1625,10 @@ class Runner(object):
             
             .. attribute:: number
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             
 
@@ -1698,8 +1698,8 @@ class Runner(object):
         
         .. attribute:: ldata
         
-        	one list data
-        	**type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.TwoList.Ldata>`
+            one list data
+            **type**\: list of  :py:class:`Ldata <ydk.models.ydktest_sanity.Runner.TwoList.Ldata>`
         
         
 
@@ -1721,20 +1721,20 @@ class Runner(object):
             
             .. attribute:: number  <key>
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             .. attribute:: subl1
             
-            	one list data
-            	**type**\: list of  :py:class:`Subl1 <ydk.models.ydktest_sanity.Runner.TwoList.Ldata.Subl1>`
+                one list data
+                **type**\: list of  :py:class:`Subl1 <ydk.models.ydktest_sanity.Runner.TwoList.Ldata.Subl1>`
             
             
 
@@ -1758,15 +1758,15 @@ class Runner(object):
                 
                 .. attribute:: number  <key>
                 
-                	integer value type
-                	**type**\:  int
+                    integer value type
+                    **type**\:  int
                 
-                	**range:** \-2147483648..2147483647
+                    **range:** \-2147483648..2147483647
                 
                 .. attribute:: name
                 
-                	this is string value
-                	**type**\:  str
+                    this is string value
+                    **type**\:  str
                 
                 
 
@@ -1872,18 +1872,18 @@ class Runner(object):
         
         .. attribute:: built_in_t
         
-        	config for built\-in types
-        	**type**\:  :py:class:`BuiltInT <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT>`
+            config for built\-in types
+            **type**\:  :py:class:`BuiltInT <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT>`
         
         .. attribute:: derived_t
         
-        	config for one\_level derived data types
-        	**type**\:  :py:class:`DerivedT <ydk.models.ydktest_sanity.Runner.Ytypes.DerivedT>`
+            config for one\_level derived data types
+            **type**\:  :py:class:`DerivedT <ydk.models.ydktest_sanity.Runner.Ytypes.DerivedT>`
         
         .. attribute:: enabled
         
-        	
-        	**type**\:  :py:class:`Empty <ydk.types.Empty>`
+            
+            **type**\:  :py:class:`Empty <ydk.types.Empty>`
         
         
 
@@ -1907,226 +1907,226 @@ class Runner(object):
             
             .. attribute:: bincoded
             
-            	this is binary value
-            	**type**\:  str
+                this is binary value
+                **type**\:  str
             
             .. attribute:: bits_llist
             
-            	
-            	**type**\:  list of :py:class:`BitsLlist_Bits <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.BitsLlist_Bits>`
+                
+                **type**\:  list of :py:class:`BitsLlist_Bits <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.BitsLlist_Bits>`
             
             .. attribute:: bits_value
             
-            	this is bits type value
-            	**type**\:  :py:class:`BitsValue_Bits <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.BitsValue_Bits>`
+                this is bits type value
+                **type**\:  :py:class:`BitsValue_Bits <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.BitsValue_Bits>`
             
             .. attribute:: bool_value
             
-            	this is boolean type value
-            	**type**\:  bool
+                this is boolean type value
+                **type**\:  bool
             
             .. attribute:: deci64
             
-            	this is decimal value
-            	**type**\:  Decimal64
+                this is decimal value
+                **type**\:  Decimal64
             
-            	**range:** 1..3.14 \| 10..None \| 20..92233720368547758.07
+                **range:** 1..3.14 \| 10..None \| 20..92233720368547758.07
             
             .. attribute:: embeded_enum
             
-            	enum embeded in leaf
-            	**type**\:  :py:class:`EmbededEnumEnum <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.EmbededEnumEnum>`
+                enum embeded in leaf
+                **type**\:  :py:class:`EmbededEnumEnum <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT.EmbededEnumEnum>`
             
             .. attribute:: emptee
             
-            	this is empty value
-            	**type**\:  :py:class:`Empty <ydk.types.Empty>`
+                this is empty value
+                **type**\:  :py:class:`Empty <ydk.types.Empty>`
             
             .. attribute:: enum_int_value
             
-            	enum int type
-            	**type**\: one of the below types:
+                enum int type
+                **type**\: one of the below types:
             
-            	**type**\:  :py:class:`YdkEnumIntTestEnum <ydk.models.ydktest_sanity.YdkEnumIntTestEnum>`
+                **type**\:  :py:class:`YdkEnumIntTestEnum <ydk.models.ydktest_sanity.YdkEnumIntTestEnum>`
             
             
             ----
-            	**type**\:  int
+                **type**\:  int
             
-            	**range:** 1..4096
+                **range:** 1..4096
             
             
             ----
             .. attribute:: enum_llist
             
-            	A leaf\-list of enum
-            	**type**\:  list of :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
+                A leaf\-list of enum
+                **type**\:  list of :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
             
             .. attribute:: enum_value
             
-            	this is enum type value
-            	**type**\:  :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
+                this is enum type value
+                **type**\:  :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
             
             .. attribute:: identity_llist
             
-            	A leaf\-list of identityref
-            	**type**\:  list of :py:class:`BaseIdentityIdentity <ydk.models.ydktest_sanity.BaseIdentityIdentity>`
+                A leaf\-list of identityref
+                **type**\:  list of :py:class:`BaseIdentityIdentity <ydk.models.ydktest_sanity.BaseIdentityIdentity>`
             
             .. attribute:: identity_ref_value
             
-            	
-            	**type**\:  :py:class:`BaseIdentityIdentity <ydk.models.ydktest_sanity.BaseIdentityIdentity>`
+                
+                **type**\:  :py:class:`BaseIdentityIdentity <ydk.models.ydktest_sanity.BaseIdentityIdentity>`
             
             .. attribute:: leaf_ref
             
-            	leaf\-ref
-            	**type**\:  int
+                leaf\-ref
+                **type**\:  int
             
-            	**range:** \-128..127
+                **range:** \-128..127
             
-            	**refers to**\: :py:class:`number8 <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT>`
+                **refers to**\: :py:class:`number8 <ydk.models.ydktest_sanity.Runner.Ytypes.BuiltInT>`
             
             .. attribute:: llstring
             
-            	A list of string
-            	**type**\:  list of str
+                A list of string
+                **type**\:  list of str
             
             .. attribute:: llunion
             
-            	A list of union
-            	**type**\: one of the below types:
+                A list of union
+                **type**\: one of the below types:
             
-            	**type**\:  list of int
+                **type**\:  list of int
             
-            	**range:** \-32768..32767
+                **range:** \-32768..32767
             
             
             ----
-            	**type**\:  list of str
+                **type**\:  list of str
             
             
             ----
             .. attribute:: name
             
-            	this is string value
-            	**type**\:  str
+                this is string value
+                **type**\:  str
             
             .. attribute:: number16
             
-            	16 bit integer value type
-            	**type**\:  int
+                16 bit integer value type
+                **type**\:  int
             
-            	**range:** \-32768..32767
+                **range:** \-32768..32767
             
             .. attribute:: number32
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-2147483648..2147483647
+                **range:** \-2147483648..2147483647
             
             .. attribute:: number64
             
-            	integer value type
-            	**type**\:  int
+                integer value type
+                **type**\:  int
             
-            	**range:** \-9223372036854775808..9223372036854775807
+                **range:** \-9223372036854775808..9223372036854775807
             
             .. attribute:: number8
             
-            	 8 bit integer value type
-            	**type**\:  int
+                 8 bit integer value type
+                **type**\:  int
             
-            	**range:** \-128..127
+                **range:** \-128..127
             
             .. attribute:: u_number16
             
-            	16 bit uinteger value type
-            	**type**\:  int
+                16 bit uinteger value type
+                **type**\:  int
             
-            	**range:** 0..65535
+                **range:** 0..65535
             
             .. attribute:: u_number32
             
-            	32 bit uinteger value type
-            	**type**\:  int
+                32 bit uinteger value type
+                **type**\:  int
             
-            	**range:** 0..4294967295
+                **range:** 0..4294967295
             
             .. attribute:: u_number64
             
-            	64 bit uinteger value type
-            	**type**\:  int
+                64 bit uinteger value type
+                **type**\:  int
             
-            	**range:** 0..18446744073709551615
+                **range:** 0..18446744073709551615
             
             .. attribute:: u_number8
             
-            	 8 bit uinteger value type
-            	**type**\:  int
+                 8 bit uinteger value type
+                **type**\:  int
             
-            	**range:** 0..255
+                **range:** 0..255
             
             .. attribute:: younion
             
-            	union test value
-            	**type**\: one of the below types:
+                union test value
+                **type**\: one of the below types:
             
-            	**type**\:  :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
+                **type**\:  :py:class:`YdkEnumTestEnum <ydk.models.ydktest_sanity.YdkEnumTestEnum>`
             
             
             ----
-            	**type**\:  int
+                **type**\:  int
             
-            	**range:** 0..63
+                **range:** 0..63
             
             
             ----
             .. attribute:: younion_list
             
-            	members of the younion
-            	**type**\: one of the below types:
+                members of the younion
+                **type**\: one of the below types:
             
-            	**type**\:  list of int
+                **type**\:  list of int
             
-            	**range:** 0..4294967295
-            
-            
-            ----
-            	**type**\:  list of str
+                **range:** 0..4294967295
             
             
             ----
-            
-            ----
-            	**type**\:  list of str
+                **type**\:  list of str
             
             
             ----
-            	**type**\:  list of str
+            
+            ----
+                **type**\:  list of str
+            
+            
+            ----
+                **type**\:  list of str
             
             
             ----
             .. attribute:: younion_recursive
             
-            	Recursive union leaf
-            	**type**\: one of the below types:
+                Recursive union leaf
+                **type**\: one of the below types:
             
-            	**type**\:  int
+                **type**\:  int
             
-            	**range:** 0..4294967295
-            
-            
-            ----
-            	**type**\:  str
+                **range:** 0..4294967295
             
             
             ----
+                **type**\:  str
+            
             
             ----
-            	**type**\:  int
             
-            	**range:** \-128..127
+            ----
+                **type**\:  int
+            
+                **range:** \-128..127
             
             
             ----
@@ -2483,8 +2483,8 @@ class SubTest(object):
     
     .. attribute:: one_aug
     
-    	config for one\_level data
-    	**type**\:  :py:class:`OneAug <ydk.models.ydktest_sanity.SubTest.OneAug>`
+        config for one\_level data
+        **type**\:  :py:class:`OneAug <ydk.models.ydktest_sanity.SubTest.OneAug>`
     
     
 
@@ -2504,15 +2504,15 @@ class SubTest(object):
         
         .. attribute:: name
         
-        	this is string value
-        	**type**\:  str
+            this is string value
+            **type**\:  str
         
         .. attribute:: number
         
-        	integer value type
-        	**type**\:  int
+            integer value type
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         
 

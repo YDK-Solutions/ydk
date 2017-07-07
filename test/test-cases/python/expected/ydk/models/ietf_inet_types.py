@@ -42,17 +42,17 @@ class IpVersionEnum(Enum):
 
     .. data:: UNKNOWN = 0
 
-    	An unknown or unspecified version of the Internet
+        An unknown or unspecified version of the Internet
 
-    	protocol.
+        protocol.
 
     .. data:: IPV4 = 1
 
-    	The IPv4 protocol as defined in RFC 791.
+        The IPv4 protocol as defined in RFC 791.
 
     .. data:: IPV6 = 2
 
-    	The IPv6 protocol as defined in RFC 2460.
+        The IPv6 protocol as defined in RFC 2460.
 
     """
 

@@ -20,16 +20,16 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#include <unistd.h>
+#include <pwd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <fstream>
 
 #include "path_private.hpp"
 #include "../ydk_yang.hpp"
-#include "core_info.hpp"
 #include "../logger.hpp"
 
 
@@ -45,14 +45,30 @@ static bool file_exists(const std::string & path)
     return stat(path.c_str(), &st) == 0;
 }
 
+static std::string get_models_download_path()
+{
+    const char *homeDir = getenv("HOME");
+
+    if (!homeDir) {
+        struct passwd* pwd = getpwuid(getuid());
+        if (pwd)
+           homeDir = pwd->pw_dir;
+    }
+
+    std::ostringstream models_path{};
+    models_path << homeDir << "/.ydk";
+
+    return models_path.str();
+}
+
 static void create_if_does_not_exist(const std::string & path)
 {
     if(!file_exists(path))
     {
         if(mkdir(path.c_str(), 0700) != 0)
         {
-            YLOG_ERROR("Could not create repository");
-            throw(YCPPIllegalStateError{"Could not create repository"});
+            YLOG_ERROR("Could not create repository: {}", path);
+            throw(YCPPIllegalStateError{"Could not create repository: "+path});
         }
     }
 }
@@ -94,7 +110,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
 ydk::path::Repository::Repository()
   : using_temp_directory(true)
 {
-    path = ydk_models_path;
+    path = get_models_download_path();
     ly_set_log_clb(libyang_log_callback, 1);
 }
 
@@ -102,6 +118,9 @@ ydk::path::Repository::Repository()
 ydk::path::Repository::Repository(const std::string& search_dir)
   : path{search_dir}, using_temp_directory(false)
 {
+ //     auto console = spdlog::stdout_color_mt("ydk");
+ //     console->set_level(spdlog::level::debug);
+
     if (!file_exists(path))
     {
         YLOG_ERROR("Path {} is not a valid directory.", search_dir);
@@ -141,18 +160,18 @@ namespace ydk {
 
         char* get_enlarged_data(const std::string & buffer, const std::string & model_name)
         {
-        	char *enlarged_data = nullptr;
-			/* enlarge data by 2 bytes for flex */
-			auto data = buffer.c_str();
-			auto len = std::strlen(data);
-			enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
-			if (!enlarged_data) {
-			    YLOG_ERROR("Could not get model: {}", model_name);
-				throw(std::bad_alloc{});
-			}
-			memcpy(enlarged_data, data, len);
-			enlarged_data[len] = enlarged_data[len + 1] = '\0';
-			return enlarged_data;
+            char *enlarged_data = nullptr;
+            /* enlarge data by 2 bytes for flex */
+            auto data = buffer.c_str();
+            auto len = std::strlen(data);
+            enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
+            if (!enlarged_data) {
+                YLOG_ERROR("Could not get model: {}", model_name);
+                throw(std::bad_alloc{});
+            }
+            memcpy(enlarged_data, data, len);
+            enlarged_data[len] = enlarged_data[len + 1] = '\0';
+            return enlarged_data;
         }
 
         extern "C" char* get_module_callback(const char* module_name, const char* module_rev, const char *submod_name, const char *sub_rev,
@@ -282,7 +301,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
                 YLOG_DEBUG("Cache hit deviation module name: {}", d);
             }
             if (!res) {
-                YLOG_DEBUG("Unable to parse deviation module: {}", d);
+                YLOG_WARN("Unable to parse deviation module: {}. This model cannot be used with YDK.", d);
                 continue;
             }
         }
@@ -299,7 +318,7 @@ ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & 
         }
 
         if (!p) {
-            YLOG_DEBUG("Unable to parse module: {}", c.module);
+            YLOG_WARN("Unable to parse module: {}. This model cannot be used with YDK", c.module);
             continue;
         }
         for (auto f : c.features)

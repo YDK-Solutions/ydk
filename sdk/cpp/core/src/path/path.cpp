@@ -78,11 +78,17 @@ static void escape_slashes(std::string& data)
            {
                replace(data, original, s);
            }
+           if(psubStrMatchStr != NULL)
+           {
+                pcre_free_substring(psubStrMatchStr);
+                psubStrMatchStr = NULL;
+           }
        }
        offset = offsets[1];
     }
     if(psubStrMatchStr != NULL)
         pcre_free_substring(psubStrMatchStr);
+    free(re);
 }
 }
 
@@ -171,18 +177,18 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-// class ydk::CodecService
+// class ydk::Codec
 //////////////////////////////////////////////////////////////////////////
-ydk::path::CodecService::CodecService()
+ydk::path::Codec::Codec()
 {
 }
 
-ydk::path::CodecService::~CodecService()
+ydk::path::Codec::~Codec()
 {
 }
 
 std::string
-ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
+ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
 {
     std::string ret{};
 
@@ -192,12 +198,12 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 
     if(format == ydk::EncodingFormat::JSON)
     {
-    	YLOG_DEBUG("Performing encode operation on JSON");
+    	YLOG_DEBUG("Performing encode operation to JSON");
         scheme = LYD_JSON;
     }
     else
     {
-    	YLOG_DEBUG("Performing encode operation on XML");
+    	YLOG_DEBUG("Performing encode operation to XML");
     }
 
     struct lyd_node* m_node = nullptr;
@@ -227,17 +233,17 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
+ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
     LYD_FORMAT scheme = LYD_XML;
     if (format == EncodingFormat::JSON)
     {
-    	YLOG_DEBUG("Performing decode operation on JSON");
+    	YLOG_DEBUG("Performing decode operation on JSON payload {}", buffer);
         scheme = LYD_JSON;
     }
     else
     {
-    	YLOG_DEBUG("Performing decode operation on XML");
+    	YLOG_DEBUG("Performing decode operation on XML payload {}", buffer);
     }
 
     const RootSchemaNodeImpl & rs_impl = dynamic_cast<const RootSchemaNodeImpl &>(root_schema);
@@ -245,11 +251,9 @@ ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::s
     struct lyd_node *root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(), scheme, LYD_OPT_TRUSTED |  LYD_OPT_GET);
     if( root == nullptr || ly_errno )
     {
-
         YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
         throw(YCPPCodecError{YCPPCodecError::Error::XML_INVAL});
     }
-
 
     YLOG_DEBUG("Performing decode operation");
     RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};

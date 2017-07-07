@@ -14,21 +14,6 @@ set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
-foreach(test_name IN LISTS core_tests)
-    add_executable(${test_name} ${test_name}.cpp)
-    set_property(TARGET ${test_name} PROPERTY CXX_STANDARD 11)
-    set_property(TARGET ${test_name} PROPERTY CXX_STANDARD_REQUIRED ON)
-    target_link_libraries(${test_name} ydk
-        curl
-        xslt
-        pcre
-        ssh_threads
-        xml2
-        ssh)
-    
-    add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
-endforeach(test_name)
-
 add_executable(${YDK_UNITTEST_TARGET_NAME} ${core_tests_src})
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)

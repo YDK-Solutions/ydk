@@ -54,7 +54,9 @@ class SourcePrinter(MultiFilePrinter):
         for header_import in multi_file.imports:
             self.ctx.writeln(header_import)
         self.ctx.bline()
-        self.ctx.writeln('namespace ydk {')
+        self.ctx.writeln('using namespace ydk;')
+        self.ctx.bline()
+        self.ctx.writeln('namespace %s {' % self.bundle_name)
         self.ctx.writeln('namespace %s {' % package.name)
         self.ctx.bline()
 

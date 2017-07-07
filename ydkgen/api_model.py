@@ -21,8 +21,6 @@
  Translation process converts the YANG model to classes defined in this module.
 """
 from __future__ import absolute_import
-
-
 from pyang.types import UnionTypeSpec
 
 
@@ -148,8 +146,6 @@ class NamedElement(Element):
         pkg = get_top_pkg(self)
         if not pkg.bundle_name:
             py_mod_name = 'ydk.models.%s' % pkg.name
-        elif pkg.aug_bundle_name:
-            py_mod_name = 'ydk.models.%s.%s' % (pkg.aug_bundle_name, pkg.name)
         else:
             py_mod_name = 'ydk.models.%s.%s' % (pkg.bundle_name, pkg.name)
         return py_mod_name
@@ -175,8 +171,6 @@ class NamedElement(Element):
         pkg = get_top_pkg(self)
         if not pkg.bundle_name:
             meta_py_mod_name = 'ydk.models._meta'
-        elif pkg.aug_bundle_name:
-            meta_py_mod_name = 'ydk.models.%s._meta' % pkg.aug_bundle_name
         else:
             meta_py_mod_name = 'ydk.models.%s._meta' % pkg.bundle_name
         return meta_py_mod_name
@@ -227,6 +221,30 @@ class NamedElement(Element):
             element = element.owner
         return '::'.join(reversed(names))
 
+    def go_name(self, case = 'UpperCamel'):
+        if self.stmt is None:
+            raise Exception('element is not yet defined')
+
+        name = camel_case(self.stmt.arg)
+        if case == 'UpperCamel':
+            return name
+        elif case == 'lowerCamel':
+            return '%s%s' % (name[0].lower(), name[1:])
+        else:
+            supported = 'Currently Supporting: UpperCamel, lowerCamel'
+            raise Exception('{0} case is not supported\n{1}'.format(case, supported))
+
+    def qualified_go_name(self):
+        ''' get the Go qualified name (sans package name) '''
+        names = []
+        element = self
+        while element is not None and not isinstance(element, Package):
+            if isinstance(element, Deviation):
+                element = element.owner
+            names.append(camel_case(element.stmt.arg))
+            element = element.owner
+        return '_'.join(reversed(names))
+
 
 class Package(NamedElement):
 
@@ -239,7 +257,6 @@ class Package(NamedElement):
         self._stmt = None
         self._sub_name = ''
         self._bundle_name = ''
-        self._aug_bundle_name = ''
         self._curr_bundle_name = ''
         self._augments_other = False
         self.identity_subclasses = {}
@@ -271,14 +288,6 @@ class Package(NamedElement):
     @bundle_name.setter
     def bundle_name(self, bundle_name):
         self._bundle_name = bundle_name
-
-    @property
-    def aug_bundle_name(self):
-        return self._aug_bundle_name
-
-    @aug_bundle_name.setter
-    def aug_bundle_name(self, aug_bundle_name):
-        self._aug_bundle_name = aug_bundle_name
 
     @property
     def curr_bundle_name(self):
@@ -509,14 +518,8 @@ class Class(NamedElement):
     @stmt.setter
     def stmt(self, stmt):
         name = escape_name(stmt.arg)
-        if stmt.keyword == 'grouping':
-            name = '%sGrouping' % camel_case(name)
-        elif stmt.keyword == 'identity':
-            name = '%sIdentity' % camel_case(name)
-        elif stmt.keyword == 'rpc':
-            name = camel_case(name) + 'Rpc'
-        else:
-            name = camel_case(name)
+        name = camel_case(name)
+
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
         self.name = name
@@ -563,6 +566,11 @@ class Class(NamedElement):
     def owner(self, owner):
         self._owner = owner
         self.name = _modify_nested_container_with_same_name(self)
+
+    def set_owner(self, owner, language):
+        self._owner = owner
+        if language == 'cpp':
+            self.name = _modify_nested_container_with_same_name(self)
 
     __hash__ = NamedElement.__hash__
 
@@ -766,7 +774,7 @@ class Enum(DataType):
         while leaf_or_typedef.parent is not None and not leaf_or_typedef.keyword in ('leaf', 'leaf-list', 'typedef'):
             leaf_or_typedef = leaf_or_typedef.parent
 
-        name = '%sEnum' % camel_case(escape_name(leaf_or_typedef.arg))
+        name = camel_case(escape_name(leaf_or_typedef.arg))
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
 
@@ -856,7 +864,6 @@ def get_top_pkg(pkg):
 
     return pkg
 
-
 def get_properties(owned_elements):
     """ get all properties from the owned_elements. """
     props = []
@@ -872,24 +879,19 @@ def get_properties(owned_elements):
 
     return props
 
-
 def _modify_nested_container_with_same_name(named_element):
     if named_element.owner.name.rstrip('_') == named_element.name:
         return '%s_' % named_element.owner.name
     else:
         return named_element.name
 
-
-
 def snake_case(input_text):
     snake_case = input_text.replace('-', '_')
     snake_case = snake_case.replace('.', '_')
     return snake_case.lower()
 
-
 def camel_case(input_text):
     return ''.join([word.title() for word in input_text.split('-')])
-
 
 def escape_name(name):
     name = name.replace('+', '__PLUS__')

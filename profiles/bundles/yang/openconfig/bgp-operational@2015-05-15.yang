@@ -242,7 +242,7 @@ module bgp-operational {
     }
 
     leaf-list supported-capabilities {
-    	type string;
+        type string;
     /*   type identityref {
         base bgp-types:bgp-capability;
       }*/

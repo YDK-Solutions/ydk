@@ -31,28 +31,28 @@ class A(object):
     
     .. attribute:: a1
     
-    	
-    	**type**\:  str
+        
+        **type**\:  str
     
     .. attribute:: a2
     
-    	
-    	**type**\:  str
+        
+        **type**\:  str
     
     .. attribute:: a3
     
-    	
-    	**type**\:  str
+        
+        **type**\:  str
     
     .. attribute:: b
     
-    	
-    	**type**\:  :py:class:`B <ydk.models.ydktest_filterread.A.B>`
+        
+        **type**\:  :py:class:`B <ydk.models.ydktest_filterread.A.B>`
     
     .. attribute:: lst
     
-    	
-    	**type**\: list of  :py:class:`Lst <ydk.models.ydktest_filterread.A.Lst>`
+        
+        **type**\: list of  :py:class:`Lst <ydk.models.ydktest_filterread.A.Lst>`
     
     
 
@@ -78,33 +78,33 @@ class A(object):
         
         .. attribute:: b1
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         .. attribute:: b2
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         .. attribute:: b3
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         .. attribute:: c
         
-        	
-        	**type**\:  :py:class:`C <ydk.models.ydktest_filterread.A.B.C>`
+            
+            **type**\:  :py:class:`C <ydk.models.ydktest_filterread.A.B.C>`
         
         .. attribute:: d
         
-        	
-        	**type**\:  :py:class:`D <ydk.models.ydktest_filterread.A.B.D>`
+            
+            **type**\:  :py:class:`D <ydk.models.ydktest_filterread.A.B.D>`
         
         .. attribute:: f
         
-        	
-        	**type**\:  :py:class:`F <ydk.models.ydktest_filterread.A.B.F>`
+            
+            **type**\:  :py:class:`F <ydk.models.ydktest_filterread.A.B.F>`
         
         
 
@@ -130,8 +130,8 @@ class A(object):
             
             .. attribute:: _is_presence
             
-            	Is present if this instance represents presence container else not
-            	**type**\: bool
+                Is present if this instance represents presence container else not
+                **type**\: bool
             
             
 
@@ -174,23 +174,23 @@ class A(object):
             
             .. attribute:: d1
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
             .. attribute:: d2
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
             .. attribute:: d3
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
             .. attribute:: e
             
-            	
-            	**type**\:  :py:class:`E <ydk.models.ydktest_filterread.A.B.D.E>`
+                
+                **type**\:  :py:class:`E <ydk.models.ydktest_filterread.A.B.D.E>`
             
             
 
@@ -214,13 +214,13 @@ class A(object):
                 
                 .. attribute:: e1
                 
-                	
-                	**type**\:  str
+                    
+                    **type**\:  str
                 
                 .. attribute:: e2
                 
-                	
-                	**type**\:  str
+                    
+                    **type**\:  str
                 
                 
 
@@ -297,13 +297,13 @@ class A(object):
             
             .. attribute:: f1
             
-            	
-            	**type**\:  str
+                
+                **type**\:  str
             
             .. attribute:: _is_presence
             
-            	Is present if this instance represents presence container else not
-            	**type**\: bool
+                Is present if this instance represents presence container else not
+                **type**\: bool
             
             
 
@@ -387,15 +387,15 @@ class A(object):
         
         .. attribute:: number  <key>
         
-        	
-        	**type**\:  int
+            
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         .. attribute:: value
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         
 

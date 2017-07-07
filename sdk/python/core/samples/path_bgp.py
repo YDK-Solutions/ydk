@@ -15,8 +15,9 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.providers import NetconfServiceProvider
-from ydk_.path import CodecService
+from ydk.providers import RestconfServiceProvider 
+from ydk.path import Codec, Repository
+from ydk.types import EncodingFormat
 
 
 def execute_path(provider, codec):
@@ -34,7 +35,7 @@ def execute_path(provider, codec):
 
 
 if __name__ == "__main__":
-    repo = Repository("/var/folders/jt/kfhqscp54dq3gfwdpkbj48zm0000gn/T//127.0.0.1:12022")
-    provider = RestconfServiceProvider(repo, '127.0.0.1', 'admin', 'admin', 8008)
-    codec = CodecService()
+    repo = Repository("/usr/local/share/ydktest@0.1.0")
+    provider = RestconfServiceProvider(repo, '127.0.0.1', 'admin', 'admin', 12306, EncodingFormat.JSON)
+    codec = Codec()
     execute_path(provider, codec)

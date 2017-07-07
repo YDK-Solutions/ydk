@@ -242,6 +242,12 @@ if __name__ == '__main__':
                       default=False,
                       help="Generate C++ SDK")
 
+    parser.add_option("-g", "--go",
+                      action="store_true",
+                      dest="go",
+                      default=False,
+                      help="Generate Go SDK")
+
     parser.add_option("-v", "--verbose",
                       action="store_true",
                       dest="verbose",
@@ -292,27 +298,34 @@ if __name__ == '__main__':
     language = ''
     if options.cpp:
         language = 'cpp'
+    elif options.go:
+        language = 'go'
     elif options.python:
         language = 'python'
 
     try:
         if options.bundle:
-            output_directory = (YdkGenerator(
-                                output_directory,
-                                ydk_root,
-                                options.groupings_as_class,
-                                options.gentests,
-                                language,
-                                'bundle').generate(options.bundle))
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.groupings_as_class,
+                options.gentests,
+                language,
+                'bundle'
+            )
+            output_directory = (generator.generate(options.bundle))
 
         if options.core:
-            output_directory = (YdkGenerator(
-                                output_directory,
-                                ydk_root,
-                                options.groupings_as_class,
-                                options.gentests,
-                                language,
-                                'core').generate(options.core))
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.groupings_as_class,
+                options.gentests,
+                language,
+                'core'
+            )
+            output_directory = (generator.generate(options.core))
+
     except YdkGenException as e:
         print('Error(s) occurred in YdkGenerator()!')
         if not options.verbose:
@@ -328,6 +341,9 @@ if __name__ == '__main__':
 
     if options.cpp:
         create_shared_libraries(output_directory)
+    elif options.go:
+        # todo: implement go packaging with the output_directory
+        pass
     else:
         create_pip_packages(output_directory)
 

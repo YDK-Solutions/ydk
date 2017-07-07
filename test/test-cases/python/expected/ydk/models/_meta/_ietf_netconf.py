@@ -58,8 +58,8 @@ _meta_table = {
                 [], [], 
                 '''                This parameter is given in order to cancel a persistent
                 confirmed commit.  The value must be equal to the value
-                given in the 'persist' parameter to the <commit> operation.
-                If it does not match, the operation fails with an
+                given in the 'persist' parameter to the <commit> yfilter.
+                If it does not match, the yfilter fails with an
                 'invalid-value' error.
                 ''',
                 'persist_id',
@@ -120,7 +120,7 @@ _meta_table = {
                 persistent.  A persistent confirmed commit is not aborted
                 if the NETCONF session terminates.  The only way to abort
                 a persistent confirmed commit is to let the timer expire,
-                or to use the <cancel-commit> operation.
+                or to use the <cancel-commit> yfilter.
                 
                 The value of this parameter is a token that must be given
                 in the 'persist-id' parameter of <commit> or
@@ -135,8 +135,8 @@ _meta_table = {
                 [], [], 
                 '''                This parameter is given in order to commit a persistent
                 confirmed commit.  The value must be equal to the value
-                given in the 'persist' parameter to the <commit> operation.
-                If it does not match, the operation fails with an
+                given in the 'persist' parameter to the <commit> yfilter.
+                If it does not match, the yfilter fails with an
                 'invalid-value' error.
                 ''',
                 'persist_id',
@@ -408,7 +408,7 @@ _meta_table = {
                 'ietf-netconf', False),
             _MetaInfoClassMember('default-operation', REFERENCE_ENUM_CLASS, 'DefaultOperationEnum' , 'ydk.models.ietf_netconf', 'EditConfigRpc.Input.DefaultOperationEnum', 
                 [], [], 
-                '''                The default operation to use.
+                '''                The default yfilter to use.
                 ''',
                 'default_operation',
                 'ietf-netconf', False),

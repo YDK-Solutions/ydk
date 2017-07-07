@@ -2,5 +2,5 @@
 export DH_VERBOSE = 1
 
 %:
-	dh  $@ --sourcedirectory=openconfig
+    dh  $@ --sourcedirectory=openconfig
 

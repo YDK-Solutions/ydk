@@ -36,7 +36,9 @@ class ClassConstructorPrinter(object):
         self.ctx.writeln(clazz.qualified_cpp_name() + '::' + clazz.name + '()')
         self.ctx.lvl_inc()
         if clazz.is_identity():
-            self.ctx.writeln(' : Identity("%s:%s")' % (clazz.module.arg, clazz.stmt.arg))
+            ns = clazz.module.search_one('namespace')
+            assert ns is not None
+            self.ctx.writeln(' : Identity("%s", "%s", "%s:%s")' % (ns.arg, clazz.module.arg, clazz.module.arg, clazz.stmt.arg))
         else:
             self._print_class_inits(clazz, leafs, children)
         self.ctx.lvl_dec()

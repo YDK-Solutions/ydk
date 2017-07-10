@@ -28,7 +28,8 @@ from ydkgen.common import get_rst_file_name
 from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _EmitArgs
 
 from .module_printer import ModulePrinter
-# from ..doc import DocPrinter
+from .generated_entity_lookup_printer import GeneratedEntityLookupPrinter
+from ..doc import DocPrinter
 # from ..tests import TestPrinter
 
 class GoBindingsPrinter(LanguageBindingsPrinter):
@@ -43,8 +44,16 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
         for index, package in enumerate(self.packages):
             self._print_module(index, package, size)
 
+        # generated entity lookup
+        path = self.models_dir
+        generated_entity_lookup_file_name = '%s/generated_entity_lookup.go' % path
+        with open(generated_entity_lookup_file_name, 'w+') as file_descriptor:
+            self.ypy_ctx.fd = file_descriptor
+            gelp = GeneratedEntityLookupPrinter(self.ypy_ctx, self.bundle_name, self.packages)
+            gelp.print_output()
+
         # RST documentation
-        # self._print_go_rst_toc()
+        self._print_go_rst_toc()
 
         # if self.generate_tests:
         #     self._print_cmake_file(self.packages, self.bundle_name, self.test_dir)
@@ -60,18 +69,66 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
         module_dir = self.initialize_output_directory(self.models_dir)
 
         # Generate go module
-        self._print_go_module(package, self.models_dir)
+        self._print_go_module(package, module_dir)
 
         # RST documentation
-        # self._print_cpp_rst_doc(package)
+        self._print_go_rst_doc(package)
         
         # if self.generate_tests:
         #     self._print_tests(package, self.test_dir)
 
     def _print_go_module(self, package, path):
+        # broken_name = package.name.split('_')
+        # if broken_name[0] == self.bundle_name:
+        #     broken_name = broken_name[1:]
+        #     package.name = '_'.join(broken_name)
+        path = '%s/%s' % (path, package.name)
+        self.initialize_output_directory(path)
+
         go_module_file_name = '%s/%s.go' % (path, package.name)
         with open(go_module_file_name, 'w+') as file_descriptor:
             self.ypy_ctx.fd = file_descriptor
-            mp = ModulePrinter(self.ypy_ctx, self.bundle_name, self.sort_clazz)
+            mp = ModulePrinter(self.ypy_ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
             mp.print_output(package)
+
+    def _print_go_rst_toc(self):
+        if self.ydk_doc_dir is None:
+            return
+        packages = [p for p in self.packages if len(p.owned_elements) > 0]
+
+        self.print_file(
+            get_table_of_contents_file_name(self.ydk_doc_dir),
+            emit_table_of_contents,
+            _EmitArgs(self.ypy_ctx, packages, (self.bundle_name, self.bundle_version))
+        )
+
+    def _print_go_rst_doc(self, package):
+        if self.ydk_doc_dir is None:
+            return
+
+        def _walk_n_print(named_element, p):
+            self.print_file(
+                get_go_doc_file_name(p, named_element),
+                emit_go_doc,
+                _EmitArgs(self.ypy_ctx, named_element, self.identity_subclasses)
+            )
+
+            for owned_element in named_element.owned_elements:
+                if isinstance(owned_element, (Class, Enum)):
+                    _walk_n_print(owned_element, p)
+
+        _walk_n_print(package, self.ydk_doc_dir)
+
+def get_table_of_contents_file_name(path):
+    return '%s/ydk.models.rst' % path
+
+def get_go_doc_file_name(path, named_element):
+    return '%s/%s.rst' % (path, get_rst_file_name(named_element))
+
+def emit_table_of_contents(ctx, packages, extra_args):
+    DocPrinter(ctx, 'go').print_table_of_contents(packages, extra_args[0], extra_args[1])
+
+def emit_go_doc(ctx, named_element, identity_subclasses):
+    DocPrinter(ctx, 'go').print_module_documentation(named_element, identity_subclasses)
+
 

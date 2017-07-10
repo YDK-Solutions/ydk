@@ -24,14 +24,15 @@ from operator import attrgetter
 
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.common import get_rst_file_name, is_config_stmt
-from ydkgen.printer.meta_data_util import (get_bits_class_docstring,
-                                           get_class_bases,
-                                           get_class_crossref_tag,
-                                           get_class_docstring,
-                                           get_class_tag,
-                                           get_enum_class_docstring,
-                                           get_langage_spec_tags
-                                           )
+from ydkgen.printer.meta_data_util import (
+    get_bits_class_docstring,
+    get_class_bases,
+    get_class_crossref_tag,
+    get_class_docstring,
+    get_class_tag,
+    get_enum_class_docstring,
+    get_langage_spec_tags
+)
 
 
 class DocPrinter(object):

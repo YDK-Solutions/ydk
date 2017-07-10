@@ -33,10 +33,11 @@ from .class_set_value_printer import ClassSetValuePrinter
 
 
 class ClassPrinter(object):
-    def __init__(self, ctx, bundle_name, sort_clazz):
+    def __init__(self, ctx, bundle_name, sort_clazz, identity_subclasses):
         self.ctx = ctx
         self.bundle_name = bundle_name
         self.sort_clazz = sort_clazz
+        self.identity_subclasses = identity_subclasses
 
     def print_output(self, clazz):
         leafs = []
@@ -47,7 +48,7 @@ class ClassPrinter(object):
         self._print_child_classes(clazz)
 
     def _print_class_constructor(self, clazz, leafs, children):
-        ClassConstructorPrinter(self.ctx, clazz, leafs).print_all()
+        ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
 
     def _print_class_method_definitions(self, clazz, leafs, children):
         if clazz.is_identity():
@@ -59,15 +60,10 @@ class ClassPrinter(object):
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_set_value(clazz, leafs)
-        
-        # todo: figure out conditions for printing these classes (every time? top level only?)
-        # self._print_top_level_entity_functions(clazz, leafs)
-
         self._print_bundle_name_function(clazz)
         self._print_yang_name_function(clazz)
         self._print_yang_models_function(clazz)
         self._print_capabilities_lookup_function(clazz)
-
         self._print_set_parent_function(clazz)
         self._print_get_parent_function(clazz)
         self._print_get_parent_yang_name_function(clazz)
@@ -116,13 +112,6 @@ class ClassPrinter(object):
     def _print_class_set_value(self, clazz, leafs):
         fp = ClassSetValuePrinter(self.ctx, clazz, leafs)
         fp.print_all()
-
-    # def _print_top_level_entity_functions(self, clazz, leafs):
-    #     if clazz.owner is not None and isinstance(clazz.owner, Package):
-    #         self._print_bundle_name_function(clazz)
-    #         self._print_yang_name_function(clazz)
-    #         self._print_yang_models_function(clazz)
-    #         self._print_capabilities_lookup_function(clazz)
 
     # GetBundleName
     def _print_bundle_name_function(self, clazz):
@@ -181,5 +170,5 @@ class ClassPrinter(object):
         sorted_classes = sort_classes_at_same_level(unsorted_classes, self.sort_clazz)
 
         for clazz in sorted_classes:
-            cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz)
+            cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
             cp.print_output(clazz)

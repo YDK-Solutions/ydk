@@ -42,9 +42,10 @@ class ClassGetChildrenPrinter(FunctionPrinter):
         self.ctx.writeln('return children')
 
     def _print_many(self, child):
-        self.ctx.writeln('for _, child := range %s.%s {' % (
-            self.class_alias, child.go_name()))
+        child_stmt = '%s.%s' % (self.class_alias, child.go_name())
+        self.ctx.writeln('for i := range %s {' % (child_stmt))
         self.ctx.lvl_inc()
-        self.ctx.writeln('children[child.GetSegmentPath()] = &child')
+        child_stmt = '%s[i]' % child_stmt
+        self.ctx.writeln('children[{0}.GetSegmentPath()] = &{0}'.format(child_stmt))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')

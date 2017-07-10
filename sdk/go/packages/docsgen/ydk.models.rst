@@ -1,0 +1,1 @@
+../../../_docsgen_common/ydk.models.rst

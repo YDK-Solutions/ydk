@@ -264,7 +264,7 @@ ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& 
     struct lyd_node* dnode = rd->m_node;
     do
     {
-        rd->child_map.insert(std::make_pair(rd->m_node, std::make_shared<DataNodeImpl>(rd, rd->m_node)));
+        rd->child_map.insert(std::make_pair(rd->m_node, std::make_shared<DataNodeImpl>(rd, rd->m_node, nullptr)));
         dnode = dnode->next;
     } while(dnode && dnode != nullptr && dnode != root);
 

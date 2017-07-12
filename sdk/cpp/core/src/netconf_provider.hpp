@@ -34,12 +34,14 @@ public:
                                const std::string& username,
                                const std::string& password,
                                int port = 830,
-                               const std::string& protocol = "ssh");
+                               const std::string& protocol = "ssh",
+                               bool on_demand = false);
         NetconfServiceProvider(const std::string& address,
                                const std::string& username,
                                const std::string& password,
                                int port = 830,
-                               const std::string& protocol = "ssh");
+                               const std::string& protocol = "ssh",
+                               bool on_demand = false);
         ~NetconfServiceProvider();
         path::RootSchemaNode& get_root_schema() const;
         std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const;
@@ -49,7 +51,7 @@ private:
         std::shared_ptr<path::DataNode> handle_edit(path::Rpc& rpc, path::Annotation ann) const;
         std::shared_ptr<path::DataNode> handle_netconf_operation(path::Rpc& ydk_rpc) const;
         std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc) const;
-        void initialize(path::Repository& repo);
+        void initialize(path::Repository& repo, bool on_demand);
         void initialize_client(const std::string& address, const std::string& username, const std::string& password, int port, const std::string& protocol);
         std::string execute_payload(const std::string & payload) const;
 
@@ -59,7 +61,6 @@ private:
         std::shared_ptr<ydk::path::RootSchemaNode> root_schema;
 
         std::vector<std::string> server_capabilities;
-
 };
 }
 

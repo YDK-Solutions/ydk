@@ -32,7 +32,6 @@
 #include <cstring>
 #include <cassert>
 #include <sstream>
-#include <regex>
 
 #include "libyang/libyang.h"
 #include "libyang/tree_schema.h"
@@ -47,6 +46,41 @@ namespace ydk {
 
         std::vector<std::string> segmentalize(const std::string& path);
 
+        class RepositoryPtr : public std::enable_shared_from_this<RepositoryPtr> {
+        public:
+            RepositoryPtr();
+            RepositoryPtr(const std::string& search_dir);
+            ~RepositoryPtr();
+
+            std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability>& server_caps);
+            std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability>& server_caps, const std::vector<path::Capability>& caps_to_load);
+
+            void add_model_provider(ModelProvider* model_provider);
+            void remove_model_provider(ModelProvider* model_provider);
+            std::vector<ModelProvider*> get_model_providers() const;
+
+            std::vector<const lys_module*> get_new_ly_modules_from_path(const std::string& path, ly_ctx* ctx, std::vector<path::Capability> caps);
+
+        public:
+            std::string path;
+
+        private:
+            ly_ctx* create_ly_context();
+
+            void load_module_from_capabilities(ly_ctx* ctx, const std::vector<path::Capability>& caps);
+
+            const lys_module* load_module(ly_ctx* ctx, const std::string& module_name);
+            const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, bool& new_module);
+            const lys_module* load_module(ly_ctx* ctx, ydk::path::Capability& capability);
+            const lys_module* load_module(ly_ctx* ctx, ydk::path::Capability& capability, bool& new_module);
+            const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision);
+            const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision, const std::vector<std::string>& features, bool& new_module);
+
+
+         private:
+            std::vector<ModelProvider*> model_providers;
+            bool using_temp_directory;
+        };
 
         class SchemaNodeImpl : public SchemaNode
         {
@@ -57,7 +91,7 @@ namespace ydk {
 
             std::string get_path() const;
 
-            std::vector<SchemaNode*> find(const std::string& path) const;
+            std::vector<SchemaNode*> find(const std::string& path);
 
             const SchemaNode* get_parent() const noexcept;
 
@@ -69,6 +103,10 @@ namespace ydk {
 
             std::vector<Statement> get_keys() const;
 
+            void populate_augmented_schema_node(std::vector<lys_node*>& ancestors, struct lys_node* target);
+
+            void populate_new_schemas_from_path(const std::string& path);
+
             const SchemaNode* m_parent;
             struct lys_node* m_node;
             std::vector<std::unique_ptr<SchemaNode>> m_children;
@@ -78,11 +116,12 @@ namespace ydk {
         class RootSchemaNodeImpl : public RootSchemaNode
         {
         public:
-            RootSchemaNodeImpl(struct ly_ctx* ctx) ;
+            RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo);
+            RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo, const std::vector<Capability>& caps);
 
             ~RootSchemaNodeImpl();
 
-            std::vector<SchemaNode*> find(const std::string& path) const;
+            std::vector<SchemaNode*> find(const std::string& path);
 
             const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
@@ -90,19 +129,30 @@ namespace ydk {
 
             DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            std::shared_ptr<Rpc> create_rpc(const std::string& path) const;
+            std::shared_ptr<Rpc> create_rpc(const std::string& path);
 
+            void populate_new_schemas_from_path(const std::string& path);
 
             struct ly_ctx* m_ctx;
             std::vector<std::unique_ptr<DataNode>> m_root_data_nodes;
             std::vector<std::unique_ptr<SchemaNode>> m_children;
+
+        private:
+
+            void populate_all_module_schemas();
+            void populate_module_schema(const struct lys_module*);
+            void populate_augmented_schema_nodes(const struct lys_module* module);
+            void populate_augmented_schema_node(std::vector<lys_node*>& ancestors, struct lys_node* target);
+
+            const std::shared_ptr<RepositoryPtr> m_priv_repo;
+            std::vector<Capability> m_caps;
         };
 
 
         class DataNodeImpl : public DataNode{
 
         public:
-            DataNodeImpl(DataNode* parent, struct lyd_node* node);
+            DataNodeImpl(DataNode* parent, struct lyd_node* node, const std::shared_ptr<RepositoryPtr> repo);
 
             //no copy constructor
             DataNodeImpl(const DataNodeImpl& dn) = delete;
@@ -129,7 +179,7 @@ namespace ydk {
 
             virtual std::string get_value() const;
 
-            virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
+            virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path);
 
             DataNode* get_parent() const;
 
@@ -151,11 +201,16 @@ namespace ydk {
 
             DataNode& create_helper(const std::string& path, const std::string& value);
 
+            void populate_new_schemas_from_path(const std::string& path);
+
         public:
 
             DataNode* m_parent;
             struct lyd_node* m_node;
             std::map<struct lyd_node*, std::shared_ptr<DataNode>> child_map;
+
+        private:
+            const std::shared_ptr<RepositoryPtr> m_priv_repo;
 
         };
 
@@ -163,6 +218,7 @@ namespace ydk {
         class RootDataImpl : public DataNodeImpl {
         public:
             RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path);
+            RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path, const std::shared_ptr<RepositoryPtr> repo);
 
             ~RootDataImpl();
 
@@ -180,19 +236,25 @@ namespace ydk {
 
             const DataNode& get_root() const;
 
-            std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
+            std::vector<std::shared_ptr<DataNode>> find(const std::string& path);
 
-
+        public:
             const SchemaNode& m_schema;
             struct ly_ctx* m_ctx;
             std::string m_path;
+
+        private:
+            void populate_new_schemas_from_path(const std::string& path);
+
+        private:
+            const std::shared_ptr<RepositoryPtr> m_priv_repo;
         };
 
 
         class RpcImpl : public Rpc {
         public:
 
-            RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx);
+            RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo);
 
             ~RpcImpl();
 
@@ -206,12 +268,12 @@ namespace ydk {
             SchemaNodeImpl& schema_node;
             std::unique_ptr<DataNode> data_node;
 
+        private:
+            const std::shared_ptr<RepositoryPtr> m_priv_repo;
+
         };
 
     }
-
-
-
 
 }
 

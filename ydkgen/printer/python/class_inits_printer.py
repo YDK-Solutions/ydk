@@ -216,7 +216,7 @@ class ClassSetAttrPrinter(object):
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('if hasattr(value, "parent"):')
+        self.ctx.writeln('if hasattr(value, "parent") and name != "parent":')
         self.ctx.lvl_inc()
         self.ctx.writeln('if hasattr(value, "is_presence_container") and value.is_presence_container:')
         self.ctx.lvl_inc()

@@ -212,4 +212,5 @@ vector<path::Capability> IetfCapabilitiesParser::parse(vector<string> & capabili
     }
     return yang_caps;
 }
+
 }

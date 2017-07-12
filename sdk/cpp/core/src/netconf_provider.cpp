@@ -65,18 +65,18 @@ const char* CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 const string PROTOCOL_SSH = "ssh";
 const string PROTOCOL_TCP = "tcp";
 
-NetconfServiceProvider::NetconfServiceProvider(const string& address, const string& username, const string& password, int port, const string& protocol)
+NetconfServiceProvider::NetconfServiceProvider(const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand)
 {
     initialize_client(address, username, password, port, protocol);
     path::Repository repo;
-    initialize(repo);
+    initialize(repo, on_demand);
     YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }
 
-NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo, const string& address, const string& username, const string& password, int port, const string& protocol)
+NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand)
 {
     initialize_client(address, username, password, port, protocol);
-    initialize(repo);
+    initialize(repo, on_demand);
     YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }
 
@@ -92,13 +92,13 @@ void NetconfServiceProvider::initialize_client(const string& address, const stri
     }
     else
     {
-        YLOG_ERROR("Protocol {} not supported.", protocol);
+        YLOG_ERROR("Protocol '{}' not supported.", protocol);
         throw(YCPPOperationNotSupportedError{"Protocol is not supported!"});
     }
     model_provider = make_unique<NetconfModelProvider>(*client);
 }
 
-void NetconfServiceProvider::initialize(path::Repository & repo)
+void NetconfServiceProvider::initialize(path::Repository & repo, bool on_demand)
 {
     IetfCapabilitiesParser capabilities_parser{};
     client->connect();
@@ -112,7 +112,15 @@ void NetconfServiceProvider::initialize(path::Repository & repo)
         }
     }
 
-    root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
+    if (on_demand)
+    {
+        std::vector<std::string> empty;
+        root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities), capabilities_parser.parse(empty));
+    }
+    else
+    {
+        root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
+    }
 
     if(root_schema.get() == nullptr)
     {

@@ -466,7 +466,6 @@ TEST_CASE("test_types_submodule")
     REQUIRE(r_1->one_aug->number == r_2->one_aug->number);
 }
 
-
 TEST_CASE("test_types_identity_other_module")
 {
     ydk::path::Repository repo{TEST_HOME};

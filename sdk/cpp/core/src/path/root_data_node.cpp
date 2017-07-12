@@ -29,7 +29,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // class ydk::RootDataImpl
 //////////////////////////////////////////////////////////////////////////
-ydk::path::RootDataImpl::RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path) : DataNodeImpl{nullptr, nullptr}, m_schema{schema}, m_ctx{ctx}, m_path{path}
+ydk::path::RootDataImpl::RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path) : DataNodeImpl{nullptr, nullptr, nullptr}, m_schema{schema}, m_ctx{ctx}, m_path{path}
+{
+}
+
+ydk::path::RootDataImpl::RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path, const std::shared_ptr<RepositoryPtr> repo) : DataNodeImpl{nullptr, nullptr, repo}, m_schema{schema}, m_ctx{ctx}, m_path{path}, m_priv_repo{repo}
 {
 }
 
@@ -49,9 +53,20 @@ ydk::path::RootDataImpl::get_path() const
     return m_schema.get_path();
 }
 
+void
+ydk::path::RootDataImpl::populate_new_schemas_from_path(const std::string& path)
+{
+    auto csnode = const_cast<SchemaNode*>(&m_schema);
+    auto snode = reinterpret_cast<SchemaNodeImpl*>(csnode);
+    snode->populate_new_schemas_from_path(path);
+}
+
 ydk::path::DataNode&
 ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::string& value)
 {
+    populate_new_schemas_from_path(path);
+    populate_new_schemas_from_path(value);
+
     if(path.empty())
     {
         YLOG_ERROR("Path is empty");
@@ -61,7 +76,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
     //path should not start with /
     if(path.at(0) == '/')
     {
-        YLOG_ERROR("Path {} starts with /", path);
+        YLOG_ERROR("Path '{}' starts with /", path);
         throw(YCPPInvalidArgumentError{"Path starts with /"});
     }
     std::vector<std::string> segments = segmentalize(path);
@@ -78,7 +93,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
 
     if( dnode == nullptr)
     {
-        YLOG_ERROR("Path {} is invalid", path);
+        YLOG_ERROR("Path '{}' is invalid", path);
         throw(YCPPInvalidArgumentError{"Path is invalid: " + path});
     }
 
@@ -86,7 +101,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
     if(m_node == nullptr)
     {
         m_node = dnode;
-        child_map.insert(std::make_pair(m_node, std::make_shared<DataNodeImpl>(this, m_node)));
+        child_map.insert(std::make_pair(m_node, std::make_shared<DataNodeImpl>(this, m_node, m_priv_repo)));
         dn = dynamic_cast<DataNodeImpl*>(child_map[m_node].get());
     }
     else
@@ -100,7 +115,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
         }
         else
         {
-            child_map.insert(std::make_pair(m_node, std::make_shared<DataNodeImpl>(this, m_node)));
+            child_map.insert(std::make_pair(m_node, std::make_shared<DataNodeImpl>(this, m_node, m_priv_repo)));
             dn = dynamic_cast<DataNodeImpl*>(child_map[m_node].get());
         }
 
@@ -179,8 +194,10 @@ ydk::path::RootDataImpl::get_root() const
 }
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::RootDataImpl::find(const std::string& path) const
+ydk::path::RootDataImpl::find(const std::string& path)
 {
+    populate_new_schemas_from_path(path);
+
     std::vector<std::shared_ptr<DataNode>> results;
 
     if(m_node == nullptr)

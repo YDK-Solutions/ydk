@@ -29,6 +29,7 @@
 #define YDK_CORE_HPP
 
 #include <string>
+#include <memory>
 #include <vector>
 #include <algorithm>
 #include "errors.hpp"
@@ -233,10 +234,11 @@ namespace path {
 ///
 
 // Forward References
-class DataNode ;
+class DataNode;
 class Rpc;
-class SchemaNode ;
-class RootSchemaNode ;
+class SchemaNode;
+class RootSchemaNode;
+class RepositoryPtr;
 
 ///
 /// @brief Validation Service
@@ -414,7 +416,7 @@ struct YCPPCodecError : public YCPPCoreError
 /// the annotation nc:operation (nc refers to the netconf namespace) on the data nodes
 /// to describe the kind of operation one needs to perform on the given DataNode.
 ///
-struct Annotation{
+struct Annotation {
 
     Annotation(const std::string& ns, const std::string& name, const std::string& val);
 
@@ -498,7 +500,7 @@ public:
     /// @throws YCPPPathError if the path expression in invalid, See error code for details.
     /// @throws YCPPInvalidArgumentError if the argument is invalid.
     ///
-    virtual std::vector<SchemaNode*> find(const std::string& path) const = 0;
+    virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
     ///
     /// @brief get the Parent Node of this SchemaNode in the tree.
@@ -569,7 +571,7 @@ public:
     /// @throws YCPPPathError if the path expression in invalid, See error code for details.
     /// @throws YCPPInvalidArgumentError if the argument is invalid.
     ///
-    virtual std::vector<SchemaNode*> find(const std::string& path) const = 0;
+    virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
     ///
     /// @brief get the Parent Node of this SchemaNode in the tree.
@@ -660,8 +662,7 @@ public:
     /// @throws YCPPInvalidArgumentError if the argument is invalid.
     /// @throws YCPPPathError if the path is invalid
     ///
-    virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) const = 0;
-
+    virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) = 0;
 };
 
 ///
@@ -766,7 +767,7 @@ public:
     ///
     /// @param[in] path The path expression.
     /// @return vector of DataNodes that satisfy the path expression supplied.
-    virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const = 0 ;
+    virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path) = 0 ;
 
 
     ///
@@ -928,7 +929,8 @@ public:
     /// @param[in] capabilities vector of Capability
     /// @return pointer to the RootSchemaNode or nullptr if one could not be created.
     ///
-    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & capabilities) ;
+    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & capabilities);
+    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & server_caps, const std::vector<path::Capability> &caps);
 
     ///
     /// @brief Adds a model provider.
@@ -963,6 +965,10 @@ public:
  private:
     std::vector<ModelProvider*> model_providers;
     bool using_temp_directory;
+
+    // class Repository is the resource manager class for RepositoryPtr,
+    // which is shared by all DataNode/SchemaNode/RootDataNode/RootSchemaNode
+    std::shared_ptr<RepositoryPtr> m_priv_repo;
 };
 
 

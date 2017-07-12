@@ -50,7 +50,32 @@ ydk::path::SchemaNodeImpl::SchemaNodeImpl(const SchemaNode* parent, struct lys_n
             last = q;
         }
     }
+}
 
+void
+ydk::path::SchemaNodeImpl::populate_augmented_schema_node(std::vector<lys_node*>& ancestors, struct lys_node* node) {
+    if (!ancestors.empty()) {
+        auto curr = ancestors.back();
+        ancestors.pop_back();
+        for (auto &c: m_children) {
+            if (c->get_statement().arg == curr->name) {
+                reinterpret_cast<SchemaNodeImpl*>(c.get())->populate_augmented_schema_node(ancestors, node);
+            }
+        }
+    }
+    else {
+        while(node) {
+            auto p = node;
+            while(p && (p->nodetype == LYS_USES)) {
+                p = p->child;
+            }
+            if (p) {
+                YLOG_DEBUG("Populating new schema node '{}'", std::string(p->name));
+                m_children.emplace_back(std::make_unique<SchemaNodeImpl>(this, const_cast<struct lys_node*>(p)));
+            }
+            node = node->next;
+        }
+    }
 }
 
 ydk::path::SchemaNodeImpl::~SchemaNodeImpl()
@@ -93,8 +118,10 @@ ydk::path::SchemaNodeImpl::get_path() const
 }
 
 std::vector<ydk::path::SchemaNode*>
-ydk::path::SchemaNodeImpl::find(const std::string& path) const
+ydk::path::SchemaNodeImpl::find(const std::string& path)
 {
+    populate_new_schemas_from_path(path);
+
     if(path.empty())
     {
         YLOG_ERROR("Path is empty");
@@ -149,6 +176,13 @@ ydk::path::SchemaNodeImpl::get_root() const noexcept
     {
         return m_parent->get_root();
     }
+}
+
+void
+ydk::path::SchemaNodeImpl::populate_new_schemas_from_path(const std::string& path) {
+    auto snode = const_cast<SchemaNode*>(&get_root());
+    auto rsnode = reinterpret_cast<RootSchemaNodeImpl*>(snode);
+    rsnode->populate_new_schemas_from_path(path);
 }
 
 static bool is_submodule(lys_node* node)

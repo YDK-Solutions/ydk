@@ -173,7 +173,7 @@ ydk::path::RootDataImpl::get_children() const
 }
 
 const ydk::path::DataNode&
-ydk::path::RootDataImpl::root() const
+ydk::path::RootDataImpl::get_root() const
 {
     return *this;
 }

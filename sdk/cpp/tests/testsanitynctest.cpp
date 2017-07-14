@@ -42,10 +42,8 @@ TEST_CASE("test_sanity_types_int8 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -75,7 +73,7 @@ TEST_CASE("test_sanity_types_int8 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -110,10 +108,8 @@ TEST_CASE("test_sanity_types_int16 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -144,7 +140,7 @@ TEST_CASE("test_sanity_types_int16 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -179,10 +175,8 @@ TEST_CASE("test_sanity_types_int32 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -211,7 +205,7 @@ TEST_CASE("test_sanity_types_int32 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -244,10 +238,8 @@ TEST_CASE("test_sanity_types_int64 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -276,7 +268,7 @@ TEST_CASE("test_sanity_types_int64 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -309,10 +301,8 @@ TEST_CASE("test_sanity_types_uint8 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -342,7 +332,7 @@ TEST_CASE("test_sanity_types_uint8 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -375,10 +365,8 @@ TEST_CASE("test_sanity_types_uint16 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -408,7 +396,7 @@ TEST_CASE("test_sanity_types_uint16 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -441,10 +429,8 @@ TEST_CASE("test_sanity_types_uint32 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -475,7 +461,7 @@ TEST_CASE("test_sanity_types_uint32 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -508,10 +494,8 @@ TEST_CASE("test_sanity_types_uint64 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -540,7 +524,7 @@ TEST_CASE("test_sanity_types_uint64 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -575,10 +559,8 @@ TEST_CASE("test_sanity_types_bits ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -608,7 +590,7 @@ TEST_CASE("test_sanity_types_bits ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -641,10 +623,8 @@ TEST_CASE("test_sanity_types_decimal64 ")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -673,7 +653,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -709,10 +689,8 @@ TEST_CASE("test_sanity_types_string")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -741,7 +719,7 @@ TEST_CASE("test_sanity_types_string")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -776,10 +754,8 @@ TEST_CASE("test_sanity_types_empty")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -808,7 +784,7 @@ TEST_CASE("test_sanity_types_empty")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -841,10 +817,8 @@ TEST_CASE("test_sanity_types_boolean")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -873,7 +847,7 @@ TEST_CASE("test_sanity_types_boolean")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -907,10 +881,8 @@ TEST_CASE("test_sanity_types_embedded_enum")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -939,7 +911,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -972,10 +944,8 @@ TEST_CASE("test_sanity_types_enum")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1004,7 +974,7 @@ TEST_CASE("test_sanity_types_enum")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1038,10 +1008,8 @@ TEST_CASE("test_sanity_types_union")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1070,7 +1038,7 @@ TEST_CASE("test_sanity_types_union")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1104,10 +1072,8 @@ TEST_CASE("test_sanity_types_union_enum")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1136,7 +1102,7 @@ TEST_CASE("test_sanity_types_union_enum")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1172,10 +1138,8 @@ TEST_CASE("test_sanity_types_union_int")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1205,7 +1169,7 @@ TEST_CASE("test_sanity_types_union_int")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1240,10 +1204,8 @@ TEST_CASE("test_union_leaflist")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1274,7 +1236,7 @@ TEST_CASE("test_union_leaflist")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1307,10 +1269,8 @@ TEST_CASE("test_enum_leaflist")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1341,7 +1301,7 @@ TEST_CASE("test_enum_leaflist")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1374,10 +1334,8 @@ TEST_CASE("test_identity_leaflist")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1408,7 +1366,7 @@ TEST_CASE("test_identity_leaflist")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1442,10 +1400,8 @@ TEST_CASE("test_union_complex_list")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1474,7 +1430,7 @@ TEST_CASE("test_union_complex_list")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1503,10 +1459,8 @@ TEST_CASE("test_identityref")
 
     auto & runner = schema.create("ydktest-sanity:runner", "");
 
-
-
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&runner.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -1535,8 +1489,7 @@ TEST_CASE("test_identityref")
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
     auto & runner_read = schema.create("ydktest-sanity:runner", "");
 
-
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&runner_read.get_root());
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -1556,4 +1509,3 @@ TEST_CASE("test_identityref")
     REQUIRE(val == "ydktest-sanity:child-child-identity");
 
 }
-

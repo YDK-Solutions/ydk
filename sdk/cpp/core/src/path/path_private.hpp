@@ -63,7 +63,7 @@ namespace ydk {
 
             const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
-            const SchemaNode& root() const noexcept;
+            const SchemaNode& get_root() const noexcept;
 
             Statement statement() const;
 
@@ -135,7 +135,7 @@ namespace ydk {
 
             virtual std::vector<std::shared_ptr<DataNode>> get_children() const;
 
-            virtual const DataNode& root() const;
+            virtual const DataNode& get_root() const;
 
             void add_annotation(const Annotation& an);
 
@@ -178,7 +178,7 @@ namespace ydk {
 
             std::vector<std::shared_ptr<DataNode>> get_children() const;
 
-            const DataNode& root() const;
+            const DataNode& get_root() const;
 
             std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
 

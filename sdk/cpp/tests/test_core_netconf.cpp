@@ -232,7 +232,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
     auto & bgp = schema.create("openconfig-bgp:bgp", "");
     //get the root
-    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&bgp.root());
+    const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&bgp.get_root());
 
     REQUIRE( data_root != nullptr );
 
@@ -264,7 +264,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
     auto & bgp_read = schema.create("openconfig-bgp:bgp", "");
 
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.root());
+    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.get_root());
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
@@ -308,7 +308,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //  //call read
 //    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
 //    auto & bgp_read = schema.create("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
-//    std::shared_ptr<const ydk::path::DataNode> data_root2{&bgp_read.root()};
+//    std::shared_ptr<const ydk::path::DataNode> data_root2{&bgp_read.get_root()};
 //
 //    xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
 //    REQUIRE( !xml.empty() );

@@ -139,7 +139,7 @@ ydk::path::SchemaNodeImpl::get_children() const
 }
 
 const ydk::path::SchemaNode&
-ydk::path::SchemaNodeImpl::root() const noexcept
+ydk::path::SchemaNodeImpl::get_root() const noexcept
 {
     if(m_parent == nullptr)
     {
@@ -147,7 +147,7 @@ ydk::path::SchemaNodeImpl::root() const noexcept
     }
     else
     {
-        return m_parent->root();
+        return m_parent->get_root();
     }
 }
 

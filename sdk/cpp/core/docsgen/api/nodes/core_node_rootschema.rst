@@ -43,7 +43,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         :return: The children of this node.
 
-    .. cpp:function:: virtual const SchemaNode* root() const noexcept
+    .. cpp:function:: virtual const SchemaNode* get_root() const noexcept
 
         Get the root of NodeTree this node is part of.
 

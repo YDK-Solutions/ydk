@@ -521,7 +521,7 @@ public:
     /// Returns the root of the NodeTree this nodes is part of
     /// @return the pointer to the root
     ///
-    virtual const SchemaNode& root() const noexcept = 0;
+    virtual const SchemaNode& get_root() const noexcept = 0;
 
     ///
     /// @brief return the YANG statement associated with this SchemaNode
@@ -592,7 +592,7 @@ public:
     /// Returns the root of the NodeTree this nodes is part of
     /// @return the pointer to the root
     ///
-    virtual const SchemaNode& root() const noexcept;
+    virtual const SchemaNode& get_root() const noexcept;
 
     ///
     /// @brief create a DataNode corresponding to the path and set its value
@@ -601,7 +601,7 @@ public:
     /// expression must identify a single node. If the last node created is of schema
     /// type list, leaf-list or anyxml that value is also set in the node.
     /// The returned DataNode is the last node created (the terminal part of the path).
-    /// The user is responsible for managing the memory of this returned tree. Use DataNode#root()
+    /// The user is responsible for managing the memory of this returned tree. Use DataNode#get_root()
     /// to get the root element of the this tree and use that pointer to dispose of the entire tree.
     /// Note in the case of List nodes the keys must be present in the path expression in the form
     /// of predicates.
@@ -622,7 +622,7 @@ public:
     /// expression must identify a single node. If the last node created is of schema
     /// type list, leaf-list or anyxml that value is also set in the node.
     /// The returned DataNode is the last node created (the terminal part of the path).
-    /// The user is responsible for managing the memory of this returned tree. Use DataNode#root()
+    /// The user is responsible for managing the memory of this returned tree. Use DataNode#get_root()
     /// to get the root element of the this tree and use that pointer to dispose of the entire tree.
     /// Note in the case of List nodes the keys must be present in the path expression in the form
     /// of predicates.
@@ -702,7 +702,7 @@ public:
     /// expression must identify a single node. If the last node created is of schema
     /// type list, leaf-list or anyxml that value is also set in the node.
     /// The returned DataNode is the last node created (the terminal part of the path).
-    /// The user is responsible for managing the memory of this returned tree. Use DataNode#root()
+    /// The user is responsible for managing the memory of this returned tree. Use DataNode#get_root()
     /// to get the root element of the this tree and use that pointer to dispose of the entire tree.
     /// Note in the case of List nodes the keys must be present in the path expression in the form
     /// of predicates.
@@ -722,7 +722,7 @@ public:
     /// expression must identify a single node. If the last node created is of schema
     /// type list, leaf-list or anyxml that value is also set in the node.
     /// The returned DataNode is the last node created (the terminal part of the path).
-    /// The user is responsible for managing the memory of this returned tree. Use DataNode#root()
+    /// The user is responsible for managing the memory of this returned tree. Use DataNode#get_root()
     /// to get the root element of the this tree and use that pointer to dispose of the entire tree.
     /// Note in the case of List nodes the keys must be present in the path expression in the form
     /// of predicates.
@@ -788,7 +788,7 @@ public:
     ///
     /// Returns the root of the DataNode.
     ///
-    virtual const DataNode& root() const = 0;
+    virtual const DataNode& get_root() const = 0;
 
     ///
     /// @brief Add the annotation to this datanode

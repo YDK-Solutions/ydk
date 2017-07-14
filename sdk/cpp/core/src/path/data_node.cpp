@@ -336,10 +336,10 @@ ydk::path::DataNodeImpl::get_children() const
 }
 
 const ydk::path::DataNode&
-ydk::path::DataNodeImpl::root() const
+ydk::path::DataNodeImpl::get_root() const
 {
     if(m_parent){
-        return m_parent->root();
+        return m_parent->get_root();
     }
     return *this;
 }

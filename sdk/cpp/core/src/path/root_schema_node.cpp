@@ -48,7 +48,7 @@ ydk::path::RootSchemaNode::get_parent() const noexcept
 }
 
 const ydk::path::SchemaNode&
-ydk::path::RootSchemaNode::root() const noexcept
+ydk::path::RootSchemaNode::get_root() const noexcept
 {
     return *this;
 }

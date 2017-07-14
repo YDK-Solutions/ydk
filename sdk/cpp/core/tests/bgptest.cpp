@@ -384,7 +384,7 @@ TEST_CASE( "submodule" )
 //    REQUIRE( subtest != nullptr );
 //
 //    //get the root
-//    std::unique_ptr<const ydk::path::DataNode> data_root{subtest->root()};
+//    std::unique_ptr<const ydk::path::DataNode> data_root{subtest->get_root()};
 //
 //    REQUIRE( data_root != nullptr );
 //

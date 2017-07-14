@@ -33,7 +33,7 @@ void test_bgp_create()
     auto & bgp = schema.create("openconfig-bgp:bgp", "");
 
     // get the root
-    // std::unique_ptr<const ydk::path::DataNode> data_root{bgp->root()};
+    // std::unique_ptr<const ydk::path::DataNode> data_root{bgp->get_root()};
 
     bgp.create("global/config/as", "65172");
 

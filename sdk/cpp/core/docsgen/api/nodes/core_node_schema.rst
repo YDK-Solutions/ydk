@@ -53,7 +53,7 @@ Represents a Node in the SchemaTree.
 
         :return: Child schema nodes.
 
-    .. cpp:function:: virtual const SchemaNode& root() const noexcept
+    .. cpp:function:: virtual const SchemaNode& get_root() const noexcept
 
         Get the root of NodeTree this node is part of
 

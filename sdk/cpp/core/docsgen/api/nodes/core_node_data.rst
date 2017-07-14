@@ -102,7 +102,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
 
         :return: Pointer to the children of this :cpp:class:`DataNode<DataNode>`.
 
-    .. cpp:function:: virtual const DataNode& root() const
+    .. cpp:function:: virtual const DataNode& get_root() const
 
         :return: Pointer to the root :cpp:class:`DataNode<DataNode>` of this tree.
 

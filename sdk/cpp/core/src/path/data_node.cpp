@@ -308,7 +308,7 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
 }
 
 ydk::path::DataNode*
-ydk::path::DataNodeImpl::parent() const
+ydk::path::DataNodeImpl::get_parent() const
 {
     return m_parent;
 }

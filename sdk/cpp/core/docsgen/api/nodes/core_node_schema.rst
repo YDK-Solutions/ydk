@@ -41,7 +41,7 @@ Represents a Node in the SchemaTree.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, see error code for details.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
 
-    .. cpp:function:: virtual const SchemaNode* parent() const noexcept
+    .. cpp:function:: virtual const SchemaNode* get_parent() const noexcept
 
         Get the Parent Node of this SchemaNode in the tree.
 

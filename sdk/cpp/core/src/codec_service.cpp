@@ -70,8 +70,8 @@ CodecService::encode(CodecServiceProvider & provider, Entity & entity, bool pret
     {
         path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
         const path::DataNode* dn = &datanode;
-        while(dn!= nullptr && dn->parent()!=nullptr)
-            dn = dn->parent();
+        while(dn!= nullptr && dn->get_parent()!=nullptr)
+            dn = dn->get_parent();
         path::Codec core_codec_service{};
         std::string result = core_codec_service.encode(*dn, provider.m_encoding, pretty);
         YLOG_INFO("Performing encode operation, resulting in {}", result);

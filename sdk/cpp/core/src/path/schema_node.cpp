@@ -126,7 +126,7 @@ ydk::path::SchemaNodeImpl::find(const std::string& path) const
 }
 
 const ydk::path::SchemaNode*
-ydk::path::SchemaNodeImpl::parent() const noexcept
+ydk::path::SchemaNodeImpl::get_parent() const noexcept
 {
     return m_parent;
 }
@@ -252,5 +252,3 @@ ydk::path::SchemaNodeImpl::keys() const
 
     return stmts;
 }
-
-

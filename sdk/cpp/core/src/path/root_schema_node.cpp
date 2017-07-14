@@ -42,7 +42,7 @@ ydk::path::RootSchemaNode::path() const
 }
 
 ydk::path::SchemaNode*
-ydk::path::RootSchemaNode::parent() const noexcept
+ydk::path::RootSchemaNode::get_parent() const noexcept
 {
     return nullptr;
 }

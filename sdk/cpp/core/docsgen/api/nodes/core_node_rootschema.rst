@@ -31,7 +31,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, See error code for details.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
 
-    .. cpp:function:: virtual SchemaNode* parent() const noexcept
+    .. cpp:function:: virtual SchemaNode* get_parent() const noexcept
 
         Get the parent node of this :cpp:class:`SchemaNode<SchemaNode>` in the tree.
 

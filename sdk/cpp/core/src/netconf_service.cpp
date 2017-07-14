@@ -345,8 +345,8 @@ static std::string get_data_payload(Entity & entity, path::RootSchemaNode & root
 {
     path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
     const path::DataNode* dn = &datanode;
-    while(dn!= nullptr && dn->parent()!=nullptr)
-        dn = dn->parent();
+    while(dn!= nullptr && dn->get_parent()!=nullptr)
+        dn = dn->get_parent();
 
     path::Codec codec{};
     return codec.encode(*dn, ydk::EncodingFormat::XML, true);

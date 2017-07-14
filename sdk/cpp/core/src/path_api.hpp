@@ -506,7 +506,7 @@ public:
     /// Returns the parent Node of this SchemaNode in the tree
     /// @return pointer the parent Node or nullptr in case this is the root.
     ///
-    virtual const SchemaNode* parent() const noexcept = 0 ;
+    virtual const SchemaNode* get_parent() const noexcept = 0 ;
 
     ///
     /// @brief return the children of this SchemaNode in the NodeTree.
@@ -577,7 +577,7 @@ public:
     /// Returns the parent Node of this SchemaNode in the tree
     /// @return pointer the parent Node or nullptr in case this is the root.
     ///
-   virtual SchemaNode* parent() const noexcept;
+   virtual SchemaNode* get_parent() const noexcept;
 
     ///
     /// @brief return the children of this SchemaNode in the NodeTree.
@@ -774,7 +774,7 @@ public:
     ///
     /// Returns the parent of this DataNode or nullptr if None exist
     ///
-    virtual DataNode* parent() const = 0;
+    virtual DataNode* get_parent() const = 0;
 
     ///
     /// @brief returns the children of this DataNode

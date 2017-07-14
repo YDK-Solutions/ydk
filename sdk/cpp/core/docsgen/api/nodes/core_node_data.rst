@@ -94,7 +94,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
         :param path: The path expression.
         :return: Vector of :cpp:class:`DataNode<DataNode>` that satisfy the path expression supplied.
 
-    .. cpp:function:: virtual DataNode* parent() const
+    .. cpp:function:: virtual DataNode* get_parent() const
 
         :return: Pointer to the parent of this :cpp:class:`DataNode<DataNode>` or ``nullptr`` if None exist.
 

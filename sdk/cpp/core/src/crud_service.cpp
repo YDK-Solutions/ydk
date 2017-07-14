@@ -141,8 +141,8 @@ static string get_config_data_payload(Entity & entity, path::ServiceProvider & p
     const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema());
 
     const path::DataNode* dn = &datanode;
-    while(dn!= nullptr && dn->parent()!=nullptr)
-        dn = dn->parent();
+    while(dn!= nullptr && dn->get_parent()!=nullptr)
+        dn = dn->get_parent();
     path::Codec codec{};
     YLOG_DEBUG("Encoding the subtree filter request using path API DataNode");
     string payload = codec.encode(*dn, provider.get_encoding(), false);

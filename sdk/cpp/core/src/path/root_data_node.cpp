@@ -108,9 +108,9 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
 
     DataNode* rdn = dn;
     // created data node is the last child
-    while(!rdn->children().empty())
+    while(!rdn->get_children().empty())
     {
-        rdn = rdn->children()[0].get();
+        rdn = rdn->get_children()[0].get();
     }
 
     //at this stage we have dn so for the remaining segments use dn as the parent
@@ -151,7 +151,7 @@ ydk::path::RootDataImpl::get() const
 
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::RootDataImpl::children() const
+ydk::path::RootDataImpl::get_children() const
 {
     std::vector<std::shared_ptr<DataNode>> ret{};
 

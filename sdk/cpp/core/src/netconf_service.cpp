@@ -231,7 +231,7 @@ shared_ptr<Entity> NetconfService::get_config(NetconfServiceProvider & provider,
         return nullptr;
 
     shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(read_datanode->children()[0].get(), top_entity);
+    get_entity_from_data_node(read_datanode->get_children()[0].get(), top_entity);
     return top_entity;
 
 }
@@ -252,7 +252,7 @@ shared_ptr<Entity> NetconfService::get(NetconfServiceProvider & provider, Entity
     if (result_datanode == nullptr)
         return {};
     shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(result_datanode->children()[0].get(), top_entity);
+    get_entity_from_data_node(result_datanode->get_children()[0].get(), top_entity);
     return top_entity;
 }
 

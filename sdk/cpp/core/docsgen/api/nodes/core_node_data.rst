@@ -98,7 +98,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
 
         :return: Pointer to the parent of this :cpp:class:`DataNode<DataNode>` or ``nullptr`` if None exist.
 
-    .. cpp:function:: virtual std::vector<std::shared_ptr<DataNode>> children() const
+    .. cpp:function:: virtual std::vector<std::shared_ptr<DataNode>> get_children() const
 
         :return: Pointer to the children of this :cpp:class:`DataNode<DataNode>`.
 

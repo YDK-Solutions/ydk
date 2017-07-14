@@ -132,7 +132,7 @@ ydk::path::SchemaNodeImpl::get_parent() const noexcept
 }
 
 const std::vector<std::unique_ptr<ydk::path::SchemaNode>> &
-ydk::path::SchemaNodeImpl::children() const
+ydk::path::SchemaNodeImpl::get_children() const
 {
 
     return m_children;

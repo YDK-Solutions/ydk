@@ -129,7 +129,7 @@ ydk::path::RootSchemaNodeImpl::find(const std::string& path) const
 }
 
 const std::vector<std::unique_ptr<ydk::path::SchemaNode>> &
-ydk::path::RootSchemaNodeImpl::children() const
+ydk::path::RootSchemaNodeImpl::get_children() const
 {
     return m_children;
 }

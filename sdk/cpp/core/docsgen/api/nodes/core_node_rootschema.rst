@@ -37,7 +37,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         :return: Pointer to the parent node or ``nullptr`` in case this is the root.
 
-    .. cpp:function:: virtual std::vector<SchemaNode*> children() const
+    .. cpp:function:: virtual std::vector<SchemaNode*> get_children() const
 
         Get the children of this :cpp:class:`SchemaNode<SchemaNode>` in the NodeTree.
 

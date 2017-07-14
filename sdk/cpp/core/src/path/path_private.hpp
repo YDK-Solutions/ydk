@@ -61,7 +61,7 @@ namespace ydk {
 
             const SchemaNode* get_parent() const noexcept;
 
-            const std::vector<std::unique_ptr<SchemaNode>>& children() const;
+            const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
             const SchemaNode& root() const noexcept;
 
@@ -84,7 +84,7 @@ namespace ydk {
 
             std::vector<SchemaNode*> find(const std::string& path) const;
 
-            const std::vector<std::unique_ptr<SchemaNode>>& children() const;
+            const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
             DataNode& create(const std::string& path);
 
@@ -133,7 +133,7 @@ namespace ydk {
 
             DataNode* get_parent() const;
 
-            virtual std::vector<std::shared_ptr<DataNode>> children() const;
+            virtual std::vector<std::shared_ptr<DataNode>> get_children() const;
 
             virtual const DataNode& root() const;
 
@@ -176,7 +176,7 @@ namespace ydk {
 
             std::string get() const;
 
-            std::vector<std::shared_ptr<DataNode>> children() const;
+            std::vector<std::shared_ptr<DataNode>> get_children() const;
 
             const DataNode& root() const;
 

@@ -69,7 +69,7 @@ shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provide
     auto output = rpc_entity.get_child_by_name("output", "");
     if (output != nullptr && result_datanode != nullptr)
     {
-        auto filter = result_datanode->children()[0].get();
+        auto filter = result_datanode->get_children()[0].get();
 
         get_entity_from_data_node(filter, top_entity);
         return top_entity;

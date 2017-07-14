@@ -90,7 +90,7 @@ shared_ptr<Entity> CrudService::read_datanode(Entity & filter, shared_ptr<path::
     if (read_data_node == nullptr)
         return {};
     shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(read_data_node->children()[0].get(), top_entity);
+    get_entity_from_data_node(read_data_node->get_children()[0].get(), top_entity);
     return top_entity;
 }
 

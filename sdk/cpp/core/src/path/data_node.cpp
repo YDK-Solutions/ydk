@@ -211,9 +211,9 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
         DataNodeImpl* rdn = dynamic_cast<DataNodeImpl*>(dn->child_map[first_node_created].get());
 
-        while(!rdn->children().empty() && rdn->m_node != cn)
+        while(!rdn->get_children().empty() && rdn->m_node != cn)
         {
-            rdn = dynamic_cast<DataNodeImpl*>(rdn->children()[0].get());
+            rdn = dynamic_cast<DataNodeImpl*>(rdn->get_children()[0].get());
         }
 
         return *rdn;
@@ -314,7 +314,7 @@ ydk::path::DataNodeImpl::get_parent() const
 }
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::DataNodeImpl::children() const
+ydk::path::DataNodeImpl::get_children() const
 {
     std::vector<std::shared_ptr<DataNode>> ret{};
     //the ordering should be determined by the lyd_node

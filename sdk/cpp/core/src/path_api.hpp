@@ -513,7 +513,7 @@ public:
     ///
     /// Returns the children of this SchemaNode.
     ///@return the children of this node.
-    virtual const std::vector<std::unique_ptr<SchemaNode>> & children() const = 0;
+    virtual const std::vector<std::unique_ptr<SchemaNode>> & get_children() const = 0;
 
     ///
     /// @brief get the root of NodeTree this node is part of
@@ -584,7 +584,7 @@ public:
     ///
     /// Returns the children of this SchemaNode.
     ///@return the children of this node.
-    virtual const std::vector<std::unique_ptr<SchemaNode>>& children() const = 0;
+    virtual const std::vector<std::unique_ptr<SchemaNode>>& get_children() const = 0;
 
     ///
     /// @brief get the root of NodeTree this node is part of
@@ -781,7 +781,7 @@ public:
     ///
     /// Returns the children of this DataNode
     ///
-    virtual std::vector<std::shared_ptr<DataNode>> children() const = 0;
+    virtual std::vector<std::shared_ptr<DataNode>> get_children() const = 0;
 
     ///
     /// @brief returns the root DataNode of this tree.

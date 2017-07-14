@@ -312,7 +312,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
 
     std::string config_payload {};
 
-    for(auto const & child : datanode->children())
+    for(auto const & child : datanode->get_children())
     {
         if((child->annotations()).size()==0)
         {

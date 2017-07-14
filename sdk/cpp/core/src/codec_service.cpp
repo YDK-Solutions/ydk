@@ -118,14 +118,14 @@ CodecService::decode(CodecServiceProvider & provider, const std::string & payloa
     path::Codec core_codec_service{};
     auto root_data_node = core_codec_service.decode(root_schema, payload, provider.m_encoding);
 
-    if (root_data_node->children().size() != 1)
+    if (root_data_node->get_children().size() != 1)
     {
         YLOG_ERROR(PAYLOAD_ERROR_MSG);
         throw(YCPPServiceProviderError(PAYLOAD_ERROR_MSG));
     }
     else
     {
-        for (auto data_node: root_data_node->children())
+        for (auto data_node: root_data_node->get_children())
         {
             get_entity_from_data_node(data_node.get(), entity);
             // Required for validation of decoded entity

@@ -47,7 +47,7 @@ Represents a Node in the SchemaTree.
 
         :return: ``SchemaNode*`` the children of this node.
 
-    .. cpp:function:: virtual std::vector<std::unique_ptr<SchemaNode>> & children() const
+    .. cpp:function:: virtual std::vector<std::unique_ptr<SchemaNode>> & get_children() const
 
         Returns the children of this :cpp:class:`SchemaNode <SchemaNode>` in the NodeTree.
 

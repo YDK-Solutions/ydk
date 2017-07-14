@@ -164,11 +164,11 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
     string url;
     if(is_config(rpc))
     {
-        url = config_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+        url = config_url_root + get_module_url_path(datanode->get_children()[0]->schema().path());
     }
     else
     {
-        url = state_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+        url = state_url_root + get_module_url_path(datanode->get_children()[0]->schema().path());
     }
 
     YLOG_INFO("Performing GET on URL {}", url);
@@ -188,7 +188,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& 
     string header_data = entity_node->get();
 
     auto datanode = codec_service.decode(*root_schema, header_data, encoding);
-    string url = config_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+    string url = config_url_root + get_module_url_path(datanode->get_children()[0]->schema().path());
 
     YLOG_INFO("Performing {} on URL {}. Payload: {}", yfilter, url, header_data);
     client->execute(yfilter, url, header_data);

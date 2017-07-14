@@ -78,7 +78,7 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
         std::string child_indent{indent};
         child_indent+="  ";
         std::cout << indent << "<" << s.arg << ">" << std::endl;
-        for(auto c : dn->children())
+        for(auto c : dn->get_children())
         print_tree(c.get(), child_indent);
         std::cout << indent << "</" << s.arg << ">" << std::endl;
 

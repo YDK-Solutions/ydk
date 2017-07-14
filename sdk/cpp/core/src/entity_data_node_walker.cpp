@@ -163,7 +163,7 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
     if (entity == nullptr || node == nullptr)
         return;
 
-    for(auto & child_data_node:node->children())
+    for(auto & child_data_node:node->get_children())
     {
         std::string child_name = child_data_node->schema().statement().arg;
         if(data_node_is_leaf(*child_data_node))

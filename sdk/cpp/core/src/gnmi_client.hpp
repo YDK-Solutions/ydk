@@ -16,53 +16,61 @@
 
 #ifndef _YDK_GNMI_CLIENT_H_
 #define _YDK_GNMI_CLIENT_H_
+#include <fstream>
+#include <iostream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <sstream>
 
 #include "errors.hpp"
+#include "json.hpp"
+#include "logger.hpp"
 
+#include <grpc++/client_context.h>
+#include <grpc++/create_channel.h>
 #include <grpc++/grpc++.h>
 #include <libgnmi/gnmi.grpc.pb.h>
 
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::Status;
-using gnmi::gNMI;
 using gnmi::CapabilityRequest;
 using gnmi::CapabilityResponse;
+using grpc::Channel;
+using grpc::ClientContext;
 using gnmi::GetRequest;
 using gnmi::GetResponse;
-
-typedef struct capabilities 
-{
-    capabilities(std::vector<std::string> cas){caps=cas;}
-    std::vector<std::string> caps;
-} capabilities;
+using gnmi::gNMI;
+using grpc::Status;
 
 namespace ydk 
 {
     class gNMIClient 
     {
     public:
+        typedef struct PathPrefixValueFlags
+        {
+            bool path_has_value;
+            bool prefix_has_value;
+        } PathPrefixValueFlags;
+
         gNMIClient(std::shared_ptr<Channel> channel);
         ~gNMIClient();
 
-        std::vector<std::string> Capabilities();
-        void Get();
-        int connect();
+        int connect(std::string address);
         std::string execute_wrapper(const std::string & payload);
-        std::string execute_payload(const std::string & payload, const GetRequest& request, GetResponse* response);
-        GetRequest ParseGetRequest(GetRequest request, std::string payload);
-        std::string ParseGetResponse(GetResponse* response); 
-        std::unique_ptr<gNMI::Stub> stub_;
-
+        std::string execute_payload(const GetRequest& request, GetResponse* response);
+        std::vector<std::string> get_capabilities();
+    
     private:
-        void init_capabilities();
-        bool get_capabilities(const CapabilityRequest& request, CapabilityResponse* response);
-        std::vector<std::string> capabilities;
+        std::string get_path_from_update(::gnmi::Update update);
+        std::string get_prefix_from_notification(::gnmi::Notification notification);
+        std::string get_value_from_update(::gnmi::Update update);
+        bool has_gnmi_version(CapabilityResponse* response);
+        void parse_capabilities_modeldata(CapabilityResponse* response);
+        void parse_capabilities_encodings(CapabilityResponse* response);
+        bool parse_capabilities(CapabilityResponse* response);
+        std::string parse_get_response(GetResponse* response); 
+        GetRequest populate_get_request(GetRequest request, std::string payload);
+        std::unique_ptr<gNMI::Stub> stub_;
     };
 }
 

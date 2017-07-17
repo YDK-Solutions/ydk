@@ -1,273 +1,325 @@
-#include <iostream>
-#include <fstream>
-#include <memory>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <iterator>
-
-#include "errors.hpp"
 #include "gnmi_client.hpp"
-#include "types.hpp"
-#include "logger.hpp"
-#include "path_api.hpp"
-#include "json.hpp"
-
-#include <libyang/libyang.h>
-#include <grpc++/grpc++.h>
-#include <grpc++/client_context.h>
-#include <grpc++/create_channel.h>
-#include <libgnmi/gnmi.grpc.pb.h>
-#include <libgnmi/gnmi.pb.h>
-#include "entity_data_node_walker.hpp"
-#include "ietf_parser.hpp"
-#include "ydk_yang.hpp"
-
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::Status;
-using gnmi::gNMI;
-using gnmi::CapabilityRequest;
-using gnmi::CapabilityResponse;
-using gnmi::GetRequest;
-using gnmi::GetResponse;
 
 using namespace std;
 using namespace ydk;
-using json = nlohmann::json;
 
-typedef vector<string> StringVec;
-std::ifstream capfile("/usr/local/share/ydk/0.0.0.0\:50051/capabilities.txt");
+using json = nlohmann::json;
+using grpc::SslCredentialsOptions;
+
+vector<string> capabilities;
+gNMIClient::PathPrefixValueFlags flag;
 
 gNMIClient::gNMIClient(shared_ptr<Channel> channel)
-	: stub_(gNMI::NewStub(channel)){}
+    : stub_(gNMI::NewStub(channel)){}
 
-StringVec gNMIClient::Capabilities() 
-{
-	CapabilityRequest request;
-	CapabilityResponse response;
-	gNMIClient::get_capabilities(request, &response);
-	return capabilities;
-}
+static bool check_capabilities_status(Status status);
+static string parse_get_request_payload(string payload);
+static vector<string> get_path_from_payload_filter(string payload_filter, vector<string> container);
+static string check_if_path_has_value(string element);
+static string format_notification_response(string prefix_to_prepend, string path_to_prepend, string value);
 
-int gNMIClient::connect() 
+
+int gNMIClient::connect(std::string address) 
 {
-    grpc::CreateChannel("0.0.0.0:50051", grpc::InsecureChannelCredentials());
-    init_capabilities();
+    // Authenticates server 
+    std::string server_cert;
+    std::ifstream rf("ems.pem");
+
+    server_cert.assign((std::istreambuf_iterator<char>(rf)),(std::istreambuf_iterator<char>()));
+
+    grpc::SslCredentialsOptions ssl_opts;
+    grpc::ChannelArguments      args;
+
+    ssl_opts.pem_root_certs = server_cert;
+    args.SetSslTargetNameOverride("ems.cisco.com");
+
+    /* TBD: Authenticate client at server
+    std::ifstream kf("client.key");
+    std::ifstream cf("client.pem");
+    client_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
+    client_cert.assign((std::istreambuf_iterator<char>(cf)),(std::istreambuf_iterator<char>()));
+    ssl_opts = {server_cert, client_key, client_cert};
+    */
+
+    auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
+    grpc::CreateCustomChannel(address, channel_creds, args);
+    get_capabilities();
     return EXIT_SUCCESS;
 }
 
-void gNMIClient::init_capabilities() 
+static bool check_capabilities_status(Status status) 
 {
-	std::string cap;
-	while (std::getline(capfile, cap)) 
-	{
-		capabilities.push_back(cap);
-		//std::cout << cap;
-	}
-}
-
-bool gNMIClient::get_capabilities(const CapabilityRequest& request, CapabilityResponse* response) 
-{
-	grpc::ClientContext context;
-	grpc::Status status = stub_->Capabilities(&context, request, response);
-	if (!status.ok()) 
-	{
-	  std::cout << "Capabilities RPC Failed." << std::endl;
-	  return false;
-	}
-	if (!response->gnmi_version().size() > 0) 
-	{
-	  std::cout << "Server has not returned gnmi version" << std::endl;
-	  return false;
-	} else 
-	{
-		std::cout << "Receive capability response with gNMI version: " << response->gnmi_version() << std::endl;
-		for (unsigned int i = 0, n = response->supported_models_size(); i < n; i++) 
-		{
-			std::cout << "supported_models size" << response->supported_models_size() << std::endl;
-			std::cout << "supported_models";
-			response->supported_models(i);
-		}
-		for (int i = 0, n = response->supported_encodings_size(); i < n; i++) 
-		{
-			std::cout << "supported_models size" << response->supported_encodings_size() << std::endl;
-			std::cout << "supported_models";
-			response->supported_encodings(i);
-		}
-	}
+    if (!(status.ok())) 
+    {
+      YLOG_ERROR("Capabilities RPC Failed.");
+      throw(YCPPError{"Capabilities RPC Failed"});
+      return false;
+    }
     return true;
 }
 
-void gNMIClient::Get() {}
-
-GetRequest gNMIClient::ParseGetRequest(GetRequest request, string payload) 
-{	
-	::gnmi::Path* prefix = new ::gnmi::Path();
-	::gnmi::Path* path;
-
-	// create parsable payload 
-	std::string payload_recieved = "{";
-	payload_recieved.append(payload);
-	payload_recieved.append("}");
-	std::cout << payload << endl;
-	auto payload_to_parse = json::parse(payload_recieved);
-	
-	// capture filter value
-	std::string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "Empty Filter");
-
-	// get prefix and path values
-	std::istringstream filter_value(payload_filter);
-	std::string token;
-	std::vector<std::string> prefix_container;
-	std::vector<std::string> path_container;
-	while(std::getline(filter_value, token, '"')) 
-	{
-		if(token.find("{")==std::string::npos && token.find("}")==std::string::npos) 
-		{
-			std::istringstream pref(token);
-			std::string subtoken;
-			while(std::getline(pref, subtoken, ':')) 
-			{
-				prefix_container.push_back(subtoken);
-			}
-		}
-	}
-
-	// populate values into request payload
-	// prefix - {"openconfig-bgp", "bgp"}
-	for(int i = 0; i < prefix_container.size(); ++i) 
-	{
-		prefix->add_element(prefix_container[i]);
-	}
-	request.set_allocated_prefix(prefix);
-
-	// path - {"global", "config", "as"}
-	path = request.add_path();
-	path->add_element("*");
-
-	// type (CONFIG/STATE/OPERATIONAL) - "CONFIG"
-	request.set_type(::gnmi::GetRequest::CONFIG);
-
-	// encoding - default JSON
-	request.set_encoding(::gnmi::Encoding::JSON);
-	return request;
+bool gNMIClient::has_gnmi_version(::gnmi::CapabilityResponse* response) 
+{
+    if (!(response->gnmi_version().size() > 0)) 
+    {
+        YLOG_ERROR("Capabilities Received Without gNMI Version");
+        throw(YCPPError{"Capabilities Received Without gNMI Version"});
+        return false;
+    }
+    return true; 
 }
 
-std::string gNMIClient::ParseGetResponse(GetResponse* response) {
-	/* 
-	Notification Message:
-	Timestamp - Timestamp values MUST be represented as the number of nanoseconds since the Unix epoch 
-		(January 1st 1970 00:00:00 UTC). The value MUST be encoded as a signed 64-bit integer (int64)[^1].
- 	Prefix - {"openconfig-bgp", "bgp"}
- 	Update 
-		Path - {"global", "config", "as"}
-		Value - bytes ("65172"), type (0)
-	*/
-	::gnmi::Notification notification;
-	::gnmi::Path prefix;
-	::gnmi::Path path;
-	::gnmi::Update update;
-	::gnmi::Value value;
-	std::string element;
-	std::string reply_to_parse;
-	int element_size;
-	std::string prefix_to_prepend;
-	std::string path_to_prepend;
-	int notification_size = response->notification_size();
+void gNMIClient::parse_capabilities_modeldata(::gnmi::CapabilityResponse* response)
+{
+    ::gnmi::ModelData modeldata;
+    string cap, name, organization, version; 
 
-	// read from all response fields and create reply
-	for(int i = 0; i < notification_size; ++i) 
-	{
-		notification = response->notification(i);
-
-		if(notification.has_prefix()) {
-			prefix = notification.prefix();
-			element_size = prefix.element_size();
-			for(int j = 0; j < element_size; ++j)
-            {
-              	element.append("\"");
-		        element.append(prefix.element(j));
-		        element.append("\" ");
-		        prefix_to_prepend.append(prefix.element(j));
-		        if(j != (element_size - 1))
-		        {
-		        	prefix_to_prepend.append(":");
-		        }
-            }
-            prefix_to_prepend.append("\": {");
-		}
-
-		int update_size = notification.update_size();
-		
-		if(notification.update_size() != 0) {
-	        for(int k = 0; k < update_size; ++k) 
-	        {
-	            update = notification.update(k);
-	            
-	            if(update.has_path()) 
-	            {
-	            	path = update.path();
-	           		element_size = path.element_size();
-	             	element.clear();
-	              	for(int l = 0; l < element_size; ++l) 
-	              	{
-		                element.append("\"");
-		                element.append(path.element(l));
-		                element.append("\" ");
-		                path_to_prepend.append(path.element(l));
-		                if(l != element_size-1)
-		                {
-		                	path_to_prepend.append(":");
-		                }
-	              	}
-	              path_to_prepend.append("\": {");
-	            }
-
-	            if(update.has_value()) 
-	            {
-	              	value = update.value();
-	              	reply_to_parse.append("\"data\": {\"");
-	              	reply_to_parse.append(prefix_to_prepend); 
-	              	reply_to_parse.append(value.value());
-	              	reply_to_parse.append(" } } }");
-            	}
-           	}   
+    for (int i = 0, n = response->supported_models_size(); i < n; i++) 
+    {
+        cap.clear();
+        modeldata = response->supported_models(i);
+        name = modeldata.name();
+        organization = modeldata.organization();
+        version = modeldata.version();
+        if(!(modeldata.name().empty()))
+        {
+            YLOG_INFO("Name: {}", name.c_str());
+            cap.append("?module=" + name);
         }
-	}
-	return reply_to_parse;
+        if(!(modeldata.organization().empty())) 
+            YLOG_INFO("Organization: {}", organization.c_str());
+        if(!(modeldata.version().empty()))
+        {
+            YLOG_INFO("Version: {}", version.c_str());
+            cap.append("&revision=" + version);
+        }
+        capabilities.push_back(cap);
+        YLOG_INFO("              ------------       ");
+        YLOG_INFO("");
+    }   
 }
 
-std::string gNMIClient::execute_wrapper(const string & payload)
+void gNMIClient::parse_capabilities_encodings(::gnmi::CapabilityResponse* response)
 {
-	GetRequest request;
-	GetResponse response;
-	request = gNMIClient::ParseGetRequest(request, payload);
-	std::cout << "===============Get Request Sent================" << std::endl;
-	std::cout << request.DebugString() << std::endl;
-	std::string reply = execute_payload(payload, request, &response);
-	return reply;
+    ::gnmi::Encoding encoding;
+    string encoding_value;
+
+    for (int i = 0, n = response->supported_encodings_size(); i < n; i++) 
+    {
+        encoding = response->supported_encodings(i);
+        switch(encoding)
+        {
+            case 0: encoding_value = "JSON"; break;
+            case 1: encoding_value = "Bytes"; break;
+            case 2: encoding_value = "Proto"; break;
+            case 3: encoding_value = "ASCII"; break;
+            case 4: encoding_value = "JSON_IETF"; break;
+        }
+        YLOG_INFO("Encoding {}", encoding_value.c_str());
+    }
 }
 
-std::string gNMIClient::execute_payload(const string & payload, const GetRequest& request, GetResponse* response)
+bool gNMIClient::parse_capabilities(::gnmi::CapabilityResponse* response)
 {
-	grpc::ClientContext context;
-	grpc::Status status;
+    YLOG_INFO("Capabilities Received:");
+    YLOG_INFO("");
+    YLOG_INFO("==============gNMI Version==============");
+    YLOG_INFO("gNMI Version: {}", response->gnmi_version().c_str());
 
-	status = stub_->Get(&context, request, response);
-	std::cout << "=============Get Response Received=============" << std::endl;
-	std::cout << response->DebugString() << std::endl;
+    YLOG_INFO("============Supported Models============");    
+    parse_capabilities_modeldata(response);
+    
+    YLOG_INFO("===========Supported Encodings===========");
+    parse_capabilities_encodings(response);
+    
+    YLOG_INFO("=========================================");
+    YLOG_INFO("");
+} 
 
-	if (!status.ok()) 
-	{
-		return status.error_message();
-	} 
-	else 
-	{
-		std::cout << "===================RPC Passed===================" << std::endl;
-		std::string reply = gNMIClient::ParseGetResponse(response);	
-		return reply;
-	}
+vector<string> gNMIClient::get_capabilities() 
+{
+    CapabilityRequest request;
+    CapabilityResponse response;
+    grpc::ClientContext context;
+    grpc::Status status = stub_->Capabilities(&context, request, &response);
+
+    check_capabilities_status(status);
+    
+    if(has_gnmi_version(&response)) 
+    {
+        parse_capabilities(&response);
+    }
+    return capabilities;
+}
+
+static vector<string> parse_get_request_payload(string payload, vector<string> path_container) 
+{
+    auto payload_to_parse = json::parse("{" + payload + "}");
+    string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "Empty Filter");
+    YLOG_INFO("payload_filter: {}", payload_filter);
+
+    std::string path_elem;
+    istringstream payload_filter_value(payload_filter);
+    while(getline(payload_filter_value, path_elem, '"')) 
+    {
+        if(path_elem.find("{")==string::npos && path_elem.find("}")==string::npos) 
+            path_container.push_back(path_elem);
+    }
+    return path_container;
+}
+
+
+::gnmi::GetRequest gNMIClient::populate_get_request(::gnmi::GetRequest request, string payload) 
+{   
+    vector<string> container;   
+    vector<string> path_container = parse_get_request_payload(payload, container);
+    
+    ::gnmi::Path* path = request.add_path();  
+    for(int i = 0; i < path_container.size(); ++i) 
+        path->add_element(path_container[i]);
+    path->add_element("interface[name=\"Loopback0\"]");
+    request.set_type(::gnmi::GetRequest::CONFIG);
+    request.set_encoding(::gnmi::Encoding::JSON_IETF);
+    return request;
+}
+
+string gNMIClient::get_prefix_from_notification(::gnmi::Notification notification)
+{
+    ::gnmi::Path prefix = notification.prefix();
+    string element;
+    string prefix_to_prepend;
+
+    int element_size = prefix.element_size();
+    for(int j = 0; j < element_size; ++j)
+    {
+        element.append("\"" + prefix.element(j) + "\" ");
+        prefix_to_prepend.append(prefix.element(j));
+        prefix_to_prepend.append(":");
+    }
+    return prefix_to_prepend;
+}
+
+static string check_if_path_has_value(string element)
+{
+    if(element.find("[")==string::npos)
+    {
+        flag.path_has_value = false;
+        return element;
+    } else { 
+        flag.path_has_value = true;
+        return element.substr(0,element.find("["));
+    }
+}
+
+string gNMIClient::get_path_from_update(::gnmi::Update update)
+{
+    string path_to_prepend;
+    string path_element_to_add;
+
+    if(update.has_path()) 
+    {
+        ::gnmi::Path path = update.path();
+        int element_size = path.element_size();
+
+        for(int l = 0; l < element_size - 1; ++l) 
+        {
+            path_element_to_add = check_if_path_has_value(path.element(l));
+            path_to_prepend.append("\"" + path_element_to_add + "\":{");
+        }
+        path_element_to_add = check_if_path_has_value(path.element(element_size - 1));
+        path_to_prepend.append("\"" + path_element_to_add + "\":");
+    } else 
+        path_to_prepend.clear();
+    return path_to_prepend;
+}
+
+string gNMIClient::get_value_from_update(::gnmi::Update update)
+{
+    ::gnmi::TypedValue value;
+    string value_for_payload;
+
+    if(update.has_val()) 
+        value = update.val();
+    value_for_payload.append(value.json_ietf_val());
+    return value_for_payload;
+}
+
+static string format_notification_response(string prefix_to_prepend, string path_to_prepend, string value)
+{
+    string reply_to_parse;
+
+    if (flag.path_has_value)
+        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "[" + value + "]" + "}}");        
+    else if (flag.prefix_has_value == true)
+        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
+    else if ((flag.prefix_has_value == true) && (flag.path_has_value==true))
+        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
+    else
+        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "{\"" + value + "" + "}}");
+
+    return reply_to_parse;
+}
+
+string gNMIClient::parse_get_response(::gnmi::GetResponse* response) 
+{
+    ::gnmi::Notification notification;
+    ::gnmi::Update update;
+    string value;
+    string reply_to_parse;
+    string prefix_to_prepend;
+    string path_to_prepend;
+
+    int notification_size = response->notification_size();
+
+    for(int i = 0; i < notification_size; ++i) 
+    {
+        notification = response->notification(i);
+
+        if(notification.has_prefix()) prefix_to_prepend = get_prefix_from_notification(notification);
+        else prefix_to_prepend.clear();
+        
+        if(notification.update_size() != 0) {
+            for(int k = 0; k < notification.update_size(); ++k) 
+            {
+                update = notification.update(k);               
+                path_to_prepend = get_path_from_update(update);
+                value.append(get_value_from_update(update));
+                reply_to_parse = format_notification_response(prefix_to_prepend, path_to_prepend, value);
+            }   
+        }
+    }
+    return reply_to_parse;
+}
+
+string gNMIClient::execute_wrapper(const string & payload)
+{
+    ::gnmi::GetRequest request;
+    ::gnmi::GetResponse response;
+
+    request = populate_get_request(request, payload);
+    YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
+    string reply = execute_payload(request, &response);
+    return reply;
+}
+
+string gNMIClient::execute_payload(const GetRequest& request, GetResponse* response)
+{
+    grpc::ClientContext context;
+    grpc::Status status;
+
+    status = stub_->Get(&context, request, response);
+    YLOG_INFO("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
+    if (!(status.ok())) 
+    {
+        YLOG_ERROR("Get RPC Status not OK");
+        throw(YCPPError{status.error_message()});
+    } 
+    else 
+    {
+        YLOG_INFO("Get RPC Passed");
+        string reply = parse_get_response(response); 
+        return reply;
+    }
 }
 
 gNMIClient::~gNMIClient() {}

@@ -18,6 +18,8 @@
 #ifndef _GNMI_PROVIDER_H_
 #define _GNMI_PROVIDER_H_
 
+#include <fstream>
+
 #include "gnmi_client.hpp"
 #include "ietf_parser.hpp"
 #include "path_api.hpp"
@@ -40,9 +42,10 @@ namespace ydk
         gNMIServiceProvider(std::string address);
         ~gNMIServiceProvider();
 
-    private:
         std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const;
         path::RootSchemaNode& get_root_schema() const;
+
+    private:
         EncodingFormat get_encoding() const;
         std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc) const;
         void initialize(path::Repository& repo, std::string address);
@@ -52,6 +55,7 @@ namespace ydk
         std::unique_ptr<gNMIClient> client;
         std::shared_ptr<ydk::path::RootSchemaNode> root_schema;
         std::vector<std::string> server_capabilities;
+
     };
 }
 #endif /*_GNMI_PROVIDER_H_*/

@@ -33,7 +33,7 @@ int gNMIClient::connect(std::string address)
     ssl_opts.pem_root_certs = server_cert;
     args.SetSslTargetNameOverride("ems.cisco.com");
 
-    /* TBD: Authenticate client at server
+    /* ToDo Authenticate client at server
     std::ifstream kf("client.key");
     std::ifstream cf("client.pem");
     client_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
@@ -83,19 +83,19 @@ void gNMIClient::parse_capabilities_modeldata(::gnmi::CapabilityResponse* respon
         version = modeldata.version();
         if(!(modeldata.name().empty()))
         {
-            YLOG_INFO("Name: {}", name.c_str());
+            YLOG_DEBUG("Name: {}", name.c_str());
             cap.append("?module=" + name);
         }
         if(!(modeldata.organization().empty())) 
-            YLOG_INFO("Organization: {}", organization.c_str());
+            YLOG_DEBUG("Organization: {}", organization.c_str());
         if(!(modeldata.version().empty()))
         {
-            YLOG_INFO("Version: {}", version.c_str());
+            YLOG_DEBUG("Version: {}", version.c_str());
             cap.append("&revision=" + version);
         }
         capabilities.push_back(cap);
-        YLOG_INFO("              ------------       ");
-        YLOG_INFO("");
+        YLOG_DEBUG("              ------------       ");
+        YLOG_DEBUG("");
     }   
 }
 
@@ -107,33 +107,26 @@ void gNMIClient::parse_capabilities_encodings(::gnmi::CapabilityResponse* respon
     for (int i = 0, n = response->supported_encodings_size(); i < n; i++) 
     {
         encoding = response->supported_encodings(i);
-        switch(encoding)
-        {
-            case 0: encoding_value = "JSON"; break;
-            case 1: encoding_value = "Bytes"; break;
-            case 2: encoding_value = "Proto"; break;
-            case 3: encoding_value = "ASCII"; break;
-            case 4: encoding_value = "JSON_IETF"; break;
-        }
-        YLOG_INFO("Encoding {}", encoding_value.c_str());
+        encoding_value = ::gnmi::Encoding_Name(encoding);
+        YLOG_DEBUG("Encoding {}", encoding_value.c_str());
     }
 }
 
 bool gNMIClient::parse_capabilities(::gnmi::CapabilityResponse* response)
 {
-    YLOG_INFO("Capabilities Received:");
-    YLOG_INFO("");
-    YLOG_INFO("==============gNMI Version==============");
-    YLOG_INFO("gNMI Version: {}", response->gnmi_version().c_str());
+    YLOG_DEBUG("Capabilities Received:");
+    YLOG_DEBUG("");
+    YLOG_DEBUG("==============gNMI Version==============");
+    YLOG_DEBUG("gNMI Version: {}", response->gnmi_version().c_str());
 
-    YLOG_INFO("============Supported Models============");    
+    YLOG_DEBUG("============Supported Models============");    
     parse_capabilities_modeldata(response);
     
-    YLOG_INFO("===========Supported Encodings===========");
+    YLOG_DEBUG("===========Supported Encodings===========");
     parse_capabilities_encodings(response);
     
-    YLOG_INFO("=========================================");
-    YLOG_INFO("");
+    YLOG_DEBUG("=========================================");
+    YLOG_DEBUG("");
 } 
 
 vector<string> gNMIClient::get_capabilities() 
@@ -156,7 +149,7 @@ static vector<string> parse_get_request_payload(string payload, vector<string> p
 {
     auto payload_to_parse = json::parse("{" + payload + "}");
     string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "Empty Filter");
-    YLOG_INFO("payload_filter: {}", payload_filter);
+    YLOG_DEBUG("payload_filter: {}", payload_filter);
 
     std::string path_elem;
     istringstream payload_filter_value(payload_filter);
@@ -248,13 +241,14 @@ static string format_notification_response(string prefix_to_prepend, string path
 {
     string reply_to_parse;
 
+    // Update again when payload format from the server(IOS XR) is made consistent with different request paths
     if (flag.path_has_value)
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "[" + value + "]" + "}}");        
-    else if (flag.prefix_has_value == true)
+    else if (flag.prefix_has_value)
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
-    else if ((flag.prefix_has_value == true) && (flag.path_has_value==true))
+    else if ((flag.prefix_has_value) && (flag.path_has_value))
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
-    else
+    else 
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "{\"" + value + "" + "}}");
 
     return reply_to_parse;

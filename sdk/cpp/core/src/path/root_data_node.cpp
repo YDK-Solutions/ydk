@@ -135,7 +135,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
  }
 
 void
-ydk::path::RootDataImpl::set(const std::string& value)
+ydk::path::RootDataImpl::set_value(const std::string& value)
 {
     if(!value.empty()) {
         YLOG_ERROR("Invalid value being assigned to root");

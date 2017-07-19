@@ -745,7 +745,7 @@ public:
     /// @param[in] value The value to set. This should be the string representation of the YANG type.
     /// @throws YCPPInvalidArgumentError if the DataNode's value cannot be set (for example it represents
     /// a container)
-    virtual void set(const std::string& value) = 0;
+    virtual void set_value(const std::string& value) = 0;
 
 
 

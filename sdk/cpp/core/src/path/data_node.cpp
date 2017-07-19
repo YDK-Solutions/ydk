@@ -225,7 +225,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 }
 
 void
-ydk::path::DataNodeImpl::set(const std::string& value)
+ydk::path::DataNodeImpl::set_value(const std::string& value)
 {
     //set depends on the kind of the node
     lys_node* s_node = m_node->schema;

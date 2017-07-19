@@ -69,7 +69,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual void set(const std::string& value)
+    .. cpp:function:: virtual void set_value(const std::string& value)
 
         Set the value of this :cpp:class:`DataNode<DataNode>`.
 

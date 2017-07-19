@@ -125,7 +125,7 @@ namespace ydk {
 
             virtual DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            void set(const std::string& value);
+            void set_value(const std::string& value);
 
             virtual std::string get() const;
 
@@ -172,7 +172,7 @@ namespace ydk {
 
             DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            void set(const std::string& value);
+            void set_value(const std::string& value);
 
             std::string get() const;
 

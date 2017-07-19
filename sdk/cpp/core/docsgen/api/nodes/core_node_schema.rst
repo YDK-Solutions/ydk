@@ -65,7 +65,7 @@ Represents a Node in the SchemaTree.
 
         :return: The pointer to the yang statement for this :cpp:class:`SchemaNode<SchemaNode>`
 
-    .. cpp:function:: virtual std::vector<Statement> keys() const
+    .. cpp:function:: virtual std::vector<Statement> get_keys() const
 
         Returns vector of YANG statement corresponding the the keys.
 

@@ -67,7 +67,7 @@ namespace ydk {
 
             Statement get_statement() const;
 
-            std::vector<Statement> keys() const;
+            std::vector<Statement> get_keys() const;
 
             const SchemaNode* m_parent;
             struct lys_node* m_node;

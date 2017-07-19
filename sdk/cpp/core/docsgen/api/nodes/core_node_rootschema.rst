@@ -94,6 +94,12 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         :return: An empty statement.
 
+    .. cpp:function:: virtual std::vector<Statement> get_keys() const
+
+            Returns vector of YANG statement corresponding the the keys.
+
+            :return: Vector of :cpp:class:`Statement` that represent keys.
+
     .. cpp:function:: virtual Rpc* rpc(const std::string& path) const
 
         Create an :cpp:class:`Rpc<Rpc>` instance.

@@ -537,7 +537,7 @@ public:
     /// Returns the vector of Statement keys
     /// @return vector of Statement that represent keys
     ///
-    virtual std::vector<Statement> keys() const = 0;
+    virtual std::vector<Statement> get_keys() const = 0;
 
 };
 
@@ -649,7 +649,7 @@ public:
     /// For a root node this will always return an empty vector
     /// @return empty vector
     ///
-    virtual std::vector<Statement> keys() const;
+    virtual std::vector<Statement> get_keys() const;
 
     ///
     /// @brief create an rpc instance

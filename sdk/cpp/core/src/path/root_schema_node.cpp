@@ -60,7 +60,7 @@ ydk::path::RootSchemaNode::get_statement() const
 }
 
 std::vector<ydk::path::Statement>
-ydk::path::RootSchemaNode::keys() const
+ydk::path::RootSchemaNode::get_keys() const
 {
     return std::vector<Statement>{};
 

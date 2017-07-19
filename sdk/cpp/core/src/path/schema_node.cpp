@@ -230,7 +230,7 @@ ydk::path::SchemaNodeImpl::get_statement() const
 /// @return vector of Statement that represent keys
 ///
 std::vector<ydk::path::Statement>
-ydk::path::SchemaNodeImpl::keys() const
+ydk::path::SchemaNodeImpl::get_keys() const
 {
     std::vector<Statement> stmts{};
 

@@ -90,7 +90,7 @@ shared_ptr<Entity> CrudService::read_datanode(Entity & filter, shared_ptr<path::
     if (read_data_node == nullptr)
         return {};
     shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(read_data_node->children()[0].get(), top_entity);
+    get_entity_from_data_node(read_data_node->get_children()[0].get(), top_entity);
     return top_entity;
 }
 
@@ -117,7 +117,7 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 //        validation.validate(provider, entity, ValidationService::Option::DATASTORE);
 //    }
     path::RootSchemaNode& root_schema = provider.get_root_schema();
-    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(operation) };
+    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.create_rpc(operation) };
     string data;
     if(data_tag == "filter" && provider.get_encoding() == EncodingFormat::XML)
     {
@@ -130,9 +130,9 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 
     if(set_config_flag)
     {
-        ydk_rpc->input().create("only-config");
+        ydk_rpc->get_input_node().create_datanode("only-config");
     }
-    ydk_rpc->input().create(data_tag, data);
+    ydk_rpc->get_input_node().create_datanode(data_tag, data);
     return (*ydk_rpc)(provider);
 }
 
@@ -141,8 +141,8 @@ static string get_config_data_payload(Entity & entity, path::ServiceProvider & p
     const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema());
 
     const path::DataNode* dn = &datanode;
-    while(dn!= nullptr && dn->parent()!=nullptr)
-        dn = dn->parent();
+    while(dn!= nullptr && dn->get_parent()!=nullptr)
+        dn = dn->get_parent();
     path::Codec codec{};
     YLOG_DEBUG("Encoding the subtree filter request using path API DataNode");
     string payload = codec.encode(*dn, provider.get_encoding(), false);

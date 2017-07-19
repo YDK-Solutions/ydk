@@ -15,22 +15,22 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.providers import RestconfServiceProvider 
+from ydk.providers import RestconfServiceProvider
 from ydk.path import Codec, Repository
 from ydk.types import EncodingFormat
 
 
 def execute_path(provider, codec):
     schema = provider.get_root_schema()
-    bgp = schema.create("openconfig-bgp:bgp")
-    bgp.create("global/config/as", "65321")
+    bgp = schema.create_datanode("openconfig-bgp:bgp")
+    bgp.create_datanode("global/config/as", "65321")
 
-    runner = schema.create('ydktest-sanity:runner')
-    runner.create('ytypes/built-in-t/number8', '12')
+    runner = schema.create_datanode('ydktest-sanity:runner')
+    runner.create_datanode('ytypes/built-in-t/number8', '12')
     xml = codec.encode(runner, EncodingFormat.JSON, True)
     print(xml)
-    create_rpc = schema.rpc("ydk:create")
-    create_rpc.input().create("entity", xml)
+    create_rpc = schema.create_rpc("ydk:create")
+    create_rpc.get_input_node().create_datanode("entity", xml)
     create_rpc(provider)
 
 

@@ -55,8 +55,8 @@ shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provide
 
     // Create RPC instance
     path::RootSchemaNode & root_schema = provider.get_root_schema();
-    shared_ptr<path::Rpc> rpc = root_schema.rpc(yfilter);
-    path::DataNode & rpc_input = rpc->input();
+    shared_ptr<path::Rpc> rpc = root_schema.create_rpc(yfilter);
+    path::DataNode & rpc_input = rpc->get_input_node();
 
     // Handle input
     auto input = rpc_entity.get_child_by_name("input", "");
@@ -69,7 +69,7 @@ shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provide
     auto output = rpc_entity.get_child_by_name("output", "");
     if (output != nullptr && result_datanode != nullptr)
     {
-        auto filter = result_datanode->children()[0].get();
+        auto filter = result_datanode->get_children()[0].get();
 
         get_entity_from_data_node(filter, top_entity);
         return top_entity;
@@ -117,7 +117,7 @@ static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNo
         if (path != "")
             temp_path = path + '/';
         temp_path = temp_path + child.first;
-        rpc_input.create(temp_path, child.second.value);
+        rpc_input.create_datanode(temp_path, child.second.value);
     }
 }
 
@@ -130,7 +130,7 @@ static void create_from_children(std::map<string, std::shared_ptr<Entity>> & chi
             YLOG_DEBUG("Creating child '{}': {}",child.first,
                 child.second->get_entity_path(child.second->parent).path);
 
-            rpc_input.create(child.first);
+            rpc_input.create_datanode(child.first);
         }
     }
 }

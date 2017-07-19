@@ -160,7 +160,7 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
     }
     ly_option = ly_option | LYD_OPT_NOAUTODEL;
 
-    YLOG_INFO("Validation called on {} with option {}", dn.path(), option_str);
+    YLOG_INFO("Validation called on {} with option {}", dn.get_path(), option_str);
 
     //what kind of a DataNode is this
     const ydk::path::DataNodeImpl & dn_impl = dynamic_cast<const ydk::path::DataNodeImpl&>(dn);

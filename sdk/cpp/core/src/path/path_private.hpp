@@ -55,19 +55,19 @@ namespace ydk {
 
             ~SchemaNodeImpl();
 
-            std::string path() const;
+            std::string get_path() const;
 
             std::vector<SchemaNode*> find(const std::string& path) const;
 
-            const SchemaNode* parent() const noexcept;
+            const SchemaNode* get_parent() const noexcept;
 
-            const std::vector<std::unique_ptr<SchemaNode>>& children() const;
+            const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
-            const SchemaNode& root() const noexcept;
+            const SchemaNode& get_root() const noexcept;
 
-            Statement statement() const;
+            Statement get_statement() const;
 
-            std::vector<Statement> keys() const;
+            std::vector<Statement> get_keys() const;
 
             const SchemaNode* m_parent;
             struct lys_node* m_node;
@@ -84,13 +84,13 @@ namespace ydk {
 
             std::vector<SchemaNode*> find(const std::string& path) const;
 
-            const std::vector<std::unique_ptr<SchemaNode>>& children() const;
+            const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
-            DataNode& create(const std::string& path);
+            DataNode& create_datanode(const std::string& path);
 
-            DataNode& create(const std::string& path, const std::string& value);
+            DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            std::shared_ptr<Rpc> rpc(const std::string& path) const;
+            std::shared_ptr<Rpc> create_rpc(const std::string& path) const;
 
 
             struct ly_ctx* m_ctx;
@@ -111,9 +111,9 @@ namespace ydk {
 
             virtual ~DataNodeImpl();
 
-            virtual const SchemaNode& schema() const;
+            virtual const SchemaNode& get_schema_node() const;
 
-            virtual std::string path() const;
+            virtual std::string get_path() const;
 
             // Create a new data node based on a simple XPath
             // The new node is normally inserted at the end, either as the last child of a parent.
@@ -123,19 +123,19 @@ namespace ydk {
             //
             // returns the first created or updated node
 
-            virtual DataNode& create(const std::string& path, const std::string& value);
+            virtual DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            void set(const std::string& value);
+            void set_value(const std::string& value);
 
-            virtual std::string get() const;
+            virtual std::string get_value() const;
 
             virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
 
-            DataNode* parent() const;
+            DataNode* get_parent() const;
 
-            virtual std::vector<std::shared_ptr<DataNode>> children() const;
+            virtual std::vector<std::shared_ptr<DataNode>> get_children() const;
 
-            virtual const DataNode& root() const;
+            virtual const DataNode& get_root() const;
 
             void add_annotation(const Annotation& an);
 
@@ -166,19 +166,19 @@ namespace ydk {
 
             ~RootDataImpl();
 
-            const SchemaNode& schema() const;
+            const SchemaNode& get_schema_node() const;
 
-            std::string path() const;
+            std::string get_path() const;
 
-            DataNode& create(const std::string& path, const std::string& value);
+            DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            void set(const std::string& value);
+            void set_value(const std::string& value);
 
-            std::string get() const;
+            std::string get_value() const;
 
-            std::vector<std::shared_ptr<DataNode>> children() const;
+            std::vector<std::shared_ptr<DataNode>> get_children() const;
 
-            const DataNode& root() const;
+            const DataNode& get_root() const;
 
             std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
 
@@ -198,9 +198,9 @@ namespace ydk {
 
             std::shared_ptr<DataNode> operator()(const ServiceProvider& provider);
 
-            DataNode& input() const;
+            DataNode& get_input_node() const;
 
-            SchemaNode& schema() const;
+            SchemaNode& get_schema_node() const;
 
 
             SchemaNodeImpl& schema_node;

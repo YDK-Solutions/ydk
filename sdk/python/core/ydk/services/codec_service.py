@@ -162,11 +162,11 @@ class CodecService(object):
         codec_service = _Codec()
         root_data_node = codec_service.decode(root_schema, payload, provider.encoding)
 
-        if len(root_data_node.children()) != 1:
+        if len(root_data_node.get_children()) != 1:
             self.logger.debug(_PAYLOAD_ERROR_MSG)
             raise _YPYServiceProviderError(_PAYLOAD_ERROR_MSG)
         else:
-            for data_node in root_data_node.children():
+            for data_node in root_data_node.get_children():
                 _get_entity_from_data_node(data_node, entity)
         return entity
 

@@ -18,7 +18,7 @@ DataNode
             >>> from ydk.providers import NetconfServiceProvider
             >>> provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 830)
             >>> root_schema = provider.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
-            >>> bgp = root_schema.create('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
+            >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
 
 
     .. py:method:: add_annotation(annotation)
@@ -35,14 +35,14 @@ DataNode
         :return: List of annotations for this data node.
         :rtype: list of :py:class:`Annotation<ydk.path.Annotation>`
 
-    .. py:method:: children()
+    .. py:method:: get_children()
 
         Return list of children for this data node.
 
         :return: List of data node children.
         :rtype: list of :py:class:`DataNode<ydk.path.DataNode>`
 
-    .. py:method:: create(path, value=None)
+    .. py:method:: create_datanode(path, value=None)
 
         Create a DataNode corresponding to the path and set its value, if provided.
 
@@ -67,7 +67,7 @@ DataNode
         :return: Value of this data node.
         :rtype: A Python string
 
-    .. py:method:: path()
+    .. py:method:: get_path()
 
         Returns the path expression representing this Node in in the NodeTree.
 
@@ -82,18 +82,18 @@ DataNode
         :return: If ``True`` the annotation was found and removed, ``False`` otherwise.
         :rtype: bool
 
-    .. py:method:: root()
+    .. py:method:: get_root()
 
         Get the root data node.
 
         :return: Root data node of current data node.
         :rtype: :py:class:`~DataNode`
 
-    .. py:method:: schema()
+    .. py:method:: get_schema_node()
 
         Get :py:class:`SchemaNode` associated with this :py:class:`DataNode`.
 
-    .. py:method:: set(value)
+    .. py:method:: set_value(value)
 
         .. note::
 

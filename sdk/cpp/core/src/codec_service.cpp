@@ -70,8 +70,8 @@ CodecService::encode(CodecServiceProvider & provider, Entity & entity, bool pret
     {
         path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
         const path::DataNode* dn = &datanode;
-        while(dn!= nullptr && dn->parent()!=nullptr)
-            dn = dn->parent();
+        while(dn!= nullptr && dn->get_parent()!=nullptr)
+            dn = dn->get_parent();
         path::Codec core_codec_service{};
         std::string result = core_codec_service.encode(*dn, provider.m_encoding, pretty);
         YLOG_INFO("Performing encode operation, resulting in {}", result);
@@ -118,14 +118,14 @@ CodecService::decode(CodecServiceProvider & provider, const std::string & payloa
     path::Codec core_codec_service{};
     auto root_data_node = core_codec_service.decode(root_schema, payload, provider.m_encoding);
 
-    if (root_data_node->children().size() != 1)
+    if (root_data_node->get_children().size() != 1)
     {
         YLOG_ERROR(PAYLOAD_ERROR_MSG);
         throw(YCPPServiceProviderError(PAYLOAD_ERROR_MSG));
     }
     else
     {
-        for (auto data_node: root_data_node->children())
+        for (auto data_node: root_data_node->get_children())
         {
             get_entity_from_data_node(data_node.get(), entity);
             // Required for validation of decoded entity

@@ -58,7 +58,7 @@ ydk::path::SchemaNodeImpl::~SchemaNodeImpl()
 }
 
 std::string
-ydk::path::SchemaNodeImpl::path() const
+ydk::path::SchemaNodeImpl::get_path() const
 {
     std::string ret{};
 
@@ -126,20 +126,20 @@ ydk::path::SchemaNodeImpl::find(const std::string& path) const
 }
 
 const ydk::path::SchemaNode*
-ydk::path::SchemaNodeImpl::parent() const noexcept
+ydk::path::SchemaNodeImpl::get_parent() const noexcept
 {
     return m_parent;
 }
 
 const std::vector<std::unique_ptr<ydk::path::SchemaNode>> &
-ydk::path::SchemaNodeImpl::children() const
+ydk::path::SchemaNodeImpl::get_children() const
 {
 
     return m_children;
 }
 
 const ydk::path::SchemaNode&
-ydk::path::SchemaNodeImpl::root() const noexcept
+ydk::path::SchemaNodeImpl::get_root() const noexcept
 {
     if(m_parent == nullptr)
     {
@@ -147,7 +147,7 @@ ydk::path::SchemaNodeImpl::root() const noexcept
     }
     else
     {
-        return m_parent->root();
+        return m_parent->get_root();
     }
 }
 
@@ -157,7 +157,7 @@ static bool is_submodule(lys_node* node)
 }
 
 ydk::path::Statement
-ydk::path::SchemaNodeImpl::statement() const
+ydk::path::SchemaNodeImpl::get_statement() const
 {
     Statement s{};
     s.arg = m_node->name;
@@ -230,11 +230,11 @@ ydk::path::SchemaNodeImpl::statement() const
 /// @return vector of Statement that represent keys
 ///
 std::vector<ydk::path::Statement>
-ydk::path::SchemaNodeImpl::keys() const
+ydk::path::SchemaNodeImpl::get_keys() const
 {
     std::vector<Statement> stmts{};
 
-    Statement stmt = statement();
+    Statement stmt = get_statement();
     if(stmt.keyword == "list") {
         //sanity check
         if(m_node->nodetype != LYS_LIST) {
@@ -245,12 +245,10 @@ ydk::path::SchemaNodeImpl::keys() const
         for(uint8_t i=0; i < slist->keys_size; ++i) {
             SchemaNode* sn = reinterpret_cast<SchemaNode*>(slist->keys[i]->priv);
             if(sn != nullptr){
-                stmts.push_back(sn->statement());
+                stmts.push_back(sn->get_statement());
             }
         }
     }
 
     return stmts;
 }
-
-

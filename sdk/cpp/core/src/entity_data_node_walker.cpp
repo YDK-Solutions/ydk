@@ -57,7 +57,7 @@ static path::Annotation get_annotation(YFilter yfilter);
 path::DataNode& get_data_node_from_entity(Entity & entity, path::RootSchemaNode & root_schema)
 {
     EntityPath root_path = entity.get_entity_path(nullptr);
-    auto & root_data_node = root_schema.create(root_path.path);
+    auto & root_data_node = root_schema.create_datanode(root_path.path);
     if(is_set(entity.yfilter))
     {
         add_annotation_to_datanode(entity, root_data_node);
@@ -89,7 +89,7 @@ static void populate_data_node(Entity & entity, path::DataNode & parent_data_nod
     EntityPath path = entity.get_entity_path(entity.parent);
     path::DataNode* data_node = nullptr;
 
-    data_node = &parent_data_node.create(path.path);
+    data_node = &parent_data_node.create_datanode(path.path);
 
     if(is_set(entity.yfilter))
     {
@@ -107,12 +107,12 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path)
     {
         path::DataNode* result = nullptr;
         LeafData leaf_data = name_value.second;
-        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.path(),
+        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.get_path(),
                 leaf_data.value, leaf_data.is_set);
 
         if(leaf_data.is_set)
         {
-            result = &data_node.create(name_value.first, leaf_data.value);
+            result = &data_node.create_datanode(name_value.first, leaf_data.value);
             YLOG_DEBUG("Result: {}", (result?"success":"failure"));
 
             if(is_set(leaf_data.yfilter))
@@ -163,22 +163,22 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
     if (entity == nullptr || node == nullptr)
         return;
 
-    for(auto & child_data_node:node->children())
+    for(auto & child_data_node:node->get_children())
     {
-        std::string child_name = child_data_node->schema().statement().arg;
+        std::string child_name = child_data_node->get_schema_node().get_statement().arg;
         if(data_node_is_leaf(*child_data_node))
         {
             YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
-                    child_data_node->get(), node->path());
-            entity->set_value(child_name, child_data_node->get());
+                    child_data_node->get_value(), node->get_path());
+            entity->set_value(child_name, child_data_node->get_value());
         }
         else
         {
-            YLOG_DEBUG("Going into child {} in parent {}", child_name, node->path());
+            YLOG_DEBUG("Going into child {} in parent {}", child_name, node->get_path());
             std::shared_ptr<Entity> child_entity;
             if(data_node_is_list(*child_data_node))
             {
-                child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->path()));
+                child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->get_path()));
             }
             else
             {
@@ -188,7 +188,7 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 
             if(child_entity == nullptr)
             {
-                YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->path());
+                YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->get_path());
             }
             get_entity_from_data_node(child_data_node.get(), child_entity);
         }
@@ -197,13 +197,13 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 
 static bool data_node_is_leaf(path::DataNode & data_node)
 {
-    return (data_node.schema().statement().keyword == "leaf"
-            || data_node.schema().statement().keyword == "leaf-list");
+    return (data_node.get_schema_node().get_statement().keyword == "leaf"
+            || data_node.get_schema_node().get_statement().keyword == "leaf-list");
 }
 
 static bool data_node_is_list(path::DataNode & data_node)
 {
-    return (data_node.schema().statement().keyword == "list");
+    return (data_node.get_schema_node().get_statement().keyword == "list");
 }
 
 static string get_segment_path(const string & path)

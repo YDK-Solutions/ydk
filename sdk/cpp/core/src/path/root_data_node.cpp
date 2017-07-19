@@ -38,19 +38,19 @@ ydk::path::RootDataImpl::~RootDataImpl()
 }
 
 const ydk::path::SchemaNode&
-ydk::path::RootDataImpl::schema() const
+ydk::path::RootDataImpl::get_schema_node() const
 {
     return m_schema;
 }
 
 std::string
-ydk::path::RootDataImpl::path() const
+ydk::path::RootDataImpl::get_path() const
 {
-    return m_schema.path();
+    return m_schema.get_path();
 }
 
 ydk::path::DataNode&
-ydk::path::RootDataImpl::create(const std::string& path, const std::string& value)
+ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::string& value)
 {
     if(path.empty())
     {
@@ -108,9 +108,9 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
 
     DataNode* rdn = dn;
     // created data node is the last child
-    while(!rdn->children().empty())
+    while(!rdn->get_children().empty())
     {
-        rdn = rdn->children()[0].get();
+        rdn = rdn->get_children()[0].get();
     }
 
     //at this stage we have dn so for the remaining segments use dn as the parent
@@ -126,7 +126,7 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
             remaining_path+=segments[i];
         }
 
-        rdn = &(rdn->create(remaining_path));
+        rdn = &(rdn->create_datanode(remaining_path));
     }
 
 
@@ -135,7 +135,7 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
  }
 
 void
-ydk::path::RootDataImpl::set(const std::string& value)
+ydk::path::RootDataImpl::set_value(const std::string& value)
 {
     if(!value.empty()) {
         YLOG_ERROR("Invalid value being assigned to root");
@@ -144,14 +144,14 @@ ydk::path::RootDataImpl::set(const std::string& value)
 }
 
 std::string
-ydk::path::RootDataImpl::get() const
+ydk::path::RootDataImpl::get_value() const
 {
     return "";
 }
 
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::RootDataImpl::children() const
+ydk::path::RootDataImpl::get_children() const
 {
     std::vector<std::shared_ptr<DataNode>> ret{};
 
@@ -173,7 +173,7 @@ ydk::path::RootDataImpl::children() const
 }
 
 const ydk::path::DataNode&
-ydk::path::RootDataImpl::root() const
+ydk::path::RootDataImpl::get_root() const
 {
     return *this;
 }
@@ -188,14 +188,13 @@ ydk::path::RootDataImpl::find(const std::string& path) const
         return results;
     }
 
-    std::string schema_path{ this->path() };
+    std::string schema_path{ this->get_path() };
     if(schema_path.size()!= 1)
     {
         schema_path+="/";
     }
 
-    auto s = schema().
-    statement();
+    auto s = get_schema_node().get_statement();
     if(s.keyword == "rpc")
     {
         schema_path+="input/";

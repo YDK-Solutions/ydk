@@ -99,7 +99,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::invoke(path::Rpc& rpc) 
     path::SchemaNode* update_schema = get_schema_for_operation(*root_schema, "ydk:update");
     path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
 
-    path::SchemaNode* rpc_schema = &(rpc.schema());
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
     std::shared_ptr<path::DataNode> datanode = nullptr;
 
     if(rpc_schema == create_schema || rpc_schema == update_schema)
@@ -139,7 +139,7 @@ static string get_module_url_path(const string & path)
 
 static bool is_config(path::Rpc & rpc)
 {
-    if(!rpc.input().find("only-config").empty())
+    if(!rpc.get_input_node().find("only-config").empty())
     {
         return true;
     }
@@ -150,25 +150,25 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
 {
     path::Codec codec_service{};
 
-    auto filter = rpc.input().find("filter");
+    auto filter = rpc.get_input_node().find("filter");
     if(filter.empty()){
         YLOG_ERROR("Failed to get entity node.");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});
     }
 
     path::DataNode* filter_node = filter[0].get();
-    string filter_instance = filter_node->get();
+    string filter_instance = filter_node->get_value();
 
     auto datanode = codec_service.decode(*root_schema, filter_instance, encoding);
 
     string url;
     if(is_config(rpc))
     {
-        url = config_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+        url = config_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
     }
     else
     {
-        url = state_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+        url = state_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
     }
 
     YLOG_INFO("Performing GET on URL {}", url);
@@ -178,17 +178,17 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
 std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& rpc, const string & yfilter) const
 {
     path::Codec codec_service{};
-    auto entity = rpc.input().find("entity");
+    auto entity = rpc.get_input_node().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});
     }
 
     path::DataNode* entity_node = entity[0].get();
-    string header_data = entity_node->get();
+    string header_data = entity_node->get_value();
 
     auto datanode = codec_service.decode(*root_schema, header_data, encoding);
-    string url = config_url_root + get_module_url_path(datanode->children()[0]->schema().path());
+    string url = config_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
 
     YLOG_INFO("Performing {} on URL {}. Payload: {}", yfilter, url, header_data);
     client->execute(yfilter, url, header_data);

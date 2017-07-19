@@ -613,7 +613,7 @@ public:
     /// @throws YCPPInvalidArgumentError In case the argument is invalid.
     /// @throws YCPPPathError In case the path is invalid.
     ///
-    virtual DataNode& create(const std::string& path, const std::string& value) = 0;
+    virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
 
     ///
     /// @brief create a DataNode corresponding to the path and set its value
@@ -632,7 +632,7 @@ public:
     /// @throws YCPPInvalidArgumentError In case the argument is invalid.
     /// @throws YCPPPathError In case the path is invalid.
     ///
-    virtual DataNode& create(const std::string& path)  = 0;
+    virtual DataNode& create_datanode(const std::string& path)  = 0;
 
     ///
     /// @brief return the Statement representing this SchemaNode
@@ -713,7 +713,7 @@ public:
     /// @throws YCPPInvalidArgumentError In case the argument is invalid.
     /// @throws YCPPPathError In case the path is invalid.
     ///
-   virtual DataNode& create(const std::string& path);
+   virtual DataNode& create_datanode(const std::string& path);
 
     ///
     /// @brief create a DataNode corresponding to the path and set its value
@@ -732,7 +732,7 @@ public:
     /// @throws YCPPInvalidArgumentError In case the argument is invalid.
     /// @throws YCPPPathError In case the path is invalid.
     ///
-    virtual DataNode& create(const std::string& path, const std::string& value) = 0;
+    virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
 
     ///
     /// @brief set the value of this DataNode.

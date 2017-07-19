@@ -96,40 +96,40 @@ TEST_CASE( "bgp_netconf_create" )
 
     ydk::path::Codec s{};
 
-    auto & bgp = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
     //first delete
     std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.rpc("ydk:delete") };
 
     auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create("entity", xml);
+    delete_rpc->input().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
 
 
-    auto & as = bgp.create("global/config/as", "65172");
+    auto & as = bgp.create_datanode("global/config/as", "65172");
 
-    auto & l3vpn_ipv4_unicast = bgp.create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
     //set the enable flag
-    auto & enable = l3vpn_ipv4_unicast.create("config/enabled","true");
+    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
 
     //bgp/neighbors/neighbor
-    auto & neighbor = bgp.create("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
 
-    auto & neighbor_address = neighbor.create("config/neighbor-address", "172.16.255.2");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
 
-    auto & peer_as = neighbor.create("config/peer-as","65172");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
 
     //bgp/neighbors/neighbor/afi-safis/afi-safi
-    auto & neighbor_af = neighbor.create("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & neighbor_af = neighbor.create_datanode("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & neighbor_afi_safi_name = neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & neighbor_afi_safi_name = neighbor_af.create_datanode("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
-    auto & neighbor_enabled = neighbor_af.create("config/enabled","true");
+    auto & neighbor_enabled = neighbor_af.create_datanode("config/enabled","true");
 
     xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
 
@@ -139,16 +139,16 @@ TEST_CASE( "bgp_netconf_create" )
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
-    create_rpc->input().create("entity", xml);
+    create_rpc->input().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
-    auto & bgp_read = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create("filter", xml);
+    read_rpc->input().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -166,7 +166,7 @@ TEST_CASE( "bgp_netconf_create" )
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.rpc("ydk:update") };
     xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    update_rpc->input().create("entity", xml);
+    update_rpc->input().create_datanode("entity", xml);
     (*update_rpc)(sp);
 
 
@@ -180,9 +180,9 @@ TEST_CASE("bits")
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
-    auto & runner = schema.create("ydktest-sanity:runner", "");
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
 
-    auto & ysanity = runner.create("ytypes/built-in-t/bits-value", "disable-nagle");
+    auto & ysanity = runner.create_datanode("ytypes/built-in-t/bits-value", "disable-nagle");
 
     ydk::path::Codec s{};
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
@@ -192,7 +192,7 @@ TEST_CASE("bits")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
-    create_rpc->input().create("entity", xml);
+    create_rpc->input().create_datanode("entity", xml);
     (*create_rpc)(sp);
 }
 
@@ -203,9 +203,9 @@ TEST_CASE("core_validate")
     ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = sp.get_root_schema();
 
-    auto & runner = schema.create("ietf-netconf:validate", "");
+    auto & runner = schema.create_datanode("ietf-netconf:validate", "");
 
-    auto & ysanity = runner.create("source/candidate", "");
+    auto & ysanity = runner.create_datanode("source/candidate", "");
 
     ydk::path::Codec s{};
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
@@ -216,7 +216,7 @@ TEST_CASE("core_validate")
 
     //call create
     // std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
-    // create_rpc->input().create("entity", xml);
+    // create_rpc->input().create_datanode("entity", xml);
     // (*create_rpc)(sp);
 }
 
@@ -230,46 +230,46 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
     ydk::path::Codec s{};
 
-    auto & bgp = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
     //get the root
     const ydk::path::DataNode* data_root = reinterpret_cast<const ydk::path::DataNode*>(&bgp.get_root());
 
     REQUIRE( data_root != nullptr );
 
     //call create
-    auto & as = bgp.create("global/config/as", "65172");
-    auto & router_id = bgp.create("global/config/router-id", "1.2.3.4");
-    auto & l3vpn_ipv4_unicast = bgp.create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
-    auto & enable = l3vpn_ipv4_unicast.create("config/enabled","true");
+    auto & as = bgp.create_datanode("global/config/as", "65172");
+    auto & router_id = bgp.create_datanode("global/config/router-id", "1.2.3.4");
+    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
     //bgp/neighbors/neighbor
-    auto & neighbor = bgp.create("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
-    auto & neighbor_address = neighbor.create("config/neighbor-address", "172.16.255.2");
-    auto & peer_as = neighbor.create("config/peer-as","65172");
-    auto & peer_group = neighbor.create("config/peer-group","IBGP");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
+    auto & peer_group = neighbor.create_datanode("config/peer-group","IBGP");
     //bgp/peer-groups/peer-group
-    auto & ppeer_group = bgp.create("peer-groups/peer-group[peer-group-name='IBGP']", "");
-    auto & peer_group_name = ppeer_group.create("config/peer-group-name", "IBGP");
-    auto & ppeer_as = ppeer_group.create("config/peer-as","65172");
+    auto & ppeer_group = bgp.create_datanode("peer-groups/peer-group[peer-group-name='IBGP']", "");
+    auto & peer_group_name = ppeer_group.create_datanode("config/peer-group-name", "IBGP");
+    auto & ppeer_as = ppeer_group.create_datanode("config/peer-as","65172");
 
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
     auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    create_rpc->input().create("entity", xml);
+    create_rpc->input().create_datanode("entity", xml);
 
     auto res = (*create_rpc)(sp);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
-    auto & bgp_read = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
 
 
     const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.get_root());
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create("filter", xml);
-    read_rpc->input().create("only-config");
+    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->input().create_datanode("only-config");
 
     auto read_result = (*read_rpc)(sp);
 
@@ -287,33 +287,33 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //
 //    ydk::path::Codec s{};
 //
-//    auto & bgp = schema.create("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
+//    auto & bgp = schema.create_datanode("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
 //
 //    //call create
-//    auto & instance = bgp.create("instance[instance-name='65172']");
+//    auto & instance = bgp.create_datanode("instance[instance-name='65172']");
 //
-//    auto & instance_as = instance->create("instance-as[as='65172']");
+//    auto & instance_as = instance->create_datanode("instance-as[as='65172']");
 //
-//    auto & four_instance_as = instance_as->create("four-byte-as[as='65172']");
+//    auto & four_instance_as = instance_as->create_datanode("four-byte-as[as='65172']");
 //
-//    auto & vrf = four_instance_as->create("vrfs/vrf[vrf-name='red']");
+//    auto & vrf = four_instance_as->create_datanode("vrfs/vrf[vrf-name='red']");
 //
 //  std::shared_ptr<ydk::path::Rpc> create_rpc { schema.rpc("ydk:create") };
 //  auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
 //  REQUIRE( !xml.empty() );
-//  create_rpc->input().create("entity", xml);
+//  create_rpc->input().create_datanode("entity", xml);
 //
 //  auto res = (*create_rpc)(sp);
 //
 //  //call read
 //    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.rpc("ydk:read") };
-//    auto & bgp_read = schema.create("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
+//    auto & bgp_read = schema.create_datanode("Cisco-IOS-XR-ipv4-bgp-cfg:bgp", "");
 //    std::shared_ptr<const ydk::path::DataNode> data_root2{&bgp_read.get_root()};
 //
 //    xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
 //    REQUIRE( !xml.empty() );
-//    read_rpc->input().create("filter", xml);
-//    read_rpc->input().create("only-config");
+//    read_rpc->input().create_datanode("filter", xml);
+//    read_rpc->input().create_datanode("only-config");
 //
 //    auto read_result = (*read_rpc)(sp);
 //

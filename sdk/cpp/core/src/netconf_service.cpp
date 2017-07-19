@@ -61,7 +61,7 @@ bool NetconfService::cancel_commit(NetconfServiceProvider & provider, int persis
 
     if (persist_id > -1)
     {
-        rpc->input().create("persist-id", std::to_string(persist_id));
+        rpc->input().create_datanode("persist-id", std::to_string(persist_id));
     }
 
     auto read_datanode = (*rpc)(provider);
@@ -91,22 +91,22 @@ bool NetconfService::commit(NetconfServiceProvider & provider, bool confirmed,
 
     if (confirmed)
     {
-        rpc->input().create("confirmed");
+        rpc->input().create_datanode("confirmed");
     }
 
     if (confirm_timeout > -1)
     {
-        rpc->input().create("confirm-timeout", std::to_string(confirm_timeout));
+        rpc->input().create_datanode("confirm-timeout", std::to_string(confirm_timeout));
     }
 
     if (persist > -1)
     {
-        rpc->input().create("persist", std::to_string(persist));
+        rpc->input().create_datanode("persist", std::to_string(persist));
     }
 
     if (persist_id > -1)
     {
-        rpc->input().create("persist", std::to_string(persist_id));
+        rpc->input().create_datanode("persist", std::to_string(persist_id));
     }
 
     auto read_datanode = (*rpc)(provider);
@@ -141,7 +141,7 @@ bool NetconfService::copy_config(NetconfServiceProvider & provider, DataStore ta
 
     // source
     std::string entity_string = get_data_payload(source, provider.get_root_schema());
-    rpc->input().create("source/config", entity_string);
+    rpc->input().create_datanode("source/config", entity_string);
 
     auto read_datanode = (*rpc)(provider);
     return read_datanode == nullptr;
@@ -190,21 +190,21 @@ bool NetconfService::edit_config(NetconfServiceProvider & provider, DataStore ta
 
     //config
     std::string entity_string = get_data_payload(config, provider.get_root_schema());
-    rpc->input().create("config", entity_string);
+    rpc->input().create_datanode("config", entity_string);
 
     if (default_operation.size() > 0)
     {
-        rpc->input().create("default-operation", default_operation);
+        rpc->input().create_datanode("default-operation", default_operation);
     }
 
     if (test_option.size() > 0)
     {
-        rpc->input().create("test-option", test_option);
+        rpc->input().create_datanode("test-option", test_option);
     }
 
     if (error_option.size() > 0)
     {
-        rpc->input().create("error-option", error_option);
+        rpc->input().create_datanode("error-option", error_option);
     }
 
     auto read_datanode = (*rpc)(provider);
@@ -224,7 +224,7 @@ shared_ptr<Entity> NetconfService::get_config(NetconfServiceProvider & provider,
 
     // filter
     std::string filter_string  = get_xml_subtree_filter_payload(filter, provider);
-    rpc->input().create("filter", filter_string);
+    rpc->input().create_datanode("filter", filter_string);
 
     auto read_datanode = (*rpc)(provider);
     if (read_datanode == nullptr)
@@ -246,7 +246,7 @@ shared_ptr<Entity> NetconfService::get(NetconfServiceProvider & provider, Entity
 
     // filter
     std::string filter_string  = get_xml_subtree_filter_payload(filter, provider);
-    rpc->input().create("filter", filter_string);
+    rpc->input().create_datanode("filter", filter_string);
 
     auto result_datanode = (*rpc)(provider);
     if (result_datanode == nullptr)
@@ -265,7 +265,7 @@ bool NetconfService::kill_session(NetconfServiceProvider & provider, int session
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:kill-session");
 
     std::string sid_string = std::to_string(session_id);
-    rpc->input().create("session-id", sid_string);
+    rpc->input().create_datanode("session-id", sid_string);
 
     auto read_datanode = (*rpc)(provider);
     return read_datanode == nullptr;
@@ -325,7 +325,7 @@ bool NetconfService::validate(NetconfServiceProvider & provider, Entity& source)
 
     // source
     std::string entity_string = get_data_payload(source, provider.get_root_schema());
-    rpc->input().create("source/config", entity_string);
+    rpc->input().create_datanode("source/config", entity_string);
 
     auto read_datanode = (*rpc)(provider);
     return read_datanode == nullptr;
@@ -373,7 +373,7 @@ static void create_input_leaf(path::DataNode & input_datanode, DataStore datasto
         }
         os << "/url";
 
-        input_datanode.create(os.str(), url);
+        input_datanode.create_datanode(os.str(), url);
     }
     else
     {
@@ -405,7 +405,7 @@ static void create_input_leaf(path::DataNode & input_datanode, DataStore datasto
             break;
     }
 
-    input_datanode.create(os.str());
+    input_datanode.create_datanode(os.str());
 }
 
 static string get_xml_subtree_filter_payload(Entity & entity, path::ServiceProvider & provider)

@@ -135,17 +135,17 @@ ydk::path::RootSchemaNodeImpl::get_children() const
 }
 
 ydk::path::DataNode&
-ydk::path::RootSchemaNodeImpl::create(const std::string& path)
+ydk::path::RootSchemaNodeImpl::create_datanode(const std::string& path)
 {
-    return create(path, "");
+    return create_datanode(path, "");
 }
 
 ydk::path::DataNode&
-ydk::path::RootSchemaNodeImpl::create(const std::string& path, const std::string& value)
+ydk::path::RootSchemaNodeImpl::create_datanode(const std::string& path, const std::string& value)
 {
     auto root_data_node = std::make_unique<RootDataImpl>(*this, m_ctx, "/");
     m_root_data_nodes.push_back(std::move(root_data_node));
-    return m_root_data_nodes.back()->create(path, value);
+    return m_root_data_nodes.back()->create_datanode(path, value);
 }
 
 std::shared_ptr<ydk::path::Rpc>

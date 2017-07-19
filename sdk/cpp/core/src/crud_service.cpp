@@ -130,9 +130,9 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 
     if(set_config_flag)
     {
-        ydk_rpc->input().create("only-config");
+        ydk_rpc->input().create_datanode("only-config");
     }
-    ydk_rpc->input().create(data_tag, data);
+    ydk_rpc->input().create_datanode(data_tag, data);
     return (*ydk_rpc)(provider);
 }
 

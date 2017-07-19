@@ -57,7 +57,7 @@ static path::Annotation get_annotation(YFilter yfilter);
 path::DataNode& get_data_node_from_entity(Entity & entity, path::RootSchemaNode & root_schema)
 {
     EntityPath root_path = entity.get_entity_path(nullptr);
-    auto & root_data_node = root_schema.create(root_path.path);
+    auto & root_data_node = root_schema.create_datanode(root_path.path);
     if(is_set(entity.yfilter))
     {
         add_annotation_to_datanode(entity, root_data_node);
@@ -89,7 +89,7 @@ static void populate_data_node(Entity & entity, path::DataNode & parent_data_nod
     EntityPath path = entity.get_entity_path(entity.parent);
     path::DataNode* data_node = nullptr;
 
-    data_node = &parent_data_node.create(path.path);
+    data_node = &parent_data_node.create_datanode(path.path);
 
     if(is_set(entity.yfilter))
     {
@@ -112,7 +112,7 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path)
 
         if(leaf_data.is_set)
         {
-            result = &data_node.create(name_value.first, leaf_data.value);
+            result = &data_node.create_datanode(name_value.first, leaf_data.value);
             YLOG_DEBUG("Result: {}", (result?"success":"failure"));
 
             if(is_set(leaf_data.yfilter))

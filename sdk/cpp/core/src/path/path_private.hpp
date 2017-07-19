@@ -86,9 +86,9 @@ namespace ydk {
 
             const std::vector<std::unique_ptr<SchemaNode>>& get_children() const;
 
-            DataNode& create(const std::string& path);
+            DataNode& create_datanode(const std::string& path);
 
-            DataNode& create(const std::string& path, const std::string& value);
+            DataNode& create_datanode(const std::string& path, const std::string& value);
 
             std::shared_ptr<Rpc> rpc(const std::string& path) const;
 
@@ -123,7 +123,7 @@ namespace ydk {
             //
             // returns the first created or updated node
 
-            virtual DataNode& create(const std::string& path, const std::string& value);
+            virtual DataNode& create_datanode(const std::string& path, const std::string& value);
 
             void set(const std::string& value);
 
@@ -170,7 +170,7 @@ namespace ydk {
 
             std::string get_path() const;
 
-            DataNode& create(const std::string& path, const std::string& value);
+            DataNode& create_datanode(const std::string& path, const std::string& value);
 
             void set(const std::string& value);
 

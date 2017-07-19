@@ -36,9 +36,9 @@ ydk::path::DataNode::~DataNode()
 }
 
 ydk::path::DataNode&
-ydk::path::DataNode::create(const std::string& path)
+ydk::path::DataNode::create_datanode(const std::string& path)
 {
-    return create(path, "");
+    return create_datanode(path, "");
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ ydk::path::DataNodeImpl::get_path() const
 }
 
 ydk::path::DataNode&
-ydk::path::DataNodeImpl::create(const std::string& path, const std::string& value)
+ydk::path::DataNodeImpl::create_datanode(const std::string& path, const std::string& value)
 {
     return create_helper(path, value);
 }

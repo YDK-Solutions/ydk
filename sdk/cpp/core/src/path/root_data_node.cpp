@@ -50,7 +50,7 @@ ydk::path::RootDataImpl::get_path() const
 }
 
 ydk::path::DataNode&
-ydk::path::RootDataImpl::create(const std::string& path, const std::string& value)
+ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::string& value)
 {
     if(path.empty())
     {
@@ -126,7 +126,7 @@ ydk::path::RootDataImpl::create(const std::string& path, const std::string& valu
             remaining_path+=segments[i];
         }
 
-        rdn = &(rdn->create(remaining_path));
+        rdn = &(rdn->create_datanode(remaining_path));
     }
 
 

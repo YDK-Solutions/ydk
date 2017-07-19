@@ -269,23 +269,23 @@ static bool is_candidate_supported(vector<string> capabilities)
 static void create_input_target(path::DataNode & input, bool candidate_supported)
 {
     if(candidate_supported){
-        input.create("target/candidate", "");
+        input.create_datanode("target/candidate", "");
     }
     else {
-        input.create("target/running", "");
+        input.create_datanode("target/running", "");
     }
 }
 
 static void create_input_error_option(path::DataNode & input)
 {
-    input.create("error-option", "rollback-on-error");
+    input.create_datanode("error-option", "rollback-on-error");
 }
 
 static void create_input_source(path::DataNode & input, bool config)
 {
     if(config)
     {
-        input.create("source/running");
+        input.create_datanode("source/running");
     }
 }
 
@@ -338,7 +338,7 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
 static string get_netconf_payload(path::DataNode & input, string data_tag, string data_value)
 {
     path::Codec codec_service{};
-    input.create(data_tag, data_value);
+    input.create_datanode(data_tag, data_value);
 
     std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"};
     payload+=codec_service.encode(input, EncodingFormat::XML, true);

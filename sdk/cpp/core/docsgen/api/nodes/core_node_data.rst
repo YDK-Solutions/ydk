@@ -30,7 +30,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
 
         :return: ``std::string`` representing the path to this Node.
 
-    .. cpp:function:: virtual DataNode& create(const std::string& path)
+    .. cpp:function:: virtual DataNode& create_datanode(const std::string& path)
 
         Creates a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 
@@ -50,7 +50,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual DataNode& create(const std::string& path, const std::string& value)
+    .. cpp:function:: virtual DataNode& create_datanode(const std::string& path, const std::string& value)
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 

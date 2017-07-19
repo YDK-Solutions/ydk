@@ -49,7 +49,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         :return: The pointer to the root.
 
-    .. cpp:function:: virtual DataNode* create(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 
@@ -67,7 +67,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual DataNode* create(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 

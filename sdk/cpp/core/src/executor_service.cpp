@@ -117,7 +117,7 @@ static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNo
         if (path != "")
             temp_path = path + '/';
         temp_path = temp_path + child.first;
-        rpc_input.create(temp_path, child.second.value);
+        rpc_input.create_datanode(temp_path, child.second.value);
     }
 }
 
@@ -130,7 +130,7 @@ static void create_from_children(std::map<string, std::shared_ptr<Entity>> & chi
             YLOG_DEBUG("Creating child '{}': {}",child.first,
                 child.second->get_entity_path(child.second->parent).path);
 
-            rpc_input.create(child.first);
+            rpc_input.create_datanode(child.first);
         }
     }
 }

@@ -208,30 +208,30 @@ TEST_CASE( "bgp" )
 
     auto & schema = sp.get_root_schema();
 
-    auto & bgp = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
 
-    auto & as = bgp.create("global/config/as", "65172");
+    auto & as = bgp.create_datanode("global/config/as", "65172");
 
-    auto & l3vpn_ipv4_unicast = bgp.create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
     //set the enable flag
-    auto & enable = l3vpn_ipv4_unicast.create("config/enabled","true");
+    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
 
     //bgp/neighbors/neighbor
-    auto & neighbor = bgp.create("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
 
-    auto & neighbor_address = neighbor.create("config/neighbor-address", "172.16.255.2");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
 
-    auto & peer_as = neighbor.create("config/peer-as","65172");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
 
     //bgp/neighbors/neighbor/afi-safis/afi-safi
-    auto & neighbor_af = neighbor.create("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & neighbor_af = neighbor.create_datanode("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & neighbor_afi_safi_name = neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & neighbor_afi_safi_name = neighbor_af.create_datanode("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
-    auto & neighbor_enabled = neighbor_af.create("config/enabled","true");
+    auto & neighbor_enabled = neighbor_af.create_datanode("config/enabled","true");
 
     ydk::path::Codec s{};
 
@@ -274,7 +274,7 @@ TEST_CASE( "bgp" )
 
 
     auto create_rpc = schema.rpc("ydk:create") ;
-    create_rpc->input().create("entity", xml);
+    create_rpc->input().create_datanode("entity", xml);
 
     //call create
     (*create_rpc)(sp);
@@ -288,38 +288,38 @@ TEST_CASE( "bgp_validation" )
 
     auto & schema = sp.get_root_schema();
 
-    auto & bgp = schema.create("openconfig-bgp:bgp", "");
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
 
-    auto & as = bgp.create("global/config/as", "65172");
+    auto & as = bgp.create_datanode("global/config/as", "65172");
 
-    auto & l3vpn_ipv4_unicast = bgp.create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
     //set the enable flag
-    auto & enable = l3vpn_ipv4_unicast.create("config/enabled","true");
+    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
 
     //bgp/neighbors/neighbor
-    auto & neighbor = bgp.create("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
 
-    //auto & peer_group = neighbor.create("config/peer-group", "IBGP");
+    //auto & peer_group = neighbor.create_datanode("config/peer-group", "IBGP");
 
-    auto & neighbor_address = neighbor.create("config/neighbor-address", "172.16.255.2");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
 
-    auto & peer_as = neighbor.create("config/peer-as","65172");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
 
-    auto & neighbor_remove_as = neighbor.create("config/remove-private-as", "openconfig-bgp-types:PRIVATE_AS_REMOVE_ALL");
+    auto & neighbor_remove_as = neighbor.create_datanode("config/remove-private-as", "openconfig-bgp-types:PRIVATE_AS_REMOVE_ALL");
 
     //bgp/neighbors/neighbor/afi-safis/afi-safi
-    auto & neighbor_af = neighbor.create("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
+    auto & neighbor_af = neighbor.create_datanode("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
 
-    auto & neighbor_afi_safi_name = neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
+    auto & neighbor_afi_safi_name = neighbor_af.create_datanode("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
 
-    auto & neighbor_enabled = neighbor_af.create("config/enabled","true");
+    auto & neighbor_enabled = neighbor_af.create_datanode("config/enabled","true");
 
-    auto & peer_group = bgp.create("peer-groups/peer-group[peer-group-name='IBGP']", "");
-    auto & peer_group_name = peer_group.create("config/peer-group-name", "IBGP");
-    peer_as = peer_group.create("config/peer-as", "65172");
+    auto & peer_group = bgp.create_datanode("peer-groups/peer-group[peer-group-name='IBGP']", "");
+    auto & peer_group_name = peer_group.create_datanode("config/peer-group-name", "IBGP");
+    peer_as = peer_group.create_datanode("config/peer-as", "65172");
 
     ydk::path::ValidationService validation_service{};
 
@@ -357,9 +357,9 @@ TEST_CASE( "bits_order" )
     auto & schema = sp.get_root_schema();
 
 
-    auto & runner = schema.create("ydktest-sanity:runner", "");
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
 
-    auto  & bits = runner.create("ytypes/built-in-t/bits-value", "auto-sense-speed disable-nagle");
+    auto  & bits = runner.create_datanode("ytypes/built-in-t/bits-value", "auto-sense-speed disable-nagle");
 
     auto new_xml = s.encode(
         runner, ydk::EncodingFormat::XML, false);
@@ -378,7 +378,7 @@ TEST_CASE( "submodule" )
 //
 //    REQUIRE(schema.get() != nullptr);
 //
-//    auto subtest = schema->create("ydktest-sanity:sub-test", "");
+//    auto subtest = schema->create_datanode("ydktest-sanity:sub-test", "");
 //    std::cout<<subtest->schema()->get_path()<<std::endl;
 //
 //    REQUIRE( subtest != nullptr );
@@ -388,10 +388,10 @@ TEST_CASE( "submodule" )
 //
 //    REQUIRE( data_root != nullptr );
 //
-//    auto name = subtest->create("ydktest-sanity:sub-test/one-aug/name", "test");
+//    auto name = subtest->create_datanode("ydktest-sanity:sub-test/one-aug/name", "test");
 //    REQUIRE( name!= nullptr );
 //
-//    auto number = subtest->create("ydktest-sanity:sub-test/one-aug/number", "3");
+//    auto number = subtest->create_datanode("ydktest-sanity:sub-test/one-aug/number", "3");
 //    REQUIRE( number!= nullptr );
 
 //    auto ne1w_xml = s.encode(*subtest, ydk::EncodingFormat::XML, false);

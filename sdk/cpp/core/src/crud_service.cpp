@@ -117,7 +117,7 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 //        validation.validate(provider, entity, ValidationService::Option::DATASTORE);
 //    }
     path::RootSchemaNode& root_schema = provider.get_root_schema();
-    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(operation) };
+    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.create_rpc(operation) };
     string data;
     if(data_tag == "filter" && provider.get_encoding() == EncodingFormat::XML)
     {

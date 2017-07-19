@@ -100,7 +100,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
             :return: Vector of :cpp:class:`Statement` that represent keys.
 
-    .. cpp:function:: virtual Rpc* rpc(const std::string& path) const
+    .. cpp:function:: virtual Rpc* create_rpc(const std::string& path) const
 
         Create an :cpp:class:`Rpc<Rpc>` instance.
 

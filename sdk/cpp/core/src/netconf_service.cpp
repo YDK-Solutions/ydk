@@ -334,7 +334,7 @@ bool NetconfService::validate(NetconfServiceProvider & provider, Entity& source)
 static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider & provider, string && yfilter)
 {
     path::RootSchemaNode & root_schema = provider.get_root_schema();
-    auto rpc =  root_schema.rpc(yfilter);
+    auto rpc =  root_schema.create_rpc(yfilter);
     if (rpc == nullptr)
         throw(YCPPServiceProviderError{"Unable to create rpc"});
 

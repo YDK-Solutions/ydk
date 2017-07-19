@@ -660,7 +660,7 @@ public:
     /// @throws YCPPInvalidArgumentError if the argument is invalid.
     /// @throws YCPPPathError if the path is invalid
     ///
-    virtual std::shared_ptr<Rpc> rpc(const std::string& path) const = 0;
+    virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) const = 0;
 
 };
 

@@ -237,7 +237,7 @@ std::string NetconfServiceProvider::execute_payload(const std::string & payload)
 
 static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name)
 {
-    auto rpc = shared_ptr<path::Rpc>(root_schema.rpc(rpc_name));
+    auto rpc = shared_ptr<path::Rpc>(root_schema.create_rpc(rpc_name));
     if(rpc == nullptr){
         YLOG_ERROR("Cannot create payload for RPC: {}", rpc_name);
         throw(YCPPIllegalStateError{"Cannot create payload for RPC: "+ rpc_name});

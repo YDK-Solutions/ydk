@@ -149,7 +149,7 @@ ydk::path::RootSchemaNodeImpl::create_datanode(const std::string& path, const st
 }
 
 std::shared_ptr<ydk::path::Rpc>
-ydk::path::RootSchemaNodeImpl::rpc(const std::string& path) const
+ydk::path::RootSchemaNodeImpl::create_rpc(const std::string& path) const
 {
     auto c = find(path);
     if(c.empty()){

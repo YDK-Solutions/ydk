@@ -273,7 +273,7 @@ TEST_CASE( "bgp" )
     REQUIRE(new_json == expected_bgp_json);
 
 
-    auto create_rpc = schema.rpc("ydk:create") ;
+    auto create_rpc = schema.create_rpc("ydk:create") ;
     create_rpc->input().create_datanode("entity", xml);
 
     //call create

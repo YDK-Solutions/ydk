@@ -90,7 +90,7 @@ namespace ydk {
 
             DataNode& create_datanode(const std::string& path, const std::string& value);
 
-            std::shared_ptr<Rpc> rpc(const std::string& path) const;
+            std::shared_ptr<Rpc> create_rpc(const std::string& path) const;
 
 
             struct ly_ctx* m_ctx;

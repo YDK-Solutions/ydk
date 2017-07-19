@@ -55,7 +55,7 @@ public:
     {
         ydk::path::Codec s{};
 
-        std::cout << s.encode(rpc.input(), ydk::EncodingFormat::XML, true) << std::endl;
+        std::cout << s.encode(rpc.get_input_node(), ydk::EncodingFormat::XML, true) << std::endl;
 
         return nullptr;
     }
@@ -274,7 +274,7 @@ TEST_CASE( "bgp" )
 
 
     auto create_rpc = schema.create_rpc("ydk:create") ;
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
 
     //call create
     (*create_rpc)(sp);

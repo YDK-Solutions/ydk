@@ -102,7 +102,7 @@ TEST_CASE( "bgp_netconf_create" )
 
     auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -139,7 +139,7 @@ TEST_CASE( "bgp_netconf_create" )
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -148,7 +148,7 @@ TEST_CASE( "bgp_netconf_create" )
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -166,7 +166,7 @@ TEST_CASE( "bgp_netconf_create" )
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };
     xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    update_rpc->input().create_datanode("entity", xml);
+    update_rpc->get_input_node().create_datanode("entity", xml);
     (*update_rpc)(sp);
 
 
@@ -192,7 +192,7 @@ TEST_CASE("bits")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 }
 
@@ -216,7 +216,7 @@ TEST_CASE("core_validate")
 
     //call create
     // std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    // create_rpc->input().create_datanode("entity", xml);
+    // create_rpc->get_input_node().create_datanode("entity", xml);
     // (*create_rpc)(sp);
 }
 
@@ -255,7 +255,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
 
     auto res = (*create_rpc)(sp);
 
@@ -268,8 +268,8 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
-    read_rpc->input().create_datanode("only-config");
+    read_rpc->get_input_node().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("only-config");
 
     auto read_result = (*read_rpc)(sp);
 
@@ -301,7 +301,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //  std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
 //  auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
 //  REQUIRE( !xml.empty() );
-//  create_rpc->input().create_datanode("entity", xml);
+//  create_rpc->get_input_node().create_datanode("entity", xml);
 //
 //  auto res = (*create_rpc)(sp);
 //
@@ -312,8 +312,8 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //
 //    xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
 //    REQUIRE( !xml.empty() );
-//    read_rpc->input().create_datanode("filter", xml);
-//    read_rpc->input().create_datanode("only-config");
+//    read_rpc->get_input_node().create_datanode("filter", xml);
+//    read_rpc->get_input_node().create_datanode("only-config");
 //
 //    auto read_result = (*read_rpc)(sp);
 //

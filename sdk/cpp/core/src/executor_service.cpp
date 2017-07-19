@@ -56,7 +56,7 @@ shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provide
     // Create RPC instance
     path::RootSchemaNode & root_schema = provider.get_root_schema();
     shared_ptr<path::Rpc> rpc = root_schema.create_rpc(yfilter);
-    path::DataNode & rpc_input = rpc->input();
+    path::DataNode & rpc_input = rpc->get_input_node();
 
     // Handle input
     auto input = rpc_entity.get_child_by_name("input", "");

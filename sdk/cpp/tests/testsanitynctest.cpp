@@ -52,7 +52,7 @@ TEST_CASE("test_sanity_types_int8 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -66,7 +66,7 @@ TEST_CASE("test_sanity_types_int8 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -77,7 +77,7 @@ TEST_CASE("test_sanity_types_int8 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -118,7 +118,7 @@ TEST_CASE("test_sanity_types_int16 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -133,7 +133,7 @@ TEST_CASE("test_sanity_types_int16 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -144,7 +144,7 @@ TEST_CASE("test_sanity_types_int16 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -185,7 +185,7 @@ TEST_CASE("test_sanity_types_int32 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -198,7 +198,7 @@ TEST_CASE("test_sanity_types_int32 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -209,7 +209,7 @@ TEST_CASE("test_sanity_types_int32 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -248,7 +248,7 @@ TEST_CASE("test_sanity_types_int64 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -261,7 +261,7 @@ TEST_CASE("test_sanity_types_int64 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -272,7 +272,7 @@ TEST_CASE("test_sanity_types_int64 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -311,7 +311,7 @@ TEST_CASE("test_sanity_types_uint8 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -325,7 +325,7 @@ TEST_CASE("test_sanity_types_uint8 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -336,7 +336,7 @@ TEST_CASE("test_sanity_types_uint8 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -375,7 +375,7 @@ TEST_CASE("test_sanity_types_uint16 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -389,7 +389,7 @@ TEST_CASE("test_sanity_types_uint16 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -400,7 +400,7 @@ TEST_CASE("test_sanity_types_uint16 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -439,7 +439,7 @@ TEST_CASE("test_sanity_types_uint32 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -454,7 +454,7 @@ TEST_CASE("test_sanity_types_uint32 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -465,7 +465,7 @@ TEST_CASE("test_sanity_types_uint32 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -504,7 +504,7 @@ TEST_CASE("test_sanity_types_uint64 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -517,7 +517,7 @@ TEST_CASE("test_sanity_types_uint64 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -528,7 +528,7 @@ TEST_CASE("test_sanity_types_uint64 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -569,7 +569,7 @@ TEST_CASE("test_sanity_types_bits ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -583,7 +583,7 @@ TEST_CASE("test_sanity_types_bits ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -594,7 +594,7 @@ TEST_CASE("test_sanity_types_bits ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -633,7 +633,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -646,7 +646,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -657,7 +657,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -699,7 +699,7 @@ TEST_CASE("test_sanity_types_string")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -712,7 +712,7 @@ TEST_CASE("test_sanity_types_string")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -723,7 +723,7 @@ TEST_CASE("test_sanity_types_string")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -764,7 +764,7 @@ TEST_CASE("test_sanity_types_empty")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -777,7 +777,7 @@ TEST_CASE("test_sanity_types_empty")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -788,7 +788,7 @@ TEST_CASE("test_sanity_types_empty")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -827,7 +827,7 @@ TEST_CASE("test_sanity_types_boolean")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -840,7 +840,7 @@ TEST_CASE("test_sanity_types_boolean")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -851,7 +851,7 @@ TEST_CASE("test_sanity_types_boolean")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -891,7 +891,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -904,7 +904,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -915,7 +915,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -954,7 +954,7 @@ TEST_CASE("test_sanity_types_enum")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -967,7 +967,7 @@ TEST_CASE("test_sanity_types_enum")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -978,7 +978,7 @@ TEST_CASE("test_sanity_types_enum")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1018,7 +1018,7 @@ TEST_CASE("test_sanity_types_union")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1031,7 +1031,7 @@ TEST_CASE("test_sanity_types_union")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1042,7 +1042,7 @@ TEST_CASE("test_sanity_types_union")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1082,7 +1082,7 @@ TEST_CASE("test_sanity_types_union_enum")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1095,7 +1095,7 @@ TEST_CASE("test_sanity_types_union_enum")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1106,7 +1106,7 @@ TEST_CASE("test_sanity_types_union_enum")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1148,7 +1148,7 @@ TEST_CASE("test_sanity_types_union_int")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1162,7 +1162,7 @@ TEST_CASE("test_sanity_types_union_int")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1173,7 +1173,7 @@ TEST_CASE("test_sanity_types_union_int")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1214,7 +1214,7 @@ TEST_CASE("test_union_leaflist")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1229,7 +1229,7 @@ TEST_CASE("test_union_leaflist")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1240,7 +1240,7 @@ TEST_CASE("test_union_leaflist")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1279,7 +1279,7 @@ TEST_CASE("test_enum_leaflist")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1294,7 +1294,7 @@ TEST_CASE("test_enum_leaflist")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1305,7 +1305,7 @@ TEST_CASE("test_enum_leaflist")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1344,7 +1344,7 @@ TEST_CASE("test_identity_leaflist")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1359,7 +1359,7 @@ TEST_CASE("test_identity_leaflist")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1370,7 +1370,7 @@ TEST_CASE("test_identity_leaflist")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1410,7 +1410,7 @@ TEST_CASE("test_union_complex_list")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1423,7 +1423,7 @@ TEST_CASE("test_union_complex_list")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1434,7 +1434,7 @@ TEST_CASE("test_union_complex_list")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 
@@ -1469,7 +1469,7 @@ TEST_CASE("test_identityref")
 
     auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
 
-    delete_rpc->input().create_datanode("entity", xml);
+    delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
     (*delete_rpc)(sp);
@@ -1482,7 +1482,7 @@ TEST_CASE("test_identityref")
 
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(sp);
 
     //call read
@@ -1493,7 +1493,7 @@ TEST_CASE("test_identityref")
 
     xml = s.encode(runner_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
-    read_rpc->input().create_datanode("filter", xml);
+    read_rpc->get_input_node().create_datanode("filter", xml);
 
     auto read_result = (*read_rpc)(sp);
 

@@ -170,7 +170,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_edit(path::Rpc& y
 std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_netconf_operation(path::Rpc& ydk_rpc) const
 {
     path::Codec codec_service{};
-    auto netconf_payload = codec_service.encode(ydk_rpc.input(), EncodingFormat::XML, true);
+    auto netconf_payload = codec_service.encode(ydk_rpc.get_input_node(), EncodingFormat::XML, true);
     std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"};
     netconf_payload = payload + netconf_payload + "</rpc>";
 
@@ -247,7 +247,7 @@ static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_sch
 
 static path::DataNode& create_rpc_input(path::Rpc & netconf_rpc)
 {
-    return netconf_rpc.input();
+    return netconf_rpc.get_input_node();
 }
 
 static string get_commit_rpc_payload()
@@ -293,7 +293,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
         path::Rpc & rpc, path::Annotation & annotation)
 {
     path::Codec codec_service{};
-    auto entity = rpc.input().find("entity");
+    auto entity = rpc.get_input_node().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});
@@ -325,7 +325,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
 
 static string get_filter_payload(path::Rpc & ydk_rpc)
 {
-    auto entity = ydk_rpc.input().find("filter");
+    auto entity = ydk_rpc.get_input_node().find("filter");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node.");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});
@@ -425,7 +425,7 @@ static string get_read_rpc_name(bool config)
 
 static bool is_config(path::Rpc & rpc)
 {
-    if(!rpc.input().find("only-config").empty())
+    if(!rpc.get_input_node().find("only-config").empty())
     {
         return true;
     }

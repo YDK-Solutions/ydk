@@ -139,7 +139,7 @@ static string get_module_url_path(const string & path)
 
 static bool is_config(path::Rpc & rpc)
 {
-    if(!rpc.input().find("only-config").empty())
+    if(!rpc.get_input_node().find("only-config").empty())
     {
         return true;
     }
@@ -150,7 +150,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
 {
     path::Codec codec_service{};
 
-    auto filter = rpc.input().find("filter");
+    auto filter = rpc.get_input_node().find("filter");
     if(filter.empty()){
         YLOG_ERROR("Failed to get entity node.");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});
@@ -178,7 +178,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
 std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& rpc, const string & yfilter) const
 {
     path::Codec codec_service{};
-    auto entity = rpc.input().find("entity");
+    auto entity = rpc.get_input_node().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
         throw(YCPPInvalidArgumentError{"Failed to get entity node"});

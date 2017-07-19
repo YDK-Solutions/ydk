@@ -1029,7 +1029,7 @@ public:
     ///@return pointer to the input DataNode or nullptr if the rpc does not have
     /// an input element in the schema.
     ///
-    virtual DataNode& input() const = 0;
+    virtual DataNode& get_input_node() const = 0;
 
     ///
     /// @brief return the SchemaNode associated with this rpc

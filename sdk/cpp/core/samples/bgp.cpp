@@ -91,7 +91,7 @@ void test_bgp_create()
 
     // TODO fix rpc
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", xml);
+    create_rpc->get_input_node().create_datanode("entity", xml);
 
     // call create
     (*create_rpc)(sp);

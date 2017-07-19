@@ -38,7 +38,7 @@ TEST_CASE("CreateDelRead")
     //first delete
     std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.create_rpc("ydk:delete") };
     auto json = s.encode(runner, EncodingFormat::JSON, false);
-    delete_rpc->input().create_datanode("entity", json);
+    delete_rpc->get_input_node().create_datanode("entity", json);
     //call delete
     (*delete_rpc)(provider);
 
@@ -48,7 +48,7 @@ TEST_CASE("CreateDelRead")
     CHECK( !json.empty());
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    create_rpc->input().create_datanode("entity", json);
+    create_rpc->get_input_node().create_datanode("entity", json);
     (*create_rpc)(provider);
 
     //read
@@ -57,7 +57,7 @@ TEST_CASE("CreateDelRead")
 
     json = s.encode(runner_read, EncodingFormat::JSON, false);
     REQUIRE( !json.empty() );
-    read_rpc->input().create_datanode("filter", json);
+    read_rpc->get_input_node().create_datanode("filter", json);
 
     auto read_result = (*read_rpc)(provider);
 
@@ -68,7 +68,7 @@ TEST_CASE("CreateDelRead")
     CHECK( !json.empty());
     //call update
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };
-    update_rpc->input().create_datanode("entity", json);
+    update_rpc->get_input_node().create_datanode("entity", json);
     (*update_rpc)(provider);
 
 

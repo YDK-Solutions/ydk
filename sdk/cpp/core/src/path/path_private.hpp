@@ -198,7 +198,7 @@ namespace ydk {
 
             std::shared_ptr<DataNode> operator()(const ServiceProvider& provider);
 
-            DataNode& input() const;
+            DataNode& get_input_node() const;
 
             SchemaNode& get_schema_node() const;
 

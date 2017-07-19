@@ -63,7 +63,7 @@ ydk::path::RpcImpl::operator()(const ydk::path::ServiceProvider& provider)
 
 
 ydk::path::DataNode&
-ydk::path::RpcImpl::input() const
+ydk::path::RpcImpl::get_input_node() const
 {
     return *data_node;
 }

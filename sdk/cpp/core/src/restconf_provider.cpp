@@ -99,7 +99,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::invoke(path::Rpc& rpc) 
     path::SchemaNode* update_schema = get_schema_for_operation(*root_schema, "ydk:update");
     path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
 
-    path::SchemaNode* rpc_schema = &(rpc.schema());
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
     std::shared_ptr<path::DataNode> datanode = nullptr;
 
     if(rpc_schema == create_schema || rpc_schema == update_schema)
@@ -164,11 +164,11 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
     string url;
     if(is_config(rpc))
     {
-        url = config_url_root + get_module_url_path(datanode->get_children()[0]->schema().get_path());
+        url = config_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
     }
     else
     {
-        url = state_url_root + get_module_url_path(datanode->get_children()[0]->schema().get_path());
+        url = state_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
     }
 
     YLOG_INFO("Performing GET on URL {}", url);
@@ -188,7 +188,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& 
     string header_data = entity_node->get();
 
     auto datanode = codec_service.decode(*root_schema, header_data, encoding);
-    string url = config_url_root + get_module_url_path(datanode->get_children()[0]->schema().get_path());
+    string url = config_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());
 
     YLOG_INFO("Performing {} on URL {}. Payload: {}", yfilter, url, header_data);
     client->execute(yfilter, url, header_data);

@@ -18,7 +18,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
 
             A :cpp:class:`DataNode<DataNode>` represents a containment hierarchy. So invocation of the destructor will lead to the children of this node being destroyed.
 
-    .. cpp:function:: virtual const SchemaNode& schema() const
+    .. cpp:function:: virtual const SchemaNode& get_schema_node() const
 
         Returns the :cpp:class:`SchemaNode<SchemaNode>` associated with this :cpp:class:`DataNode<DataNode>`.
 

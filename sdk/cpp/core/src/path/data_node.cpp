@@ -68,7 +68,7 @@ ydk::path::DataNodeImpl::~DataNodeImpl()
 }
 
 const ydk::path::SchemaNode&
-ydk::path::DataNodeImpl::schema() const
+ydk::path::DataNodeImpl::get_schema_node() const
 {
     auto schema_ptr = reinterpret_cast<const SchemaNode*>(m_node->schema->priv);
     return *schema_ptr;
@@ -117,7 +117,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
     size_t start_index = 0;
     auto iter = segments.begin();
 
-    YLOG_DEBUG("Current path: {}", schema().get_path());
+    YLOG_DEBUG("Current path: {}", get_schema_node().get_path());
     YLOG_DEBUG("Top container path: {}", top_container_path);
 
     while (iter != segments.end())
@@ -277,7 +277,7 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
     }
     std::string spath{path};
 
-    auto s = schema().get_statement();
+    auto s = get_schema_node().get_statement();
     if(s.keyword == "rpc"){
         spath="input/" + spath;
     }

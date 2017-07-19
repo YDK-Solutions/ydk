@@ -38,7 +38,7 @@ ydk::path::RootDataImpl::~RootDataImpl()
 }
 
 const ydk::path::SchemaNode&
-ydk::path::RootDataImpl::schema() const
+ydk::path::RootDataImpl::get_schema_node() const
 {
     return m_schema;
 }
@@ -194,7 +194,7 @@ ydk::path::RootDataImpl::find(const std::string& path) const
         schema_path+="/";
     }
 
-    auto s = schema().get_statement();
+    auto s = get_schema_node().get_statement();
     if(s.keyword == "rpc")
     {
         schema_path+="input/";

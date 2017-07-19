@@ -179,7 +179,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_netconf_operation
     YLOG_INFO("\n");
 
     std::string reply = execute_payload(netconf_payload);
-    if (ydk_rpc.schema().get_path().find("get") != string::npos or ydk_rpc.schema().get_path().find("get-config") != string::npos)
+    if (ydk_rpc.get_schema_node().get_path().find("get") != string::npos or ydk_rpc.get_schema_node().get_path().find("get-config") != string::npos)
     {
         return handle_read_reply(reply, *root_schema);
     }
@@ -200,7 +200,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::invoke(path::Rpc& rpc) c
     path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
 
     //for now we only support crud rpc's
-    path::SchemaNode* rpc_schema = &(rpc.schema());
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
     std::shared_ptr<path::DataNode> datanode = nullptr;
 
     if(rpc_schema == create_schema || rpc_schema == delete_schema || rpc_schema == update_schema)

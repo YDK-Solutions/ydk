@@ -685,7 +685,7 @@ public:
     /// Return the SchemaNode associated with this DataNode.
     /// @return SchemaNode associated with this DataNode
     ///
-    virtual const SchemaNode& schema() const = 0;
+    virtual const SchemaNode& get_schema_node() const = 0;
 
     ///
     /// @brief returns the XPath expression of this Node in the NodeTree
@@ -1035,7 +1035,7 @@ public:
     /// @brief return the SchemaNode associated with this rpc
     ///
     /// @return pointer to the SchemaNode associated with this rpc.
-    virtual SchemaNode& schema() const = 0;
+    virtual SchemaNode& get_schema_node() const = 0;
 
 
 };

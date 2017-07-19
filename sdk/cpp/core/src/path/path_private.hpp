@@ -111,7 +111,7 @@ namespace ydk {
 
             virtual ~DataNodeImpl();
 
-            virtual const SchemaNode& schema() const;
+            virtual const SchemaNode& get_schema_node() const;
 
             virtual std::string get_path() const;
 
@@ -166,7 +166,7 @@ namespace ydk {
 
             ~RootDataImpl();
 
-            const SchemaNode& schema() const;
+            const SchemaNode& get_schema_node() const;
 
             std::string get_path() const;
 
@@ -200,7 +200,7 @@ namespace ydk {
 
             DataNode& input() const;
 
-            SchemaNode& schema() const;
+            SchemaNode& get_schema_node() const;
 
 
             SchemaNodeImpl& schema_node;

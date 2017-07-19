@@ -69,7 +69,7 @@ ydk::path::RpcImpl::input() const
 }
 
 ydk::path::SchemaNode&
-ydk::path::RpcImpl::schema() const
+ydk::path::RpcImpl::get_schema_node() const
 {
     return schema_node;
 }

@@ -30,10 +30,10 @@ class SanityTest(unittest.TestCase):
         self.codec = Codec()
 
     def _delete_runner(self):
-        runner = self.root_schema.create("ydktest-sanity:runner")
+        runner = self.root_schema.create_datanode("ydktest-sanity:runner")
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
-        create_rpc = self.root_schema.rpc("ydk:delete")
-        create_rpc.input().create("entity", xml)
+        create_rpc = self.root_schema.create_rpc("ydk:delete")
+        create_rpc.get_input_node().create_datanode("entity", xml)
         create_rpc(self.ncc)
 
     def tearDown(self):
@@ -50,19 +50,19 @@ class SanityTest(unittest.TestCase):
                             ("ytypes/built-in-t/enum-llist[.='local']", ""),
                             ("ytypes/built-in-t/enum-llist[.='remote']", ""),
                             ("ytypes/built-in-t/younion-recursive", "18")]
-        runner = self.root_schema.create("ydktest-sanity:runner")
+        runner = self.root_schema.create_datanode("ydktest-sanity:runner")
         for (leaf_path, leaf_value) in leaf_path_values:
-            runner.create(leaf_path, leaf_value)
+            runner.create_datanode(leaf_path, leaf_value)
 
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
-        create_rpc = self.root_schema.rpc("ydk:create")
-        create_rpc.input().create("entity", xml)
+        create_rpc = self.root_schema.create_rpc("ydk:create")
+        create_rpc.get_input_node().create_datanode("entity", xml)
         create_rpc(self.ncc)
 
-        runner_filter = self.root_schema.create("ydktest-sanity:runner")
+        runner_filter = self.root_schema.create_datanode("ydktest-sanity:runner")
         xml_filter = self.codec.encode(runner_filter, EncodingFormat.XML, False)
-        read_rpc = self.root_schema.rpc("ydk:read")
-        read_rpc.input().create("filter", xml_filter)
+        read_rpc = self.root_schema.create_rpc("ydk:read")
+        read_rpc.get_input_node().create_datanode("filter", xml_filter)
         runner_read = read_rpc(self.ncc)
         xml_read = self.codec.encode(runner_read, EncodingFormat.XML, True)
         self.maxDiff = None

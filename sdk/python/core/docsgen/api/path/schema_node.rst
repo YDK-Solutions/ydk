@@ -18,8 +18,8 @@ SchemaNode
             >>> from ydk.providers import NetconfServiceProvider
             >>> provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 830)
             >>> root_schema = provider.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
-            >>> bgp = root_schema.create('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
-            >>> schema_node = bgp.schema()                                             # <-- schema node for bgp
+            >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
+            >>> schema_node = bgp.get_schema_node()                                             # <-- schema node for bgp
 
     .. py:method:: find(path)
 
@@ -31,28 +31,28 @@ SchemaNode
         :raises RuntimeError: With ``YCPPPathError`` prefix if the path expression in invalid, see error code for details.
         :raises RuntimeError: With ``YCPPInvalidArgumentError`` if the argument is invalid.
 
-    .. py:method:: parent()
+    .. py:method:: get_parent()
 
         Get the parent node of this schema node in the tree.
 
         :return: Parent schema node.
         :rtype: :py:class:`SchemaNode`
 
-    .. py:method:: path()
+    .. py:method:: get_path()
 
         Get the path expression representing this schema node in in the schema node tree.
 
         :return: Path to this schema node.
         :rtype: A Python string
 
-    .. py:method:: root()
+    .. py:method:: get_root()
 
         Get the root schema node of current schema node.
 
         :return: Root schema node of current schema node.
         :rtype: :py:class:`SchemaNode`
 
-    .. py:method:: statement()
+    .. py:method:: get_statement()
 
         Get current schema node's YANG statement.
 

@@ -33,9 +33,9 @@ Statement
         >>> from ydk.providers import NetconfServiceProvider
         >>> provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 830)
         >>> root_schema = provider.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
-        >>> bgp = root_schema.create('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
-        >>> schema_node = bgp.schema()                                             # <-- schema node for bgp
-        >>> statement = schema_node.statement()                                    # <-- YANG statement for this schema node
+        >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
+        >>> schema_node = bgp.get_schema_node()                                             # <-- schema node for bgp
+        >>> statement = schema_node.get_statement()                                    # <-- YANG statement for this schema node
         >>> statement.keyword
         'container'
         >>> statement.arg

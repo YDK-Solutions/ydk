@@ -281,46 +281,46 @@ PYBIND11_PLUGIN(ydk_)
         .def_readonly("arg", &ydk::path::Statement::arg);
 
     class_<ydk::path::SchemaNode, shared_ptr<ydk::path::SchemaNode>>(path, "SchemaNode")
-        .def("path", &ydk::path::SchemaNode::path)
-        .def("parent", &ydk::path::SchemaNode::parent)
-        .def("root", &ydk::path::SchemaNode::root, return_value_policy::reference)
-        .def("statement", &ydk::path::SchemaNode::statement, return_value_policy::reference)
+        .def("get_path", &ydk::path::SchemaNode::get_path)
+        .def("get_parent", &ydk::path::SchemaNode::get_parent)
+        .def("get_root", &ydk::path::SchemaNode::get_root, return_value_policy::reference)
+        .def("get_statement", &ydk::path::SchemaNode::get_statement, return_value_policy::reference)
         .def("find", &ydk::path::SchemaNode::find, return_value_policy::reference, arg("path"))
-        // .def("children", &ydk::path::SchemaNode::children)
-        .def("keys", &ydk::path::SchemaNode::keys, return_value_policy::reference);
+        // .def("get_children", &ydk::path::SchemaNode::get_children)
+        .def("get_keys", &ydk::path::SchemaNode::get_keys, return_value_policy::reference);
 
 
     class_<ydk::path::DataNode, shared_ptr<ydk::path::DataNode>>(path, "DataNode")
-        .def("schema", &ydk::path::DataNode::schema, return_value_policy::reference)
-        .def("path", &ydk::path::DataNode::path, return_value_policy::reference)
-        .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create, return_value_policy::reference, arg("path"))
-        .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create, return_value_policy::reference, arg("path"), arg("value"))
-        .def("get", &ydk::path::DataNode::get, return_value_policy::reference)
-        .def("set", &ydk::path::DataNode::set, return_value_policy::reference, arg("value"))
-        .def("children", &ydk::path::DataNode::children, return_value_policy::reference)
-        .def("root", &ydk::path::DataNode::root, return_value_policy::reference)
+        .def("get_schema_node", &ydk::path::DataNode::get_schema_node, return_value_policy::reference)
+        .def("get_path", &ydk::path::DataNode::get_path, return_value_policy::reference)
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create_datanode, return_value_policy::reference, arg("path"))
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create_datanode, return_value_policy::reference, arg("path"), arg("value"))
+        .def("get_value", &ydk::path::DataNode::get_value, return_value_policy::reference)
+        .def("set_value", &ydk::path::DataNode::set_value, return_value_policy::reference, arg("value"))
+        .def("get_children", &ydk::path::DataNode::get_children, return_value_policy::reference)
+        .def("get_root", &ydk::path::DataNode::get_root, return_value_policy::reference)
         .def("find", &ydk::path::DataNode::find, return_value_policy::reference, arg("path"))
         .def("add_annotation", &ydk::path::DataNode::add_annotation, return_value_policy::reference, arg("annotation"))
         .def("remove_annotation", &ydk::path::DataNode::remove_annotation, return_value_policy::reference, arg("annotation"))
         .def("annotations", &ydk::path::DataNode::annotations, return_value_policy::reference);
 
     class_<ydk::path::RootSchemaNode, shared_ptr<ydk::path::RootSchemaNode>>(path, "RootSchemaNode")
-        .def("path", &ydk::path::RootSchemaNode::path, return_value_policy::reference)
-        .def("parent", &ydk::path::RootSchemaNode::parent, return_value_policy::reference)
+        .def("get_path", &ydk::path::RootSchemaNode::get_path, return_value_policy::reference)
+        .def("get_parent", &ydk::path::RootSchemaNode::get_parent, return_value_policy::reference)
         .def("find", &ydk::path::RootSchemaNode::find, return_value_policy::reference)
-        .def("root", &ydk::path::RootSchemaNode::root, return_value_policy::reference)
-//      .def("children", &ydk::path::RootSchemaNode::children)
-        .def("create", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&)) &ydk::path::RootSchemaNode::create, return_value_policy::reference, arg("path"))
-        .def("create", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&, const string&)) &ydk::path::RootSchemaNode::create, return_value_policy::reference, arg("path"), arg("value"))
-        .def("rpc", &ydk::path::RootSchemaNode::rpc, arg("path"), return_value_policy::reference);
+        .def("get_root", &ydk::path::RootSchemaNode::get_root, return_value_policy::reference)
+//      .def("get_children", &ydk::path::RootSchemaNode::get_children)
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&)) &ydk::path::RootSchemaNode::create_datanode, return_value_policy::reference, arg("path"))
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&, const string&)) &ydk::path::RootSchemaNode::create_datanode, return_value_policy::reference, arg("path"), arg("value"))
+        .def("create_rpc", &ydk::path::RootSchemaNode::create_rpc, arg("path"), return_value_policy::reference);
 
     class_<ydk::path::ServiceProvider>(path, "ServiceProvider")
         .def("invoke", &ydk::path::ServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::path::ServiceProvider::get_root_schema, return_value_policy::reference);
 
     class_<ydk::path::Rpc, shared_ptr<ydk::path::Rpc>>(path, "Rpc")
-        .def("schema", &ydk::path::Rpc::schema, return_value_policy::reference)
-        .def("input", &ydk::path::Rpc::input, return_value_policy::reference)
+        .def("get_schema_node", &ydk::path::Rpc::get_schema_node, return_value_policy::reference)
+        .def("get_input_node", &ydk::path::Rpc::get_input_node, return_value_policy::reference)
         .def("__call__", &ydk::path::Rpc::operator(), arg("service_provider"));
 
     class_<ydk::path::Repository>(path, "Repository")

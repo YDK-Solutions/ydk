@@ -160,7 +160,7 @@ TEST_CASE( "bgp_netconf_create" )
 
     REQUIRE(xml == expected_bgp_read);
 
-    peer_as.set("6500");
+    peer_as.set_value("6500");
 
     //call update
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };

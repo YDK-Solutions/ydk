@@ -51,13 +51,13 @@ XmlSubtreeCodec::XmlSubtreeCodec()
 std::string XmlSubtreeCodec::encode(Entity & entity, path::RootSchemaNode & root_schema)
 {
     EntityPath root_path = entity.get_entity_path(nullptr);
-    auto & root_data_node = root_schema.create(root_path.path);
+    auto & root_data_node = root_schema.create_datanode(root_path.path);
     xmlDocPtr doc = xmlNewDoc(to_xmlchar("1.0"));
     xmlNodePtr root_node = xmlNewNode(NULL, to_xmlchar(entity.yang_name));
-    xmlNewProp(root_node, (const unsigned char *)"xmlns", to_xmlchar(root_data_node.schema().statement().name_space));
+    xmlNewProp(root_node, (const unsigned char *)"xmlns", to_xmlchar(root_data_node.get_schema_node().get_statement().name_space));
 
-    populate_xml_node_contents(root_data_node.schema(), root_path, root_node);
-    walk_children(entity, root_data_node.schema(), root_node);
+    populate_xml_node_contents(root_data_node.get_schema_node(), root_path, root_node);
+    walk_children(entity, root_data_node.get_schema_node(), root_node);
 
     return to_string(doc, root_node);
 }
@@ -90,7 +90,7 @@ static const path::SchemaNode* find_child_by_name(const path::SchemaNode & paren
 
 static bool has_same_namespace(const path::SchemaNode & left, const path::SchemaNode & right)
 {
-    return left.statement().name_space == right.statement().name_space;
+    return left.get_statement().name_space == right.get_statement().name_space;
 }
 
 static void set_xml_namespace(const string & name_space, xmlNodePtr xml_node)
@@ -109,10 +109,10 @@ static void set_operation_from_yfilter(YFilter yfilter, xmlNodePtr xml_node)
 static xmlNodePtr create_and_populate_xml_node(const path::SchemaNode & parent_schema, const path::SchemaNode & schema,
             YFilter yfilter, xmlNodePtr parent_xml_node, const xmlChar* content)
 {
-    xmlNodePtr child = xmlNewChild(parent_xml_node, NULL, to_xmlchar(schema.statement().arg), content);
+    xmlNodePtr child = xmlNewChild(parent_xml_node, NULL, to_xmlchar(schema.get_statement().arg), content);
     if(!has_same_namespace(schema, parent_schema))
     {
-        set_xml_namespace(schema.statement().name_space, child);
+        set_xml_namespace(schema.get_statement().name_space, child);
     }
 
     if(is_set(yfilter))
@@ -168,7 +168,7 @@ static void populate_xml_node_contents(const path::SchemaNode & parent_schema, E
     {
         LeafData leaf_data = name_value.second;
         const path::SchemaNode* schema = find_child_by_name(parent_schema, name_value.first);
-        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, parent_schema.path(),
+        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, parent_schema.get_path(),
                 leaf_data.value, leaf_data.is_set);
 
         const xmlChar* content = get_content_from_leafdata(leaf_data);

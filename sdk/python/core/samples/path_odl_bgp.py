@@ -22,12 +22,12 @@ from ydk_.types import EncodingFormat
 
 def run(codec, provider):
     schema = provider.get_root_schema()
-    bgp = schema.create("openconfig-bgp:bgp")
-    bgp.create("global/config/as", "65321")
+    bgp = schema.create_datanode("openconfig-bgp:bgp")
+    bgp.create_datanode("global/config/as", "65321")
 
     xml = codec.encode(bgp, EncodingFormat.XML, True)
-    create_rpc = schema.rpc("ydk:create")
-    create_rpc.input().create("entity", xml)
+    create_rpc = schema.create_rpc("ydk:create")
+    create_rpc.get_input_node().create_datanode("entity", xml)
     create_rpc(provider)
 
 
@@ -37,4 +37,3 @@ if __name__ == "__main__":
     provider = o.get_node_provider('xr')
     codec = Codec()
     run(codec, provider)
-

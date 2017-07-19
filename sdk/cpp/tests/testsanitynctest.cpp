@@ -90,7 +90,7 @@ TEST_CASE("test_sanity_types_int8 ")
 
     auto number8_read = number8_read_vec[0];
 
-    REQUIRE(number8.get() == number8_read->get() );
+    REQUIRE(number8.get_value() == number8_read->get_value() );
 
 
 }
@@ -157,7 +157,7 @@ TEST_CASE("test_sanity_types_int16 ")
 
     auto & number16_read = number16_read_vec[0];
 
-    REQUIRE(number16.get() == number16_read->get() );
+    REQUIRE(number16.get_value() == number16_read->get_value() );
 
 
 }
@@ -221,7 +221,7 @@ TEST_CASE("test_sanity_types_int32 ")
 
     auto number32_read = number32_read_vec[0];
 
-    REQUIRE(number32.get() == number32_read->get() );
+    REQUIRE(number32.get_value() == number32_read->get_value() );
 
 }
 
@@ -284,7 +284,7 @@ TEST_CASE("test_sanity_types_int64 ")
 
     auto number64_read = number64_read_vec[0];
 
-    REQUIRE(number64.get() == number64_read->get() );
+    REQUIRE(number64.get_value() == number64_read->get_value() );
 
 }
 
@@ -348,7 +348,7 @@ TEST_CASE("test_sanity_types_uint8 ")
 
     auto unumber8_read = unumber8_read_vec[0];
 
-    REQUIRE(unumber8.get() == unumber8_read->get() );
+    REQUIRE(unumber8.get_value() == unumber8_read->get_value() );
 
 }
 
@@ -412,7 +412,7 @@ TEST_CASE("test_sanity_types_uint16 ")
 
     auto unumber16_read = unumber16_read_vec[0];
 
-    REQUIRE(unumber16.get() == unumber16_read->get() );
+    REQUIRE(unumber16.get_value() == unumber16_read->get_value() );
 
 }
 
@@ -477,7 +477,7 @@ TEST_CASE("test_sanity_types_uint32 ")
 
     auto unumber32_read = unumber32_read_vec[0];
 
-    REQUIRE(unumber32.get() == unumber32_read->get() );
+    REQUIRE(unumber32.get_value() == unumber32_read->get_value() );
 
 }
 
@@ -540,7 +540,7 @@ TEST_CASE("test_sanity_types_uint64 ")
 
     auto unumber64_read = unumber64_read_vec[0];
 
-    REQUIRE(unumber64.get() == unumber64_read->get() );
+    REQUIRE(unumber64.get_value() == unumber64_read->get_value() );
 
 
 }
@@ -606,7 +606,7 @@ TEST_CASE("test_sanity_types_bits ")
 
     auto bits_read = bits_read_vec[0];
 
-    REQUIRE(bits.get() == bits_read->get() );
+    REQUIRE(bits.get_value() == bits_read->get_value() );
 
 }
 
@@ -670,9 +670,9 @@ TEST_CASE("test_sanity_types_decimal64 ")
     auto deci64_read = deci64_read_vec[0];
 
     //TODO log this
-    //std::cout << deci64_read->get() << std::endl;
+    //std::cout << deci64_read->get_value() << std::endl;
 
-    REQUIRE(deci64.get() == deci64_read->get() );
+    REQUIRE(deci64.get_value() == deci64_read->get_value() );
 
 }
 
@@ -735,9 +735,9 @@ TEST_CASE("test_sanity_types_string")
 
     auto str_read = str_read_vec[0];
 
-    //std::cout << str_read->get() << std::endl;
+    //std::cout << str_read->get_value() << std::endl;
 
-    REQUIRE(str.get() == str_read->get() );
+    REQUIRE(str.get_value() == str_read->get_value() );
 
 }
 
@@ -863,7 +863,7 @@ TEST_CASE("test_sanity_types_boolean")
 
     auto bool_val_read = bool_val_read_vec[0];
 
-    REQUIRE(bool_val.get() == bool_val_read->get() );
+    REQUIRE(bool_val.get_value() == bool_val_read->get_value() );
 
 }
 
@@ -927,7 +927,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
 
     auto embedded_enum_read = embedded_enum_read_vec[0];
 
-    REQUIRE(embedded_enum.get() == embedded_enum_read->get() );
+    REQUIRE(embedded_enum.get_value() == embedded_enum_read->get_value() );
 
 }
 
@@ -991,7 +991,7 @@ TEST_CASE("test_sanity_types_enum")
     auto enum_value_read = enum_value_read_vec[0];
 
 
-    REQUIRE(enum_value.get() == enum_value_read->get() );
+    REQUIRE(enum_value.get_value() == enum_value_read->get_value() );
 
 }
 
@@ -1054,7 +1054,7 @@ TEST_CASE("test_sanity_types_union")
 
     auto union_value_read = union_value_read_vec[0];
 
-    REQUIRE(union_value.get() == union_value_read->get() );
+    REQUIRE(union_value.get_value() == union_value_read->get_value() );
 
 
 }
@@ -1120,7 +1120,7 @@ TEST_CASE("test_sanity_types_union_enum")
     auto enum_int_value_read = enum_int_value_read_vec[0];
 
 
-    REQUIRE(enum_int_value.get() == enum_int_value_read->get() );
+    REQUIRE(enum_int_value.get_value() == enum_int_value_read->get_value() );
 
 
 }
@@ -1186,7 +1186,7 @@ TEST_CASE("test_sanity_types_union_int")
 
     auto enum_int_value_read = enum_int_value_read_vec[0];
 
-    REQUIRE(enum_int_value.get() == enum_int_value_read->get() );
+    REQUIRE(enum_int_value.get_value() == enum_int_value_read->get_value() );
 
 }
 
@@ -1503,7 +1503,7 @@ TEST_CASE("test_identityref")
 
     REQUIRE(!identityref_value_read_vec.empty());
 
-    auto val = identityref_value_read_vec[0]->get();
+    auto val = identityref_value_read_vec[0]->get_value();
     //std::cout <<  val << std::endl;
 
     REQUIRE(val == "ydktest-sanity:child-child-identity");

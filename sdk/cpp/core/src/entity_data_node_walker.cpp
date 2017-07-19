@@ -169,8 +169,8 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
         if(data_node_is_leaf(*child_data_node))
         {
             YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
-                    child_data_node->get(), node->get_path());
-            entity->set_value(child_name, child_data_node->get());
+                    child_data_node->get_value(), node->get_path());
+            entity->set_value(child_name, child_data_node->get_value());
         }
         else
         {

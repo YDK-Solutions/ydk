@@ -157,7 +157,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(path::Rpc& 
     }
 
     path::DataNode* filter_node = filter[0].get();
-    string filter_instance = filter_node->get();
+    string filter_instance = filter_node->get_value();
 
     auto datanode = codec_service.decode(*root_schema, filter_instance, encoding);
 
@@ -185,7 +185,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(path::Rpc& 
     }
 
     path::DataNode* entity_node = entity[0].get();
-    string header_data = entity_node->get();
+    string header_data = entity_node->get_value();
 
     auto datanode = codec_service.decode(*root_schema, header_data, encoding);
     string url = config_url_root + get_module_url_path(datanode->get_children()[0]->get_schema_node().get_path());

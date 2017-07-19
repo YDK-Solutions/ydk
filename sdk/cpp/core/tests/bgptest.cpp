@@ -376,7 +376,7 @@ TEST_CASE( "submodule" )
 //
 //    std::unique_ptr<ydk::path::RootSchemaNode> schema{sp.get_root_schema()};
 //
-//    REQUIRE(schema.get() != nullptr);
+//    REQUIRE(schema.get_value() != nullptr);
 //
 //    auto subtest = schema->create_datanode("ydktest-sanity:sub-test", "");
 //    std::cout<<subtest->get_schema_node()->get_path()<<std::endl;

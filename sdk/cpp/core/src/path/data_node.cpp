@@ -253,7 +253,7 @@ ydk::path::DataNodeImpl::set_value(const std::string& value)
 }
 
 std::string
-ydk::path::DataNodeImpl::get() const
+ydk::path::DataNodeImpl::get_value() const
 {
     lys_node* s_node = m_node->schema;
     std::string ret {};

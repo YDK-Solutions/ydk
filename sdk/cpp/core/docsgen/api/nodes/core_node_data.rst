@@ -81,7 +81,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
         :param value: The value to set. This should be the string representation of the YANG type.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the :cpp:class:`DataNode<DataNode>`'s value cannot be set (for example it represents a container)
 
-    .. cpp:function:: virtual std::string get() const
+    .. cpp:function:: virtual std::string get_value() const
 
         Returns a copy of the value of this :cpp:class:`DataNode<DataNode>`.
 

@@ -72,7 +72,7 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
     ydk::path::Statement s = dn->get_schema_node().get_statement();
     if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
-        auto val = dn->get();
+        auto val = dn->get_value();
         std::cout << indent << "<" << s.arg << ">" << val << "</" << s.arg << ">" << std::endl;
     } else {
         std::string child_indent{indent};

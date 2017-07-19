@@ -127,7 +127,7 @@ namespace ydk {
 
             void set_value(const std::string& value);
 
-            virtual std::string get() const;
+            virtual std::string get_value() const;
 
             virtual std::vector<std::shared_ptr<DataNode>> find(const std::string& path) const;
 
@@ -174,7 +174,7 @@ namespace ydk {
 
             void set_value(const std::string& value);
 
-            std::string get() const;
+            std::string get_value() const;
 
             std::vector<std::shared_ptr<DataNode>> get_children() const;
 

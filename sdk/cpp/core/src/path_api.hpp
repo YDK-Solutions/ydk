@@ -756,7 +756,7 @@ public:
     ///
     // @returns The string representation of the value.
     ///
-    virtual std::string get() const = 0;
+    virtual std::string get_value() const = 0;
 
     ///
     /// @brief finds nodes that satisfy the given path expression.

@@ -300,7 +300,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
     }
 
     path::DataNode* entity_node = entity[0].get();
-    std::string entity_value = entity_node->get();
+    std::string entity_value = entity_node->get_value();
 
     //deserialize the entity_value
     auto datanode = codec_service.decode(root_schema, entity_value, EncodingFormat::XML);
@@ -332,7 +332,7 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
     }
 
     auto datanode = entity[0];
-    return datanode->get();
+    return datanode->get_value();
 }
 
 static string get_netconf_payload(path::DataNode & input, string data_tag, string data_value)

@@ -144,7 +144,7 @@ ydk::path::RootDataImpl::set_value(const std::string& value)
 }
 
 std::string
-ydk::path::RootDataImpl::get() const
+ydk::path::RootDataImpl::get_value() const
 {
     return "";
 }

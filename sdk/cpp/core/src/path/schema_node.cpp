@@ -157,7 +157,7 @@ static bool is_submodule(lys_node* node)
 }
 
 ydk::path::Statement
-ydk::path::SchemaNodeImpl::statement() const
+ydk::path::SchemaNodeImpl::get_statement() const
 {
     Statement s{};
     s.arg = m_node->name;
@@ -234,7 +234,7 @@ ydk::path::SchemaNodeImpl::keys() const
 {
     std::vector<Statement> stmts{};
 
-    Statement stmt = statement();
+    Statement stmt = get_statement();
     if(stmt.keyword == "list") {
         //sanity check
         if(m_node->nodetype != LYS_LIST) {
@@ -245,7 +245,7 @@ ydk::path::SchemaNodeImpl::keys() const
         for(uint8_t i=0; i < slist->keys_size; ++i) {
             SchemaNode* sn = reinterpret_cast<SchemaNode*>(slist->keys[i]->priv);
             if(sn != nullptr){
-                stmts.push_back(sn->statement());
+                stmts.push_back(sn->get_statement());
             }
         }
     }

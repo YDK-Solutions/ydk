@@ -165,7 +165,7 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 
     for(auto & child_data_node:node->get_children())
     {
-        std::string child_name = child_data_node->schema().statement().arg;
+        std::string child_name = child_data_node->schema().get_statement().arg;
         if(data_node_is_leaf(*child_data_node))
         {
             YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
@@ -197,13 +197,13 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 
 static bool data_node_is_leaf(path::DataNode & data_node)
 {
-    return (data_node.schema().statement().keyword == "leaf"
-            || data_node.schema().statement().keyword == "leaf-list");
+    return (data_node.schema().get_statement().keyword == "leaf"
+            || data_node.schema().get_statement().keyword == "leaf-list");
 }
 
 static bool data_node_is_list(path::DataNode & data_node)
 {
-    return (data_node.schema().statement().keyword == "list");
+    return (data_node.schema().get_statement().keyword == "list");
 }
 
 static string get_segment_path(const string & path)

@@ -70,7 +70,7 @@ const char* expected_bgp_read ="<bgp xmlns=\"http://openconfig.net/yang/bgp\"><g
 
 void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
-    ydk::path::Statement s = dn->schema().statement();
+    ydk::path::Statement s = dn->schema().get_statement();
     if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
         auto val = dn->get();
         std::cout << indent << "<" << s.arg << ">" << val << "</" << s.arg << ">" << std::endl;

@@ -59,7 +59,7 @@ Represents a Node in the SchemaTree.
 
         :return: The pointer to the root.
 
-    .. cpp:function:: virtual Statement statement() const
+    .. cpp:function:: virtual Statement get_statement() const
 
         Returns the YANG statement associated with this :cpp:class:`SchemaNode<SchemaNode>`
 

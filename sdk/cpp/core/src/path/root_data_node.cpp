@@ -194,8 +194,7 @@ ydk::path::RootDataImpl::find(const std::string& path) const
         schema_path+="/";
     }
 
-    auto s = schema().
-    statement();
+    auto s = schema().get_statement();
     if(s.keyword == "rpc")
     {
         schema_path+="input/";

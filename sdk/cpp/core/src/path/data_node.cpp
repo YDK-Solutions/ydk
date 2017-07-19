@@ -277,7 +277,7 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
     }
     std::string spath{path};
 
-    auto s = schema().statement();
+    auto s = schema().get_statement();
     if(s.keyword == "rpc"){
         spath="input/" + spath;
     }

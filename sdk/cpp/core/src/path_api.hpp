@@ -529,7 +529,7 @@ public:
     /// Returns the YANG statement associated with this SchemaNode
     /// @return the yang statement for this SchemaNode
     ///
-    virtual Statement statement() const = 0;
+    virtual Statement get_statement() const = 0;
 
     ///
     /// @brief return YANG statement corresponding the the keys
@@ -641,7 +641,7 @@ public:
     /// So this method returns an empty statement.
     /// @return an empty statement
     ///
-   virtual Statement statement() const;
+   virtual Statement get_statement() const;
 
     ///
     /// @brief return vector of keys

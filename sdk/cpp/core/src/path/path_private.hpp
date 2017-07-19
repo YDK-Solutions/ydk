@@ -65,7 +65,7 @@ namespace ydk {
 
             const SchemaNode& get_root() const noexcept;
 
-            Statement statement() const;
+            Statement get_statement() const;
 
             std::vector<Statement> keys() const;
 

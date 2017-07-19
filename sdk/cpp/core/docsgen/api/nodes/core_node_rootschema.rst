@@ -84,7 +84,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual Statement statement() const
+    .. cpp:function:: virtual Statement get_statement() const
 
         Return the :cpp:class:`Statement<Statement>` representing this :cpp:class:`SchemaNode<SchemaNode>`.
 

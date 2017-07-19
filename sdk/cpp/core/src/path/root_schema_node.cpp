@@ -54,7 +54,7 @@ ydk::path::RootSchemaNode::get_root() const noexcept
 }
 
 ydk::path::Statement
-ydk::path::RootSchemaNode::statement() const
+ydk::path::RootSchemaNode::get_statement() const
 {
     return Statement{};
 }
@@ -160,7 +160,7 @@ ydk::path::RootSchemaNodeImpl::rpc(const std::string& path) const
     SchemaNode* rpc_sn = nullptr;
 
     for(auto item : c) {
-        auto s = item->statement();
+        auto s = item->get_statement();
         if(s.keyword == "rpc"){
             found = true;
             rpc_sn = item;

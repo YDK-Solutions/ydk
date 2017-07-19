@@ -14,7 +14,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         Destructor for the :cpp:class:`RootSchemaNode<RootSchemaNode>`
 
-    .. cpp:function:: std::string path() const
+    .. cpp:function:: std::string get_path() const
 
         Get the path expression representing this Node in in the NodeTree.
 

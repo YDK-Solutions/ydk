@@ -24,7 +24,7 @@ Class represents the :cpp:class:`DataNode<DataNode>`.
 
         :return: :cpp:class:`SchemaNode<SchemaNode>` associated with this :cpp:class:`DataNode<DataNode>`.
 
-    .. cpp:function:: virtual std::string path() const
+    .. cpp:function:: virtual std::string get_path() const
 
         Returns the path expression representing this Node in in the NodeTree.
 

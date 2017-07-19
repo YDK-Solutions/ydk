@@ -40,10 +40,10 @@ ydk::path::Rpc::~Rpc()
 ydk::path::RpcImpl::RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx) : schema_node{sn}
 {
 
-    struct lyd_node* dnode = lyd_new_path(nullptr, ctx, sn.path().c_str(), (void*)"", LYD_ANYDATA_SXML, 0);
+    struct lyd_node* dnode = lyd_new_path(nullptr, ctx, sn.get_path().c_str(), (void*)"", LYD_ANYDATA_SXML, 0);
 
     if(!dnode){
-        YLOG_ERROR("Cannot find DataNode with path {}", sn.path());
+        YLOG_ERROR("Cannot find DataNode with path {}", sn.get_path());
         throw(YCPPIllegalStateError{"Illegal state"});
     }
 

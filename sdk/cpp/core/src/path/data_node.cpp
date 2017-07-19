@@ -75,7 +75,7 @@ ydk::path::DataNodeImpl::schema() const
 }
 
 std::string
-ydk::path::DataNodeImpl::path() const
+ydk::path::DataNodeImpl::get_path() const
 {
     char* path = lyd_path(m_node);
     if (!path) {
@@ -117,7 +117,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
     size_t start_index = 0;
     auto iter = segments.begin();
 
-    YLOG_DEBUG("Current path: {}", schema().path());
+    YLOG_DEBUG("Current path: {}", schema().get_path());
     YLOG_DEBUG("Top container path: {}", top_container_path);
 
     while (iter != segments.end())
@@ -148,13 +148,13 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
             dn = dynamic_cast<DataNodeImpl*>(r[0].get());
             ++iter;
             start_index++;
-            YLOG_DEBUG("Found existing datanode with path '{}'", dn->path());
+            YLOG_DEBUG("Found existing datanode with path '{}'", dn->get_path());
 
             auto s = dn->m_node->schema;
             if (s->nodetype == LYS_LEAFLIST)
             {
-                YLOG_ERROR("Duplicate leaf-list item detected: {}", dn->path());
-                throw(YCPPModelError{"Duplicate leaf-list item detected: " + dn->path()});
+                YLOG_ERROR("Duplicate leaf-list item detected: {}", dn->get_path());
+                throw(YCPPModelError{"Duplicate leaf-list item detected: " + dn->get_path()});
             }
         }
     }

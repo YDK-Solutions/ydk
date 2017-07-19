@@ -486,7 +486,7 @@ public:
     /// Get the path expression representing this Node in in the NodeTree.
     /// @return std::string representing the path to this Node.
     ///
-    virtual std::string path() const = 0;
+    virtual std::string get_path() const = 0;
 
     ///
     /// @brief finds descendant nodes that match the given xpath expression
@@ -557,7 +557,7 @@ public:
     ///
    virtual ~RootSchemaNode();
 
-   std::string path() const;
+   std::string get_path() const;
 
     ///
     /// @brief finds descendant nodes that match the given xpath expression
@@ -693,7 +693,7 @@ public:
     /// Get the path expression representing this Node in in the NodeTree.
     /// @return std::string representing the path to this Node.
     ///
-    virtual std::string path() const = 0;
+    virtual std::string get_path() const = 0;
 
     ///
     /// @brief create a DataNode corresponding to the path and set its value

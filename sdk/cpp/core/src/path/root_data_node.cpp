@@ -44,9 +44,9 @@ ydk::path::RootDataImpl::schema() const
 }
 
 std::string
-ydk::path::RootDataImpl::path() const
+ydk::path::RootDataImpl::get_path() const
 {
-    return m_schema.path();
+    return m_schema.get_path();
 }
 
 ydk::path::DataNode&
@@ -188,7 +188,7 @@ ydk::path::RootDataImpl::find(const std::string& path) const
         return results;
     }
 
-    std::string schema_path{ this->path() };
+    std::string schema_path{ this->get_path() };
     if(schema_path.size()!= 1)
     {
         schema_path+="/";

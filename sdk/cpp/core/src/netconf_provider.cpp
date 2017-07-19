@@ -179,7 +179,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::handle_netconf_operation
     YLOG_INFO("\n");
 
     std::string reply = execute_payload(netconf_payload);
-    if (ydk_rpc.schema().path().find("get") != string::npos or ydk_rpc.schema().path().find("get-config") != string::npos)
+    if (ydk_rpc.schema().get_path().find("get") != string::npos or ydk_rpc.schema().get_path().find("get-config") != string::npos)
     {
         return handle_read_reply(reply, *root_schema);
     }
@@ -213,7 +213,7 @@ std::shared_ptr<path::DataNode> NetconfServiceProvider::invoke(path::Rpc& rpc) c
     {
         return handle_read(rpc);
     }
-    else if(rpc_schema->path().find("ietf-netconf:")!= string::npos)
+    else if(rpc_schema->get_path().find("ietf-netconf:")!= string::npos)
     {
        return handle_netconf_operation(rpc);
     }

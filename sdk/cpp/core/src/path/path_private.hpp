@@ -55,7 +55,7 @@ namespace ydk {
 
             ~SchemaNodeImpl();
 
-            std::string path() const;
+            std::string get_path() const;
 
             std::vector<SchemaNode*> find(const std::string& path) const;
 
@@ -113,7 +113,7 @@ namespace ydk {
 
             virtual const SchemaNode& schema() const;
 
-            virtual std::string path() const;
+            virtual std::string get_path() const;
 
             // Create a new data node based on a simple XPath
             // The new node is normally inserted at the end, either as the last child of a parent.
@@ -168,7 +168,7 @@ namespace ydk {
 
             const SchemaNode& schema() const;
 
-            std::string path() const;
+            std::string get_path() const;
 
             DataNode& create(const std::string& path, const std::string& value);
 

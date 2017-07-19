@@ -107,7 +107,7 @@ static void populate_name_values(path::DataNode & data_node, EntityPath & path)
     {
         path::DataNode* result = nullptr;
         LeafData leaf_data = name_value.second;
-        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.path(),
+        YLOG_DEBUG("Creating child {} of {} with value: '{}', is_set: {}", name_value.first, data_node.get_path(),
                 leaf_data.value, leaf_data.is_set);
 
         if(leaf_data.is_set)
@@ -169,16 +169,16 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
         if(data_node_is_leaf(*child_data_node))
         {
             YLOG_DEBUG("Creating leaf {} of value '{}' in parent {}", child_name,
-                    child_data_node->get(), node->path());
+                    child_data_node->get(), node->get_path());
             entity->set_value(child_name, child_data_node->get());
         }
         else
         {
-            YLOG_DEBUG("Going into child {} in parent {}", child_name, node->path());
+            YLOG_DEBUG("Going into child {} in parent {}", child_name, node->get_path());
             std::shared_ptr<Entity> child_entity;
             if(data_node_is_list(*child_data_node))
             {
-                child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->path()));
+                child_entity = entity->get_child_by_name(child_name, get_segment_path(child_data_node->get_path()));
             }
             else
             {
@@ -188,7 +188,7 @@ void get_entity_from_data_node(path::DataNode * node, std::shared_ptr<Entity> en
 
             if(child_entity == nullptr)
             {
-                YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->path());
+                YLOG_ERROR("Couldn't fetch child entity {} in parent {}!", child_name, node->get_path());
             }
             get_entity_from_data_node(child_data_node.get(), child_entity);
         }

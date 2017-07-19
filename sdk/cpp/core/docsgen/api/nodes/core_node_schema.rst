@@ -24,7 +24,7 @@ Represents a Node in the SchemaTree.
 
             A :cpp:class:`SchemaNode<SchemaNode>` represents a containment hierarchy. So invocation of the destructor will lead to the children of this node being destroyed.
 
-    .. cpp:function:: virtual std::string path() const
+    .. cpp:function:: virtual std::string get_path() const
 
         Get the path expression representing this Node in in the NodeTree.
 

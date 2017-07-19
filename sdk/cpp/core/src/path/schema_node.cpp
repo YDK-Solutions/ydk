@@ -58,7 +58,7 @@ ydk::path::SchemaNodeImpl::~SchemaNodeImpl()
 }
 
 std::string
-ydk::path::SchemaNodeImpl::path() const
+ydk::path::SchemaNodeImpl::get_path() const
 {
     std::string ret{};
 

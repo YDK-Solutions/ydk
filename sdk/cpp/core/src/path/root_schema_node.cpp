@@ -36,7 +36,7 @@ ydk::path::RootSchemaNode::~RootSchemaNode()
 }
 
 std::string
-ydk::path::RootSchemaNode::path() const
+ydk::path::RootSchemaNode::get_path() const
 {
     return "/";
 }

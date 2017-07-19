@@ -16,7 +16,7 @@
 
 void print_paths(ydk::path::SchemaNode & sn)
 {
-    std::cout << sn.path() << std::endl;
+    std::cout << sn.get_path() << std::endl;
     for(auto const& p : sn.get_children())
         print_paths(*p);
 }

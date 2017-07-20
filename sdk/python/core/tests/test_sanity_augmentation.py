@@ -18,6 +18,8 @@
         Unittest for bundle augmentation.
 """
 from __future__ import absolute_import
+
+import sys
 import unittest
 
 from ydk.services import CRUDService
@@ -25,20 +27,20 @@ from ydk.providers import NetconfServiceProvider
 from ydk.models.augmentation import ietf_aug_base_1
 from ydk.models.augmentation import ietf_aug_base_2
 
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
+
 
 class SanityYang(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                          username='admin',
-                                          password='admin',
-                                          protocol='ssh',
-                                          port=12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -81,7 +83,9 @@ class SanityYang(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
+    device, on_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, on_demand=on_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

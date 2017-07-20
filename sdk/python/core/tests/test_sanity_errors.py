@@ -15,6 +15,8 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
+
+import sys
 import unittest
 
 from ydk.services import CRUDService
@@ -24,7 +26,10 @@ from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError, YPYServiceError
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+
 from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 test_int8_invalid_pattern = """Invalid value "8.5" in "number8" element. Path: '/ydktest-sanity:runner/ytypes/built-in-t/number8'"""
@@ -101,16 +106,12 @@ test_ylist_assignment_pattern = ''.join(["Attempt to assign value of '\[<ydk.mod
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -213,7 +214,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, on_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, on_demand=on_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

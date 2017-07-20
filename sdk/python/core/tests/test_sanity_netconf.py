@@ -20,7 +20,6 @@ sanity test for netconf
 from __future__ import absolute_import
 
 import sys
-import argparse
 import unittest
 
 from ydk.errors import YPYModelError, YPYError, YPYServiceError
@@ -28,14 +27,16 @@ from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import NetconfService, DataStore
 
+from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityNetconf(ParametrizedTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', cls.port, cls.protocol)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
         cls.netconf_service = NetconfService()
 
     @classmethod
@@ -223,15 +224,9 @@ class SanityNetconf(ParametrizedTestCase):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='NETCONF test')
-    parser.add_argument('--port', dest='port', type=int, default=12022, help='port number')
-    parser.add_argument('--protocol', dest='protocol', default='ssh', help='protocol')
-
-    args = parser.parse_args()
-    port = int(args.port)
-    protocol = args.protocol
+    device, on_demand = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityNetconf, port=port, protocol=protocol))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityNetconf, device=device, on_demand=on_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

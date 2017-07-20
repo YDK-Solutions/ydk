@@ -19,6 +19,7 @@ test YFilter
 """
 from __future__ import absolute_import
 
+import sys
 import unittest
 
 from ydk.errors import YPYServiceProviderError
@@ -28,6 +29,9 @@ from ydk.services import CRUDService, DataStore
 from ydk.filters import YFilter
 
 from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
+
 
 test_create_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
 <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
@@ -90,12 +94,12 @@ test_delete_leaflist_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -223,7 +227,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, on_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, on_demand=on_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

@@ -15,7 +15,9 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
+
 import re
+import sys
 import unittest
 
 from ydk.services import CRUDService, DataStore, ExecutorService, CodecService, NetconfService
@@ -23,7 +25,10 @@ from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.types import Empty, Decimal64, EncodingFormat
 from ydk.errors import YPYServiceError
+
 from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 try:
     from ydk.models.ydktest import ietf_netconf
@@ -143,12 +148,12 @@ class SanityCodec(unittest.TestCase):
 class SanityCRUD(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -220,18 +225,14 @@ class SanityCRUD(unittest.TestCase):
 class SanityExecutor(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                          username='admin',
-                                          password='admin',
-                                          protocol='ssh',
-                                          port=12022)
-        self.executor = ExecutorService()
-        self.codec = CodecService()
-        self.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.executor = ExecutorService()
+        cls.codec = CodecService()
+        cls.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -280,16 +281,12 @@ class SanityExecutor(unittest.TestCase):
 class SanityNetconf(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                          username='admin',
-                                          password='admin',
-                                          protocol='ssh',
-                                          port=12022)
-        self.netconf_service = NetconfService()
+    def setUpClass(cls):
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.netconf_service = NetconfService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -504,13 +501,12 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
 
 if __name__ == '__main__':
-    import sys
+    device, on_demand = get_device_info()
+
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    testCaseList = []
     for testCase in [SanityCRUD, SanityExecutor, SanityNetconf, SanityCodec]:
-        testCaseList.append(loader.loadTestsFromTestCase(testCase))
-    suite = unittest.TestSuite(testCaseList)
+        suite.addTest(ParametrizedTestCase.parametrize(testCase, device=device, on_demand=on_demand))
     res=unittest.TextTestRunner(verbosity=2).run(suite)
     # sys.exit expects an integer, will throw libc++ abi error if use:
     # ret = res.wasSuccessful() # <-- ret is a bool

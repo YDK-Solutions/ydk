@@ -387,7 +387,7 @@ ydk::path::RepositoryPtr::get_new_ly_modules_from_path(const std::string& path, 
             new_modules.emplace_back(m);
         }
 
-        for (auto& d: caps[0].deviations)
+        for (auto& d: cap[0].deviations)
         {
             new_module = true;
             m = load_module(ctx, d, new_module);

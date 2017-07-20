@@ -35,13 +35,13 @@ public:
                                const std::string& password,
                                int port = 830,
                                const std::string& protocol = "ssh",
-                               bool on_demand = false);
+                               bool on_demand = true);
         NetconfServiceProvider(const std::string& address,
                                const std::string& username,
                                const std::string& password,
                                int port = 830,
                                const std::string& protocol = "ssh",
-                               bool on_demand = false);
+                               bool on_demand = true);
         ~NetconfServiceProvider();
         path::RootSchemaNode& get_root_schema() const;
         std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const;

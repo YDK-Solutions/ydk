@@ -53,7 +53,13 @@ class SanityTest(unittest.TestCase):
         # start a brand new session for every single test case
         # so test_close_session_rpc will not interfere with other test cases
         # self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.ncc = NetconfServiceProvider(self.hostname, self.username, self.password, self.port, self.protocol, self.on_demand)
+        hostname = getattr(self, 'hostname', '127.0.0.1')
+        username = getattr(self, 'username', 'admin')
+        password = getattr(self, 'password', 'admin')
+        port = getattr(self, 'port', 12022)
+        protocol = getattr(self, 'protocol', 'ssh')
+        on_demand = not getattr(self, 'non_demand', True)
+        self.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
@@ -205,10 +211,10 @@ class SanityTest(unittest.TestCase):
         reply = self.executor.execute_rpc(self.ncc, get_schema_rpc)
 
 if __name__ == '__main__':
-    device, on_demand = get_device_info()
+    device, non_demand = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, on_demand=on_demand))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
 

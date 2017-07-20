@@ -149,7 +149,13 @@ class SanityCRUD(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         cls.crud = CRUDService()
 
     @classmethod
@@ -226,7 +232,13 @@ class SanityExecutor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         cls.executor = ExecutorService()
         cls.codec = CodecService()
         cls.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
@@ -282,7 +294,13 @@ class SanityNetconf(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         cls.netconf_service = NetconfService()
 
     @classmethod
@@ -501,12 +519,12 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
 
 if __name__ == '__main__':
-    device, on_demand = get_device_info()
+    device, non_demand = get_device_info()
 
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     for testCase in [SanityCRUD, SanityExecutor, SanityNetconf, SanityCodec]:
-        suite.addTest(ParametrizedTestCase.parametrize(testCase, device=device, on_demand=on_demand))
+        suite.addTest(ParametrizedTestCase.parametrize(testCase, device=device, non_demand=non_demand))
     res=unittest.TextTestRunner(verbosity=2).run(suite)
     # sys.exit expects an integer, will throw libc++ abi error if use:
     # ret = res.wasSuccessful() # <-- ret is a bool

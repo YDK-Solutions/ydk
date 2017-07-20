@@ -169,21 +169,6 @@ function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
 
-    run_test sdk/python/core/tests/test_opendaylight.py
-    run_test sdk/python/core/tests/test_restconf_provider.py
-    run_test sdk/python/core/tests/test_netconf_operations.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_delete.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_errors.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_filter_read.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_filters.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_levels.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_netconf.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_path.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_service_errors.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --on-demand
-    run_test sdk/python/core/tests/test_sanity_types.py --on-demand
-    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py --on-demand
-
     run_test sdk/python/core/tests/test_netconf_operations.py
     run_test sdk/python/core/tests/test_opendaylight.py
     run_test sdk/python/core/tests/test_restconf_provider.py
@@ -198,12 +183,25 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
+
+    run_test sdk/python/core/tests/test_netconf_operations.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_delete.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_filter_read.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_filters.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_levels.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_netconf.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_path.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_types.py --non-demand
+    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py --non-demand
 }
 
 function py_sanity_ydktest_test_tcp {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
-    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --on-demand
     run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307
+    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
 }
 
 function py_sanity_deviation {
@@ -237,8 +235,8 @@ function py_sanity_deviation_ydktest_test {
     print_msg "py_sanity_deviation_ydktest_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
-    run_test sdk/python/core/tests/test_sanity_deviation.py --on-demand
     run_test sdk/python/core/tests/test_sanity_deviation.py
+    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
 }
 
 function py_sanity_deviation_bgp_gen {
@@ -259,8 +257,8 @@ function py_sanity_deviation_bgp_install {
 function py_sanity_deviation_bgp_test {
     print_msg "py_sanity_deviation_bgp_test"
 
-    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --on-demand
     run_test sdk/python/core/tests/test_sanity_deviation_bgp.py
+    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
 }
 
 function py_sanity_augmentation {
@@ -293,8 +291,9 @@ function py_sanity_augmentation_test {
     print_msg "py_sanity_augmentation_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
-    run_test sdk/python/core/tests/test_sanity_augmentation.py --on-demand
+
     run_test sdk/python/core/tests/test_sanity_augmentation.py
+    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
 }
 
 function cpp_sanity_core_gen_install {

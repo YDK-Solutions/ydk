@@ -525,7 +525,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("password"),
             arg("port")=830,
             arg("protocol")=string("ssh"),
-            arg("on_demand")=false)
+            arg("on_demand")=true)
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol, on_demand);
@@ -535,7 +535,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("password"),
             arg("port")=830,
             arg("protocol")=string("ssh"),
-            arg("on_demand")=false)
+            arg("on_demand")=true)
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, void* port, const string& protocol, bool on_demand) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol, on_demand);
@@ -545,7 +545,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("password"),
             arg("port")=nullptr,
             arg("protocol")=string("ssh"),
-            arg("on_demand")=false)
+            arg("on_demand")=true)
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, bool on_demand) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, "ssh", on_demand);
@@ -554,7 +554,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("username"),
             arg("password"),
             arg("port")=830,
-            arg("on_demand")=false)
+            arg("on_demand")=true)
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, bool on_demand) {
                     new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, "ssh", on_demand);
@@ -562,7 +562,7 @@ PYBIND11_PLUGIN(ydk_)
             arg("address"),
             arg("username"),
             arg("password"),
-            arg("on_demand")=false)
+            arg("on_demand")=true)
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 

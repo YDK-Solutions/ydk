@@ -32,7 +32,13 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         cls.root_schema = cls.ncc.get_root_schema()
         cls.codec = Codec()
 
@@ -77,9 +83,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    device, on_demand = get_device_info()
+    device, non_demand = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, on_demand=on_demand))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

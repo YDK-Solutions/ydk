@@ -79,7 +79,8 @@ static void walk_children(Entity & entity, const path::SchemaNode & schema, xmlN
 
 static const path::SchemaNode* find_child_by_name(const path::SchemaNode & parent_schema, const string & name)
 {
-    vector<path::SchemaNode*> s = parent_schema.find(name);
+    auto p = const_cast<path::SchemaNode*>(&parent_schema);
+    vector<path::SchemaNode*> s = p->find(name);
     if(s.size()==0)
     {
         YLOG_ERROR("Could not find node '{}'", name);

@@ -15,19 +15,32 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
+
+import sys
 import unittest
+
 from ydk.providers import NetconfServiceProvider
 from ydk.path import Codec
 from ydk.types import EncodingFormat
+
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.root_schema = self.ncc.get_root_schema()
-        self.codec = Codec()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        cls.root_schema = cls.ncc.get_root_schema()
+        cls.codec = Codec()
 
     def _delete_runner(self):
         runner = self.root_schema.create_datanode("ydktest-sanity:runner")
@@ -70,7 +83,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, non_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

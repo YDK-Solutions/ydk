@@ -44,7 +44,7 @@ ydk::path::DataNode::create_datanode(const std::string& path)
 ////////////////////////////////////////////////////////////////////////////
 // class ydk::DataNodeImpl
 //////////////////////////////////////////////////////////////////////////
-ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_parent{parent}, m_node{node}
+ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node, const std::shared_ptr<RepositoryPtr> repo): m_parent{parent}, m_node{node}, m_priv_repo{repo}
 {
     //add the children
     if(m_node && m_node->child && !(m_node->schema->nodetype == LYS_LEAF ||
@@ -53,7 +53,7 @@ ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_paren
     {
         lyd_node *iter = nullptr;
         LY_TREE_FOR(m_node->child, iter) {
-            child_map.insert(std::make_pair(iter, std::make_shared<DataNodeImpl>(this, iter)));
+            child_map.insert(std::make_pair(iter, std::make_shared<DataNodeImpl>(this, iter, m_priv_repo)));
         }
     }
 
@@ -86,9 +86,18 @@ ydk::path::DataNodeImpl::get_path() const
     return str;
 }
 
+void
+ydk::path::DataNodeImpl::populate_new_schemas_from_path(const std::string& path)
+{
+    auto snode = reinterpret_cast<SchemaNodeImpl*>(m_node->schema->priv);
+    snode->populate_new_schemas_from_path(path);
+}
+
 ydk::path::DataNode&
 ydk::path::DataNodeImpl::create_datanode(const std::string& path, const std::string& value)
 {
+    populate_new_schemas_from_path(path);
+    populate_new_schemas_from_path(value);
     return create_helper(path, value);
 }
 
@@ -207,7 +216,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
     if (first_node_created)
     {
-        dn->child_map.insert(std::make_pair(first_node_created, std::make_shared<DataNodeImpl>(dn, first_node_created)));
+        dn->child_map.insert(std::make_pair(first_node_created, std::make_shared<DataNodeImpl>(dn, first_node_created, m_priv_repo)));
 
         DataNodeImpl* rdn = dynamic_cast<DataNodeImpl*>(dn->child_map[first_node_created].get());
 
@@ -268,8 +277,10 @@ ydk::path::DataNodeImpl::get_value() const
 }
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::DataNodeImpl::find(const std::string& path) const
+ydk::path::DataNodeImpl::find(const std::string& path)
 {
+    populate_new_schemas_from_path(path);
+
     std::vector<std::shared_ptr<DataNode>> results;
 
     if(m_node == nullptr) {

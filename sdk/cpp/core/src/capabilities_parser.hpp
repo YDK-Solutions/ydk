@@ -42,7 +42,7 @@ class CapabilitiesParser
         CapabilitiesParser();
         virtual ~CapabilitiesParser();
 
-        virtual std::vector<path::Capability> parse(std::vector<std::string> & capabilities) const =0;
+        virtual std::vector<path::Capability> parse(std::vector<std::string> & capabilities) const = 0;
 };
 }
 

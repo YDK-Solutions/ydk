@@ -272,7 +272,7 @@ namespace ydk {
 
             ~RpcImpl();
 
-            std::shared_ptr<DataNode> operator()(const ServiceProvider& provider);
+            std::shared_ptr<DataNode> operator()(const Session& session);
 
             DataNode& get_input_node() const;
 

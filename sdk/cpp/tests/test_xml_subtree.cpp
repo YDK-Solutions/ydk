@@ -24,6 +24,7 @@
 #include <iostream>
 #include <string>
 
+#include "ydk/path/netconf_session.hpp"
 #include "ydk/netconf_provider.hpp"
 #include "ydk/crud_service.hpp"
 #include "ydk/codec_service.hpp"
@@ -50,6 +51,8 @@ CodecServiceProvider cp{EncodingFormat::XML};
 
 ydk::path::Repository repo{TEST_HOME};
 NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session = provider.get_session();
+
 CrudService crud{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
 bool result = crud.delete_(provider, *r_1);
@@ -58,7 +61,7 @@ REQUIRE(result);
 XmlSubtreeCodec codec{};
 r_1->ytypes->built_in_t->number16 = 102;
 
-auto s = codec.encode(*r_1, provider.get_root_schema());
+auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <ytypes>
     <built-in-t>
@@ -83,6 +86,8 @@ TEST_CASE("subtree_encode_yfilter_delete")
 {
 ydk::path::Repository repo{TEST_HOME};
 NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session = provider.get_session();
+
 CrudService crud{};
 
 XmlSubtreeCodec codec{};
@@ -95,7 +100,7 @@ ld->name="xyz";
 ld->number.yfilter = YFilter::delete_;
 r_1->one_list->ldata.push_back(ld);
 
-auto s = codec.encode(*r_1, provider.get_root_schema());
+auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <one-list>
     <ldata>
@@ -110,13 +115,13 @@ REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 TEST_CASE("subtree_encode_yfilter_read")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
 XmlSubtreeCodec codec{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
 r_1->ytypes->built_in_t->number16.yfilter = YFilter::read;
 
-auto s = codec.encode(*r_1, provider.get_root_schema());
+auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <ytypes>
     <built-in-t>
@@ -129,7 +134,7 @@ REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 TEST_CASE("subtree_encode_namespaces")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
 CodecService c{};
 CodecServiceProvider cp{EncodingFormat::XML};
@@ -147,7 +152,7 @@ pd->statements->statement.push_back(stmt);
 
 rp->policy_definitions->policy_definition.push_back(pd);
 
-auto s = codec.encode(*rp, provider.get_root_schema());
+auto s = codec.encode(*rp, session.get_root_schema());
 REQUIRE(s==R"(<routing-policy xmlns="http://openconfig.net/yang/routing-policy">
   <policy-definitions>
     <policy-definition>
@@ -174,7 +179,7 @@ REQUIRE(s==s1);
 TEST_CASE("subtree_encode_identity")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
 XmlSubtreeCodec codec{};
 
@@ -192,7 +197,7 @@ afi_safi->config->enabled = true;
 afi_safi->parent = bgp->global->afi_safis.get();
 bgp->global->afi_safis->afi_safi.push_back(move(afi_safi));
 
-auto s = codec.encode(*bgp, provider.get_root_schema());
+auto s = codec.encode(*bgp, session.get_root_schema());
 REQUIRE(s==R"(<bgp xmlns="http://openconfig.net/yang/bgp">
   <global>
     <afi-safis>
@@ -263,6 +268,8 @@ TEST_CASE("subtree_decode_identity")
 {
 ydk::path::Repository repo{TEST_HOME};
 NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfSession session = provider.get_session();
+
 CrudService crud{};
 
 XmlSubtreeCodec codec{};
@@ -287,7 +294,7 @@ auto payload = R"(<bgp xmlns="http://openconfig.net/yang/bgp">
         </bgp>)";
 
 auto g = codec.decode(payload, bgp);
-auto s = codec.encode(*g, provider.get_root_schema());
+auto s = codec.encode(*g, session.get_root_schema());
 auto a = codec.decode(s, make_shared<openconfig_bgp::Bgp>());
 
 crud.create(provider, *a);

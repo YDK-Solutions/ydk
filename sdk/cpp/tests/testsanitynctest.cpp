@@ -25,7 +25,7 @@
 #include "../core/src/path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
-#include "../core/src/netconf_provider.hpp"
+#include "../core/src/path/netconf_session.hpp"
 
 //test_sanity_types begin
 
@@ -34,8 +34,8 @@ TEST_CASE("test_sanity_types_int8 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -55,7 +55,7 @@ TEST_CASE("test_sanity_types_int8 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & number8 = runner.create_datanode("ytypes/built-in-t/number8", "0");
 
@@ -67,7 +67,7 @@ TEST_CASE("test_sanity_types_int8 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -79,7 +79,7 @@ TEST_CASE("test_sanity_types_int8 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -100,8 +100,8 @@ TEST_CASE("test_sanity_types_int16 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -121,7 +121,7 @@ TEST_CASE("test_sanity_types_int16 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & number16 = runner.create_datanode("ytypes/built-in-t/number16", "126");
 
@@ -134,7 +134,7 @@ TEST_CASE("test_sanity_types_int16 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -146,7 +146,7 @@ TEST_CASE("test_sanity_types_int16 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -167,8 +167,8 @@ TEST_CASE("test_sanity_types_int32 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -188,7 +188,7 @@ TEST_CASE("test_sanity_types_int32 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & number32 = runner.create_datanode("ytypes/built-in-t/number32", "200000");
 
@@ -199,7 +199,7 @@ TEST_CASE("test_sanity_types_int32 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -211,7 +211,7 @@ TEST_CASE("test_sanity_types_int32 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -230,8 +230,8 @@ TEST_CASE("test_sanity_types_int64 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -251,7 +251,7 @@ TEST_CASE("test_sanity_types_int64 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & number64 = runner.create_datanode("ytypes/built-in-t/number64", "-9223372036854775808");
 
@@ -262,7 +262,7 @@ TEST_CASE("test_sanity_types_int64 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -274,7 +274,7 @@ TEST_CASE("test_sanity_types_int64 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -293,8 +293,8 @@ TEST_CASE("test_sanity_types_uint8 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -314,7 +314,7 @@ TEST_CASE("test_sanity_types_uint8 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & unumber8 = runner.create_datanode("ytypes/built-in-t/u_number8", "0");
 
@@ -326,7 +326,7 @@ TEST_CASE("test_sanity_types_uint8 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -338,7 +338,7 @@ TEST_CASE("test_sanity_types_uint8 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -357,8 +357,8 @@ TEST_CASE("test_sanity_types_uint16 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -378,7 +378,7 @@ TEST_CASE("test_sanity_types_uint16 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & unumber16 = runner.create_datanode("ytypes/built-in-t/u_number16", "65535");
 
@@ -390,7 +390,7 @@ TEST_CASE("test_sanity_types_uint16 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -402,7 +402,7 @@ TEST_CASE("test_sanity_types_uint16 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -421,8 +421,8 @@ TEST_CASE("test_sanity_types_uint32 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -442,7 +442,7 @@ TEST_CASE("test_sanity_types_uint32 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & unumber32 = runner.create_datanode("ytypes/built-in-t/u_number32", "5927");
 
@@ -455,7 +455,7 @@ TEST_CASE("test_sanity_types_uint32 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -467,7 +467,7 @@ TEST_CASE("test_sanity_types_uint32 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -486,8 +486,8 @@ TEST_CASE("test_sanity_types_uint64 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -507,7 +507,7 @@ TEST_CASE("test_sanity_types_uint64 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & unumber64 = runner.create_datanode("ytypes/built-in-t/u_number64", "18446744073709551615");
 
@@ -518,7 +518,7 @@ TEST_CASE("test_sanity_types_uint64 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -530,7 +530,7 @@ TEST_CASE("test_sanity_types_uint64 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -551,8 +551,8 @@ TEST_CASE("test_sanity_types_bits ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -572,7 +572,7 @@ TEST_CASE("test_sanity_types_bits ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & bits = runner.create_datanode("ytypes/built-in-t/bits-value", "disable-nagle");
 
@@ -584,7 +584,7 @@ TEST_CASE("test_sanity_types_bits ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -596,7 +596,7 @@ TEST_CASE("test_sanity_types_bits ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -615,8 +615,8 @@ TEST_CASE("test_sanity_types_decimal64 ")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -636,7 +636,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & deci64 = runner.create_datanode("ytypes/built-in-t/deci64", "2.14");
 
@@ -647,7 +647,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -659,7 +659,7 @@ TEST_CASE("test_sanity_types_decimal64 ")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -681,8 +681,8 @@ TEST_CASE("test_sanity_types_string")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -702,7 +702,7 @@ TEST_CASE("test_sanity_types_string")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & str = runner.create_datanode("ytypes/built-in-t/name", "name_str");
 
@@ -713,7 +713,7 @@ TEST_CASE("test_sanity_types_string")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -725,7 +725,7 @@ TEST_CASE("test_sanity_types_string")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -746,8 +746,8 @@ TEST_CASE("test_sanity_types_empty")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -767,7 +767,7 @@ TEST_CASE("test_sanity_types_empty")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & emptee = runner.create_datanode("ytypes/built-in-t/emptee", "");
 
@@ -778,7 +778,7 @@ TEST_CASE("test_sanity_types_empty")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -790,7 +790,7 @@ TEST_CASE("test_sanity_types_empty")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -809,8 +809,8 @@ TEST_CASE("test_sanity_types_boolean")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -830,7 +830,7 @@ TEST_CASE("test_sanity_types_boolean")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & bool_val = runner.create_datanode("ytypes/built-in-t/bool-value", "true");
 
@@ -841,7 +841,7 @@ TEST_CASE("test_sanity_types_boolean")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -853,7 +853,7 @@ TEST_CASE("test_sanity_types_boolean")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -873,8 +873,8 @@ TEST_CASE("test_sanity_types_embedded_enum")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -894,7 +894,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & embedded_enum = runner.create_datanode("ytypes/built-in-t/embeded-enum", "zero");
 
@@ -905,7 +905,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -917,7 +917,7 @@ TEST_CASE("test_sanity_types_embedded_enum")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -936,8 +936,8 @@ TEST_CASE("test_sanity_types_enum")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -957,7 +957,7 @@ TEST_CASE("test_sanity_types_enum")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & enum_value = runner.create_datanode("ytypes/built-in-t/enum-value", "none");
 
@@ -968,7 +968,7 @@ TEST_CASE("test_sanity_types_enum")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -980,7 +980,7 @@ TEST_CASE("test_sanity_types_enum")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1000,8 +1000,8 @@ TEST_CASE("test_sanity_types_union")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1021,7 +1021,7 @@ TEST_CASE("test_sanity_types_union")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & union_value = runner.create_datanode("ytypes/built-in-t/younion", "none");
 
@@ -1032,7 +1032,7 @@ TEST_CASE("test_sanity_types_union")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1044,7 +1044,7 @@ TEST_CASE("test_sanity_types_union")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1064,8 +1064,8 @@ TEST_CASE("test_sanity_types_union_enum")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1085,7 +1085,7 @@ TEST_CASE("test_sanity_types_union_enum")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & enum_int_value = runner.create_datanode("ytypes/built-in-t/enum-int-value", "any");
 
@@ -1096,7 +1096,7 @@ TEST_CASE("test_sanity_types_union_enum")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1108,7 +1108,7 @@ TEST_CASE("test_sanity_types_union_enum")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1130,8 +1130,8 @@ TEST_CASE("test_sanity_types_union_int")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1151,7 +1151,7 @@ TEST_CASE("test_sanity_types_union_int")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & enum_int_value = runner.create_datanode("ytypes/built-in-t/enum-int-value", "2");
 
@@ -1163,7 +1163,7 @@ TEST_CASE("test_sanity_types_union_int")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1175,7 +1175,7 @@ TEST_CASE("test_sanity_types_union_int")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1196,8 +1196,8 @@ TEST_CASE("test_union_leaflist")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1217,7 +1217,7 @@ TEST_CASE("test_union_leaflist")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & llunion1 = runner.create_datanode("ytypes/built-in-t/llunion[.='1']", "");
 
@@ -1230,7 +1230,7 @@ TEST_CASE("test_union_leaflist")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1242,7 +1242,7 @@ TEST_CASE("test_union_leaflist")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1261,8 +1261,8 @@ TEST_CASE("test_enum_leaflist")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1282,7 +1282,7 @@ TEST_CASE("test_enum_leaflist")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & local = runner.create_datanode("ytypes/built-in-t/enum-llist[.='local']", "");
 
@@ -1295,7 +1295,7 @@ TEST_CASE("test_enum_leaflist")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1307,7 +1307,7 @@ TEST_CASE("test_enum_leaflist")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1326,8 +1326,8 @@ TEST_CASE("test_identity_leaflist")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1347,7 +1347,7 @@ TEST_CASE("test_identity_leaflist")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & child_identity = runner.create_datanode("ytypes/built-in-t/identity-llist[.='ydktest-sanity:child-identity']", "");
 
@@ -1360,7 +1360,7 @@ TEST_CASE("test_identity_leaflist")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1372,7 +1372,7 @@ TEST_CASE("test_identity_leaflist")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1392,8 +1392,8 @@ TEST_CASE("test_union_complex_list")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1413,7 +1413,7 @@ TEST_CASE("test_union_complex_list")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & younion = runner.create_datanode("ytypes/built-in-t/younion-list[.='123:45']", "");
 
@@ -1424,7 +1424,7 @@ TEST_CASE("test_union_complex_list")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1436,7 +1436,7 @@ TEST_CASE("test_union_complex_list")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -1451,8 +1451,8 @@ TEST_CASE("test_identityref")
     std::string searchdir{TEST_HOME};
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
 
     ydk::path::Codec s{};
@@ -1472,7 +1472,7 @@ TEST_CASE("test_identityref")
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & identity_ref_value = runner.create_datanode("ytypes/built-in-t/identity-ref-value", "ydktest-sanity:child-child-identity");
 
@@ -1483,7 +1483,7 @@ TEST_CASE("test_identityref")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -1495,7 +1495,7 @@ TEST_CASE("test_identityref")
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 

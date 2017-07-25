@@ -1,6 +1,6 @@
 //
-// @file validation_service.hpp
-// @brief The entity validation service.
+// @file path_api.hpp
+// @brief The main ydk public header.
 //
 // YANG Development Kit
 // Copyright 2016 Cisco Systems. All rights reserved
@@ -25,47 +25,33 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#ifndef VALIDATION_SERVICE_HPP
-#define VALIDATION_SERVICE_HPP
+#ifndef _SERVICE_PROVIDER_H_
+#define _SERVICE_PROVIDER_H_
 
-#include <string>
-#include <memory>
-
+#include "path_api.hpp"
 
 namespace ydk {
 
-class Entity;
-namespace path
+///
+/// @brief Interface for all ServiceProvider implementations
+///
+/// Concretes instances of ServiceProviders are expected to extend this interface.
+///
+class ServiceProvider
 {
-class Session;
-}
-
-class ValidationService {
-
-  public:
-
+public:
     ///
-    /// @brief Options for validation.
+    /// @brief return the SchemaTree supported by this instance of the ServiceProvider
     ///
-    /// All validation is performed in the context of some yfilter.
-    /// These options capture the context of use.
+    /// @return pointer to the RootSchemaNode or nullptr if one could not be created
     ///
-    enum class Option {
-        DATASTORE,  /// Datastore validation. Note the DataNode Tree should contain everything for cross reference resolution
-        GET_CONFIG, // Get config validation. Checks to see if only config nodes are references
-        GET, // Get validation
-        EDIT_CONFIG // Edit validation. Checks on the values of leafs etc
-    };
 
-    ValidationService()
-    {
-    }
-    ~ValidationService(){}
+    virtual ~ServiceProvider();
 
-    void validate(const ydk::path::Session& session, ydk::Entity& entity, ydk::ValidationService::Option option);
+    virtual EncodingFormat get_encoding() const = 0;
+
+    virtual Session get_session() const = 0;
+
 };
-
-
 }
-
-#endif /* VALIDATION_SERVICE_HPP */
+#endif /*_SERVICE_PROVIDER_H_*/

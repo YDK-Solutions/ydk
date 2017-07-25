@@ -32,7 +32,7 @@
 #include <memory>
 #include <string>
 #include "service.hpp"
-#include "netconf_provider.hpp"
+#include "path/netconf_session.hpp"
 
 namespace ydk
 {
@@ -40,7 +40,7 @@ namespace ydk
 namespace core
 {
 class DataNode;
-class ServiceProvider;
+class Session;
 }
 
 class Entity;
@@ -50,8 +50,11 @@ class ExecutorService : public Service
     public:
         ExecutorService();
         ~ExecutorService();
-        std::shared_ptr<Entity> execute_rpc(NetconfServiceProvider & provider,
-            Entity & rpc_entity, std::shared_ptr<Entity> top_entity = nullptr);
+        std::shared_ptr<Entity> execute_rpc(
+            NetconfSession & session,
+            Entity & rpc_entity,
+            std::shared_ptr<Entity> top_entity = nullptr
+        );
 };
 
 }

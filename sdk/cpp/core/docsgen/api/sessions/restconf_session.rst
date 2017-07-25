@@ -1,13 +1,13 @@
-RestconfServiceProvider
-========================
+RestconfSession
+===============
 
 .. cpp:namespace:: ydk
 
-.. cpp:class:: RestconfServiceProvider : public ServiceProvider
+.. cpp:class:: RestconfSession : public path::Session
 
-Implementation of :cpp:class:`ServiceProvider<ServiceProvider>` for the `restconf <https://tools.ietf.org/html/draft-ietf-netconf-restconf-18>`_ protocol.
+Implementation of :cpp:class:`Session<path::Session>` for the `restconf <https://tools.ietf.org/html/draft-ietf-netconf-restconf-18>`_ protocol.
 
-    .. cpp:function::RestconfServiceProvider(
+    .. cpp:function::RestconfSession(
         path::Repository & repo,\
         const std::string & address,\
         const std::string & username,\
@@ -28,12 +28,17 @@ Implementation of :cpp:class:`ServiceProvider<ServiceProvider>` for the `restcon
         :param config_url_root: To provider backwards compatibility with older drafts of restconf RFC, this can be "/config" or "/data" (which is the default)
         :param state_url_root: To provider backwards compatibility with older drafts of restconf RFC, this can be "/operational" or "/data" (which is the default)
 
-    .. cpp:function:: EncodingFormat get_encoding()
+    .. cpp:function:: path::RootSchemaNode* get_root_schema() const
 
-        Returns the type of encoding supported by the service provider.
+        Returns the :cpp:class:`RootSchemaNode<path::RootSchemaNode>` tree supported by this instance of the ``RestconfSession``.
 
-    .. cpp:function:: RestconfSession get_session()
+        :return: Pointer to the :cpp:class:`RootSchemaNode<path::RootSchemaNode>` or ``nullptr`` if one could not be created.
 
-        Returns the instance of the :cpp:class:`RestconfSession<path::RestconfSession>` used to connect to the restconf server
+    .. cpp:function:: path::DataNode* invoke(path::Rpc* rpc) const
 
-    .. cpp:function:: ~RestconfServiceProvider()
+         Invokes or executes the given rpc and returns a :cpp:class:`DataNode<DataNode>` pointer if the Rpc has an output modeled in YANG.
+
+        :param rpc: Pointer to the :cpp:class:`Rpc<Rpc>` node.
+        :return: Pointer to the :cpp:class:`DataNode<DataNode>` representing the output.
+
+    .. cpp:function:: ~RestconfSession()

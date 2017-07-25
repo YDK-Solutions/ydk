@@ -3,7 +3,6 @@
 Rpc
 ===
 
-
 .. cpp:namespace:: ydk::path
 
 .. cpp:class:: Rpc
@@ -12,15 +11,15 @@ An instance of the YANG schmea rpc node.
 
 Instances of this class represent a YANG rpc and are modelled as Callables.
 The input data node tree is used to populate the input parameters to the rpc
-if any. The Callable takes as a parameter the :cpp:class:`ServiceProvider<ServiceProvider>` that can execute this rpc as its parameter returning a pointer to a :cpp:class:`DataNode<DataNode>` tree if output is available.
+if any. The Callable takes as a parameter the :cpp:class:`Session<Session>` that can execute this rpc as its parameter returning a pointer to a :cpp:class:`DataNode<DataNode>` tree if output is available.
 
     .. cpp:function:: virtual ~Rpc()
 
-    .. cpp:function:: virtual std::shared_ptr<DataNode> operator()(const ServiceProvider& provider)
+    .. cpp:function:: virtual std::shared_ptr<DataNode> operator()(const Session& session)
 
-        Execute/Invoke the rpc through the given service provider.
+        Execute/Invoke the rpc through the given Session.
 
-        :param sp: The Service provider.
+        :param session: The Session.
         :return: Pointer to the :cpp:class:`DataNode<DataNode>` or ``nullptr`` if none exists.
 
     .. cpp:function:: virtual DataNode& get_input_node() const

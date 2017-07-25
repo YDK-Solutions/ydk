@@ -10,11 +10,11 @@ ValidationService
 
 Validation Service class for validating C++ model API objects of type :cpp:class:`Entity<Entity>`
 
-    .. cpp:function:: void validate(const path::ServiceProvider & provider, Entity & entity, ValidationService::Option option)
+    .. cpp:function:: void validate(const ydk::path::Session & session, Entity & entity, ValidationService::Option option)
 
         Validates an entity based on the option.
 
-        :param provider: An instance of :cpp:class:`ServiceProvider<path::ServiceProvider>`
+        :param session: An instance of :cpp:class:`Session<ydk::path::Session>`
         :param entity: An instance of :cpp:class:`Entity<Entity>` class defined under a bundle
         :return: An instance of :cpp:class:`EntityDiagnostic<EntityDiagnostic>`
         :param option: An instance of type `Option<Option>`

@@ -106,8 +106,6 @@ namespace path {
 /// and provides an interface to obtain the root SchemaTree
 /// based on the set of Capability(s) supported by it.
 ///
-/// The ServiceProvider is also responsible for Servicing RPC's.
-///
 /// @section ServiceProvider Errors
 /// TODO
 ///
@@ -117,9 +115,6 @@ namespace path {
 /// - revision
 /// - set of enabled features
 /// - set of deviations active on this module
-///
-/// @note to ServiceProvider implementors
-/// Use the Repository class to instantiate a SchemaTree based on the Capabilities.
 ///
 ///
 
@@ -209,9 +204,9 @@ namespace path {
 ///
 /// The input DataNode can be obtained using Rpc#input. This can be used to populate/create the child
 /// nodes of input as per this rpc's schema.
-/// The Rpc is a callable that takes  a single argument which is the ServiceProvider. To invoke the rpc
+/// The Rpc is a callable that takes  a single argument which is the Session. To invoke the rpc
 /// do this
-/// auto config = get_config(sp); /// sp is a service provider
+/// auto config = get_config(session);
 /// The config variable above is the DataNode representing the output of the rpc
 ///
 ///
@@ -902,7 +897,7 @@ class ModelProvider {
 ///
 /// A instance of the Repository will be used to create a RootSchemaNode given a set of Capabilities.
 /// Behind the scenes the repository is responsible for loading and parsing the YANG modules and
-/// creating the SchemaNode tree. ServiceProviders are expected to use the Repository#create_root_schema
+/// creating the SchemaNode tree. Sessions are expected to use the Repository#create_root_schema
 /// to generate the RootSchemaNode.
 ///
 class Repository {
@@ -980,25 +975,17 @@ public:
 };
 
 
-///
-/// @brief Interface for all ServiceProvider implementations
-///
-/// Concretes instances of ServiceProviders are expected to extend this interface.
-///
-class ServiceProvider
+/// @note to Session implementors
+/// Use the Repository class to instantiate a SchemaTree based on the Capabilities.
+class Session
 {
 public:
     ///
-    /// @brief return the SchemaTree supported by this instance of the ServiceProvider
+    /// @brief return the SchemaTree supported by this instance of the Session
     ///
     /// @return pointer to the RootSchemaNode or nullptr if one could not be created
     ///
     virtual RootSchemaNode& get_root_schema() const = 0;
-
-
-    virtual ~ServiceProvider();
-
-    virtual EncodingFormat get_encoding() const = 0;
 
     ///
     /// @brief invoke the Rpc
@@ -1010,7 +997,6 @@ public:
     /// @return The pointer to the DataNode representing the output.
     ///
     virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const = 0 ;
-
 };
 
 ///
@@ -1020,7 +1006,7 @@ public:
 /// Instances of this class represent a YANG rpc and are modelled as Callables.
 /// The input data node tree is used to populate the input parameters to the rpc
 /// if any.
-/// The Callable takes as a parameter the ServiceProvider that can execute this rpc
+/// The Callable takes as a parameter the Session that can execute this rpc
 /// as its parameter returning a pointer to a DataNode tree if output is available
 ///
 class Rpc
@@ -1030,12 +1016,12 @@ public:
     virtual ~Rpc();
 
     ///
-    /// @brief execute/invoke the rpc through the given service provider.
+    /// @brief execute/invoke the rpc through the given session.
     ///
-    /// @param[in] sp The Service provider
+    /// @param[in] session The Session
     /// @areturn pointer to the DataNode or nullptr if none exists
     ///
-    virtual std::shared_ptr<DataNode> operator()(const ServiceProvider& provider) = 0;
+    virtual std::shared_ptr<DataNode> operator()(const Session& session) = 0;
 
     ///
     /// @brief get the input data tree

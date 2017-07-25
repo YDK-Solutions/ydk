@@ -36,7 +36,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    
+
     set (CMAKE_C_COMPILER "/usr/bin/clang")
     set (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
@@ -48,15 +48,15 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set (CPACK_DEBIAN_PACKAGE_NAME ${CPACK_PACKAGE_NAME})
         set (CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
         set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-        set (CPACK_DEBIAN_PACKAGE_DEPENDS 
-            "libcurl4-openssl-dev, 
-            libpcre3-dev, 
-            libssh-dev, 
-            libxml2-dev, 
-            libxslt1-dev, 
-            libtool-bin, 
-            cmake (>=3), 
-            git, 
+        set (CPACK_DEBIAN_PACKAGE_DEPENDS
+            "libcurl4-openssl-dev,
+            libpcre3-dev,
+            libssh-dev,
+            libxml2-dev,
+            libxslt1-dev,
+            libtool-bin,
+            cmake (>=3),
+            git,
             pkg-config")
         set (CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_CONTACT})
         set (CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
@@ -66,7 +66,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
         # <foo>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
         # libydk_0.6.0-0.1.alpha_amd64.deb   // Debian
-        set (CPACK_PACKAGE_FILE_NAME 
+        set (CPACK_PACKAGE_FILE_NAME
             "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
     # Linux Fedora
@@ -90,7 +90,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
         # <name>-<version>-<release>.<architecture>.(src).rpm
         # libydk-0.6.0-0.1.alpha.x86_64.rpm  // RPM
-        set (CPACK_PACKAGE_FILE_NAME 
+        set (CPACK_PACKAGE_FILE_NAME
             "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CPACK_RPM_PACKAGE_ARCHITECTURE}")
     endif()
 endif()
@@ -164,8 +164,10 @@ set(libydk_src
     src/path/annotation.cpp
     src/path/capability.cpp
     src/path/data_node.cpp
+    src/path/netconf_session.cpp
     src/path/path.cpp
     src/path/repository.cpp
+    src/path/restconf_session.cpp
     src/path/root_data_node.cpp
     src/path/root_schema_node.cpp
     src/path/rpc.cpp
@@ -196,10 +198,10 @@ set(libydk_install_headers
     src/executor_service.hpp
     src/filters.hpp
     src/logging_callback.hpp
-    src/netconf_provider.hpp
-    src/network_topology.hpp
     src/netconf_client.hpp
+    src/netconf_provider.hpp
     src/netconf_service.hpp
+    src/network_topology.hpp
     src/opendaylight_parser.hpp
     src/opendaylight_provider.hpp
     src/path_api.hpp
@@ -472,4 +474,3 @@ if(ENABLE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif(ENABLE_BUILD_TESTS)
-

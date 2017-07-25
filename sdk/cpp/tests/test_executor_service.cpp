@@ -49,7 +49,7 @@ TEST_CASE("es_close_session_rpc")
 
     ietf_netconf::CloseSession rpc{};
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -76,13 +76,13 @@ TEST_CASE("es_commit_rpc")
     // rpc.input->persist = "2";
     // rpc.input->persist_id = "2";
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -106,13 +106,13 @@ TEST_CASE("es_copy_config_rpc")
     rpc.input->target->candidate = Empty();
     rpc.input->source->running = e;
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -134,13 +134,17 @@ TEST_CASE("es_delete_config_rpc")
     ietf_netconf::DeleteConfig rpc{};
 
     rpc.input->target->url = "http://test";
-    // std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    // std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
 
-    CHECK_THROWS_AS(es.execute_rpc(provider, rpc), YCPPServiceProviderError);
+    CHECK_THROWS_AS(
+        es.execute_rpc(provider.get_session(), rpc),
+        YCPPServiceProviderError
+    );
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, discard_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -160,13 +164,13 @@ TEST_CASE("es_discard_changes_rpc")
 
     ietf_netconf::DiscardChanges rpc{};
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -201,7 +205,8 @@ TEST_CASE("es_edit_config_rpc")
     edit_config_rpc.input->target->candidate = Empty();
     edit_config_rpc.input->config = runner_xml;
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, edit_config_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider.get_session(), edit_config_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
@@ -210,13 +215,13 @@ TEST_CASE("es_edit_config_rpc")
     get_config_rpc.input->source->candidate = Empty();
     get_config_rpc.input->filter = filter_xml;
 
-    reply = es.execute_rpc(provider, get_config_rpc, runner);
+    reply = es.execute_rpc(provider.get_session(), get_config_rpc, runner);
     REQUIRE(reply);
 
     // Commit Rpc
     ietf_netconf::Commit commit_rpc{};
 
-    reply = es.execute_rpc(provider, commit_rpc);
+    reply = es.execute_rpc(provider.get_session(), commit_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
@@ -224,12 +229,12 @@ TEST_CASE("es_edit_config_rpc")
     ietf_netconf::Get get_rpc{};
     get_rpc.input->filter = filter_xml;
 
-    reply = es.execute_rpc(provider, get_rpc, runner);
+    reply = es.execute_rpc(provider.get_session(), get_rpc, runner);
     REQUIRE(reply);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -251,12 +256,16 @@ TEST_CASE("es_kill_session_rpc")
     ietf_netconf::KillSession rpc{};
     rpc.input->session_id = 3;
 
-   // std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
-    CHECK_THROWS_AS(es.execute_rpc(provider, rpc), YCPPServiceProviderError);
+   // std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
+    CHECK_THROWS_AS(
+        es.execute_rpc(provider.get_session(), rpc),
+        YCPPServiceProviderError
+    );
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, discard_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -278,20 +287,21 @@ TEST_CASE("es_lock_rpc")
     ietf_netconf::Lock lock_rpc{};
     lock_rpc.input->target->candidate = Empty();
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, lock_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider.get_session(), lock_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     ietf_netconf::Unlock unlock_rpc{};
     unlock_rpc.input->target->candidate = Empty();
 
-    reply = es.execute_rpc(provider, unlock_rpc);
+    reply = es.execute_rpc(provider.get_session(), unlock_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -311,13 +321,13 @@ TEST_CASE("es_validate_rpc_1")
     ietf_netconf::Validate rpc{};
     rpc.input->source->candidate = Empty();
     // rpc.input->source->config = r_1;
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -338,14 +348,13 @@ TEST_CASE("es_validate_rpc_2")
     Empty e;
     e.set = true;
     rpc.input->source->running = e;
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(provider.get_session(), rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    reply = es.execute_rpc(provider, discard_rpc);
+    reply = es.execute_rpc(provider.get_session(), discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
-

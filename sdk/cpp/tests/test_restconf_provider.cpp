@@ -14,7 +14,7 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 #include <string.h>
-#include "../core/src/restconf_provider.hpp"
+#include "../core/src/path/restconf_session.hpp"
 #include "../core/src/errors.hpp"
 #include <iostream>
 #include "config.hpp"
@@ -27,9 +27,9 @@ using namespace std;
 TEST_CASE("CreateDelRead")
 {
     ydk::path::Repository repo{TEST_HOME};
-    RestconfServiceProvider provider{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
+    RestconfSession session{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
 
-    ydk::path::RootSchemaNode& schema = provider.get_root_schema();
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -40,7 +40,7 @@ TEST_CASE("CreateDelRead")
     auto json = s.encode(runner, EncodingFormat::JSON, false);
     delete_rpc->get_input_node().create_datanode("entity", json);
     //call delete
-    (*delete_rpc)(provider);
+    (*delete_rpc)(session);
 
     auto & number8 = runner.create_datanode("ytypes/built-in-t/number8", "3");
 
@@ -49,7 +49,7 @@ TEST_CASE("CreateDelRead")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", json);
-    (*create_rpc)(provider);
+    (*create_rpc)(session);
 
     //read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -59,7 +59,7 @@ TEST_CASE("CreateDelRead")
     REQUIRE( !json.empty() );
     read_rpc->get_input_node().create_datanode("filter", json);
 
-    auto read_result = (*read_rpc)(provider);
+    auto read_result = (*read_rpc)(session);
 
     runner = schema.create_datanode("ydktest-sanity:runner", "");
     number8 = runner.create_datanode("ytypes/built-in-t/number8", "5");
@@ -69,7 +69,7 @@ TEST_CASE("CreateDelRead")
     //call update
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };
     update_rpc->get_input_node().create_datanode("entity", json);
-    (*update_rpc)(provider);
+    (*update_rpc)(session);
 
 
 }

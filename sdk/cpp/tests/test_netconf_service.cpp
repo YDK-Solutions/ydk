@@ -34,86 +34,86 @@ using namespace std;
 // cancel_commit -- issues in netsim
 //TEST_CASE("cancel_commit")
 //{
-//    // provider
+//    // session
 //    path::Repository repo{TEST_HOME};
-//    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+//    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 //    NetconfService ns{};
 //
-//    auto reply = ns.cancel_commit(provider);
+//    auto reply = ns.cancel_commit(session);
 //    REQUIRE(reply);
 //}
 
 // close_session
 TEST_CASE("close_session")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
-    auto reply = ns.close_session(provider);
+    auto reply = ns.close_session(session);
     REQUIRE(reply);
 }
 
 // commit
 TEST_CASE("commit")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
-    auto reply = ns.commit(provider);
+    auto reply = ns.commit(session);
     REQUIRE(reply);
 }
 
 // copy_config
 TEST_CASE("copy_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore target = DataStore::candidate;
     DataStore source = DataStore::running;
 
-    auto reply = ns.copy_config(provider, target, source);
+    auto reply = ns.copy_config(session, target, source);
     REQUIRE(reply);
 }
 
 // delete_config -- issues in netsim
 TEST_CASE("delete_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore target = DataStore::url;
 
-//    auto reply = ns.delete_config(provider, target, "http://test");
-    CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YCPPServiceProviderError);
+//    auto reply = ns.delete_config(session, target, "http://test");
+    CHECK_THROWS_AS(ns.delete_config(session, target, "http://test"), YCPPError);
 }
 
 // discard_changes
 TEST_CASE("discard_changes")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
-    auto reply = ns.discard_changes(provider);
+    auto reply = ns.discard_changes(session);
     REQUIRE(reply);
 }
 
 // edit_config, get_config
 TEST_CASE("edit_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore target = DataStore::candidate;
@@ -122,75 +122,75 @@ TEST_CASE("edit_config")
     openconfig_bgp::Bgp bgp = {};
     bgp.global->config->as = 6500;
 
-    auto reply = ns.edit_config(provider, target, bgp);
+    auto reply = ns.edit_config(session, target, bgp);
     REQUIRE(reply);
 
-    auto data = ns.get_config(provider, source, filter);
+    auto data = ns.get_config(session, source, filter);
     REQUIRE(data);
 
     auto data_ptr = dynamic_cast<openconfig_bgp::Bgp*>(data.get());
     REQUIRE(data_ptr != nullptr);
     REQUIRE(data_ptr->global->config->as == bgp.global->config->as);
 
-    reply = ns.discard_changes(provider);
+    reply = ns.discard_changes(session);
     REQUIRE(reply);
 }
 
 // get
 TEST_CASE("get")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     openconfig_bgp::Bgp filter = {};
 
-    auto reply = ns.get(provider, filter);
+    auto reply = ns.get(session, filter);
     REQUIRE(reply);
 }
 
 // kill_session
 TEST_CASE("kill_session")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     int session_id = 3;
 
-//    auto reply = ns.kill_session(provider, session_id);
-    CHECK_THROWS_AS(ns.kill_session(provider, session_id), YCPPServiceProviderError);
+//    auto reply = ns.kill_session(session, session_id);
+    CHECK_THROWS_AS(ns.kill_session(session, session_id), YCPPError);
 }
 
 // lock, unlock
 TEST_CASE("lock")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore target = DataStore::candidate;
 
-    auto reply = ns.lock(provider, target);
+    auto reply = ns.lock(session, target);
     REQUIRE(reply);
 
-    reply = ns.unlock(provider, target);
+    reply = ns.unlock(session, target);
     REQUIRE(reply);
 }
 
 // validate
 TEST_CASE("validate")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore source = DataStore::candidate;
 
-    auto reply = ns.validate(provider, source);
+    auto reply = ns.validate(session, source);
     REQUIRE(reply);
 }

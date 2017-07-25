@@ -128,12 +128,16 @@ def ispythonkeyword(word):
 
 def iscppkeyword(word):
     return word in ('parent', 'operator', 'inline', 'default', 'virtual',
-                    'children', 'auto', 'entity', 'int', 'static', 'final',
-                    'template', 'index', 'protected', 'true', 'false', 'or',
-                    'do', 'new', 'delete', 'private', 'public', 'export',
-                    'for', 'break', 'case', 'catch', 'float', 'long', 'return',
-                    'explicit', 'class', 'if', 'try', 'while', 'and', 'const',
-                    'continue', 'double', 'else', 'value', 'namespace', 'yfilter')
+                    'children', 'value', 'auto', 'entity', 'int', 'signed'
+                    'final', 'template', 'index', 'protected', 'true', 'false',
+                    'default' , 'auto', 'static', 'or', 'do', 'new', 'delete',
+                    'private', 'public', 'export' , 'virtual', 'for', 'and',
+                    'break', 'case', 'catch', 'float', 'long', 'return',
+                    'explicit', 'class', 'if', 'try', 'while', 'and', 'or',
+                    'const', 'continue', 'double', 'else', 'value', 'namespace',
+                    'operation', 'volatile', 'register', 'short', 'extern',
+                    'mutable', 'unsigned', 'struct', 'switch', 'void', 'typedef',
+                    'typeid', 'using', 'char', 'goto', 'not','clock')
 
 
 def get_sphinx_ref_label(named_element):

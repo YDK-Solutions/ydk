@@ -72,9 +72,11 @@ void RestconfServiceProvider::initialize(path::Repository & repo)
                                 state_url_root + default_capabilities_url, get_encoding_string(EncodingFormat::XML)
                                 )
                     );
+
+    auto lookup_tables = capabilities_parser.get_lookup_tables(server_capabilities);
     capabilities = capabilities_parser.parse(server_capabilities);
 
-    root_schema = repo.create_root_schema(capabilities);
+    root_schema = repo.create_root_schema(lookup_tables, capabilities);
 }
 
 RestconfServiceProvider::~RestconfServiceProvider()

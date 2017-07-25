@@ -32,6 +32,7 @@ class NamespacePrinter(FilePrinter):
         self._print_bundle_name(bundle_name)
         self._print_capabilities(packages)
         self._print_entity_lookup(packages)
+        self._print_namespace_lookup(packages)
 
     def _get_imports(self, packages):
         imports = set()
@@ -70,6 +71,20 @@ class NamespacePrinter(FilePrinter):
                     self.ctx.writeln('("{}", "{}"): "{}",'
                                      .format(p.stmt.arg, e.stmt.arg, e.fqn()))
 
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
+
+    def _print_namespace_lookup(self, packages):
+        self.ctx.writeln('NAMESPACE_LOOKUP = {')
+        self.ctx.lvl_inc()
+        for p in packages:
+            ns = p.stmt.search_one('namespace')
+            # submodule
+            if ns is None:
+                continue
+            name = p.stmt.arg
+            self.ctx.writeln('"{}": "{}",'.format(name, ns.arg))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()

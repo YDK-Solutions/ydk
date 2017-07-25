@@ -294,6 +294,7 @@ function py_sanity_augmentation_test {
 
     run_test sdk/python/core/tests/test_sanity_augmentation.py
     run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
+    run_test sdk/python/core/tests/test_on_demand.py
 }
 
 function cpp_sanity_core_gen_install {

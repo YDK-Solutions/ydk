@@ -15,10 +15,10 @@ DataNode
 
         .. code-block:: python
 
-            >>> from ydk.providers import NetconfServiceProvider
-            >>> provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 830)
-            >>> root_schema = provider.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
-            >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')                         # <-- bgp is an instance of DataNode
+            >>> from ydk.path import NetconfSession
+            >>> session = NetconfSession('127.0.0.1', 'admin', 'admin', 830)
+            >>> root_schema = session.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
+            >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')               # <-- bgp is an instance of DataNode
 
 
     .. py:method:: add_annotation(annotation)

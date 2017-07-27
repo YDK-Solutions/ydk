@@ -19,15 +19,15 @@ Interface for all ServiceProvider implementations.
 
 Concrete instances of ServiceProviders are expected to extend this interface.
 
-    .. cpp:function:: virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const
-
-        Invokes or executes the given rpc and returns a :cpp:class:`DataNode<DataNode>` pointer if the Rpc has an output modelled in YANG.
-
-        :param rpc: Reference to the :cpp:class:`Rpc<Rpc>` node.
-        :return: Shared pointer to the :cpp:class:`DataNode<DataNode>` representing the output.
-
     .. cpp:function:: EncodingFormat get_encoding()
 
         Returns the type of encoding supported by the service provider.
+
+    .. py:method:: get_session()
+
+        Returns the instance of the :py:class:`Session<ydk.path.Session>` used to connect to the server
+
+        :return: A :py:class:`Session<ydk.path.Session>` instance.
+
 
     .. cpp:function:: virtual ~ServiceProvider()

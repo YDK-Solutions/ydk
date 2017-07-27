@@ -48,7 +48,7 @@ namespace path {
 ///
 /// @section about-features Main Features
 ///
-/// - A ServiceProvider interface for ServiceProviders
+/// - A Session interface for Sessions
 /// - A Repository class to help create a SchemaNode Tree based on capabilities.
 /// - Creation of DataNode Tree's for config and oper
 /// - Create and Invoke RPC's
@@ -84,7 +84,7 @@ namespace path {
 /// @page howto How To ...
 ///
 /// - @subpage howtoErrors
-/// - @subpage howtoserviceprovider
+/// - @subpage howtosession
 /// - @subpage howtoschemas
 /// - @subpage howtodata
 /// - @subpage howtomemory
@@ -101,12 +101,12 @@ namespace path {
 ///
 
 ///
-/// @page howtoserviceprovider ServiceProvider.
-/// A ServiceProvider extends the class ydk::ServiceProvider
+/// @page howtosession Session.
+/// A Session extends the class ydk::path::Session
 /// and provides an interface to obtain the root SchemaTree
 /// based on the set of Capability(s) supported by it.
 ///
-/// @section ServiceProvider Errors
+/// @section Session Errors
 /// TODO
 ///
 /// @section Capability

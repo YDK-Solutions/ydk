@@ -14,15 +14,15 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-"""test_restconf_provider.py
-RestconfServiceProvider test
+"""test_restconf_session.py
+RestconfSession test
 """
 from __future__ import absolute_import
 
 import os
 import unittest
 
-from ydk.providers import RestconfServiceProvider
+from ydk.path import RestconfSession
 from ydk.types import EncodingFormat
 from ydk.path import Repository
 from ydk.path import Codec
@@ -38,7 +38,7 @@ class SanityTest(unittest.TestCase):
         repo_path = os.path.dirname(__file__)
         repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
         self.repo = Repository(repo_path)
-        self.restconf_provider = RestconfServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
+        self.restconf_session = RestconfSession(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
 
     @classmethod
     def tearDownClass(self):
@@ -50,12 +50,8 @@ class SanityTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_get_encoding(self):
-        pass
-
-    def test_get_session(self):
-        session = self.restconf_provider.get_session()
-        root_schema = session.get_root_schema()
+    def test_create_del_read(self):
+        root_schema = self.restconf_session.get_root_schema()
         runner = root_schema.create_datanode('ydktest-sanity:runner', '')
 
         delete_rpc = root_schema.create_rpc('ydk:delete')
@@ -63,7 +59,33 @@ class SanityTest(unittest.TestCase):
 
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         delete_rpc.get_input_node().create_datanode('entity', json)
-        delete_rpc(session)
+        delete_rpc(self.restconf_session)
+
+        number8 = runner.create_datanode('ytypes/built-in-t/number8', '3')
+        json = codec_service.encode(runner, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+        create_rpc = root_schema.create_rpc('ydk:create')
+        create_rpc.get_input_node().create_datanode('entity', json)
+
+        read_rpc = root_schema.create_rpc('ydk:read')
+        runner_read = root_schema.create_datanode('ydktest-sanity:runner', '')
+
+        json = codec_service.encode(runner_read, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+        read_rpc.get_input_node().create_datanode('filter', json)
+
+        read_result = read_rpc(self.restconf_session)
+
+        runner = root_schema.create_datanode('ydktest-sanity:runner', '')
+        number8 = runner.create_datanode('ytypes/built-in-t/number8', '5')
+
+        json = codec_service.encode(runner, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+
+        update_rpc = root_schema.create_rpc('ydk:update')
+        update_rpc.get_input_node().create_datanode('entity', json)
+        update_rpc(self.restconf_session)
+
 
 if __name__ == '__main__':
     import sys

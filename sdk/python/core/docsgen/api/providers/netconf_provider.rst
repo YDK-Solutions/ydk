@@ -16,15 +16,12 @@ NETCONF Service Provider
     :param repo: User provided repository stores cached models
     :type repo: :py:class:`Repository<ydk.path.Repository>`
 
-    .. py:method:: get_root_schema()
+    .. py:method:: get_encoding()
 
-        Returns the :py:class:`RootSchemaNode<ydk.path.RootSchemaNode>` tree supported by this instance.
+        Returns the type of encoding supported by the service provider.
 
-        :return: A :py:class:`RootSchemaNode<ydk.path.RootSchemaNode>` instance or ``None`` if it such root schema could not be created.
+    .. py:method:: get_session()
 
-    .. py:method:: invoke(rpc)
+        Returns the instance of the :py:class:`NetconfSession<ydk.path.NetconfSession>` used to connect to the netconf server
 
-        Invokes or executes the given rpc and returns a :py:class:`DataNode<ydk.path.DataNode>` instance if the Rpc has an output modelled in YANG.
-
-        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) Targeted Rpc.
-        :return: A :py:class:`Datanode<ydk.path.DataNode>` instance.
+        :return: A :py:class:`NetconfSession<ydk.path.NetconfSession>` instance.

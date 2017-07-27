@@ -67,7 +67,7 @@ RootSchemaNode
         .. code-block:: python
             :linenos:
 
-            from ydk.providers import NetconfServiceProvider
-            provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin')
-            root_schema = provider.get_root_schema()
+            from ydk.path import NetconfSession
+            session = NetconfSession('127.0.0.1', 'admin', 'admin')
+            root_schema = session.get_root_schema()
             root_schema.create_rpc('ydk:create')

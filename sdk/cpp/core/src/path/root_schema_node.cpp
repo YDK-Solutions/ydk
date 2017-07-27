@@ -22,8 +22,109 @@
 //////////////////////////////////////////////////////////////////
 
 #include "path_private.hpp"
+#include <unordered_set>
+
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <json.hpp>
+
 #include "../logger.hpp"
 
+
+static void get_namespaces_from_xml_doc(xmlNodePtr root, std::unordered_set<std::string>& namespaces)
+{
+    xmlNodePtr curr = nullptr;
+    for (curr = root; curr; curr = curr->next)
+    {
+        if (curr->type == XML_ELEMENT_NODE && curr->ns && curr->ns->href)
+        {
+            namespaces.insert(std::string{reinterpret_cast<const char*>(curr->ns->href)});
+        }
+        get_namespaces_from_xml_doc(curr->children, namespaces);
+    }
+}
+
+namespace ydk
+{
+
+using json = nlohmann::json;
+
+    static std::unordered_set<std::string>
+    get_namespaces_from_xml_payload(const std::string& payload)
+    {
+        YLOG_DEBUG("Extracting module namespaces from XML payload");
+        xmlDocPtr doc = xmlParseDoc(reinterpret_cast<const xmlChar*>(payload.c_str()));
+        xmlNodePtr root = xmlDocGetRootElement(doc);
+        std::unordered_set<std::string> namespaces;
+
+        get_namespaces_from_xml_doc(root, namespaces);
+
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+
+        return namespaces;
+    }
+
+    static void
+    get_module_names_from_json_object(json& o, std::unordered_set<std::string>& module_names)
+    {
+        for (json::iterator it = o.begin(); it != o.end(); ++it)
+        {
+            if (it->is_array())
+            {
+                for (auto i = it->begin(); i != it->end(); i++)
+                {
+                    get_module_names_from_json_object(*i, module_names);
+                }
+            }
+            else
+            {
+                // extract module name from key
+                auto identifier = std::string(it.key());
+                auto found = identifier.find(":");
+                if (found != std::string::npos)
+                {
+                    module_names.insert(identifier.substr(0, found));
+                }
+                // extract module name from primitive type value
+                if (it->is_primitive())
+                {
+                    auto v = it->dump();
+                    if (v.find("\"") == 0)
+                        v = v.substr(1);
+                    auto ns = path::segmentalize_module_names(v);
+                    module_names.insert(ns.begin(), ns.end());
+                }
+                else
+                {
+                    get_module_names_from_json_object(*it, module_names);
+                }
+            }
+        }
+    }
+
+    static std::unordered_set<std::string>
+    get_module_names_from_json_payload(const std::string& payload)
+    {
+        YLOG_DEBUG("Extracting module names from JSON payload");
+        std::unordered_set<std::string> module_names;
+        auto o = json::parse(payload);
+        get_module_names_from_json_object(o, module_names);
+        return module_names;
+    }
+
+    static std::unordered_set<std::string>
+    get_top_module_name_from_json_payload(const std::string& payload)
+    {
+        YLOG_DEBUG("Extracting top level module name from JSON payload");
+        std::unordered_set<std::string> top_module_name;
+        auto o = json::parse(payload);
+
+        // top level element must have a module name identifier
+        auto identifier = std::string(o.begin().key());
+        return {identifier.substr(0, identifier.find(":"))};
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////
 /// RootSchemaNode
@@ -69,12 +170,15 @@ ydk::path::RootSchemaNode::get_keys() const
 /////////////////////////////////////////////////////////////////////////////////////
 // class RootSchemaNodeImpl
 /////////////////////////////////////////////////////////////////////////////////////
-ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo) : m_ctx{ctx}, m_priv_repo{repo}
+ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo)
+    : m_ctx{ctx}, m_priv_repo{repo}
 {
     populate_all_module_schemas();
 }
 
-ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo, const std::vector<path::Capability>& caps) : m_ctx{ctx}, m_priv_repo{repo}, m_caps(caps)
+ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo,
+                                                  const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables)
+    : m_ctx{ctx}, m_priv_repo{repo}, m_name_lookup({lookup_tables[0]}), m_namespace_lookup({lookup_tables[1]})
 {
     populate_all_module_schemas();
 }
@@ -110,9 +214,38 @@ ydk::path::RootSchemaNodeImpl::populate_module_schema(const struct lys_module* m
 }
 
 void
-ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_path(const std::string& path) {
-    auto new_modules = m_priv_repo->get_new_ly_modules_from_path(path, m_ctx, m_caps);
+ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_payload(const std::string& payload, ydk::EncodingFormat format)
+{
+    std::vector<const lys_module*> modules;
+    if (format == ydk::EncodingFormat::XML)
+    {
+        auto namespaces = get_namespaces_from_xml_payload(payload);
+        modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, namespaces, m_namespace_lookup);
+    }
+    else
+    {
+        // populate module, submodule and imported module
+        auto top_module_name = get_top_module_name_from_json_payload(payload);
+        auto top_module = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, top_module_name, m_name_lookup);
+        populate_new_schemas(top_module);
 
+        // populate augmentation module
+        auto module_names = get_module_names_from_json_payload(payload);
+        auto modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, module_names, m_name_lookup);
+    }
+
+    populate_new_schemas(modules);
+}
+
+void
+ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_path(const std::string& path) {
+    auto new_modules = m_priv_repo->get_new_ly_modules_from_path(m_ctx, path, m_name_lookup);
+    populate_new_schemas(new_modules);
+}
+
+void
+ydk::path::RootSchemaNodeImpl::populate_new_schemas(std::vector<const lys_module*>& new_modules)
+{
     for (auto m: new_modules) {
         populate_module_schema(m);
         populate_augmented_schema_nodes(m);

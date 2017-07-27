@@ -1,5 +1,6 @@
 #include "gnmi_client.hpp"
 
+using namespace gnmi;
 using namespace std;
 using namespace ydk;
 
@@ -14,18 +15,20 @@ gNMIClient::gNMIClient(shared_ptr<Channel> channel)
 
 static bool check_capabilities_status(Status status);
 static string parse_get_request_payload(string payload);
+static json parse_set_request_payload(string payload);
 static vector<string> get_path_from_payload_filter(string payload_filter, vector<string> container);
 static string check_if_path_has_value(string element);
 static string format_notification_response(string prefix_to_prepend, string path_to_prepend, string value);
+static ::gnmi::SetRequest allocate_set_request_path(string operation, ::gnmi::SetRequest request, vector<string> root_path, json config_payload);
 
 
-int gNMIClient::connect(std::string address) 
+int gNMIClient::connect(string address) 
 {
     // Authenticates server 
-    std::string server_cert;
-    std::ifstream rf("ems.pem");
+    /*string server_cert;
+    ifstream rf("ems.pem");
 
-    server_cert.assign((std::istreambuf_iterator<char>(rf)),(std::istreambuf_iterator<char>()));
+    server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
 
     grpc::SslCredentialsOptions ssl_opts;
     grpc::ChannelArguments      args;
@@ -33,16 +36,17 @@ int gNMIClient::connect(std::string address)
     ssl_opts.pem_root_certs = server_cert;
     args.SetSslTargetNameOverride("ems.cisco.com");
 
-    /* ToDo Authenticate client at server
-    std::ifstream kf("client.key");
-    std::ifstream cf("client.pem");
-    client_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
-    client_cert.assign((std::istreambuf_iterator<char>(cf)),(std::istreambuf_iterator<char>()));
+    // ToDo Authenticate client at server
+    /*ifstream kf("client.key");
+    ifstream cf("client.pem");
+    client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
+    client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
     ssl_opts = {server_cert, client_key, client_cert};
-    */
+    
 
     auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
-    grpc::CreateCustomChannel(address, channel_creds, args);
+    grpc::CreateCustomChannel(address, channel_creds, args);*/
+    grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
     get_capabilities();
     return EXIT_SUCCESS;
 }
@@ -151,7 +155,7 @@ static vector<string> parse_get_request_payload(string payload, vector<string> p
     string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "Empty Filter");
     YLOG_DEBUG("payload_filter: {}", payload_filter);
 
-    std::string path_elem;
+    string path_elem;
     istringstream payload_filter_value(payload_filter);
     while(getline(payload_filter_value, path_elem, '"')) 
     {
@@ -161,7 +165,6 @@ static vector<string> parse_get_request_payload(string payload, vector<string> p
     return path_container;
 }
 
-
 ::gnmi::GetRequest gNMIClient::populate_get_request(::gnmi::GetRequest request, string payload) 
 {   
     vector<string> container;   
@@ -170,10 +173,67 @@ static vector<string> parse_get_request_payload(string payload, vector<string> p
     ::gnmi::Path* path = request.add_path();  
     for(int i = 0; i < path_container.size(); ++i) 
         path->add_element(path_container[i]);
-    path->add_element("interface[name=\"Loopback0\"]");
     request.set_type(::gnmi::GetRequest::CONFIG);
     request.set_encoding(::gnmi::Encoding::JSON_IETF);
     return request;
+}
+
+json parse_set_request_payload(string payload) 
+{
+    auto payload_to_parse = json::parse("{" + payload + "}");
+    json config_payload = json::parse(payload_to_parse.value("/rpc/ietf-netconf:edit-config/config"_json_pointer, "Empty Config"));
+    YLOG_INFO("json payload: {}", config_payload.dump());
+
+    return config_payload;
+}
+
+::gnmi::SetRequest allocate_set_request_path(string operation, ::gnmi::SetRequest request, vector<string> root_path, json config_payload)
+{
+    ::gnmi::Path* path = new ::gnmi::Path;
+    ::gnmi::Update* update;
+    ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+
+    if(operation == "delete")
+    {
+        ::gnmi::Path* delete_path = request.add_delete_(); 
+        for(int i = 0; i < root_path.size(); ++i)
+        {
+            delete_path->add_element(root_path[i]);  
+        }   
+    } else if (operation == "create")
+    {
+        update = request.add_update();
+        for(int i = 0; i < root_path.size(); ++i)
+        {
+            path->add_element(root_path[i]);  
+        }  
+        update->set_allocated_path(path);
+        for (auto& config_value : config_payload) 
+        {
+            value->set_json_ietf_val(config_value.dump());
+            update->set_allocated_val(value);
+        }
+    }
+    return request;  
+}
+
+::gnmi::SetRequest gNMIClient::populate_set_request(::gnmi::SetRequest request, string payload, string operation) 
+{   
+    YLOG_DEBUG("Payload {}\n operation {}", payload, operation);
+    json config_payload = parse_set_request_payload(payload);
+
+    string path_elem;
+    vector<string> root_path;
+    istringstream payload_config_value(config_payload.dump());
+    while(getline(payload_config_value, path_elem, '"')) 
+    {
+        if(path_elem.find("{")==string::npos && path_elem.find("}")==string::npos)
+        { 
+            root_path.push_back(path_elem);
+            break;
+        }
+    }
+    return allocate_set_request_path(operation, request, root_path, config_payload);
 }
 
 string gNMIClient::get_prefix_from_notification(::gnmi::Notification notification)
@@ -233,7 +293,7 @@ string gNMIClient::get_value_from_update(::gnmi::Update update)
 
     if(update.has_val()) 
         value = update.val();
-    value_for_payload.append(value.json_ietf_val());
+        value_for_payload.append(value.json_ietf_val());
     return value_for_payload;
 }
 
@@ -249,8 +309,7 @@ static string format_notification_response(string prefix_to_prepend, string path
     else if ((flag.prefix_has_value) && (flag.path_has_value))
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
     else 
-        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "{\"" + value + "" + "}}");
-
+        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + value + "}");
     return reply_to_parse;
 }
 
@@ -285,18 +344,44 @@ string gNMIClient::parse_get_response(::gnmi::GetResponse* response)
     return reply_to_parse;
 }
 
-string gNMIClient::execute_wrapper(const string & payload)
+string gNMIClient::parse_set_response(::gnmi::SetResponse* response) 
 {
-    ::gnmi::GetRequest request;
-    ::gnmi::GetResponse response;
-
-    request = populate_get_request(request, payload);
-    YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
-    string reply = execute_payload(request, &response);
-    return reply;
+    ::gnmi::UpdateResult update_response;
+    string reply_to_parse;
+    for(int i = 0; i < response->response_size(); ++i) 
+    {
+        update_response = response->response(i);
+        reply_to_parse.append(UpdateResult_Operation_Name(update_response.op()) + " Success");
+    }
+    return reply_to_parse;
 }
 
-string gNMIClient::execute_payload(const GetRequest& request, GetResponse* response)
+string gNMIClient::execute_wrapper(const string & payload, string operation)
+{
+    YLOG_DEBUG("In execute_wrapper");
+    if (operation == "read")
+    {
+        ::gnmi::GetRequest request;
+        ::gnmi::GetResponse response;
+
+        request = populate_get_request(request, payload);
+        YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
+        string reply = execute_get_payload(request, &response);
+        return reply;
+    } else if ((operation == "create")||(operation == "update")||(operation == "delete"))
+    {   
+        ::gnmi::SetRequest request;
+        ::gnmi::SetResponse response;
+
+        request = populate_set_request(request, payload, operation);
+        YLOG_INFO("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
+        string reply = execute_set_payload(request, &response);
+        return reply;
+
+    }
+}
+
+string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* response)
 {
     grpc::ClientContext context;
     grpc::Status status;
@@ -312,6 +397,26 @@ string gNMIClient::execute_payload(const GetRequest& request, GetResponse* respo
     {
         YLOG_INFO("Get RPC Passed");
         string reply = parse_get_response(response); 
+        return reply;
+    }
+}
+
+string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response)
+{
+    grpc::ClientContext context;
+    grpc::Status status;
+
+    status = stub_->Set(&context, request, response);
+    YLOG_INFO("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
+    if (!(status.ok())) 
+    {
+        YLOG_ERROR("Set RPC Status not OK");
+        throw(YCPPError{status.error_message()});
+    } 
+    else 
+    {
+        YLOG_INFO("Set RPC Passed");
+        string reply = parse_set_response(response); 
         return reply;
     }
 }

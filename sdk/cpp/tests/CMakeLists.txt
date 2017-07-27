@@ -10,6 +10,9 @@ set(bundle_tests_src
         test_core_netconf.cpp
         test_netconf_ssh_client.cpp
         test_netconf_tcp_client.cpp
+	test_core_gnmi.cpp
+        test_netconf_client.cpp
+        test_gnmi_client.cpp
         test_restconf_client.cpp
         testsanitynctest.cpp
         test_crud.cpp
@@ -18,6 +21,7 @@ set(bundle_tests_src
         test_sanity_types.cpp
         testsanityvalidationtest.cpp
         test_netconf_provider.cpp
+        test_gnmi_provider.cpp
         test_restconf_provider.cpp
         test_sanity_codec.cpp
         test_netconf_operations.cpp
@@ -27,6 +31,21 @@ set(bundle_tests_src
         test_opendaylight.cpp
         test_xml_subtree.cpp
         main.cpp)
+
+find_library(LIBGNMI_LIBRARY
+	NAMES
+	gnmi
+	libgnmi
+	PATHS
+	/usr/lib
+	/usr/lib64	
+	/usr/local/lib
+	/usr/local/lib64
+	/opt/local/lib
+	/sw/lib
+	${CMAKE_LIBRARY_PATH}
+	${CMAKE_INSTALL_PREFIX}/lib
+)
 
 find_library(xml2_location xml2)
 find_library(curl_location curl)
@@ -40,11 +59,12 @@ find_library(ydk_location ydk)
 find_library(ydk_ydktest_location ydk_ydktest)
 find_library(ydk_ydktest_new_location ydk_ydktest_new)
 find_package(PythonLibs REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(gRPC REQUIRED)
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -fprofile-arcs -ftest-coverage")
-
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
@@ -71,6 +91,11 @@ target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
     ${pthread_location}
     ${dl_location}
     ${PYTHON_LIBRARIES}
+    ${LIBGNMI_LIBRARY}
+    grpc++_unsecure 
+    grpc 
+    gpr 
+    ${PROTOBUF_LIBRARY}
     -rdynamic
 )
 

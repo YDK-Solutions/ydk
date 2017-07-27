@@ -14,10 +14,10 @@ from __future__ import absolute_import
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
-import ydk.types as ytypes
+import sys
 import unittest
 
+import ydk.types as ytypes
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
@@ -25,16 +25,26 @@ from ydk.errors import YPYError, YPYModelError
 from ydk.models.deviation import openconfig_bgp, openconfig_bgp_types
 from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyType, RoutingPolicy
 
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
+
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12023)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = 12023
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -55,8 +65,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, non_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
-

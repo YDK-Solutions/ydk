@@ -23,6 +23,7 @@ class_inits_printer.py
 from pyang.types import UnionTypeSpec, PathTypeSpec
 from ydkgen.api_model import Bits, Class, Package, DataType, Enum
 from ydkgen.builder import TypesExtractor
+from ydkgen.common import get_module_name
 
 
 def get_leafs(clazz):
@@ -51,8 +52,9 @@ def get_lists(clazz):
 
 class ClassInitsPrinter(object):
 
-    def __init__(self, ctx):
+    def __init__(self, ctx, module_namespace_lookup):
         self.ctx = ctx
+        self.module_namespace_lookup = module_namespace_lookup
 
     def print_output(self, clazz, leafs, children):
         self._print_class_inits_header(clazz)
@@ -65,8 +67,9 @@ class ClassInitsPrinter(object):
 
     def _print_class_inits_body(self, clazz, leafs, children):
         if clazz.is_identity():
-            arg = '"%s:%s"' % (clazz.module.arg, clazz.stmt.arg)
-            line = 'super(%s, self).__init__(%s)' % (clazz.name, arg)
+            module_name = get_module_name(clazz.stmt)
+            namespace = self.module_namespace_lookup[module_name]
+            line = 'super(%s, self).__init__("%s", "%s", "%s:%s")' % (clazz.name, namespace, module_name, module_name, clazz.stmt.arg)
             self.ctx.writeln(line)
         else:
             self.ctx.writeln('super(%s, self).__init__()' % clazz.qn())
@@ -213,7 +216,7 @@ class ClassSetAttrPrinter(object):
         self.ctx.lvl_dec()
         self.ctx.writeln('else:')
         self.ctx.lvl_inc()
-        self.ctx.writeln('if hasattr(value, "parent"):')
+        self.ctx.writeln('if hasattr(value, "parent") and name != "parent":')
         self.ctx.lvl_inc()
         self.ctx.writeln('if hasattr(value, "is_presence_container") and value.is_presence_container:')
         self.ctx.lvl_inc()

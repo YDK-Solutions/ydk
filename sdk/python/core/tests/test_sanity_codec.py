@@ -26,6 +26,7 @@ from ydk.providers import CodecServiceProvider
 from ydk.services import CodecService
 from ydk.errors import YPYServiceError
 from ydk.types import EncodingFormat
+
 from test_utils import assert_with_error
 
 
@@ -33,6 +34,7 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
+        self.maxDiff = None
         self.codec = CodecService()
         self.provider = CodecServiceProvider(type='xml')
 
@@ -302,6 +304,23 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(entity.a.get(), 'Hello')
         self.assertEqual(entity.b.b.get(), 'Hello')
 
+    def test_xml_subtree(self):
+        self.provider.encoding = EncodingFormat.XML
+        r_1 = self._get_runner_entity()
+        payload = self.codec.encode(self.provider, r_1, subtree=True)
+        self.assertEqual(self._xml_runner_payload[:-1], payload)
+        r_2 = self.codec.decode(self.provider, payload, subtree=True)
+        self.assertEqual(r_1, r_2)
+
+    @assert_with_error("Subtree option can only be used with XML encoding", YPYServiceError)
+    def test_decode_invalid_subtree_1(self):
+        self.provider.encoding = EncodingFormat.JSON
+        self.codec.decode(self.provider, '{"ydktest-sanity:runner": {}}', subtree=True)
+
+    @assert_with_error("Subtree option can only be used with XML encoding", YPYServiceError)
+    def test_decode_invalid_subtree_2(self):
+        self.provider.encoding = EncodingFormat.JSON
+        self.codec.encode(self.provider, ysanity.Runner(), subtree=True)
 
 if __name__ == '__main__':
     import sys

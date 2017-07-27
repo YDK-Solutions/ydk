@@ -21,17 +21,18 @@
 #include <ydk/codec_provider.hpp>
 #include <ydk/codec_service.hpp>
 #include <ydk/crud_service.hpp>
-#include <ydk/entity_util.hpp>
 #include <ydk/entity_data_node_walker.hpp>
+#include <ydk/entity_util.hpp>
 #include <ydk/executor_service.hpp>
 #include <ydk/filters.hpp>
 #include <ydk/logging_callback.hpp>
-#include <ydk/netconf_service.hpp>
 #include <ydk/netconf_provider.hpp>
+#include <ydk/netconf_service.hpp>
 #include <ydk/opendaylight_provider.hpp>
-#include <ydk/restconf_provider.hpp>
 #include <ydk/path_api.hpp>
+#include <ydk/restconf_provider.hpp>
 #include <ydk/types.hpp>
+#include <ydk/xml_subtree_codec.hpp>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/null_sink.h>
@@ -48,7 +49,7 @@ PYBIND11_MAKE_OPAQUE(ChildrenMap)
 
 static object log_debug;
 static object log_info;
-static object log_warn;
+static object log_warning;
 static object log_error;
 static object log_critical;
 static bool added_nullhandler = false;
@@ -76,7 +77,7 @@ void add_null_handler(object logger)
 
 void debug(const char* msg) { log_debug(msg); }
 void info(const char* msg) { log_info(msg); }
-void warn(const char* msg) { log_warn(msg); }
+void warning(const char* msg) { log_warning(msg); }
 void error(const char* msg) { log_error(msg); }
 void critical(const char* msg) { log_critical(msg); }
 
@@ -90,13 +91,13 @@ void setup_logging()
         add_null_handler(logger);
         log_debug = logger.attr("debug");
         log_info = logger.attr("info");
-        log_warn = logger.attr("warn");
+        log_warning = logger.attr("warning");
         log_error = logger.attr("error");
         log_critical = logger.attr("critical");
 
         ydk::set_logging_callback("debug", debug);
         ydk::set_logging_callback("info", info);
-        ydk::set_logging_callback("warn", warn);
+        ydk::set_logging_callback("warning", warning);
         ydk::set_logging_callback("error", error);
         ydk::set_logging_callback("critical", critical);
         enabled_logging = true;
@@ -163,13 +164,34 @@ public:
         );
     }
 
-    void set_value(const std::string & value_path, std::string value) override {
+    bool has_leaf_or_child_of_name(const std::string & name) const override {
+        PYBIND11_OVERLOAD_PURE(
+            bool,
+            ydk::Entity,
+            has_leaf_or_child_of_name,
+            name
+        );
+    }
+
+    void set_value(const std::string & value_path, const std::string & value, const std::string & name_space, const std::string & name_space_prefix) override {
         PYBIND11_OVERLOAD_PURE(
             void,
             ydk::Entity,
             set_value,
             value_path,
-            value
+            value,
+            name_space,
+            name_space_prefix
+        );
+    }
+
+    void set_filter(const std::string & value_path, ydk::YFilter yfilter) override {
+        PYBIND11_OVERLOAD_PURE(
+            void,
+            ydk::Entity,
+            set_filter,
+            value_path,
+            yfilter
         );
     }
 
@@ -237,7 +259,7 @@ PYBIND11_PLUGIN(ydk_)
     module filters = ydk.def_submodule("filters", "filters module");
     module types = ydk.def_submodule("types", "types module");
     module path = ydk.def_submodule("path", "path module");
-    module entity_utils = ydk.def_submodule("entity_utils", "path module");
+    module entity_utils = ydk.def_submodule("entity_utils", "entity utils module");
     module logging = ydk.def_submodule("logging", "logging");
 
     bind_vector<LeafDataList>(types, "LeafDataList");
@@ -259,59 +281,66 @@ PYBIND11_PLUGIN(ydk_)
         .def_readonly("arg", &ydk::path::Statement::arg);
 
     class_<ydk::path::SchemaNode, shared_ptr<ydk::path::SchemaNode>>(path, "SchemaNode")
-        .def("path", &ydk::path::SchemaNode::path)
-        .def("parent", &ydk::path::SchemaNode::parent)
-        .def("root", &ydk::path::SchemaNode::root, return_value_policy::reference)
-        .def("statement", &ydk::path::SchemaNode::statement, return_value_policy::reference)
+        .def("get_path", &ydk::path::SchemaNode::get_path)
+        .def("get_parent", &ydk::path::SchemaNode::get_parent)
+        .def("get_root", &ydk::path::SchemaNode::get_root, return_value_policy::reference)
+        .def("get_statement", &ydk::path::SchemaNode::get_statement, return_value_policy::reference)
         .def("find", &ydk::path::SchemaNode::find, return_value_policy::reference, arg("path"))
-        // .def("children", &ydk::path::SchemaNode::children)
-        .def("keys", &ydk::path::SchemaNode::keys, return_value_policy::reference);
+        // .def("get_children", &ydk::path::SchemaNode::get_children)
+        .def("get_keys", &ydk::path::SchemaNode::get_keys, return_value_policy::reference);
 
 
     class_<ydk::path::DataNode, shared_ptr<ydk::path::DataNode>>(path, "DataNode")
-        .def("schema", &ydk::path::DataNode::schema, return_value_policy::reference)
-        .def("path", &ydk::path::DataNode::path, return_value_policy::reference)
-        .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create, return_value_policy::reference, arg("path"))
-        .def("create", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create, return_value_policy::reference, arg("path"), arg("value"))
-        .def("get", &ydk::path::DataNode::get, return_value_policy::reference)
-        .def("set", &ydk::path::DataNode::set, return_value_policy::reference, arg("value"))
-        .def("children", &ydk::path::DataNode::children, return_value_policy::reference)
-        .def("root", &ydk::path::DataNode::root, return_value_policy::reference)
+        .def("get_schema_node", &ydk::path::DataNode::get_schema_node, return_value_policy::reference)
+        .def("get_path", &ydk::path::DataNode::get_path, return_value_policy::reference)
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&)) &ydk::path::DataNode::create_datanode, return_value_policy::reference, arg("path"))
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::DataNode::*)(const string&, const string&)) &ydk::path::DataNode::create_datanode, return_value_policy::reference, arg("path"), arg("value"))
+        .def("get_value", &ydk::path::DataNode::get_value, return_value_policy::reference)
+        .def("set_value", &ydk::path::DataNode::set_value, return_value_policy::reference, arg("value"))
+        .def("get_children", &ydk::path::DataNode::get_children, return_value_policy::reference)
+        .def("get_root", &ydk::path::DataNode::get_root, return_value_policy::reference)
         .def("find", &ydk::path::DataNode::find, return_value_policy::reference, arg("path"))
         .def("add_annotation", &ydk::path::DataNode::add_annotation, return_value_policy::reference, arg("annotation"))
         .def("remove_annotation", &ydk::path::DataNode::remove_annotation, return_value_policy::reference, arg("annotation"))
         .def("annotations", &ydk::path::DataNode::annotations, return_value_policy::reference);
 
     class_<ydk::path::RootSchemaNode, shared_ptr<ydk::path::RootSchemaNode>>(path, "RootSchemaNode")
-        .def("path", &ydk::path::RootSchemaNode::path, return_value_policy::reference)
-        .def("parent", &ydk::path::RootSchemaNode::parent, return_value_policy::reference)
+        .def("get_path", &ydk::path::RootSchemaNode::get_path, return_value_policy::reference)
+        .def("get_parent", &ydk::path::RootSchemaNode::get_parent, return_value_policy::reference)
         .def("find", &ydk::path::RootSchemaNode::find, return_value_policy::reference)
-        .def("root", &ydk::path::RootSchemaNode::root, return_value_policy::reference)
-//      .def("children", &ydk::path::RootSchemaNode::children)
-        .def("create", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&)) &ydk::path::RootSchemaNode::create, return_value_policy::reference, arg("path"))
-        .def("create", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&, const string&)) &ydk::path::RootSchemaNode::create, return_value_policy::reference, arg("path"), arg("value"))
-        .def("rpc", &ydk::path::RootSchemaNode::rpc, arg("path"), return_value_policy::reference);
+        .def("get_root", &ydk::path::RootSchemaNode::get_root, return_value_policy::reference)
+//      .def("get_children", &ydk::path::RootSchemaNode::get_children)
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&)) &ydk::path::RootSchemaNode::create_datanode, return_value_policy::reference, arg("path"))
+        .def("create_datanode", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&, const string&)) &ydk::path::RootSchemaNode::create_datanode, return_value_policy::reference, arg("path"), arg("value"))
+        .def("create_rpc", &ydk::path::RootSchemaNode::create_rpc, arg("path"), return_value_policy::reference);
 
     class_<ydk::path::ServiceProvider>(path, "ServiceProvider")
         .def("invoke", &ydk::path::ServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::path::ServiceProvider::get_root_schema, return_value_policy::reference);
 
     class_<ydk::path::Rpc, shared_ptr<ydk::path::Rpc>>(path, "Rpc")
-        .def("schema", &ydk::path::Rpc::schema, return_value_policy::reference)
-        .def("input", &ydk::path::Rpc::input, return_value_policy::reference)
+        .def("get_schema_node", &ydk::path::Rpc::get_schema_node, return_value_policy::reference)
+        .def("get_input_node", &ydk::path::Rpc::get_input_node, return_value_policy::reference)
+        .def("has_output_node", &ydk::path::Rpc::has_output_node)
         .def("__call__", &ydk::path::Rpc::operator(), arg("service_provider"));
 
     class_<ydk::path::Repository>(path, "Repository")
         .def(init<>())
         .def(init<const string&>())
-        .def("create_root_schema", &ydk::path::Repository::create_root_schema, return_value_policy::move);
+        .def("create_root_schema",
+            (std::shared_ptr<ydk::path::RootSchemaNode> (ydk::path::Repository::*)(const std::vector<ydk::path::Capability>&)) &ydk::path::Repository::create_root_schema,
+            return_value_policy::move)
+        .def("create_root_schema",
+            (std::shared_ptr<ydk::path::RootSchemaNode> (ydk::path::Repository::*)(const std::vector<ydk::path::Capability>&, const std::vector<ydk::path::Capability>&)) &ydk::path::Repository::create_root_schema,
+            return_value_policy::move);
 
-    class_<ydk::path::CodecService> codec_service(path, "CodecService");
+    class_<ydk::path::Codec> codec(path, "Codec");
 
-    codec_service
+    codec
         .def(init<>())
-        .def("encode", &ydk::path::CodecService::encode, arg("data_node"), arg("encoding"), arg("pretty"))
-        .def("decode", &ydk::path::CodecService::decode, arg("root_schema_node"), arg("payload"), arg("encoding"));
+        .def("encode", &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
+        .def("decode", &ydk::path::Codec::decode, arg("root_schema_node"), arg("payload"), arg("encoding"))
+        .def("decode_rpc_output", &ydk::path::Codec::decode_rpc_output, arg("root_schema_node"), arg("payload"), arg("rpc_path"), arg("encoding"));
 
     enum_<ydk::DataStore>(services, "DataStore")
         .value("candidate", ydk::DataStore::candidate)
@@ -354,10 +383,12 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("set", &ydk::Empty::set);
 
     class_<ydk::LeafData>(types, "LeafData")
-        .def(init<string, ydk::YFilter, bool>())
+        .def(init<const string &, ydk::YFilter, bool, const string &, const string &>())
         .def_readonly("value", &ydk::LeafData::value, return_value_policy::reference)
         .def_readonly("yfilter", &ydk::LeafData::yfilter, return_value_policy::reference)
         .def_readonly("is_set", &ydk::LeafData::is_set, return_value_policy::reference)
+        .def_readonly("name_space", &ydk::LeafData::name_space, return_value_policy::reference)
+        .def_readonly("name_space_prefix", &ydk::LeafData::name_space_prefix, return_value_policy::reference)
         .def(self == self, return_value_policy::reference);
 
     class_<ydk::Entity, PyEntity, shared_ptr<ydk::Entity>>(types, "Entity")
@@ -366,6 +397,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_segment_path", &ydk::Entity::get_segment_path, return_value_policy::reference)
         .def("get_child_by_name", &ydk::Entity::get_child_by_name, return_value_policy::reference)
         .def("set_value", &ydk::Entity::set_value, return_value_policy::reference)
+        .def("set_filter", &ydk::Entity::set_filter, return_value_policy::reference)
         .def("has_data", &ydk::Entity::has_data, return_value_policy::reference)
         .def("has_operation", &ydk::Entity::has_operation, return_value_policy::reference)
         .def("get_children", &ydk::Entity::get_children, return_value_policy::reference)
@@ -405,7 +437,7 @@ PYBIND11_PLUGIN(ydk_)
         .def_readwrite("value", &ydk::Decimal64::value);
 
     class_<ydk::Identity>(types, "Identity")
-        .def(init<string>())
+        .def(init<const std::string &, const std::string &, const std::string &>())
         .def("to_string", &ydk::Identity::to_string, return_value_policy::reference);
 
     class_<ydk::Enum> enum_(types, "Enum");
@@ -450,7 +482,9 @@ PYBIND11_PLUGIN(ydk_)
         .def("set", (void (ydk::YLeaf::*)(ydk::Enum::YLeaf)) &ydk::YLeaf::set, arg("value"))
         .def("set", (void (ydk::YLeaf::*)(ydk::Decimal64)) &ydk::YLeaf::set, arg("value"))
         .def_readonly("is_set", &ydk::YLeaf::is_set, return_value_policy::reference)
-        .def_readwrite("yfilter", &ydk::YLeaf::yfilter);
+        .def_readwrite("yfilter", &ydk::YLeaf::yfilter)
+        .def_readwrite("value_namespace", &ydk::YLeaf::value_namespace)
+        .def_readwrite("value_namespace_prefix", &ydk::YLeaf::value_namespace_prefix);
 
     class_<ydk::YLeafList, PyYLeafList>(types, "YLeafList")
         .def(init<ydk::YType, string>(), arg("leaflist_type"), arg("name"))
@@ -484,53 +518,53 @@ PYBIND11_PLUGIN(ydk_)
 
     class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, string address, string username, string password, int port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port);
+            [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port, protocol, on_demand);
             },
             arg("repo"),
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=830,
-            arg("protocol")=string("ssh"))
+            arg("protocol")=string("ssh"),
+            arg("on_demand")=true)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol, on_demand);
             },
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=830,
-            arg("protocol")=string("ssh"))
+            arg("protocol")=string("ssh"),
+            arg("on_demand")=true)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, void* port, string protocol) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, void* port, const string& protocol, bool on_demand) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol, on_demand);
             },
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=nullptr,
-            arg("protocol")=string("ssh"))
+            arg("protocol")=string("ssh"),
+            arg("on_demand")=true)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password, int port) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, bool on_demand) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, "ssh", on_demand);
             },
             arg("address"),
             arg("username"),
             arg("password"),
-            arg("port")=830)
+            arg("port")=830,
+            arg("on_demand")=true)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, string address, string username, string password) {
-                    // use default protocol at the moment
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, bool on_demand) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, "ssh", on_demand);
             },
             arg("address"),
             arg("username"),
-            arg("password"))
+            arg("password"),
+            arg("on_demand")=true)
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 
@@ -620,6 +654,11 @@ PYBIND11_PLUGIN(ydk_)
             arg("provider"),
             arg("source_config"),
             return_value_policy::reference);
+
+    class_<ydk::XmlSubtreeCodec>(entity_utils, "XmlSubtreeCodec")
+        .def(init<>())
+        .def("encode", &ydk::XmlSubtreeCodec::encode, return_value_policy::reference)
+        .def("decode", &ydk::XmlSubtreeCodec::decode);
 
     entity_utils.def("get_relative_entity_path", &ydk::get_relative_entity_path);
     entity_utils.def("get_entity_from_data_node", &ydk::get_entity_from_data_node);

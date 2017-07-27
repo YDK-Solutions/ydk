@@ -28,7 +28,7 @@ using json = nlohmann::json;
 
 namespace ydk
 {
-#define ODLNode network_topology::NetworkTopology::Topology::Node
+#define ODLNode opendaylight::network_topology::NetworkTopology::Topology::Node
 
 //////////////////////////////////////////
 //// OpenDaylightCapabilitiesParser

@@ -1,7 +1,7 @@
 .. _howto-path:
 
-How To Path
-===========
+Using the Path API
+==================
 
 .. module:: ydk.path
 
@@ -65,28 +65,28 @@ Example for using Path API is shown below(assuming you have openconfig-bgp avaia
     log.addHandler(ch)                                                      # enable logging
 
     from ydk.providers import NetconfServiceProvider
-    from ydk.path import CodecService
+    from ydk.path import Codec
     from ydk.types import EncodingFormat
 
     provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
     root_schema = provider.get_root_schema()                                # get root schema node
 
-    bgp = root_schema.create("openconfig-bgp:bgp", "")
-    bgp.create("global/config/as", "65172")
-    l3vpn_ipv4_unicast = bgp.create("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "")
-    l3vpn_ipv4_unicast.create("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST")
-    l3vpn_ipv4_unicast.create("config/enabled","true")
-    neighbor = bgp.create("neighbors/neighbor[neighbor-address='172.16.255.2']", "")
-    neighbor.create("config/neighbor-address", "172.16.255.2")
-    neighbor.create("config/peer-as","65172")
-    neighbor_af = neighbor.create("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "")
-    neighbor_af.create("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST")
-    neighbor_af.create("config/enabled","true")
+    bgp = root_schema.create_datanode("openconfig-bgp:bgp", "")
+    bgp.create_datanode("global/config/as", "65172")
+    l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "")
+    l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST")
+    l3vpn_ipv4_unicast.create_datanode("config/enabled","true")
+    neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "")
+    neighbor.create_datanode("config/neighbor-address", "172.16.255.2")
+    neighbor.create_datanode("config/peer-as","65172")
+    neighbor_af = neighbor.create_datanode("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "")
+    neighbor_af.create_datanode("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST")
+    neighbor_af.create_datanode("config/enabled","true")
 
-    codec_service = CodecService()
+    codec_service = Codec()
     xml = codec_service.encode(bgp, EncodingFormat.XML, True)               # get XML encoding
-    create_rpc = root_schema.rpc('ydk:create')
-    create_rpc.input().create('entity', xml)
+    create_rpc = root_schema.create_rpc('ydk:create')
+    create_rpc.get_input_node().create_datanode('entity', xml)
     create_rpc(provider)                                                    # create bgp configuration
 
     json = codec_service.encode(bgp, EncodingFormat.JSON, True)             # get JSON encoding

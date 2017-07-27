@@ -15,9 +15,12 @@
 # ------------------------------------------------------------------
 
 from __future__ import absolute_import
-import ydk.types as ytypes
+
+
+import sys
 import unittest
 
+import ydk.types as ytypes
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
@@ -25,19 +28,28 @@ from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64, YType, YLeaf, Bits
 from ydk.errors import YPYError, YPYModelError, YPYServiceProviderError
-
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -455,7 +467,10 @@ class SanityTest(unittest.TestCase):
     #     pass
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, non_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
+

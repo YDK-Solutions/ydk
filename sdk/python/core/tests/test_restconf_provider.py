@@ -25,7 +25,7 @@ import unittest
 from ydk.providers import RestconfServiceProvider
 from ydk.types import EncodingFormat
 from ydk.path import Repository
-from ydk.path import CodecService
+from ydk.path import Codec
 
 from test_utils import assert_with_error
 
@@ -52,38 +52,38 @@ class SanityTest(unittest.TestCase):
 
     def test_create_del_read(self):
         root_schema = self.restconf_provider.get_root_schema()
-        runner = root_schema.create('ydktest-sanity:runner', '')
+        runner = root_schema.create_datanode('ydktest-sanity:runner', '')
 
-        delete_rpc = root_schema.rpc('ydk:delete')
-        codec_service = CodecService()
+        delete_rpc = root_schema.create_rpc('ydk:delete')
+        codec_service = Codec()
 
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
-        delete_rpc.input().create('entity', json)
+        delete_rpc.get_input_node().create_datanode('entity', json)
         delete_rpc(self.restconf_provider)
 
-        number8 = runner.create('ytypes/built-in-t/number8', '3')
+        number8 = runner.create_datanode('ytypes/built-in-t/number8', '3')
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         self.assertNotEqual(json, '')
-        create_rpc = root_schema.rpc('ydk:create')
-        create_rpc.input().create('entity', json)
+        create_rpc = root_schema.create_rpc('ydk:create')
+        create_rpc.get_input_node().create_datanode('entity', json)
 
-        read_rpc = root_schema.rpc('ydk:read')
-        runner_read = root_schema.create('ydktest-sanity:runner', '')
+        read_rpc = root_schema.create_rpc('ydk:read')
+        runner_read = root_schema.create_datanode('ydktest-sanity:runner', '')
 
         json = codec_service.encode(runner_read, EncodingFormat.JSON, False)
         self.assertNotEqual(json, '')
-        read_rpc.input().create('filter', json)
+        read_rpc.get_input_node().create_datanode('filter', json)
 
         read_result = read_rpc(self.restconf_provider)
 
-        runner = root_schema.create('ydktest-sanity:runner', '')
-        number8 = runner.create('ytypes/built-in-t/number8', '5')
+        runner = root_schema.create_datanode('ydktest-sanity:runner', '')
+        number8 = runner.create_datanode('ytypes/built-in-t/number8', '5')
 
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         self.assertNotEqual(json, '')
 
-        update_rpc = root_schema.rpc('ydk:update')
-        update_rpc.input().create('entity', json)
+        update_rpc = root_schema.create_rpc('ydk:update')
+        update_rpc.get_input_node().create_datanode('entity', json)
         update_rpc(self.restconf_provider)
 
 

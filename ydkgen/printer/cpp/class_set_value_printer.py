@@ -20,7 +20,7 @@ source_printer.py
  prints C++ classes
 
 """
-from ydkgen.api_model import Bits
+from ydkgen.api_model import Bits, Class
 
 
 class ClassSetYLeafPrinter(object):
@@ -30,10 +30,14 @@ class ClassSetYLeafPrinter(object):
     def print_class_set_value(self, clazz, leafs):
         self._print_class_set_value_header(clazz)
         self._print_class_set_value_body(leafs)
-        self._print_class_set_value_trailer(clazz)
+        self._print_trailer(clazz)
+
+        self._print_class_set_filter_header(clazz)
+        self._print_class_set_filter_body(leafs)
+        self._print_trailer(clazz)
 
     def _print_class_set_value_header(self, clazz):
-        self.ctx.writeln('void %s::set_value(const std::string & value_path, std::string value)' % clazz.qualified_cpp_name())
+        self.ctx.writeln('void %s::set_value(const std::string & value_path, const std::string & value, const std::string & name_space, const std::string & name_space_prefix)' % clazz.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
 
@@ -53,14 +57,36 @@ class ClassSetYLeafPrinter(object):
             else:
                 self.ctx.writeln('%s[value] = true;' % leaf.name)
         elif(leaf.is_many):
-            self.ctx.writeln('%s.append(value);' % leaf.name)
+            if (isinstance(leaf.property_type, Class) and leaf.property_type.is_identity()):
+                self.ctx.writeln('Identity identity{name_space, name_space_prefix, value};')
+                self.ctx.writeln('%s.append(identity);' % leaf.name)
+            else:
+                self.ctx.writeln('%s.append(value);' % leaf.name)
         else:
             self.ctx.writeln('%s = value;' % leaf.name)
+            self.ctx.writeln('%s.value_namespace = name_space;' % leaf.name)
+            self.ctx.writeln('%s.value_namespace_prefix = name_space_prefix;' % leaf.name)
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
 
-    def _print_class_set_value_trailer(self, clazz):
+    def _print_class_set_filter_header(self, clazz):
+        self.ctx.writeln('void %s::set_filter(const std::string & value_path, YFilter yfilter)' % clazz.qualified_cpp_name())
+        self.ctx.writeln('{')
+        self.ctx.lvl_inc()
+
+    def _print_class_set_filter_body(self, leafs):
+        for leaf in leafs:
+            self._print_class_set_filters(leaf)
+
+    def _print_class_set_filters(self, leaf):
+        self.ctx.writeln('if(value_path == "%s")' % (leaf.stmt.arg))
+        self.ctx.writeln('{')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('%s.yfilter = yfilter;' % leaf.name)
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+
+    def _print_trailer(self, clazz):
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()
-

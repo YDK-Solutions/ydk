@@ -32,10 +32,9 @@ using namespace std;
 
 namespace ydk
 {
-LeafData::LeafData(std::string value, YFilter yfilter, bool is_set)
-    : value(value), yfilter(yfilter), is_set(is_set)
+LeafData::LeafData(const string & value, YFilter yfilter, bool is_set, const string & name_space, const string & name_space_prefix)
+    : value(value), name_space(name_space), name_space_prefix(name_space_prefix), yfilter(yfilter), is_set(is_set)
 {
-
 }
 
 LeafData::~LeafData()

@@ -19,6 +19,15 @@
 Utility function for test cases.
 """
 import re
+import unittest
+from argparse import ArgumentParser
+
+import sys
+if sys.version_info > (3,):
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
+
 
 def assert_with_error(pattern, ErrorClass):
     def assert_with_pattern(func):
@@ -30,3 +39,45 @@ def assert_with_error(pattern, ErrorClass):
                 self.assertEqual(res is not None, True)
         return helper
     return assert_with_pattern
+
+
+class ParametrizedTestCase(unittest.TestCase):
+    """ TestCase classes that want to be parametrized should
+        inherit from this class.
+    """
+    def __init__(self, methodName='runTest'):
+        super(ParametrizedTestCase, self).__init__(methodName)
+
+    @staticmethod
+    def parametrize(testcase_klass, device, non_demand):
+        """ Create a suite containing all tests taken from the given
+            subclass, passing them the parameter 'param'.
+        """
+        testloader = unittest.TestLoader()
+        testcase_klass.hostname = device.hostname
+        testcase_klass.username = device.username
+        testcase_klass.password = device.password
+        testcase_klass.port = device.port
+        testcase_klass.protocol = device.scheme
+        testcase_klass.non_demand = non_demand
+        testnames = testloader.getTestCaseNames(testcase_klass)
+        suite = unittest.TestSuite()
+        for name in testnames:
+            suite.addTest(testcase_klass(name))
+        return suite
+
+
+def get_device_info():
+    parser = ArgumentParser()
+    parser.add_argument("-v", "--verbose", help="print debugging messages",
+                        action="store_true")
+    parser.add_argument("--non-demand", help="disable on demand model downloading",
+                        dest="non_demand", action="store_true")
+    parser.add_argument("device", nargs='?',
+                        help="NETCONF device (ssh://user:password@host:port)")
+
+    args = parser.parse_args()
+    if not args.device:
+        args.device = "ssh://admin:admin@127.0.0.1:12022"
+    device = urlparse(args.device)
+    return device, args.non_demand

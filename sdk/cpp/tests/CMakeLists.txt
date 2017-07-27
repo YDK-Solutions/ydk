@@ -8,7 +8,8 @@ enable_testing()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
         test_core_netconf.cpp
-        test_netconf_client.cpp
+        test_netconf_ssh_client.cpp
+        test_netconf_tcp_client.cpp
         test_restconf_client.cpp
         testsanitynctest.cpp
         test_crud.cpp
@@ -23,6 +24,7 @@ set(bundle_tests_src
         test_netconf_service.cpp
         test_errors.cpp
         test_opendaylight.cpp
+        test_xml_subtree.cpp
         main.cpp)
 
 find_library(xml2_location xml2)

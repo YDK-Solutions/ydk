@@ -24,11 +24,11 @@ import xml.etree.ElementTree
 
 from ydk.entity_utils import get_data_node_from_entity as _get_data_node_from_entity
 from ydk.entity_utils import get_entity_from_data_node as _get_entity_from_data_node
-from ydk.path import CodecService as _CodecService
-from ydk.path import Capability as _Capability
+from ydk.entity_utils import XmlSubtreeCodec
+from ydk.path import Codec as _Codec
 from ydk.errors import YPYServiceProviderError as _YPYServiceProviderError
+from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
-from ydk.errors.error_handler import handle_import_error as _handle_import_error
 from ydk.errors.error_handler import check_argument as _check_argument
 from ydk.types import EncodingFormat
 
@@ -50,7 +50,7 @@ class CodecService(object):
         self.logger = logging.getLogger(__name__)
 
     @_check_argument
-    def encode(self, provider, entity_holder, pretty=True):
+    def encode(self, provider, entity_holder, pretty=True, subtree=False):
         """Encode entities from entity_holder to string payload(s).
 
         Args:
@@ -68,12 +68,12 @@ class CodecService(object):
         if isinstance(entity_holder, dict):
             payload_map = {}
             for key in entity_holder:
-                payload_map[key] = self._encode(provider, entity_holder[key], pretty)
+                payload_map[key] = self._encode(provider, entity_holder[key], pretty, subtree)
             return payload_map
         else:
-            return self._encode(provider, entity_holder, pretty)
+            return self._encode(provider, entity_holder, pretty, subtree)
 
-    def _encode(self, provider, entity, pretty):
+    def _encode(self, provider, entity, pretty, subtree):
         """Encode a YDK entity to string payload.
 
         Args:
@@ -91,15 +91,21 @@ class CodecService(object):
         provider.initialize(bundle_name, _get_yang_path(entity))
         root_schema = provider.get_root_schema(bundle_name)
 
+        if subtree:
+            if provider.encoding != EncodingFormat.XML:
+                raise _YPYServiceError('Subtree option can only be used with XML encoding')
+            xml_codec = XmlSubtreeCodec()
+            return xml_codec.encode(entity, root_schema)
+
         with _handle_error():
             data_node = _get_data_node_from_entity(entity, root_schema)
-            codec_service = _CodecService()
+            codec_service = _Codec()
             result = codec_service.encode(data_node, provider.encoding, pretty)
-            self.logger.debug("Performing encode yfilter, resulting in {}".format(result))
+            self.logger.debug("Performing encode operation, resulting in {}".format(result))
             return result
 
     @_check_argument
-    def decode(self, provider, payload_holder):
+    def decode(self, provider, payload_holder, subtree=False):
         """Decode payload from payload holder to YDK entities.
 
         Args:
@@ -116,13 +122,13 @@ class CodecService(object):
         if isinstance(payload_holder, dict):
             entities = {}
             for key in payload_holder:
-                entity = self.decode(provider, payload_holder[key])
+                entity = self.decode(provider, payload_holder[key], subtree)
                 entities[key] = entity
             return entities
         else:
-            return self._decode(provider, payload_holder)
+            return self._decode(provider, payload_holder, subtree)
 
-    def _decode(self, provider, payload):
+    def _decode(self, provider, payload, subtree):
         """Decode payload to a YDK entity instance.
 
         Args:
@@ -140,21 +146,27 @@ class CodecService(object):
         """
         entity = self._get_top_entity(payload, provider.encoding)
 
+        if subtree:
+            if provider.encoding != EncodingFormat.XML:
+                raise _YPYServiceError('Subtree option can only be used with XML encoding')
+            xml_codec = XmlSubtreeCodec()
+            return xml_codec.decode(payload, entity)
+
         bundle_name = _get_bundle_name(entity)
         provider.initialize(bundle_name, _get_yang_path(entity))
 
         root_schema = provider.get_root_schema(bundle_name)
 
-        self.logger.debug("Performing decode yfilter on {}".format(payload))
+        self.logger.debug("Performing decode operation on {}".format(payload))
 
-        codec_service = _CodecService()
+        codec_service = _Codec()
         root_data_node = codec_service.decode(root_schema, payload, provider.encoding)
 
-        if len(root_data_node.children()) != 1:
+        if len(root_data_node.get_children()) != 1:
             self.logger.debug(_PAYLOAD_ERROR_MSG)
             raise _YPYServiceProviderError(_PAYLOAD_ERROR_MSG)
         else:
-            for data_node in root_data_node.children():
+            for data_node in root_data_node.get_children():
                 _get_entity_from_data_node(data_node, entity)
         return entity
 

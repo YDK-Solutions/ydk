@@ -28,10 +28,11 @@ from .class_enum_printer import EnumPrinter
 
 
 class SourcePrinter(MultiFilePrinter):
-    def __init__(self, ctx, bundle_name):
+    def __init__(self, ctx, bundle_name, module_namespace_lookup):
         super(SourcePrinter, self).__init__(ctx)
         self.enum_printer = EnumPrinter(self.ctx)
         self.bundle_name = bundle_name
+        self.module_namespace_lookup = module_namespace_lookup
 
     def print_body(self, multi_file):
         assert isinstance(multi_file, MultiFileSource)
@@ -54,7 +55,9 @@ class SourcePrinter(MultiFilePrinter):
         for header_import in multi_file.imports:
             self.ctx.writeln(header_import)
         self.ctx.bline()
-        self.ctx.writeln('namespace ydk {')
+        self.ctx.writeln('using namespace ydk;')
+        self.ctx.bline()
+        self.ctx.writeln('namespace %s {' % self.bundle_name)
         self.ctx.writeln('namespace %s {' % package.name)
         self.ctx.bline()
 
@@ -66,7 +69,7 @@ class SourcePrinter(MultiFilePrinter):
         self.ctx.bline()
 
     def _print_class(self, clazz):
-        ClassSourcePrinter(self.ctx, self.bundle_name).print_output(clazz)
+        ClassSourcePrinter(self.ctx, self.bundle_name, self.module_namespace_lookup).print_output(clazz)
 
     def _print_enums(self, package, classes):
         self.enum_printer.print_enum_to_string_funcs(package, classes)

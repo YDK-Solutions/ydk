@@ -36,15 +36,15 @@ ydk::path::DataNode::~DataNode()
 }
 
 ydk::path::DataNode&
-ydk::path::DataNode::create(const std::string& path)
+ydk::path::DataNode::create_datanode(const std::string& path)
 {
-    return create(path, "");
+    return create_datanode(path, "");
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // class ydk::DataNodeImpl
 //////////////////////////////////////////////////////////////////////////
-ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_parent{parent}, m_node{node}
+ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node, const std::shared_ptr<RepositoryPtr> repo): m_parent{parent}, m_node{node}, m_priv_repo{repo}
 {
     //add the children
     if(m_node && m_node->child && !(m_node->schema->nodetype == LYS_LEAF ||
@@ -53,7 +53,7 @@ ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node): m_paren
     {
         lyd_node *iter = nullptr;
         LY_TREE_FOR(m_node->child, iter) {
-            child_map.insert(std::make_pair(iter, std::make_shared<DataNodeImpl>(this, iter)));
+            child_map.insert(std::make_pair(iter, std::make_shared<DataNodeImpl>(this, iter, m_priv_repo)));
         }
     }
 
@@ -68,14 +68,14 @@ ydk::path::DataNodeImpl::~DataNodeImpl()
 }
 
 const ydk::path::SchemaNode&
-ydk::path::DataNodeImpl::schema() const
+ydk::path::DataNodeImpl::get_schema_node() const
 {
     auto schema_ptr = reinterpret_cast<const SchemaNode*>(m_node->schema->priv);
     return *schema_ptr;
 }
 
 std::string
-ydk::path::DataNodeImpl::path() const
+ydk::path::DataNodeImpl::get_path() const
 {
     char* path = lyd_path(m_node);
     if (!path) {
@@ -86,9 +86,18 @@ ydk::path::DataNodeImpl::path() const
     return str;
 }
 
-ydk::path::DataNode&
-ydk::path::DataNodeImpl::create(const std::string& path, const std::string& value)
+void
+ydk::path::DataNodeImpl::populate_new_schemas_from_path(const std::string& path)
 {
+    auto snode = reinterpret_cast<SchemaNodeImpl*>(m_node->schema->priv);
+    snode->populate_new_schemas_from_path(path);
+}
+
+ydk::path::DataNode&
+ydk::path::DataNodeImpl::create_datanode(const std::string& path, const std::string& value)
+{
+    populate_new_schemas_from_path(path);
+    populate_new_schemas_from_path(value);
     return create_helper(path, value);
 }
 
@@ -117,7 +126,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
     size_t start_index = 0;
     auto iter = segments.begin();
 
-    YLOG_DEBUG("Current path: {}", schema().path());
+    YLOG_DEBUG("Current path: {}", get_schema_node().get_path());
     YLOG_DEBUG("Top container path: {}", top_container_path);
 
     while (iter != segments.end())
@@ -148,13 +157,13 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
             dn = dynamic_cast<DataNodeImpl*>(r[0].get());
             ++iter;
             start_index++;
-            YLOG_DEBUG("Found existing datanode with path '{}'", dn->path());
+            YLOG_DEBUG("Found existing datanode with path '{}'", dn->get_path());
 
             auto s = dn->m_node->schema;
             if (s->nodetype == LYS_LEAFLIST)
             {
-                YLOG_ERROR("Duplicate leaf-list item detected: {}", dn->path());
-                throw(YCPPModelError{"Duplicate leaf-list item detected: " + dn->path()});
+                YLOG_ERROR("Duplicate leaf-list item detected: {}", dn->get_path());
+                throw(YCPPModelError{"Duplicate leaf-list item detected: " + dn->get_path()});
             }
         }
     }
@@ -207,13 +216,13 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
     if (first_node_created)
     {
-        dn->child_map.insert(std::make_pair(first_node_created, std::make_shared<DataNodeImpl>(dn, first_node_created)));
+        dn->child_map.insert(std::make_pair(first_node_created, std::make_shared<DataNodeImpl>(dn, first_node_created, m_priv_repo)));
 
         DataNodeImpl* rdn = dynamic_cast<DataNodeImpl*>(dn->child_map[first_node_created].get());
 
-        while(!rdn->children().empty() && rdn->m_node != cn)
+        while(!rdn->get_children().empty() && rdn->m_node != cn)
         {
-            rdn = dynamic_cast<DataNodeImpl*>(rdn->children()[0].get());
+            rdn = dynamic_cast<DataNodeImpl*>(rdn->get_children()[0].get());
         }
 
         return *rdn;
@@ -225,7 +234,7 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 }
 
 void
-ydk::path::DataNodeImpl::set(const std::string& value)
+ydk::path::DataNodeImpl::set_value(const std::string& value)
 {
     //set depends on the kind of the node
     lys_node* s_node = m_node->schema;
@@ -253,7 +262,7 @@ ydk::path::DataNodeImpl::set(const std::string& value)
 }
 
 std::string
-ydk::path::DataNodeImpl::get() const
+ydk::path::DataNodeImpl::get_value() const
 {
     lys_node* s_node = m_node->schema;
     std::string ret {};
@@ -268,8 +277,10 @@ ydk::path::DataNodeImpl::get() const
 }
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::DataNodeImpl::find(const std::string& path) const
+ydk::path::DataNodeImpl::find(const std::string& path)
 {
+    populate_new_schemas_from_path(path);
+
     std::vector<std::shared_ptr<DataNode>> results;
 
     if(m_node == nullptr) {
@@ -277,7 +288,7 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
     }
     std::string spath{path};
 
-    auto s = schema().statement();
+    auto s = get_schema_node().get_statement();
     if(s.keyword == "rpc"){
         spath="input/" + spath;
     }
@@ -308,13 +319,13 @@ ydk::path::DataNodeImpl::find(const std::string& path) const
 }
 
 ydk::path::DataNode*
-ydk::path::DataNodeImpl::parent() const
+ydk::path::DataNodeImpl::get_parent() const
 {
     return m_parent;
 }
 
 std::vector<std::shared_ptr<ydk::path::DataNode>>
-ydk::path::DataNodeImpl::children() const
+ydk::path::DataNodeImpl::get_children() const
 {
     std::vector<std::shared_ptr<DataNode>> ret{};
     //the ordering should be determined by the lyd_node
@@ -336,10 +347,10 @@ ydk::path::DataNodeImpl::children() const
 }
 
 const ydk::path::DataNode&
-ydk::path::DataNodeImpl::root() const
+ydk::path::DataNodeImpl::get_root() const
 {
     if(m_parent){
-        return m_parent->root();
+        return m_parent->get_root();
     }
     return *this;
 }

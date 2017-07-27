@@ -23,12 +23,12 @@ if any. The Callable takes as a parameter the :cpp:class:`ServiceProvider<Servic
         :param sp: The Service provider.
         :return: Pointer to the :cpp:class:`DataNode<DataNode>` or ``nullptr`` if none exists.
 
-    .. cpp:function:: virtual DataNode& input() const
+    .. cpp:function:: virtual DataNode& get_input_node() const
 
         Get the input data tree.
 
         :return: Pointer to the input :cpp:class:`DataNode<DataNode>` or ``nullptr`` if the rpc does not have an input element in the schema.
 
-    .. cpp:function:: virtual SchemaNode& schema() const
+    .. cpp:function:: virtual SchemaNode& get_schema_node() const
 
         :return: Pointer to the :cpp:class:`SchemaNode<SchemaNode>` associated with this rpc.

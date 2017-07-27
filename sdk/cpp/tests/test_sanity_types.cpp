@@ -25,6 +25,7 @@
 #include "catch.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
 TEST_CASE("test_types_int8")
@@ -464,7 +465,6 @@ TEST_CASE("test_types_submodule")
     REQUIRE(r_1->one_aug->name == r_2->one_aug->name);
     REQUIRE(r_1->one_aug->number == r_2->one_aug->number);
 }
-
 
 TEST_CASE("test_types_identity_other_module")
 {

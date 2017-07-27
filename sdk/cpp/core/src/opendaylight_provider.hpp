@@ -60,7 +60,7 @@ class OpenDaylightServiceProvider
         int port;
         EncodingFormat encoding;
 
-        std::map<std::string, std::unique_ptr<network_topology::NetworkTopology::Topology::Node>> odl_nodes;
+        std::map<std::string, std::unique_ptr<opendaylight::network_topology::NetworkTopology::Topology::Node>> odl_nodes;
         std::map<std::string, std::unique_ptr<path::ServiceProvider>> providers;
         std::vector<std::string> node_ids;
 };

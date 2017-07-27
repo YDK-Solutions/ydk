@@ -47,7 +47,6 @@ class CodecServiceProvider(object):
         self.logger = logging.getLogger(__name__)
         self._root_schema_table = {}
 
-
         repo = kwargs.get('repo', None)
         if repo is None:
             self._user_provided_repo = False

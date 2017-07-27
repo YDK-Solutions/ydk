@@ -9,7 +9,7 @@ RootSchemaNode
 
     Instances of this class represent the ``Root`` of the ``SchemaTree``. A ``RootSchemaNode`` can be used to instantiate a ``DataNode`` tree or an ``Rpc`` object. The children of the ``RootSchemaNode`` represent the top level ``SchemaNode`` in the YANG module submodules.
 
-    .. py:method:: create(path, value=None)
+    .. py:method:: create_datanode(path, value=None)
 
         Create data node with path and value.
         This methods creates a :py:class:`DataNode` tree based on the path passed in. The path expression must identify a single node. If the last node created is of schema type ``list``, ``leaf-list`` or ``anyxml`` that value is also set in the node.
@@ -31,28 +31,28 @@ RootSchemaNode
         :return: List of schema node satisfies the criterion.
         :rtype: list of :py:class:`SchemaNode`
 
-    .. py:method:: parent()
+    .. py:method:: get_parent()
 
         Get parent.
 
         :return: ``RootSchemaNode``'s parent, which is ``None``.
         :rtype: None
 
-    .. py:method:: path()
+    .. py:method:: get_path()
 
         Get path.
 
         :return: ``RootSchemaNode``'s path, which is ``\``.
         :rtype: A Python string
 
-    .. py:method:: root()
+    .. py:method:: get_root()
 
         Get the root schema node for ``RootSchemaNode``.
 
         :return: ``RootSchemaNode``'s Root schema node.
         :rtype: :py:class:`SchemaNode<ydk.path.SchemaNode>`
 
-    .. py:method:: rpc(path)
+    .. py:method:: create_rpc(path)
 
         Create an Rpc instance.
 
@@ -70,4 +70,4 @@ RootSchemaNode
             from ydk.providers import NetconfServiceProvider
             provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin')
             root_schema = provider.get_root_schema()
-            root_schema.rpc('ydk:create')
+            root_schema.create_rpc('ydk:create')

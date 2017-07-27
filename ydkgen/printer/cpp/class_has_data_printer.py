@@ -60,7 +60,7 @@ class ClassHasDataPrinter(object):
 
     def _init_has_operation_conditions(self, leafs, children):
         conditions = ['is_set(yfilter)']
-        conditions.extend([ 'is_set(%s.yfilter)' % (prop.name) for prop in leafs])
+        conditions.extend([ 'ydk::is_set(%s.yfilter)' % (prop.name) for prop in leafs])
         conditions.extend([('(%s !=  nullptr && %s->has_operation())' % (prop.name, prop.name)) for prop in children if not prop.is_many])
         return conditions
 

@@ -59,17 +59,6 @@ typedef signed int int16;
 typedef signed int int32;
 typedef signed long long int64;
 
-// enum class YFilter
-// {
-//     merge,
-//     create,
-//     remove,
-//     delete_,
-//     replace,
-//     read,
-//     not_set
-// };
-
 typedef struct Empty {
     bool set;
 } Empty;
@@ -79,16 +68,17 @@ class Entity;
 class LeafData
 {
   public:
-    LeafData(std::string value, YFilter yfilter, bool is_set);
+    LeafData(const std::string & value, YFilter yfilter, bool is_set, const std::string & name_space, const std::string & name_space_prefix);
     ~LeafData();
 
     bool operator == (LeafData & other) const;
     bool operator == (const LeafData & other) const;
     friend std::ostream& operator<<(std::ostream& stream, const LeafData& value);
 
-
   public:
     std::string value;
+    std::string name_space;
+    std::string name_space_prefix;
     YFilter yfilter;
     bool is_set;
 };
@@ -132,8 +122,11 @@ class Entity {
     virtual bool has_data() const = 0;
     virtual bool has_operation() const = 0;
 
-    virtual void set_value(const std::string & value_path, std::string value) = 0;
+    virtual void set_value(const std::string & path, const std::string & value, const std::string & name_space="", const std::string & name_space_prefix="") = 0;
+    virtual void set_filter(const std::string & path, YFilter filter) = 0;
     virtual std::shared_ptr<Entity> get_child_by_name(const std::string & yang_name, const std::string & segment_path="") = 0;
+
+    virtual bool has_leaf_or_child_of_name(const std::string & name) const = 0;
 
     virtual std::map<std::string, std::shared_ptr<Entity>> get_children() const = 0;
     virtual std::shared_ptr<Entity> clone_ptr() const;
@@ -144,6 +137,7 @@ class Entity {
     virtual augment_capabilities_function get_augment_capabilities_function() const;
     virtual std::string get_bundle_yang_models_location() const;
     virtual std::string get_bundle_name() const;
+    virtual std::map<std::pair<std::string, std::string>, std::string> get_namespace_identity_lookup() const;
 
     bool operator == (Entity & other) const;
     bool operator == (const Entity & other) const;
@@ -171,7 +165,7 @@ class Bits {
 
 class Decimal64 {
   public:
-    Decimal64(std::string value)
+    Decimal64(const std::string & value)
      : value(value)
     {
     }
@@ -184,7 +178,7 @@ class Decimal64 {
 
 class Identity {
   public:
-    Identity(std::string tag) : tag(tag)
+    Identity(const std::string & name_space, const std::string & namespace_prefix, const std::string & tag) :name_space(name_space), namespace_prefix(namespace_prefix),  tag(tag)
     {
     }
 
@@ -195,6 +189,10 @@ class Identity {
         return tag;
     }
 
+  public:
+    std::string name_space;
+    std::string namespace_prefix;
+
   private:
     std::string tag;
 };
@@ -203,7 +201,7 @@ class Enum {
   public:
     class YLeaf {
       public:
-        YLeaf(int value, std::string name)
+        YLeaf(int value, const std::string & name)
             : value(value), name(name)
         {
         }
@@ -293,6 +291,8 @@ class YLeaf
   public:
     bool is_set;
     YFilter yfilter;
+    std::string value_namespace;
+    std::string value_namespace_prefix;
 
   private:
     void store_value(std::string && val);

@@ -19,6 +19,7 @@ sanity test for netconf
 """
 from __future__ import absolute_import
 
+import sys
 import unittest
 
 from ydk.errors import YPYModelError, YPYError, YPYServiceError
@@ -30,6 +31,11 @@ except:
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.services import ExecutorService, CodecService
 from ydk.types import Empty, EncodingFormat
+
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
+
 
 class SanityTest(unittest.TestCase):
 
@@ -46,7 +52,14 @@ class SanityTest(unittest.TestCase):
     def setUp(self):
         # start a brand new session for every single test case
         # so test_close_session_rpc will not interfere with other test cases
-        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        # self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
+        hostname = getattr(self, 'hostname', '127.0.0.1')
+        username = getattr(self, 'username', 'admin')
+        password = getattr(self, 'password', 'admin')
+        port = getattr(self, 'port', 12022)
+        protocol = getattr(self, 'protocol', 'ssh')
+        on_demand = not getattr(self, 'non_demand', True)
+        self.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
         from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
@@ -198,7 +211,10 @@ class SanityTest(unittest.TestCase):
         reply = self.executor.execute_rpc(self.ncc, get_schema_rpc)
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, non_demand = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
+

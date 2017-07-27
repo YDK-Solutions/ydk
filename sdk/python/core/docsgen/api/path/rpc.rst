@@ -18,14 +18,14 @@ Rpc
         :return: :py:class:`DataNode` instance if succeed.
         :rtype: None or :py:class:`DataNode`
 
-    .. py:method:: input()
+    .. py:method:: get_input_node()
 
         Get the input data tree.
 
         :return: :py:class:`DataNode` representing the input data tree or ``None`` if the rpc does not have an input element in the schema.
         :rtype: :py:class:`DataNode` or ``None``
 
-    .. py:method:: schema()
+    .. py:method:: get_schema_node()
 
         Get schema node for this rpc.
 

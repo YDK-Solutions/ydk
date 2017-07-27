@@ -27,6 +27,7 @@
 #include "path_api.hpp"
 #include "entity_data_node_walker.hpp"
 #include "validation_service.hpp"
+#include "xml_subtree_codec.hpp"
 #include "logger.hpp"
 #include <sstream>
 #include <libxml/parser.h>
@@ -37,9 +38,10 @@ using namespace std;
 
 namespace ydk {
 
-static string get_data_payload(Entity & entity, path::ServiceProvider & provider);
+static string get_config_data_payload(Entity & entity, path::ServiceProvider & provider);
+static string get_xml_subtree_filter_payload(Entity & entity, path::ServiceProvider & provider);
 static std::shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
-        const string & yfilter, const string & data_tag, bool set_config_flag);
+        const string & operation, const string & data_tag, bool set_config_flag);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 static bool operation_succeeded(shared_ptr<path::DataNode> node);
 
@@ -49,7 +51,7 @@ CrudService::CrudService()
 
 bool CrudService::create(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD create yfilter");
+    YLOG_INFO("Executing CRUD create operation");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:create", "entity", false)
             );
@@ -57,7 +59,7 @@ bool CrudService::create(path::ServiceProvider & provider, Entity & entity)
 
 bool CrudService::update(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD update yfilter");
+    YLOG_INFO("Executing CRUD update operation");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:update", "entity", false)
             );
@@ -65,7 +67,7 @@ bool CrudService::update(path::ServiceProvider & provider, Entity & entity)
 
 bool CrudService::delete_(path::ServiceProvider & provider, Entity & entity)
 {
-    YLOG_INFO("Executing CRUD delete yfilter");
+    YLOG_INFO("Executing CRUD delete operation");
     return operation_succeeded(
             execute_rpc(provider, entity, "ydk:delete", "entity", false)
             );
@@ -73,13 +75,13 @@ bool CrudService::delete_(path::ServiceProvider & provider, Entity & entity)
 
 shared_ptr<Entity> CrudService::read(path::ServiceProvider & provider, Entity & filter)
 {
-    YLOG_INFO("Executing CRUD read yfilter");
+    YLOG_INFO("Executing CRUD read operation");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", false));
 }
 
 shared_ptr<Entity> CrudService::read_config(path::ServiceProvider & provider, Entity & filter)
 {
-    YLOG_INFO("Executing CRUD config read yfilter");
+    YLOG_INFO("Executing CRUD config read operation");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", true));
 }
 
@@ -88,7 +90,7 @@ shared_ptr<Entity> CrudService::read_datanode(Entity & filter, shared_ptr<path::
     if (read_data_node == nullptr)
         return {};
     shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(read_data_node->children()[0].get(), top_entity);
+    get_entity_from_data_node(read_data_node->get_children()[0].get(), top_entity);
     return top_entity;
 }
 
@@ -107,7 +109,7 @@ static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
 }
 
 static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, Entity & entity,
-        const string & yfilter, const string & data_tag, bool set_config_flag)
+        const string & operation, const string & data_tag, bool set_config_flag)
 {
 //    if(data_tag == "entity")
 //    {
@@ -115,79 +117,42 @@ static shared_ptr<path::DataNode> execute_rpc(path::ServiceProvider & provider, 
 //        validation.validate(provider, entity, ValidationService::Option::DATASTORE);
 //    }
     path::RootSchemaNode& root_schema = provider.get_root_schema();
-    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.rpc(yfilter) };
-    string data = get_data_payload(entity, provider);
+    shared_ptr<ydk::path::Rpc> ydk_rpc { root_schema.create_rpc(operation) };
+    string data;
+    if(data_tag == "filter" && provider.get_encoding() == EncodingFormat::XML)
+    {
+        data = get_xml_subtree_filter_payload(entity, provider);
+    }
+    else
+    {
+        data = get_config_data_payload(entity, provider);
+    }
 
     if(set_config_flag)
     {
-        ydk_rpc->input().create("only-config");
+        ydk_rpc->get_input_node().create_datanode("only-config");
     }
-    ydk_rpc->input().create(data_tag, data);
+    ydk_rpc->get_input_node().create_datanode(data_tag, data);
     return (*ydk_rpc)(provider);
 }
 
-static void modify_xml_tree(xmlNodePtr root, const string & data_path,
-        const string & leaf_name, YFilter yfilter)
+static string get_config_data_payload(Entity & entity, path::ServiceProvider & provider)
 {
-    int i;
-    xmlNodePtr node = NULL;
-
-    for (node = root, i= 0; node; node = node->next, i=i+1)
-    {
-        ostringstream os{};
-        xmlNodePtr n = node;
-        os<<leaf_name<<"/";
-        while(n && n->parent)
-        {
-            os<<n->name<<"/";
-            n = n->parent;
-        }
-        if(os.str() == data_path)
-        {
-            YLOG_INFO("Setting leaf {} to yfilter {}", leaf_name, to_string(yfilter));
-            xmlNodePtr child = xmlNewChild(node, NULL, (const unsigned char *)leaf_name.c_str(), NULL);
-            if(yfilter!=YFilter::read)
-            {
-                xmlNewProp(child, (const unsigned char *)"yfilter", (const unsigned char *)(to_string(yfilter)).c_str());
-            }
-        }
-        modify_xml_tree(node->children, data_path, leaf_name, yfilter);
-    }
-}
-
-static string get_data_payload(Entity & entity, path::ServiceProvider & provider)
-{
-    map<string, pair<string, YFilter>> leaf_operations;
-    const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema(), leaf_operations);
+    const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_root_schema());
 
     const path::DataNode* dn = &datanode;
-    while(dn!= nullptr && dn->parent()!=nullptr)
-        dn = dn->parent();
-    path::CodecService codec{};
+    while(dn!= nullptr && dn->get_parent()!=nullptr)
+        dn = dn->get_parent();
+    path::Codec codec{};
+    YLOG_DEBUG("Encoding the subtree filter request using path API DataNode");
     string payload = codec.encode(*dn, provider.get_encoding(), false);
-    if(provider.get_encoding() == EncodingFormat::XML && leaf_operations.size()>0)
-    {
-        xmlDocPtr doc = xmlParseDoc((const unsigned char *)payload.c_str());
-        xmlNodePtr root = xmlDocGetRootElement(doc);
-        for(auto & leaf_operation : leaf_operations)
-        {
-            modify_xml_tree(root, leaf_operation.first, leaf_operation.second.first, leaf_operation.second.second);
-        }
-        xmlBufferPtr buf = xmlBufferCreate();
-        if (buf != NULL)
-        {
-            xmlNodeDump(buf, doc, root, 0, 1);
-            payload.clear();
-            string path{reinterpret_cast<char*>(buf->content)};
-            payload = path;
-            xmlBufferFree(buf);
-        }
-        else
-        {
-            YLOG_ERROR("Error creating the xml buffer");
-        }
-    }
     return payload;
 }
 
+static string get_xml_subtree_filter_payload(Entity & entity, path::ServiceProvider & provider)
+{
+    XmlSubtreeCodec xml_subtree_codec{};
+    YLOG_DEBUG("Encoding the subtree filter request using XML subtree codec");
+    return xml_subtree_codec.encode(entity, provider.get_root_schema());
+}
 }

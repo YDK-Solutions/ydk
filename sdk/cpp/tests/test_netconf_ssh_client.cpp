@@ -13,9 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ------------------------------------------------------------------*/
-#define TEST_MODULE NetconfClientTest
+#define TEST_MODULE NetconfSSHClientTest
 #include <string.h>
-#include "../core/src/netconf_client.hpp"
+#include "../core/src/netconf_ssh_client.hpp"
 #include "../core/src/errors.hpp"
 #include <iostream>
 #include <sys/time.h>
@@ -23,11 +23,12 @@
 
 using namespace ydk;
 using namespace std;
+
 #define NC_VERB_VERBOSE 2
 
 TEST_CASE("xr")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -63,7 +64,7 @@ TEST_CASE("xr")
 
 TEST_CASE("Create")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -75,7 +76,7 @@ TEST_CASE("Create")
 
 TEST_CASE("EditgetConfig")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -120,7 +121,7 @@ TEST_CASE("EditgetConfig")
 
 TEST_CASE("Validate")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -141,7 +142,7 @@ TEST_CASE("Validate")
 
 TEST_CASE("LockUnlock")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -188,7 +189,7 @@ TEST_CASE("LockUnlock")
 
 TEST_CASE("RpcError")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -210,7 +211,7 @@ TEST_CASE("RpcError")
 
 TEST_CASE("DeviceNotConnectedExecute")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     try
     {
         string s = client.execute_payload(
@@ -234,7 +235,7 @@ TEST_CASE("DeviceNotConnectedExecute")
 
 TEST_CASE("RpcInvalid")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -263,7 +264,7 @@ TEST_CASE("RpcInvalid")
 
 TEST_CASE("WrongXml")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -284,35 +285,35 @@ TEST_CASE("WrongXml")
 
     REQUIRE(result == OK);
 }
-
-TEST_CASE("CorrectXmlWrongRpc")
-{
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
-    int OK = 0;
-
-    int result = client.connect();
-    REQUIRE(result == OK);
-
-    try
-    {
-        string reply = client.execute_payload(
-                "<testing/>"
-        );
-        REQUIRE(reply== "");
-    }
-    catch (YCPPError & e)
-    {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
-    }
-
-
-
-    REQUIRE(result == OK);
-}
+// Disabled as we want to be able to send any RPC via client
+//TEST_CASE("CorrectXmlWrongRpc")
+//{
+//    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
+//    int OK = 0;
+//
+//    int result = client.connect();
+//    REQUIRE(result == OK);
+//
+//    try
+//    {
+//        string reply = client.execute_payload(
+//                "<testing/>"
+//        );
+//        REQUIRE(reply== "");
+//    }
+//    catch (YCPPError & e)
+//    {
+//        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+//    }
+//
+//
+//
+//    REQUIRE(result == OK);
+//}
 
 TEST_CASE("EmptyRpc")
 {
-    NetconfClient client{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client{"admin", "admin", "127.0.0.1", 12022};
     int OK = 0;
 
     int result = client.connect();
@@ -334,21 +335,21 @@ TEST_CASE("EmptyRpc")
 
 TEST_CASE("MultipleClients")
 {
-    NetconfClient client1{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client2{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client3{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client4{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client5{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client6{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client7{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client8{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client9{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client10{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client11{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client12{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client13{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client14{"admin", "admin", "127.0.0.1", 12022};
-    NetconfClient client15{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client1{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client2{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client3{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client4{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client5{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client6{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client7{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client8{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client9{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client10{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client11{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client12{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client13{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client14{"admin", "admin", "127.0.0.1", 12022};
+    NetconfSSHClient client15{"admin", "admin", "127.0.0.1", 12022};
 
     int result = client1.connect() && client2.connect() && client3.connect() && client4.connect() && client5.connect()
          && client6.connect() && client7.connect() && client8.connect() && client9.connect() && client10.connect()

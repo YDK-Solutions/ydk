@@ -99,6 +99,11 @@ function init_rest_server {
     rest_server_id=$(./test/start_rest_server.sh)
 }
 
+function init_tcp_server {
+    print_msg "starting tcp proxy server"
+    ./test/tcp_proxy_server.py -b 12307 -c 2023 &> /dev/null &
+}
+
 function py_sanity_ydktest {
     print_msg "Generating, installing and testing python ydktest bundle"
 
@@ -133,8 +138,6 @@ function py_sanity_ydktest_install {
 function py_sanity_ydktest_test {
     print_msg "py_sanity_ydktest_test"
 
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
-
     cd $YDKGEN_HOME && cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "running import tests"
@@ -152,6 +155,7 @@ function py_sanity_ydktest_test {
 
     run_test sdk/python/core/tests/test_sanity_codec.py
 
+    py_sanity_ydktest_test_tcp
     py_sanity_ydktest_test_ncclient
 
     git checkout .
@@ -163,6 +167,8 @@ function py_sanity_ydktest_test {
 
 function py_sanity_ydktest_test_ncclient {
     print_msg "py_sanity_ydktest_test_ncclient"
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+
     run_test sdk/python/core/tests/test_netconf_operations.py
     run_test sdk/python/core/tests/test_opendaylight.py
     run_test sdk/python/core/tests/test_restconf_provider.py
@@ -177,6 +183,25 @@ function py_sanity_ydktest_test_ncclient {
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
+
+    run_test sdk/python/core/tests/test_netconf_operations.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_delete.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_filter_read.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_filters.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_levels.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_netconf.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_path.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
+    run_test sdk/python/core/tests/test_sanity_types.py --non-demand
+    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py --non-demand
+}
+
+function py_sanity_ydktest_test_tcp {
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307
+    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
 }
 
 function py_sanity_deviation {
@@ -211,6 +236,7 @@ function py_sanity_deviation_ydktest_test {
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py
+    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
 }
 
 function py_sanity_deviation_bgp_gen {
@@ -232,6 +258,7 @@ function py_sanity_deviation_bgp_test {
     print_msg "py_sanity_deviation_bgp_test"
 
     run_test sdk/python/core/tests/test_sanity_deviation_bgp.py
+    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
 }
 
 function py_sanity_augmentation {
@@ -264,7 +291,9 @@ function py_sanity_augmentation_test {
     print_msg "py_sanity_augmentation_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
+
     run_test sdk/python/core/tests/test_sanity_augmentation.py
+    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
 }
 
 function cpp_sanity_core_gen_install {
@@ -355,6 +384,7 @@ function py_tests {
 
 function cpp_tests {
     init_env "python" "python"
+    cpp_sanity_core_gen_install
     cpp_sanity_core_test
     cpp_sanity_ydktest
     teardown_env
@@ -424,9 +454,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 init_rest_server
+init_tcp_server
 
-py_tests
 cpp_tests
+py_tests
 # test_gen_tests
 cd $YDKGEN_HOME
 print_msg "gathering cpp coverage"

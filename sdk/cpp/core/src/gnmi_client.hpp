@@ -31,14 +31,19 @@
 #include <grpc++/create_channel.h>
 #include <grpc++/grpc++.h>
 #include <libgnmi/gnmi.grpc.pb.h>
+#include <libgnmi/gnmi.pb.h>
 
+using namespace gnmi;
+
+using gnmi::gNMI;
 using gnmi::CapabilityRequest;
 using gnmi::CapabilityResponse;
 using grpc::Channel;
 using grpc::ClientContext;
 using gnmi::GetRequest;
 using gnmi::GetResponse;
-using gnmi::gNMI;
+using gnmi::SetRequest;
+using gnmi::SetResponse;
 using grpc::Status;
 
 namespace ydk 
@@ -56,8 +61,9 @@ namespace ydk
         ~gNMIClient();
 
         int connect(std::string address);
-        std::string execute_wrapper(const std::string & payload);
-        std::string execute_payload(const GetRequest& request, GetResponse* response);
+        std::string execute_wrapper(const std::string & payload, std::string operation);
+        std::string execute_get_payload(const GetRequest& request, GetResponse* response);
+        std::string execute_set_payload(const SetRequest& request, SetResponse* response);
         std::vector<std::string> get_capabilities();
     
     private:
@@ -69,7 +75,9 @@ namespace ydk
         void parse_capabilities_encodings(CapabilityResponse* response);
         bool parse_capabilities(CapabilityResponse* response);
         std::string parse_get_response(GetResponse* response); 
+        std::string parse_set_response(SetResponse* response); 
         GetRequest populate_get_request(GetRequest request, std::string payload);
+        SetRequest populate_set_request(SetRequest request, std::string payload, std::string operation);
         std::unique_ptr<gNMI::Stub> stub_;
     };
 }

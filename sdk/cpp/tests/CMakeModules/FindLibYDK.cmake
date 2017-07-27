@@ -34,6 +34,8 @@ else (LIBYDK_LIBRARIES AND LIBYDK_INCLUDE_DIRS)
     NAMES
       ydk/netconf_provider.hpp
       ydk/netconf_client.hpp
+      #ydk/gnmi_provider.hpp
+      #ydk/gnmi_client.hpp
       ydk/core.hpp
       ydk/value.hpp
       ydk/entity_data_node_walker.hpp

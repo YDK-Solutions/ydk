@@ -22,12 +22,11 @@
 //
 //////////////////////////////////////////////////////////////////
 #include "gnmi_provider.hpp"
-#include <fstream>
 
 using grpc::Channel;
-using grpc::SslCredentialsOptions;
-using grpc::ChannelCredentials;
 using grpc::ChannelArguments;
+using grpc::ChannelCredentials;
+using grpc::SslCredentialsOptions;
 
 using namespace std;
 using namespace ydk;
@@ -70,7 +69,6 @@ namespace ydk
         client->connect(address);
         server_capabilities = client->get_capabilities();
         
-        std::cout << "In gNMIServiceProvider initialize" << std::endl;
         root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
 
         if(root_schema.get() == nullptr)
@@ -84,25 +82,22 @@ namespace ydk
     {
         std::string server_cert, client_key, client_cert;
         std::ifstream rf("ems.pem");
-        //std::ifstream kf("client.key");
-        //std::ifstream cf("client.pem");
 
         server_cert.assign((std::istreambuf_iterator<char>(rf)),(std::istreambuf_iterator<char>()));
-        //client_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
-        //client_cert.assign((std::istreambuf_iterator<char>(cf)),(std::istreambuf_iterator<char>()));
 
         grpc::SslCredentialsOptions ssl_opts;
         grpc::ChannelArguments      args;
         gNMIServiceProvider::SecureChannelArguments input_args;
-
-        std::cout << "server cert: " << server_cert << std::endl;
-        //std::cout << "client key: " << client_key << std::endl;
-        //std::cout << "client cert: " << client_cert << std::endl;
         ssl_opts.pem_root_certs = server_cert;
-        //ssl_opts = {server_cert, client_key, client_cert};
-
         args.SetSslTargetNameOverride("ems.cisco.com");
 
+        /* ToDo Authenticate client at server
+        std::ifstream kf("client.key");
+        std::ifstream cf("client.pem");
+        client_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
+        client_cert.assign((std::istreambuf_iterator<char>(cf)),(std::istreambuf_iterator<char>()));
+        ssl_opts = {server_cert, client_key, client_cert};
+        */
         auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
         input_args.channel_creds = channel_creds;
         input_args.args = args;
@@ -111,13 +106,11 @@ namespace ydk
 
     EncodingFormat gNMIServiceProvider::get_encoding() const
     {
-        std::cout << "In gNMIServiceProvider: get_encoding" << std::endl;
         return EncodingFormat::JSON;
     }
 
     path::RootSchemaNode& gNMIServiceProvider::get_root_schema() const
     {
-        std::cout << "In gNMIServiceProvider: Get root schema" << std::endl;
         return *root_schema;
     }
 
@@ -139,7 +132,6 @@ namespace ydk
             YLOG_ERROR("RPC is not supported");
             throw(YCPPOperationNotSupportedError{"RPC is not supported!"});
         }
-
         return datanode;
     }
 
@@ -188,13 +180,6 @@ namespace ydk
         {
             YLOG_ERROR( "Codec service failed to decode datanode");
             throw(YCPPError{"Problems deserializing output"});
-            try 
-            {
-                throw(YCPPError{""});
-            } catch(int) 
-            {
-                std::cout << " " << endl;
-            }
         }
         return datanode;
     }
@@ -243,7 +228,6 @@ namespace ydk
 
     static string get_filter_payload(path::Rpc & ydk_rpc)
     {
-        YLOG_INFO("In get_filter_payload");
         auto entity = ydk_rpc.input().find("filter");
         if(entity.empty())
         {
@@ -259,7 +243,6 @@ namespace ydk
     {
         path::CodecService codec_service{};
         input.create(data_tag, data_value);
-        YLOG_INFO("In get_gnmi_payload");
         string payload{"\"rpc\":"};
         payload+=codec_service.encode(input, EncodingFormat::JSON, true);
         YLOG_INFO("===========Generating Target Payload============");
@@ -270,7 +253,6 @@ namespace ydk
 
     std::string gNMIServiceProvider::execute_payload(const std::string & payload) const
     {
-        YLOG_INFO("In execute_payload");
         std::string reply = client->execute_wrapper(payload);
         YLOG_INFO("=============Reply payload received from device=============");
         YLOG_INFO(reply.c_str());

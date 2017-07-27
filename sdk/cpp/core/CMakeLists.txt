@@ -115,7 +115,7 @@ endif()
 
 set(HOME_DIRECTORY $ENV{HOME})
 
-set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
@@ -149,6 +149,10 @@ set(libydk_src
     src/netconf_tcp_client.cpp
     src/netconf_model_provider.cpp
     src/netconf_provider.cpp
+    src/netconf_service.cpp
+    src/gnmi_client.cpp    
+    #src/gnmi_model_provider.cpp
+    src/gnmi_provider.cpp
     src/netconf_service.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
@@ -197,6 +201,8 @@ set(libydk_install_headers
     src/filters.hpp
     src/logging_callback.hpp
     src/netconf_provider.hpp
+    src/gnmi_provider.hpp
+    src/gnmi_client.hpp
     src/network_topology.hpp
     src/netconf_client.hpp
     src/netconf_service.hpp
@@ -273,6 +279,17 @@ set(netconf_objs
     yinparser.o
 )
 
+# Set gNMI variables
+set(libgnmi_location ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/src/project_libgnmi)
+
+set(libgnmi_headers
+	${libgnmi_location}/generated/gnmi.grpc.pb.h
+	${libgnmi_location}/generated/gnmi.pb.h)
+
+set(libgnmi_sources
+	${libgnmi_location}/generated/gnmi.grpc.pb.cc
+	${libgnmi_location}/generated/gnmi.pb.cc)
+
 # Set LibYang variables
 set(libyang_location ${CMAKE_CURRENT_BINARY_DIR}/project_libyang/src/project_libyang)
 
@@ -334,6 +351,9 @@ find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_package(LibXml2 REQUIRED)
 find_package(LibSSH REQUIRED)
+find_package(PythonLibs REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(grpc REQUIRED)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)
@@ -374,6 +394,47 @@ add_library(libnetconf STATIC IMPORTED)
 set_property(TARGET libnetconf PROPERTY IMPORTED_LOCATION ${libnetconf_archive})
 add_dependencies(libnetconf project_libnetconf)
 
+# Add LibgNMI
+set(libgnmi_include_location include/libgnmi)
+set(libgnmi_headers_location ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/headers)
+set(libgnmi_sources_location ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/sources)
+include(ExternalProject)
+ExternalProject_Add(project_libgnmi
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
+    URL "https://github.com/shgandhi/reference/archive/ydk_gnmi.zip"
+    #CONFIGURE_COMMAND "./configure"
+    BUILD_COMMAND "make"
+    INSTALL_DIR "${libgnmi_location}"
+    INSTALL_COMMAND mkdir -p ${libgnmi_headers_location}/libgnmi && mkdir -p ${libgnmi_sources_location}/libgnmi && cp ${libgnmi_headers} ${libgnmi_headers_location}/libgnmi && cp ${libgnmi_sources} ${libgnmi_sources_location}/libgnmi
+    BUILD_IN_SOURCE 1
+)
+install(FILES ${libgnmi_headers} DESTINATION ${libgnmi_include_location})
+install(FILES ${libgnmi_sources} DESTINATION ${libgnmi_include_location})
+
+ExternalProject_Get_Property(project_libgnmi install_dir)
+set(libgnmi_archive ${install_dir}/libgnmi.a)
+
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/objs
+    COMMAND cmake -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/objs
+)
+set (libgnmi_objs ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/objs)
+
+list(APPEND libgnmi_inc_objs "")
+foreach(gnmi_obj IN LISTS gnmi_objs)
+    add_custom_command(
+        OUTPUT ${libgnmi_objs}/${gnmi_obj}
+        COMMAND ar -x ${gnmi_archive} ${gnmi_obj}
+        MAIN_DEPENDENCY ${libgnmi_objs}
+        WORKING_DIRECTORY ${libgnmi_objs}
+    )
+    list(APPEND libgnmi_inc_objs ${libgnmi_objs}/${gnmi_obj})
+endforeach(gnmi_obj)
+add_library(libgnmi STATIC IMPORTED)
+set_property(TARGET libgnmi PROPERTY IMPORTED_LOCATION ${libgnmi_archive})
+add_dependencies(libgnmi project_libgnmi)
+
+
 # Add LibYang
 set(libyang_include_location include/libyang)
 set(libyang_headers_location ${CMAKE_CURRENT_BINARY_DIR}/project_libyang/headers)
@@ -411,17 +472,26 @@ foreach(yang_obj IN LISTS yang_objs)
 endforeach(yang_obj)
 
 include_directories(
+    /usr/local/include
     ${LIBYANG_INCLUDE_DIRS}
     ${LIBSSH_INCLUDE_DIRS}
     ${LIBXML2_INCLUDE_DIR}
     ${libnetconf_headers_location}
     ${libnetconf_location}/headers
+    ${libgnmi_headers_location}
+    ${libgnmi_location}/headers
+    ${libgnmi_sources_location}
+    ${libgnmi_location}/sources
     ${libyang_headers_location}
     ${libyang_location}/headers
     ${PROJECT_SOURCE_DIR}/src
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(libgnmi_client_sources "src/gnmi_client.cpp" ${libgnmi_headers} ${libgnmi_sources})
+add_library(gnmiclient STATIC ${libgnmi_client_sources})
+target_link_libraries(gnmiclient grpc++ grpc gpr ${PROTOBUF_LIBRARY})
 
 add_library(ydk STATIC ${libydk_src} ${libnetconf_inc_objs} ${libyang_inc_objs})
 
@@ -436,7 +506,11 @@ target_link_libraries(ydk
     ${dl_location}
     libnetconf
     libyang
+    libgnmi
+    ${PYTHON_LIBRARIES}
 )
+
+target_link_libraries(ydk gnmiclient)
 
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)
 set_property(TARGET ydk PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -472,4 +546,3 @@ if(ENABLE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif(ENABLE_BUILD_TESTS)
-

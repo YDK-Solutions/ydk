@@ -127,8 +127,8 @@ class YdkGenerator(object):
         yang_models = self._create_models_archive(curr_bundle, gen_api_root)
 
         if self.language == 'cpp':
-            _modify_cpp_cmake(gen_api_root, curr_bundle.name, curr_bundle.str_version, 
-                    curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
+            _modify_cpp_cmake(gen_api_root, curr_bundle.name, curr_bundle.str_version,
+                              generated_files[0], generated_files[1], yang_models)
 
         os.remove(tmp_file)
 
@@ -223,7 +223,6 @@ class YdkGenerator(object):
             _modify_python_setup(gen_api_root,
                                  'ydk-models-%s' % bundle.name,
                                  bundle.str_version,
-                                 bundle.str_core_version,
                                  bundle.dependencies,
                                  bundle.description,
                                  bundle.long_description)
@@ -298,7 +297,7 @@ def _set_original_bundle_name_for_packages(bundles, packages, curr_bundle):
                     pkg.bundle_name = bundle.name
 
 
-def _modify_python_setup(gen_api_root, package_name, version, core_version, dependencies, description, long_description):
+def _modify_python_setup(gen_api_root, package_name, version, dependencies, description, long_description):
     """ Modify setup.py template for python packages. Replace package name
         and version number in setup.py located in <gen_api_root>/setup.py.
         If dependencies are specified, $DEPENDENCY$ in setup.py will be replaced.
@@ -308,7 +307,6 @@ def _modify_python_setup(gen_api_root, package_name, version, core_version, depe
         gen_api_root (str): Root directory for generated APIs.
         package_name (str): Package name for generated APIs.
         version (str): Package version for generated APIs.
-        core_version (str): YDK core library version for generated APIs.
         dependencies (list): bundle dependencies
         description (str): description for bundle package
         long_description (str): long description for bundle package
@@ -316,7 +314,6 @@ def _modify_python_setup(gen_api_root, package_name, version, core_version, depe
     setup_file = os.path.join(gen_api_root, 'setup.py')
     replaced_package = False
     replaced_version = False
-    replaced_core_version = False
     replaced_dependencies = False
     replaced_description = False
     replaced_long_description = False
@@ -327,9 +324,6 @@ def _modify_python_setup(gen_api_root, package_name, version, core_version, depe
         elif not replaced_version and "$VERSION$" in line:
             replaced_version = True
             print(line.replace("$VERSION$", version), end='')
-        elif not replaced_core_version and "$CORE_VERSION$" in line:
-            replaced_core_version = True
-            print(line.replace("$CORE_VERSION$", core_version), end='')
         elif not replaced_dependencies and "$DEPENDENCY$" in line:
             replaced_dependencies = True
             if dependencies:
@@ -357,14 +351,13 @@ def _modify_python_manifest(gen_api_root, bundle_name):
             print(line, end='')
 
 
-def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_files, header_files, model_names):
+def _modify_cpp_cmake(gen_api_root, bundle_name, version, source_files, header_files, model_names):
     """ Modify CMakeLists.txt template for cpp libraries.
 
     Args:
         gen_api_root (str): Root directory for generated APIs.
         bundle_name (str): Package name for generated APIs.
         version (str): Package version for generated APIs.
-        core_version (str): YDK core library version for generated APIs.
     """
     cmake_file = os.path.join(gen_api_root, 'CMakeLists.txt')
 
@@ -383,8 +376,6 @@ def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_f
                 line = line.replace("@HEADER_FILES@", header_file_names)
             elif "@VERSION@" in line:
                 line = line.replace("@VERSION@", version)
-            elif "@CORE_VERSION@" in line:
-                line = line.replace("@CORE_VERSION@", core_version)
             elif "@YANG_FILES@" in line:
                 line = line.replace("@YANG_FILES@", model_file_names)
             print(line, end='')

@@ -326,7 +326,9 @@ PYBIND11_PLUGIN(ydk_)
 
     class_<ydk::path::Repository>(path, "Repository")
         .def(init<>())
+        .def(init<ydk::path::ModelCachingOption>())
         .def(init<const string&>())
+        .def(init<const string&, ydk::path::ModelCachingOption>())
         .def("create_root_schema",
             (std::shared_ptr<ydk::path::RootSchemaNode> (ydk::path::Repository::*)(const std::vector<ydk::path::Capability>&)) &ydk::path::Repository::create_root_schema,
             return_value_policy::move)
@@ -379,6 +381,10 @@ PYBIND11_PLUGIN(ydk_)
         .value("enumeration", ydk::YType::enumeration)
         .value("bits", ydk::YType::bits)
         .value("decimal64", ydk::YType::decimal64);
+
+    enum_<ydk::path::ModelCachingOption>(types, "ModelCachingOption")
+        .value("common", ydk::path::ModelCachingOption::COMMON)
+        .value("per_device", ydk::path::ModelCachingOption::PER_DEVICE);
 
     class_<ydk::Empty>(types, "Empty")
         .def(init<>())
@@ -531,42 +537,46 @@ PYBIND11_PLUGIN(ydk_)
             arg("protocol")=string("ssh"),
             arg("on_demand")=true)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand) {
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol, on_demand);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand, bool common_cache) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, protocol, on_demand, common_cache);
             },
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=830,
             arg("protocol")=string("ssh"),
-            arg("on_demand")=true)
+            arg("on_demand")=true,
+            arg("common_cache")=false)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, void* port, const string& protocol, bool on_demand) {
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol, on_demand);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, void* port, const string& protocol, bool on_demand, bool common_cache) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, protocol, on_demand, common_cache);
             },
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=nullptr,
             arg("protocol")=string("ssh"),
-            arg("on_demand")=true)
+            arg("on_demand")=true,
+            arg("common_cache")=false)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, bool on_demand) {
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, "ssh", on_demand);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, int port, bool on_demand, bool common_cache) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, port, "ssh", on_demand, common_cache);
             },
             arg("address"),
             arg("username"),
             arg("password"),
             arg("port")=830,
-            arg("on_demand")=true)
+            arg("on_demand")=true,
+            arg("common_cache")=false)
         .def("__init__",
-            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, bool on_demand) {
-                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, "ssh", on_demand);
+            [](ydk::NetconfServiceProvider &nc_provider, const string& address, const string& username, const string& password, bool on_demand, bool common_cache) {
+                    new(&nc_provider) ydk::NetconfServiceProvider(address, username, password, 830, "ssh", on_demand, common_cache);
             },
             arg("address"),
             arg("username"),
             arg("password"),
-            arg("on_demand")=true)
+            arg("on_demand")=true,
+            arg("common_cache")=false)
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
 

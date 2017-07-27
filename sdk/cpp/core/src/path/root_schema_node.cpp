@@ -112,18 +112,6 @@ using json = nlohmann::json;
         get_module_names_from_json_object(o, module_names);
         return module_names;
     }
-
-    static std::unordered_set<std::string>
-    get_top_module_name_from_json_payload(const std::string& payload)
-    {
-        YLOG_DEBUG("Extracting top level module name from JSON payload");
-        std::unordered_set<std::string> top_module_name;
-        auto o = json::parse(payload);
-
-        // top level element must have a module name identifier
-        auto identifier = std::string(o.begin().key());
-        return {identifier.substr(0, identifier.find(":"))};
-    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -224,12 +212,6 @@ ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_payload(const std::stri
     }
     else
     {
-        // populate module, submodule and imported module
-        auto top_module_name = get_top_module_name_from_json_payload(payload);
-        auto top_module = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, top_module_name, m_name_lookup);
-        populate_new_schemas(top_module);
-
-        // populate augmentation module
         auto module_names = get_module_names_from_json_payload(payload);
         auto modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, module_names, m_name_lookup);
     }

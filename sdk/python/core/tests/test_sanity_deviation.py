@@ -42,7 +42,8 @@ class SanityTest(unittest.TestCase):
         port = 12023
         protocol = getattr(cls, 'protocol', 'ssh')
         on_demand = not getattr(cls, 'non_demand', True)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        common_cache = getattr(cls, "common_cache", False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
         cls.crud = CRUDService()
 
     @classmethod
@@ -218,9 +219,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    device, non_demand = get_device_info()
+    device, non_demand, common_cache = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

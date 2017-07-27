@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include <fstream>
+#include <unordered_set>
 
 #include "path_private.hpp"
 #include "../ydk_yang.hpp"
@@ -74,7 +75,7 @@ static void create_if_does_not_exist(const std::string & path)
 }
 
 static std::vector<path::Capability>
-get_capability_from_module_name(std::string& module_name, std::vector<path::Capability>& caps) {
+get_capability_from_module_name(const std::string& module_name, std::vector<path::Capability>& caps) {
     std::vector<path::Capability> ret;
 
     for (auto c: caps) {
@@ -87,27 +88,16 @@ get_capability_from_module_name(std::string& module_name, std::vector<path::Capa
     return ret;
 }
 
-static std::vector<std::vector<path::Capability>>
-get_module_capabilities_from_path(const std::string& path, std::vector<path::Capability>& caps)
+static std::vector<path::Capability>
+get_module_capabilities_from_namespaces(const std::unordered_set<std::string>& module_names, std::vector<path::Capability>& caps)
 {
-    std::vector<std::vector<path::Capability>> module_caps;
-    std::vector<std::string> segs = path::segmentalize(path);
+    std::vector<path::Capability> module_caps;
 
-    for (auto &s: segs)
+    for (auto &c: caps)
     {
-        auto found = s.find_first_of(":");
-        if (found != std::string::npos)
+        if (module_names.find(c.module) != module_names.end())
         {
-            size_t start = 0;
-            size_t colon = s.rfind("'", found);
-            start = colon == std::string::npos ? 0 : colon + 1;
-            auto module_name = s.substr(start, found-start);
-
-            auto cap = get_capability_from_module_name(module_name, caps);
-            if (!cap.empty())
-            {
-                module_caps.emplace_back(cap);
-            }
+            module_caps.emplace_back(c);
         }
     }
 
@@ -328,30 +318,17 @@ ydk::path::RepositoryPtr::create_ly_context() {
 }
 
 std::shared_ptr<ydk::path::RootSchemaNode>
-ydk::path::RepositoryPtr::create_root_schema(const std::vector<path::Capability> & server_caps)
-{
-    std::vector<path::Capability> caps_to_load;
-    return create_root_schema(server_caps, caps_to_load);
-}
-
-std::shared_ptr<ydk::path::RootSchemaNode>
-ydk::path::RepositoryPtr::create_root_schema(const std::vector<path::Capability>& server_caps, const std::vector<path::Capability>& caps_to_load)
+ydk::path::RepositoryPtr::create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
+                                             const std::vector<path::Capability>& caps_to_load)
 {
 
     ly_verb(LY_LLSILENT); //turn off libyang logging at the beginning
     ly_ctx* ctx = create_ly_context();
 
-    if (!caps_to_load.empty())
-    {
-        load_module_from_capabilities(ctx, caps_to_load);
-    }
-    else
-    {
-        load_module_from_capabilities(ctx, server_caps);
-    }
+    load_module_from_capabilities(ctx, caps_to_load);
 
     ly_verb(LY_LLVRB); // enable libyang logging after model download has completed
-    RootSchemaNodeImpl* rs = new RootSchemaNodeImpl{ctx, shared_from_this(), server_caps};
+    RootSchemaNodeImpl* rs = new RootSchemaNodeImpl{ctx, shared_from_this(), lookup_tables};
     return std::shared_ptr<RootSchemaNode>(rs);
 }
 
@@ -372,49 +349,64 @@ ydk::path::RepositoryPtr::load_module_from_capabilities(ly_ctx* ctx, const std::
 }
 
 std::vector<const lys_module*>
-ydk::path::RepositoryPtr::get_new_ly_modules_from_path(const std::string& path, ly_ctx* ctx, std::vector<path::Capability> caps) {
+ydk::path::RepositoryPtr::get_new_ly_modules_from_lookup(ly_ctx* ctx,
+                                                         const std::unordered_set<std::string>& keys,
+                                                         const std::unordered_map<std::string, path::Capability>& lookup_table)
+{
     std::vector<const lys_module*> new_modules;
-    auto module_caps = get_module_capabilities_from_path(path, caps);
 
-    for (auto &cap: module_caps)
+    for (auto k: keys)
     {
-        bool new_module = true;
-        auto m = load_module(ctx, cap[0], new_module);
-
-        if (m && new_module)
+        auto it = lookup_table.find(k);
+        if (it != lookup_table.end())
         {
-            YLOG_DEBUG("Added new libyang module '{}'", std::string(m->name));
-            new_modules.emplace_back(m);
-        }
+            auto capability = it->second;
 
-        for (auto& d: cap[0].deviations)
-        {
-            new_module = true;
-            m = load_module(ctx, d, new_module);
+            bool new_module = true;
+            auto m = load_module(ctx, capability.module, new_module);
+
             if (m && new_module)
             {
-                YLOG_DEBUG("Added new libyang deivation module '{}'", std::string(m->name));
+                YLOG_DEBUG("Added new libyang module '{}'", std::string(m->name));
                 new_modules.emplace_back(m);
+            }
+
+            for (auto& d: capability.deviations)
+            {
+                new_module = true;
+                m = load_module(ctx, d, new_module);
+
+                if (m && new_module)
+                {
+                    YLOG_DEBUG("Added new libyang deivation module '{}'", std::string(m->name));
+                    new_modules.emplace_back(m);
+                }
             }
         }
     }
-
     return new_modules;
+}
+
+std::vector<const lys_module*>
+ydk::path::RepositoryPtr::get_new_ly_modules_from_path(ly_ctx* ctx,
+                                                       const std::string& path,
+                                                       const std::unordered_map<std::string, path::Capability>& lookup_table)
+{
+    auto module_names = path::segmentalize_module_names(path);
+    return get_new_ly_modules_from_lookup(ctx, module_names, lookup_table);
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name)
 {
     bool new_module = true;
-    std::vector<std::string> features;
-    return load_module(ctx, module_name, "", features, new_module);
+    return load_module(ctx, module_name, "", {}, new_module);
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, bool& new_module)
 {
-    std::vector<std::string> features;
-    return load_module(ctx, module_name, "", features, new_module);
+    return load_module(ctx, module_name, "", {}, new_module);
 }
 
 const lys_module*
@@ -434,8 +426,7 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision)
 {
     bool new_module = true;
-    std::vector<std::string> features;
-    return load_module(ctx, module_name, revision, features, new_module);
+    return load_module(ctx, module_name, revision, {}, new_module);
 }
 
 const lys_module*
@@ -519,15 +510,17 @@ ydk::path::Repository::~Repository ()
 }
 
 std::shared_ptr<ydk::path::RootSchemaNode>
-ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & capabilities)
+ydk::path::Repository::create_root_schema(const std::vector<path::Capability>& caps_to_load)
 {
-    return m_priv_repo->create_root_schema(capabilities);
+    std::vector<std::unordered_map<std::string, path::Capability>> lookup_tables(2);
+    return m_priv_repo->create_root_schema(lookup_tables, caps_to_load);
 }
 
 std::shared_ptr<ydk::path::RootSchemaNode>
-ydk::path::Repository::create_root_schema(const std::vector<path::Capability> & capabilities, const std::vector<path::Capability>& caps)
+ydk::path::Repository::create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
+                                          const std::vector<path::Capability>& caps_to_load)
 {
-    return m_priv_repo->create_root_schema(capabilities, caps);
+    return m_priv_repo->create_root_schema(lookup_tables, caps_to_load);
 }
 
 void

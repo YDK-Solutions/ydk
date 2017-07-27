@@ -13,6 +13,7 @@ set(bundle_tests_src
         test_restconf_client.cpp
         testsanitynctest.cpp
         test_crud.cpp
+        test_on_demand_loading.cpp
         test_sanity_levels.cpp
         test_sanity_types.cpp
         testsanityvalidationtest.cpp

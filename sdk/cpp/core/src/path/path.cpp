@@ -92,6 +92,24 @@ static void escape_slashes(std::string& data)
 }
 }
 
+std::unordered_set<std::string> ydk::path::segmentalize_module_names(const std::string& value)
+{
+    std::unordered_set<std::string> module_names;
+    auto segs = segmentalize(value);
+    for (auto &s: segs)
+    {
+        auto found = s.find(":");
+        if (found != std::string::npos)
+        {
+            size_t start = 0;
+            size_t colon = s.rfind("'", found);
+            start = colon == std::string::npos ? 0 : colon + 1;
+            module_names.insert(s.substr(start, found-start));
+        }
+    }
+    return module_names;
+}
+
 std::vector<std::string> ydk::path::segmentalize(const std::string& path)
 {
     const std::string token {"/"};
@@ -247,13 +265,13 @@ static LYD_FORMAT get_ly_format(ydk::EncodingFormat format)
     return scheme;
 }
 
-static const ydk::path::RootSchemaNodeImpl & get_root_schema_impl(const ydk::path::RootSchemaNode & root_schema)
+static ydk::path::RootSchemaNodeImpl & get_root_schema_impl(ydk::path::RootSchemaNode & root_schema)
 {
-    const ydk::path::RootSchemaNodeImpl & rs_impl = dynamic_cast<const ydk::path::RootSchemaNodeImpl &>(root_schema);
+    ydk::path::RootSchemaNodeImpl & rs_impl = dynamic_cast<ydk::path::RootSchemaNodeImpl &>(root_schema);
     return rs_impl;
 }
 
-static std::shared_ptr<ydk::path::DataNode> perform_decode(const ydk::path::RootSchemaNodeImpl & rs_impl, struct lyd_node *root)
+static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchemaNodeImpl & rs_impl, struct lyd_node *root)
 {
     ydk::YLOG_DEBUG("Performing decode operation");
     ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
@@ -270,9 +288,10 @@ static std::shared_ptr<ydk::path::DataNode> perform_decode(const ydk::path::Root
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
+ydk::path::Codec::decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
-    const RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
+    RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
+    rs_impl.populate_new_schemas_from_payload(buffer, format);
     struct lyd_node *root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(),
                 get_ly_format(format), LYD_OPT_TRUSTED |  LYD_OPT_GET);
 
@@ -284,7 +303,7 @@ ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& 
     return perform_decode(rs_impl, root);
 }
 
-static const struct lyd_node* create_ly_rpc_node(const ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
+static const struct lyd_node* create_ly_rpc_node(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
 {
     const struct lyd_node* rpc = lyd_new_path(NULL, rs_impl.m_ctx, rpc_path.c_str(), NULL, LYD_ANYDATA_SXML, 0);
     if( rpc == nullptr || ly_errno )
@@ -296,10 +315,11 @@ static const struct lyd_node* create_ly_rpc_node(const ydk::path::RootSchemaNode
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::Codec::decode_rpc_output(const RootSchemaNode & root_schema, const std::string& buffer,
+ydk::path::Codec::decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer,
             const std::string & rpc_path, EncodingFormat format)
 {
-    const RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
+    RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
+    rs_impl.populate_new_schemas_from_payload(buffer, format);
     const struct lyd_node* rpc = create_ly_rpc_node(rs_impl, rpc_path);
 
     struct lyd_node* root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(),

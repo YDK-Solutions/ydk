@@ -104,7 +104,7 @@ void NetconfServiceProvider::initialize(path::Repository & repo, bool on_demand)
     client->connect();
     server_capabilities = client->get_capabilities();
 
-    for(std::string c : server_capabilities )
+    for(std::string &c : server_capabilities )
     {
         if(c.find("ietf-netconf-monitoring") != std::string::npos)
         {
@@ -112,15 +112,17 @@ void NetconfServiceProvider::initialize(path::Repository & repo, bool on_demand)
         }
     }
 
+    auto lookup_tables = capabilities_parser.get_lookup_tables(server_capabilities);
+
+    std::vector<path::Capability> yang_caps;
+    std::vector<std::string> empty_caps;
+
     if (on_demand)
-    {
-        std::vector<std::string> empty;
-        root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities), capabilities_parser.parse(empty));
-    }
+        yang_caps = capabilities_parser.parse(empty_caps);
     else
-    {
-        root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
-    }
+        yang_caps = capabilities_parser.parse(server_capabilities);
+
+    root_schema = repo.create_root_schema(lookup_tables, yang_caps);
 
     if(root_schema.get() == nullptr)
     {

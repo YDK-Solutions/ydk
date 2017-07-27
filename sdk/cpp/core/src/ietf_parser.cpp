@@ -112,10 +112,28 @@ IetfCapabilitiesParser::~IetfCapabilitiesParser()
 
 }
 
-vector<path::Capability> IetfCapabilitiesParser::parse(vector<string> & capabilities) const
+std::vector<unordered_map<string, path::Capability>>
+IetfCapabilitiesParser::get_lookup_tables(vector<string>& capabilities) const
 {
-    vector<path::Capability> yang_caps {};
-    for(string c : capabilities )
+    unordered_map<string, path::Capability> name_lookup;
+    unordered_map<string, path::Capability> namespace_lookup;
+
+    auto segs = segmentalize_capabilities(capabilities);
+
+    for (auto &c: segs)
+    {
+        name_lookup.insert(make_pair(c.second.module, c.second));
+        namespace_lookup.insert(make_pair(c.first, c.second));
+    }
+
+    return {name_lookup, namespace_lookup};
+}
+
+vector<pair<std::string, path::Capability>> IetfCapabilitiesParser::segmentalize_capabilities(vector<string>& capabilities) const
+{
+    vector<pair<std::string, path::Capability>> segs;
+
+    for( string &c : capabilities )
     {
         if(c.find("calvados") != string::npos || c.find("tailf") != string::npos || c.find("tail-f") != string::npos)
         {
@@ -126,6 +144,13 @@ vector<path::Capability> IetfCapabilitiesParser::parse(vector<string> & capabili
 
         if(p == c.end())
             continue;
+
+        auto ns_end = c.find("?");
+
+        if (ns_end == string::npos)
+            continue;
+
+        auto c_ns = c.substr(0, ns_end);
 
         auto module_start = c.find("module=");
 
@@ -194,22 +219,36 @@ vector<path::Capability> IetfCapabilitiesParser::parse(vector<string> & capabili
         if(c_module.find("tailf") != string::npos) {
             continue;
         }
-        path::Capability core_cap{c_module, c_revision, c_features, c_deviations};
-        yang_caps.emplace_back(core_cap);
+
+        segs.emplace_back(make_pair(c_ns, path::Capability{c_module, c_revision, c_features, c_deviations}));
+    }
+
+    return segs;
+}
+
+vector<path::Capability> IetfCapabilitiesParser::parse(vector<string> & capabilities) const
+{
+    auto segs = segmentalize_capabilities(capabilities);
+
+    vector<path::Capability> yang_caps;
+    for (auto &c: segs)
+    {
+        yang_caps.emplace_back(c.second);
     }
 
     //add ydk capability
     path::Capability ydk_cap{ydk::path::YDK_MODULE_NAME, ydk::path::YDK_MODULE_REVISION, {}, {}};
     auto result = find(yang_caps.begin(), yang_caps.end(), ydk_cap);
-    if(result == yang_caps.end()){
+    if(result == yang_caps.end()) {
         yang_caps.push_back(ydk_cap);
     }
     //add ietf-netconf capability
     path::Capability ietf_netconf_cap{ydk::IETF_NETCONF_MODULE_NAME, ydk::IETF_NETCONF_MODULE_REVISION, {}, {}};
     result = find(yang_caps.begin(), yang_caps.end(), ietf_netconf_cap);
-    if(result == yang_caps.end()){
+    if(result == yang_caps.end()) {
         yang_caps.push_back(ietf_netconf_cap);
     }
+
     return yang_caps;
 }
 

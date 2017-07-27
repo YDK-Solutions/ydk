@@ -32,6 +32,8 @@
 #include <memory>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
+
 #include "errors.hpp"
 #include "types.hpp"
 #include "validation_service.hpp"
@@ -294,8 +296,8 @@ public:
     /// @return The DataNode instantiated or nullptr in case of error.
     /// @throws YCPPInvalidArgumentError if the arguments are invalid.
     ///
-    std::shared_ptr<DataNode> decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
-    std::shared_ptr<DataNode> decode_rpc_output(const RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format);
+    std::shared_ptr<DataNode> decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
+    std::shared_ptr<DataNode> decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format);
 };
 
 ///
@@ -931,7 +933,8 @@ public:
     /// @return pointer to the RootSchemaNode or nullptr if one could not be created.
     ///
     std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & capabilities);
-    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & server_caps, const std::vector<path::Capability> &caps);
+    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
+                                                       const std::vector<path::Capability> &caps_to_load);
 
     ///
     /// @brief Adds a model provider.

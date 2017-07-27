@@ -29,6 +29,7 @@ from .service import Service
 from .meta_service import MetaService
 import logging
 import importlib
+import operator
 
 
 class CRUDService(Service):
@@ -206,7 +207,7 @@ class CRUDService(Service):
             raise YPYServiceError(error_msg=err_msg)
 
         module = importlib.import_module(entity._meta_info().pmodule_name)
-        update_filter = getattr(module, entity._meta_info().name)()
+        update_filter = operator.attrgetter(entity._meta_info().name)(module)()
 
         # copy over the keys
         for key_member in entity._meta_info().key_members():

@@ -297,6 +297,18 @@ function py_sanity_augmentation_test {
     run_test sdk/python/core/tests/test_on_demand.py
 }
 
+function py_sanity_common_cache {
+    print_msg "py_sanity_common_cache"
+
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
+    run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
+    run_test sdk/python/core/tests/test_sanity_augmentation.py --common-cache
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    run_test sdk/python/core/tests/test_sanity_levels.py --common-cache
+    run_test sdk/python/core/tests/test_sanity_types.py --common-cache
+}
+
 function cpp_sanity_core_gen_install {
     print_msg "cpp_sanity_core_gen_install"
 
@@ -380,6 +392,7 @@ function py_tests {
     py_sanity_ydktest
     py_sanity_deviation
     py_sanity_augmentation
+    py_sanity_common_cache
     teardown_env
 }
 

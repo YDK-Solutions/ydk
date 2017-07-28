@@ -242,6 +242,11 @@ class SchemaNode;
 class RootSchemaNode;
 class RepositoryPtr;
 
+enum class ModelCachingOption {
+    COMMON,
+    PER_DEVICE
+};
+
 ///
 /// @brief Validation Service
 ///
@@ -902,14 +907,13 @@ class ModelProvider {
 ///
 class Repository {
 public:
-
     ///
     /// @brief Constructor for the Repositor.
     ///
     /// Constructor
     /// Uses the temp directory to download the yang files
     /// from the model provider
-    Repository();
+    Repository(ModelCachingOption caching_option = ModelCachingOption::PER_DEVICE);
 
     ///
     /// @brief Constructor for the Repository.
@@ -918,7 +922,7 @@ public:
     /// @param[in] search_dir The path in the filesystem where yang files can be found.
     /// @throws YCPPInvalidArgumentError if the search_dir is not a valid directory in the
     /// filesystem
-    Repository(const std::string& search_dir);
+    Repository(const std::string& search_dir, ModelCachingOption caching_option = ModelCachingOption::PER_DEVICE);
 
     ~Repository();
 

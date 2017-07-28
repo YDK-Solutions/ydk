@@ -59,7 +59,8 @@ class SanityTest(unittest.TestCase):
         port = getattr(self, 'port', 12022)
         protocol = getattr(self, 'protocol', 'ssh')
         on_demand = not getattr(self, 'non_demand', True)
-        self.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        common_cache = getattr(self, "common_cache", False)
+        self.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
         from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
@@ -211,10 +212,10 @@ class SanityTest(unittest.TestCase):
         reply = self.executor.execute_rpc(self.ncc, get_schema_rpc)
 
 if __name__ == '__main__':
-    device, non_demand = get_device_info()
+    device, non_demand, common_cache = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
 

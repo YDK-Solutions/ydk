@@ -52,8 +52,8 @@ namespace ydk {
 
         class RepositoryPtr : public std::enable_shared_from_this<RepositoryPtr> {
         public:
-            RepositoryPtr();
-            RepositoryPtr(const std::string& search_dir);
+            RepositoryPtr(ModelCachingOption caching_option);
+            RepositoryPtr(const std::string& search_dir, ModelCachingOption caching_option);
             ~RepositoryPtr();
 
             std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
@@ -88,6 +88,7 @@ namespace ydk {
          private:
             std::vector<ModelProvider*> model_providers;
             bool using_temp_directory;
+            ModelCachingOption caching_option;
         };
 
         class SchemaNodeImpl : public SchemaNode

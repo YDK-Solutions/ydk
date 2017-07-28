@@ -65,10 +65,11 @@ const char* CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 const string PROTOCOL_SSH = "ssh";
 const string PROTOCOL_TCP = "tcp";
 
-NetconfServiceProvider::NetconfServiceProvider(const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand)
+NetconfServiceProvider::NetconfServiceProvider(const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand, bool common_cache)
 {
     initialize_client(address, username, password, port, protocol);
-    path::Repository repo;
+    auto caching_option = common_cache ? path::ModelCachingOption::COMMON : path::ModelCachingOption::PER_DEVICE;
+    path::Repository repo(caching_option);
     initialize(repo, on_demand);
     YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }

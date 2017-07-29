@@ -56,7 +56,7 @@ OpenDaylightServiceProvider::~OpenDaylightServiceProvider()
 {
 }
 
-unique_ptr<ydk::ServiceProvider> OpenDaylightServiceProvider::create_provider_for_node(const string & node_id)
+unique_ptr<ydk::path::ServiceProvider> OpenDaylightServiceProvider::create_provider_for_node(const string & node_id)
 {
     if(odl_nodes.find(node_id) == odl_nodes.end())
     {
@@ -87,7 +87,7 @@ unique_ptr<ydk::ServiceProvider> OpenDaylightServiceProvider::create_provider_fo
                             );
 }
 
-ydk::ServiceProvider & OpenDaylightServiceProvider::get_node_provider(const string & node_id)
+ydk::path::ServiceProvider & OpenDaylightServiceProvider::get_node_provider(const string & node_id)
 {
     if(providers.find(node_id) != providers.end())
     {

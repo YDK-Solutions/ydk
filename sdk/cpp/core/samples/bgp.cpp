@@ -11,7 +11,6 @@
 #include <iostream>
 #include <memory>
 #include "../src/path_api.hpp"
-#include "../src/path/netconf_session.hpp"
 
 
 void print_paths(ydk::path::SchemaNode & sn)
@@ -24,7 +23,7 @@ void print_paths(ydk::path::SchemaNode & sn)
 void test_bgp_create()
 {
     ydk::path::Repository repo{};
-    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  2022};
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
     print_paths(schema);
 

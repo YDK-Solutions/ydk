@@ -22,8 +22,7 @@
 //////////////////////////////////////////////////////////////////
 
 #include <string>
-#include "../src/path_api.hpp"
-#include "../core/src/netconf_provider.hpp"
+#include "ydk/path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
 
@@ -109,8 +108,8 @@ std::string AUGMENTED_JSON_PAYLOAD = R"({
 TEST_CASE("on_demand_loading_json")
 {
     ydk::path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-    auto & root_schema = provider.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& root_schema = session.get_root_schema();
     ydk::path::Codec codec{};
 
     auto cpython = codec.decode(root_schema, AUGMENTED_JSON_PAYLOAD, ydk::EncodingFormat::JSON);
@@ -120,8 +119,8 @@ TEST_CASE("on_demand_loading_json")
 TEST_CASE("on_demand_loading_xml")
 {
     ydk::path::Repository repo{TEST_HOME};
-    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-    auto & root_schema = provider.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& root_schema = session.get_root_schema();
     ydk::path::Codec codec{};
 
     auto cpython = codec.decode(root_schema, AUGMENTED_XML_PAYLOAD, ydk::EncodingFormat::XML);

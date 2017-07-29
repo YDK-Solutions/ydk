@@ -19,7 +19,7 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-from ydk.providers import NetconfServiceProvider
+from ydk.path import NetconfSession
 from ydk.path import Codec
 from ydk.types import EncodingFormat
 
@@ -39,8 +39,8 @@ class SanityTest(unittest.TestCase):
         protocol = getattr(cls, 'protocol', 'ssh')
         on_demand = not getattr(cls, 'non_demand', False)
         common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
-        cls.root_schema = cls.ncc.get_root_schema()
+        cls.nc_session = NetconfSession(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.root_schema = cls.nc_session.get_root_schema()
         cls.codec = Codec()
 
     def _delete_runner(self):
@@ -48,7 +48,7 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
         create_rpc = self.root_schema.create_rpc("ydk:delete")
         create_rpc.get_input_node().create_datanode("entity", xml)
-        create_rpc(self.ncc)
+        create_rpc(self.nc_session)
 
     def tearDown(self):
         self._delete_runner()
@@ -71,18 +71,18 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
         create_rpc = self.root_schema.create_rpc("ydk:create")
         create_rpc.get_input_node().create_datanode("entity", xml)
-        create_rpc(self.ncc)
+        create_rpc(self.nc_session)
 
         runner_filter = self.root_schema.create_datanode("ydktest-sanity:runner")
         xml_filter = self.codec.encode(runner_filter, EncodingFormat.XML, False)
         read_rpc = self.root_schema.create_rpc("ydk:read")
         read_rpc.get_input_node().create_datanode("filter", xml_filter)
-        runner_read = read_rpc(self.ncc)
+        runner_read = read_rpc(self.nc_session)
         xml_read = self.codec.encode(runner_read, EncodingFormat.XML, True)
         self.maxDiff = None
         self.assertEqual(xml, xml_read)
 
-    def test_rpcs(self):        
+    def test_rpcs(self):
         getc = self.root_schema.create_rpc("ietf-netconf:get-config")
         self.assertEqual(getc.has_output_node() , True)
         get = self.root_schema.create_rpc("ietf-netconf:get")
@@ -122,7 +122,7 @@ class SanityTest(unittest.TestCase):
         get_schema_rpc = self.root_schema.create_rpc("ietf-netconf-monitoring:get-schema")
         get_schema_rpc.get_input_node().create_datanode("identifier", "ydktest-sanity-types")
 
-        res = get_schema_rpc(self.ncc)
+        res = get_schema_rpc(self.nc_session)
 
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )

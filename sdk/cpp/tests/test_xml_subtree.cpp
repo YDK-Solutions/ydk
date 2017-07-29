@@ -24,7 +24,7 @@
 #include <iostream>
 #include <string>
 
-#include "ydk/path/netconf_session.hpp"
+#include "ydk/path_api.hpp"
 #include "ydk/netconf_provider.hpp"
 #include "ydk/crud_service.hpp"
 #include "ydk/codec_service.hpp"
@@ -50,8 +50,8 @@ CodecService c{};
 CodecServiceProvider cp{EncodingFormat::XML};
 
 ydk::path::Repository repo{TEST_HOME};
-NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-NetconfSession session = provider.get_session();
+ydk::NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+const ydk::path::Session& session = provider.get_session();
 
 CrudService crud{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
@@ -86,7 +86,7 @@ TEST_CASE("subtree_encode_yfilter_delete")
 {
 ydk::path::Repository repo{TEST_HOME};
 NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-NetconfSession session = provider.get_session();
+const path::Session& session = provider.get_session();
 
 CrudService crud{};
 
@@ -115,7 +115,8 @@ REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 TEST_CASE("subtree_encode_yfilter_read")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+const path::Session& session = provider.get_session();
 
 XmlSubtreeCodec codec{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
@@ -134,7 +135,8 @@ REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 TEST_CASE("subtree_encode_namespaces")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+const path::Session& session = provider.get_session();
 
 CodecService c{};
 CodecServiceProvider cp{EncodingFormat::XML};
@@ -179,7 +181,8 @@ REQUIRE(s==s1);
 TEST_CASE("subtree_encode_identity")
 {
 ydk::path::Repository repo{TEST_HOME};
-NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+const path::Session& session = provider.get_session();
 
 XmlSubtreeCodec codec{};
 
@@ -268,7 +271,7 @@ TEST_CASE("subtree_decode_identity")
 {
 ydk::path::Repository repo{TEST_HOME};
 NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-NetconfSession session = provider.get_session();
+const path::Session& session = provider.get_session();
 
 CrudService crud{};
 

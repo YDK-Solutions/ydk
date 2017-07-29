@@ -38,7 +38,7 @@ class SanityTest(unittest.TestCase):
         repo_path = os.path.dirname(__file__)
         repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
         self.repo = Repository(repo_path)
-        self.restconf_session = RestconfSession(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
+        self.restconf_session = RestconfSession(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON, "/data", "/data")
 
     @classmethod
     def tearDownClass(self):

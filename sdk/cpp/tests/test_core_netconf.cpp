@@ -25,7 +25,6 @@
 #include <spdlog/spdlog.h>
 
 #include "path_api.hpp"
-#include "path/netconf_session.hpp"
 #include "config.hpp"
 #include "catch.hpp"
 
@@ -225,13 +224,13 @@ TEST_CASE( "get_schema"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     std::shared_ptr<ydk::path::Rpc> get_schema_rpc { schema.create_rpc("ietf-netconf-monitoring:get-schema") };
     get_schema_rpc->get_input_node().create_datanode("identifier", "ydktest-sanity");
 
-    auto res = (*get_schema_rpc)(sp);
+    auto res = (*get_schema_rpc)(session);
 
     ydk::path::Codec s{};
 
@@ -244,14 +243,14 @@ TEST_CASE( "get_config"  )
 {
     ydk::path::Repository repo{};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     std::shared_ptr<ydk::path::Rpc> get_schema_rpc { schema.create_rpc("ietf-netconf:get-config") };
     get_schema_rpc->get_input_node().create_datanode("source/candidate");
     get_schema_rpc->get_input_node().create_datanode("filter", "<bgp xmlns=\"xmlns=http://openconfig.net/yang/bgp\"/>");
 
-    REQUIRE_NOTHROW((*get_schema_rpc)(sp));
+    REQUIRE_NOTHROW((*get_schema_rpc)(session));
 
 }
 

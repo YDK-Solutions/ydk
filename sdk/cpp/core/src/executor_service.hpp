@@ -31,8 +31,7 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "service.hpp"
-#include "path/netconf_session.hpp"
+#include "path_api.hpp"
 
 namespace ydk
 {
@@ -45,13 +44,13 @@ class Session;
 
 class Entity;
 
-class ExecutorService : public Service
+class ExecutorService
 {
     public:
         ExecutorService();
         ~ExecutorService();
         std::shared_ptr<Entity> execute_rpc(
-            NetconfSession & session,
+            path::ServiceProvider & provider,
             Entity & rpc_entity,
             std::shared_ptr<Entity> top_entity = nullptr
         );

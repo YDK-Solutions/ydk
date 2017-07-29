@@ -144,6 +144,7 @@ set(libydk_src
     src/ietf_parser.cpp
     src/leaf_data.cpp
     src/logging_callback.cpp
+    src/service_provider.cpp
     src/netconf_client.cpp
     src/netconf_ssh_client.cpp
     src/netconf_tcp_client.cpp
@@ -164,15 +165,16 @@ set(libydk_src
     src/path/annotation.cpp
     src/path/capability.cpp
     src/path/data_node.cpp
-    src/path/netconf_session.cpp
     src/path/path.cpp
     src/path/repository.cpp
     src/path/restconf_session.cpp
+    src/path/netconf_session.cpp
     src/path/root_data_node.cpp
     src/path/root_schema_node.cpp
     src/path/rpc.cpp
     src/path/schema_node.cpp
     src/path/statement.cpp)
+
 
 file(GLOB SPDLOG_HEADERS src/spdlog/*.h)
 file(GLOB SPDLOG_DETAILS_HEADERS src/spdlog/details/*.h)
@@ -187,6 +189,7 @@ set(spdlog_fmt_bundled_include_location include/spdlog/fmt/bundled)
 set(spdlog_sinks_include_location include/spdlog/sinks)
 
 set(libydk_install_headers
+    src/path_api.hpp
     src/capabilities_parser.hpp
     src/codec_provider.hpp
     src/codec_service.hpp
@@ -204,10 +207,8 @@ set(libydk_install_headers
     src/network_topology.hpp
     src/opendaylight_parser.hpp
     src/opendaylight_provider.hpp
-    src/path_api.hpp
     src/restconf_provider.hpp
-    src/service.hpp
-    src/service.hpp
+    src/restconf_client.hpp
     src/types.hpp
     src/xml_subtree_codec.hpp
     src/validation_service.hpp)

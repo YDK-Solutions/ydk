@@ -18,7 +18,9 @@ from ydk.ext.path import Annotation
 from ydk.ext.path import Capability
 from ydk.ext.path import Codec
 from ydk.ext.path import DataNode
+from ydk.ext.path import NetconfSession
 from ydk.ext.path import Repository
+from ydk.ext.path import RestconfSession
 from ydk.ext.path import RootSchemaNode
 from ydk.ext.path import Rpc
 from ydk.ext.path import SchemaNode
@@ -30,7 +32,9 @@ __all__ = [ "Annotation",
             "Capability",
             "Codec",
             "DataNode",
+            "NetconfSession",
             "Repository",
+            "RestconfSession",
             "RootSchemaNode",
             "Rpc",
             "SchemaNode",

@@ -14,7 +14,8 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 #include <string.h>
-#include "../core/src/path/restconf_session.hpp"
+#include "ydk/path_api.hpp"
+#include "ydk/restconf_provider.hpp"
 #include "../core/src/errors.hpp"
 #include <iostream>
 #include "config.hpp"
@@ -27,9 +28,9 @@ using namespace std;
 TEST_CASE("CreateDelRead")
 {
     ydk::path::Repository repo{TEST_HOME};
-    RestconfSession session{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
+    ydk::RestconfServiceProvider provider{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
 
-    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::RootSchemaNode& schema = provider.get_session().get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -40,7 +41,7 @@ TEST_CASE("CreateDelRead")
     auto json = s.encode(runner, EncodingFormat::JSON, false);
     delete_rpc->get_input_node().create_datanode("entity", json);
     //call delete
-    (*delete_rpc)(session);
+    (*delete_rpc)(provider.get_session());
 
     auto & number8 = runner.create_datanode("ytypes/built-in-t/number8", "3");
 
@@ -49,7 +50,7 @@ TEST_CASE("CreateDelRead")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", json);
-    (*create_rpc)(session);
+    (*create_rpc)(provider.get_session());
 
     //read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -59,7 +60,7 @@ TEST_CASE("CreateDelRead")
     REQUIRE( !json.empty() );
     read_rpc->get_input_node().create_datanode("filter", json);
 
-    auto read_result = (*read_rpc)(session);
+    auto read_result = (*read_rpc)(provider.get_session());
 
     runner = schema.create_datanode("ydktest-sanity:runner", "");
     number8 = runner.create_datanode("ytypes/built-in-t/number8", "5");
@@ -69,7 +70,7 @@ TEST_CASE("CreateDelRead")
     //call update
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };
     update_rpc->get_input_node().create_datanode("entity", json);
-    (*update_rpc)(session);
+    (*update_rpc)(provider.get_session());
 
 
 }

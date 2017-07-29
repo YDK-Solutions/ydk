@@ -39,6 +39,10 @@
 #include "validation_service.hpp"
 
 namespace ydk {
+
+class NetconfClient;
+class RestconfClient;
+
 namespace path {
 
 ///
@@ -102,7 +106,7 @@ namespace path {
 
 ///
 /// @page howtosession Session.
-/// A Session extends the class ydk::path::Session
+/// A Session extends the class ydk::Session
 /// and provides an interface to obtain the root SchemaTree
 /// based on the set of Capability(s) supported by it.
 ///
@@ -931,9 +935,9 @@ public:
     /// @param[in] capabilities vector of Capability
     /// @return pointer to the RootSchemaNode or nullptr if one could not be created.
     ///
-    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<path::Capability> & capabilities);
-    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
-                                                       const std::vector<path::Capability> &caps_to_load);
+    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<Capability> & capabilities);
+    std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<std::unordered_map<std::string, Capability>>& lookup_tables,
+                                                       const std::vector<Capability> &caps_to_load);
 
     ///
     /// @brief Adds a model provider.
@@ -974,12 +978,30 @@ public:
     std::shared_ptr<RepositoryPtr> m_priv_repo;
 };
 
+class ServiceProvider
+{
+public:
+    ///
+    /// @brief return the SchemaTree supported by this instance of the ServiceProvider
+    ///
+    /// @return pointer to the RootSchemaNode or nullptr if one could not be created
+    ///
+
+    virtual ~ServiceProvider();
+
+    virtual EncodingFormat get_encoding() const = 0;
+
+    virtual const path::Session& get_session() const = 0;
+
+};
 
 /// @note to Session implementors
 /// Use the Repository class to instantiate a SchemaTree based on the Capabilities.
 class Session
 {
 public:
+    virtual ~Session();
+
     ///
     /// @brief return the SchemaTree supported by this instance of the Session
     ///
@@ -998,6 +1020,98 @@ public:
     ///
     virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const = 0 ;
 };
+
+class NetconfSession : public Session {
+public:
+    NetconfSession(
+        Repository & repo,
+        const std::string& address,
+        const std::string& username,
+        const std::string& password,
+        int port = 830,
+        const std::string& protocol = "ssh",
+        bool on_demand = true
+    );
+
+    NetconfSession(
+        const std::string& address,
+        const std::string& username,
+        const std::string& password,
+        int port = 830,
+        const std::string& protocol = "ssh",
+        bool on_demand = true,
+        bool common_cache = false
+    );
+
+    virtual ~NetconfSession();
+
+    virtual RootSchemaNode& get_root_schema() const;
+    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+
+private:
+    std::shared_ptr<DataNode> handle_edit(
+        Rpc& rpc, Annotation ann) const;
+    std::shared_ptr<DataNode> handle_read(Rpc& rpc) const;
+    std::shared_ptr<DataNode> handle_netconf_operation(Rpc& ydk_rpc) const;
+    void initialize(Repository& repo, bool on_demand);
+    void initialize_client(
+        const std::string& address,
+        const std::string& username,
+        const std::string& password,
+        int port,
+        const std::string& protocol
+    );
+    std::string execute_payload(const std::string & payload) const;
+private:
+    std::unique_ptr<NetconfClient> client;
+    std::unique_ptr<ModelProvider> model_provider;
+    std::shared_ptr<RootSchemaNode> root_schema;
+    std::vector<std::string> server_capabilities;
+};
+
+
+class RestconfSession : public Session {
+public:
+    RestconfSession(
+        Repository & repo,
+        const std::string & address,
+        const std::string & username,
+        const std::string & password,
+        int port = 80,
+        EncodingFormat encoding = EncodingFormat::JSON,
+        const std::string & config_url_root = "/data",
+        const std::string & state_url_root = "/data"
+    );
+
+    RestconfSession(
+        std::shared_ptr<RestconfClient> client,
+        std::shared_ptr<RootSchemaNode> root_schema,
+        const std::string & edit_method,
+        EncodingFormat encoding,
+        const std::string & config_url_root,
+        const std::string & state_url_root
+    );
+
+    virtual ~RestconfSession();
+
+    virtual RootSchemaNode& get_root_schema() const;
+    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+
+private:
+    void initialize(Repository & repo);
+    std::shared_ptr<DataNode> handle_edit(Rpc& rpc, const std::string & yfilter) const;
+    std::shared_ptr<DataNode> handle_read(Rpc& rpc) const;
+private:
+        std::shared_ptr<RestconfClient> client;
+        std::shared_ptr<RootSchemaNode> root_schema;
+        std::vector<std::string> server_capabilities;
+
+        EncodingFormat encoding;
+        std::string edit_method;
+        std::string config_url_root;
+        std::string state_url_root;
+};
+
 
 ///
 ///

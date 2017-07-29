@@ -21,18 +21,12 @@
 #include <memory>
 #include <string>
 
-#include "path/restconf_session.hpp"
-#include "service_provider.hpp"
+#include "path_api.hpp"
 
 namespace ydk {
-static const std::string default_capabilities_url = "/ietf-restconf-monitoring:restconf-state/capabilities";
 
-struct OpenDaylightNode;
-class CapabilitiesParser;
-class RestconfClient;
-class RestconfSession;
 
-class RestconfServiceProvider : public ServiceProvider {
+class RestconfServiceProvider : public path::ServiceProvider {
 public:
         RestconfServiceProvider(path::Repository & repo,
                                const std::string & address,
@@ -53,11 +47,11 @@ public:
         ~RestconfServiceProvider();
 
         EncodingFormat get_encoding() const;
-        RestconfSession get_session() const;
+        const path::Session& get_session() const;
 
 private:
         EncodingFormat encoding;
-        RestconfSession session;
+        const path::RestconfSession session;
 };
 }
 

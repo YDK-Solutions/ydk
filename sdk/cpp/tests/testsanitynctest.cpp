@@ -22,10 +22,9 @@
 //////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include "../core/src/path_api.hpp"
+#include "ydk/path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
-#include "../core/src/path/netconf_session.hpp"
 
 //test_sanity_types begin
 

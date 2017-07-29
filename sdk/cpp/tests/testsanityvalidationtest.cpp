@@ -24,11 +24,9 @@
 #include <iostream>
 
 #include "ydk/path_api.hpp"
-#include "ydk/netconf_provider.hpp"
 #include "ydk_ydktest/ydktest_sanity.hpp"
 #include "ydk/types.hpp"
 #include "ydk/validation_service.hpp"
-#include "ydk/path/netconf_session.hpp"
 #include "config.hpp"
 #include "catch.hpp"
 
@@ -38,7 +36,7 @@ TEST_CASE("validation_int8 ")
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
     ydk::ValidationService validation_service{};
 

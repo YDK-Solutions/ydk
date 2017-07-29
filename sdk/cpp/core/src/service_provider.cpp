@@ -1,9 +1,9 @@
 //
-// @file path_api.hpp
+// @file service_provider.cpp
 // @brief The main ydk public header.
 //
 // YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
+// Copyright 2017 Cisco Systems. All rights reserved
 //
 ////////////////////////////////////////////////////////////////
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -25,33 +25,12 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#ifndef _SERVICE_PROVIDER_H_
-#define _SERVICE_PROVIDER_H_
-
 #include "path_api.hpp"
 
 namespace ydk {
 
-///
-/// @brief Interface for all ServiceProvider implementations
-///
-/// Concretes instances of ServiceProviders are expected to extend this interface.
-///
-class ServiceProvider
+path::ServiceProvider::~ServiceProvider()
 {
-public:
-    ///
-    /// @brief return the SchemaTree supported by this instance of the ServiceProvider
-    ///
-    /// @return pointer to the RootSchemaNode or nullptr if one could not be created
-    ///
-
-    virtual ~ServiceProvider();
-
-    virtual EncodingFormat get_encoding() const = 0;
-
-    virtual Session get_session() const = 0;
-
-};
 }
-#endif /*_SERVICE_PROVIDER_H_*/
+
+} //namespace ydk

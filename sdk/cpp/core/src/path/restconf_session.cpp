@@ -33,17 +33,19 @@
 #include "../restconf_client.hpp"
 #include "../types.hpp"
 #include "../logger.hpp"
-#include "restconf_session.hpp"
+
 
 using namespace std;
 
 namespace ydk
 {
-static std::shared_ptr<path::DataNode> handle_read_reply(
-    const string & reply,
-    path::RootSchemaNode & root_schema,
-    EncodingFormat encoding
-);
+
+namespace path
+{
+
+static const std::string default_capabilities_url = "/ietf-restconf-monitoring:restconf-state/capabilities";
+
+static std::shared_ptr<path::DataNode> handle_read_reply(const string & reply, path::RootSchemaNode & root_schema, EncodingFormat encoding);
 
 static path::SchemaNode* get_schema_for_operation(
     path::RootSchemaNode & root_schema,
@@ -60,11 +62,13 @@ RestconfSession::RestconfSession(
     const string & password,
     int port,
     EncodingFormat encoding,
+    const string & config_url_root,
     const string & state_url_root)
     :
-    client(make_unique<RestconfClient>(
+    client(make_shared<RestconfClient>(
         address, username, password, port, get_encoding_string(encoding))),
     encoding(encoding),
+    config_url_root(config_url_root),
     state_url_root(state_url_root)
 {
     edit_method = "PATCH";
@@ -73,16 +77,18 @@ RestconfSession::RestconfSession(
 
 // sets client, encoding, state_url_root, edit_method, root_schema
 RestconfSession::RestconfSession(
-    std::unique_ptr<RestconfClient> client,
+    std::shared_ptr<RestconfClient> client,
     std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
     const std::string & edit_method,
-    const std::string & state_url_root,
-    EncodingFormat encoding)
+    EncodingFormat encoding,
+    const std::string & config_url_root,
+    const std::string & state_url_root)
     :
     client(move(client)),
     root_schema(move(root_schema)),
     edit_method(edit_method),
     encoding(encoding),
+    config_url_root(config_url_root),
     state_url_root(state_url_root)
 {
 }
@@ -109,7 +115,7 @@ RestconfSession::~RestconfSession()
     YLOG_INFO("Disconnected from device");
 }
 
-std::shared_ptr<path::DataNode> RestconfServiceProvider::invoke(
+std::shared_ptr<path::DataNode> RestconfSession::invoke(
     path::Rpc& rpc) const
 {
     path::SchemaNode* create_schema = get_schema_for_operation(*root_schema, "ydk:create");
@@ -169,7 +175,7 @@ static bool is_config(path::Rpc & rpc)
     return false;
 }
 
-std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(
+std::shared_ptr<path::DataNode> RestconfSession::handle_read(
     path::Rpc& rpc) const
 {
     path::Codec codec_service{};
@@ -199,7 +205,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_read(
     return handle_read_reply( client->execute("GET", url, ""), *root_schema, encoding);
 }
 
-std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(
+std::shared_ptr<path::DataNode> RestconfSession::handle_edit(
     path::Rpc& rpc, const string & yfilter) const
 {
     path::Codec codec_service{};
@@ -221,10 +227,7 @@ std::shared_ptr<path::DataNode> RestconfServiceProvider::handle_edit(
     return nullptr;
 }
 
-static std::shared_ptr<path::DataNode> handle_read_reply(
-    const string & reply,
-    path::RootSchemaNode & root_schema,
-    EncodingFormat encoding)
+static std::shared_ptr<path::DataNode> handle_read_reply(const string & reply, path::RootSchemaNode & root_schema, EncodingFormat encoding)
 {
     path::Codec codec_service{};
 
@@ -256,4 +259,6 @@ static string get_encoding_string(EncodingFormat encoding)
         ("application/yang-data+json");
 }
 
-}
+} //namespace path
+
+} //namespace ydk

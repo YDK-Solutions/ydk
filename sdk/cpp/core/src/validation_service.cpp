@@ -23,7 +23,6 @@
 
 #include "entity_data_node_walker.hpp"
 #include "path_api.hpp"
-#include "service.hpp"
 #include "validation_service.hpp"
 #include <map>
 #include "logger.hpp"

@@ -21,10 +21,10 @@
 #include <string>
 
 #include "path_api.hpp"
+#include "netconf_client.hpp"
 
 namespace ydk {
 
-class NetconfClient;
 
 class NetconfModelProvider : public path::ModelProvider {
 public:

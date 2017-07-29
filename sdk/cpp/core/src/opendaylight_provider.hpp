@@ -22,15 +22,14 @@
 #include <vector>
 
 #include "network_topology.hpp"
-#include "service_provider.hpp"
 #include "types.hpp"
 
 namespace ydk
 {
 namespace path
 {
-class Repository;
-class ServiceProvider;
+
+
 }
 class OpenDaylightServiceProvider
 {
@@ -45,11 +44,11 @@ class OpenDaylightServiceProvider
 
         ~OpenDaylightServiceProvider();
 
-        ydk::ServiceProvider & get_node_provider(const std::string & node_id);
+        ydk::path::ServiceProvider & get_node_provider(const std::string & node_id);
         const std::vector<std::string> & get_node_ids();
 
     private:
-        std::unique_ptr<ydk::ServiceProvider> create_provider_for_node(const std::string & node_id);
+        std::unique_ptr<ydk::path::ServiceProvider> create_provider_for_node(const std::string & node_id);
 
     private:
         std::unique_ptr<path::Repository> m_repo_ptr;
@@ -62,7 +61,7 @@ class OpenDaylightServiceProvider
         EncodingFormat encoding;
 
         std::map<std::string, std::unique_ptr<opendaylight::network_topology::NetworkTopology::Topology::Node>> odl_nodes;
-        std::map<std::string, std::unique_ptr<ydk::ServiceProvider>> providers;
+        std::map<std::string, std::unique_ptr<ydk::path::ServiceProvider>> providers;
         std::vector<std::string> node_ids;
 };
 }

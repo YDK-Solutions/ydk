@@ -123,7 +123,7 @@ def merge_file_path_segments(segs):
 
 
 def ispythonkeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent', 'exec')
+    return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'operation', 'exec', 'entity')
 
 
 def iscppkeyword(word):
@@ -223,6 +223,8 @@ def get_module_name(stmt):
         return stmt.arg
 
     module_stmt = stmt.i_module
+    if module_stmt is None:
+        return None
     if module_stmt.i_including_modulename is not None:
         return module_stmt.i_including_modulename
     else:

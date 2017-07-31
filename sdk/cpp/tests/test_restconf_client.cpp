@@ -26,23 +26,23 @@ using namespace std;
 
 TEST_CASE("PostGetPatchGet")
 {
-	string response;
-	RestconfClient client{"http://localhost", "admin", "admin", 12306, "application/json"};
+    string response;
+    RestconfClient client{"http://localhost", "admin", "admin", 12306, "application/json"};
 
-	string json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"netconf\"}}";
-	CHECK_NOTHROW(client.execute("POST", "/test", json));
-	CHECK_NOTHROW((response = client.execute("GET", "/test", "")));
-	REQUIRE(response.find(json) != string::npos);
+    string json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"netconf\"}}";
+    CHECK_NOTHROW(client.execute("POST", "/test", json));
+    CHECK_NOTHROW((response = client.execute("GET", "/test", "")));
+    REQUIRE(response.find(json) != string::npos);
 
-	json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"restconf\"}}";
-	CHECK_NOTHROW(client.execute("PATCH", "/test/1", json));
-	CHECK_NOTHROW((response = client.execute("GET", "/test/1", "")));
-	REQUIRE(response.find(json) != string::npos);
+    json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"restconf\"}}";
+    CHECK_NOTHROW(client.execute("PATCH", "/test/1", json));
+    CHECK_NOTHROW((response = client.execute("GET", "/test/1", "")));
+    REQUIRE(response.find(json) != string::npos);
 
-	json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"odl\"}}";
-	CHECK_NOTHROW(client.execute("PUT", "/test/2", json));
-	CHECK_NOTHROW((response = client.execute("GET", "/test/2", "")));
-	REQUIRE(response.find(json) != string::npos);
+    json = "{\"id\": \"2\",\"network-topology\": {\"topology\": \"odl\"}}";
+    CHECK_NOTHROW(client.execute("PUT", "/test/2", json));
+    CHECK_NOTHROW((response = client.execute("GET", "/test/2", "")));
+    REQUIRE(response.find(json) != string::npos);
 
-	CHECK_NOTHROW(client.execute("DELETE", "/test/2", ""));
+    CHECK_NOTHROW(client.execute("DELETE", "/test/2", ""));
 }

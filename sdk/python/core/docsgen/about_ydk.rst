@@ -20,11 +20,15 @@ This ydk-py is generated using `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>
 
 To check out the version of ydk-gen used to generate this ydk-py, use the below commands:
 
-.. code-block:: none
+.. code-block:: sh
 
-  git clone repo-url
-  git checkout commit-id
+    $ git clone repo-url
+    $ git checkout commit-id
+
+Backwards Compatibility Notes
+-----------------------------
+When installing and using the ``0.6.0`` and newer releases of ``YDK-Py``, please refer to the :ref:`compatibility`.
 
 Changelog
 ----------
- - `Changelog <https://github.com/CiscoDevNet/ydk-cpp/blob/master/CHANGES.md>`_
+ - `Changelog <https://github.com/CiscoDevNet/ydk-py/blob/master/CHANGES.md>`_

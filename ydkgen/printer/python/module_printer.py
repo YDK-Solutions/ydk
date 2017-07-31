@@ -36,10 +36,18 @@ class ModulePrinter(FilePrinter):
         super(ModulePrinter, self).__init__(ctx)
         self.sort_clazz = extra_args.get('sort_clazz', False)
         self.identity_subclasses = extra_args.get('identity_subclasses', {})
+        self.module_namespace_lookup = extra_args.get('module_namespace_lookup', {})
 
     def print_header(self, package):
         self._print_module_description(package)
-        self._print_imports(package)
+
+        self.ctx.writeln("from ydk.entity_utils import get_relative_entity_path as _get_relative_entity_path")
+        self.ctx.writeln("from ydk.types import Entity, EntityPath, Identity, Enum, YType, YLeaf, YLeafList, YList, LeafDataList, Bits, Empty, Decimal64")
+        self.ctx.writeln("from ydk.filters import YFilter")
+        self.ctx.writeln("from ydk.errors import YPYError, YPYModelError")
+        self.ctx.writeln("from ydk.errors.error_handler import handle_type_error as _handle_type_error")
+        self.ctx.bline()
+        self.ctx.bline()
 
     def print_body(self, package):
         self._print_module_enums(package)
@@ -77,19 +85,14 @@ class ModulePrinter(FilePrinter):
         self.ctx.bline()
 
     def _print_static_imports(self):
-        self.ctx.str('''
-
-import re
-import collections
-
-from enum import Enum
-
-from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict
-
-from ydk.errors import YPYError, YPYModelError
-
-
-''')
+        self.ctx.writeln('import re')
+        self.ctx.writeln('import collections')
+        self.ctx.bline()
+        self.ctx.writeln('from enum import Enum')
+        self.ctx.writeln('from ydk_.types import Entity, Enum')
+        self.ctx.writeln('from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict')
+        self.ctx.writeln('from ydk.errors import YPYError, YPYModelError')
+        self.ctx.bline()
 
     def _print_module_enums(self, package):
         enumz = []
@@ -106,7 +109,7 @@ from ydk.errors import YPYError, YPYModelError
             self._print_bits(bit)
 
     def _print_module_classes(self, package):
-        ClassPrinter(self.ctx, self.sort_clazz).print_output(
+        ClassPrinter(self.ctx, self.sort_clazz, self.module_namespace_lookup).print_output(
             [clazz for clazz in package.owned_elements if isinstance(clazz, Class)])
 
     def _print_bits(self, bits):
@@ -114,3 +117,4 @@ from ydk.errors import YPYError, YPYModelError
 
     def _print_enum(self, enum_class):
         EnumPrinter(self.ctx).print_enum(enum_class, False)
+

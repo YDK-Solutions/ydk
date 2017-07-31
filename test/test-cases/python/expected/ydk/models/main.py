@@ -31,35 +31,35 @@ class MainA(object):
     
     .. attribute:: main_aug1_c
     
-    	
-    	**type**\:  :py:class:`MainAug1_C <ydk.models.main.MainA.MainAug1_C>`
+        
+        **type**\:  :py:class:`MainAug1_C <ydk.models.main.MainA.MainAug1_C>`
     
     .. attribute:: main_aug2_c
     
-    	
-    	**type**\:  :py:class:`MainAug2_C <ydk.models.main.MainA.MainAug2_C>`
+        
+        **type**\:  :py:class:`MainAug2_C <ydk.models.main.MainA.MainAug2_C>`
     
     .. attribute:: main_aug2_d
     
-    	
-    	**type**\:  :py:class:`MainAug2_D <ydk.models.main.MainA.MainAug2_D>`
+        
+        **type**\:  :py:class:`MainAug2_D <ydk.models.main.MainA.MainAug2_D>`
     
     .. attribute:: main_aug3_c
     
-    	
-    	**type**\:  :py:class:`MainAug3_C <ydk.models.main.MainA.MainAug3_C>`
+        
+        **type**\:  :py:class:`MainAug3_C <ydk.models.main.MainA.MainAug3_C>`
     
     .. attribute:: main_aug3_d
     
-    	
-    	**type**\:  :py:class:`MainAug3_D <ydk.models.main.MainA.MainAug3_D>`
+        
+        **type**\:  :py:class:`MainAug3_D <ydk.models.main.MainA.MainAug3_D>`
     
     .. attribute:: one
     
-    	blah
-    	**type**\:  int
+        blah
+        **type**\:  int
     
-    	**range:** \-2147483648..2147483647
+        **range:** \-2147483648..2147483647
     
     
 
@@ -88,8 +88,8 @@ class MainA(object):
         
         .. attribute:: two
         
-        	blah
-        	**type**\:  str
+            blah
+            **type**\:  str
         
         
 
@@ -131,10 +131,10 @@ class MainA(object):
         
         .. attribute:: three
         
-        	blah
-        	**type**\:  int
+            blah
+            **type**\:  int
         
-        	**range:** \-32768..32767
+            **range:** \-32768..32767
         
         
 
@@ -176,10 +176,10 @@ class MainA(object):
         
         .. attribute:: poo
         
-        	blah
-        	**type**\:  int
+            blah
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         
 
@@ -221,10 +221,10 @@ class MainA(object):
         
         .. attribute:: meh
         
-        	blah
-        	**type**\:  int
+            blah
+            **type**\:  int
         
-        	**range:** \-128..127
+            **range:** \-128..127
         
         
 
@@ -266,8 +266,8 @@ class MainA(object):
         
         .. attribute:: buh
         
-        	blah
-        	**type**\:  str
+            blah
+            **type**\:  str
         
         
 

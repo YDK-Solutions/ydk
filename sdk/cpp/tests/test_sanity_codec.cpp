@@ -30,6 +30,8 @@
 #include "catch.hpp"
 
 using namespace std;
+using namespace ydktest;
+using namespace ydktest_new;
 using namespace ydk;
 
 std::string XML_OC_PATTERN_PAYLOAD = R"(<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">

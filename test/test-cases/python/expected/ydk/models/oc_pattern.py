@@ -31,15 +31,15 @@ class OcA(object):
     
     .. attribute:: a  <key>
     
-    	blah
-    	**type**\:  str
+        blah
+        **type**\:  str
     
-    	**refers to**\: :py:class:`b <ydk.models.oc_pattern.OcA.B>`
+        **refers to**\: :py:class:`b <ydk.models.oc_pattern.OcA.B>`
     
     .. attribute:: b
     
-    	
-    	**type**\:  :py:class:`B <ydk.models.oc_pattern.OcA.B>`
+        
+        **type**\:  :py:class:`B <ydk.models.oc_pattern.OcA.B>`
     
     
 
@@ -60,8 +60,8 @@ class OcA(object):
         
         .. attribute:: b
         
-        	
-        	**type**\:  str
+            
+            **type**\:  str
         
         
 

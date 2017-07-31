@@ -19,37 +19,36 @@ sanity test for ydktest-sanity.yang
 """
 from __future__ import absolute_import
 
+import sys
 import unittest
-from compare import is_equal
 
 from ydk.models.ydktest import ydktest_sanity as ysanity
-from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
+from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
-from ydk.types import READ
+from ydk.filters import YFilter
+
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityYang(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
 
     @classmethod
-    def setUpClass(self):
-        if SanityYang.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        common_cache = getattr(cls, "common_cache", False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
-        self.ncc.close()
+    def tearDownClass(cls):
+        pass
 
     def setUp(self):
         runner = ysanity.Runner()
@@ -65,16 +64,17 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
 
-        r_2.one = READ()
+        r_2.one.yfilter = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(is_equal(r_1, r_2), True)
+        self.assertEqual(r_1.one.number, r_2.one.number)
+        self.assertEqual(r_1.one.name, r_2.one.name)
 
     def test_read_on_leaf(self):
         r_1 = ysanity.Runner()
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2 = ysanity.Runner()
-        r_2.one.number = READ()
+        r_2.one.number.yfilter = YFilter.read
         r_2 = self.crud.read(self.ncc, r_2)
         self.assertEqual(r_2.one.number, r_1.one.number)
 
@@ -88,29 +88,29 @@ class SanityYang(unittest.TestCase):
         r_2 = ysanity.Runner()
         r_2.one.number = 2
         r_2 = self.crud.read(self.ncc, r_2)
-        self.assertNotEqual(r_2.one.number, r_1.one.number)
+        self.assertEqual(r_2, None)
 
     def test_read_on_ref_enum_class(self):
-        from ydk.models.ydktest.ydktest_sanity import YdkEnumTestEnum
+        from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.enum_value = YdkEnumTestEnum.local
+        r_1.enum_value = YdkEnumTest.local
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = READ()
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(is_equal(r_1, r_2), True)
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.enum_value.yfilter = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = YdkEnumTestEnum.local
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(is_equal(r_1, r_2), True)
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.enum_value = YdkEnumTest.local
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
 
         # no such value, nothing returned
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.enum_value = YdkEnumTestEnum.remote
+        r_2.enum_value = YdkEnumTest.remote
         r_2 = self.crud.read(self.ncc, r_2)
-        self.assertNotEqual(is_equal(r_1, r_2), True)
+        self.assertEqual(r_2, None)
 
     def test_read_on_ref_list(self):
         r_1 = ysanity.Runner.OneList()
@@ -119,11 +119,12 @@ class SanityYang(unittest.TestCase):
         r_1.ldata.extend([l_1, l_2])
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.OneList()
-        r_2.ldata = READ()
-        r_2 = self.crud.read(self.ncc, r_2)
+        r_2 = ysanity.Runner()
+        r_2.one_list.ldata.yfilter = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(is_equal(r_1, r_2), True)
+        self.assertEqual(runner_read.one_list.ldata[0].number, r_1.ldata[0].number)
+        self.assertEqual(runner_read.one_list.ldata[1].number, r_1.ldata[1].number)
 
     def test_read_on_list_with_key(self):
         r_1 = ysanity.Runner.OneList()
@@ -132,57 +133,46 @@ class SanityYang(unittest.TestCase):
         r_1.ldata.extend([l_1, l_2])
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner.OneList()
-        r_2.ldata.extend([l_1])
-        r_2 = self.crud.read(self.ncc, r_2)
+        r_2 = ysanity.Runner()
+        r_2.one_list.ldata.extend([l_1])
+        runner_read = self.crud.read(self.ncc, r_2)
 
-        r_3 = ysanity.Runner.OneList()
-        r_3.ldata.extend([l_1])
-        self.assertEqual(is_equal(r_2, r_3), True)
+        self.assertEqual(runner_read.one_list.ldata[0].number, r_2.one_list.ldata[0].number)
 
     def test_read_on_leaflist(self):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
         r_1.llstring.extend(['1', '2', '3'])
         self.crud.create(self.ncc, r_1)
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.llstring.extend(['1', '2', '3'])
-        runner_read = self.crud.read(self.ncc, r_2)
 
-        self.assertEqual(is_equal(r_1, runner_read), True)
-
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        # invalid input, user should use READ()
-        # or the same data on device
-        r_2.llstring.extend(['something else'])
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.llstring.yfilter = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
-        self.assertNotEqual(is_equal(r_1, runner_read), True)
+        self.assertEqual(runner_read.ytypes.built_in_t.llstring, r_1.llstring)
 
 
     def test_read_on_identity_ref(self):
         r_1 = ysanity.Runner.Ytypes.BuiltInT()
-        r_1.identity_ref_value = ysanity.ChildIdentityIdentity()
+        r_1.identity_ref_value = ysanity.ChildIdentity()
         self.crud.create(self.ncc, r_1)
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.identity_ref_value = READ()
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(is_equal(r_1, r_2), True)
 
-        r_2 = ysanity.Runner.Ytypes.BuiltInT()
-        r_2.identity_ref_value = ysanity.ChildIdentityIdentity()
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(is_equal(r_1, r_2), True)
+        r_2 = ysanity.Runner()
+        r_2.ytypes.built_in_t.identity_ref_value.yfilter = YFilter.read
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
 
     def test_read_only_config(self):
         r_1 = ysanity.Runner()
         r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2, r_3 = ysanity.Runner(), ysanity.Runner()
-        r_2.one.number, r_3.one.number = READ(), READ()
+        r_2.one.number.yfilter = YFilter.read
+        r_3.one.number.yfilter = YFilter.read
 
-        r_2 = self.crud.read(self.ncc, r_2, only_config=True)
+        r_2 = self.crud.read_config(self.ncc, r_2)
         r_3 = self.crud.read(self.ncc, r_3)
         # ysanity only have config data, ok to compare
-        self.assertEqual(is_equal(r_2, r_3), True)
+        self.assertEqual(r_2.one.number, r_3.one.number)
+        self.assertEqual(r_2.one.name, r_3.one.name)
 
     def test_decoder(self):
         # send payload to device
@@ -194,13 +184,16 @@ class SanityYang(unittest.TestCase):
 
         self.crud.create(self.ncc, runner)
 
-        self.crud.read(self.ncc, ysanity.Runner.OneList.Ldata())
+        r_2 = ysanity.Runner()
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertEqual(runner.one_list.ldata[0].number, runner_read.one_list.ldata[0].number)
+        self.assertEqual(runner.one_list.ldata[0].name, runner_read.one_list.ldata[0].name)
 
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 1:
-        SanityYang.PROVIDER_TYPE = sys.argv.pop()
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
+    device, non_demand, common_cache = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

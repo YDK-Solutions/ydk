@@ -25,7 +25,7 @@ import unittest
 from ydk.errors import YPYModelError, YPYError, YPYServiceError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
-from ydk.services import NetconfService, DataStore
+from ydk.services import NetconfService, Datastore
 
 from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
@@ -67,43 +67,43 @@ class SanityNetconf(ParametrizedTestCase):
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
-        result = self.netconf_service.get_config(self.ncc, DataStore.candidate, get_filter)
+        result = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
         self.assertEqual(runner, result)
 
         op = self.netconf_service.commit(self.ncc)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
         self.assertEqual(runner, result)
 
     def test_lock_unlock(self):
         op = self.netconf_service.lock(self.ncc, Datastore.running)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.unlock(self.ncc, Datastore.running)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
     # Failing - NetconfService glue code needed
     def test_lock_unlock_fail(self):
         op = self.netconf_service.lock(self.ncc, Datastore.candidate)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         try:
-            op = self.netconf_service.unlock(self.ncc, DataStore.running)
+            op = self.netconf_service.unlock(self.ncc, Datastore.running)
         except Exception as e:
             self.assertIsInstance(e, YPYError)
 
     def test_validate(self):
         op = self.netconf_service.validate(self.ncc, source=Datastore.candidate)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         runner = ysanity.Runner()
         runner.one.number = 1
         runner.one.name = 'runner:one:name'
         op = self.netconf_service.validate(self.ncc, source=runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
     def test_validate_fail(self):
         # should have been handled by YDK local validation
@@ -116,16 +116,16 @@ class SanityNetconf(ParametrizedTestCase):
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.discard_changes(self.ncc)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.commit(self.ncc)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
         self.assertEqual(runner, result)
@@ -138,20 +138,20 @@ class SanityNetconf(ParametrizedTestCase):
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.commit(self.ncc, confirmed=True, confirm_timeout=120)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         result = self.netconf_service.get(self.ncc, get_filter)
         self.assertEqual(runner, result)
 
         op = self.netconf_service.cancel_commit(self.ncc)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
     def test_copy_config(self):
         op = self.netconf_service.copy_config(self.ncc, Datastore.candidate, Datastore.running)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         runner = ysanity.Runner()
         runner.two.number = 2
@@ -159,33 +159,33 @@ class SanityNetconf(ParametrizedTestCase):
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
         op = self.netconf_service.copy_config(self.ncc, Datastore.running, Datastore.candidate)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
-        result = self.netconf_service.get_config(self.ncc, DataStore.running, get_filter)
+        result = self.netconf_service.get_config(self.ncc, Datastore.running, get_filter)
         self.assertEqual(runner, result)
 
         runner.two.name = '%smodified' % runner.two.name
 
         op = self.netconf_service.copy_config(self.ncc, Datastore.running, runner)
-        self.assertEqual(None, op)
+        self.assertEqual(True, op)
 
-        result = self.netconf_service.get_config(self.ncc, DataStore.running, get_filter)
+        result = self.netconf_service.get_config(self.ncc, Datastore.running, get_filter)
         self.assertEqual(runner, result)
 
     def test_delete_config(self):
         pass
         # startup and candidate cannot be both enabled in ConfD
-        # op = self.netconf_service.delete_config(self.ncc, DataStore.startup)
-        # self.assertEqual(None, op)
+        # op = self.netconf_service.delete_config(self.ncc, Datastore.startup)
+        # self.assertEqual(True, op)
 
     # Error not thrown by TCP client, YPYError is populated instead
     def test_delete_config_fail(self):
         found = False
         try:
-            self.netconf_service.delete_config(self.ncc, DataStore.running)
+            self.netconf_service.delete_config(self.ncc, Datastore.running)
         except (YPYError, YPYModelError) as e:
             found = True
         self.assertEqual(found, True)
@@ -203,8 +203,8 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertRaises(YPYServiceError,
                           self.netconf_service.edit_config,
                           self.ncc,
-                          DataStore.startup,
-                          DataStore.candidate)
+                          Datastore.startup,
+                          Datastore.candidate)
 
     # Failing - NetconfService glue code needed
     def test_get_config_fail(self):

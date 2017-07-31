@@ -14,35 +14,9 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 import inspect
-from ydk.ext.services import DataStore, NetconfService as _NetconfService
+from ydk.ext.services import Datastore, NetconfService as _NetconfService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
-
-==== BASE ====
-   The Netconf Service class.
-
-"""
-from .executor_service import ExecutorService
-from .service import Service
-from enum import Enum
-from ydk.errors import YPYModelError, YPYServiceError
-from . import ietf_netconf
-from . import ietf_netconf_with_defaults
-
-from ydk.types import Empty
-import logging
-
-
-class Datastore(Enum):
-    """Type of datastore."""
-    candidate = 1
-    running = 2
-    startup = 3
-
-
-class NetconfService(Service):
-    """Netconf Service class for executing netconf operations."""
-==== BASE ====
 
 class NetconfService(_NetconfService):
     """ Python wrapper for NetconfService
@@ -76,7 +50,7 @@ class NetconfService(_NetconfService):
             raise _YPYServiceError("provider, target, and source/source_config cannot be None")
 
         with _handle_error():
-            if type(source) == DataStore:
+            if type(source) == Datastore:
                 return self._ns.copy_config(provider, target, source, url)
             elif source_config is not None:
                 return self._ns.copy_config(provider, target, source_config)
@@ -139,17 +113,15 @@ class NetconfService(_NetconfService):
         if None in (provider, target):
             raise _YPYServiceError("provider and target cannot be None")
 
-        Args:
-            provider (ydk.providers.ServiceProvider): A provider instance.
-            target (Datastore): Particular configuration to unlock. Valid
-            options are Datastore.candidate, Datastore.running, and
-            Datastore.startup if the device has such feature advertised.
+        with _handle_error():
+            return self._ns.unlock(provider, target)
 
-        Returns:
-            An ok reply string if operation succeeds.
+    def validate(self, provider, source=None, url="", source_config=None):
+        if provider is None or (source is None and source_config is None):
+            raise _YPYServiceError("provider and source/source_config cannot be None")
 
         with _handle_error():
-            if type(source) == DataStore:
+            if type(source) == Datastore:
                 return self._ns.validate(provider, source, url)
             elif source_config is not None:
                 return self._ns.validate(provider, source_config)

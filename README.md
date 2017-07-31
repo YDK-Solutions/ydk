@@ -57,14 +57,14 @@ The output of ydk-gen is either a core package, that defines services and provid
 Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp:
 
 ## Linux
-Ubuntu (Debian-based): The following packages must be present in your system before installing YDK-Py/YDK-Cpp:
+Ubuntu (Debian-based):
 ```
    $ sudo apt-get install gdebi-core
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
    $ sudo gdebi libydk_0.6.0-1_amd64.deb
 ```
 
-Centos (Fedora-based): The following packages must be present in your system before installing YDK-Py/YDK-Cpp:
+Centos (Fedora-based):
 ```
    $ sudo yum install epel-release
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.0/libydk-0.6.0-1.x86_64.rpm

@@ -6,7 +6,7 @@ NETCONF operations
 This document explains how to use :py:class:`YFilter<ydk.filters.YFilter>` as defined under netconf
 edit-config operation attribute in
 `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_. This guide
-assumes you have ``core`` and ``openconfig`` bundle installed(see :ref:`howto-install`).
+assumes you have the ``core`` and ``openconfig`` bundle installed(see :ref:`howto-install`). Here, the ``replace`` filter is used as an example.
 
 The first step in any application is to create a service provider instance. In this case, the NETCONF service provider (defined in :py:class:`NetconfServiceProvider<ydk.providers.NetconfServiceProvider>`) is responsible for mapping between the CRUD service API and the underlying manageability protocol (NETCONF RPCs).
 

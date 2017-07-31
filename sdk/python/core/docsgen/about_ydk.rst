@@ -25,6 +25,10 @@ To check out the version of ydk-gen used to generate this ydk-py, use the below 
     $ git clone repo-url
     $ git checkout commit-id
 
+Backwards Compatibility Notes
+-----------------------------
+When installing and using the ``0.6.0`` and newer releases of ``YDK-Py``, please refer to the :ref:`compatibility`.
+
 Changelog
 ----------
  - `Changelog <https://github.com/CiscoDevNet/ydk-py/blob/master/CHANGES.md>`_

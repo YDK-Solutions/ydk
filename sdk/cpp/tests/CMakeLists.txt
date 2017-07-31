@@ -8,10 +8,12 @@ enable_testing()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
         test_core_netconf.cpp
-        test_netconf_client.cpp
+        test_netconf_ssh_client.cpp
+        test_netconf_tcp_client.cpp
         test_restconf_client.cpp
         testsanitynctest.cpp
         test_crud.cpp
+        test_on_demand_loading.cpp
         test_sanity_levels.cpp
         test_sanity_types.cpp
         testsanityvalidationtest.cpp
@@ -23,6 +25,7 @@ set(bundle_tests_src
         test_netconf_service.cpp
         test_errors.cpp
         test_opendaylight.cpp
+        test_xml_subtree.cpp
         main.cpp)
 
 find_library(xml2_location xml2)
@@ -45,7 +48,7 @@ set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -fprofile-arcs -ftest-coverage")
 
 # set default build type if not specified by user
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE debug)
+    set(CMAKE_BUILD_TYPE debug)
 endif()
 
 include_directories(

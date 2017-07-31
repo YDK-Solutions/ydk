@@ -40,27 +40,27 @@ class WithDefaultsModeEnum(Enum):
 
     .. data:: REPORT_ALL = 0
 
-    	All default data is reported.
+        All default data is reported.
 
     .. data:: REPORT_ALL_TAGGED = 1
 
-    	All default data is reported.
+        All default data is reported.
 
-    	Any nodes considered to be default data
+        Any nodes considered to be default data
 
-    	will contain a 'default' XML attribute,
+        will contain a 'default' XML attribute,
 
-    	set to 'true' or '1'.
+        set to 'true' or '1'.
 
     .. data:: TRIM = 2
 
-    	Values are not reported if they contain the default.
+        Values are not reported if they contain the default.
 
     .. data:: EXPLICIT = 3
 
-    	Report values that contain the definition of
+        Report values that contain the definition of
 
-    	explicitly set data.
+        explicitly set data.
 
     """
 

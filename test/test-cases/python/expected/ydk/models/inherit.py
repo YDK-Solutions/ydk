@@ -31,15 +31,15 @@ class InheritRunner(object):
     
     .. attribute:: jumper
     
-    	
-    	**type**\:  int
+        
+        **type**\:  int
     
-    	**range:** \-2147483648..2147483647
+        **range:** \-2147483648..2147483647
     
     .. attribute:: one
     
-    	config for one\_level data
-    	**type**\:  :py:class:`One <ydk.models.inherit.InheritRunner.One>`
+        config for one\_level data
+        **type**\:  :py:class:`One <ydk.models.inherit.InheritRunner.One>`
     
     
 
@@ -60,15 +60,15 @@ class InheritRunner(object):
         
         .. attribute:: name
         
-        	this is string value
-        	**type**\:  str
+            this is string value
+            **type**\:  str
         
         .. attribute:: number
         
-        	integer value type
-        	**type**\:  int
+            integer value type
+            **type**\:  int
         
-        	**range:** \-2147483648..2147483647
+            **range:** \-2147483648..2147483647
         
         
 

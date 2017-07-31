@@ -78,7 +78,7 @@ _meta_table = {
                 '''                Access operations associated with this rule.
                 
                 This leaf matches if it has the value '*' or if the
-                bit corresponding to the requested operation is set.
+                bit corresponding to the requested yfilter is set.
                 ''',
                 'access_operations',
                 'ietf-netconf-acm', False, [
@@ -87,7 +87,7 @@ _meta_table = {
                         '''                        Access operations associated with this rule.
                         
                         This leaf matches if it has the value '*' or if the
-                        bit corresponding to the requested operation is set.
+                        bit corresponding to the requested yfilter is set.
                         ''',
                         'access_operations',
                         'ietf-netconf-acm', False),
@@ -96,7 +96,7 @@ _meta_table = {
                         '''                        Access operations associated with this rule.
                         
                         This leaf matches if it has the value '*' or if the
-                        bit corresponding to the requested operation is set.
+                        bit corresponding to the requested yfilter is set.
                         ''',
                         'access_operations',
                         'ietf-netconf-acm', False),
@@ -188,7 +188,7 @@ _meta_table = {
             _MetaInfoClassMember('rpc-name', REFERENCE_UNION, 'str' , None, None, 
                 [], [], 
                 '''                This leaf matches if it has the value '*' or if
-                its value equals the requested protocol operation
+                its value equals the requested protocol yfilter
                 name.
                 ''',
                 'rpc_name',
@@ -196,7 +196,7 @@ _meta_table = {
                     _MetaInfoClassMember('rpc-name', ATTRIBUTE, 'str' , None, None, 
                         [], ['\\*'], 
                         '''                        This leaf matches if it has the value '*' or if
-                        its value equals the requested protocol operation
+                        its value equals the requested protocol yfilter
                         name.
                         ''',
                         'rpc_name',
@@ -204,7 +204,7 @@ _meta_table = {
                     _MetaInfoClassMember('rpc-name', ATTRIBUTE, 'str' , None, None, 
                         [], [], 
                         '''                        This leaf matches if it has the value '*' or if
-                        its value equals the requested protocol operation
+                        its value equals the requested protocol yfilter
                         name.
                         ''',
                         'rpc_name',
@@ -287,7 +287,7 @@ _meta_table = {
             _MetaInfoClassMember('denied-data-writes', ATTRIBUTE, 'int' , None, None, 
                 [('0', '4294967295')], [], 
                 '''                Number of times since the server last restarted that a
-                protocol operation request to alter
+                protocol yfilter request to alter
                 a configuration datastore was denied.
                 ''',
                 'denied_data_writes',
@@ -303,7 +303,7 @@ _meta_table = {
             _MetaInfoClassMember('denied-operations', ATTRIBUTE, 'int' , None, None, 
                 [('0', '4294967295')], [], 
                 '''                Number of times since the server last restarted that a
-                protocol operation request was denied.
+                protocol yfilter request was denied.
                 ''',
                 'denied_operations',
                 'ietf-netconf-acm', False),
@@ -329,7 +329,7 @@ _meta_table = {
             _MetaInfoClassMember('exec-default', REFERENCE_ENUM_CLASS, 'ActionTypeEnum' , 'ydk.models.ietf_netconf_acm', 'ActionTypeEnum', 
                 [], [], 
                 '''                Controls whether exec access is granted if no appropriate
-                rule is found for a particular protocol operation request.
+                rule is found for a particular protocol yfilter request.
                 ''',
                 'exec_default',
                 'ietf-netconf-acm', False),

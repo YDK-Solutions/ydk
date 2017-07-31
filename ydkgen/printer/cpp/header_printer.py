@@ -30,10 +30,11 @@ from .class_enum_printer import EnumPrinter
 
 
 class HeaderPrinter(MultiFilePrinter):
-    def __init__(self, ctx, identity_subclasses):
+    def __init__(self, ctx, identity_subclasses, bundle_name):
         super(HeaderPrinter, self).__init__(ctx)
         self.enum_printer = EnumPrinter(self.ctx)
         self.identity_subclasses = identity_subclasses
+        self.bundle_name = bundle_name
 
     def print_body(self, multi_file):
         assert isinstance(multi_file, MultiFileHeader)
@@ -49,7 +50,7 @@ class HeaderPrinter(MultiFilePrinter):
         self.p = package
         self._print_include_guard_header(multi_file.include_guard)
         self._print_imports(package, multi_file.imports)
-        self.ctx.writeln('namespace ydk {')
+        self.ctx.writeln('namespace %s {' % self.bundle_name)
         self.ctx.writeln('namespace %s {' % package.name)
         self.ctx.bline()
 
@@ -99,12 +100,12 @@ class HeaderPrinter(MultiFilePrinter):
         if len(clazz.extends) > 0:
             parents = ', '.join([sup.fully_qualified_cpp_name() for sup in clazz.extends])
             if clazz.is_identity():
-                parents += ', virtual Identity'
+                parents += ', virtual ydk::Identity'
             self.ctx.writeln('class ' + class_name + ' : public ' + parents)
         elif clazz.is_identity():
-            self.ctx.writeln('class ' + class_name + ' : public virtual Identity')
+            self.ctx.writeln('class ' + class_name + ' : public virtual ydk::Identity')
         else:
-            self.ctx.writeln('class ' + class_name + ' : public Entity')
+            self.ctx.writeln('class ' + class_name + ' : public ydk::Entity')
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
 

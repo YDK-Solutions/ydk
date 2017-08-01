@@ -11,25 +11,24 @@ set(bundle_tests_src
         test_netconf_ssh_client.cpp
         test_netconf_tcp_client.cpp
 	test_core_gnmi.cpp
-        test_netconf_client.cpp
         test_gnmi_client.cpp
         test_restconf_client.cpp
         testsanitynctest.cpp
-        test_crud.cpp
+	#test_crud.cpp
         test_on_demand_loading.cpp
-        test_sanity_levels.cpp
-        test_sanity_types.cpp
-        testsanityvalidationtest.cpp
+        #test_sanity_levels.cpp
+        #test_sanity_types.cpp
+        #testsanityvalidationtest.cpp
         test_netconf_provider.cpp
         test_gnmi_provider.cpp
         test_restconf_provider.cpp
-        test_sanity_codec.cpp
-        test_netconf_operations.cpp
-        test_executor_service.cpp
-        test_netconf_service.cpp
-        test_errors.cpp
-        test_opendaylight.cpp
-        test_xml_subtree.cpp
+        #test_sanity_codec.cpp
+        #test_netconf_operations.cpp
+        #test_executor_service.cpp
+        #test_netconf_service.cpp
+        #test_errors.cpp
+        #test_opendaylight.cpp
+        #test_xml_subtree.cpp
         main.cpp)
 
 find_library(LIBGNMI_LIBRARY

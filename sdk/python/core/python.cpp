@@ -28,6 +28,7 @@
 #include <ydk/logging_callback.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/netconf_service.hpp>
+#include <ydk/gnmi_provider.hpp>
 #include <ydk/opendaylight_provider.hpp>
 #include <ydk/path_api.hpp>
 #include <ydk/restconf_provider.hpp>
@@ -569,6 +570,13 @@ PYBIND11_PLUGIN(ydk_)
             arg("on_demand")=true)
         .def("invoke", &ydk::NetconfServiceProvider::invoke, return_value_policy::reference)
         .def("get_root_schema", &ydk::NetconfServiceProvider::get_root_schema, return_value_policy::reference);
+
+
+    class_<ydk::gNMIServiceProvider, ydk::path::ServiceProvider>(providers, "gNMIServiceProvider")
+        .def(init<ydk::path::Repository&, string>(), arg("repo"), arg("address"))
+        .def(init<string>(), arg("address"))
+        .def("invoke", &ydk::gNMIServiceProvider::invoke, return_value_policy::reference)
+        .def("get_root_schema", &ydk::gNMIServiceProvider::get_root_schema, return_value_policy::reference);
 
     class_<ydk::RestconfServiceProvider, ydk::path::ServiceProvider>(providers, "RestconfServiceProvider")
         .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>(),

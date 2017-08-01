@@ -7,12 +7,28 @@ set(path_DESCRIPTION "Python wrapper around C++ path API using pybind11.")
 
 set(python_src python.cpp)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
+
 # set default build type if not specified by user
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -fprofile-arcs -ftest-coverage")
 
 # Find dependent libraries
+find_library(LIBGNMI_LIBRARY
+        NAMES
+        gnmi
+        libgnmi
+        PATHS
+        /usr/lib
+        /usr/lib64      
+        /usr/local/lib
+        /usr/local/lib64
+        /opt/local/lib
+        /sw/lib
+        ${CMAKE_LIBRARY_PATH}
+        ${CMAKE_INSTALL_PREFIX}/lib
+)
 find_library(ydk_location ydk)
 find_library(xml2_location xml2)
 find_library(curl_location curl)
@@ -20,6 +36,8 @@ find_library(ssh_threads_location ssh_threads)
 find_library(xslt_location xslt)
 find_library(pcre_location pcre)
 find_library(ssh_location ssh)
+find_package(Protobuf REQUIRED)
+find_package(grpc REQUIRED)
 
 if(PYTHON_LIBRARY)
     message( "python library: ${PYTHON_LIBRARY}" )
@@ -66,5 +84,10 @@ target_link_libraries(ydk_
             ${xslt_location}
             ${ssh_location}
             ${PYTHON_LIBRARY}
-            -rdynamic
+	    ${LIBGNMI_LIBRARY}
+            grpc++_unsecure 
+            grpc 
+            gpr 
+	    -rdynamic
+            ${PROTOBUF_LIBRARY}
             )

@@ -55,15 +55,15 @@ namespace ydk
     //DEBUG functions
     void gNMIServiceProvider::print_paths(ydk::path::SchemaNode& sn) const
     {
-        YLOG_DEBUG((sn.path()).c_str());
-        for(auto const& p : sn.children())
+        YLOG_DEBUG("{}", (sn.get_path()).c_str());
+        for(auto const& p : sn.get_children())
         print_paths(*p);
     }
 
     void gNMIServiceProvider::print_root_paths(ydk::path::RootSchemaNode& rsn) const
     {
-          YLOG_DEBUG((rsn.path()).c_str());
-          for(auto const& p : rsn.children())
+          YLOG_DEBUG("{}", (rsn.get_path()).c_str());
+          for(auto const& p : rsn.get_children())
           print_paths(*p);
     }
 
@@ -76,7 +76,7 @@ namespace ydk
     {
         path::Repository repo;       
         initialize(repo, address);
-        YLOG_INFO("Connected to {} using ssh", address);
+        YLOG_DEBUG("Connected to {} using ssh", address);
     }
 
     gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo, string address)
@@ -84,7 +84,7 @@ namespace ydk
         : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
     {
         initialize(repo, address);
-        YLOG_INFO("Connected to {} using ssh", address);
+        YLOG_DEBUG("Connected to {} using ssh", address);
     }
 
     gNMIServiceProvider::~gNMIServiceProvider() = default;
@@ -93,7 +93,7 @@ namespace ydk
         IetfCapabilitiesParser capabilities_parser{};
         client->connect(address);
         server_capabilities = client->get_capabilities();
-        
+
         root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
 
         if(root_schema.get() == nullptr)
@@ -147,7 +147,7 @@ namespace ydk
         path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
 
         //for now we only support crud rpc's
-        path::SchemaNode* rpc_schema = &(rpc.schema());
+        path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
         shared_ptr<path::DataNode> datanode = nullptr;
         
         if(rpc_schema == create_schema || rpc_schema == delete_schema || rpc_schema == update_schema)
@@ -207,12 +207,12 @@ namespace ydk
             //need to send the commit request
             string commit_payload = get_commit_rpc_payload();
 
-            YLOG_INFO( "Executing commit RPC: {}", commit_payload);
+            YLOG_DEBUG( "Executing commit RPC: {}", commit_payload);
             reply = client.execute_wrapper(commit_payload, operation);
 
-            YLOG_INFO("=============Reply payload received from device=============");
-            YLOG_INFO(reply.c_str());
-            YLOG_INFO("\n");
+            YLOG_DEBUG("=============Reply payload received from device=============");
+            YLOG_DEBUG("{}", reply.c_str());
+            YLOG_DEBUG("\n");
             if(reply.find("Success") == string::npos)
             {
                 YLOG_ERROR("RPC error occurred: {}", reply);
@@ -240,29 +240,29 @@ namespace ydk
     
     static shared_ptr<path::DataNode> handle_read_reply(string reply, path::RootSchemaNode & root_schema)
     {
-        path::CodecService codec_service{};
+        path::Codec codec_service{};
         auto empty_data = reply.find("data");
         if(empty_data == string::npos)
         {
-            YLOG_INFO( "Found empty data tag");
+            YLOG_DEBUG( "Found empty data tag");
             return nullptr;
         }
 
         auto data_start = reply.find("\"data\":");
         if(data_start == string::npos)
         {
-            YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply);
+            YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply.c_str());
             throw(YCPPServiceProviderError{reply});
         }
         data_start+= sizeof("\"data\":") - 1;
         auto data_end = reply.find_last_of("}");
         if(data_end == string::npos)
         {
-            YLOG_ERROR( "No end data tag found in reply sent by device {}", reply);
+            YLOG_ERROR( "No end data tag found in reply sent by device {}", reply.c_str());
             throw(YCPPError{"No end data tag found"});
         }
 
-        string data = reply.substr(data_start, data_end-data_start);
+        string data = reply.substr(data_start, data_end-data_start + 1);
 
         auto datanode = shared_ptr<path::DataNode>(codec_service.decode(root_schema, data, EncodingFormat::JSON));
         if(!datanode)
@@ -276,10 +276,10 @@ namespace ydk
     static void create_input_target(path::DataNode & input, bool candidate_supported)
     {
         if(candidate_supported){
-            input.create("target/candidate", "");
+            input.create_datanode("target/candidate", "");
         }
         else {
-            input.create("target/running", "");
+            input.create_datanode("target/running", "");
         }
     }
 
@@ -294,21 +294,21 @@ namespace ydk
 
     static void create_input_error_option(path::DataNode & input)
     {
-        input.create("error-option", "rollback-on-error");
+        input.create_datanode("error-option", "rollback-on-error");
     }
 
     static string get_config_payload(path::RootSchemaNode & root_schema,
         path::Rpc & rpc)
     {
-        path::CodecService codec_service{};
-        auto entity = rpc.input().find("entity");
+        path::Codec codec_service{};
+        auto entity = rpc.get_input_node().find("entity");
         if(entity.empty()){
             YLOG_ERROR("Failed to get entity node");
             throw(YCPPInvalidArgumentError{"Failed to get entity node"});
         }
 
         path::DataNode* entity_node = entity[0].get();
-        string entity_value = entity_node->get();
+        string entity_value = entity_node->get_value();
 
         //deserialize the entity_value
         auto datanode = codec_service.decode(root_schema, entity_value, EncodingFormat::JSON);
@@ -320,7 +320,7 @@ namespace ydk
 
         string config_payload {};
 
-        for(auto const & child : datanode->children())
+        for(auto const & child : datanode->get_children())
         {
             config_payload += codec_service.encode(*child, EncodingFormat::JSON, false);
         }
@@ -336,7 +336,7 @@ namespace ydk
 
     static bool is_config(path::Rpc & rpc)
     {
-        if(!rpc.input().find("only-config").empty())
+        if(!rpc.get_input_node().find("only-config").empty())
         {
             return true;
         }
@@ -345,7 +345,7 @@ namespace ydk
 
     static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name)
     {
-        auto rpc = shared_ptr<path::Rpc>(root_schema.rpc(rpc_name));
+        auto rpc = shared_ptr<path::Rpc>(root_schema.create_rpc(rpc_name));
         if(rpc == nullptr)
         {
             YLOG_ERROR("Cannot create payload for RPC: {}", rpc_name);
@@ -365,20 +365,20 @@ namespace ydk
 
     static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc)
     {
-        return gnmi_rpc.input();
+        return gnmi_rpc.get_input_node();
     }
 
     static void create_input_source(path::DataNode & input, bool config)
     {
         if(config)
         {
-            input.create("source/running");
+            input.create_datanode("source/running");
         }
     }
 
     static string get_filter_payload(path::Rpc & ydk_rpc)
     {
-        auto entity = ydk_rpc.input().find("filter");
+        auto entity = ydk_rpc.get_input_node().find("filter");
         if(entity.empty())
         {
             YLOG_ERROR("Failed to get entity node.");
@@ -386,27 +386,27 @@ namespace ydk
         }
 
         auto datanode = entity[0];
-        return datanode->get();
+        return datanode->get_value();
     }
 
     static string get_gnmi_payload(path::DataNode & input, string data_tag, string data_value)
     {
-        path::CodecService codec_service{};
-        input.create(data_tag, data_value);
+        path::Codec codec_service{};
+        input.create_datanode(data_tag, data_value);
         string payload{"\"rpc\":"};
         payload+=codec_service.encode(input, EncodingFormat::JSON, false);
-        YLOG_INFO("===========Generating Target Payload============");
-        YLOG_INFO(payload.c_str());
-        YLOG_INFO("\n");
+        YLOG_DEBUG("===========Generating Target Payload============");
+        YLOG_DEBUG("{}", payload.c_str());
+        YLOG_DEBUG("\n");
         return payload;
     }
 
     string gNMIServiceProvider::execute_payload(const string & payload, string operation) const
     {
         string reply = client->execute_wrapper(payload, operation);
-        YLOG_INFO("=============Reply payload received from device=============");
-        YLOG_INFO(reply.c_str());
-        YLOG_INFO("\n");
+        YLOG_DEBUG("=============Reply payload received from device=============");
+        YLOG_DEBUG("{}", reply.c_str());
+        YLOG_DEBUG("\n");
         return reply;
     }
 

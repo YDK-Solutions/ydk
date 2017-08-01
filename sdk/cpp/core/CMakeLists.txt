@@ -203,6 +203,7 @@ set(libydk_install_headers
     src/netconf_provider.hpp
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
+    src/json.hpp
     src/network_topology.hpp
     src/netconf_client.hpp
     src/netconf_service.hpp

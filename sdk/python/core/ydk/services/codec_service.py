@@ -191,7 +191,6 @@ class CodecService(object):
         Raises:
             YPYServiceProviderError if search fails.
         """
-        top_entity = None
         ns_ename = _get_ns_ename(payload, encoding)
         ydk_models = importlib.import_module('ydk.models')
         for (_, name, ispkg) in pkgutil.iter_modules(ydk_models.__path__):
@@ -227,7 +226,7 @@ def _get_ns_ename(payload, encoding):
     """
     ns, ename = None, None
     if encoding == EncodingFormat.XML:
-        payload_root = xml.etree.ElementTree.fromstring(payload)
+        xml.etree.ElementTree.fromstring(payload)
         ns, ename = payload_root.tag.rsplit('}')
         ns = ns.strip('{')
     else:

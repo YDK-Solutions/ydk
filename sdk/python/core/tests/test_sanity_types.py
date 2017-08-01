@@ -26,11 +26,10 @@ from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.models.ydktest import ydktest_types as y_types
-from ydk.types import Empty, Decimal64, YType, YLeaf, Bits
-from ydk.errors import YPYError, YPYModelError, YPYServiceProviderError
+from ydk.types import Empty, Decimal64,  YLeaf, Bits
+from ydk.errors import  YPYModelError, YPYServiceProviderError
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-import inspect
 from ydk.ext.services import CRUDService as _CrudService
-from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
 
@@ -32,14 +30,14 @@ class CRUDService(_CrudService):
             return self._crud.create(provider, entity)
 
     @_check_argument
-    def read(self, provider, filter):
+    def read(self, provider, read_filter):
         with _handle_error():
-            return self._crud.read(provider, filter)
+            return self._crud.read(provider, read_filter)
 
     @_check_argument
-    def read_config(self, provider, filter):
+    def read_config(self, provider, read_filter):
         with _handle_error():
-            return self._crud.read_config(provider, filter)
+            return self._crud.read_config(provider, read_filter)
 
     @_check_argument
     def update(self, provider, entity):

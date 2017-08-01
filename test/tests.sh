@@ -97,6 +97,7 @@ function init_confd {
 function init_rest_server {
     print_msg "starting rest server"
     rest_server_id=$(./test/start_rest_server.sh)
+    print_msg "Rest server started with PID $rest_server_id()"
 }
 
 function init_tcp_server {

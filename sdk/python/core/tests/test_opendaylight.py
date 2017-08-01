@@ -28,8 +28,6 @@ from ydk.services import CRUDService
 from ydk.types import EncodingFormat
 from ydk.path import Repository
 
-from test_utils import assert_with_error
-
 
 class SanityTest(unittest.TestCase):
 

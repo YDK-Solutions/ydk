@@ -33,7 +33,6 @@ from ydk.services import CRUDService
 from ydk.services import CodecService
 
 from ydk.models.augmentation import ietf_aug_base_1
-from ydk.models.augmentation import ietf_aug_base_2
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info

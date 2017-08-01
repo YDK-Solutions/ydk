@@ -298,8 +298,6 @@ TEST_CASE( "bgp_xr_openconfig"  )
     auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
 
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.get_root());
-
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);

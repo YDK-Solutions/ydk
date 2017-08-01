@@ -44,7 +44,7 @@ ydk::path::DataNode::create_datanode(const std::string& path)
 ////////////////////////////////////////////////////////////////////////////
 // class ydk::DataNodeImpl
 //////////////////////////////////////////////////////////////////////////
-ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node, const std::shared_ptr<RepositoryPtr> repo): m_parent{parent}, m_node{node}, m_priv_repo{repo}
+ydk::path::DataNodeImpl::DataNodeImpl(DataNode* parent, lyd_node* node, const std::shared_ptr<RepositoryPtr> & repo): m_parent{parent}, m_node{node}, m_priv_repo{repo}
 {
     //add the children
     if(m_node && m_node->child && !(m_node->schema->nodetype == LYS_LEAF ||

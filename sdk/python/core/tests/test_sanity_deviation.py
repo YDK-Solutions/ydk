@@ -27,7 +27,6 @@ from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
 from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

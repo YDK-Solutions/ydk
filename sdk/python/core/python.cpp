@@ -83,7 +83,7 @@ void critical(const char* msg) { log_critical(msg); }
 
 void setup_logging()
 {
-    if (!enabled_logging)
+    if (enabled_logging == false)
     {
         object get_logger = module::import("logging").attr("getLogger");
         object logger = get_logger("ydk");

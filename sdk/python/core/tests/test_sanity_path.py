@@ -23,7 +23,6 @@ from ydk.providers import NetconfServiceProvider
 from ydk.path import Codec
 from ydk.types import EncodingFormat
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
@@ -82,7 +81,7 @@ class SanityTest(unittest.TestCase):
         self.maxDiff = None
         self.assertEqual(xml, xml_read)
 
-    def test_rpcs(self):        
+    def test_rpcs(self):
         getc = self.root_schema.create_rpc("ietf-netconf:get-config")
         self.assertEqual(getc.has_output_node() , True)
         get = self.root_schema.create_rpc("ietf-netconf:get")

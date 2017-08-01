@@ -27,7 +27,6 @@ from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import NetconfService, Datastore
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
@@ -186,7 +185,7 @@ class SanityNetconf(ParametrizedTestCase):
         found = False
         try:
             self.netconf_service.delete_config(self.ncc, Datastore.running)
-        except (YPYError, YPYModelError) as e:
+        except (YPYError, YPYModelError):
             found = True
         self.assertEqual(found, True)
 

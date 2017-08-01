@@ -27,7 +27,6 @@ from ydk.errors import YPYError
 from ydk.filters import YFilter
 from ydk.models.ydktest import ydktest_sanity as ysanity
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
@@ -205,7 +204,7 @@ class SanityYang(unittest.TestCase):
 
         self.assertEqual(runner_compare, runner_read)
 
-    def test_delete_on_nested_list(self):
+    def test_delete_on_nested_list_1(self):
         runner_create, _, e_22 = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 

@@ -22,17 +22,13 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-from ydk.errors import YPYModelError, YPYError, YPYServiceError
+from ydk.errors import YPYError, YPYServiceError
 from ydk.models.ydktest import ydktest_sanity as ysanity
-try:
-    from ydk.models.ydktest import ietf_netconf
-except:
-    pass
+from ydk.models.ydktest import ietf_netconf
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.services import ExecutorService, CodecService
 from ydk.types import Empty, EncodingFormat
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
@@ -209,7 +205,7 @@ class SanityTest(unittest.TestCase):
         get_schema_rpc = ietf_netconf_monitoring.GetSchema()
         get_schema_rpc.input.identifier = 'ietf-netconf-monitoring'
         get_schema_rpc.input.format = ietf_netconf_monitoring.Yang_Identity()
-        reply = self.executor.execute_rpc(self.ncc, get_schema_rpc)
+        self.executor.execute_rpc(self.ncc, get_schema_rpc)
 
 if __name__ == '__main__':
     device, non_demand, common_cache = get_device_info()

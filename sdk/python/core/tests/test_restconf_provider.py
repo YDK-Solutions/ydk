@@ -27,8 +27,6 @@ from ydk.types import EncodingFormat
 from ydk.path import Repository
 from ydk.path import Codec
 
-from test_utils import assert_with_error
-
 
 class SanityTest(unittest.TestCase):
 
@@ -61,7 +59,7 @@ class SanityTest(unittest.TestCase):
         delete_rpc.get_input_node().create_datanode('entity', json)
         delete_rpc(self.restconf_provider)
 
-        number8 = runner.create_datanode('ytypes/built-in-t/number8', '3')
+        runner.create_datanode('ytypes/built-in-t/number8', '3')
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         self.assertNotEqual(json, '')
         create_rpc = root_schema.create_rpc('ydk:create')
@@ -74,7 +72,7 @@ class SanityTest(unittest.TestCase):
         self.assertNotEqual(json, '')
         read_rpc.get_input_node().create_datanode('filter', json)
 
-        read_result = read_rpc(self.restconf_provider)
+        read_rpc(self.restconf_provider)
 
         runner = root_schema.create_datanode('ydktest-sanity:runner', '')
         number8 = runner.create_datanode('ytypes/built-in-t/number8', '5')

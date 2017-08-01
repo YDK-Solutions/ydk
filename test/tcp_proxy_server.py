@@ -29,13 +29,6 @@ import socket
 import logging
 import argparse
 
-if sys.version_info < (3,):
-    import SocketServer as socketserver
-    from urlparse import urlparse
-else:
-    import socketserver
-    from urllib.parse import urlparse
-
 sys.tracebacklimit = 0
 
 logging.basicConfig(level=logging.INFO,
@@ -102,7 +95,7 @@ class SimpleProxyServer(socketserver.TCPServer):
         while True:
             try:
                 self.handle_request()
-            except Exception as e:
+            except Exception:
                 pass
         return
 

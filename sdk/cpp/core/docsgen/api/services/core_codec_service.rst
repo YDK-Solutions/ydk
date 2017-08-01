@@ -1,14 +1,14 @@
 .. _ref-codecservice:
 
-path::CodecService
+path::Codec
 ===================
 
 
 .. cpp:namespace:: ydk::path
 
-.. cpp:class:: ydk::path::CodecService
+.. cpp:class:: ydk::path::Codec
 
-Codec Service, part of YDK path API, which deals with generic path-based YANG data nodes
+Codec, part of YDK path API, which deals with generic path-based YANG data nodes
 
     .. cpp:function:: virtual std::string encode(const std::unique_ptr<DataNode> datanode, EncodingFormat format, bool pretty)
 
@@ -30,4 +30,4 @@ Codec Service, part of YDK path API, which deals with generic path-based YANG da
         :return: The :cpp:class:`DataNode<DataNode>` instantiated or ``nullptr`` in case of error.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the arguments are invalid.
 
-    .. cpp:function:: virtual ~CodecService()
+    .. cpp:function:: virtual ~Codec()

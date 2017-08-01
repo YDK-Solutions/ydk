@@ -18,6 +18,8 @@
         Unittest for bundle augmentation.
 """
 from __future__ import absolute_import
+
+import sys
 import unittest
 
 from ydk.services import CRUDService
@@ -25,20 +27,27 @@ from ydk.providers import NetconfServiceProvider
 from ydk.models.augmentation import ietf_aug_base_1
 from ydk.models.augmentation import ietf_aug_base_2
 
+from test_utils import assert_with_error
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
+
 
 class SanityYang(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                          username='admin',
-                                          password='admin',
-                                          protocol='ssh',
-                                          port=12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        common_cache = getattr(cls, "common_cache", False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         pass
 
     def setUp(self):
@@ -68,12 +77,7 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, cpython)
         cpython_read = self.crud.read(self.ncc, ietf_aug_base_1.Cpython())
 
-        self.assertEqual(cpython.doc.ydktest_aug_1.aug_one, cpython_read.doc.ydktest_aug_1.aug_one)
-        self.assertEqual(cpython.doc.ydktest_aug_2.aug_two, cpython_read.doc.ydktest_aug_2.aug_two)
-        self.assertEqual(cpython.doc.ydktest_aug_4.aug_four, cpython_read.doc.ydktest_aug_4.aug_four)
-        self.assertEqual(cpython.lib.ydktest_aug_1.ydktest_aug_nested_1.aug_one, cpython_read.lib.ydktest_aug_1.ydktest_aug_nested_1.aug_one)
-        self.assertEqual(cpython.lib.ydktest_aug_2.ydktest_aug_nested_2.aug_two, cpython_read.lib.ydktest_aug_2.ydktest_aug_nested_2.aug_two)
-        self.assertEqual(cpython.lib.ydktest_aug_4.ydktest_aug_nested_4.aug_four, cpython_read.lib.ydktest_aug_4.ydktest_aug_nested_4.aug_four)
+        self.assertEqual(cpython, cpython_read)
 
     def test_aug_base_2(self):
         cpython = ietf_aug_base_2.Cpython()
@@ -82,11 +86,13 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, cpython)
         cpython_read = self.crud.read(self.ncc, ietf_aug_base_2.Cpython())
 
-        self.assertEqual(cpython.tools.aug_four, cpython_read.tools.aug_four)
+        self.assertEqual(cpython, cpython_read)
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
+    device, non_demand, common_cache = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

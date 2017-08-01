@@ -24,7 +24,7 @@ Represents a Node in the SchemaTree.
 
             A :cpp:class:`SchemaNode<SchemaNode>` represents a containment hierarchy. So invocation of the destructor will lead to the children of this node being destroyed.
 
-    .. cpp:function:: virtual std::string path() const
+    .. cpp:function:: virtual std::string get_path() const
 
         Get the path expression representing this Node in in the NodeTree.
 
@@ -41,31 +41,31 @@ Represents a Node in the SchemaTree.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, see error code for details.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
 
-    .. cpp:function:: virtual const SchemaNode* parent() const noexcept
+    .. cpp:function:: virtual const SchemaNode* get_parent() const noexcept
 
         Get the Parent Node of this SchemaNode in the tree.
 
         :return: ``SchemaNode*`` the children of this node.
 
-    .. cpp:function:: virtual std::vector<std::unique_ptr<SchemaNode>> & children() const
+    .. cpp:function:: virtual std::vector<std::unique_ptr<SchemaNode>> & get_children() const
 
         Returns the children of this :cpp:class:`SchemaNode <SchemaNode>` in the NodeTree.
 
         :return: Child schema nodes.
 
-    .. cpp:function:: virtual const SchemaNode& root() const noexcept
+    .. cpp:function:: virtual const SchemaNode& get_root() const noexcept
 
         Get the root of NodeTree this node is part of
 
         :return: The pointer to the root.
 
-    .. cpp:function:: virtual Statement statement() const
+    .. cpp:function:: virtual Statement get_statement() const
 
         Returns the YANG statement associated with this :cpp:class:`SchemaNode<SchemaNode>`
 
         :return: The pointer to the yang statement for this :cpp:class:`SchemaNode<SchemaNode>`
 
-    .. cpp:function:: virtual std::vector<Statement> keys() const
+    .. cpp:function:: virtual std::vector<Statement> get_keys() const
 
         Returns vector of YANG statement corresponding the the keys.
 

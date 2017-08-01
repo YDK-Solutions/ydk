@@ -101,7 +101,7 @@ module policy-types {
     condition statements";
 
     leaf operator {
-    	type string;
+        type string;
        /*  type identityref {
           base attribute-comparison;
         }*/

@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6e111527081b48e1b2252c3562e08a3b)](https://www.codacy.com/app/ydk/ydk-gen?utm_source=github.com&utm_medium=referral&utm_content=CiscoDevNet/ydk-gen&utm_campaign=badger)
 [![License](https://cloud.githubusercontent.com/assets/17089095/19458582/dd626d2c-9481-11e6-8019-8227c5c66a06.png)](https://github.com/CiscoDevNet/ydk-gen/blob/master/LICENSE) [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-gen.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-gen)
 [![codecov](https://codecov.io/gh/CiscoDevNet/ydk-gen/branch/master/graph/badge.svg)](https://codecov.io/gh/CiscoDevNet/ydk-gen)
 
@@ -20,7 +21,7 @@ YANG Development Kit (Generator)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Usage](#usage)
   - [First step: choose your bundle profile](#first-step-choose-your-bundle-profile)
-    - [Details](#details)
+    - [Details](#Details)
   - [Second step: Generate & install the core](#second-step-generate--install-the-core)
   - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
@@ -40,7 +41,7 @@ YANG Development Kit (Generator)
 
 # Overview
 
-**ydk-gen** is a developer tool that can generate API's that are modeled in YANG.  Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
+**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
 
 Other tools and libraries are used to deliver `ydk-gen`'s functionality. In particular:
 
@@ -53,32 +54,35 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # System requirements
+Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp:
 
 ## Linux
-Ubuntu (Debian-based): The following packages must be present in your system before installing YDK-Py/YDK-Cpp:
+Ubuntu (Debian-based):
 ```
-$ sudo apt-get install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev libssh-dev libcurl4-openssl-dev libtool-bin libpcre3-dev libpcre++-dev libtool pkg-config python3-dev python3-lxml cmake clang
+   $ sudo apt-get install gdebi-core
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
+   $ sudo gdebi libydk_0.6.0-1_amd64.deb
 ```
 
-Centos (Fedora-based): The following packages must be present in your system before installing YDK-Py/YDK-Cpp:
+Centos (Fedora-based):
 ```
-$ sudo yum install epel-release
-$ sudo yum install python-pip python-devel libxml2-devel libxslt-devel libssh-devel libcurl-devel libtool clang cmake3 pcre-devel
-$ sudo ln -fs /usr/bin/cmake3 /usr/bin/cmake
+   $ sudo yum install epel-release
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.0/libydk-0.6.0-1.x86_64.rpm
+   $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
 ```
 
 ## macOS
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp:
 ```
-$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-$ xcode-select --install
-$ brew install pkg-config cmake libssh xml2 curl pcre
+   $ xcode-select --install
+   $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   $ brew install python pkg-config libssh xml2 curl pcre cmake
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk-0.6.0-Darwin.tar.gz
+   $ sudo installer -pkg libydk_0.6.0_Darwin.pkg -target /
 ```
 
 ## Windows
-You must install the following requirements::
-* [Python Releases for Windows](https://www.python.org/downloads/windows)
-* [Visual C++ Build Tools](http://landinghub.visualstudio.com/visual-cpp-build-tools)
+Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
 
 # Installation
 ## Setting up your environment
@@ -132,7 +136,7 @@ The below steps specify how to use `ydk-gen` to generate the core and a bundle. 
 
 The first step in using ydk-gen is either using one of the already existing [bundle profiles](https://github.com/CiscoDevNet/ydk-gen/tree/master/profiles/bundles) or constructing your own bundle profile, consisting of the YANG models you are interested in:
 
-Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies
+Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies.
 
 ### Details
 
@@ -271,8 +275,8 @@ When run in this way, we will generate a bundle that only contains tje files spe
 ```
 README          - install and usage notes
 gen-api         - generated bundle/core
-					- python (Python SDK)
-					- cpp (C++ SDK)
+                    - python (Python SDK)
+                    - cpp (C++ SDK)
 
 generate.py     - script used to generate SDK for yang models
 profiles        - profile files used during generation

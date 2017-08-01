@@ -14,7 +14,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         Destructor for the :cpp:class:`RootSchemaNode<RootSchemaNode>`
 
-    .. cpp:function:: std::string path() const
+    .. cpp:function:: std::string get_path() const
 
         Get the path expression representing this Node in in the NodeTree.
 
@@ -31,25 +31,25 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, See error code for details.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
 
-    .. cpp:function:: virtual SchemaNode* parent() const noexcept
+    .. cpp:function:: virtual SchemaNode* get_parent() const noexcept
 
         Get the parent node of this :cpp:class:`SchemaNode<SchemaNode>` in the tree.
 
         :return: Pointer to the parent node or ``nullptr`` in case this is the root.
 
-    .. cpp:function:: virtual std::vector<SchemaNode*> children() const
+    .. cpp:function:: virtual std::vector<SchemaNode*> get_children() const
 
         Get the children of this :cpp:class:`SchemaNode<SchemaNode>` in the NodeTree.
 
         :return: The children of this node.
 
-    .. cpp:function:: virtual const SchemaNode* root() const noexcept
+    .. cpp:function:: virtual const SchemaNode* get_root() const noexcept
 
         Get the root of NodeTree this node is part of.
 
         :return: The pointer to the root.
 
-    .. cpp:function:: virtual DataNode* create(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 
@@ -67,7 +67,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual DataNode* create(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 
@@ -84,7 +84,7 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual Statement statement() const
+    .. cpp:function:: virtual Statement get_statement() const
 
         Return the :cpp:class:`Statement<Statement>` representing this :cpp:class:`SchemaNode<SchemaNode>`.
 
@@ -94,7 +94,13 @@ Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaN
 
         :return: An empty statement.
 
-    .. cpp:function:: virtual Rpc* rpc(const std::string& path) const
+    .. cpp:function:: virtual std::vector<Statement> get_keys() const
+
+            Returns vector of YANG statement corresponding the the keys.
+
+            :return: Vector of :cpp:class:`Statement` that represent keys.
+
+    .. cpp:function:: virtual Rpc* create_rpc(const std::string& path) const
 
         Create an :cpp:class:`Rpc<Rpc>` instance.
 

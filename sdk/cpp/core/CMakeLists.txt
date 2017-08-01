@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.5.5 LANGUAGES C CXX)
+project(ydk VERSION 0.6.0 LANGUAGES C CXX)
 
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The library for  YDK API.")
@@ -114,7 +114,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE debug)
 endif()
 
-configure_file("${CMAKE_SOURCE_DIR}/core_info.hpp.in" "${CMAKE_SOURCE_DIR}/src/path/core_info.hpp" ESCAPE_QUOTES @ONLY)
+set(HOME_DIRECTORY $ENV{HOME})
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -144,7 +144,10 @@ set(libydk_src
     src/executor_service.cpp
     src/ietf_parser.cpp
     src/leaf_data.cpp
-    src/netconf_client.cpp    
+    src/logging_callback.cpp
+    src/netconf_client.cpp
+    src/netconf_ssh_client.cpp
+    src/netconf_tcp_client.cpp
     src/netconf_model_provider.cpp
     src/netconf_provider.cpp
     src/netconf_service.cpp
@@ -156,6 +159,7 @@ set(libydk_src
     src/validation_service.cpp
     src/value.cpp
     src/value_list.cpp
+    src/xml_subtree_codec.cpp
     src/ydk_operation.cpp
     src/ydk_yang.cpp
     src/path/annotation.cpp
@@ -191,8 +195,11 @@ set(libydk_install_headers
     src/entity_util.hpp
     src/errors.hpp
     src/executor_service.hpp
+    src/filters.hpp
+    src/logging_callback.hpp
     src/netconf_provider.hpp
     src/network_topology.hpp
+    src/netconf_client.hpp
     src/netconf_service.hpp
     src/opendaylight_parser.hpp
     src/opendaylight_provider.hpp
@@ -201,6 +208,7 @@ set(libydk_install_headers
     src/service.hpp
     src/service.hpp
     src/types.hpp
+    src/xml_subtree_codec.hpp
     src/validation_service.hpp)
 
 # Set LibNetconf variables
@@ -327,7 +335,6 @@ find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_package(LibXml2 REQUIRED)
 find_package(LibSSH REQUIRED)
-find_package(PythonLibs REQUIRED)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)
@@ -413,7 +420,6 @@ include_directories(
     ${libyang_headers_location}
     ${libyang_location}/headers
     ${PROJECT_SOURCE_DIR}/src
-    ${PYTHON_INCLUDE_PATH}
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -431,7 +437,6 @@ target_link_libraries(ydk
     ${dl_location}
     libnetconf
     libyang
-    ${PYTHON_LIBRARIES}
 )
 
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)

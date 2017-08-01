@@ -15,42 +15,40 @@
 # ------------------------------------------------------------------
 """
     test_sanity_delete.py
-        Unittest for DELETE object.
 """
 from __future__ import absolute_import
-import ydk.types as ytypes
+
+import sys
 import unittest
 
 from ydk.services import CRUDService
-from ydk.providers import NetconfServiceProvider, NativeNetconfServiceProvider
-from ydk.types import Empty, DELETE, Decimal64, YLeafList
-from compare import is_equal
+from ydk.providers import NetconfServiceProvider
 from ydk.errors import YPYError
+from ydk.filters import YFilter
 from ydk.models.ydktest import ydktest_sanity as ysanity
+
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityYang(unittest.TestCase):
-    PROVIDER_TYPE = "non-native"
+
 
     @classmethod
-    def setUpClass(self):
-        if SanityYang.PROVIDER_TYPE == "native":
-            self.ncc = NativeNetconfServiceProvider(address='127.0.0.1',
-                                                    username='admin',
-                                                    password='admin',
-                                                    protocol='ssh',
-                                                    port=12022)
-        else:
-            self.ncc = NetconfServiceProvider(address='127.0.0.1',
-                                              username='admin',
-                                              password='admin',
-                                              protocol='ssh',
-                                              port=12022)
-        self.crud = CRUDService()
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        common_cache = getattr(cls, "common_cache", False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.crud = CRUDService()
 
     @classmethod
-    def tearDownClass(self):
-        self.ncc.close()
+    def tearDownClass(cls):
+        pass
 
     def setUp(self):
         runner = ysanity.Runner()
@@ -106,17 +104,16 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_read_filter)
 
         # use DELETE object to remove leaf one
-        runner_delete = runner_read
-        runner_delete.one.name = DELETE()
-        self.crud.update(self.ncc, runner_delete)
+        runner_update = runner_read
+        runner_update.one.name.yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_update)
 
         # manually create remaining runner with leaf two
         runner_read = self.crud.read(self.ncc, runner_read_filter)
-        runner_left = runner_create
-        runner_left.one.name = None
+        runner_compare = ysanity.Runner()
+        runner_compare.two.name = 'two'
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
-
+        self.assertEqual(runner_compare, runner_read)
 
     def test_delete_on_leaflist_slice(self):
         runner_create = ysanity.Runner()
@@ -125,47 +122,68 @@ class SanityYang(unittest.TestCase):
 
         self.crud.create(self.ncc, runner_create)
 
-        elements_to_delete = runner_create.ytypes.built_in_t.llstring[0:2]
-        self.crud.delete(self.ncc, elements_to_delete)
+        runner_update = ysanity.Runner()
+        # specify the leaflist value to be deleted
+        runner_update.ytypes.built_in_t.llstring.append('0')
+        runner_update.ytypes.built_in_t.llstring.append('3')
+        # set yfilter
+        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
 
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        del runner_left.ytypes.built_in_t.llstring[0:2]
 
-        self.assertEqual(is_equal(runner_read, runner_create), True)
+        runner_compare = runner_create
+        runner_compare.one.name = 'one'
+
+        runner_compare.ytypes.built_in_t.llstring.clear()
+        runner_compare.ytypes.built_in_t.llstring.extend(['1', '2', '4'])
+
+        self.assertEqual(runner_compare, runner_read)
 
     def test_delete_on_leaflist(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-        runner_create.ytypes.built_in_t.llstring.extend([str(i) for i in range(5)])
+        runner_create.ytypes.built_in_t.llstring.extend(['0', '1', '2', '3', '4'])
 
         self.crud.create(self.ncc, runner_create)
 
-        self.crud.delete(self.ncc, runner_create.ytypes.built_in_t.llstring[3])
+        runner_update = ysanity.Runner()
+        runner_update.ytypes.built_in_t.llstring.append('3')
+        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
 
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        del runner_left.ytypes.built_in_t.llstring[3]
-        self.assertEqual(is_equal(runner_read, runner_create), True)
+
+        runner_compare = ysanity.Runner()
+        runner_compare.one.name = 'one'
+        runner_compare.ytypes.built_in_t.llstring.extend(['0', '1', '2', '4'])
+
+        self.assertEqual(runner_compare, runner_read)
 
     def test_delete_on_list_with_identitykey(self):
         runner = ysanity.Runner()
-
         a1 = ysanity.Runner.OneList.IdentityList()
-        a1.config.id = ysanity.ChildIdentityIdentity()
-        a1.id_ref =  a1.config.id
-        runner.one_list.identity_list.extend([a1])
-
+        a1.config.id = ysanity.ChildIdentity()
+        a1.id_ref =  a1.config.id.get()
+        runner.one_list.identity_list.append(a1)
         self.crud.create(self.ncc, runner)
 
         empty_runner = ysanity.Runner()
-        runner_read = self.crud.read(self.ncc, empty_runner)
-        self.crud.delete(self.ncc, runner_read.one_list.identity_list)
+
+        runner_update = ysanity.Runner()
+        k = ysanity.Runner.OneList.IdentityList()
+        k.config.id = ysanity.ChildIdentity()
+        k.id_ref = k.config.id.get()
+        k.yfilter = YFilter.delete
+        runner_update.one_list.identity_list.append(k)
+
+        self.crud.update(self.ncc, runner_update)
+
         runner_read = self.crud.read(self.ncc, empty_runner)
 
-        self.assertEqual(len(runner_read.one_list.identity_list), 0)
+        self.assertEqual(runner_read, None)
 
-    def test_delete_operation_on_container(self):
+    def test_delete_on_container(self):
         # create runner with a container
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
@@ -176,63 +194,69 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_read_filter)
 
         # delete contianer two
-        self.crud.delete(self.ncc, runner_read.two)
+        runner_update = ysanity.Runner()
+        runner_update.two.yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_update)
 
         runner_read = self.crud.read(self.ncc, runner_read_filter)
-        runner_left = runner_create
-        runner_left.two.name = None
+        runner_compare = ysanity.Runner()
+        runner_compare.one.name = 'one'
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(runner_compare, runner_read)
 
-    def test_delete_operation_on_nested_list(self):
+    def test_delete_on_nested_list_1(self):
         runner_create, _, e_22 = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_read.inbtw_list.ldata[1].subc.subc_subl1)
-        # get object after a crud delete operation
+        runner_read.inbtw_list.ldata[1].subc.subc_subl1.yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_read)
+
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        del runner_left.inbtw_list.ldata[1].subc.subc_subl1[:]
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        runner_compare = runner_create
+        runner_compare.inbtw_list.ldata[1].subc.subc_subl1.pop()
+        runner_compare.inbtw_list.ldata[1].subc.subc_subl1.pop()
 
-    def test_delete_operation_on_nested_list_with_key(self):
+        self.assertEqual(runner_compare, runner_read)
+
+    def test_delete_on_nested_list(self):
         runner_create, _, e_22 = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
+        runner_update = self.read_from_empty_filter()
+        runner_update.inbtw_list.ldata[1].subc.subc_subl1[1].yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_update)
+
+        # get object after a crud delete yfilter
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_create.inbtw_list.ldata[1].subc.subc_subl1[1])
-        # get object after a crud delete operation
-        runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        runner_left.inbtw_list.ldata[1].subc.subc_subl1.remove(e_22)
+        runner_compare = runner_create
+        runner_compare.inbtw_list.ldata[1].subc.subc_subl1.pop()
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(runner_compare, runner_read)
 
-    def test_delete_operation_on_list_with_key(self):
+    def test_delete_on_list_element(self):
         runner_create, e_2, _ = self.get_nested_object()
         self.crud.create(self.ncc, runner_create)
 
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_read.inbtw_list.ldata[1])
-        # get object after a crud delete operation
+        runner_update = runner_create
+        runner_update.inbtw_list.ldata[1].yfilter = YFilter.delete
+
+        self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete element e_2 in runner_create object
-        runner_left.inbtw_list.ldata.remove(e_2)
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        runner_compare = runner_create
+        runner_compare.inbtw_list.ldata.pop()
 
-    def test_delete_operation_on_list_slice(self):
+        self.assertEqual(runner_compare, runner_read)
+
+    def test_delete_on_list_elements(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-
         foo = ysanity.Runner.OneList.Ldata()
         bar = ysanity.Runner.OneList.Ldata()
         baz = ysanity.Runner.OneList.Ldata()
@@ -243,26 +267,25 @@ class SanityYang(unittest.TestCase):
         baz.number = 3
         baz.name = 'baz'
         runner_create.one_list.ldata.extend([foo, bar, baz])
-
         self.crud.create(self.ncc, runner_create)
 
+        runner_update = self.read_from_empty_filter()
+        runner_update.one_list.ldata[1].yfilter = YFilter.delete
+        runner_update.one_list.ldata[2].yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_update)
+
+        # read after a crud delete yfilter
         runner_read = self.read_from_empty_filter()
 
-        elements_to_delete = runner_read.one_list.ldata[:1]
-        self.crud.delete(self.ncc, elements_to_delete)
+        runner_compare = runner_create
+        runner_compare.one_list.ldata.pop()
+        runner_compare.one_list.ldata.pop()
 
-        # read after a crud delete operation
-        runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-        # manually delete entire list
-        del runner_left.one_list.ldata[:1]
+        self.assertEqual(runner_compare, runner_read)
 
-        self.assertEqual(is_equal(runner_read, runner_left), True)
-
-    def test_delete_operation_on_list(self):
+    def test_delete_on_list(self):
         runner_create = ysanity.Runner()
         runner_create.one.name = 'one'
-
         foo = ysanity.Runner.OneList.Ldata()
         bar = ysanity.Runner.OneList.Ldata()
         foo.number = 1
@@ -270,25 +293,25 @@ class SanityYang(unittest.TestCase):
         bar.number = 2
         bar.name = 'bar'
         runner_create.one_list.ldata.extend([foo, bar])
-
         self.crud.create(self.ncc, runner_create)
 
+        runner_update = self.read_from_empty_filter()
+        runner_update.one_list.ldata.yfilter = YFilter.delete
+        self.crud.update(self.ncc, runner_update)
+
         runner_read = self.read_from_empty_filter()
 
-        self.crud.delete(self.ncc, runner_read.one_list.ldata)
+        runner_compare = runner_create
+        runner_compare.one_list.ldata.pop()
+        runner_compare.one_list.ldata.pop()
 
-        runner_read = self.read_from_empty_filter()
-        runner_left = runner_create
-
-        del runner_left.one_list.ldata[:]
-
-        self.assertEqual(is_equal(runner_read, runner_left), True)
+        self.assertEqual(runner_compare, runner_read)
 
 
 if __name__ == '__main__':
-    import sys
-    if len(sys.argv) > 1:
-        SanityYang.PROVIDER_TYPE = sys.argv.pop()
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)
+    device, non_demand, common_cache = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

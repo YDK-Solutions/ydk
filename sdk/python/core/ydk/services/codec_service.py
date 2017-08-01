@@ -226,7 +226,7 @@ def _get_ns_ename(payload, encoding):
     """
     ns, ename = None, None
     if encoding == EncodingFormat.XML:
-        xml.etree.ElementTree.fromstring(payload)
+        payload_root = xml.etree.ElementTree.fromstring(payload)
         ns, ename = payload_root.tag.rsplit('}')
         ns = ns.strip('{')
     else:

@@ -1,14 +1,14 @@
 module bgp-types {
-	yang-version "1";
+    yang-version "1";
 
-	namespace "http://openconfig.net/yang/bgp-types";
+    namespace "http://openconfig.net/yang/bgp-types";
 
-	prefix "bgp-types";
+    prefix "bgp-types";
 
-	import ietf-inet-types { prefix inet; }
+    import ietf-inet-types { prefix inet; }
 
-	// meta
-	organization
+    // meta
+    organization
     "OpenConfig working group";
 
   contact
@@ -210,7 +210,7 @@ module bgp-types {
   }
 
   typedef bgp-well-known-community-type {
-  		type string;
+        type string;
   /*   type identityref {
       base bgp-well-known-std-community;
     } */

@@ -26,17 +26,23 @@ using namespace std;
 
 TEST_CASE("CreateP")
 {
-	ydk::path::Repository repo{};
-	NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    ydk::path::Repository repo{};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
 
-	CHECK_NOTHROW(provider.get_root_schema());
+    CHECK_NOTHROW(provider.get_root_schema());
 }
 
 
 TEST_CASE("CreateNoRepoP")
 {
 
-	NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12022};
+    NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12022};
 
-	CHECK_NOTHROW(provider.get_root_schema());
+    CHECK_NOTHROW(provider.get_root_schema());
+}
+
+TEST_CASE("CreateNoRepoPTCP")
+{
+    NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12307, "tcp"};
+    CHECK_NOTHROW(provider.get_root_schema());
 }

@@ -227,7 +227,7 @@ module routing-policy {
         characteristic of a route";
 
     leaf install-protocol-eq {
-    	type string;
+        type string;
       /*type identityref {
         base pt:install-protocol-type;
       }*/

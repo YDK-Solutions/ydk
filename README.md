@@ -59,16 +59,16 @@ Please follow the below instructions to install the system requirements before i
 ## Linux
 Ubuntu (Debian-based):
 ```
-   $ sudo apt-get install gdebi-core
+   $ sudo apt-get install gdebi-core python3-dev python-dev
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
    $ sudo gdebi libydk_0.6.0-1_amd64.deb
 ```
 
 Centos (Fedora-based):
 ```
-   $ sudo yum install epel-release
+   $ sudo yum install epel-release libssh-devel gcc-c++
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.0/libydk-0.6.0-1.x86_64.rpm
-   $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
+   $ sudo ln –fs /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin:$PATH
 ```
 
 ## macOS

@@ -159,7 +159,7 @@ ydk::path::RootSchemaNode::get_keys() const
 // class RootSchemaNodeImpl
 /////////////////////////////////////////////////////////////////////////////////////
 ydk::path::RootSchemaNodeImpl::RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> & repo)
-    : m_ctx{ctx}, m_priv_repo{repo}
+    : m_ctx{ctx}, m_priv_repo{repo}, m_name_lookup(), m_namespace_lookup()
 {
     populate_all_module_schemas();
 }

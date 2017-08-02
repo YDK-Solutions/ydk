@@ -53,13 +53,17 @@ Of course, many other libraries are used as an integral part of ydk-gen and its 
 The output of ydk-gen is either a core package, that defines services and providers, or a module bundle, consisting of APIs based on YANG models. Each module bundle is generated using a bundle profile and the ydk-gen tool. Developers can either use pre-packaged generated bundles (e.g. [ydk-py](http://cs.co/ydk-py)), or they can define their own bundle, consisting of a set of YANG models, using a bundle profile (e.g. [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json)). This gives a developer the ability to customize the scope of their bundle based on their requirements.
 
 
+# Note
+ Please see [this page](http://ydk.cisco.com/py/docs/backward_compatibility.html) for details on some backward incompatible changes introduced as part of 0.6.0 release
+
+
 # System requirements
 Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp:
 
 ## Linux
 Ubuntu (Debian-based):
 ```
-   $ sudo apt-get install gdebi-core python3-dev python-dev
+   $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
    $ sudo gdebi libydk_0.6.0-1_amd64.deb
 ```
@@ -77,8 +81,9 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install python pkg-config libssh xml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk-0.6.0-Darwin.tar.gz
-   $ sudo installer -pkg libydk_0.6.0_Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk-0.6.0-Darwin.pkg
+   $ sudo installer -pkg libydk-0.6.0-Darwin.pkg -target /
+
 ```
 
 ## Windows

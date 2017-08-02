@@ -148,7 +148,7 @@ To see time stamps and logging levels, please see the below code snippet.
 
    import logging
    log = logging.getLogger('ydk')
-   log.setLevel(logging.DEBUG)
+   log.setLevel(logging.INFO)
    handler = logging.StreamHandler()
    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
    handler.setFormatter(formatter)

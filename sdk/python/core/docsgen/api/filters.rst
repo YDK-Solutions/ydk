@@ -65,4 +65,7 @@ YDK Filters
         device and a specific leaf is desired to be read, the operation can
         be set to ``read`` on that leaf.
 
-Examples for using :py:class:`YFilter<ydk.filters.YFilter>` could be found :ref:`here<netconf-operations>`.
+Examples
+--------
+
+Examples for using :py:class:`YFilter<ydk.filters.YFilter>` can be found :ref:`here<netconf-operations>`.

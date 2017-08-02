@@ -25,7 +25,7 @@ import unittest
 from ydk.errors import YPYServiceProviderError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
-from ydk.services import CRUDService, DataStore
+from ydk.services import CRUDService
 from ydk.filters import YFilter
 
 from test_utils import assert_with_error

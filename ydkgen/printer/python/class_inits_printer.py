@@ -20,9 +20,8 @@ class_inits_printer.py
  __init__ printer
 
 """
-from pyang.types import UnionTypeSpec, PathTypeSpec
+from pyang.types import PathTypeSpec
 from ydkgen.api_model import Bits, Class, Package, DataType, Enum
-from ydkgen.builder import TypesExtractor
 from ydkgen.common import get_module_name
 
 

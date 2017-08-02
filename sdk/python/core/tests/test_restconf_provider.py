@@ -27,8 +27,6 @@ from ydk.types import EncodingFormat
 from ydk.path import Repository
 from ydk.path import Codec
 
-from test_utils import assert_with_error
-
 
 class SanityTest(unittest.TestCase):
 
@@ -50,10 +48,7 @@ class SanityTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_get_encoding(self):
-        pass
-
-    def test_get_session(self):
+    def test_create_del_read(self):
         session = self.restconf_provider.get_session()
         root_schema = session.get_root_schema()
         runner = root_schema.create_datanode('ydktest-sanity:runner', '')
@@ -64,6 +59,32 @@ class SanityTest(unittest.TestCase):
         json = codec_service.encode(runner, EncodingFormat.JSON, False)
         delete_rpc.get_input_node().create_datanode('entity', json)
         delete_rpc(session)
+
+        runner.create_datanode('ytypes/built-in-t/number8', '3')
+        json = codec_service.encode(runner, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+        create_rpc = root_schema.create_rpc('ydk:create')
+        create_rpc.get_input_node().create_datanode('entity', json)
+
+        read_rpc = root_schema.create_rpc('ydk:read')
+        runner_read = root_schema.create_datanode('ydktest-sanity:runner', '')
+
+        json = codec_service.encode(runner_read, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+        read_rpc.get_input_node().create_datanode('filter', json)
+
+        read_rpc(session)
+
+        runner = root_schema.create_datanode('ydktest-sanity:runner', '')
+        number8 = runner.create_datanode('ytypes/built-in-t/number8', '5')
+
+        json = codec_service.encode(runner, EncodingFormat.JSON, False)
+        self.assertNotEqual(json, '')
+
+        update_rpc = root_schema.create_rpc('ydk:update')
+        update_rpc.get_input_node().create_datanode('entity', json)
+        update_rpc(session)
+
 
 if __name__ == '__main__':
     import sys

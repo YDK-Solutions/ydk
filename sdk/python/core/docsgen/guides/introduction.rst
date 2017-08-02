@@ -130,7 +130,7 @@ Note if there were any errors the above API will raise a YPYError exception.
 
 Logging
 -------
-YDK uses common Python logging.  All modules are based on the ``ydk`` log.
+YDK uses common Python logging.  All modules are based on the ``ydk`` log. The below code snippet shows how to enable basic logging with the ``INFO`` level, which is useful for most `users` of YDK. Using the ``DEBUG`` level will produces a lot more detailed logs, which may be useful for `developers` working on YDK.
 
 .. code-block:: python
     :linenos:
@@ -138,5 +138,18 @@ YDK uses common Python logging.  All modules are based on the ``ydk`` log.
     import logging
     log = logging.getLogger('ydk')
     log.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
-    log.addHandler(ch)
+    handler = logging.StreamHandler()
+    log.addHandler(handler)
+
+To see time stamps and logging levels, please see the below code snippet.
+
+.. code-block:: python
+   :linenos:
+
+   import logging
+   log = logging.getLogger('ydk')
+   log.setLevel(logging.INFO)
+   handler = logging.StreamHandler()
+   formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+   handler.setFormatter(formatter)
+   log.addHandler(handler)

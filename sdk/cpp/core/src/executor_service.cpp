@@ -33,7 +33,7 @@ using namespace std;
 namespace ydk{
 
 static void walk_children(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, std::string path);
-static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, std::string path);
+static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, const std::string & path);
 static void create_from_children(std::map<string, std::shared_ptr<Entity>> & children, path::DataNode & rpc_input);
 shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 
@@ -104,7 +104,7 @@ static void walk_children(std::shared_ptr<Entity> entity, path::DataNode & rpc_i
     }
 }
 
-static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, std::string path)
+static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, const std::string & path)
 {
     auto entity_path = entity->get_entity_path(entity->parent);
 

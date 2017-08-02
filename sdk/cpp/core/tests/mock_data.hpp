@@ -31,7 +31,7 @@ namespace mock {
 class MockServiceProvider
 {
 public:
-    MockServiceProvider(const std::string searchdir, const std::vector<ydk::path::Capability> capabilities) : m_searchdir{searchdir}, m_capabilities{capabilities}
+    MockServiceProvider(const std::string & searchdir, const std::vector<ydk::path::Capability> capabilities) : m_searchdir{searchdir}, m_capabilities{capabilities}
     {
         ydk::path::Repository repo{m_searchdir};
         root_schema = repo.create_root_schema(m_capabilities);

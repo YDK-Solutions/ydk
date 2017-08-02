@@ -28,7 +28,6 @@ from ydk.models.ydktest import ydktest_filterread as ysanity
 from ydk.models.ydktest import oc_pattern
 from ydk.providers import NetconfServiceProvider
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

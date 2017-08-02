@@ -23,9 +23,8 @@ from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
 from ydk.models.deviation import openconfig_bgp, openconfig_bgp_types
-from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyType, RoutingPolicy
+from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyType 
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

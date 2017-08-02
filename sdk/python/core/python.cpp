@@ -84,7 +84,7 @@ void critical(const char* msg) { log_critical(msg); }
 
 void setup_logging()
 {
-    if (!enabled_logging)
+    if (enabled_logging == false)
     {
         object get_logger = module::import("logging").attr("getLogger");
         object logger = get_logger("ydk");
@@ -405,7 +405,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("decode", &ydk::path::Codec::decode, arg("root_schema_node"), arg("payload"), arg("encoding"))
         .def("decode_rpc_output", &ydk::path::Codec::decode_rpc_output, arg("root_schema_node"), arg("payload"), arg("rpc_path"), arg("encoding"));
 
-    enum_<ydk::DataStore>(services, "DataStore")
+    enum_<ydk::DataStore>(services, "Datastore")
         .value("candidate", ydk::DataStore::candidate)
         .value("running", ydk::DataStore::running)
         .value("startup", ydk::DataStore::startup)

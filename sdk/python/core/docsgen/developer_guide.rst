@@ -12,3 +12,4 @@ Developer Guide
     guides/presence_class.rst
     guides/deviation.rst
     guides/path.rst
+    guides/backward_compatibility.rst

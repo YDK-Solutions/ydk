@@ -23,7 +23,6 @@ from ydk.path.sessions import NetconfSession
 from ydk.path import Codec
 from ydk.types import EncodingFormat
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

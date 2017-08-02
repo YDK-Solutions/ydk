@@ -35,6 +35,7 @@ using namespace std;
             || Catch::Contains("Failed to resolve") \
             || Catch::Contains("Unexpected character") \
             || Catch::Contains("does not satisfy the constraint") \
+            || Catch::Contains("is an invalid value") \
             || Catch::Contains("YCPPModelError")
 
 

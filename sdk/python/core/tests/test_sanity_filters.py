@@ -27,7 +27,6 @@ from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 from ydk.filters import YFilter
 
-from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 

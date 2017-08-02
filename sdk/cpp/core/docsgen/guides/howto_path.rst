@@ -1,7 +1,7 @@
 .. _ref-howtopath:
 
-Path Syntax
-===========
+Using YDK Path API
+==================
 
 
 .. cpp:namespace:: ydk::path

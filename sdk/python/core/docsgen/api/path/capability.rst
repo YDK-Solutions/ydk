@@ -4,7 +4,7 @@ Capability
 .. module:: ydk.path
     :synopsis: Path API' Capability
 
-.. py:class:: Capability(model, revision)
+.. py:class:: Capability(model, revision):
 
     An instance of Capability is defined by the module name and revision.
 

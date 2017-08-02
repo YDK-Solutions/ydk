@@ -7,7 +7,7 @@ Codec Service
 .. py:class:: CodecService()
 
     Supports encoding and decoding Python model API objects of type :py:class:`Entity<ydk.types.Entity>`.
-\
+
     .. py:method:: encode(provider, entity, pretty=True, subtree=False)
 
         Encodes :py:class:`Entity<ydk.types.Entity>` in ``entity`` and returns the payload.

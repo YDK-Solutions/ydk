@@ -14,7 +14,7 @@ YDK Python provides a new interface in the form of Path API, which can be used t
 
    annotation.rst
    capability.rst
-   codec_service.rst
+   codec.rst
    data_node.rst
    repository.rst
    root_schema_node.rst
@@ -22,3 +22,5 @@ YDK Python provides a new interface in the form of Path API, which can be used t
    schema_node.rst
    service_provider.rst
    statement.rst
+   netconf_session.rst
+   restconf_session.rst

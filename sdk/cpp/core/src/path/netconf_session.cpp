@@ -254,7 +254,7 @@ std::shared_ptr<path::DataNode> NetconfSession::handle_netconf_operation(path::R
     netconf_payload = payload + netconf_payload + "</rpc>";
 
     YLOG_INFO("=============Generating payload to send to device=============");
-    YLOG_INFO(netconf_payload.c_str());
+    YLOG_INFO("{}", netconf_payload);
     YLOG_INFO("\n");
 
     std::string reply = execute_payload(netconf_payload);
@@ -276,7 +276,7 @@ std::string NetconfSession::execute_payload(
 {
     std::string reply = client->execute_payload(payload);
     YLOG_INFO("=============Reply payload received from device=============");
-    YLOG_INFO(reply.c_str());
+    YLOG_INFO("{}", reply);
     YLOG_INFO("\n");
     return reply;
 }
@@ -370,7 +370,7 @@ static string get_netconf_payload(
     payload+=codec_service.encode(input, EncodingFormat::XML, true);
     payload+="</rpc>";
     YLOG_INFO("=============Generating payload to send to device=============");
-    YLOG_INFO(payload.c_str());
+    YLOG_INFO("{}", payload);
     YLOG_INFO("\n");
     return payload;
 }
@@ -392,7 +392,7 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
         reply = client.execute_payload(commit_payload);
 
         YLOG_INFO("=============Reply payload received from device=============");
-        YLOG_INFO(reply.c_str());
+        YLOG_INFO("{}", reply);
         YLOG_INFO("\n");
         if(reply.find("<ok/>") == std::string::npos)
         {

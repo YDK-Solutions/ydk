@@ -10,7 +10,7 @@ YDK CRUDService provides Create/Read/Update/Delete funcionalities.
 .. py:class:: CRUDService()
 
     Supports CRUD operations on entities.
-\
+
     .. py:method:: create(provider, entity)
 
         Create the entity.

@@ -7,7 +7,7 @@ NETCONF Service Provider
 .. py:class:: NetconfServiceProvider(address, username, password, port=830, protocol='ssh', repo=None)
 
     Constructs an instance of the ``NetconfServiceProvider`` to connect to a server which **has** to support model download. Since the class is a Python wrapper for C++ ``NetconfServiceProvider`` class, which has clean up methods implemented in its destructor. The user does not need to worry about close NETCONF session.
-\
+
     :param address: (``str``) IP address of the device supporting a netconf interface
     :param port: (``int``) The port to use, defaults to 830
     :param username: (``str``) Username to log in to the device

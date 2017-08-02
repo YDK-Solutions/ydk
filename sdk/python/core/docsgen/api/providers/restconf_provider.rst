@@ -7,7 +7,7 @@ RESTCONF Service Provider
 .. py:class:: RestconfServiceProvider(repo, address, username, password, port, encoding)
 
     Constructs an instance of the ``RestconfServiceProvider`` to connect to a server which has to support model download. Since the class is a Python wrapper for C++ ``RestconfServiceProvider`` class, which has clean up methods implemented in its destructor. The user does not need to worry about close RESTCONF session.
-\
+
     :param repo: (:py:class:`Repository<ydk.path.Repository>`) User provided repository stores cached models
     :param address: (``str``) IP address of the device supporting a restconf interface
     :param username: (``str``) Username to log in to the device

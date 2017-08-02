@@ -327,13 +327,6 @@ PYBIND11_PLUGIN(ydk_)
              arg("username"),
              arg("password"),
              arg("port"),
-             arg("encoding"), // error setting default argument enum value using pybin11
-             arg("config_url_root"),
-             arg("state_url_root"))
-        .def(init<std::shared_ptr<ydk::RestconfClient>, std::shared_ptr<ydk::path::RootSchemaNode>, const std::string&, ydk::EncodingFormat, const std::string&, const std::string&>(),
-             arg("client"),
-             arg("root_schema"),
-             arg("edit_method"),
              arg("encoding"),
              arg("config_url_root"),
              arg("state_url_root"))

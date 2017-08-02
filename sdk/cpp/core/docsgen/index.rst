@@ -14,5 +14,5 @@ Contents:
 
    about_ydk.rst
    getting_started.rst
-   developer_guide.rst
-   api_guide.rst   
+   guides/guides.rst
+   api/api.rst

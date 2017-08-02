@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import os
 import unittest
 
-from ydk.path import RestconfSession
+from ydk.path.sessions import RestconfSession
 from ydk.types import EncodingFormat
 from ydk.path import Repository
 from ydk.path import Codec

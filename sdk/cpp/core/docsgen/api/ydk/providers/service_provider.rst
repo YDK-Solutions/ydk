@@ -1,18 +1,19 @@
 ServiceProvider
 ===============
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: ServiceProvider
+.. cpp:class:: ydk::ServiceProvider
 
-    Class represents the base class :cpp:class:`ServiceProvider<ydk::ServiceProvider>` to be inherited for implementation.
+Interface for all ServiceProvider implementations.
 
-    .. cpp:function:: virtual EncodingFormat get_encoding() const
+    Concrete instances of ServiceProviders are expected to extend this interface.
+
+    .. cpp:function:: virtual EncodingFormat get_encoding()
 
         Returns the type of encoding supported by the service provider.
 
-    .. cpp:function:: virtual Session get_session() const
+    .. cpp:function:: virtual const path::Session& get_session()
 
-        Returns the instance of the :cpp:class:`Session<path::Session>` used to connect to the server
+        Returns reference to the session used to connect to the server
 
     .. cpp:function:: virtual ~ServiceProvider()

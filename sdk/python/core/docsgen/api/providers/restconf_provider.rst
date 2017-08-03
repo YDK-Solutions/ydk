@@ -1,10 +1,8 @@
 RESTCONF Service Provider
 =========================
 
-.. module:: ydk.providers
-    :synopsis: YDK RESTCONF Service provider
 
-.. py:class:: RestconfServiceProvider(repo, address, username, password, port, encoding)
+.. py:class:: ydk.providers.RestconfServiceProvider(repo, address, username, password, port, encoding)
 
     Constructs an instance of the ``RestconfServiceProvider`` to connect to a server which has to support model download. Since the class is a Python wrapper for C++ ``RestconfServiceProvider`` class, which has clean up methods implemented in its destructor. The user does not need to worry about close RESTCONF session.
 

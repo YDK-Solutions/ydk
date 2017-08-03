@@ -22,7 +22,6 @@ from ydk.ext.path import Repository
 from ydk.ext.path import RootSchemaNode
 from ydk.ext.path import Rpc
 from ydk.ext.path import SchemaNode
-from ydk.ext.path import ServiceProvider
 from ydk.ext.path import Statement
 
 from .sessions import NetconfSession
@@ -40,5 +39,4 @@ __all__ = [ "Annotation",
             "RootSchemaNode",
             "Rpc",
             "SchemaNode",
-            "ServiceProvider",
             "Statement" ]

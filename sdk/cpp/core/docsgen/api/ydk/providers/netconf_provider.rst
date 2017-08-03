@@ -1,9 +1,8 @@
 NetconfServiceProvider
 ======================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: NetconfServiceProvider : public ydk::ServiceProvider
+.. cpp:class:: ydk::NetconfServiceProvider : public ydk::ServiceProvider
 
     Implementation of :cpp:class:`ServiceProvider<ydk::ServiceProvider>` for the `netconf <https://tools.ietf.org/html/rfc6241>`_ protocol.
 

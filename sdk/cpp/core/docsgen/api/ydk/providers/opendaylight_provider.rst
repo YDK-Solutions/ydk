@@ -1,9 +1,8 @@
 OpenDaylightServiceProvider
 ============================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: OpenDaylightServiceProvider
+.. cpp:class:: ydk::OpenDaylightServiceProvider
 
   A service provider to be used to communicate with an  `OpenDaylight <https://opendaylight.org>`_ instance.
 

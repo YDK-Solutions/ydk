@@ -1,11 +1,10 @@
 Session
 =======
 
-.. cpp:namespace:: ydk::path
 
-.. cpp:class:: Session
+.. cpp:class:: ydk::path::Session
 
-Abstract session base class.
+    Abstract session base class.
 
     .. cpp:function:: virtual RootSchemaNode& get_root_schema() const
 

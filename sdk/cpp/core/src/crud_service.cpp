@@ -21,26 +21,27 @@
 //
 //////////////////////////////////////////////////////////////////
 
-
-#include "crud_service.hpp"
-#include "types.hpp"
-#include "path_api.hpp"
-#include "entity_data_node_walker.hpp"
-#include "validation_service.hpp"
-#include "xml_subtree_codec.hpp"
-#include "logger.hpp"
-#include <sstream>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xpath.h>
+
+#include "crud_service.hpp"
+#include "entity_data_node_walker.hpp"
+#include "logger.hpp"
+#include "path_api.hpp"
+#include "service_provider.hpp"
+#include "types.hpp"
+#include "validation_service.hpp"
+#include "xml_subtree_codec.hpp"
+
 
 using namespace std;
 
 namespace ydk {
 
-static string get_config_data_payload(Entity & entity, ydk::path::ServiceProvider & provider);
+static string get_config_data_payload(Entity & entity, ydk::ServiceProvider & provider);
 static string get_xml_subtree_filter_payload(Entity & entity, const path::Session & session);
-static std::shared_ptr<path::DataNode> execute_rpc(ydk::path::ServiceProvider & provider, Entity & entity,
+static std::shared_ptr<path::DataNode> execute_rpc(ydk::ServiceProvider & provider, Entity & entity,
         const string & operation, const string & data_tag, bool set_config_flag);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 static bool operation_succeeded(shared_ptr<path::DataNode> node);
@@ -53,7 +54,7 @@ CrudService::~CrudService()
 {
 }
 
-bool CrudService::create(ydk::path::ServiceProvider & provider, Entity & entity)
+bool CrudService::create(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD create operation");
     return operation_succeeded(
@@ -61,7 +62,7 @@ bool CrudService::create(ydk::path::ServiceProvider & provider, Entity & entity)
             );
 }
 
-bool CrudService::update(ydk::path::ServiceProvider & provider, Entity & entity)
+bool CrudService::update(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD update operation");
     return operation_succeeded(
@@ -69,7 +70,7 @@ bool CrudService::update(ydk::path::ServiceProvider & provider, Entity & entity)
             );
 }
 
-bool CrudService::delete_(ydk::path::ServiceProvider & provider, Entity & entity)
+bool CrudService::delete_(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD delete operation");
     return operation_succeeded(
@@ -77,13 +78,13 @@ bool CrudService::delete_(ydk::path::ServiceProvider & provider, Entity & entity
             );
 }
 
-shared_ptr<Entity> CrudService::read(ydk::path::ServiceProvider & provider, Entity & filter)
+shared_ptr<Entity> CrudService::read(ydk::ServiceProvider & provider, Entity & filter)
 {
     YLOG_INFO("Executing CRUD read operation");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", false));
 }
 
-shared_ptr<Entity> CrudService::read_config(ydk::path::ServiceProvider & provider, Entity & filter)
+shared_ptr<Entity> CrudService::read_config(ydk::ServiceProvider & provider, Entity & filter)
 {
     YLOG_INFO("Executing CRUD config read operation");
     return read_datanode(filter, execute_rpc(provider, filter, "ydk:read", "filter", true));
@@ -112,7 +113,7 @@ static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
     return get_top_entity_from_filter(*(filter.parent));
 }
 
-static shared_ptr<path::DataNode> execute_rpc(ydk::path::ServiceProvider & provider, Entity & entity,
+static shared_ptr<path::DataNode> execute_rpc(ydk::ServiceProvider & provider, Entity & entity,
         const string & operation, const string & data_tag, bool set_config_flag)
 {
     const path::Session& session = provider.get_session();
@@ -141,7 +142,7 @@ static shared_ptr<path::DataNode> execute_rpc(ydk::path::ServiceProvider & provi
     return (*ydk_rpc)(session);
 }
 
-static string get_config_data_payload(Entity & entity, ydk::path::ServiceProvider & provider)
+static string get_config_data_payload(Entity & entity, ydk::ServiceProvider & provider)
 {
     const path::Session& session = provider.get_session();
     const ydk::path::DataNode& datanode = get_data_node_from_entity(entity, session.get_root_schema());

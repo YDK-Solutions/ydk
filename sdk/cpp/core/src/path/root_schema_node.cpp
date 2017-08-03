@@ -21,7 +21,6 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include "path_private.hpp"
 #include <unordered_set>
 
 #include <libxml/parser.h>
@@ -29,6 +28,7 @@
 #include <json.hpp>
 
 #include "../logger.hpp"
+#include "path_private.hpp"
 
 
 static void get_namespaces_from_xml_doc(xmlNodePtr root, std::unordered_set<std::string>& namespaces)

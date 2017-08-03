@@ -373,9 +373,9 @@ PYBIND11_PLUGIN(ydk_)
         .def("create_datanode", (ydk::path::DataNode& (ydk::path::RootSchemaNode::*)(const string&, const string&)) &ydk::path::RootSchemaNode::create_datanode, return_value_policy::reference, arg("path"), arg("value"))
         .def("create_rpc", &ydk::path::RootSchemaNode::create_rpc, arg("path"), return_value_policy::reference);
 
-    class_<ydk::path::ServiceProvider>(path, "ServiceProvider")
-        .def("get_encoding", &ydk::path::ServiceProvider::get_encoding, return_value_policy::reference)
-        .def("get_session", &ydk::path::ServiceProvider::get_session, return_value_policy::reference);
+    class_<ydk::ServiceProvider>(providers, "ServiceProvider")
+        .def("get_encoding", &ydk::ServiceProvider::get_encoding, return_value_policy::reference)
+        .def("get_session", &ydk::ServiceProvider::get_session, return_value_policy::reference);
 
     class_<ydk::path::Rpc, shared_ptr<ydk::path::Rpc>>(path, "Rpc")
         .def("get_schema_node", &ydk::path::Rpc::get_schema_node, return_value_policy::reference)
@@ -583,7 +583,7 @@ PYBIND11_PLUGIN(ydk_)
                         })
         .def_readwrite("yfilter", &ydk::YLeafList::yfilter);
 
-    class_<ydk::NetconfServiceProvider, ydk::path::ServiceProvider>(providers, "NetconfServiceProvider")
+    class_<ydk::NetconfServiceProvider, ydk::ServiceProvider>(providers, "NetconfServiceProvider")
         .def("__init__",
             [](ydk::NetconfServiceProvider &nc_provider, ydk::path::Repository& repo, const string& address, const string& username, const string& password, int port, const string& protocol, bool on_demand) {
                     new(&nc_provider) ydk::NetconfServiceProvider(repo, address, username, password, port, protocol, on_demand);
@@ -639,7 +639,7 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_encoding", &ydk::NetconfServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::NetconfServiceProvider::get_session, return_value_policy::reference);
 
-    class_<ydk::RestconfServiceProvider, ydk::path::ServiceProvider>(providers, "RestconfServiceProvider")
+    class_<ydk::RestconfServiceProvider, ydk::ServiceProvider>(providers, "RestconfServiceProvider")
         .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>(),
             arg("repo"), arg("address"), arg("username"), arg("password"), arg("port"), arg("encoding"))
         .def("get_encoding", &ydk::RestconfServiceProvider::get_encoding, return_value_policy::reference)

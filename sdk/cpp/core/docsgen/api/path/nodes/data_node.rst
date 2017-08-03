@@ -4,9 +4,7 @@ DataNode
 ========
 
 
-.. cpp:namespace:: ydk::path
-
-.. cpp:class:: DataNode
+.. cpp:class:: ydk::path::DataNode
 
     Class represents the :cpp:class:`DataNode<DataNode>`.
 

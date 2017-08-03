@@ -1,11 +1,10 @@
 NetconfSession
 ==============
 
-.. cpp:namespace:: ydk::path
 
-.. cpp:class:: NetconfSession : public path::Session
+.. cpp:class:: ydk::path::NetconfSession : public path::Session
 
-Implementation of :cpp:class:`Session<Session>` for the `netconf <https://tools.ietf.org/html/rfc6241>`_ protocol.
+    Implementation of :cpp:class:`Session<Session>` for the `netconf <https://tools.ietf.org/html/rfc6241>`_ protocol.
 
     .. cpp:function:: NetconfSession(\
         const std::string& address, \

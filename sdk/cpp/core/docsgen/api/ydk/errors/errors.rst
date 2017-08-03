@@ -1,9 +1,8 @@
-Errors
-======
+Errors Classes
+==============
 
-.. cpp:namespace:: ydk
 
-.. toctree:: Error Classes
+.. toctree::
    :maxdepth: 2
 
    error.rst

@@ -2,11 +2,9 @@ Annotation
 ==========
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::Annotation
 
-.. cpp:class:: Annotation
-
-Class represents an annotation.
+    Class represents an annotation.
 
     An annotation has a namespace and a name and an associated value.
     Annotations are not defined in the YANG model and hence just provide a means of hanging some useful data to :cpp:class:`DataNode<DataNode>`. For example netconf edit-config rpc operation uses the annotation ``nc:operation`` (``nc`` refers to the netconf namespace) on the data nodes to describe the kind of operation one needs to perform on the given :cpp:class:`DataNode<DataNode>`.

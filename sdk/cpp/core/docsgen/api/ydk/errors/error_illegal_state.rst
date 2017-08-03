@@ -1,9 +1,8 @@
 YCPPIllegalStateError
 =====================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: YCPPIllegalStateError : public YCPPError
+.. cpp:class:: ydk::YCPPIllegalStateError : public YCPPError
 
     Thrown when an operation/service is invoked on an object that is not in the right state. Use the ``msg`` for the error.
 

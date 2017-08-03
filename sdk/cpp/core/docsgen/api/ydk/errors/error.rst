@@ -1,9 +1,9 @@
 YCPPError
 =========
 
-.. cpp:class:: YCPPError : public std::exception
+.. cpp:class:: ydk::YCPPError : public std::exception
 
-  Base class for YDK Exceptions.
+    Base class for YDK Exceptions.
 
     .. cpp:member:: std::string err_msg
 

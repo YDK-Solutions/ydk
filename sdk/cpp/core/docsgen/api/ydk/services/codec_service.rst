@@ -1,9 +1,8 @@
 Codec Service
 =============
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: CodecService
+.. cpp:class:: ydk::CodecService
 
     Codec Service class for supporting encoding and decoding C++ model API objects of type :cpp:class:`Entity<Entity>`.
 

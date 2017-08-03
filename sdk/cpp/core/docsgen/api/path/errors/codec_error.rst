@@ -2,11 +2,9 @@ YCPPCodecError
 ==============
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::YCPPCodecError : public YCPPCoreError
 
-.. cpp:class:: YCPPCodecError : public YCPPCoreError
-
-    Exception that encapsualtes the validation errors for YDK :cpp:class:`CodecService`.
+    Exception that encapsulates the validation errors for YDK :cpp:class:`CodecService`.
 
     .. cpp:member: Error err
 

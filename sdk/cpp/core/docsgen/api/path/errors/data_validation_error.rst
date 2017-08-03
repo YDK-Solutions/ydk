@@ -2,11 +2,9 @@ YCPPDataValidationError
 =======================
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::YCPPDataValidationError : public YCPPCoreError
 
-.. cpp:class:: YCPPDataValidationError : public YCPPCoreError
-
-    Exception that encapsualtes the validation errors on a data tree.
+    Exception that encapsulates the validation errors on a data tree.
 
     .. cpp:member:: std::vector<std::pair<DataNode*,Error>> errors
 

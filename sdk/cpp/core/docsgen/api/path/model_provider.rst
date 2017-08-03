@@ -1,16 +1,10 @@
 ModelProvider
 =============
 
-.. contents::
 
-Model Provider Base Class
-~~~~~~~~~~~~~~~~~~~~~~~~~
+.. cpp:class:: ydk::path::ModelProvider
 
-.. cpp:namespace:: ydk::path
-
-.. cpp:class:: ModelProvider
-
-Interface for a YANG model provider which can download YANG models from a server.
+  Interface for a YANG model provider which can download YANG models from a server.
 
     .. cpp:enum-class:: Format
 
@@ -19,10 +13,6 @@ Interface for a YANG model provider which can download YANG models from a server
        .. cpp:enumerator:: YANG
 
        .. cpp:enumerator:: YIN
-
-    .. cpp:function:: ModelProvider()
-
-        Constructor.
 
     .. cpp:function:: virtual std::string get_model(const std::string& name, const std::string& version, Format format) = 0
 
@@ -36,12 +26,3 @@ Interface for a YANG model provider which can download YANG models from a server
     .. cpp:function:: virtual std::string get_hostname_port() = 0
 
        Return the hostname and port of the connected server.
-
-
-Model Provider Implementations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. toctree::
-   :maxdepth: 2
-
-   ../ydk/providers/netconf_model_provider.rst

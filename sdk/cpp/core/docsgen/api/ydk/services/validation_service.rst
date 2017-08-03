@@ -3,15 +3,10 @@
 ValidationService
 =================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: ValidationService
+.. cpp:class:: ydk::ValidationService
 
     Validation Service class for validating C++ model API objects of type :cpp:class:`Entity<Entity>`.
-
-    .. cpp:function:: ValidationService()
-
-    .. cpp:function:: virtual ~ValidationService()
 
     .. cpp:enum-class:: Option
 
@@ -41,3 +36,5 @@ ValidationService
         :param entity: An instance of :cpp:class:`Entity<Entity>` class defined under a bundle
         :param option: An instance of type :cpp:class:`Option<Option>`
         :raises YCPPError: If validation errors were detected
+
+    .. cpp:function:: virtual ~ValidationService()

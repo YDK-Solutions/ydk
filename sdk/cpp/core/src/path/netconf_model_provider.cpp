@@ -21,24 +21,25 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <iostream>
 #include <memory>
-#include <sstream>
 
-#include "errors.hpp"
-#include "netconf_client.hpp"
 #include "netconf_model_provider.hpp"
-#include "types.hpp"
-#include "ydk_yang.hpp"
-#include "logger.hpp"
+#include "../errors.hpp"
+#include "../netconf_client.hpp"
+#include "../types.hpp"
+#include "../ydk_yang.hpp"
+#include "../logger.hpp"
 
 using namespace std;
 using namespace ydk;
 
 namespace ydk
 {
-NetconfModelProvider::NetconfModelProvider(NetconfClient & client)
-    : client(client)
+
+namespace path
+{
+
+NetconfModelProvider::NetconfModelProvider(NetconfClient & client) : client(client)
 {
 }
 
@@ -55,11 +56,13 @@ string NetconfModelProvider::get_model(const string& name, const string& version
 {
     string model{};
 
-    if(name == ydk::path::YDK_MODULE_NAME && version == ydk::path::YDK_MODULE_REVISION) {
+    if(name == ydk::path::YDK_MODULE_NAME && version == ydk::path::YDK_MODULE_REVISION)
+    {
        return ydk::path::YDK_MODULE;
     }
 
-    if(name == ydk::IETF_NETCONF_MODULE_NAME && version == ydk::IETF_NETCONF_MODULE_REVISION) {
+    if(name == ydk::IETF_NETCONF_MODULE_NAME && version == ydk::IETF_NETCONF_MODULE_REVISION)
+    {
        return ydk::IETF_NETCONF_MODULE;
     }
 
@@ -67,7 +70,8 @@ string NetconfModelProvider::get_model(const string& name, const string& version
     //not be available
 
     string file_format = "yang";
-    if(format == Format::YIN) {
+    if(format == Format::YIN)
+    {
         file_format = "yin";
     }
 
@@ -78,7 +82,8 @@ string NetconfModelProvider::get_model(const string& name, const string& version
     payload+="<identifier>";
     payload+=name;
     payload+="</identifier>";
-    if(!version.empty()){
+    if(!version.empty())
+    {
         payload+="<version>";
         payload+=version;
         payload+="</version>";
@@ -92,12 +97,14 @@ string NetconfModelProvider::get_model(const string& name, const string& version
     string reply = client.execute_payload(payload);
 
     auto data_start = reply.find("<data ");
-    if(data_start == string::npos) {
+    if(data_start == string::npos)
+    {
         return model;
     }
 
     auto data_end = reply.find("</data>", data_start);
-    if(data_end == string::npos) {
+    if(data_end == string::npos)
+    {
         //indicates that data was probably empty
         return model;
     }
@@ -111,9 +118,11 @@ string NetconfModelProvider::get_model(const string& name, const string& version
 
     //Remove <!CDATA[ if any
     auto cdata_start = model.find("<![CDATA[");
-    if(cdata_start != string::npos) {
+    if(cdata_start != string::npos)
+    {
         auto cdata_end = model.find("]]>", cdata_start);
-        if(cdata_end != string::npos) {
+        if(cdata_end != string::npos)
+        {
             data_start = cdata_start + sizeof("<![CDATA[") - 1;
             data_end = cdata_end;
             model = model.substr(data_start, data_end - data_start);
@@ -122,4 +131,8 @@ string NetconfModelProvider::get_model(const string& name, const string& version
 
     return model;
 }
-}
+
+} //namespace path
+
+} //namespace ydk
+

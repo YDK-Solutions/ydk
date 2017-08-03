@@ -1,12 +1,10 @@
 Path API types
 ==============
 
-.. cpp:namespace:: ydk::path
 
+.. cpp:enum-class:: ydk::path::ModelCachingOption
 
-.. cpp:enum-class:: ModelCachingOption
-
-Model caching option
+    Model caching option
 
     .. cpp:enumerator:: PER_DEVICE
 

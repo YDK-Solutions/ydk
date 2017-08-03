@@ -28,11 +28,11 @@
 #ifndef YDK_CORE_HPP
 #define YDK_CORE_HPP
 
-#include <string>
-#include <memory>
-#include <vector>
 #include <algorithm>
+#include <memory>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "errors.hpp"
 #include "types.hpp"
@@ -978,23 +978,6 @@ public:
     std::shared_ptr<RepositoryPtr> m_priv_repo;
 };
 
-class ServiceProvider
-{
-public:
-    ///
-    /// @brief return the SchemaTree supported by this instance of the ServiceProvider
-    ///
-    /// @return pointer to the RootSchemaNode or nullptr if one could not be created
-    ///
-
-    virtual ~ServiceProvider();
-
-    virtual EncodingFormat get_encoding() const = 0;
-
-    virtual const path::Session& get_session() const = 0;
-
-};
-
 /// @note to Session implementors
 /// Use the Repository class to instantiate a SchemaTree based on the Capabilities.
 class Session
@@ -1023,25 +1006,21 @@ public:
 
 class NetconfSession : public Session {
 public:
-    NetconfSession(
-        Repository & repo,
-        const std::string& address,
-        const std::string& username,
-        const std::string& password,
-        int port = 830,
-        const std::string& protocol = "ssh",
-        bool on_demand = true
-    );
+    NetconfSession(Repository & repo,
+                   const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 830,
+                   const std::string& protocol = "ssh",
+                   bool on_demand = true);
 
-    NetconfSession(
-        const std::string& address,
-        const std::string& username,
-        const std::string& password,
-        int port = 830,
-        const std::string& protocol = "ssh",
-        bool on_demand = true,
-        bool common_cache = false
-    );
+    NetconfSession(const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 830,
+                   const std::string& protocol = "ssh",
+                   bool on_demand = true,
+                   bool common_cache = false);
 
     virtual ~NetconfSession();
 
@@ -1054,13 +1033,11 @@ private:
     std::shared_ptr<DataNode> handle_read(Rpc& rpc) const;
     std::shared_ptr<DataNode> handle_netconf_operation(Rpc& ydk_rpc) const;
     void initialize(Repository& repo, bool on_demand);
-    void initialize_client(
-        const std::string& address,
-        const std::string& username,
-        const std::string& password,
-        int port,
-        const std::string& protocol
-    );
+    void initialize_client(const std::string& address,
+                           const std::string& username,
+                           const std::string& password,
+                           int port,
+                           const std::string& protocol);
     std::string execute_payload(const std::string & payload) const;
 private:
     std::unique_ptr<NetconfClient> client;
@@ -1072,25 +1049,21 @@ private:
 
 class RestconfSession : public Session {
 public:
-    RestconfSession(
-        Repository & repo,
-        const std::string & address,
-        const std::string & username,
-        const std::string & password,
-        int port = 80,
-        EncodingFormat encoding = EncodingFormat::JSON,
-        const std::string & config_url_root = "/data",
-        const std::string & state_url_root = "/data"
-    );
+    RestconfSession(Repository & repo,
+                    const std::string & address,
+                    const std::string & username,
+                    const std::string & password,
+                    int port = 80,
+                    EncodingFormat encoding = EncodingFormat::JSON,
+                    const std::string & config_url_root = "/data",
+                    const std::string & state_url_root = "/data");
 
-    RestconfSession(
-        std::shared_ptr<RestconfClient> client,
-        std::shared_ptr<RootSchemaNode> root_schema,
-        const std::string & edit_method,
-        EncodingFormat encoding,
-        const std::string & config_url_root,
-        const std::string & state_url_root
-    );
+    RestconfSession(std::shared_ptr<RestconfClient> client,
+                    std::shared_ptr<RootSchemaNode> root_schema,
+                    const std::string & edit_method,
+                    EncodingFormat encoding,
+                    const std::string & config_url_root,
+                    const std::string & state_url_root);
 
     virtual ~RestconfSession();
 

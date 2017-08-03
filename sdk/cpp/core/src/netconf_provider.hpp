@@ -22,10 +22,11 @@
 
 #include "netconf_client.hpp"
 #include "path_api.hpp"
+#include "service_provider.hpp"
 
 namespace ydk {
 
-class NetconfServiceProvider : public path::ServiceProvider {
+class NetconfServiceProvider : public ServiceProvider {
 public:
         NetconfServiceProvider(path::Repository & repo,
                                const std::string& address,

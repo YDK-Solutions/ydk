@@ -1,9 +1,8 @@
 CodecServiceProvider
 ====================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: CodecServiceProvider
+.. cpp:class:: ydk::CodecServiceProvider
 
     A provider to be used with :cpp:class:`CodecService<CodecService>` for performing encoding and decoding.
 

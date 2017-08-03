@@ -1,9 +1,9 @@
 //
-// @file crud_service.hpp
-// @brief The main ydk public header.
+// @file service_provider.hpp
+// @brief Header for service provider abstract class.
 //
 // YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
+// Copyright 2017 Cisco Systems. All rights reserved
 //
 ////////////////////////////////////////////////////////////////
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -25,38 +25,27 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#ifndef EXECUTOR_SERVICE_HPP
-#define EXECUTOR_SERVICE_HPP
-
-#include <memory>
+#ifndef _SERVICE_PROVIDER_H_
+#define _SERVICE_PROVIDER_H_
 
 #include "path_api.hpp"
-#include "service_provider.hpp"
 
 
 namespace ydk
 {
 
-namespace core
+class ServiceProvider
 {
-class DataNode;
-class Session;
-}
+public:
 
-class Entity;
+    virtual ~ServiceProvider();
 
-class ExecutorService
-{
-    public:
-        ExecutorService();
-        ~ExecutorService();
-        std::shared_ptr<Entity> execute_rpc(
-            ServiceProvider & provider,
-            Entity & rpc_entity,
-            std::shared_ptr<Entity> top_entity = nullptr
-        );
+    virtual EncodingFormat get_encoding() const = 0;
+
+    virtual const path::Session& get_session() const = 0;
+
 };
 
-}
+} //namespace ydk
 
-#endif /* EXECUTOR_SERVICE_HPP */
+#endif /* _SERVICE_PROVIDER_H_ */

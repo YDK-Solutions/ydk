@@ -3,9 +3,8 @@ YCPPOperationNotSupportedError
 
 Operation Not Supported Exception.
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: YCPPOperationNotSupportedError : public YCPPError
+.. cpp:class:: ydk::YCPPOperationNotSupportedError : public YCPPError
 
     Thrown when an operation is not supported.
 

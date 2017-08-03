@@ -42,31 +42,27 @@ using namespace ydk;
 namespace ydk
 {
 
-NetconfServiceProvider::NetconfServiceProvider(
-    const string& address,
-    const string& username,
-    const string& password,
-    int port,
-    const string& protocol,
-    bool on_demand,
-    bool common_cache
-) : session {address, username, password, port, protocol, on_demand, common_cache}
+NetconfServiceProvider::NetconfServiceProvider(const string& address,
+                                               const string& username,
+                                               const string& password,
+                                               int port,
+                                               const string& protocol,
+                                               bool on_demand,
+                                               bool common_cache)
+    : session{address, username, password, port, protocol, on_demand, common_cache}
 {
-
     YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }
 
-NetconfServiceProvider::NetconfServiceProvider(
-    path::Repository & repo,
-    const string& address,
-    const string& username,
-    const string& password,
-    int port,
-    const string& protocol,
-    bool on_demand
-) : session {repo, address, username, password, port, protocol, on_demand}
+NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo,
+                                               const string& address,
+                                               const string& username,
+                                               const string& password,
+                                               int port,
+                                               const string& protocol,
+                                               bool on_demand)
+    : session{repo, address, username, password, port, protocol, on_demand}
 {
-
     YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
 }
 

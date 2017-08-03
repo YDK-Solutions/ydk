@@ -1,9 +1,8 @@
 YDK Filters
 ===========
 
-.. cpp:namespace:: ydk
 
-.. cpp:enum-class:: YFilter
+.. cpp:enum-class:: ydk::YFilter
 
     Filters as defined under netconf edit-config operation attribute in `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and read filters by leaf to be used with various :ref:`services<ref-service>` and :cpp:class:`entities<Entity>`.
 

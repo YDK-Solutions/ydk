@@ -41,31 +41,27 @@ namespace ydk
 {
 static string get_encoding_string(EncodingFormat encoding);
 
-RestconfServiceProvider::RestconfServiceProvider(
-    path::Repository & repo,
-    const string & address,
-    const string & username,
-    const string & password,
-    int port,
-    EncodingFormat encoding,
-    const string & config_url_root,
-    const string & state_url_root)
-    :
-    encoding(encoding),
-    session {repo, address, username, password, port, encoding, config_url_root, state_url_root}
+RestconfServiceProvider::RestconfServiceProvider(path::Repository & repo,
+                                                 const string & address,
+                                                 const string & username,
+                                                 const string & password,
+                                                 int port,
+                                                 EncodingFormat encoding,
+                                                 const string & config_url_root,
+                                                 const string & state_url_root)
+    : encoding(encoding),
+      session{repo, address, username, password, port, encoding, config_url_root, state_url_root}
 {
 }
 
-RestconfServiceProvider::RestconfServiceProvider(
-    std::unique_ptr<RestconfClient> client,
-    std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
-    const std::string & edit_method,
-    const std::string & config_url_root,
-    const std::string & state_url_root,
-    EncodingFormat encoding)
-    :
-    encoding(encoding),
-    session{move(client), root_schema, edit_method, encoding, config_url_root, state_url_root}
+RestconfServiceProvider::RestconfServiceProvider(std::unique_ptr<RestconfClient> client,
+                                                 std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
+                                                 const std::string & edit_method,
+                                                 const std::string & config_url_root,
+                                                 const std::string & state_url_root,
+                                                 EncodingFormat encoding)
+    : encoding(encoding),
+      session{move(client), root_schema, edit_method, encoding, config_url_root, state_url_root}
 {
 }
 

@@ -1,9 +1,8 @@
 RestconfServiceProvider
 ========================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: RestconfServiceProvider : public ServiceProvider
+.. cpp:class:: ydk::RestconfServiceProvider : public ServiceProvider
 
     Implementation of :cpp:class:`ServiceProvider<ServiceProvider>` for the `restconf <https://tools.ietf.org/html/draft-ietf-netconf-restconf-18>`_ protocol.
 

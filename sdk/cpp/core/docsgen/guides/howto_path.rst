@@ -44,4 +44,4 @@ Almost the same XPath is accepted by :cpp:class:`SchemaNode<SchemaNode>` methods
 
 .. note::
 
-In all cases the node's prefix is specified as the name of the appropriate YANG schema. Any node can be prefixed by the module name. However, if the prefix is omitted, the module name is inherited from the previous (parent) node. It means, that the first node in the path is always supposed to have a prefix.
+    In all cases the node's prefix is specified as the name of the appropriate YANG schema. Any node can be prefixed by the module name. However, if the prefix is omitted, the module name is inherited from the previous (parent) node. It means, that the first node in the path is always supposed to have a prefix.

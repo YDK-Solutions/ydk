@@ -17,16 +17,20 @@
 #ifndef _NETCONF_MODEL_PROVIDER_H_
 #define _NETCONF_MODEL_PROVIDER_H_
 
-#include <memory>
 #include <string>
 
-#include "path_api.hpp"
-#include "netconf_client.hpp"
+#include "../netconf_client.hpp"
+#include "../path_api.hpp"
+#include "../service_provider.hpp"
 
-namespace ydk {
+namespace ydk
+{
 
+namespace path
+{
 
-class NetconfModelProvider : public path::ModelProvider {
+class NetconfModelProvider : public path::ModelProvider
+{
 public:
         NetconfModelProvider(NetconfClient & client);
 
@@ -38,6 +42,9 @@ public:
 private:
         NetconfClient & client;
 };
-}
+
+} //namespace path
+
+} //namespace ydk
 
 #endif /*_NETCONF_MODEL_PROVIDER_H_*/

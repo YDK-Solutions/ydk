@@ -2,11 +2,9 @@ YCPPPathError
 =============
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::YCPPPathError : public YCPPCoreError
 
-.. cpp:class:: YCPPPathError : public YCPPCoreError
-
-    Exception that encapsualtes the validation errors for YDK Path.
+    Exception that encapsulates the validation errors for YDK Path.
 
     .. cpp:member:: Error err
 

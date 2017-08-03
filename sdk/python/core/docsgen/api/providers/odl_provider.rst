@@ -1,10 +1,8 @@
 Opendaylight Service Provider
 =============================
 
-.. module:: ydk.providers
-    :synopsis: YDK Opendaylight Service provider
 
-.. py:class:: OpendaylightServiceProvider(repo, address, username, password, port, encoding)
+.. py:class:: ydk.providers.OpendaylightServiceProvider(repo, address, username, password, port, encoding)
 
     A service provider to be used to communicate with an OpenDaylight instance.
 

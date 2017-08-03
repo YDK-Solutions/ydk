@@ -1,9 +1,8 @@
 Netconf Service
 ===============
 
-.. cpp:namespace:: ydk
 
-.. cpp:enum-class:: Datastore
+.. cpp:enum-class:: ydk::Datastore
 
     Type of datastore to perform operation on.
 

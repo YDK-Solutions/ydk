@@ -2,11 +2,9 @@ Statement
 =========
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::Statement
 
-.. cpp:class:: Statement
-
-Represents the YANG :cpp:class:`Statement<Statement>`.
+    Represents the YANG :cpp:class:`Statement<Statement>`.
 
     .. cpp:member:: std::string keyword
 

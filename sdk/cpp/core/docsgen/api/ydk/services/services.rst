@@ -3,7 +3,6 @@
 Service
 =======
 
-.. cpp:namespace:: ydk
 
 .. toctree::
    :maxdepth: 2

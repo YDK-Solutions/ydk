@@ -9,9 +9,8 @@ Types
 
 The C++ types present in ydk namespace corresponding to YANG types. See below for example usage.
 
-.. cpp:namespace:: ydk
 
-.. cpp:enum-class:: EncodingFormat
+.. cpp:enum-class:: ydk::EncodingFormat
 
     Format of encoding to be used when creating the payload.
 
@@ -24,7 +23,7 @@ The C++ types present in ydk namespace corresponding to YANG types. See below fo
         JSON
 
 
-.. cpp:enum-class:: Protocol
+.. cpp:enum-class:: ydk::Protocol
 
     Type of protocol.
 
@@ -37,21 +36,12 @@ The C++ types present in ydk namespace corresponding to YANG types. See below fo
         Restconf protocol
 
 
-.. cpp:class:: Entity
-
-Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
-
-    .. cpp:member:: YFilter filter
-
-        Optional attribute of the Entity class which can be set to perform various :cpp:class:`filtering<YFilter>`
-
-
 YANG container and list
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:class:: Entity
+.. cpp:class:: ydk::Entity
 
-Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
+    Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
 
     .. cpp:member:: YFilter filter
 
@@ -60,9 +50,9 @@ Super class of all classes that represents containers in YANG. YANG lists are re
 YANG leaf and leaf-list
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. cpp:class:: YLeaf
+.. cpp:class:: ydk::YLeaf
 
-Concrete class that represents a YANG leaf to which data can be assigned.
+    Concrete class that represents a YANG leaf to which data can be assigned.
 
     .. cpp:member:: YFilter filter
 
@@ -70,7 +60,7 @@ Concrete class that represents a YANG leaf to which data can be assigned.
 
 .. cpp:class:: YLeafList
 
-Concrete class that represents a YANG leaf-list to which multiple instances of data can be appended to.
+    Concrete class that represents a YANG leaf-list to which multiple instances of data can be appended to.
 
     .. cpp:member:: YFilter filter
 
@@ -79,25 +69,25 @@ Concrete class that represents a YANG leaf-list to which multiple instances of d
 YANG type
 ~~~~~~~~~~
 
-.. cpp:class:: Bits
+.. cpp:class:: ydk::Bits
 
-Concrete class representing a bits data type.
+    Concrete class representing a bits data type.
 
-.. cpp:class:: Decimal64
+.. cpp:class:: ydk::Decimal64
 
-Concrete class representing a decimal64 data type.
+    Concrete class representing a decimal64 data type.
 
-.. cpp:class:: Empty
+.. cpp:class:: ydk::Empty
 
-Represents the empty type in YANG. The empty built-in type represents a leaf that does not have any value, it conveys information by its presence or absence.
+    Represents the empty type in YANG. The empty built-in type represents a leaf that does not have any value, it conveys information by its presence or absence.
 
-.. cpp:class:: Enum
+.. cpp:class:: ydk::Enum
 
-Super class of all classes that represents the enumeration type in YANG.
+    Super class of all classes that represents the enumeration type in YANG.
 
-.. cpp:class:: Identity
+.. cpp:class:: ydk::Identity
 
-Super class of all classes that represents the identity type in YANG. Instances of this type of classes are assigned as data to leafs of ``identityref`` type.
+    Super class of all classes that represents the identity type in YANG. Instances of this type of classes are assigned as data to leafs of ``identityref`` type.
 
 Example usage
 ~~~~~~~~~~~~~~~

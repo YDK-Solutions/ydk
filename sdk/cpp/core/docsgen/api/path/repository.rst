@@ -3,11 +3,10 @@
 Repository
 ==========
 
-.. cpp:namespace:: ydk::path
 
-.. cpp:class:: Repository
+.. cpp:class:: ydk::path::Repository
 
-The Repository is responsible for loading module locally or downloading module remotely if certain model providers are provided; It holds a variable pointing to the location for model downloads and could be used as a factory class to create :cpp:class:`RootSchemaNode<RootSchemaNode>` based on a list of :cpp:class:`Capability<Capability>` passed in or list of capability lookup tables and a list of :cpp:class:`Capability<Capability>` passed in.
+    The Repository is responsible for loading module locally or downloading module remotely if certain model providers are provided; It holds a variable pointing to the location for model downloads and could be used as a factory class to create :cpp:class:`RootSchemaNode<RootSchemaNode>` based on a list of :cpp:class:`Capability<Capability>` passed in or list of capability lookup tables and a list of :cpp:class:`Capability<Capability>` passed in.
 
     .. cpp:member:: std::string path
 

@@ -1,10 +1,8 @@
 NETCONF Service Provider
 ========================
 
-.. module:: ydk.providers
-    :synopsis: NETCONF Service provider
 
-.. py:class:: NetconfServiceProvider(address, username, password, port=830, protocol='ssh', repo=None)
+.. py:class:: ydk.providers.NetconfServiceProvider(address, username, password, port=830, protocol='ssh', repo=None)
 
     Constructs an instance of the ``NetconfServiceProvider`` to connect to a server which **has** to support model download. Since the class is a Python wrapper for C++ ``NetconfServiceProvider`` class, which has clean up methods implemented in its destructor. The user does not need to worry about close NETCONF session.
 

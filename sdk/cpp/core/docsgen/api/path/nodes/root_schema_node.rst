@@ -1,14 +1,12 @@
 RootSchemaNode
 ==============
 
-.. cpp:namespace:: ydk::path
 
 Instances of this class represent the Root of the SchemaTree.
-A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:class:`DataNode<DataNode>` tree or an :cpp:class:`Rpc<Rpc>` object. The children of the :cpp:class:`RootSchemaNode<RootSchemaNode>` represent the top level :cpp:class:`SchemaNode<SchemaNode>` in the YANG module submodules.
 
-.. cpp:class:: RootSchemaNode : public SchemaNode
+.. cpp:class:: ydk::path::RootSchemaNode : public SchemaNode
 
-    Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaNode>` Tree.
+    Instances of this class represent the Root of the :cpp:class:`SchemaNode<SchemaNode>` Tree. A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:class:`DataNode<DataNode>` tree or an :cpp:class:`Rpc<Rpc>` object. The children of the :cpp:class:`RootSchemaNode<RootSchemaNode>` represent the top level :cpp:class:`SchemaNode<SchemaNode>` in the YANG module submodules.
 
     .. cpp:function:: virtual ~RootSchemaNode()
 
@@ -43,13 +41,13 @@ A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:
 
         :return: The children of this node.
 
-    .. cpp:function:: virtual const SchemaNode* get_root() const noexcept
+    .. cpp:function:: virtual const SchemaNode& get_root() const noexcept
 
         Get the root of NodeTree this node is part of.
 
-        :return: The pointer to the root.
+        :return: Reference to the root.
 
-    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode& create_datanode(const std::string& path, const std::string& value) const
 
         Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
 
@@ -63,13 +61,13 @@ A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:
 
         :param path: The XPath expression identifying the node relative to the root of the schema tree.
         :param value: The string representation of the value to set.
-        :return: Pointer to :cpp:class:`DataNode<DataNode>` created.
+        :return: Reference to :cpp:class:`DataNode<DataNode>` created.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
-    .. cpp:function:: virtual DataNode* create_datanode(const std::string& path, const std::string& value) const
+    .. cpp:function:: virtual DataNode& create_datanode(const std::string& path) const
 
-        Create a :cpp:class:`DataNode<DataNode>` corresponding to the path and set its value.
+        Create a :cpp:class:`DataNode<DataNode>` corresponding to the path.
 
         This methods creates a DataNode tree based on the path passed in. The path expression must identify a single node. If the last node created is of schema type ``list``, ``leaf-list`` or ``anyxml`` that value is also set in the node.
 
@@ -80,7 +78,7 @@ A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:
         Note in the case of List nodes the keys must be present in the path expression in the form of predicates.
 
         :param path: The XPath expression identifying the node.
-        :return: :cpp:class:`DataNode<DataNode>` created or ``nullptr``.
+        :return: Reference to :cpp:class:`DataNode<DataNode>` created.
         :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
         :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
@@ -100,9 +98,9 @@ A :cpp:class:`RootSchemaNode<RootSchemaNode>` can be used to instantiate a :cpp:
 
             :return: Vector of :cpp:class:`Statement` that represent keys.
 
-    .. cpp:function:: virtual Rpc* create_rpc(const std::string& path) const
+    .. cpp:function:: virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) const
 
-        Create an :cpp:class:`Rpc<Rpc>` instance.
+        Create rpc and return pointer to this rpc.
 
         The path expression should point to a :cpp:class:`SchemaNode<SchemaNode>` that represents the :cpp:class:`Rpc<Rpc>`.
 

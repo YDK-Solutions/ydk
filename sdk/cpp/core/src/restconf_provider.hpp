@@ -22,11 +22,12 @@
 #include <string>
 
 #include "path_api.hpp"
+#include "service_provider.hpp"
 
 namespace ydk {
 
 
-class RestconfServiceProvider : public path::ServiceProvider {
+class RestconfServiceProvider : public ServiceProvider {
 public:
         RestconfServiceProvider(path::Repository & repo,
                                const std::string & address,

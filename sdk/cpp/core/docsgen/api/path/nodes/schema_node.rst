@@ -4,9 +4,7 @@ SchemaNode
 ==========
 
 
-.. cpp:namespace:: ydk::path
-
-.. cpp:class:: SchemaNode
+.. cpp:class:: ydk::path::SchemaNode
 
     Represents a Node in the SchemaTree.
 

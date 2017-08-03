@@ -2,11 +2,9 @@ Capability
 ==========
 
 
-.. cpp:namespace:: ydk::path
+.. cpp:class:: ydk::path::Capability
 
-.. cpp:class:: Capability
-
-An instance of Capability consists of module name, revision, a the set of enabled features defined in this modules as well as the list of deviation modules.
+    An instance of Capability consists of module name, revision, a the set of enabled features defined in this modules as well as the list of deviation modules.
 
     .. cpp:member:: std::string module
 

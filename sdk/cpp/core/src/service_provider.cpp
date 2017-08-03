@@ -25,11 +25,12 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include "path_api.hpp"
+#include "service_provider.hpp"
+
 
 namespace ydk {
 
-path::ServiceProvider::~ServiceProvider()
+ServiceProvider::~ServiceProvider()
 {
 }
 

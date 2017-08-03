@@ -1,9 +1,8 @@
 YCPPInvalidArgumentError
 ========================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: YCPPInvalidArgumentError : public YCPPError
+.. cpp:class:: ydk::YCPPInvalidArgumentError : public YCPPError
 
     Use the msg for the error.
 

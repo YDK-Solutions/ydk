@@ -8,11 +8,11 @@ Path API Nodes
 .. toctree::
    :maxdepth: 2
 
+   nodes/annotation.rst
+   nodes/statement.rst
    nodes/data_node.rst
    nodes/schema_node.rst
    nodes/root_schema_node.rst
-   nodes/annotation.rst
-   nodes/statement.rst
 
 Path API Sessions
 ~~~~~~~~~~~~~~~~~
@@ -30,8 +30,8 @@ Path API Errors
 .. toctree::
    :maxdepth: 2
 
-   errors/core_error.rst
    errors/codec_error.rst
+   errors/core_error.rst
    errors/data_validation_error.rst
    errors/path_error.rst
 
@@ -42,11 +42,9 @@ Path API
    :maxdepth: 2
 
    capability.rst
-   repository.rst
-   model_provider.rst
-   rpc.rst
-   .. validation_service.rst
    codec.rst
-   service_provider.rst
+   model_provider.rst
+   repository.rst
+   rpc.rst
    types.rst
-
+   validation_service.rst

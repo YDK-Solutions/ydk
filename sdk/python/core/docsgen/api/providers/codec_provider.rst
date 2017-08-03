@@ -1,10 +1,8 @@
 Codec Service Provider
 ======================
 
-.. module:: ydk.providers
-    :synopsis: YDK Codec Service provider
 
-.. py:class:: CodecServiceProvider(type=EncodingFormat.XML, repo=None)
+.. py:class:: ydk.providers.CodecServiceProvider(type=EncodingFormat.XML, repo=None)
 
     A provider to be used with :py:class:`CodecService<ydk.services.CodecService>` for performing encoding and decoding.
 

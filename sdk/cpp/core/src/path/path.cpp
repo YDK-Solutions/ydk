@@ -22,12 +22,12 @@
 //////////////////////////////////////////////////////////////////
 
 
-#include "path_private.hpp"
 #include <pcre.h>
-#include <iostream>
 #include <fstream>
 #include <sstream>
+
 #include "../logger.hpp"
+#include "path_private.hpp"
 
 #define SLASH_CHAR "##SLASH##"
 

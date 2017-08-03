@@ -21,12 +21,12 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-#include "executor_service.hpp"
-#include "types.hpp"
 #include "entity_data_node_walker.hpp"
+#include "executor_service.hpp"
 #include "logger.hpp"
+#include "service_provider.hpp"
+#include "types.hpp"
+
 
 using namespace std;
 
@@ -46,7 +46,7 @@ ExecutorService::~ExecutorService()
 {
 }
 
-shared_ptr<Entity> ExecutorService::execute_rpc(path::ServiceProvider& provider,
+shared_ptr<Entity> ExecutorService::execute_rpc(ServiceProvider& provider,
     Entity & rpc_entity, std::shared_ptr<Entity> top_entity)
 {
     // Get the yfilter - RPC Name

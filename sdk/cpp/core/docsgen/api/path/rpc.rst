@@ -3,15 +3,14 @@
 Rpc
 ===
 
-.. cpp:namespace:: ydk::path
 
-.. cpp:class:: Rpc
+.. cpp:class:: ydk::path::Rpc
 
-An instance of the YANG schmea rpc node.
+    An instance of the YANG schmea rpc node.
 
-Instances of this class represent a YANG rpc and are modelled as Callables.
+    Instances of this class represent a YANG rpc and are modelled as Callables.
 
-The input data node tree is used to populate the input parameters to the rpc if any. The Callable takes as a parameter the :cpp:class:`Session<Session>` that can execute this rpc as its parameter returning a pointer to a :cpp:class:`DataNode<DataNode>` tree if output is available.
+    The input data node tree is used to populate the input parameters to the rpc if any. The Callable takes as a parameter the :cpp:class:`Session<Session>` that can execute this rpc as its parameter returning a pointer to a :cpp:class:`DataNode<DataNode>` tree if output is available.
 
     .. cpp:function:: virtual ~Rpc()
 

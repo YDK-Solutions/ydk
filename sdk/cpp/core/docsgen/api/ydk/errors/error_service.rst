@@ -1,9 +1,8 @@
 YCPPServiceError
 ================
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: YCPPServiceError : public YCPPError
+.. cpp:class:: ydk::YCPPServiceError : public YCPPError
 
     Exception for service.
 

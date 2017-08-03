@@ -1,7 +1,7 @@
 ServiceProvider
 ===============
 
-.. module:: ydk.path
+.. module:: ydk.providers
     :synopsis: Path API' ServiceProvider
 
 

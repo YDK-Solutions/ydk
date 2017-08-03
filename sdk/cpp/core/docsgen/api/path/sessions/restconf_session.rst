@@ -1,11 +1,10 @@
 RestconfSession
 ===============
 
-.. cpp:namespace:: ydk::path
 
-.. cpp:class:: RestconfSession : public path::Session
+.. cpp:class:: ydk::path::RestconfSession : public path::Session
 
-Implementation of :cpp:class:`Session<Session>` for the `restconf <https://tools.ietf.org/html/draft-ietf-netconf-restconf-18>`_ protocol.
+    Implementation of :cpp:class:`Session<Session>` for the `restconf <https://tools.ietf.org/html/draft-ietf-netconf-restconf-18>`_ protocol.
 
     .. cpp:function::RestconfSession(\
         path::Repository& repo,\

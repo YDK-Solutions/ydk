@@ -1,9 +1,8 @@
 CRUD Service
 ============
 
-.. cpp:namespace:: ydk
 
-.. cpp:class:: CrudService
+.. cpp:class:: ydk::CrudService
 
     CRUD Service class for supporting CRUD operations on entities.
 

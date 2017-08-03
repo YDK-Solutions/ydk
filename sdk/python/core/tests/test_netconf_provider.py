@@ -1,5 +1,5 @@
 #  ----------------------------------------------------------------
-# Copyright 2016 Cisco Systems
+# Copyright 2017 Cisco Systems
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,21 +22,23 @@ from __future__ import absolute_import
 import os
 import unittest
 
-from ydk.providers import RestconfServiceProvider
-from ydk.types import EncodingFormat
+from ydk.providers import NetconfServiceProvider
+from ydk.path.sessions import NetconfSession
 from ydk.path import Repository
-from ydk.path import Codec
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
-    def setUpClass(self):
-        # Need to keep a local reference for repo to keep it alive
-        repo_path = os.path.dirname(__file__)
-        repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
-        self.repo = Repository(repo_path)
-        self.restconf_provider = RestconfServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
+    def setUpClass(cls):
+        hostname = getattr(cls, 'hostname', '127.0.0.1')
+        username = getattr(cls, 'username', 'admin')
+        password = getattr(cls, 'password', 'admin')
+        port = getattr(cls, 'port', 12022)
+        protocol = getattr(cls, 'protocol', 'ssh')
+        on_demand = not getattr(cls, 'non_demand', True)
+        common_cache = getattr(cls, "common_cache", False)
+        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
 
     @classmethod
     def tearDownClass(self):
@@ -49,12 +51,16 @@ class SanityTest(unittest.TestCase):
         pass
 
     def test_get_session(self):
-        session = self.restconf_provider.get_session()
+        session = self.ncc.get_session()
         self.assertEqual(session is not None, True)
 
     def test_get_encoding(self):
-        encoding = self.restconf_provider.get_encoding()
+        encoding = self.ncc.get_encoding()
         self.assertEqual(encoding is not None, True)
+
+    def test_get_capabilities(self):
+        capabilities = self.ncc.get_capabilities()
+        self.assertEqual(capabilities is not None, True)
 
 
 if __name__ == '__main__':

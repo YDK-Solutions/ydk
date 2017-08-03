@@ -276,16 +276,6 @@ PYBIND11_PLUGIN(ydk_)
         .def(init<const string &, const string &, const string &>(),
             arg("namespace"), arg("name"), arg("value"));
 
-    class_<ydk::RestconfClient>(clients, "RestconfClient")
-        .def(init<const std::string&, const std::string&, const std::string&, int, const std::string&>(),
-             arg("address"),
-             arg("username"),
-             arg("password"),
-             arg("port"),
-             arg("encoding"))
-        .def("execute", &ydk::RestconfClient::execute, return_value_policy::reference)
-        .def("get_capabilities", &ydk::RestconfClient::get_capabilities, return_value_policy::reference);
-
     class_<ydk::path::Session>(path, "Session")
         .def("get_root_schema", &ydk::path::Session::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::Session::invoke, return_value_policy::reference);
@@ -637,7 +627,8 @@ PYBIND11_PLUGIN(ydk_)
             arg("on_demand")=true,
             arg("common_cache")=false)
         .def("get_encoding", &ydk::NetconfServiceProvider::get_encoding, return_value_policy::reference)
-        .def("get_session", &ydk::NetconfServiceProvider::get_session, return_value_policy::reference);
+        .def("get_session", &ydk::NetconfServiceProvider::get_session, return_value_policy::reference)
+        .def("get_capabilities", &ydk::NetconfServiceProvider::get_capabilities, return_value_policy::reference);
 
     class_<ydk::RestconfServiceProvider, ydk::ServiceProvider>(providers, "RestconfServiceProvider")
         .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>(),

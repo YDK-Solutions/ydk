@@ -162,6 +162,11 @@ NetconfSession::~NetconfSession()
     YLOG_INFO("Disconnected from device");
 }
 
+std::vector<std::string> NetconfSession::get_capabilities() const
+{
+    return server_capabilities;
+}
+
 path::RootSchemaNode& NetconfSession::get_root_schema() const
 {
     return *root_schema;

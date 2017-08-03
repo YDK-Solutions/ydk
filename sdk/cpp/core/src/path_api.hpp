@@ -1026,6 +1026,7 @@ public:
 
     virtual RootSchemaNode& get_root_schema() const;
     virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    std::vector<std::string> get_capabilities() const;
 
 private:
     std::shared_ptr<DataNode> handle_edit(

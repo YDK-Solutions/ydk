@@ -81,4 +81,9 @@ const path::Session& NetconfServiceProvider::get_session() const
     return session;
 }
 
+std::vector<std::string> NetconfServiceProvider::get_capabilities() const
+{
+    return session.get_capabilities();
+}
+
 }

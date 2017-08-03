@@ -32,12 +32,9 @@ TEST_CASE("CreateP")
     CHECK_NOTHROW(provider.get_encoding());
 }
 
-
 TEST_CASE("CreateNoRepoP")
 {
-
     NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12022};
-
     CHECK_NOTHROW(provider.get_encoding());
 }
 
@@ -45,4 +42,9 @@ TEST_CASE("CreateNoRepoPTCP")
 {
     NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12307, "tcp"};
     CHECK_NOTHROW(provider.get_encoding());
+}
+
+TEST_CASE("get_capabilities")
+{    NetconfServiceProvider provider{ "127.0.0.1", "admin", "admin", 12022};
+    CHECK_NOTHROW(provider.get_capabilities);
 }

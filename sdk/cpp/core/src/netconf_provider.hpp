@@ -45,6 +45,7 @@ public:
         ~NetconfServiceProvider();
         EncodingFormat get_encoding() const;
         const path::Session& get_session() const;
+        std::vector<std::string> get_capabilities() const;
 
 private:
         const path::NetconfSession session;

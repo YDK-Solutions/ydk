@@ -42,77 +42,79 @@ namespace ydk
 
 namespace path
 {
-
 static const std::string default_capabilities_url = "/ietf-restconf-monitoring:restconf-state/capabilities";
 
 static std::shared_ptr<path::DataNode> handle_read_reply(const string & reply, path::RootSchemaNode & root_schema, EncodingFormat encoding);
-
-static path::SchemaNode* get_schema_for_operation(
-    path::RootSchemaNode & root_schema,
-    const string & yfilter
-);
-
+static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, const string & yfilter);
 static string get_encoding_string(EncodingFormat encoding);
 
-// sets client, encoding, state_url_root, edit_method
-RestconfSession::RestconfSession(
-    path::Repository & repo,
-    const string & address,
-    const string & username,
-    const string & password,
-    int port,
-    EncodingFormat encoding,
-    const string & config_url_root,
-    const string & state_url_root)
-    :
-    client(make_shared<RestconfClient>(
-        address, username, password, port, get_encoding_string(encoding))),
-    encoding(encoding),
-    config_url_root(config_url_root),
-    state_url_root(state_url_root)
+static bool is_config(path::Rpc & rpc);
+static string get_module_url_path(const string & path);
+
+RestconfSession::RestconfSession(path::Repository & repo,
+                                 const string & address,
+                                 const string & username,
+                                 const string & password,
+                                 int port,
+                                 EncodingFormat encoding,
+                                 const string & config_url_root,
+                                 const string & state_url_root)
+    : client(make_shared<RestconfClient>(address,
+                                         username,
+                                         password,
+                                         port,
+                                         get_encoding_string(encoding))),
+      encoding(encoding),
+      config_url_root(config_url_root),
+      state_url_root(state_url_root)
 {
     edit_method = "PATCH";
     initialize(repo);
 }
 
-// sets client, encoding, state_url_root, edit_method, root_schema
-RestconfSession::RestconfSession(
-    std::shared_ptr<RestconfClient> client,
-    std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
-    const std::string & edit_method,
-    EncodingFormat encoding,
-    const std::string & config_url_root,
-    const std::string & state_url_root)
-    :
-    client(move(client)),
-    root_schema(move(root_schema)),
-    edit_method(edit_method),
-    encoding(encoding),
-    config_url_root(config_url_root),
-    state_url_root(state_url_root)
+RestconfSession::RestconfSession(std::shared_ptr<RestconfClient> client,
+                                 std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
+                                 const std::string & edit_method,
+                                 EncodingFormat encoding,
+                                 const std::string & config_url_root,
+                                 const std::string & state_url_root)
+    : client(move(client)),
+      root_schema(move(root_schema)),
+      encoding(encoding),
+      edit_method(edit_method),
+      config_url_root(config_url_root),
+      state_url_root(state_url_root)
 {
 }
 
-// sets server_capabilities and root_schema
 void RestconfSession::initialize(path::Repository & repo)
 {
     vector<path::Capability> capabilities;
     IetfCapabilitiesParser capabilities_parser{};
     IetfCapabilitiesXmlParser capabilities_xml_parser{};
-    server_capabilities = capabilities_xml_parser.parse(
-        client->get_capabilities(
-            state_url_root + default_capabilities_url,
-            get_encoding_string(EncodingFormat::XML)
-        )
-    );
+    edit_method = "PATCH";
+    server_capabilities = capabilities_xml_parser.parse
+                    (
+                    client->get_capabilities
+                                (
+                                state_url_root + default_capabilities_url, get_encoding_string(EncodingFormat::XML)
+                                )
+                    );
+
+    auto lookup_tables = capabilities_parser.get_lookup_tables(server_capabilities);
     capabilities = capabilities_parser.parse(server_capabilities);
 
-    root_schema = repo.create_root_schema(capabilities);
+    root_schema = repo.create_root_schema(lookup_tables, capabilities);
 }
 
 RestconfSession::~RestconfSession()
 {
     YLOG_INFO("Disconnected from device");
+}
+
+path::RootSchemaNode& RestconfSession::get_root_schema() const
+{
+    return *root_schema;
 }
 
 std::shared_ptr<path::DataNode> RestconfSession::invoke(
@@ -147,36 +149,7 @@ std::shared_ptr<path::DataNode> RestconfSession::invoke(
     return datanode;
 }
 
-path::RootSchemaNode& RestconfSession::get_root_schema() const
-{
-    return *root_schema;
-}
-
-static string get_module_url_path(const string & path)
-{
-    auto top = path.find_last_of("/");
-    auto t = path.substr(top+1, path.size()-top);
-
-    if(t.find(":") != string::npos)
-        return "/"+t;
-
-    auto begin = path.find(":");
-    auto mod = path.substr(0,begin);
-
-    return mod+string(":")+t;
-}
-
-static bool is_config(path::Rpc & rpc)
-{
-    if(!rpc.get_input_node().find("only-config").empty())
-    {
-        return true;
-    }
-    return false;
-}
-
-std::shared_ptr<path::DataNode> RestconfSession::handle_read(
-    path::Rpc& rpc) const
+std::shared_ptr<path::DataNode> RestconfSession::handle_read(path::Rpc& rpc) const
 {
     path::Codec codec_service{};
 
@@ -205,8 +178,7 @@ std::shared_ptr<path::DataNode> RestconfSession::handle_read(
     return handle_read_reply( client->execute("GET", url, ""), *root_schema, encoding);
 }
 
-std::shared_ptr<path::DataNode> RestconfSession::handle_edit(
-    path::Rpc& rpc, const string & yfilter) const
+std::shared_ptr<path::DataNode> RestconfSession::handle_edit(path::Rpc& rpc, const string & yfilter) const
 {
     path::Codec codec_service{};
     auto entity = rpc.get_input_node().find("entity");
@@ -240,8 +212,7 @@ static std::shared_ptr<path::DataNode> handle_read_reply(const string & reply, p
     return datanode;
 }
 
-static path::SchemaNode* get_schema_for_operation(
-    path::RootSchemaNode & root_schema, const string & yfilter)
+static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, const string & yfilter)
 {
     auto c = root_schema.find(yfilter);
     if(c.empty())
@@ -257,6 +228,29 @@ static string get_encoding_string(EncodingFormat encoding)
     return (encoding == EncodingFormat::XML)?
         ("application/yang-data+xml"):
         ("application/yang-data+json");
+}
+
+static string get_module_url_path(const string & path)
+{
+    auto top = path.find_last_of("/");
+    auto t = path.substr(top+1, path.size()-top);
+
+    if(t.find(":") != string::npos)
+        return "/"+t;
+
+    auto begin = path.find(":");
+    auto mod = path.substr(0,begin);
+
+    return mod+string(":")+t;
+}
+
+static bool is_config(path::Rpc & rpc)
+{
+    if(!rpc.get_input_node().find("only-config").empty())
+    {
+        return true;
+    }
+    return false;
 }
 
 } //namespace path

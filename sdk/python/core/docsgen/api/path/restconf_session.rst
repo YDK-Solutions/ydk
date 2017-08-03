@@ -5,11 +5,9 @@ RestconfSession
     :synopsis: RestconfSession
 
 
-.. py:class:: RestconfSession
-
-    .. py:method:: __init__(\
+.. py:class:: RestconfSession(\
             repo, address, username, password, port=80, \
-            encoding=_EncodingFormat.JSON, \
+            encoding=EncodingFormat.JSON, \
             config_url_root="/data", state_url_root="/data")
 
         :param repo: (:py:class:`Repository`) Reference to an instance of :py:class:`Repository<Repository>`

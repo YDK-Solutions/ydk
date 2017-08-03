@@ -25,12 +25,10 @@ and :class:`~YType`.
 
     Represents a YANG built-in bits type.
 
-    .. method:: __init__(self):
+    Instantiate a bit object::
 
-        Instantiate a bit object::
-
-            >>> from ydk.types import Bits
-            >>> bits = Bits()
+        >>> from ydk.types import Bits
+        >>> bits = Bits()
 
     .. method:: __setitem__(self, name, value):
 
@@ -52,16 +50,16 @@ and :class:`~YType`.
             >>> bits.get_bitmap()
             {'disable-nagle': False}
 
-.. class:: Decimal64
+.. class:: Decimal64(value)
 
     Represents a YANG built-in decimal64 type.
 
-    .. method:: __init__(self, value):
+    :param value: (``str``) String representation of value:
 
-        Instantiate a decimal64 object::
+    Instantiate a decimal64 object::
 
-            >>> from ydk.types import Decimal64
-            >>> decimal = Decimal64('922337203685.4775807')
+        >>> from ydk.types import Decimal64
+        >>> decimal = Decimal64('922337203685.4775807')
 
     .. attribute:: value
 
@@ -74,12 +72,10 @@ and :class:`~YType`.
 
     Represents a YANG built-in empty type.
 
-    .. method:: __init__(self):
+    Instantiate an empty object::
 
-        Instantiate an empty object::
-
-            >>> from ydk.types import Empty
-            >>> empty = Empty()
+        >>> from ydk.types import Empty
+        >>> empty = Empty()
 
 .. class:: Enum
 
@@ -122,21 +118,18 @@ YDK types
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
 
-.. class:: YLeaf
+.. class:: YLeaf(leaf_type, name)
 
     Concrete class that represents a YANG ``leaf`` to which data can be assigned.
+
+    Create a ``YLeaf`` instance.
+
+    :param leaf_type: (:py:class:`YType`) YANG type for this ``leaf``.
+    :param name: (``str``) YANG argument for this leaf.
 
     .. py:attribute:: operation
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
-
-    .. py:method:: __init__(self, leaf_type, name):
-
-        Create a ``YLeaf`` instance.
-
-        :param leaf_type: YANG type for this ``leaf``.
-        :type leaf_type: :py:class:`YType`
-        :param name: (``str``) YANG argument for this leaf.
 
     .. py:method:: set(self, value):
 
@@ -155,32 +148,22 @@ YDK types
         >>> from ydk.types import YLeaf, YType
         >>> yleaf = YLeaf(YType.int8, 'afi-safi-name')
 
-.. class:: YLeafList
+.. class:: YLeafList(self, leaflist_type, name)
 
     Concrete class that represents a YANG ``leaf-list`` to which multiple instances of data can be appended to.
 
-    .. py:method:: __init__(self, leaflist_type, name):
-
-        Create a ``YLeafList`` instance.
-
-        :param leaflist_type: YANG type for this ``leaf-list``.
-        :type leaflist_type: :py:class:`YType`
-        :param name: (``str``) YANG argument for this ``leaf-list``.
+    :param leaflist_type: (:py:class:`YType`) YANG type for this ``leaf-list``.
+    :param name: (``str``) YANG argument for this ``leaf-list``.
 
     .. py:method:: append(self, value):
 
         Append value to current ``leaf-list``.
 
-.. class:: YList
+.. class:: YList(parent)
 
     Concrete class that represents a YANG ``list``, with pointer to its parent.
 
-    .. py:method:: __init__(self, parent):
-
-        Create a ``YList`` instance.
-
-        :param parent: Parent YDK ``Entity`` object.
-        :type parent: :py:class:`Entity<ydk.types.Entity>`
+    :param parent: (:py:class:`Entity<ydk.types.Entity>`) Parent YDK ``Entity`` object.
 
     .. py:method:: append(self, item):
 

@@ -17,6 +17,7 @@ Linux
 Ubuntu (Debian-based)
 
 .. code-block:: sh
+
    $ sudo apt-get install gdebi-core
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
    $ sudo gdebi libydk_0.6.0-1_amd64.deb

@@ -18,9 +18,9 @@ Executor Service
 
         :return: An instance of :py:class:`Entity<ydk.types.Entity>` when provided top_entity or None otherwise
 
-        :raises ydk.errors.YPYDataValidationError: if validation error has occurred
-        :raises ydk.errors.YPYError: if other error has occurred
+        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
         Possible Errors:
+
         * a server side error
         * there isn't enough information in the entity to prepare the message (eg. missing keys)

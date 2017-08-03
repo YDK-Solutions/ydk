@@ -27,16 +27,6 @@ from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
 
-# import logging
-# logger = logging.getLogger("ydk")
-# logger.setLevel(logging.DEBUG)
-# handler = logging.StreamHandler()
-# formatter = logging.Formatter(("%(asctime)s - %(name)s - "
-#                               "%(levelname)s - %(message)s"))
-# handler.setFormatter(formatter)
-# logger.addHandler(handler)
-
-
 class SanityTest(unittest.TestCase):
 
     @classmethod

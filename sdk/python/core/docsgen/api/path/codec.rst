@@ -4,7 +4,7 @@ Codec
 .. module:: ydk.path
     :synopsis: Path API Codec
 
-.. py:class:: Codec():
+.. py:class:: Codec
 
     YDK Path Codec used to encode and decode between payload and ``DataNode``.
 

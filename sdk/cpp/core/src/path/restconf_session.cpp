@@ -73,13 +73,13 @@ RestconfSession::RestconfSession(path::Repository & repo,
 }
 
 RestconfSession::RestconfSession(std::shared_ptr<RestconfClient> client,
-                                 std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
+                                 const std::shared_ptr<ydk::path::RootSchemaNode>& root_schema,
                                  const std::string & edit_method,
                                  EncodingFormat encoding,
                                  const std::string & config_url_root,
                                  const std::string & state_url_root)
     : client(move(client)),
-      root_schema(move(root_schema)),
+      root_schema(root_schema),
       encoding(encoding),
       edit_method(edit_method),
       config_url_root(config_url_root),

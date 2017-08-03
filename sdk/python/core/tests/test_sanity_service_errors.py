@@ -83,16 +83,6 @@ class SanityCodec(unittest.TestCase):
 </runner>
 """
 
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def _get_runner_entity(self):
         r_1 = ysanity.Runner()
         e_1, e_2 = ysanity.Runner.TwoList.Ldata(), ysanity.Runner.TwoList.Ldata()
@@ -146,19 +136,8 @@ class SanityCRUD(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', False)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.crud = CRUDService()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def setUp(self):
         runner = ysanity.Runner()
@@ -230,29 +209,15 @@ class SanityExecutor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.executor = ExecutorService()
         cls.codec = CodecService()
         cls.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def setUp(self):
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
-
-    def tearDown(self):
-        pass
 
     def test_execute_rpc_invalid_1(self):
         runner = ysanity.Runner()
@@ -293,28 +258,13 @@ class SanityNetconf(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.netconf_service = NetconfService()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     def setUp(self):
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
-
-
-    def tearDown(self):
-        pass
 
     def _create_runner(self):
         runner = ysanity.Runner()

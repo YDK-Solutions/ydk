@@ -1060,7 +1060,7 @@ public:
                     const std::string & state_url_root = "/data");
 
     RestconfSession(std::shared_ptr<RestconfClient> client,
-                    std::shared_ptr<RootSchemaNode> root_schema,
+                    const std::shared_ptr<RootSchemaNode>& root_schema,
                     const std::string & edit_method,
                     EncodingFormat encoding,
                     const std::string & config_url_root,

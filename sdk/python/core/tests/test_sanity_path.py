@@ -31,14 +31,7 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', False)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.nc_session = NetconfSession(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.nc_session = NetconfSession(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.root_schema = cls.nc_session.get_root_schema()
         cls.codec = Codec()
 

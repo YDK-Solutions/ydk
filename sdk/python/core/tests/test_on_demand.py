@@ -118,33 +118,15 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-        common_cache = getattr(cls, 'common_cache', False)
-
         tmp_dir = tempfile.mkdtemp()
         repo = Repository(tmp_dir)
 
-        cls.ncc_empty_repo = NetconfServiceProvider(repo, hostname, username, password, port, protocol, on_demand)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.ncc_empty_repo = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.crud = CRUDService()
 
         cls.codec_provider = CodecServiceProvider()
         cls.codec = CodecService()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_on_demand_downloading(self):
         # create augmentation configuration

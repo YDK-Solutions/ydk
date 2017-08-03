@@ -38,16 +38,6 @@ class SanityTest(unittest.TestCase):
         self.repo = Repository(repo_path)
         self.restconf_provider = RestconfServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
 
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_get_session(self):
         session = self.restconf_provider.get_session()
         self.assertEqual(session is not None, True)

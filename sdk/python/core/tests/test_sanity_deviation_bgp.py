@@ -23,7 +23,7 @@ from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
 from ydk.errors import YPYError, YPYModelError
 from ydk.models.deviation import openconfig_bgp, openconfig_bgp_types
-from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyType 
+from ydk.models.deviation.openconfig_routing_policy import DefaultPolicyType
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -33,25 +33,8 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = 12023
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, 12023, cls.protocol, cls.on_demand, cls.common_cache)
         cls.crud = CRUDService()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_bgp(self):
         # Bgp.Global.AfiSafis.AfiSafi.ApplyPolicy is not supported

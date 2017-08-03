@@ -19,36 +19,19 @@ RestconfServiceProvider test
 """
 from __future__ import absolute_import
 
-import os
+import sys
 import unittest
 
 from ydk.providers import NetconfServiceProvider
-from ydk.path.sessions import NetconfSession
-from ydk.path import Repository
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-        common_cache = getattr(cls, "common_cache", False)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
-
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
 
     def test_get_session(self):
         session = self.ncc.get_session()
@@ -64,7 +47,9 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    import sys
-    suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
+    device, non_demand, common_cache = get_device_info()
+
+    suite = unittest.TestSuite()
+    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

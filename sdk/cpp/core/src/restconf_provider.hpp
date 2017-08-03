@@ -39,7 +39,7 @@ public:
                                const std::string & state_url_root = "/data");
 
         RestconfServiceProvider(std::unique_ptr<RestconfClient> client,
-                                std::shared_ptr<ydk::path::RootSchemaNode> root_schema,
+                                const std::shared_ptr<ydk::path::RootSchemaNode>& root_schema,
                                 const std::string & edit_method,
                                 const std::string & config_url_root,
                                 const std::string & state_url_root,

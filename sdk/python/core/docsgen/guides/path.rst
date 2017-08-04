@@ -64,12 +64,12 @@ Example for using Path API is shown below(assuming you have openconfig-bgp avaia
     ch = logging.StreamHandler()
     log.addHandler(ch)                                                      # enable logging
 
-    from ydk.providers import NetconfServiceProvider
+    from ydk.path import NetconfSession
     from ydk.path import Codec
     from ydk.types import EncodingFormat
 
-    provider = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-    root_schema = provider.get_root_schema()                                # get root schema node
+    session = NetconfSession('127.0.0.1', 'admin', 'admin', 12022)
+    root_schema = session.get_root_schema()                                # get root schema node
 
     bgp = root_schema.create_datanode("openconfig-bgp:bgp", "")
     bgp.create_datanode("global/config/as", "65172")
@@ -87,7 +87,7 @@ Example for using Path API is shown below(assuming you have openconfig-bgp avaia
     xml = codec_service.encode(bgp, EncodingFormat.XML, True)               # get XML encoding
     create_rpc = root_schema.create_rpc('ydk:create')
     create_rpc.get_input_node().create_datanode('entity', xml)
-    create_rpc(provider)                                                    # create bgp configuration
+    create_rpc(session)                                                    # create bgp configuration
 
     json = codec_service.encode(bgp, EncodingFormat.JSON, True)             # get JSON encoding
     print(json)

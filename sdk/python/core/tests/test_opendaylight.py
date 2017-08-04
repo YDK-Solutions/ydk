@@ -42,16 +42,6 @@ class SanityTest(unittest.TestCase):
         self.odl = OpenDaylightServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
         self.crud = CRUDService()
 
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_read_ODL(self):
         bgp_filter = oc_bgp.Bgp()
         node_provider = self.odl.get_node_provider('xr')

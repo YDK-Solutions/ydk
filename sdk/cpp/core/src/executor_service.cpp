@@ -21,13 +21,12 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <iostream>
-
-#include "executor_service.hpp"
-#include "types.hpp"
-#include "path_api.hpp"
 #include "entity_data_node_walker.hpp"
+#include "executor_service.hpp"
 #include "logger.hpp"
+#include "service_provider.hpp"
+#include "types.hpp"
+
 
 using namespace std;
 
@@ -47,14 +46,14 @@ ExecutorService::~ExecutorService()
 {
 }
 
-shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provider,
+shared_ptr<Entity> ExecutorService::execute_rpc(ServiceProvider& provider,
     Entity & rpc_entity, std::shared_ptr<Entity> top_entity)
 {
     // Get the yfilter - RPC Name
     auto const & yfilter = rpc_entity.get_segment_path();
 
     // Create RPC instance
-    path::RootSchemaNode & root_schema = provider.get_root_schema();
+    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
     shared_ptr<path::Rpc> rpc = root_schema.create_rpc(yfilter);
     path::DataNode & rpc_input = rpc->get_input_node();
 
@@ -63,7 +62,7 @@ shared_ptr<Entity> ExecutorService::execute_rpc(NetconfServiceProvider & provide
     walk_children(input, rpc_input, "");
 
     // Execute
-    auto result_datanode = (*rpc)(provider);
+    auto result_datanode = (*rpc)(provider.get_session());
 
     // Handle output
     auto output = rpc_entity.get_child_by_name("output", "");

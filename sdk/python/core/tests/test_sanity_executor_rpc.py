@@ -41,22 +41,11 @@ class SanityTest(unittest.TestCase):
         self.es = ExecutorService()
         self.cs = CodecService()
 
-    @classmethod
-    def tearDownClass(self):
-        pass
-
     def setUp(self):
         # start a brand new session for every single test case
         # so test_close_session_rpc will not interfere with other test cases
         # self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
-        hostname = getattr(self, 'hostname', '127.0.0.1')
-        username = getattr(self, 'username', 'admin')
-        password = getattr(self, 'password', 'admin')
-        port = getattr(self, 'port', 12022)
-        protocol = getattr(self, 'protocol', 'ssh')
-        on_demand = not getattr(self, 'non_demand', True)
-        common_cache = getattr(self, "common_cache", False)
-        self.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand, common_cache)
+        self.ncc = NetconfServiceProvider(self.hostname, self.username, self.password, self.port, self.protocol, self.on_demand, self.common_cache)
         from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()

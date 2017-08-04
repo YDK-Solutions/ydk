@@ -59,7 +59,7 @@ class ParametrizedTestCase(unittest.TestCase):
         testcase_klass.password = device.password
         testcase_klass.port = device.port
         testcase_klass.protocol = device.scheme
-        testcase_klass.non_demand = non_demand
+        testcase_klass.on_demand = not non_demand
         testcase_klass.common_cache = common_cache
         testnames = testloader.getTestCaseNames(testcase_klass)
         suite = unittest.TestSuite()
@@ -84,3 +84,5 @@ def get_device_info():
         args.device = "ssh://admin:admin@127.0.0.1:12022"
     device = urlparse(args.device)
     return device, args.non_demand, args.common_cache
+
+

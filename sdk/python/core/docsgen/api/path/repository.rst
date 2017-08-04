@@ -24,6 +24,13 @@ Repository
 
     .. py:method:: create_root_schema(capabilities)
 
-        Creates the root schema based on the capabilities passed in. This method verifies the said capabilities and can throw exceptions if a module is not found in the search directory or cannot be loaded.
+        Creates the root schema based on the capabilities passed in.
 
+        :param capabilities: (list of :py:class:`Capability<ydk.path.Capability>`) Enabled capabilities.
+
+    .. py:method:: create_root_schema(lookup_tables, capabilities)
+
+        Creates the root schema based on capability lookup tables and capabilities passed in.
+
+        :param lookup_tables: (list of map of string and :py:class:`Capability<ydk.path.Capability>`) Lookup tables.
         :param capabilities: (list of :py:class:`Capability<ydk.path.Capability>`) Enabled capabilities.

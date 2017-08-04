@@ -140,16 +140,6 @@ class SanityYang(unittest.TestCase):
   ]
 }"""
 
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def _get_runner_entity(self):
         r_1 = ysanity.Runner()
         e_1, e_2 = ysanity.Runner.TwoList.Ldata(), ysanity.Runner.TwoList.Ldata()

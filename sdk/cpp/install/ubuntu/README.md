@@ -1,4 +1,4 @@
-#Getting Set Up
+# Getting Set Up
 <a href="http://packaging.ubuntu.com/html/getting-set-up.html">http://packaging.ubuntu.com/html/getting-set-up.html</a>
 
 Install basic packaging software
@@ -76,7 +76,7 @@ export DEBFULLNAME="Bob Bacon (BB)"
 export DEBEMAIL="BBacon@cisco.com"
 ```
 
-#Packaging
+# Packaging
 <a href="http://packaging.ubuntu.com/html/packaging-new-software.html">http://packaging.ubuntu.com/html/packaging-new-software.html</a>
 
 Install build tools
@@ -96,7 +96,7 @@ $ bzr dh-make ydk 0.5.2 ydk-0.5.2.tar.gz
 ```
 Package type is l for library. Verify information is correct. This will create a directory `ydk`. In this, a few files under `ydk/debian` need to be customized.
 
-##Customize Debian Files
+## Customize Debian Files
 
 Remove the optional example files
 ```
@@ -149,7 +149,7 @@ Commit the code to your packaging branch
 $ bzr add debian/source/format
 $ bzr commit -m "Initial commit of Debian packaging."
 ```
-##Build Package
+## Build Package
 Build Package
 ```
 $ bzr builddeb -- -us -uc
@@ -168,7 +168,7 @@ $ debuild -S -rfakeroot -k<key-id>
 ```
 Packages and source.changes are output to one directory above and thus outside the project. 
 
-##Confirm source (optional)
+## Confirm source (optional)
 
 View Contents
 ```
@@ -205,7 +205,7 @@ Set up a PPA in Launchpad
 https://launchpad.net/~<LP USERNAME>
 ```
 
-##Upload Package
+## Upload Package
 
 Upload PPA with dput
 ```

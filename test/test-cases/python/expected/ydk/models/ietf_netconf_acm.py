@@ -39,11 +39,11 @@ class ActionTypeEnum(Enum):
 
     .. data:: PERMIT = 0
 
-    	Requested action is permitted.
+        Requested action is permitted.
 
     .. data:: DENY = 1
 
-    	Requested action is denied.
+        Requested action is denied.
 
     """
 
@@ -85,65 +85,65 @@ class Nacm(object):
     
     .. attribute:: denied_data_writes
     
-    	Number of times since the server last restarted that a protocol operation request to alter a configuration datastore was denied
-    	**type**\:  int
+        Number of times since the server last restarted that a protocol yfilter request to alter a configuration datastore was denied
+        **type**\:  int
     
-    	**range:** 0..4294967295
+        **range:** 0..4294967295
     
-    	**mandatory**\: True
+        **mandatory**\: True
     
     .. attribute:: denied_notifications
     
-    	Number of times since the server last restarted that a notification was dropped for a subscription because access to the event type was denied
-    	**type**\:  int
+        Number of times since the server last restarted that a notification was dropped for a subscription because access to the event type was denied
+        **type**\:  int
     
-    	**range:** 0..4294967295
+        **range:** 0..4294967295
     
-    	**mandatory**\: True
+        **mandatory**\: True
     
     .. attribute:: denied_operations
     
-    	Number of times since the server last restarted that a protocol operation request was denied
-    	**type**\:  int
+        Number of times since the server last restarted that a protocol yfilter request was denied
+        **type**\:  int
     
-    	**range:** 0..4294967295
+        **range:** 0..4294967295
     
-    	**mandatory**\: True
+        **mandatory**\: True
     
     .. attribute:: enable_external_groups
     
-    	Controls whether the server uses the groups reported by the NETCONF transport layer when it assigns the user to a set of NACM groups.  If this leaf has the value 'false', any group names reported by the transport layer are ignored by the server
-    	**type**\:  bool
+        Controls whether the server uses the groups reported by the NETCONF transport layer when it assigns the user to a set of NACM groups.  If this leaf has the value 'false', any group names reported by the transport layer are ignored by the server
+        **type**\:  bool
     
     .. attribute:: enable_nacm
     
-    	Enables or disables all NETCONF access control enforcement.  If 'true', then enforcement is enabled.  If 'false', then enforcement is disabled
-    	**type**\:  bool
+        Enables or disables all NETCONF access control enforcement.  If 'true', then enforcement is enabled.  If 'false', then enforcement is disabled
+        **type**\:  bool
     
     .. attribute:: exec_default
     
-    	Controls whether exec access is granted if no appropriate rule is found for a particular protocol operation request
-    	**type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
+        Controls whether exec access is granted if no appropriate rule is found for a particular protocol yfilter request
+        **type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
     
     .. attribute:: groups
     
-    	NETCONF Access Control Groups
-    	**type**\:  :py:class:`Groups <ydk.models.ietf_netconf_acm.Nacm.Groups>`
+        NETCONF Access Control Groups
+        **type**\:  :py:class:`Groups <ydk.models.ietf_netconf_acm.Nacm.Groups>`
     
     .. attribute:: read_default
     
-    	Controls whether read access is granted if no appropriate rule is found for a particular read request
-    	**type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
+        Controls whether read access is granted if no appropriate rule is found for a particular read request
+        **type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
     
     .. attribute:: rule_list
     
-    	An ordered collection of access control rules
-    	**type**\: list of  :py:class:`RuleList <ydk.models.ietf_netconf_acm.Nacm.RuleList>`
+        An ordered collection of access control rules
+        **type**\: list of  :py:class:`RuleList <ydk.models.ietf_netconf_acm.Nacm.RuleList>`
     
     .. attribute:: write_default
     
-    	Controls whether create, update, or delete access is granted if no appropriate rule is found for a particular write request
-    	**type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
+        Controls whether create, update, or delete access is granted if no appropriate rule is found for a particular write request
+        **type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
     
     
 
@@ -174,8 +174,8 @@ class Nacm(object):
         
         .. attribute:: group
         
-        	One NACM Group Entry.  This list will only contain configured entries, not any entries learned from any transport protocols
-        	**type**\: list of  :py:class:`Group <ydk.models.ietf_netconf_acm.Nacm.Groups.Group>`
+            One NACM Group Entry.  This list will only contain configured entries, not any entries learned from any transport protocols
+            **type**\: list of  :py:class:`Group <ydk.models.ietf_netconf_acm.Nacm.Groups.Group>`
         
         
 
@@ -199,17 +199,17 @@ class Nacm(object):
             
             .. attribute:: name  <key>
             
-            	Group name associated with this entry
-            	**type**\:  str
+                Group name associated with this entry
+                **type**\:  str
             
-            	**pattern:** [^\\\*].\*
+                **pattern:** [^\\\*].\*
             
             .. attribute:: user_name
             
-            	Each entry identifies the username of a member of the group associated with this entry
-            	**type**\:  list of str
+                Each entry identifies the username of a member of the group associated with this entry
+                **type**\:  list of str
             
-            	**range:** 1..18446744073709551615
+                **range:** 1..18446744073709551615
             
             
 
@@ -285,32 +285,32 @@ class Nacm(object):
         
         .. attribute:: name  <key>
         
-        	Arbitrary name assigned to the rule\-list
-        	**type**\:  str
+            Arbitrary name assigned to the rule\-list
+            **type**\:  str
         
-        	**range:** 1..18446744073709551615
+            **range:** 1..18446744073709551615
         
         .. attribute:: group
         
-        	List of administrative groups that will be assigned the associated access rights defined by the 'rule' list.  The string '\*' indicates that all groups apply to the entry
-        	**type**\: one of the below types:
+            List of administrative groups that will be assigned the associated access rights defined by the 'rule' list.  The string '\*' indicates that all groups apply to the entry
+            **type**\: one of the below types:
         
-        	**type**\:  list of str
+            **type**\:  list of str
         
-        	**pattern:** \\\*
+            **pattern:** \\\*
         
         
         ----
-        	**type**\:  list of str
+            **type**\:  list of str
         
-        	**pattern:** [^\\\*].\*
+            **pattern:** [^\\\*].\*
         
         
         ----
         .. attribute:: rule
         
-        	One access control rule.  Rules are processed in user\-defined order until a match is found.  A rule matches if 'module\-name', 'rule\-type', and 'access\-operations' match the request.  If a rule matches, the 'action' leaf determines if access is granted or not
-        	**type**\: list of  :py:class:`Rule <ydk.models.ietf_netconf_acm.Nacm.RuleList.Rule>`
+            One access control rule.  Rules are processed in user\-defined order until a match is found.  A rule matches if 'module\-name', 'rule\-type', and 'access\-operations' match the request.  If a rule matches, the 'action' leaf determines if access is granted or not
+            **type**\: list of  :py:class:`Rule <ydk.models.ietf_netconf_acm.Nacm.RuleList.Rule>`
         
         
 
@@ -342,87 +342,87 @@ class Nacm(object):
             
             .. attribute:: name  <key>
             
-            	Arbitrary name assigned to the rule
-            	**type**\:  str
+                Arbitrary name assigned to the rule
+                **type**\:  str
             
-            	**range:** 1..18446744073709551615
+                **range:** 1..18446744073709551615
             
             .. attribute:: access_operations
             
-            	Access operations associated with this rule.  This leaf matches if it has the value '\*' or if the bit corresponding to the requested operation is set
-            	**type**\: one of the below types:
+                Access operations associated with this rule.  This leaf matches if it has the value '\*' or if the bit corresponding to the requested yfilter is set
+                **type**\: one of the below types:
             
-            	**type**\:  str
+                **type**\:  str
             
-            	**pattern:** \\\*
+                **pattern:** \\\*
             
             
             ----
-            	**type**\:  :py:class:`AccessOperationsType_Bits <ydk.models.ietf_netconf_acm.AccessOperationsType_Bits>`
+                **type**\:  :py:class:`AccessOperationsType_Bits <ydk.models.ietf_netconf_acm.AccessOperationsType_Bits>`
             
             
             ----
             .. attribute:: action
             
-            	The access control action associated with the rule.  If a rule is determined to match a particular request, then this object is used to determine whether to permit or deny the request
-            	**type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
+                The access control action associated with the rule.  If a rule is determined to match a particular request, then this object is used to determine whether to permit or deny the request
+                **type**\:  :py:class:`ActionTypeEnum <ydk.models.ietf_netconf_acm.ActionTypeEnum>`
             
-            	**mandatory**\: True
+                **mandatory**\: True
             
             .. attribute:: comment
             
-            	A textual description of the access rule
-            	**type**\:  str
+                A textual description of the access rule
+                **type**\:  str
             
             .. attribute:: module_name
             
-            	Name of the module associated with this rule.  This leaf matches if it has the value '\*' or if the object being accessed is defined in the module with the specified module name
-            	**type**\: one of the below types:
+                Name of the module associated with this rule.  This leaf matches if it has the value '\*' or if the object being accessed is defined in the module with the specified module name
+                **type**\: one of the below types:
             
-            	**type**\:  str
+                **type**\:  str
             
-            	**pattern:** \\\*
+                **pattern:** \\\*
             
             
             ----
-            	**type**\:  str
+                **type**\:  str
             
             
             ----
             .. attribute:: notification_name
             
-            	This leaf matches if it has the value '\*' or if its value equals the requested notification name
-            	**type**\: one of the below types:
+                This leaf matches if it has the value '\*' or if its value equals the requested notification name
+                **type**\: one of the below types:
             
-            	**type**\:  str
+                **type**\:  str
             
-            	**pattern:** \\\*
+                **pattern:** \\\*
             
             
             ----
-            	**type**\:  str
+                **type**\:  str
             
             
             ----
             .. attribute:: path
             
-            	Data Node Instance Identifier associated with the data node controlled by this rule.  Configuration data or state data instance identifiers start with a top\-level data node.  A complete instance identifier is required for this type of path value.  The special value '/' refers to all possible datastore contents
-            	**type**\:  str
+                Data Node Instance Identifier associated with the data node controlled by this rule.  Configuration data or state data instance identifiers start with a top\-level data node.  A complete instance identifier is required for this type of path value.  The special value '/' refers to all possible datastore contents
+                **type**\:  str
             
-            	**mandatory**\: True
+                **mandatory**\: True
             
             .. attribute:: rpc_name
             
-            	This leaf matches if it has the value '\*' or if its value equals the requested protocol operation name
-            	**type**\: one of the below types:
+                This leaf matches if it has the value '\*' or if its value equals the requested protocol yfilter name
+                **type**\: one of the below types:
             
-            	**type**\:  str
+                **type**\:  str
             
-            	**pattern:** \\\*
+                **pattern:** \\\*
             
             
             ----
-            	**type**\:  str
+                **type**\:  str
             
             
             ----

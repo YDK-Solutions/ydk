@@ -71,6 +71,10 @@ def get_release_version(output_directory, language):
         return get_py_release_version(output_directory)
     elif language == 'cpp':
         return get_cpp_release_version(output_directory)
+    elif language == 'go':
+        return get_go_release_version(output_directory)
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_py_release_version(output_directory):
@@ -99,6 +103,9 @@ def get_cpp_release_version(output_directory):
     release = "release=%s" % version_string
     version = "version=%s" % version_string
     return (release, version)
+
+def get_go_release_version(output_directory):
+    return ("release=test", "version=test")
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):

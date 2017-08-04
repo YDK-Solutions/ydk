@@ -63,6 +63,7 @@ class ClassSourcePrinter(object):
         self._print_class_get_children(clazz, children)
         self._print_class_set_value(clazz, leafs)
         self._print_top_level_entity_functions(clazz, leafs)
+        self._print_has_leaf_or_child_of_name(clazz, children, leafs)
 
     def _print_top_level_entity_functions(self, clazz, leafs):
         if clazz.owner is not None and isinstance(clazz.owner, Package):
@@ -70,6 +71,7 @@ class ClassSourcePrinter(object):
             self._print_yang_models_function(clazz)
             self._print_bundle_name_function(clazz)
             self._print_capabilities_lookup_function(clazz)
+            self._print_namespace_identity_lookup_function(clazz)
 
     def _print_clone_ptr_function(self, clazz):
         self.ctx.writeln('std::shared_ptr<Entity> %s::clone_ptr() const' % clazz.qualified_cpp_name())
@@ -103,6 +105,31 @@ class ClassSourcePrinter(object):
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
         self.ctx.writeln("return %s_augment_lookup_tables;" % snake_case(self.bundle_name))
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
+
+    def _print_namespace_identity_lookup_function(self, clazz):
+        self.ctx.writeln('std::map<std::pair<std::string, std::string>, std::string> %s::get_namespace_identity_lookup() const' % clazz.qualified_cpp_name())
+        self.ctx.writeln('{')
+        self.ctx.lvl_inc()
+        self.ctx.writeln("return %s_namespace_identity_lookup;" % snake_case(self.bundle_name))
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
+
+    def _print_has_leaf_or_child_of_name(self, clazz, children, leafs):
+        self.ctx.writeln('bool %s::has_leaf_or_child_of_name(const std::string & name) const' % clazz.qualified_cpp_name())
+        self.ctx.writeln('{')
+        self.ctx.lvl_inc()
+        if(len(children) > 0 or len(leafs) > 0):
+            props = children+leafs
+            if_condition = ' || '.join('name == "%s"'% x.stmt.arg for x in props)
+            self.ctx.writeln('if(%s)' % if_condition)
+            self.ctx.lvl_inc()
+            self.ctx.writeln('return true;')
+            self.ctx.lvl_dec()
+        self.ctx.writeln('return false;')
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()

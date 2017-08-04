@@ -16,21 +16,18 @@
 
 from __future__ import absolute_import
 import unittest
-from ydk_.providers import NetconfServiceProvider
-from ydk_.path import CodecService
-from ydk_.types import EncodingFormat
+from ydk.providers import NetconfServiceProvider
+from ydk.path import Codec
+from ydk.types import EncodingFormat
 
 
 class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(self):
-        self.ncc = NetconfServiceProvider('127.0.0.1',
-                                              'admin',
-                                              'admin',
-                                              12022)
+        self.ncc = NetconfServiceProvider('127.0.0.1', 'admin', 'admin', 12022)
         self.root_schema = self.ncc.get_root_schema()
-        self.codec = CodecService()
+        self.codec = Codec()
 
     def _delete_runner(self):
         runner = self.root_schema.create("ydktest-sanity:runner")
@@ -74,7 +71,6 @@ class SanityTest(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityTest)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

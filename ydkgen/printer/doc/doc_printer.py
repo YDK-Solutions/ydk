@@ -24,14 +24,15 @@ from operator import attrgetter
 
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.common import get_rst_file_name, is_config_stmt
-from ydkgen.printer.meta_data_util import (get_bits_class_docstring,
-                                           get_class_bases,
-                                           get_class_crossref_tag,
-                                           get_class_docstring,
-                                           get_class_tag,
-                                           get_enum_class_docstring,
-                                           get_langage_spec_tags
-                                           )
+from ydkgen.printer.meta_data_util import (
+    get_bits_class_docstring,
+    get_class_bases,
+    get_class_crossref_tag,
+    get_class_docstring,
+    get_class_tag,
+    get_enum_class_docstring,
+    get_langage_spec_tags
+)
 
 
 class DocPrinter(object):
@@ -159,14 +160,36 @@ class DocPrinter(object):
 
     def _print_toctree(self, elements, is_package=False):
         if not is_package:
-            elements.reverse()
-            data_classes = [elem for elem in elements if (isinstance(elem, Class) and not elem.is_identity())]
-            self._print_toctree_section(data_classes, 'Data Classes')
+            # Data Classes
+            elements = sorted(elements, key=attrgetter('name'))
 
-            type_classes = [elem for elem in elements if any((isinstance(elem, Class) and elem.is_identity(),
-                                                    isinstance(elem, Enum),
-                                                    isinstance(elem, Bits) and self.lang == 'py'))]
-            self._print_toctree_section(type_classes, 'Type Classes')
+            data_classes = []
+            rpc_classes = []
+            bits_classes = []
+            enum_classes = []
+            idty_classes = []
+
+            for elem in elements:
+                if isinstance(elem, Enum):
+                    enum_classes.append(elem)
+
+                if self.lang == 'py' and isinstance(elem, Bits):
+                    bits_classes.append(elem)
+
+                if (isinstance(elem, Class)):
+                    if elem.is_identity():
+                        idty_classes.append(elem)
+                    elif elem.is_rpc():
+                        rpc_classes.append(elem)
+                    else:
+                        data_classes.append(elem)
+
+            self._print_toctree_section(data_classes, 'Data Classes')
+            self._print_toctree_section(rpc_classes, 'RPC Classes')
+            self._print_toctree_section(bits_classes, 'Bits Classes')
+            self._print_toctree_section(enum_classes, 'Enum Classes')
+            self._print_toctree_section(idty_classes, 'Identity Classes')
+
         else:
             self._print_toctree_section(elements, '')
 

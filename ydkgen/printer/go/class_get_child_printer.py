@@ -54,6 +54,7 @@ class ClassGetChildPrinter(FunctionPrinter):
         self.ctx.lvl_dec();     self.ctx.writeln('}')
         self.ctx.lvl_dec();     self.ctx.writeln('}')
         self.ctx.writeln('child := %s{}' % (child.qualified_go_name()))
-        self.ctx.writeln('{0}.{1} = append({0}.{1}, child)'.format(
-            self.class_alias, child.go_name()))
-        self.ctx.writeln('return &child')
+
+        list_name = '%s.%s' % (self.class_alias, child.go_name())
+        self.ctx.writeln('{0} = append({0}, child)'.format(list_name))
+        self.ctx.writeln('return &{0}[len({0})-1]'.format(list_name))

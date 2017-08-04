@@ -95,7 +95,8 @@ class GetEntityPathPrinter(FunctionPrinter):
         self.ctx.lvl_inc()
         self.ctx.writeln(line % ('true', 'Value', 'fmt.Sprintf("%%v", %s.%s)' % leaf_var))
         self.ctx.lvl_dec()
-        line = 'entityPath = append(entityPath, types.NameLeafData{Name: "%s", Data: leafData})'
+        var_name = ('entityPath.ValuePaths', 'entityPath.ValuePaths')
+        line = '%s = append(%s, types.NameLeafData{Name: "%%s", Data: leafData})' % var_name
         self.ctx.writeln(line % leaf.stmt.arg)
         self.ctx.writeln('}')
         self.ctx.lvl_dec()

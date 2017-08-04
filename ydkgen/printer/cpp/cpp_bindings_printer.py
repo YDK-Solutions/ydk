@@ -71,7 +71,7 @@ class CppBindingsPrinter(LanguageBindingsPrinter):
 
     def _print_header_file(self, package, multi_file_data, path):
         hp = HeaderPrinter(self.ypy_ctx,
-                           self.identity_subclasses)
+                           self.identity_subclasses, self.bundle_name)
         for multi_file_header in [x for x in multi_file_data.multi_file_list if isinstance(x, MultiFileHeader)]:
             hp.print_output(
                             package,

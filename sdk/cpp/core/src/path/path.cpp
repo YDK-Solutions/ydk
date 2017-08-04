@@ -78,11 +78,17 @@ static void escape_slashes(std::string& data)
            {
                replace(data, original, s);
            }
+           if(psubStrMatchStr != NULL)
+           {
+                pcre_free_substring(psubStrMatchStr);
+                psubStrMatchStr = NULL;
+           }
        }
        offset = offsets[1];
     }
     if(psubStrMatchStr != NULL)
         pcre_free_substring(psubStrMatchStr);
+    free(re);
 }
 }
 
@@ -171,18 +177,18 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
 ///////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-// class ydk::CodecService
+// class ydk::Codec
 //////////////////////////////////////////////////////////////////////////
-ydk::path::CodecService::CodecService()
+ydk::path::Codec::Codec()
 {
 }
 
-ydk::path::CodecService::~CodecService()
+ydk::path::Codec::~Codec()
 {
 }
 
 std::string
-ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
+ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
 {
     std::string ret{};
 
@@ -227,7 +233,7 @@ ydk::path::CodecService::encode(const ydk::path::DataNode& dn, ydk::EncodingForm
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::CodecService::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
+ydk::path::Codec::decode(const RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
     LYD_FORMAT scheme = LYD_XML;
     if (format == EncodingFormat::JSON)

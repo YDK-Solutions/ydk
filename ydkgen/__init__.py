@@ -117,7 +117,7 @@ class YdkGenerator(object):
         for x in all_bundles:
             assert isinstance(x, bundle_resolver.Bundle)
 
-        packages = self._get_packages(curr_bundle.resolved_models_dir)
+        packages = self._get_packages(curr_bundle)
         if len(packages) == 0:
             raise YdkGenException('No YANG models were found. Please check your JSON profile file to make sure it is valid')
 
@@ -147,7 +147,7 @@ class YdkGenerator(object):
 
         return gen_api_root
 
-    def _get_packages(self, resolved_model_dir):
+    def _get_packages(self, bundle):
         """ Return packages for resolved YANG modules. Each module will be
             represented as an api package.
 
@@ -158,16 +158,17 @@ class YdkGenerator(object):
             packages (List[.api_model.Package]): List of api packages.
         """
 
+        resolved_model_dir = bundle.resolved_models_dir
         pyang_builder = PyangModelBuilder(resolved_model_dir)
         modules = pyang_builder.parse_and_return_modules()
 
         # build api model packages
         if not self.groupings_as_class:
-            packages = ApiModelBuilder(self.iskeyword, self.language).generate(modules)
+            packages = ApiModelBuilder(self.iskeyword, self.language, bundle.name).generate(modules)
         else:
             packages = GroupingClassApiModelBuilder(self.iskeyword, self.language).generate(modules)
         packages.extend(
-            SubModuleBuilder().generate(pyang_builder.get_submodules(), self.iskeyword))
+            SubModuleBuilder().generate(pyang_builder.get_submodules(), self.iskeyword, self.language, bundle.name))
 
         return packages
 
@@ -254,13 +255,30 @@ class YdkGenerator(object):
             elif package_type == 'core':
                 target_dir = os.path.join(target_dir, 'core')
         elif self.language == 'go':
-            if package_type == 'core':
-                target_dir = os.path.join(target_dir, 'core')
-            # todo: something ??
+            target_dir = os.path.join(target_dir, package_type)
 
         shutil.rmtree(gen_api_root)
         logger.debug('Copying %s to %s' % (target_dir, gen_api_root))
         dir_util.copy_tree(target_dir, gen_api_root)
+
+        if self.language == 'go':
+            src_dir = os.path.join(self.ydk_root, 'sdk', '_docsgen_common')
+            dest_dir = os.path.join(gen_api_root, 'docsgen')
+
+            # Copy index.rst
+            lines = ''
+            with open('%s/index.rst' % src_dir, 'r+') as fd:
+                lines = fd.read()
+            with open('%s/index.rst' % dest_dir, 'w+') as fd:
+                fd.write(lines % self.language.title())
+
+            # Copy about_ydk.rst
+            lines = ''
+            with open('%s/about_ydk.rst' % src_dir, 'r+') as fd:
+                lines = fd.read()
+            with open('%s/about_ydk.rst' % dest_dir, 'w+') as fd:
+                fd.write(lines.format(self.language.title()))
+
 
     def _create_models_archive(self, bundle, target_dir):
         '''

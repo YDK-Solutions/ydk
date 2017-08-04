@@ -25,16 +25,19 @@ from .class_printer import ClassPrinter
 # from .class_enum_printer import EnumPrinter
 
 from ydkgen.printer.file_printer import FilePrinter
+from ydkgen.common import convert_to_reStructuredText
 
 
 class ModulePrinter(FilePrinter):
 
-    def __init__(self, ctx, bundle_name, sort_clazz):
+    def __init__(self, ctx, bundle_name, sort_clazz, identity_subclasses):
         super(ModulePrinter, self).__init__(ctx)
         self.bundle_name = bundle_name
         self.sort_clazz = sort_clazz
+        self.identity_subclasses = identity_subclasses
 
     def print_header(self, package):
+        self._print_package_description(package)
         self.ctx.writeln('package %s' % package.name)
         self.ctx.bline()
         self._print_imports(package)
@@ -51,8 +54,15 @@ class ModulePrinter(FilePrinter):
     def print_trailer(self, package):
         pass
 
+    def _print_package_description(self, package):
+        comment = package.stmt.search_one('description')
+        if comment is not None:
+            comment = comment.arg
+            for line in comment.split('\n'):
+                self.ctx.writeln("// %s" % convert_to_reStructuredText(line))
+
     def _print_class(self, clazz):
-        cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz)
+        cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
         cp.print_output(clazz)
 
     def _print_enums(self, package, classes):
@@ -73,7 +83,7 @@ class ModulePrinter(FilePrinter):
         self.ctx.writeln('"github.com/CiscoDevNet/ydk-go/ydk/types"')
 
     def _print_derived_imports(self, package):
-        derived_imports = ['"github.com/CiscoDevNet/ydk-go/ydk/%s"' % self.bundle_name]
+        derived_imports = ['"github.com/CiscoDevNet/ydk-go/ydk/models/%s"' % self.bundle_name]
         for imported_type in package.imported_types():
             if( self.is_derived_identity(package, imported_type) ):
                 stmt = '"github.com/CiscoDevNet/ydk-go/ydk/models/%s"' % (
@@ -83,3 +93,6 @@ class ModulePrinter(FilePrinter):
 
         self.ctx.writelns(derived_imports)
         self.ctx.bline()
+
+    def _print_init_function(self, package):
+        self.ctx.writeln('import (')

@@ -25,50 +25,50 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"github.com/CiscoDevNet/ydk-go/ydk"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	"github.com/CiscoDevNet/ydk-go/ydk/providers"
-	"github.com/CiscoDevNet/ydk-go/ydk/services"
+    "flag"
+    "fmt"
+    "github.com/CiscoDevNet/ydk-go/ydk"
+    oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
+    "github.com/CiscoDevNet/ydk-go/ydk/providers"
+    "github.com/CiscoDevNet/ydk-go/ydk/services"
 )
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println("\nError occured!!\n ", r)
-		}
-	}()
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("\nError occured!!\n ", r)
+        }
+    }()
 
-	vPtr := flag.Bool("v", false, "Enable verbose")
-	flag.Parse()
+    vPtr := flag.Bool("v", false, "Enable verbose")
+    flag.Parse()
 
-	if *vPtr {
-		ydk.EnableLogging(ydk.Debug)
-	}
+    if *vPtr {
+        ydk.EnableLogging(ydk.Debug)
+    }
 
-	var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
-		Address:  "127.0.0.1",
-		Username: "admin",
-		Password: "admin",
-		Port:     12022}
+    var provider providers.NetconfServiceProvider = providers.NetconfServiceProvider{
+        Address:  "127.0.0.1",
+        Username: "admin",
+        Password: "admin",
+        Port:     12022}
 
-	provider.Connect()
+    provider.Connect()
 
-	crud := services.CrudService{}
+    crud := services.CrudService{}
 
-	bgp := oc_bgp.Bgp{}
-	bgp.Global.SetParent(&bgp)
-	bgp.Global.Config.SetParent(&bgp.Global)
+    bgp := oc_bgp.Bgp{}
+    bgp.Global.SetParent(&bgp)
+    bgp.Global.Config.SetParent(&bgp.Global)
 
-	result := crud.Delete(&provider, &bgp.Global.Config)
+    result := crud.Delete(&provider, &bgp.Global.Config)
 
-	provider.Disconnect()
+    provider.Disconnect()
 
-	if result == true {
-		fmt.Println("\nOperation succeeded!\n")
-	} else {
-		fmt.Println("\nOperation failed!\n")
-	}
+    if result == true {
+        fmt.Println("\nOperation succeeded!\n")
+    } else {
+        fmt.Println("\nOperation failed!\n")
+    }
 
 }

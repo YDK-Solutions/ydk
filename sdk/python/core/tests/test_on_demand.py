@@ -121,7 +121,7 @@ class SanityYang(unittest.TestCase):
         tmp_dir = tempfile.mkdtemp()
         repo = Repository(tmp_dir)
 
-        cls.ncc_empty_repo = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc_empty_repo = NetconfServiceProvider(repo, cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
         cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.crud = CRUDService()
 

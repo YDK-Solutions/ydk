@@ -25,7 +25,6 @@ import unittest
 from ydk.providers import RestconfServiceProvider
 from ydk.types import EncodingFormat
 from ydk.path import Repository
-from ydk.path import Codec
 
 
 class SanityTest(unittest.TestCase):

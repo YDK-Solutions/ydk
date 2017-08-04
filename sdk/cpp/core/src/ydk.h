@@ -36,7 +36,7 @@ typedef void* Rpc;
 typedef void* SchemaNode;
 typedef void* RootSchemaNode;
 typedef void* RootSchemaWrapper;
-typedef void* CodecService;
+typedef void* Codec;
 typedef void* ServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
@@ -77,10 +77,10 @@ ServiceProvider NetconfServiceProviderInit(const char * address, const char * us
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
 
-CodecService CodecServiceInit(void);
-void CodecServiceFree(CodecService);
-const char* CodecServiceEncode(CodecService, DataNode, EncodingFormat, boolean);
-DataNode CodecServiceDecode(CodecService, RootSchemaNode, const char*, EncodingFormat);
+Codec CodecInit(void);
+void CodecFree(Codec);
+const char* CodecEncode(Codec, DataNode, EncodingFormat, boolean);
+DataNode CodecDecode(Codec, RootSchemaNode, const char*, EncodingFormat);
 
 DataNode RootSchemaNodeCreate(RootSchemaNode, const char*);
 Rpc RootSchemaNodeRpc(RootSchemaNode, const char*);

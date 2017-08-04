@@ -50,7 +50,7 @@ class ClassGetChildPrinter(FunctionPrinter):
             self.class_alias, child.go_name()))
         self.ctx.lvl_inc()
         self.ctx.writeln('if %s.GetSegmentPath() == segment_path {' % self.class_alias)
-        self.ctx.lvl_inc();     self.ctx.writeln('return &c');  
+        self.ctx.lvl_inc();     self.ctx.writeln('return &c');
         self.ctx.lvl_dec();     self.ctx.writeln('}')
         self.ctx.lvl_dec();     self.ctx.writeln('}')
         self.ctx.writeln('child := %s{}' % (child.qualified_go_name()))

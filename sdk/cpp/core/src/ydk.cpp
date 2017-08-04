@@ -243,26 +243,26 @@ RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
     }
 }
 
-CodecService CodecServiceInit(void)
+Codec CodecInit(void)
 {
-    ydk::path::CodecService * codec = new ydk::path::CodecService();
+    ydk::path::Codec * codec = new ydk::path::Codec();
     return static_cast<void*>(codec);
 }
 
-void CodecServiceFree(CodecService codec)
+void CodecFree(Codec codec)
 {
-    ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+    ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
     if(real_codec != NULL)
     {
         delete real_codec;
     }
 }
 
-const char* CodecServiceEncode(CodecService codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
+const char* CodecEncode(Codec codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
 {
     try
     {
-        ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+        ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
         DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
         ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
 
@@ -275,11 +275,11 @@ const char* CodecServiceEncode(CodecService codec, DataNode datanode, EncodingFo
     }
 }
 
-DataNode CodecServiceDecode(CodecService codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
+DataNode CodecDecode(Codec codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
 {
     try
     {
-        ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+        ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
         ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
         shared_ptr<ydk::path::DataNode> datanode = real_codec->decode(*real_root_schema, payload, get_real_encoding(encoding));
 

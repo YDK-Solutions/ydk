@@ -71,9 +71,9 @@ func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode) *C.char {
 	//	datanode = C.DataNodeGetParent(datanode)
 	//}
 
-	codec := C.CodecServiceInit()
-	defer C.CodecServiceFree(codec)
-	var data *C.char = C.CodecServiceEncode(codec, datanode, C.XML, 1)
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
+	var data *C.char = C.CodecEncode(codec, datanode, C.XML, 1)
 
 	return (data)
 }
@@ -170,16 +170,16 @@ func CodecServiceEncode(entity types.Entity, root_schema types.RootSchemaNode, e
 		return ""
 	}
 
-	codec := C.CodecServiceInit()
-	defer C.CodecServiceFree(codec)
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
 
 	var payload *C.char
 
 	switch encoding {
 	case types.XML:
-		payload = C.CodecServiceEncode(codec, data_node, C.XML, 1)
+		payload = C.CodecEncode(codec, data_node, C.XML, 1)
 	case types.JSON:
-		payload = C.CodecServiceEncode(codec, data_node, C.JSON, 1)
+		payload = C.CodecEncode(codec, data_node, C.JSON, 1)
 	}
 
 	return C.GoString(payload)
@@ -189,17 +189,17 @@ func CodecServiceDecode(root_schema types.RootSchemaNode, payload string, encodi
 	root_schema_wrapper := root_schema.Private.(C.RootSchemaWrapper)
 	real_root_schema := C.RootSchemaWrapperUnwrap(root_schema_wrapper)
 
-	codec := C.CodecServiceInit()
-	defer C.CodecServiceFree(codec)
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
 
 	var real_payload = C.CString(payload)
 	var real_data_node C.DataNode
 
 	switch encoding {
 	case types.XML:
-		real_data_node = C.CodecServiceDecode(codec, real_root_schema, real_payload, C.XML)
+		real_data_node = C.CodecDecode(codec, real_root_schema, real_payload, C.XML)
 	case types.JSON:
-		real_data_node = C.CodecServiceDecode(codec, real_root_schema, real_payload, C.JSON)
+		real_data_node = C.CodecDecode(codec, real_root_schema, real_payload, C.JSON)
 	}
 
 	var data_node = types.DataNode{Private: real_data_node}

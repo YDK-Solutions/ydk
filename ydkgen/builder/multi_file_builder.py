@@ -75,12 +75,6 @@ class MultiFileBuilder(object):
         self._populate_class_list(package)
         self._populate_multi_file_data(package)
         self._populate_imports_for_fragmented_files()
-#         for x in self._multi_file_data.multi_file_list:
-#             print (x.file_name, x.imports)
-#             for y in x.class_list:
-#                 print y.fully_qualified_cpp_name()
-#             print
-#         print '---------------\n'
 
     @property
     def multi_file_data(self):

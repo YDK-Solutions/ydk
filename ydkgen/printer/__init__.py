@@ -16,9 +16,9 @@
 
 """
 printer.py
- 
+
  YANG model driven API, emitter.
- 
+
 """
 
 

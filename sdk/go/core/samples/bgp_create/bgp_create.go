@@ -28,8 +28,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
-	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/bgp"
-	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/openconfig/types"
+	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	//"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -39,15 +39,15 @@ func config_bgp(bgp *oc_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
-	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6UnicastIdentity{}
+	ipv6_afisafi := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6_afisafi.AfiSafiName = &oc_bgp_types.Ipv6_Unicast{}
+	ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv6_Unicast{}
 	ipv6_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
 
-	ipv4_afisafi := oc_bgp.BgpGlobalAfiSafisAfiSafi{}
-	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
-	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4UnicastIdentity{}
+	ipv4_afisafi := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4_afisafi.AfiSafiName = &oc_bgp_types.Ipv4_Unicast{}
+	ipv4_afisafi.Config.AfiSafiName = &oc_bgp_types.Ipv4_Unicast{}
 	ipv4_afisafi.Config.Enabled = true
 	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
 }

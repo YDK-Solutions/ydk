@@ -166,7 +166,7 @@ class YdkGenerator(object):
         if not self.groupings_as_class:
             packages = ApiModelBuilder(self.iskeyword, self.language, bundle.name).generate(modules)
         else:
-            packages = GroupingClassApiModelBuilder(self.iskeyword, self.language).generate(modules)
+            packages = GroupingClassApiModelBuilder(self.iskeyword, self.language, bundle.name).generate(modules)
         packages.extend(
             SubModuleBuilder().generate(pyang_builder.get_submodules(), self.iskeyword, self.language, bundle.name))
 
@@ -234,7 +234,8 @@ class YdkGenerator(object):
 
         # write init file for bundle models directory.
         bundle_model_dir = os.path.join(gen_api_root, 'ydk')
-        os.mkdir(bundle_model_dir)
+        if not os.path.exists(bundle_model_dir):
+            os.mkdir(bundle_model_dir)
 
         return gen_api_root
 

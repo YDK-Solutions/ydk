@@ -236,6 +236,8 @@ class NamedElement(Element):
 
     def qualified_go_name(self):
         ''' get the Go qualified name (sans package name) '''
+        if self.stmt.keyword == 'identity':
+            return camel_snake(self.stmt.arg)
         names = []
         element = self
         while element is not None and not isinstance(element, Package):
@@ -892,6 +894,9 @@ def snake_case(input_text):
 
 def camel_case(input_text):
     return ''.join([word.title() for word in input_text.split('-')])
+
+def camel_snake(input_text):
+    return '_'.join([word.title() for word in input_text.split('-')])
 
 def escape_name(name):
     name = name.replace('+', '__PLUS__')

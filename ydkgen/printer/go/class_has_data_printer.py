@@ -31,9 +31,9 @@ class ClassDataFilterPrinter(FunctionPrinter):
         self.print_function_header_helper('HasDataOrFilter', return_type='bool')
 
     def print_function_body(self):
-        iter_stmt = 'for _, %s := range &{0}.%s {{'.format(self.class_alias)
+        iter_stmt = 'for _, %s := range {0}.%s {{'.format(self.class_alias)
 
-        a_stmt =  'if(leaf != nil) {'
+        a_stmt =  'if(&leaf != nil) {'
         for leaf in self.leafs:
             if leaf.is_many:
                 self._print_many(iter_stmt % ('leaf', leaf.go_name()), a_stmt)
@@ -42,7 +42,7 @@ class ClassDataFilterPrinter(FunctionPrinter):
         for child in self.children:
             if child.is_many:
                 self._print_many(iter_stmt % ('child', child.go_name()), a_stmt)
-        
+
         conditions = self._get_conditions()
         if len(conditions) == 0:
             self.ctx.writeln('return false')
@@ -51,10 +51,10 @@ class ClassDataFilterPrinter(FunctionPrinter):
 
     def _get_conditions(self):
         conditions = []
-        line = '&{0}.%s != nil'.format(self.class_alias)
+        line = '{0}.%s != nil'.format(self.class_alias)
         conditions.extend([line % l.go_name() for l in self.leafs if not l.is_many])
 
-        line = '&{0}.{{0}} != nil && &{0}.{{0}}.HasDataOrFilter()'.format(self.class_alias)
+        line = '{0}.{{0}}.HasDataOrFilter()'.format(self.class_alias)
         conditions.extend([line.format(c.go_name()) for c in self.children if not c.is_many])
 
         return conditions

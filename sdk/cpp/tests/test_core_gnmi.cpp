@@ -29,8 +29,8 @@
 #include "config.hpp"
 #include "catch.hpp"
 
-const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172},\"afi-safis\":{\"afi-safi\":[{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"config\":{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"enabled\":true}}]}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172},\"afi-safis\":{\"afi-safi\":[{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"config\":{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"enabled\":true}}]}}]}}}";
-const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172},\"afi-safis\":{\"afi-safi\":[{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"config\":{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"enabled\":true}}]}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172},\"afi-safis\":{\"afi-safi\":[{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"config\":{\"afi-safi-name\":\"openconfig-bgp-types:L3VPN_IPV4_UNICAST\",\"enabled\":true}}]}}]}}}";
+const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
+const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
 
 void gnmi_print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
@@ -109,7 +109,8 @@ TEST_CASE("gnmi_test_json_payload"  )
     std::cout<< rpc_json<<std::endl;
 }
 
-TEST_CASE("bgp_gnmi_create")
+
+TEST_CASE("gnmi_bgp_create")
 {
     ydk::path::Repository repo{TEST_HOME};
 
@@ -126,23 +127,13 @@ TEST_CASE("bgp_gnmi_create")
     //call delete
     (*delete_rpc)(sp);
 
-
     auto & as = bgp.create_datanode("global/config/as", "65172");
-    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
-
-    //set the enable flag
-    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
 
     //bgp/neighbors/neighbor
     auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
     auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
     auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
 
-    //bgp/neighbors/neighbor/afi-safis/afi-safi
-    auto & neighbor_af = neighbor.create_datanode("afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
-    auto & neighbor_afi_safi_name = neighbor_af.create_datanode("config/afi-safi-name" , "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
-    auto & neighbor_enabled = neighbor_af.create_datanode("config/enabled","true");
     json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
 
     CHECK( !json.empty());
@@ -194,7 +185,6 @@ TEST_CASE("gnmi_core_validate")
     std::cout << json << std::endl;
 }
 
-
 TEST_CASE("gnmi_bgp_xr_openconfig"  )
 {
     ydk::path::Repository repo{TEST_HOME};
@@ -208,36 +198,24 @@ TEST_CASE("gnmi_bgp_xr_openconfig"  )
     
     //call create
     auto & as = bgp.create_datanode("global/config/as", "65172");
-    auto & router_id = bgp.create_datanode("global/config/router-id", "1.2.3.4");
-    auto & l3vpn_ipv4_unicast = bgp.create_datanode("global/afi-safis/afi-safi[afi-safi-name='openconfig-bgp-types:L3VPN_IPV4_UNICAST']", "");
-    auto & afi_safi_name = l3vpn_ipv4_unicast.create_datanode("config/afi-safi-name", "openconfig-bgp-types:L3VPN_IPV4_UNICAST");
-    auto & enable = l3vpn_ipv4_unicast.create_datanode("config/enabled","true");
     //bgp/neighbors/neighbor
     auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
     auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
-    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
-    auto & peer_group = neighbor.create_datanode("config/peer-group","IBGP");
-    //bgp/peer-groups/peer-group
-    auto & ppeer_group = bgp.create_datanode("peer-groups/peer-group[peer-group-name='IBGP']", "");
-    auto & peer_group_name = ppeer_group.create_datanode("config/peer-group-name", "IBGP");
-    auto & ppeer_as = ppeer_group.create_datanode("config/peer-as","65172");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");    
 
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
     REQUIRE( !json.empty() );
     create_rpc->get_input_node().create_datanode("entity", json);
-
     auto res = (*create_rpc)(sp);
 
 	//call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
     auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
-
     json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
     REQUIRE( !json.empty() );
     read_rpc->get_input_node().create_datanode("filter", json);
     read_rpc->get_input_node().create_datanode("only-config");
-
     auto read_result = (*read_rpc)(sp);
 
     REQUIRE(read_result != nullptr);

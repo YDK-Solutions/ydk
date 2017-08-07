@@ -66,7 +66,6 @@ TEST_CASE("gnmi_create")
     REQUIRE(result == ok);
 }
 
-
 TEST_CASE("gnmi_edit_get_config")
 {
     gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
@@ -77,12 +76,12 @@ TEST_CASE("gnmi_edit_get_config")
     REQUIRE(result == ok);
 
     string reply = client.execute_wrapper(
-     R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172,\"router-id\":\"1.2.3.4\"}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"6.7.8.9\",\"config\":{\"local-as\":65001,\"neighbor-address\":\"6.7.8.9\",\"peer-as\":65001,\"peer-group\":\"IBGP\"}}]},\"peer-groups\":{\"peer-group\":[{\"peer-group-name\":\"IBGP\",\"config\":{\"description\":\"test description\",\"local-as\":65001,\"peer-as\":65001,\"peer-group-name\":\"IBGP\"}}]}}}"}})", "create");
+     R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}"}})", "create");
     REQUIRE(NULL != strstr(reply.c_str(), "Success"));
 
     reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"openconfig-bgp:bgp\":{}}"}})", "read");
     
-    REQUIRE(NULL != strstr(reply.c_str(), R"("config":{"as":"65172"})"));
+    REQUIRE(NULL != strstr(reply.c_str(), R"({"as":65172})"));
 
     reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{}}"}})", "delete");
     REQUIRE(NULL != strstr(reply.c_str(), "Success"));
@@ -97,7 +96,6 @@ TEST_CASE("gnmi_device_not_connected_execute")
 
     try
     {
-
         string s = client.execute_wrapper( R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172,\"router-id\":\"1.2.3.4\"}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"6.7.8.9\",\"config\":{\"local-as\":65001,\"neighbor-address\":\"6.7.8.9\",\"peer-as\":65001,\"peer-group\":\"IBGP\"}}]},\"peer-groups\":{\"peer-group\":[{\"peer-group-name\":\"IBGP\",\"config\":{\"description\":\"test description\",\"local-as\":65001,\"peer-as\":65001,\"peer-group-name\":\"IBGP\"}}]}}}"}})", "create");
         std::cout << "s: " << s << std::endl;
         REQUIRE(s == "");
@@ -140,8 +138,8 @@ TEST_CASE("RpcInvalid")
     REQUIRE(result == ok);
 }*/
 
-/* To Do
-TEST_CASE("gnmi_wrong_json")
+
+/*TEST_CASE("gnmi_wrong_json")
 {
     gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
 
@@ -152,15 +150,16 @@ TEST_CASE("gnmi_wrong_json")
 
     try
     {
-        string reply = client.execute_wrapper("{\"testing\"}", "read");
+        string reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"testing}"}})", "read");
         std::cout << "reply: " << reply << std::endl;
-        REQUIRE(NULL != strstr(reply.c_str(), "parse error"));
+        //REQUIRE(NULL != strstr(reply.c_str(), "parse error"));
     }
     catch (YCPPError & e)
     {
-        REQUIRE(e.err_msg=="parse error - unexpected '{'; expected string literal");
+        std::cout << e.err_msg << std::endl;
+        //REQUIRE(e.err_msg=="parse error - unexpected '{'; expected string literal");
     }
-    REQUIRE(result == ok);
+    //REQUIRE(result == ok);
 }*/
 
 // Disabled as we want to be able to send any RPC via client

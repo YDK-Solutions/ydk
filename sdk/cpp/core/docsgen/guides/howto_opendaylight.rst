@@ -9,7 +9,9 @@ Applications can be written using the C++ model API in conjunction with a servic
 Writing the app
 ----------------
 
-In this example, we set some BGP configuration using the Cisco IOS XR model, the :cpp:class:`CRUD (Create/Read/Update/Delete) service<ydk::CrudService>` and the :cpp:class:`OpenDaylight service provider<ydk::OpenDaylightServiceProvider>`. The example in this document is a simplified version of the more complete sample that is available in ``core/samples/bgp_xr_opendaylight.cpp``. Assuming you have performed the core and cisco-ios-xr bundle installations first, that more complete sample can be run with the below steps::
+In this example, we set some BGP configuration using the Cisco IOS XR model, the :cpp:class:`CRUD (Create/Read/Update/Delete) service<ydk::CrudService>` and the :cpp:class:`OpenDaylight service provider<ydk::OpenDaylightServiceProvider>`. The example in this document is a simplified version of the more complete sample that is available in ``core/samples/bgp_xr_opendaylight.cpp``. Assuming you have performed the core and cisco-ios-xr bundle installations first, that more complete sample can be run with the below steps:
+
+.. code-block:: sh
 
   ydk-cpp$ cd core/samples
   samples$ mkdir build && cd build
@@ -35,7 +37,7 @@ In our example YDK application, first, let us include the necessary header files
 
  #include <iostream>
  #include <spdlog/spdlog.h>
- 
+
  #include <ydk/crud_service.hpp>
  #include <ydk/path_api.hpp>
  #include <ydk/opendaylight_provider.hpp>
@@ -43,10 +45,10 @@ In our example YDK application, first, let us include the necessary header files
 
  #include <ydk_cisco_ios_xr/Cisco_IOS_XR_ipv4_bgp_cfg.hpp>
  #include <ydk_cisco_ios_xr/Cisco_IOS_XR_ipv4_bgp_datatypes.hpp>
- 
+
   // indicate the namespaces being used (optional)
   using namespace std;
-  using namespace ydk; 
+  using namespace ydk;
   using namespace Cisco_IOS_XR_ipv4_bgp_cfg;
   using namespace Cisco_IOS_XR_ipv4_bgp_datatypes;
 
@@ -105,7 +107,7 @@ The CRUD service provides methods to create, read, update and delete entities on
 
  CrudService crud_service{};
 
-At this point we can explore the southbound device node-IDs using the function call: ``provider.get_node_ids()``. Let us assume there is a XR device mounted with the node ID "xr". We can obtain the :cpp:class:`ServiceProvider<ydk::path::ServiceProvider>` instance corresponding to this node using the function call: ``odl_provider.get_node_provider("xr")``.
+At this point we can explore the southbound device node-IDs using the function call: ``provider.get_node_ids()``. Let us assume there is a XR device mounted with the node ID "xr". We can obtain the :cpp:class:`ServiceProvider<ydk::ServiceProvider>` instance corresponding to this node using the function call: ``odl_provider.get_node_provider("xr")``.
 
 Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudService>` class passing in the service provider instance and our entity, ``bgp``
 
@@ -116,7 +118,7 @@ Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudSer
  {
    auto & provider = odl_provider.get_node_provider("xr");
    crud_service.create(provider, *bgp);
- }    
+ }
  catch(YCPPError & e)
  {
    cerr << "Error details: " << e.what() << endl;
@@ -135,4 +137,3 @@ YDK uses the `spdlog` logging library. The logging can be enabled as follows by 
  {
    auto console = spdlog::stdout_color_mt("ydk");
  }
-

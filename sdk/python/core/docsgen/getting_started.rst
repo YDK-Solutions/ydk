@@ -10,20 +10,25 @@ The YANG Development Kit (YDK) is a Software Development Kit that provides API's
 
 System Requirements
 ===================
+Please follow the below instructions to install the system requirements before installing YDK-Py:
+
 Linux
 -----
-Ubuntu (Debian-based) - The following packages must be present in your system before installing YDK-Py:
+Ubuntu (Debian-based)
 
 .. code-block:: sh
 
-   $ sudo apt-get install python-pip zlib1g-dev python-lxml libxml2-dev libxslt1-dev python-dev
+   $ sudo apt-get install gdebi-core
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
+   $ sudo gdebi libydk_0.6.0-1_amd64.deb
 
-Centos (Fedora-based) - The following packages must be present in your system before installing YDK-Py:
+Centos (Fedora-based)
 
 .. code-block:: sh
 
    $ sudo yum install epel-release
-   $ sudo yum install python-pip python-devel libxml2-devel libxslt-devel libcurl-devel libtool
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.0/libydk-0.6.0-1.x86_64.rpm
+   $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
 
 macOS
 -----
@@ -33,18 +38,21 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install python pkg-config libssh xml2 curl pcre
+   $ brew install python pkg-config libssh xml2 curl pcre cmake
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk_0.6.0_Darwin.pkg
+   $ sudo installer -pkg libydk_0.6.0_Darwin.pkg -target /
 
 Windows
 -------
-You must install the following requirements:
-
-  * `Python Releases for Windows <https://www.python.org/downloads/windows/>`_
-  * `Visual C++ Build Tools <http://landinghub.visualstudio.com/visual-cpp-build-tools>`_
+Currently, ``YDK-Py`` from release ``0.6.0`` onwards is not supported on Windows.
 
 Python Requirements
 ===================
-Both Python 2 and 3 are supported.  At least, Python2.7 or Python 3.4 must be installed in your system.
+Both Python 2 and 3 are supported.  At least Python2.7 or Python 3.4 must be installed in your system.
+
+Backwards Compatibility Notes
+=============================
+When installing and using the ``0.6.0`` and newer releases of ``YDK-Py``, please refer to the :ref:`compatibility`.
 
 .. _howto-install:
 

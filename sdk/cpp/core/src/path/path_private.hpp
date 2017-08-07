@@ -25,13 +25,10 @@
 #define YDK_PRIVATE_HPP
 
 #include <algorithm>
-#include <map>
 #include <cstdlib>
 #include <functional>
-#include <iostream>
 #include <cstring>
 #include <cassert>
-#include <sstream>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -52,8 +49,8 @@ namespace ydk {
 
         class RepositoryPtr : public std::enable_shared_from_this<RepositoryPtr> {
         public:
-            RepositoryPtr();
-            RepositoryPtr(const std::string& search_dir);
+            explicit RepositoryPtr(ModelCachingOption caching_option);
+            explicit RepositoryPtr(const std::string& search_dir, ModelCachingOption caching_option);
             ~RepositoryPtr();
 
             std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables,
@@ -88,6 +85,7 @@ namespace ydk {
          private:
             std::vector<ModelProvider*> model_providers;
             bool using_temp_directory;
+            ModelCachingOption caching_option;
         };
 
         class SchemaNodeImpl : public SchemaNode
@@ -124,8 +122,8 @@ namespace ydk {
         class RootSchemaNodeImpl : public RootSchemaNode
         {
         public:
-            RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo);
-            RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo,
+            explicit RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> & repo);
+            explicit RootSchemaNodeImpl(struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> & repo,
                                                    const std::vector<std::unordered_map<std::string, path::Capability>>& lookup_tables);
 
             ~RootSchemaNodeImpl();
@@ -165,7 +163,7 @@ namespace ydk {
         class DataNodeImpl : public DataNode{
 
         public:
-            DataNodeImpl(DataNode* parent, struct lyd_node* node, const std::shared_ptr<RepositoryPtr> repo);
+            DataNodeImpl(DataNode* parent, struct lyd_node* node, const std::shared_ptr<RepositoryPtr> & repo);
 
             //no copy constructor
             DataNodeImpl(const DataNodeImpl& dn) = delete;
@@ -230,8 +228,8 @@ namespace ydk {
 
         class RootDataImpl : public DataNodeImpl {
         public:
-            RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path);
-            RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string path, const std::shared_ptr<RepositoryPtr> repo);
+            RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string & path);
+            RootDataImpl(const SchemaNode& schema, struct ly_ctx* ctx, const std::string & path, const std::shared_ptr<RepositoryPtr> & repo);
 
             ~RootDataImpl();
 
@@ -267,11 +265,11 @@ namespace ydk {
         class RpcImpl : public Rpc {
         public:
 
-            RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo);
+            RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> & repo);
 
             ~RpcImpl();
 
-            std::shared_ptr<DataNode> operator()(const ServiceProvider& provider);
+            std::shared_ptr<DataNode> operator()(const Session& session);
 
             DataNode& get_input_node() const;
 

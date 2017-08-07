@@ -227,7 +227,6 @@ std::string NetconfTCPClient::recv_value()
     {
         do
         {
-            found = false;
             bzero(&buf, sizeof(buf));
             nread = 0;
             res = curl_easy_recv(curl, buf, sizeof(buf)-1, &nread);

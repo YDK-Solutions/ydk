@@ -97,11 +97,17 @@ function init_confd {
 function init_rest_server {
     print_msg "starting rest server"
     rest_server_id=$(./test/start_rest_server.sh)
+    print_msg "Rest server started with PID $(rest_server_id)"
 }
 
 function init_tcp_server {
     print_msg "starting tcp proxy server"
     ./test/tcp_proxy_server.py -b 12307 -c 2023 &> /dev/null &
+    local status=$?
+    if [ $status -ne 0 ]; then
+        print_msg "Could not start tcp server"
+        exit $status
+    fi
 }
 
 function py_sanity_ydktest {
@@ -297,6 +303,18 @@ function py_sanity_augmentation_test {
     run_test sdk/python/core/tests/test_on_demand.py
 }
 
+function py_sanity_common_cache {
+    print_msg "py_sanity_common_cache"
+
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
+    run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
+    run_test sdk/python/core/tests/test_sanity_augmentation.py --common-cache
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    run_test sdk/python/core/tests/test_sanity_levels.py --common-cache
+    run_test sdk/python/core/tests/test_sanity_types.py --common-cache
+}
+
 function cpp_sanity_core_gen_install {
     print_msg "cpp_sanity_core_gen_install"
 
@@ -380,6 +398,7 @@ function py_tests {
     py_sanity_ydktest
     py_sanity_deviation
     py_sanity_augmentation
+    py_sanity_common_cache
     teardown_env
 }
 

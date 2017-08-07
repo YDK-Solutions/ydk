@@ -34,19 +34,19 @@ using namespace std;
 // cancel_commit -- issues in netsim
 //TEST_CASE("cancel_commit")
 //{
-//    // provider
+//    // session
 //    path::Repository repo{TEST_HOME};
 //    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
 //    NetconfService ns{};
 //
-//    auto reply = ns.cancel_commit(provider);
+//    auto reply = ns.cancel_commit(session);
 //    REQUIRE(reply);
 //}
 
 // close_session
 TEST_CASE("close_session")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -58,7 +58,7 @@ TEST_CASE("close_session")
 // commit
 TEST_CASE("commit")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -70,7 +70,7 @@ TEST_CASE("commit")
 // copy_config
 TEST_CASE("copy_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -85,21 +85,21 @@ TEST_CASE("copy_config")
 // delete_config -- issues in netsim
 TEST_CASE("delete_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     DataStore target = DataStore::url;
 
-//    auto reply = ns.delete_config(provider, target, "http://test");
-    CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YCPPServiceProviderError);
+//    auto reply = ns.delete_config(session, target, "http://test");
+    CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YCPPError);
 }
 
 // discard_changes
 TEST_CASE("discard_changes")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -111,7 +111,7 @@ TEST_CASE("discard_changes")
 // edit_config, get_config
 TEST_CASE("edit_config")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -139,7 +139,7 @@ TEST_CASE("edit_config")
 // get
 TEST_CASE("get")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -153,21 +153,21 @@ TEST_CASE("get")
 // kill_session
 TEST_CASE("kill_session")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
 
     int session_id = 3;
 
-//    auto reply = ns.kill_session(provider, session_id);
-    CHECK_THROWS_AS(ns.kill_session(provider, session_id), YCPPServiceProviderError);
+//    auto reply = ns.kill_session(session, session_id);
+    CHECK_THROWS_AS(ns.kill_session(provider, session_id), YCPPError);
 }
 
 // lock, unlock
 TEST_CASE("lock")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
@@ -184,7 +184,7 @@ TEST_CASE("lock")
 // validate
 TEST_CASE("validate")
 {
-    // provider
+    // session
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};

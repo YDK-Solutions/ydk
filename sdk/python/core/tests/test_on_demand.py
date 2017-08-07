@@ -33,7 +33,6 @@ from ydk.services import CRUDService
 from ydk.services import CodecService
 
 from ydk.models.augmentation import ietf_aug_base_1
-from ydk.models.augmentation import ietf_aug_base_2
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -119,32 +118,15 @@ class SanityYang(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        hostname = getattr(cls, 'hostname', '127.0.0.1')
-        username = getattr(cls, 'username', 'admin')
-        password = getattr(cls, 'password', 'admin')
-        port = getattr(cls, 'port', 12022)
-        protocol = getattr(cls, 'protocol', 'ssh')
-        on_demand = not getattr(cls, 'non_demand', True)
-
         tmp_dir = tempfile.mkdtemp()
         repo = Repository(tmp_dir)
 
-        cls.ncc_empty_repo = NetconfServiceProvider(repo, hostname, username, password, port, protocol, on_demand)
-        cls.ncc = NetconfServiceProvider(hostname, username, password, port, protocol, on_demand)
+        cls.ncc_empty_repo = NetconfServiceProvider(repo, cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
+        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
         cls.crud = CRUDService()
 
         cls.codec_provider = CodecServiceProvider()
         cls.codec = CodecService()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_on_demand_downloading(self):
         # create augmentation configuration
@@ -177,9 +159,9 @@ class SanityYang(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    device, non_demand = get_device_info()
+    device, non_demand, common_cache = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand))
+    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand, common_cache=common_cache))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

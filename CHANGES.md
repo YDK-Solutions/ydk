@@ -1,3 +1,61 @@
+### 2017-08-01 version 0.6.0
+
+#### Python
+ * Introduced new YDK python [`core`](https://github.com/CiscoDevNet/ydk-py/tree/master/core) package using [pybind11](https://github.com/pybind/pybind11) to wrap around YDK C++ [`core`](https://github.com/CiscoDevNet/ydk-cpp/tree/master/core) ([#507](https://github.com/CiscoDevNet/ydk-gen/pull/507))
+   * Introduced `ydk.path` module consisting of APIs to read, manipulate and write YANG data using XPath-like expressions
+   * Updated YDK services and providers to internally use the path API
+   * Introduced `RestconfServiceProvider` and `OpenDaylightServiceProvider`
+   * Updated `NetconfServiceProvider` to be able to download the device yang models on connecting to a device
+   * Introduced ability to encode/decode subtree XML in `CodecService` and changed `CRUDService` to use XML subtree filtering to create filters for the `read` operation
+   * Added equality/inequality operators to compare YDK model API objects
+
+##### Note on backward compatibility
+The [backward incompatible](http://ydk.cisco.com/py/docs/backward_compatibility.html) changes introduced with `0.6.0` python release include:
+ * **Installation:** When installing `YDK-Py`, there is a new system requirement which needs to be installed. This is the `libydk` library, which is available on the DevHub website for various OS platforms. Please refer to the [system requirements](https://github.com/CiscoDevNet/ydk-py/blob/master/README.rst#system-requirements) for details.
+* **Windows support:** From release ``0.6.0`` onwards, YDK is no longer supported on the Windows platform. We plan to add back support for this platform in the future.
+* **API changes:** Please refer to the [developer guide](http://ydk.cisco.com/py/docs/developer_guide.html) and [API guide](http://ydk.cisco.com/py/docs/api_guide.html) for details about APIs and how to use them.
+   * `NetconfServiceProvider` no longer has the `close()` method. There is no need to explicitly close the provider as it will be automatically cleaned up when the object goes out of scope.
+   * `YFilter` has replaced the functionality of the `READ` and `DELETE` objects
+   * When using logging, the suggested level for users of YDK is `INFO` as `DEBUG` provides highly detailed logging suitable for developers working on YDK
+   * The type names of `enumerations` and `identities` no longer have `Enum` or `Identity` in their names. For example, the  identity `InterfaceTypeIdentity` in `ydk.models.ietf.ietf_interfaces` is now renamed to just `InterfaceType`
+
+
+#### C++
+ * Renamed some of the methods in path API to be verbs like `DataNode::get_schema()` instead of nouns like `DataNode::schema()` ([#498](https://github.com/CiscoDevNet/ydk-gen/pull/498))
+ * Add option for TCP transport in `NetconfServiceProvider` ([#476](https://github.com/CiscoDevNet/ydk-gen/pull/476), [#444](https://github.com/CiscoDevNet/ydk-gen/pull/444))
+  * Support `get`/`get-config` with no filter in path API ([#503](https://github.com/CiscoDevNet/ydk-gen/pull/503))
+ * Introduce optimized on-demand yang model downloading for `NetconfServiceProvider` ([#499](https://github.com/CiscoDevNet/ydk-gen/pull/499))
+ * Add support for choosing either a per-device or a common cache for storing downloaded yang models ([#502](https://github.com/CiscoDevNet/ydk-gen/pull/502))
+ * Introduced encoding/decoding subtree XML in `CodecService` and changed `CRUDService` to use XML subtree filtering to create filters for the `read` operation ([#489](https://github.com/CiscoDevNet/ydk-gen/pull/489))
+ * Added support for non-standard RPCs as well in path API ([#498](https://github.com/CiscoDevNet/ydk-gen/pull/498))
+ * Add ability to generate Linux and Mac OSX packages in cmake using [cpack](https://cmake.org/Wiki/CMake:Packaging_With_CPack) ([#466](https://github.com/CiscoDevNet/ydk-gen/pull/466))
+
+#### ydk-gen
+ * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_2_2.json) to support Cisco IOS XR 6.2.2 release
+ * Updated [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_6_1.json) to support Cisco IOS XE 16.6.1 release
+ * Also updated [`openconfig`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/openconfig_0_1_3.json) and [`ietf`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/ietf_0_1_3.json) bundles
+
+### 2017-06-06 version 0.5.5
+
+#### Python
+ * Fixed bundle `setup.py` to match ydk `core` dependency in bundle profile ([#433](https://github.com/CiscoDevNet/ydk-gen/issues/443))
+ * Updated `lxml` dependency for ydk `core` package ([#427](https://github.com/CiscoDevNet/ydk-gen/issues/427))
+ * Improved reading of data using `ExecutorService` ([#332](https://github.com/CiscoDevNet/ydk-gen/issues/332)) and `CRUDService` ([#457](https://github.com/CiscoDevNet/ydk-gen/issues/457))
+ * Fixed encoding key elements of yang `list`s ([#363](https://github.com/CiscoDevNet/ydk-gen/issues/363)) and operational data ([#452](https://github.com/CiscoDevNet/ydk-gen/issues/452), [#455](https://github.com/CiscoDevNet/ydk-gen/issues/455))
+
+#### C++
+ * Added equality operator for model API objects ([#432](https://github.com/CiscoDevNet/ydk-gen/pull/432))
+ * Improved handling of presence `container`s ([#437](https://github.com/CiscoDevNet/ydk-gen/pull/437))
+
+#### ydk-gen
+ * Added [`cisco-ios-xe` bundle](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_5_1.json) to support Cisco IOS XE 16.5.1 release
+ * Improved exception handling in the ydk-gen `generate.py` script ([#440](https://github.com/CiscoDevNet/ydk-gen/pull/440))
+
+#### Documentation
+ * Improved getting-started guides for YDK-Py and YDK-Cpp  ([#418](https://github.com/CiscoDevNet/ydk-gen/pull/418), [#419](https://github.com/CiscoDevNet/ydk-gen/pull/419))
+ * Made table of contents for bundle documentation be sorted alphabetically ([#446](https://github.com/CiscoDevNet/ydk-gen/pull/418), [#419](https://github.com/CiscoDevNet/ydk-gen/pull/446))
+ * Improved documentation of `rpc` classes ([#435](https://github.com/CiscoDevNet/ydk-gen/issues/435))
+
 ### 2017-03-17 version 0.5.4
 
 #### Python

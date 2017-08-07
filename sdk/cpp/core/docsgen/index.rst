@@ -13,6 +13,7 @@ Contents:
    :maxdepth: 2
 
    about_ydk.rst
+   introduction.rst
    getting_started.rst
-   developer_guide.rst
-   api_guide.rst   
+   guides/guides.rst
+   api/api.rst

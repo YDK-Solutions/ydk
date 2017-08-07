@@ -24,28 +24,26 @@ and :class:`~YType`.
 .. class:: Bits
 
     Represents a YANG built-in bits type.
-\
-    .. method:: \__init\__(self)
 
-        Instantiate a bit object::
+    Instantiate a bit object::
 
-            >>> from ydk.types import Bits
-            >>> bits = Bits()
+        >>> from ydk.types import Bits
+        >>> bits = Bits()
 
-    .. method:: \__setitem\__(name, value)
+    .. method:: __setitem__(self, name, value):
 
         Called to implement assignment to ``self[name]``. Assign boolean value for ``name``::
 
             >>> bits['disable-nagle'] = False
 
-    .. method:: \__getitem\__(name)
+    .. method:: __getitem__(self, name):
 
         Called to implement evaluation of ``self[name]``. Return boolean value for ``name``::
 
             >>> bits['disable-nagle']
             False
 
-    .. method:: get_bitmap
+    .. method:: get_bitmap(self):
 
         Return a dictionary wrapper for an internal C++ ``std::map<std::string, bool>`` bitmap::
 
@@ -55,13 +53,13 @@ and :class:`~YType`.
 .. class:: Decimal64(value)
 
     Represents a YANG built-in decimal64 type.
-\
-    .. method:: \__init\__(self, value)
 
-        Instantiate a decimal64 object::
+    :param value: (``str``) String representation of value:
 
-            >>> from ydk.types import Decimal64
-            >>> decimal = Decimal64('922337203685.4775807')
+    Instantiate a decimal64 object::
+
+        >>> from ydk.types import Decimal64
+        >>> decimal = Decimal64('922337203685.4775807')
 
     .. attribute:: value
 
@@ -73,28 +71,26 @@ and :class:`~YType`.
 .. class:: Empty
 
     Represents a YANG built-in empty type.
-\
-    .. method:: \__init\__(self)
 
-        Instantiate an empty object::
+    Instantiate an empty object::
 
-            >>> from ydk.types import Empty
-            >>> empty = Empty()
+        >>> from ydk.types import Empty
+        >>> empty = Empty()
 
 .. class:: Enum
 
     Represents a YANG built-in enum type, a base type for all YDK enums.
     The usage is the same as a Python enum::
-\
+
         >>> from ydk.models.openconfig import openconfig_bgp_types
         >>> e = openconfig_bgp_types.BgpSessionDirection.INBOUND
 
 .. class:: Identity
 
     Represents a YANG built-in identity type, a base type for all YDK identities::
-\
+
         >>> from ydk.models.openconfig import openconfig_bgp_types
-        >>> identity = openconfig_bgp_types.L3VpnIpv6Multicast()            # iden      ti
+        >>> identity = openconfig_bgp_types.L3VpnIpv6Multicast()
 
 
 .. _types-ydk:
@@ -105,7 +101,7 @@ YDK types
 .. class:: EncodingFormat
 
     Enum class for encoding format.
-\
+
     .. py:data:: XML
 
         XML format.
@@ -117,34 +113,31 @@ YDK types
 .. class:: Entity
 
     Super class of all classes that represents containers in YANG. YANG lists are represented as :py:class:`YList` of ``Entity`` objects, with support for hanging a parent.
-\
+
     .. py:attribute:: operation
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
 
-.. class:: YLeaf
+.. class:: YLeaf(leaf_type, name)
 
     Concrete class that represents a YANG ``leaf`` to which data can be assigned.
-\
+
+    Create a ``YLeaf`` instance.
+
+    :param leaf_type: (:py:class:`YType`) YANG type for this ``leaf``.
+    :param name: (``str``) YANG argument for this leaf.
+
     .. py:attribute:: operation
 
         Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
 
-    .. py:method:: \__init\__(self, leaf_type, name)
-
-        Create a ``YLeaf`` instance.
-
-        :param leaf_type: YANG type for this ``leaf``.
-        :type leaf_type: :py:class:`YType`
-        :param name: (``str``) YANG argument for this leaf.
-
-    .. py:method:: set(value)
+    .. py:method:: set(self, value):
 
         Set value for current leaf.
 
         :param value: Value to be set.
 
-    .. py:method:: get()
+    .. py:method:: get(self):
 
         Get leaf value.
 
@@ -155,41 +148,31 @@ YDK types
         >>> from ydk.types import YLeaf, YType
         >>> yleaf = YLeaf(YType.int8, 'afi-safi-name')
 
-.. class:: YLeafList
+.. class:: YLeafList(self, leaflist_type, name)
 
     Concrete class that represents a YANG ``leaf-list`` to which multiple instances of data can be appended to.
-\
-    .. py:method:: __init__(self, leaflist_type, name):
 
-        Create a ``YLeafList`` instance.
+    :param leaflist_type: (:py:class:`YType`) YANG type for this ``leaf-list``.
+    :param name: (``str``) YANG argument for this ``leaf-list``.
 
-        :param leaflist_type: YANG type for this ``leaf-list``.
-        :type leaflist_type: :py:class:`YType`
-        :param name: (``str``) YANG argument for this ``leaf-list``.
-
-    .. py:method:: append(value):
+    .. py:method:: append(self, value):
 
         Append value to current ``leaf-list``.
 
-.. class:: YList
+.. class:: YList(parent)
 
     Concrete class that represents a YANG ``list``, with pointer to its parent.
-\
-    .. py:method:: __init__(self, parent)
 
-        Create a ``YList`` instance.
+    :param parent: (:py:class:`Entity<ydk.types.Entity>`) Parent YDK ``Entity`` object.
 
-        :param parent: Parent YDK ``Entity`` object.
-        :type parent: :py:class:`Entity<ydk.types.Entity>`
-
-    .. py:method:: append(item)
+    .. py:method:: append(self, item):
 
         Append YDK ``Entity`` object to current list.
 
         :param item: YDK ``Entity`` object to be appended.
         :type param: :py:class:`Entity<ydk.types.Entity>`
 
-    .. py:method:: extend(items)
+    .. py:method:: extend(self, items):
 
         Append list of YDK ``Entity`` object to current list.
 
@@ -199,7 +182,7 @@ YDK types
 .. class:: YType
 
     Enum class representing YANG types.
-\
+
     .. py:data:: YType.bits
 
         bits type.

@@ -31,7 +31,7 @@ typedef struct nc_msg nc_reply;
 typedef struct ssh_session_struct* ssh_session;
 
 typedef struct capabilities {
-    capabilities(std::vector<std::string> cas){caps=cas;}
+    explicit capabilities(std::vector<std::string> cas):caps(cas){}
 
     std::vector<std::string> caps;
 } capabilities;

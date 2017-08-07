@@ -40,7 +40,7 @@ TEST_CASE("xr")
     // start timer
     gettimeofday(&t1, NULL);
 
-    string reply = client.execute_payload(
+    client.execute_payload(
      "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
      "<get-config>"
      "<source><candidate/></source>"

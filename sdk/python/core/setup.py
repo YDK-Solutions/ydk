@@ -32,7 +32,7 @@ NMSP_PKG_DEPENDENCIES = ["$DEPENDENCY$"]
 # Define and modify version number and package name here,
 # Namespace packages are share same prefix: "ydk-models"
 NAME = 'ydk'
-VERSION = '0.6.0-alpha'
+VERSION = '0.6.0'
 INSTALL_REQUIREMENTS = ['pybind11>=2.1.1']
 
 
@@ -85,7 +85,7 @@ class YdkBuildExtension(build_ext):
                                       get_python_library()),
                       '-DPYTHON_INCLUDE={0}'.format(
                                       get_python_include()),
-                      '-DCMAKE_BUILD_TYPE=Debug']
+                      '-DCMAKE_BUILD_TYPE=Release']
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)

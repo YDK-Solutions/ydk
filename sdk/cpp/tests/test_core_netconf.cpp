@@ -25,7 +25,6 @@
 #include <spdlog/spdlog.h>
 
 #include "path_api.hpp"
-#include "netconf_provider.hpp"
 #include "config.hpp"
 #include "catch.hpp"
 
@@ -91,8 +90,8 @@ TEST_CASE( "bgp_netconf_create" )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -105,7 +104,7 @@ TEST_CASE( "bgp_netconf_create" )
     delete_rpc->get_input_node().create_datanode("entity", xml);
 
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
 
     auto & as = bgp.create_datanode("global/config/as", "65172");
@@ -140,7 +139,7 @@ TEST_CASE( "bgp_netconf_create" )
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -150,7 +149,7 @@ TEST_CASE( "bgp_netconf_create" )
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 
@@ -167,7 +166,7 @@ TEST_CASE( "bgp_netconf_create" )
     xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
     update_rpc->get_input_node().create_datanode("entity", xml);
-    (*update_rpc)(sp);
+    (*update_rpc)(session);
 
 
 }
@@ -177,8 +176,8 @@ TEST_CASE("bits")
 {
     ydk::path::Repository repo{};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
 
@@ -193,15 +192,15 @@ TEST_CASE("bits")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 }
 
 TEST_CASE("core_validate")
 {
     ydk::path::Repository repo{};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     auto & runner = schema.create_datanode("ietf-netconf:validate", "");
 
@@ -217,7 +216,7 @@ TEST_CASE("core_validate")
     //call create
     // std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     // create_rpc->get_input_node().create_datanode("entity", xml);
-    // (*create_rpc)(sp);
+    // (*create_rpc)(session);
 }
 
 
@@ -225,13 +224,13 @@ TEST_CASE( "get_schema"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     std::shared_ptr<ydk::path::Rpc> get_schema_rpc { schema.create_rpc("ietf-netconf-monitoring:get-schema") };
     get_schema_rpc->get_input_node().create_datanode("identifier", "ydktest-sanity");
 
-    auto res = (*get_schema_rpc)(sp);
+    auto res = (*get_schema_rpc)(session);
 
     ydk::path::Codec s{};
 
@@ -244,14 +243,14 @@ TEST_CASE( "get_config"  )
 {
     ydk::path::Repository repo{};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     std::shared_ptr<ydk::path::Rpc> get_schema_rpc { schema.create_rpc("ietf-netconf:get-config") };
     get_schema_rpc->get_input_node().create_datanode("source/candidate");
     get_schema_rpc->get_input_node().create_datanode("filter", "<bgp xmlns=\"xmlns=http://openconfig.net/yang/bgp\"/>");
 
-    REQUIRE_NOTHROW((*get_schema_rpc)(sp));
+    REQUIRE_NOTHROW((*get_schema_rpc)(session));
 
 }
 
@@ -259,8 +258,8 @@ TEST_CASE( "bgp_xr_openconfig"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::NetconfServiceProvider sp{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -291,21 +290,19 @@ TEST_CASE( "bgp_xr_openconfig"  )
     REQUIRE( !xml.empty() );
     create_rpc->get_input_node().create_datanode("entity", xml);
 
-    auto res = (*create_rpc)(sp);
+    auto res = (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
     auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
 
 
-    const ydk::path::DataNode* data_root2 = reinterpret_cast<const ydk::path::DataNode*>(&bgp_read.get_root());
-
     xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
     REQUIRE( !xml.empty() );
     read_rpc->get_input_node().create_datanode("filter", xml);
     read_rpc->get_input_node().create_datanode("only-config");
 
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 }
@@ -316,8 +313,8 @@ TEST_CASE( "bgp_xr_openconfig"  )
 
 //    ydk::path::Repository repo{};
 //
-//    ydk::NetconfServiceProvider sp{repo,"localhost", "admin", "admin",  1220};
-//    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+//    ydk::path::NetconfSession session{repo,"localhost", "admin", "admin",  1220};
+//    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 //
 //    ydk::path::Codec s{};
 //
@@ -337,7 +334,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //  REQUIRE( !xml.empty() );
 //  create_rpc->get_input_node().create_datanode("entity", xml);
 //
-//  auto res = (*create_rpc)(sp);
+//  auto res = (*create_rpc)(session);
 //
 //  //call read
 //    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -349,7 +346,7 @@ TEST_CASE( "bgp_xr_openconfig"  )
 //    read_rpc->get_input_node().create_datanode("filter", xml);
 //    read_rpc->get_input_node().create_datanode("only-config");
 //
-//    auto read_result = (*read_rpc)(sp);
+//    auto read_result = (*read_rpc)(session);
 //
 //    REQUIRE(read_result != nullptr);
 //

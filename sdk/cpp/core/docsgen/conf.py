@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'YANG Development Kit'
-copyright = u'Copyright 2016 Cisco Systems. All rights reserved'
+copyright = u'Copyright 2017 Cisco Systems. All rights reserved'
 author = u'Cisco Systems, Inc'
 
 # The version info for the project you're documenting, acts as replacement for

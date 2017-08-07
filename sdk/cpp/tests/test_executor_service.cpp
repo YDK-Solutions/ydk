@@ -136,11 +136,15 @@ TEST_CASE("es_delete_config_rpc")
     rpc.input->target->url = "http://test";
     // std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
 
-    CHECK_THROWS_AS(es.execute_rpc(provider, rpc), YCPPServiceProviderError);
+    CHECK_THROWS_AS(
+        es.execute_rpc(provider, rpc),
+        YCPPServiceProviderError
+    );
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, discard_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider, discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -201,7 +205,8 @@ TEST_CASE("es_edit_config_rpc")
     edit_config_rpc.input->target->candidate = Empty();
     edit_config_rpc.input->config = runner_xml;
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, edit_config_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider, edit_config_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
@@ -252,11 +257,15 @@ TEST_CASE("es_kill_session_rpc")
     rpc.input->session_id = 3;
 
    // std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
-    CHECK_THROWS_AS(es.execute_rpc(provider, rpc), YCPPServiceProviderError);
+    CHECK_THROWS_AS(
+        es.execute_rpc(provider, rpc),
+        YCPPServiceProviderError
+    );
 
     // Discard Changes
     ietf_netconf::DiscardChanges discard_rpc{};
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, discard_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider, discard_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 }
@@ -278,7 +287,8 @@ TEST_CASE("es_lock_rpc")
     ietf_netconf::Lock lock_rpc{};
     lock_rpc.input->target->candidate = Empty();
 
-    std::shared_ptr<Entity> reply = es.execute_rpc(provider, lock_rpc);
+    std::shared_ptr<Entity> reply = es.execute_rpc(
+        provider, lock_rpc);
     result = reply == nullptr;
     REQUIRE(result);
 
@@ -348,4 +358,3 @@ TEST_CASE("es_validate_rpc_2")
     result = reply == nullptr;
     REQUIRE(result);
 }
-

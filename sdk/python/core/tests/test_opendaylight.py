@@ -28,8 +28,6 @@ from ydk.services import CRUDService
 from ydk.types import EncodingFormat
 from ydk.path import Repository
 
-from test_utils import assert_with_error
-
 
 class SanityTest(unittest.TestCase):
 
@@ -43,16 +41,6 @@ class SanityTest(unittest.TestCase):
         self.repo = Repository(repo_path)
         self.odl = OpenDaylightServiceProvider(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON)
         self.crud = CRUDService()
-
-    @classmethod
-    def tearDownClass(self):
-        pass
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_read_ODL(self):
         bgp_filter = oc_bgp.Bgp()

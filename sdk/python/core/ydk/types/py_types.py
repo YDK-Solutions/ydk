@@ -22,7 +22,7 @@
         - Entity
 """
 from ydk.ext.types import ChildrenMap
-from ydk.ext.types import Bits, YLeaf as _YLeaf
+from ydk.ext.types import YLeaf as _YLeaf
 from ydk.ext.types import YLeafList as _YLeafList
 from ydk.ext.types import Entity as _Entity
 from ydk.filters import YFilter as _YFilter

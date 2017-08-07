@@ -49,7 +49,7 @@ class ParametrizedTestCase(unittest.TestCase):
         super(ParametrizedTestCase, self).__init__(methodName)
 
     @staticmethod
-    def parametrize(testcase_klass, device, non_demand):
+    def parametrize(testcase_klass, device, non_demand, common_cache):
         """ Create a suite containing all tests taken from the given
             subclass, passing them the parameter 'param'.
         """
@@ -59,7 +59,8 @@ class ParametrizedTestCase(unittest.TestCase):
         testcase_klass.password = device.password
         testcase_klass.port = device.port
         testcase_klass.protocol = device.scheme
-        testcase_klass.non_demand = non_demand
+        testcase_klass.on_demand = not non_demand
+        testcase_klass.common_cache = common_cache
         testnames = testloader.getTestCaseNames(testcase_klass)
         suite = unittest.TestSuite()
         for name in testnames:
@@ -73,6 +74,8 @@ def get_device_info():
                         action="store_true")
     parser.add_argument("--non-demand", help="disable on demand model downloading",
                         dest="non_demand", action="store_true")
+    parser.add_argument("--common-cache", help="use common cache directory",
+                        dest="common_cache", action="store_true")
     parser.add_argument("device", nargs='?',
                         help="NETCONF device (ssh://user:password@host:port)")
 
@@ -80,4 +83,6 @@ def get_device_info():
     if not args.device:
         args.device = "ssh://admin:admin@127.0.0.1:12022"
     device = urlparse(args.device)
-    return device, args.non_demand
+    return device, args.non_demand, args.common_cache
+
+

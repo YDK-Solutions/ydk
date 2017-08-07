@@ -17,6 +17,7 @@
 from .py_types import Entity, YList, YLeafList
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
+from ydk.ext.types import ModelCachingOption
 from ydk.ext.types import Decimal64
 from ydk.ext.types import Empty
 from ydk.ext.types import EncodingFormat
@@ -32,6 +33,7 @@ from ydk.ext.types import YLeaf
 __all__ = [ "YList",
             "Bits",
             "ChildrenMap",
+            "ModelCachingOption",
             "Decimal64",
             "Empty",
             "EncodingFormat",

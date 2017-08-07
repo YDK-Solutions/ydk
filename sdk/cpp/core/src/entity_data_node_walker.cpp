@@ -87,9 +87,7 @@ static void walk_children(Entity & entity, path::DataNode & data_node)
 static void populate_data_node(Entity & entity, path::DataNode & parent_data_node)
 {
     EntityPath path = entity.get_entity_path(entity.parent);
-    path::DataNode* data_node = nullptr;
-
-    data_node = &parent_data_node.create_datanode(path.path);
+    path::DataNode* data_node = &parent_data_node.create_datanode(path.path);
 
     if(is_set(entity.yfilter))
     {

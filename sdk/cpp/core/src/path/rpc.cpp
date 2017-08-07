@@ -37,7 +37,7 @@ ydk::path::Rpc::~Rpc()
 ////////////////////////////////////////////////////////////////////////////////
 
 
-ydk::path::RpcImpl::RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> repo) : schema_node{sn}, m_priv_repo{repo}
+ydk::path::RpcImpl::RpcImpl(SchemaNodeImpl& sn, struct ly_ctx* ctx, const std::shared_ptr<RepositoryPtr> & repo) : schema_node{sn}, m_priv_repo{repo}
 {
 
     struct lyd_node* dnode = lyd_new_path(nullptr, ctx, sn.get_path().c_str(), (void*)"", LYD_ANYDATA_SXML, 0);
@@ -56,9 +56,9 @@ ydk::path::RpcImpl::~RpcImpl()
 }
 
 std::shared_ptr<ydk::path::DataNode>
-ydk::path::RpcImpl::operator()(const ydk::path::ServiceProvider& provider)
+ydk::path::RpcImpl::operator()(const ydk::path::Session& session)
 {
-    return provider.invoke(*this);
+    return session.invoke(*this);
 }
 
 

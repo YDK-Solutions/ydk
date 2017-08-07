@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8.9)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.5.4 LANGUAGES C CXX)
+project(ydk VERSION 0.6.0 LANGUAGES C CXX)
+
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The library for  YDK API.")
 
@@ -36,7 +37,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    
+
     set (CMAKE_C_COMPILER "/usr/bin/clang")
     set (CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
@@ -48,15 +49,15 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set (CPACK_DEBIAN_PACKAGE_NAME ${CPACK_PACKAGE_NAME})
         set (CPACK_DEBIAN_PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
         set (CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
-        set (CPACK_DEBIAN_PACKAGE_DEPENDS 
-            "libcurl4-openssl-dev, 
-            libpcre3-dev, 
-            libssh-dev, 
-            libxml2-dev, 
-            libxslt1-dev, 
-            libtool-bin, 
-            cmake (>=3), 
-            git, 
+        set (CPACK_DEBIAN_PACKAGE_DEPENDS
+            "libcurl4-openssl-dev,
+            libpcre3-dev,
+            libssh-dev,
+            libxml2-dev,
+            libxslt1-dev,
+            libtool-bin,
+            cmake (>=3),
+            git,
             pkg-config")
         set (CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_CONTACT})
         set (CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION_SUMMARY})
@@ -66,7 +67,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
         # <foo>_<VersionNumber>-<DebianRevisionNumber>_<DebianArchitecture>.deb
         # libydk_0.6.0-0.1.alpha_amd64.deb   // Debian
-        set (CPACK_PACKAGE_FILE_NAME 
+        set (CPACK_PACKAGE_FILE_NAME
             "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
 
     # Linux Fedora
@@ -90,7 +91,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
         # <name>-<version>-<release>.<architecture>.(src).rpm
         # libydk-0.6.0-0.1.alpha.x86_64.rpm  // RPM
-        set (CPACK_PACKAGE_FILE_NAME 
+        set (CPACK_PACKAGE_FILE_NAME
             "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_RELEASE}.${CPACK_RPM_PACKAGE_ARCHITECTURE}")
     endif()
 endif()
@@ -115,7 +116,7 @@ endif()
 
 set(HOME_DIRECTORY $ENV{HOME})
 
-set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
@@ -144,16 +145,15 @@ set(libydk_src
     src/ietf_parser.cpp
     src/leaf_data.cpp
     src/logging_callback.cpp
+    src/service_provider.cpp
     src/netconf_client.cpp
     src/netconf_ssh_client.cpp
     src/netconf_tcp_client.cpp
-    src/netconf_model_provider.cpp
     src/netconf_provider.cpp
     src/netconf_service.cpp
+    src/path/netconf_session.cpp
     src/gnmi_client.cpp    
-    #src/gnmi_model_provider.cpp
     src/gnmi_provider.cpp
-    src/netconf_service.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
     src/opendaylight_provider.cpp
@@ -168,13 +168,16 @@ set(libydk_src
     src/path/annotation.cpp
     src/path/capability.cpp
     src/path/data_node.cpp
+    src/path/netconf_model_provider.cpp
     src/path/path.cpp
     src/path/repository.cpp
+    src/path/restconf_session.cpp
     src/path/root_data_node.cpp
     src/path/root_schema_node.cpp
     src/path/rpc.cpp
     src/path/schema_node.cpp
     src/path/statement.cpp)
+
 
 file(GLOB SPDLOG_HEADERS src/spdlog/*.h)
 file(GLOB SPDLOG_DETAILS_HEADERS src/spdlog/details/*.h)
@@ -200,19 +203,19 @@ set(libydk_install_headers
     src/executor_service.hpp
     src/filters.hpp
     src/logging_callback.hpp
-    src/netconf_provider.hpp
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
     src/json.hpp
-    src/network_topology.hpp
     src/netconf_client.hpp
+    src/netconf_provider.hpp
     src/netconf_service.hpp
+    src/network_topology.hpp
     src/opendaylight_parser.hpp
     src/opendaylight_provider.hpp
     src/path_api.hpp
+    src/restconf_client.hpp
     src/restconf_provider.hpp
-    src/service.hpp
-    src/service.hpp
+    src/service_provider.hpp
     src/types.hpp
     src/xml_subtree_codec.hpp
     src/validation_service.hpp)
@@ -450,7 +453,6 @@ foreach(yang_obj IN LISTS yang_objs)
 endforeach(yang_obj)
 
 include_directories(
-    /usr/local/include
     ${LIBYANG_INCLUDE_DIRS}
     ${LIBSSH_INCLUDE_DIRS}
     ${LIBXML2_INCLUDE_DIR}

@@ -191,7 +191,6 @@ class CodecService(object):
         Raises:
             YPYServiceProviderError if search fails.
         """
-        top_entity = None
         ns_ename = _get_ns_ename(payload, encoding)
         ydk_models = importlib.import_module('ydk.models')
         for (_, name, ispkg) in pkgutil.iter_modules(ydk_models.__path__):

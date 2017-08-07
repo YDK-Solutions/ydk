@@ -165,7 +165,7 @@ class Bits {
 
 class Decimal64 {
   public:
-    Decimal64(const std::string & value)
+    explicit Decimal64(const std::string & value)
      : value(value)
     {
     }

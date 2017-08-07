@@ -14,21 +14,21 @@ set(bundle_tests_src
         test_gnmi_client.cpp
         test_restconf_client.cpp
         testsanitynctest.cpp
-	#test_crud.cpp
+	test_crud.cpp
         test_on_demand_loading.cpp
-        #test_sanity_levels.cpp
-        #test_sanity_types.cpp
-        #testsanityvalidationtest.cpp
+	#test_sanity_levels.cpp
+	#test_sanity_types.cpp
+	#testsanityvalidationtest.cpp
         test_netconf_provider.cpp
         test_gnmi_provider.cpp
         test_restconf_provider.cpp
-        #test_sanity_codec.cpp
-        #test_netconf_operations.cpp
-        #test_executor_service.cpp
-        #test_netconf_service.cpp
-        #test_errors.cpp
-        #test_opendaylight.cpp
-        #test_xml_subtree.cpp
+	#test_sanity_codec.cpp
+	#test_netconf_operations.cpp
+	#test_executor_service.cpp
+	#test_netconf_service.cpp
+	#test_errors.cpp
+	#test_opendaylight.cpp
+	#test_xml_subtree.cpp
         main.cpp)
 
 find_library(LIBGNMI_LIBRARY
@@ -55,6 +55,7 @@ find_library(xslt_location xslt)
 find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_library(ydk_location ydk)
+find_library(ydk_openconfig_location ydk_openconfig)
 find_library(ydk_ydktest_location ydk_ydktest)
 find_library(ydk_ydktest_new_location ydk_ydktest_new)
 find_package(PythonLibs REQUIRED)
@@ -79,6 +80,7 @@ set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
     ${ydk_location}
+    ${ydk_openconfig_location}
     ${ydk_ydktest_location}
     ${ydk_ydktest_new_location}
     ${xml2_location}

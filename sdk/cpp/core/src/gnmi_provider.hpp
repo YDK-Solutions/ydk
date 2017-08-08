@@ -24,43 +24,32 @@
 #include "gnmi_client.hpp"
 #include "ietf_parser.hpp"
 #include "path_api.hpp"
+#include "service_provider.hpp"
 #include "ydk_yang.hpp"
 
 namespace ydk 
 {
     class gNMIClient;
 
-    class gNMIServiceProvider : public path::ServiceProvider 
+    class gNMIServiceProvider : public ServiceProvider 
     {
     public:
         typedef struct SecureChannelArguments
         {
-        std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-        grpc::ChannelArguments args;
-            
+            std::shared_ptr<grpc::ChannelCredentials> channel_creds;
+            grpc::ChannelArguments args;
         } SecureChannelArguments;
 
-        gNMIServiceProvider(path::Repository & repo, std::string address);
-        gNMIServiceProvider(std::string address);
+        gNMIServiceProvider(path::Repository & repo, const std::string& address);
+        gNMIServiceProvider(const std::string& address);
         ~gNMIServiceProvider();
 
-        std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const;
-        path::RootSchemaNode& get_root_schema() const;
         EncodingFormat get_encoding() const;
+        const path::Session& get_session() const;
+        std::vector<std::string> get_capabilities() const;
 
     private:
-        std::shared_ptr<path::DataNode> handle_edit(path::Rpc& ydk_rpc, std::string operation) const;
-        std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc, std::string operation) const;
-        void initialize(path::Repository& repo, std::string address);
-        std::string execute_payload(const std::string & payload, std::string operation) const;
-        void print_root_paths(ydk::path::RootSchemaNode& rsn) const;
-        void print_paths(ydk::path::SchemaNode& sn) const;
-
-    private:
-        std::unique_ptr<gNMIClient> client;
-        std::shared_ptr<ydk::path::RootSchemaNode> root_schema;
-        std::vector<std::string> server_capabilities;
-
+        const path::gNMISession session;
     };
 }
 #endif /*_GNMI_PROVIDER_H_*/

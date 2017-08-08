@@ -4,10 +4,10 @@ To build, first install [C++ core](https://github.com/CiscoDevNet/ydk-gen#second
 
 ```
 $ export GOPATH=/your/path/to/install/go/packages
-$ mkdir -p $GOPATH/github.com/CiscoDevNet/ydk-go/ydk
-$ cp -r ydk/* $GOPATH/github.com/CiscoDevNet/ydk-go/ydk
+$ mkdir -p $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
+$ cp -r ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
 $ cd ../packages
-$ cp -r ydk/*  $GOPATH/github.com/CiscoDevNet/ydk-go/ydk 
+$ cp -r ydk/*  $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
 ```
 
 Then execute the below to run the samples
@@ -19,4 +19,11 @@ $ cd samples/bgp_create && go run bgp_create
 ```
 ```
 $ cd samples/bgp_read && go run bgp_read
+```
+
+To test gen code:
+```bash
+$ go get gopkg.in/stretchr/testify.v1
+$ cd tests
+$ go test gen_code_test.go
 ```

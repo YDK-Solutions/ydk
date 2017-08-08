@@ -12,7 +12,7 @@
  * "License") you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http:www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -25,6 +25,7 @@
 package types
 
 import (
+	"reflect"
 	"sort"
 )
 
@@ -53,6 +54,20 @@ type LeafData struct {
 type NameLeafData struct {
 	Name string
 	Data LeafData
+}
+
+type nameLeafDataList []NameLeafData
+
+func (p nameLeafDataList) Len() int {
+	return len(p)
+}
+
+func (p nameLeafDataList) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p nameLeafDataList) Less(i, j int) bool {
+	return p[i].Name < p[j].Name
 }
 
 type EntityPath struct {
@@ -189,8 +204,10 @@ type ServiceProvider interface {
 	Disconnect()
 }
 
-type CodecServiceProvider struct {
-	Encoding EncodingFormat
+type CodecServiceProvider interface {
+	Initialize(Entity)
+	GetEncoding() EncodingFormat
+	GetRootSchemaNode(Entity) RootSchemaNode
 }
 
 type Protocol int
@@ -204,12 +221,17 @@ type DataNode struct {
 	Private interface{}
 }
 
+type RootSchemaNode struct {
+	Private interface{}
+}
+
 type CServiceProvider struct {
 	Private interface{}
 }
 
 type Repository struct {
-	Path string
+	Path    string
+	Private interface{}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -268,4 +290,79 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 
 func IsSet(Filter YFilter) bool {
 	return Filter != NotSet
+}
+
+func sortValuePaths(v []NameLeafData) []NameLeafData {
+	ret := make([]NameLeafData, 0)
+	for _, v := range v {
+		ret = append(ret, v)
+	}
+	sort.Sort(nameLeafDataList(ret))
+	return ret
+}
+
+func nameValuesEqual(e1, e2 Entity) bool {
+	value_path1 := e1.GetEntityPath(e1.GetParent()).ValuePaths
+	value_path2 := e2.GetEntityPath(e2.GetParent()).ValuePaths
+	path1 := sortValuePaths(value_path1)
+	path2 := sortValuePaths(value_path2)
+
+	if len(path1) != len(path2) {
+		return false
+	}
+
+	ret := true
+	for k := range path1 {
+		name1 := path1[k].Name
+		value1 := path1[k].Data
+		name2 := path2[k].Name
+		value2 := path2[k].Data
+
+		if name1 != name2 || !reflect.DeepEqual(value1, value2) {
+			ret = false
+			break
+		}
+	}
+	return ret
+}
+
+func deepValueEqual(e1, e2 Entity) bool {
+	if e1 == nil && e2 == nil {
+		return false
+	}
+	children1 := e1.GetChildren()
+	children2 := e2.GetChildren()
+
+	marker := make(map[string]bool)
+
+	ret := true
+	for k, c1 := range children1 {
+		marker[k] = true
+		if c1.HasDataOrFilter() {
+			c2, ok := children2[k]
+			if ok && deepValueEqual(c1, c2) {
+				ret = ret && nameValuesEqual(c1, c2)
+			} else {
+				ret = false
+				break
+			}
+		}
+	}
+
+	for k := range children2 {
+		_, ok := marker[k]
+		if !ok {
+			ret = false
+			break
+		}
+	}
+
+	return ret
+}
+
+func EntityEqual(x, y Entity) bool {
+	if x == nil && y == nil {
+		return x == y
+	}
+	return deepValueEqual(x, y)
 }

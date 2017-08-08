@@ -22,13 +22,15 @@
 from __future__ import print_function
 
 import os
+from distutils.file_util import copy_file
+from distutils.dir_util import mkpath
 
 from ydkgen.api_model import Class, Enum
 from ydkgen.common import get_rst_file_name
 from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _EmitArgs
 
 from .module_printer import ModulePrinter
-from .generated_entity_lookup_printer import GeneratedEntityLookupPrinter
+from .generated_package_methods_printer import GeneratedPackageMethodsPrinter
 from ..doc import DocPrinter
 # from ..tests import TestPrinter
 
@@ -46,10 +48,10 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
 
         # generated entity lookup
         path = self.models_dir
-        generated_entity_lookup_file_name = '%s/generated_entity_lookup.go' % path
+        generated_entity_lookup_file_name = '%s/generated_package_methods.go' % path
         with open(generated_entity_lookup_file_name, 'w+') as file_descriptor:
             self.ypy_ctx.fd = file_descriptor
-            gelp = GeneratedEntityLookupPrinter(self.ypy_ctx, self.bundle_name, self.packages)
+            gelp = GeneratedPackageMethodsPrinter(self.ypy_ctx, self.bundle_name, self.packages)
             gelp.print_output()
 
         # RST documentation
@@ -73,7 +75,10 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
 
         # RST documentation
         self._print_go_rst_doc(package)
-        
+
+        # YANG models
+        self._print_yang_files()
+
         # if self.generate_tests:
         #     self._print_tests(package, self.test_dir)
 
@@ -96,28 +101,29 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
             return
         packages = [p for p in self.packages if len(p.owned_elements) > 0]
 
-        self.print_file(
-            get_table_of_contents_file_name(self.ydk_doc_dir),
-            emit_table_of_contents,
-            _EmitArgs(self.ypy_ctx, packages, (self.bundle_name, self.bundle_version))
-        )
+        self.print_file(get_table_of_contents_file_name(self.ydk_doc_dir),
+                        emit_table_of_contents,
+                        _EmitArgs(self.ypy_ctx, packages, (self.bundle_name, self.bundle_version)))
 
     def _print_go_rst_doc(self, package):
         if self.ydk_doc_dir is None:
             return
 
         def _walk_n_print(named_element, p):
-            self.print_file(
-                get_go_doc_file_name(p, named_element),
-                emit_go_doc,
-                _EmitArgs(self.ypy_ctx, named_element, self.identity_subclasses)
-            )
+            self.print_file(get_go_doc_file_name(p, named_element),
+                            emit_go_doc,
+                            _EmitArgs(self.ypy_ctx, named_element, self.identity_subclasses))
 
             for owned_element in named_element.owned_elements:
                 if isinstance(owned_element, (Class, Enum)):
                     _walk_n_print(owned_element, p)
 
         _walk_n_print(package, self.ydk_doc_dir)
+
+    def _print_yang_files(self):
+        yang_files_dir = os.path.sep.join([self.models_dir, '_yang'])
+        mkpath(yang_files_dir)
+        copy_tree(self.bundle.resolved_models_dir, yang_files_dir)
 
 def get_table_of_contents_file_name(path):
     return '%s/ydk.models.rst' % path
@@ -131,4 +137,19 @@ def emit_table_of_contents(ctx, packages, extra_args):
 def emit_go_doc(ctx, named_element, identity_subclasses):
     DocPrinter(ctx, 'go').print_module_documentation(named_element, identity_subclasses)
 
+def copy_tree(src, dst):
+    names = os.listdir(src)
+    outputs = []
+
+    for n in names:
+        src_name = os.path.join(src, n)
+        dst_name = os.path.join(dst, n)
+
+        if os.path.isdir(src_name):
+            outputs.extend(copy_tree(src_name, dst_name))
+        elif dst_name.endswith('.yang'):
+            copy_file(src_name, dst_name)
+            outputs.append(dst_name)
+
+    return outputs
 

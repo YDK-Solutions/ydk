@@ -12,7 +12,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http:www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  *  Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -24,33 +24,22 @@
  */
 package ydk
 
-// #cgo CXXFLAGS: -g -std=c++11
-// #cgo darwin LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
-//#include <ydk/ydk.h>
-import "C"
-
-type LogLevel int
-
-const (
-	Debug LogLevel = iota
-	Info
-	Warning
-	Error
+import (
+	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"reflect"
 )
 
-func EnableLogging(level LogLevel) {
-	switch level {
-	case Debug:
-		C.EnableLogging(C.DEBUG)
+var topEntityRegistry = make(map[string]reflect.Type)
 
-	case Info:
-		C.EnableLogging(C.INFO)
+func RegisterEntity(name string, entity_type reflect.Type) {
+	topEntityRegistry[name] = entity_type
+}
 
-	case Warning:
-		C.EnableLogging(C.WARNING)
-
-	case Error:
-		C.EnableLogging(C.ERROR)
+func GetTopEntity(name string) types.Entity {
+	_, ok := topEntityRegistry[name]
+	if !ok {
+		panic(fmt.Sprintf("Top entity '%s' not registered!", name))
 	}
+	return reflect.New(topEntityRegistry[name]).Elem().Addr().Interface().(types.Entity)
 }

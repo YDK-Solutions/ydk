@@ -47,15 +47,15 @@ class ClassConstructorPrinter(FunctionPrinter):
         self.ctx.writeln('// %s' % self.clazz.qualified_go_name())
         self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
         lines = []
-        
         # class comment
+
         if self.clazz.comment is not None:
             lines.extend(self.clazz.comment.split('\n'))
 
         # presence statement
         if self.clazz.stmt.search_one('presence') is not None:
             lines.append('This type is a presence type.')
-        
+
         for l in lines:
             self.ctx.writeln('// %s' % l)
         self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
@@ -72,11 +72,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             index += 1
             leaf_comments = []
 
-            leaf_name = ''
-            if prop.stmt.i_module.arg != self.clazz.stmt.i_module.arg:
-                leaf_name = prop.stmt.i_module.arg + ':' + prop.stmt.arg
-            else:
-                leaf_name = prop.go_name()
+            leaf_name = prop.go_name()
             type_name = get_type_name(prop.property_type)
 
             declaration_stmt = '%s interface{}' % leaf_name
@@ -88,7 +84,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             self.ctx.writelns(comments)
             self.ctx.bline()
             self.ctx.writeln(declaration_stmt)
-    
+
     def _print_children_inits(self):
         for prop in self.clazz.properties():
             if not prop.is_many:
@@ -235,7 +231,7 @@ class ClassConstructorPrinter(FunctionPrinter):
         #     if isinstance(meta_info_data.doc_link, list):
         #         doc_link = map(lambda l: '%s' % l, meta_info_data.doc_link)
         #         target = '%s%s' % (meta_info_data.doc_link_description, ''.join(doc_link))
-            
+
         #     if (prop in self.clazz.properties() and prop.is_many) or prop in self.leafs:
         #         description.append('The type is %s.' % target.lstrip())
 
@@ -330,11 +326,14 @@ def get_type_name(prop_type):
     elif prop_type.name == 'instance-identifier':
         return 'string'
     elif isinstance(prop_type, Bits):
-        return 'bits'
+        return 'interface{}'
     elif isinstance(prop_type, Class) and prop_type.is_identity():
-        return 'identityref'
+        return 'interface{}'
+    elif prop_type.name == 'leafref':
+        return 'interface{}'
     elif isinstance(prop_type, Enum):
-        return 'the enumeration %s' % prop_type.qualified_go_name()
+        return 'interface{}'
     elif isinstance(prop_type, DataType):
         return 'string'
-    return prop_type.name
+    return 'interface{}'
+

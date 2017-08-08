@@ -64,7 +64,7 @@ class GetEntityPathPrinter(FunctionPrinter):
     def print_function_body(self):
         self.ctx.writeln(
             'entityPath := types.EntityPath{Path: %s.GetSegmentPath()}' % self.class_alias)
-        
+
         # todo: check if ancestor is irrelevant (see cpp)
         if self.clazz.owner is not None and isinstance(self.clazz.owner, Package):
             pass

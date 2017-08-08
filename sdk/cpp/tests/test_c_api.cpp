@@ -34,7 +34,7 @@ const char* test_string="<runner xmlns=\"http://cisco.com/ns/yang/ydktest-sanity
 
 TEST_CASE( "codec_encode"  )
 {
-    CodecService c = CodecServiceInit();
+    Codec c = CodecInit();
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(repo, "localhost", "admin", "admin", 12022);
 
@@ -44,32 +44,32 @@ TEST_CASE( "codec_encode"  )
 
     DataNodeCreate(runner, "ytypes/built-in-t/number8", "2");
 
-    string s { CodecServiceEncode(c, runner, XML, 0)};
+    string s { CodecEncode(c, runner, XML, 0)};
     REQUIRE(s == test_string);
 
     NetconfServiceProviderFree(provider);
     RepositoryFree(repo);
-    CodecServiceFree(c);
+    CodecFree(c);
 }
 
 TEST_CASE( "codec_decode"  )
 {
-    CodecService c = CodecServiceInit();
+    Codec c = CodecInit();
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(repo, "localhost", "admin", "admin", 12022);
 
     RootSchemaNode root_schema = ServiceProviderGetRootSchema(provider);
 
-    DataNode runner = CodecServiceDecode(c, root_schema, test_string, XML);
+    DataNode runner = CodecDecode(c, root_schema, test_string, XML);
 
     REQUIRE(runner!=NULL);
 
-    string s { CodecServiceEncode(c, runner, XML, 0)};
+    string s { CodecEncode(c, runner, XML, 0)};
     REQUIRE(s == test_string);
 
     NetconfServiceProviderFree(provider);
     RepositoryFree(repo);
-    CodecServiceFree(c);
+    CodecFree(c);
 }
 
 TEST_CASE( "provider_withpath"  )
@@ -98,7 +98,7 @@ TEST_CASE( "provider"  )
 
 TEST_CASE( "rpc" )
 {
-    CodecService c = CodecServiceInit();
+    Codec c = CodecInit();
 
     Repository repo = RepositoryInitWithPath("/usr/local/share/ydktest@0.1.0/");
 
@@ -108,7 +108,7 @@ TEST_CASE( "rpc" )
     DataNode runner = RootSchemaNodeCreate(root_schema, "ydktest-sanity:runner");
 
     DataNodeCreate(runner, "ytypes/built-in-t/number8", "2");
-    const char* create_xml = CodecServiceEncode(c, runner, XML, 0);
+    const char* create_xml = CodecEncode(c, runner, XML, 0);
 
     Rpc create_rpc = RootSchemaNodeRpc(root_schema, "ydk:create");
     DataNode input = RpcInput(create_rpc);
@@ -118,7 +118,7 @@ TEST_CASE( "rpc" )
     Rpc read_rpc = RootSchemaNodeRpc(root_schema, "ydk:read");
     input = RpcInput(read_rpc);
     DataNode runner_filter = RootSchemaNodeCreate(root_schema, "ydktest-sanity:runner");
-    const char* read_xml = CodecServiceEncode(c, runner_filter, XML, 0);
+    const char* read_xml = CodecEncode(c, runner_filter, XML, 0);
 
     DataNodeCreate(input, "filter", read_xml);
     DataNode read_data = RpcExecute(read_rpc, provider);
@@ -127,5 +127,5 @@ TEST_CASE( "rpc" )
     delete read_xml;
     NetconfServiceProviderFree(provider);
     RepositoryFree(repo);
-    CodecServiceFree(c);
+    CodecFree(c);
 }

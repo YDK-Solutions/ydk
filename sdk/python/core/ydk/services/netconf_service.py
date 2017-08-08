@@ -13,11 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-import inspect
 from ydk.ext.services import DataStore, NetconfService as _NetconfService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
-
 
 class NetconfService(_NetconfService):
     """ Python wrapper for NetconfService
@@ -51,7 +49,7 @@ class NetconfService(_NetconfService):
             raise _YPYServiceError("provider, target, and source/source_config cannot be None")
 
         with _handle_error():
-            if type(source) == DataStore:
+            if isinstance(source, DataStore):
                 return self._ns.copy_config(provider, target, source, url)
             elif source_config is not None:
                 return self._ns.copy_config(provider, target, source_config)
@@ -72,29 +70,29 @@ class NetconfService(_NetconfService):
         with _handle_error():
             return self._ns.discard_changes(provider)
 
-    def edit_config(self, provider, target, config, 
+    def edit_config(self, provider, target, config,
         default_operation="", test_option="", error_option=""):
 
         if None in (provider, target, config):
             raise _YPYServiceError("provider, target, and config cannot be None")
 
         with _handle_error():
-            return self._ns.edit_config(provider, target, config, 
+            return self._ns.edit_config(provider, target, config,
                 default_operation, test_option, error_option)
 
-    def get_config(self, provider, source, filter):
-        if None in (provider, source, filter):
+    def get_config(self, provider, source, read_filter):
+        if None in (provider, source, read_filter):
             raise _YPYServiceError("provider, source, and filter cannot be None")
 
         with _handle_error():
-            return self._ns.get_config(provider, source, filter)
+            return self._ns.get_config(provider, source, read_filter)
 
-    def get(self, provider, filter):
-        if None in (provider, filter):
+    def get(self, provider, read_filter):
+        if None in (provider, read_filter):
             raise _YPYServiceError("provider and filter cannot be None")
 
         with _handle_error():
-            return self._ns.get(provider, filter)
+            return self._ns.get(provider, read_filter)
 
     def kill_session(self, provider, session_id):
         if None in (provider, session_id):
@@ -114,14 +112,12 @@ class NetconfService(_NetconfService):
         if None in (provider, target):
             raise _YPYServiceError("provider and target cannot be None")
 
-        Args:
-            provider (ydk.providers.ServiceProvider): A provider instance.
-            target (Datastore): Particular configuration to unlock. Valid
-            options are Datastore.candidate, Datastore.running, and
-            Datastore.startup if the device has such feature advertised.
+        with _handle_error():
+            return self._ns.unlock(provider, target)
 
-        Returns:
-            An ok reply string if operation succeeds.
+    def validate(self, provider, source=None, url="", source_config=None):
+        if provider is None or (source is None and source_config is None):
+            raise _YPYServiceError("provider and source/source_config cannot be None")
 
         with _handle_error():
             if type(source) == DataStore:

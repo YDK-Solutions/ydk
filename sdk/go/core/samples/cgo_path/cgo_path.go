@@ -25,7 +25,8 @@
 package main
 
 // #cgo CXXFLAGS: -g -std=c++11
-// #cgo LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
+// #cgo darwin LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
+// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
 // #include <ydk/ydk.h>
 // #include <stdlib.h>
 import "C"
@@ -50,8 +51,6 @@ func main() {
 	defer C.free(unsafe.Pointer(username))
 	var password *C.char = C.CString("admin")
 	defer C.free(unsafe.Pointer(password))
-	var path *C.char = C.CString("/usr/local/share/ydktest@0.1.0/")
-	defer C.free(unsafe.Pointer(path))
 	var runner_path *C.char = C.CString("ydktest-sanity:runner")
 	defer C.free(unsafe.Pointer(runner_path))
 	var number_path *C.char = C.CString("ytypes/built-in-t/number8")
@@ -67,9 +66,9 @@ func main() {
 	var filter_path *C.char = C.CString("filter")
 	defer C.free(unsafe.Pointer(filter_path))
 
-	codec := C.CodecServiceInit()
-	defer C.CodecServiceFree(codec)
-	repo := C.RepositoryInitWithPath(path)
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
+	repo := C.RepositoryInit()
 	defer C.RepositoryFree(repo)
 	provider := C.NetconfServiceProviderInitWithRepo(repo, address, username, password, 12022)
 	defer C.NetconfServiceProviderFree(provider)
@@ -78,7 +77,7 @@ func main() {
 	runner := C.RootSchemaNodeCreate(root_schema, runner_path)
 
 	C.DataNodeCreate(runner, number_path, number_value)
-	var create_xml *C.char = C.CodecServiceEncode(codec, runner, C.XML, 0)
+	var create_xml *C.char = C.CodecEncode(codec, runner, C.XML, 0)
 	defer C.free(unsafe.Pointer(create_xml))
 
 	create_rpc := C.RootSchemaNodeRpc(root_schema, create_path)
@@ -89,7 +88,7 @@ func main() {
 	read_rpc := C.RootSchemaNodeRpc(root_schema, read_path)
 	input = C.RpcInput(read_rpc)
 	runner_filter := C.RootSchemaNodeCreate(root_schema, runner_path)
-	var read_xml *C.char = C.CodecServiceEncode(codec, runner_filter, C.XML, 0)
+	var read_xml *C.char = C.CodecEncode(codec, runner_filter, C.XML, 0)
 	defer C.free(unsafe.Pointer(read_xml))
 
 	C.DataNodeCreate(input, filter_path, read_xml)
@@ -97,7 +96,7 @@ func main() {
 	if read_data == nil {
 		fmt.Println("uhoh")
 	}
-	var data *C.char = C.CodecServiceEncode(codec, read_data, C.XML, 1)
+	var data *C.char = C.CodecEncode(codec, read_data, C.XML, 1)
 	defer C.free(unsafe.Pointer(data))
 	s := C.GoString(data)
 	fmt.Println("Read data:", s)

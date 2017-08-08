@@ -60,6 +60,15 @@ typedef struct DataNodeWrapper
     shared_ptr<ydk::path::DataNode> priv;
 } DataNodeWrapper;
 
+typedef struct RootSchemaNodeWrapper
+{
+    RootSchemaNodeWrapper(shared_ptr<ydk::path::RootSchemaNode> node)
+        :priv(node)
+    {
+    }
+    shared_ptr<ydk::path::RootSchemaNode> priv;
+} RootSchemaNodeWrapper;
+
 //////////////////////////////////////////////////////////////////////////
 // Utility functions
 //////////////////////////////////////////////////////////////////////////
@@ -76,6 +85,21 @@ static DataNodeWrapper* wrap(shared_ptr<ydk::path::DataNode> datanode)
 static ydk::path::DataNode* unwrap(DataNodeWrapper* datanode_wrapper)
 {
     return datanode_wrapper->priv.get();
+}
+
+static RootSchemaNodeWrapper* wrap(ydk::path::RootSchemaNode* node)
+{
+    return (new RootSchemaNodeWrapper(shared_ptr<ydk::path::RootSchemaNode>(node)));
+}
+
+static RootSchemaNodeWrapper* wrap(shared_ptr<ydk::path::RootSchemaNode> node)
+{
+    return (new RootSchemaNodeWrapper(node));
+}
+
+static ydk::path::RootSchemaNode* unwrap(RootSchemaNodeWrapper* node_wrapper)
+{
+    return node_wrapper->priv.get();
 }
 
 static RpcWrapper* wrap(shared_ptr<ydk::path::Rpc> rpc)
@@ -122,12 +146,50 @@ Repository RepositoryInit()
     return static_cast<void*>(real_repo);
 }
 
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository repo, const Capability caps[], int caps_size) {
+    try
+    {
+        std::vector<ydk::path::Capability> real_caps;
+        for(int i = 0; i < caps_size; i++) {
+            real_caps.push_back(*static_cast<ydk::path::Capability*>(caps[i]));
+        }
+        ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
+        std::shared_ptr<ydk::path::RootSchemaNode> schema_node = real_repo->create_root_schema(real_caps);
+        return static_cast<void*>(wrap(schema_node));
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
 void RepositoryFree(Repository repo)
 {
     ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
     if(real_repo != NULL)
     {
         delete real_repo;
+    }
+}
+
+Capability CapabilityCreate(const char* mod, const char* rev) {
+    try
+    {
+        ydk::path::Capability * real_cap = new ydk::path::Capability(mod, rev);
+        return static_cast<void*>(real_cap);
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
+void CapabilityFree(Capability cap)
+{
+    ydk::path::Capability * real_cap = static_cast<ydk::path::Capability*>(cap);
+    if (real_cap != NULL)
+    {
+        delete real_cap;
     }
 }
 
@@ -181,26 +243,26 @@ RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
     }
 }
 
-CodecService CodecServiceInit(void)
+Codec CodecInit(void)
 {
-    ydk::path::CodecService * codec = new ydk::path::CodecService();
+    ydk::path::Codec * codec = new ydk::path::Codec();
     return static_cast<void*>(codec);
 }
 
-void CodecServiceFree(CodecService codec)
+void CodecFree(Codec codec)
 {
-    ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+    ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
     if(real_codec != NULL)
     {
         delete real_codec;
     }
 }
 
-const char* CodecServiceEncode(CodecService codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
+const char* CodecEncode(Codec codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
 {
     try
     {
-        ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+        ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
         DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
         ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
 
@@ -213,11 +275,11 @@ const char* CodecServiceEncode(CodecService codec, DataNode datanode, EncodingFo
     }
 }
 
-DataNode CodecServiceDecode(CodecService codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
+DataNode CodecDecode(Codec codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
 {
     try
     {
-        ydk::path::CodecService * real_codec = (ydk::path::CodecService*)codec;
+        ydk::path::Codec * real_codec = (ydk::path::Codec*)codec;
         ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
         shared_ptr<ydk::path::DataNode> datanode = real_codec->decode(*real_root_schema, payload, get_real_encoding(encoding));
 
@@ -242,6 +304,12 @@ DataNode RootSchemaNodeCreate(RootSchemaNode root_schema, const char* path)
     {
         return NULL;
     }
+}
+
+RootSchemaNode RootSchemaWrapperUnwrap(RootSchemaWrapper wrapper)
+{
+    RootSchemaNodeWrapper* real_wrapper = (RootSchemaNodeWrapper*) wrapper;
+    return static_cast<void*>(unwrap(real_wrapper));
 }
 
 Rpc RootSchemaNodeRpc(RootSchemaNode root_schema, const char* path)

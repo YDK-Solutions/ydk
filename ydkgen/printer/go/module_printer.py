@@ -22,6 +22,7 @@ module_printer.py
 """
 from ydkgen.api_model import Class, Enum, Bits
 from .class_printer import ClassPrinter
+from .class_identity_printer import IdentityPrinter
 # from .class_enum_printer import EnumPrinter
 
 from ydkgen.printer.file_printer import FilePrinter
@@ -35,17 +36,23 @@ class ModulePrinter(FilePrinter):
         self.bundle_name = bundle_name
         self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
+        self.cp = ClassPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
+        self.ip = IdentityPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
 
     def print_header(self, package):
         self._print_package_description(package)
         self.ctx.writeln('package %s' % package.name)
         self.ctx.bline()
         self._print_imports(package)
+        self._print_init(package)
 
     def print_body(self, package):
         classes = [clazz for clazz in package.owned_elements if isinstance(clazz, Class)]
         for clazz in classes:
-            self._print_class(clazz)
+            if clazz.is_identity():
+                self.ip.print_identity(clazz)
+            else:
+                self.cp.print_output(clazz)
 
     def print_extra(self, package):
         # self._print_enums(package, multi_file.class_list)
@@ -62,8 +69,8 @@ class ModulePrinter(FilePrinter):
                 self.ctx.writeln("// %s" % convert_to_reStructuredText(line))
 
     def _print_class(self, clazz):
-        cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
-        cp.print_output(clazz)
+        self.cp.print_output(clazz)
+        self.ip.print_identity(clazz)
 
     def _print_enums(self, package, classes):
         # self.enum_printer.print_enum_to_string_funcs(package, classes)
@@ -72,18 +79,41 @@ class ModulePrinter(FilePrinter):
     def _print_imports(self, package):
         self.ctx.writeln('import (')
         self.ctx.lvl_inc()
-        self._print_static_imports()
+        self._print_static_imports(package)
         self._print_derived_imports(package)
         self.ctx.lvl_dec()
         self.ctx.writeln(')')
         self.ctx.bline()
 
-    def _print_static_imports(self):
+    def _print_init(self, package):
+        self.ctx.writeln('func init() {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('fmt.Println("Registering top level entities for package {}")'.format(package.name))
+        for e in package.owned_elements:
+            ns = package.stmt.search_one('namespace')
+            if ns is not None and isinstance(e, Class) and not e.is_identity():
+                self.ctx.writeln('ydk.RegisterEntity("{{{} {}}}", reflect.TypeOf({}{{}}))'.format(ns.arg, e.stmt.arg, e.go_name()))
+                self.ctx.writeln('ydk.RegisterEntity("{}:{}", reflect.TypeOf({}{{}}))'.format(package.stmt.arg, e.stmt.arg, e.go_name()))
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
+
+    def _print_static_imports(self, package):
         self.ctx.writeln('"fmt"')
-        self.ctx.writeln('"github.com/CiscoDevNet/ydk-go/ydk/types"')
+        has_top_entity = False
+        for c in package.owned_elements:
+            if isinstance(c, Class) and not c.is_identity():
+                has_top_entity = True
+                break;
+        if has_top_entity:
+            self.ctx.writeln('"github.com/CiscoDevNet/ydk-go/ydk"')
+            self.ctx.writeln('"github.com/CiscoDevNet/ydk-go/ydk/types"')
+            self.ctx.writeln('"github.com/CiscoDevNet/ydk-go/ydk/models/{}"'.format(self.bundle_name))
+            self.ctx.writeln('"reflect"')
 
     def _print_derived_imports(self, package):
-        derived_imports = ['"github.com/CiscoDevNet/ydk-go/ydk/models/%s"' % self.bundle_name]
+        # derived_imports = ['"github.com/CiscoDevNet/ydk-go/ydk/models/%s"' % self.bundle_name]
+        derived_imports = []
         for imported_type in package.imported_types():
             if( self.is_derived_identity(package, imported_type) ):
                 stmt = '"github.com/CiscoDevNet/ydk-go/ydk/models/%s"' % (
@@ -91,8 +121,6 @@ class ModulePrinter(FilePrinter):
                 if stmt not in derived_imports:
                     derived_imports.append(stmt)
 
-        self.ctx.writelns(derived_imports)
+        if len(derived_imports) > 0:
+            self.ctx.writelns(derived_imports)
         self.ctx.bline()
-
-    def _print_init_function(self, package):
-        self.ctx.writeln('import (')

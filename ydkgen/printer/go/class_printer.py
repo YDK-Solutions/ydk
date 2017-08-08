@@ -51,8 +51,6 @@ class ClassPrinter(object):
         ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
 
     def _print_class_method_definitions(self, clazz, leafs, children):
-        if clazz.is_identity():
-            return
         self._print_class_has_data(clazz, leafs, children)
         self._print_class_get_filter(clazz)
         self._print_class_get_segment_path(clazz)
@@ -132,7 +130,7 @@ class ClassPrinter(object):
         bundle_name = snake_case(self.bundle_name)
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetBundleYangModelsLocation', return_type='string')
-        fp.ctx.writeln('return %s.Ydk%sModelsPath' % (bundle_name, bundle_name.title()))
+        fp.ctx.writeln('return %s.GetModelsPath()' % bundle_name)
         fp.print_function_trailer()
 
     # GetAugmentCapabilitiesFunction
@@ -157,7 +155,7 @@ class ClassPrinter(object):
         fp.print_function_header_helper('GetParent', return_type='types.Entity')
         fp.ctx.writeln('return %s.parent' % fp.class_alias)
         fp.print_function_trailer()
-    
+
     # GetYangName
     def _print_get_parent_yang_name_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)

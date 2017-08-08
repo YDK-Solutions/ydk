@@ -35,7 +35,8 @@ typedef void* DataNode;
 typedef void* Rpc;
 typedef void* SchemaNode;
 typedef void* RootSchemaNode;
-typedef void* CodecService;
+typedef void* RootSchemaWrapper;
+typedef void* Codec;
 typedef void* ServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
@@ -63,8 +64,12 @@ typedef enum LogLevel
     ERROR
 } LogLevel;
 
+Capability CapabilityCreate(const char* mod, const char* rev);
+void CapabilityFree(Capability);
+
 Repository RepositoryInitWithPath(const char*);
 Repository RepositoryInit(void);
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository, const Capability caps[], int caps_size);
 void RepositoryFree(Repository);
 
 ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
@@ -72,13 +77,14 @@ ServiceProvider NetconfServiceProviderInit(const char * address, const char * us
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
 
-CodecService CodecServiceInit(void);
-void CodecServiceFree(CodecService);
-const char* CodecServiceEncode(CodecService, DataNode, EncodingFormat, boolean);
-DataNode CodecServiceDecode(CodecService, RootSchemaNode, const char*, EncodingFormat);
+Codec CodecInit(void);
+void CodecFree(Codec);
+const char* CodecEncode(Codec, DataNode, EncodingFormat, boolean);
+DataNode CodecDecode(Codec, RootSchemaNode, const char*, EncodingFormat);
 
 DataNode RootSchemaNodeCreate(RootSchemaNode, const char*);
 Rpc RootSchemaNodeRpc(RootSchemaNode, const char*);
+RootSchemaNode RootSchemaWrapperUnwrap(RootSchemaWrapper);
 
 DataNode RpcInput(Rpc);
 DataNode RpcExecute(Rpc, ServiceProvider);

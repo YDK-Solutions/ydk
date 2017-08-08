@@ -58,32 +58,51 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # System requirements
-Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp:
+Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate--install-the-core) after installing the below requirements:
 
 ## Linux
 Ubuntu (Debian-based):
+
+**Install prebuilt libydk binary:**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.0/libydk_0.6.0-1_amd64.deb
    $ sudo gdebi libydk_0.6.0-1_amd64.deb
 ```
-
+**To build from source:**
+```
+$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake python3-dev python-dev
+```
 Centos (Fedora-based):
+
+**Install prebuilt libydk binary:**
 ```
    $ sudo yum install epel-release libssh-devel gcc-c++
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.0/libydk-0.6.0-1.x86_64.rpm
    $ sudo ln –fs /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin:$PATH
 ```
+**To build from source:**
+```
+$ sudo yum install epel-release
+$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 clang libcurl-devel
+$ sudo ln –fs $(which cmake3) /usr/bin/cmake && export PATH=/usr/bin:$PATH
+```
 
 ## macOS
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp:
+**Install prebuilt libydk binary:**
 ```
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install python pkg-config libssh xml2 curl pcre cmake
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.0/libydk-0.6.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.6.0-Darwin.pkg -target /
-
+```
+**To build from source:**
+```
+   $ xcode-select --install
+   $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   $ brew install python pkg-config libssh xml2 curl pcre cmake
 ```
 
 ## Windows

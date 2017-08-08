@@ -41,4 +41,3 @@ class IdentityPrinter(object):
         self.ctx.writeln('\treturn "{}:{}"'.format(clazz.module.arg, clazz.stmt.arg))
         self.ctx.writeln('}')
         self.ctx.bline()
-

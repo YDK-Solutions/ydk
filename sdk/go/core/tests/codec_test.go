@@ -253,15 +253,18 @@ func (suite *CodecTestSuite) TestXMLEncode() {
 }
 
 func (suite *CodecTestSuite) TestXMLDecode() {
-	bgp := ysanity_bgp.Bgp{}
-	config(&bgp)
 
-	suite.Provider.Encoding = types.XML
+	for i := 0; i < 100; i++ {
+		bgp := ysanity_bgp.Bgp{}
+		config(&bgp)
 
-	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+		suite.Provider.Encoding = types.XML
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+		entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
+		bgp_decoded := entity.(*ysanity_bgp.Bgp)
+
+		suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	}
 }
 
 func (suite *CodecTestSuite) TestXMLEncodeDecode() {

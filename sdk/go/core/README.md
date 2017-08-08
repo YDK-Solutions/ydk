@@ -6,24 +6,29 @@ To build, first install [C++ core](https://github.com/CiscoDevNet/ydk-gen#second
 $ export GOPATH=/your/path/to/install/go/packages
 $ mkdir -p $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
 $ cp -r ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
-$ cd ../packages
-$ cp -r ydk/*  $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
+$ cd ../../..
+$ ./generate.py --bundle profiles/test/ydktest-cpp.json --go
+$ cp -r gen-api/go/ydktest-bundle/ydk/models/*  $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/models
+$ cd -
 ```
 
 Then execute the below to run the samples
 ```
-$ cd samples/cgo_path && go run cgo_path
+$ go run samples/cgo_path/cgo_path.gp
 ```
 ```
-$ cd samples/bgp_create && go run bgp_create
+$ go run samples/bgp_create/bgp_create.gp
 ```
 ```
-$ cd samples/bgp_read && go run bgp_read
+$ go run samples/bgp_read/bgp_read.go
 ```
 
-To test gen code:
+To run tests:
 ```bash
+$ cd ../../..
+$ ./generate.py --bundle profiles/test/ydktest-cpp.json --go
+$ cp -r gen-api/go/ydktest-bundle/ydk/models/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/models
 $ go get gopkg.in/stretchr/testify.v1
 $ cd tests
-$ go test gen_code_test.go
+$ go test
 ```

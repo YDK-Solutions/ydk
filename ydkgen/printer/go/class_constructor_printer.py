@@ -75,10 +75,10 @@ class ClassConstructorPrinter(FunctionPrinter):
             leaf_name = prop.go_name()
             type_name = get_type_name(prop.property_type)
 
-            declaration_stmt = '%s interface{}' % leaf_name
             if prop.is_many:
-                type_name = None
-                declaration_stmt = '%s []%s' %(leaf_name, get_type_name(prop.property_type))
+                declaration_stmt = '%s []interface{}' % leaf_name
+            else:
+                declaration_stmt = '%s interface{}' % leaf_name
 
             comments = self._get_attribute_comment(prop, type_name)
             self.ctx.writelns(comments)
@@ -327,13 +327,13 @@ def get_type_name(prop_type):
     elif prop_type.name == 'instance-identifier':
         return 'string'
     elif isinstance(prop_type, Bits):
-        return 'interface{}'
+        return 'map[string]bool'
     elif isinstance(prop_type, Class) and prop_type.is_identity():
         return 'interface{}'
     elif prop_type.name == 'leafref':
         return 'interface{}'
     elif isinstance(prop_type, Enum):
-        return 'interface{}'
+        return prop_type.go_name()
     elif isinstance(prop_type, DataType):
         return 'string'
     return 'interface{}'

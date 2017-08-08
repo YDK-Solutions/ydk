@@ -23,7 +23,7 @@ module_printer.py
 from ydkgen.api_model import Class, Enum, Bits
 from .class_printer import ClassPrinter
 from .class_identity_printer import IdentityPrinter
-# from .class_enum_printer import EnumPrinter
+from .class_enum_printer import EnumPrinter
 
 from ydkgen.printer.file_printer import FilePrinter
 from ydkgen.common import convert_to_reStructuredText
@@ -36,8 +36,9 @@ class ModulePrinter(FilePrinter):
         self.bundle_name = bundle_name
         self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
-        self.cp = ClassPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
-        self.ip = IdentityPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
+        self.class_printer = ClassPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
+        self.identity_printer = IdentityPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
+        self.enum_printer = EnumPrinter(ctx)
 
     def print_header(self, package):
         self._print_package_description(package)
@@ -47,12 +48,8 @@ class ModulePrinter(FilePrinter):
         self._print_init(package)
 
     def print_body(self, package):
-        classes = [clazz for clazz in package.owned_elements if isinstance(clazz, Class)]
-        for clazz in classes:
-            if clazz.is_identity():
-                self.ip.print_identity(clazz)
-            else:
-                self.cp.print_output(clazz)
+        for elem in package.owned_elements:
+            self._print_element(elem)
 
     def print_extra(self, package):
         # self._print_enums(package, multi_file.class_list)
@@ -68,13 +65,15 @@ class ModulePrinter(FilePrinter):
             for line in comment.split('\n'):
                 self.ctx.writeln("// %s" % convert_to_reStructuredText(line))
 
-    def _print_class(self, clazz):
-        self.cp.print_output(clazz)
-        self.ip.print_identity(clazz)
-
-    def _print_enums(self, package, classes):
-        # self.enum_printer.print_enum_to_string_funcs(package, classes)
-        pass
+    def _print_element(self, elem):
+        if isinstance(elem, Enum):
+            self.enum_printer.print_enum(elem)
+        elif isinstance(elem, Bits):
+            pass
+        elif elem.is_identity():
+            self.identity_printer.print_identity(elem)
+        else:
+            self.class_printer.print_output(elem)
 
     def _print_imports(self, package):
         self.ctx.writeln('import (')
@@ -100,6 +99,8 @@ class ModulePrinter(FilePrinter):
 
     def _print_static_imports(self, package):
         self.ctx.writeln('"fmt"')
+        if self._has_bits(package):
+            self.ctx.writeln('"strings"')
         has_top_entity = False
         for c in package.owned_elements:
             if isinstance(c, Class) and not c.is_identity():
@@ -124,3 +125,9 @@ class ModulePrinter(FilePrinter):
         if len(derived_imports) > 0:
             self.ctx.writelns(derived_imports)
         self.ctx.bline()
+
+    def _has_bits(self, element):
+        for e in element.owned_elements:
+            if isinstance(e, Bits) or self._has_bits(e):
+                return True
+        return False

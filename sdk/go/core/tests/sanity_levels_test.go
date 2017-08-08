@@ -28,6 +28,7 @@ func (suite *SanityLevelsTestSuite) SetupSuite() {
 }
 
 func (suite *SanityLevelsTestSuite) BeforeTest(suiteName, testName string) {
+	suite.CRUD.Delete(&suite.Provider, &ysanity.Runner{})
 	fmt.Printf("%v: %v ...\n", suiteName, testName)
 }
 

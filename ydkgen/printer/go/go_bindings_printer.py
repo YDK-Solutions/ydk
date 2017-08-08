@@ -152,4 +152,3 @@ def copy_tree(src, dst):
             outputs.append(dst_name)
 
     return outputs
-

@@ -201,16 +201,16 @@ Only directory examples are shown below.
 
 First, generate the core and install it:
 
+For C++ or Python, the below step is required:
+```
+$ ./generate.py --cpp --core
+$ cd gen-api/cpp/ydk/build && make && sudo make install
+```
+
 For python:
 ```
 $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
-```
-
-For C++:
-```
-$ ./generate.py --cpp --core
-$ cd gen-api/cpp/ydk/build && make && sudo make install
 ```
 
 ## Third step: Generate & install your bundle

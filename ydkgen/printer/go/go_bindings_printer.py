@@ -146,7 +146,7 @@ def copy_tree(src, dst):
         dst_name = os.path.join(dst, n)
 
         if os.path.isdir(src_name):
-            outputs.extend(copy_tree(src_name, dst_name))
+            outputs.extend(copy_tree(src_name, dst))
         elif dst_name.endswith('.yang'):
             copy_file(src_name, dst_name)
             outputs.append(dst_name)

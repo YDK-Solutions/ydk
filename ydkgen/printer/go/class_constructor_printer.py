@@ -307,8 +307,9 @@ class ClassConstructorPrinter(FunctionPrinter):
 
     # todo: untested
     def _add_comment_on_status(self, description, meta_info_data):
-        if len(meta_info_data.status) > 0:
-            properties_description.append('The status is %s' % meta_info_data.status)
+        pass
+        # if len(meta_info_data.status) > 0:
+            # properties_description.append('The status is %s' % meta_info_data.status)
 
 def get_type_name(prop_type):
     if prop_type.name in ('str', 'string'):

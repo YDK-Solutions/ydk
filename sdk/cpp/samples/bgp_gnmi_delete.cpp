@@ -15,8 +15,8 @@
 ------------------------------------------------------------------*/
 #include <iostream>
 #include <memory>
-#include "../src/path_api.hpp"
-#include "../src/gnmi_provider.hpp"
+#include "ydk/path_api.hpp"
+#include "ydk/gnmi_provider.hpp"
 #include "ydk/crud_service.hpp"
 #include "ydk_openconfig/openconfig_bgp.hpp"
 #include <spdlog/spdlog.h>

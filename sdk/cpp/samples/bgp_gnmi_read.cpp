@@ -1,4 +1,22 @@
-#include "../src/gnmi_provider.hpp"
+/*  ----------------------------------------------------------------
+ Copyright 2016 Cisco Systems
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+------------------------------------------------------------------*/
+#include <iostream>
+#include <memory>
+#include "ydk/path_api.hpp"
+#include "ydk/gnmi_provider.hpp"
 #include "args_parser.h"
 #include "ydk/crud_service.hpp"
 #include "ydk_openconfig/openconfig_bgp.hpp"
@@ -8,6 +26,7 @@
 
 using namespace std;
 using namespace ydk;
+using namespace path;
 
 void print_paths(ydk::path::SchemaNode & sn)
 {
@@ -37,14 +56,14 @@ int main(int argc, char* argv[])
 
     ydk::path::Repository repo{"/usr/local/share/ydk/0.0.0.0\:50051/"};
 
-    gNMIServiceProvider sp{repo, address};
+    gNMIServiceProvider provider{repo, address};
 
     CrudService crud{};
 
     auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
-    crud.read_config(sp, *bgp_filter);
+    crud.read_config(provider, *bgp_filter);
 
-    auto bgp_read = crud.read_config(sp, *bgp_filter);
+    auto bgp_read = crud.read_config(provider, *bgp_filter);
     if(bgp_read == nullptr)
     {
         cout << "=================================================="<<endl;

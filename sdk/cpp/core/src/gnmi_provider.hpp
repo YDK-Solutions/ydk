@@ -1,4 +1,3 @@
-
 /*  ----------------------------------------------------------------
  Copyright 2016 Cisco Systems
 
@@ -22,10 +21,8 @@
 #include <libyang/libyang.h>
 
 #include "gnmi_client.hpp"
-#include "ietf_parser.hpp"
 #include "path_api.hpp"
 #include "service_provider.hpp"
-#include "ydk_yang.hpp"
 
 namespace ydk 
 {
@@ -42,14 +39,15 @@ namespace ydk
 
         gNMIServiceProvider(path::Repository & repo, const std::string& address);
         gNMIServiceProvider(const std::string& address);
-        ~gNMIServiceProvider();
+        virtual ~gNMIServiceProvider();
 
-        EncodingFormat get_encoding() const;
-        const path::Session& get_session() const;
+        virtual EncodingFormat get_encoding() const;
+        virtual const path::Session& get_session() const;
         std::vector<std::string> get_capabilities() const;
 
     private:
         const path::gNMISession session;
     };
 }
-#endif /*_GNMI_PROVIDER_H_*/
+#endif 
+/*_GNMI_PROVIDER_H_*/

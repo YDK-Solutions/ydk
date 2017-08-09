@@ -25,9 +25,10 @@
 #include <libyang/libyang.h>
 
 #include "../gnmi_client.hpp"
-#include "../ietf_parser.hpp"
-#include "../path_api.hpp"
 #include "../gnmi_provider.hpp"
+#include "../ietf_parser.hpp"
+#include "../logger.hpp"
+#include "../path_api.hpp"
 #include "../ydk_yang.hpp"
 
 using grpc::Channel;

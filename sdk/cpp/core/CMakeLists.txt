@@ -116,7 +116,7 @@ endif()
 
 set(HOME_DIRECTORY $ENV{HOME})
 
-set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
@@ -129,7 +129,7 @@ else()
     option(ENABLE_VALGRIND_TESTS "Build tests with valgrind" OFF)
 endif()
 
-# Set LibYDK variables
+# Set LibYDK variables7y4
 set(libydk_src
     src/bits.cpp
     src/codec_provider.cpp
@@ -154,6 +154,7 @@ set(libydk_src
     src/path/netconf_session.cpp
     src/gnmi_client.cpp    
     src/gnmi_provider.cpp
+    src/path/gnmi_session.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
     src/opendaylight_provider.cpp
@@ -205,7 +206,6 @@ set(libydk_install_headers
     src/logging_callback.hpp
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
-    src/json.hpp
     src/netconf_client.hpp
     src/netconf_provider.hpp
     src/netconf_service.hpp
@@ -356,7 +356,7 @@ find_package(LibXml2 REQUIRED)
 find_package(LibSSH REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Protobuf REQUIRED)
-find_package(grpc REQUIRED)
+find_package(GRPC REQUIRED)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)

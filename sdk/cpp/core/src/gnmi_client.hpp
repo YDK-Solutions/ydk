@@ -26,8 +26,8 @@
 #include <grpc++/client_context.h>
 #include <grpc++/create_channel.h>
 #include <grpc++/grpc++.h>
-#include "libgnmi/gnmi.grpc.pb.h"
-#include "libgnmi/gnmi.pb.h"
+#include "gnmi.grpc.pb.h"
+#include "gnmi.pb.h"
 
 using namespace gnmi;
 

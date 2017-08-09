@@ -20,8 +20,6 @@
 #include "logger.hpp"
 
 #include "gnmi_client.hpp"
-#include "libgnmi/gnmi.grpc.pb.h"
-#include "libgnmi/gnmi.pb.h"
 
 using namespace std;
 using namespace ydk;

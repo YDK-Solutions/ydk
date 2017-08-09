@@ -357,6 +357,7 @@ find_package(LibSSH REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
+find_library(PROTOBUF_LIBRARY Protobuf)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)

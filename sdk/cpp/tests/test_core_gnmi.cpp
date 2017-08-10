@@ -25,7 +25,6 @@
 #include <spdlog/spdlog.h>
 
 #include "path_api.hpp"
-#include "gnmi_provider.hpp"
 #include "config.hpp"
 #include "catch.hpp"
 
@@ -52,12 +51,12 @@ TEST_CASE("gnmi_test_json_payload"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::gNMIServiceProvider sp{repo,"127.0.0.1:50051"};
-    ydk::path::RootSchemaNode& root = sp.get_root_schema();
+    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
-    auto bgp = s.decode(root, R"(
+    auto bgp = s.decode(schema, R"(
     {"openconfig-bgp:bgp": 
       {
          "@": {
@@ -101,7 +100,7 @@ TEST_CASE("gnmi_test_json_payload"  )
     std::string json = s.encode(*bgp, ydk::EncodingFormat::JSON, false);
     std::cout<< json<<std::endl;
 
-    auto edit_config = root.create_rpc("ietf-netconf:get-config");
+    auto edit_config = schema.create_rpc("ietf-netconf:get-config");
     edit_config->get_input_node().create_datanode("source/candidate");
     edit_config->get_input_node().create_datanode("filter",json);
 
@@ -114,8 +113,8 @@ TEST_CASE("gnmi_bgp_create")
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::gNMIServiceProvider sp{repo,"127.0.0.1:50051"};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -125,7 +124,7 @@ TEST_CASE("gnmi_bgp_create")
     auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
     delete_rpc->get_input_node().create_datanode("entity", json);
     //call delete
-    (*delete_rpc)(sp);
+    (*delete_rpc)(session);
 
     auto & as = bgp.create_datanode("global/config/as", "65172");
 
@@ -143,7 +142,7 @@ TEST_CASE("gnmi_bgp_create")
     //call create
     std::shared_ptr<ydk::path::Rpc> create_rpc{schema.create_rpc("ydk:create")};
     create_rpc->get_input_node().create_datanode("entity", json);
-    (*create_rpc)(sp);
+    (*create_rpc)(session);
 
     //call read
     std::shared_ptr<ydk::path::Rpc> read_rpc{schema.create_rpc("ydk:read")};
@@ -151,7 +150,7 @@ TEST_CASE("gnmi_bgp_create")
     json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
     REQUIRE( !json.empty() );
     read_rpc->get_input_node().create_datanode("filter", "{\"openconfig-bgp:bgp\":{}}");
-    auto read_result = (*read_rpc)(sp); 
+    auto read_result = (*read_rpc)(session); 
     REQUIRE(read_result != nullptr);
     gnmi_print_tree(read_result.get(),"");
     json = s.encode(*read_result, ydk::EncodingFormat::JSON, false);
@@ -163,15 +162,15 @@ TEST_CASE("gnmi_bgp_create")
     CHECK( !json.empty());
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:create") };
     update_rpc->get_input_node().create_datanode("entity", json);
-    (*update_rpc)(sp);
+    (*update_rpc)(session);
 }
 
 TEST_CASE("gnmi_core_validate")
 {
     ydk::path::Repository repo{};
 
-    ydk::gNMIServiceProvider sp{repo,"127.0.0.1:50051"};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     auto & runner = schema.create_datanode("ietf-netconf:validate", "");
 
@@ -189,8 +188,8 @@ TEST_CASE("gnmi_bgp_xr_openconfig"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::gNMIServiceProvider sp{repo,"127.0.0.1:50051"};
-    ydk::path::RootSchemaNode& schema = sp.get_root_schema();
+    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
 
@@ -207,7 +206,7 @@ TEST_CASE("gnmi_bgp_xr_openconfig"  )
     auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
     REQUIRE( !json.empty() );
     create_rpc->get_input_node().create_datanode("entity", json);
-    auto res = (*create_rpc)(sp);
+    auto res = (*create_rpc)(session);
 
 	//call read
     std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
@@ -216,7 +215,7 @@ TEST_CASE("gnmi_bgp_xr_openconfig"  )
     REQUIRE( !json.empty() );
     read_rpc->get_input_node().create_datanode("filter", json);
     read_rpc->get_input_node().create_datanode("only-config");
-    auto read_result = (*read_rpc)(sp);
+    auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
 }

@@ -90,7 +90,7 @@ function install_protobuf {
 
     wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
     unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-cpp-3.3.0
+    cd protobuf-3.3.0
     ./configure
     make
     make check
@@ -103,6 +103,7 @@ function install_grpc {
     git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
+    sudo ldconfig
     make
     sudo make install
 }

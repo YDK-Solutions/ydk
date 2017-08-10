@@ -301,6 +301,15 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_root_schema", &ydk::path::NetconfSession::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::NetconfSession::invoke, return_value_policy::reference);
 
+        class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
+        .def(init<ydk::path::Repository&, const std::string&>(),
+             arg("repo"),
+             arg("address"))
+        .def(init<const std::string&>(),
+             arg("address"))
+        .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
+        .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference);
+
     class_<ydk::path::RestconfSession, ydk::path::Session>(path, "RestconfSession")
         .def("__init__",
              [](ydk::path::RestconfSession &session, ydk::path::Repository& repo,
@@ -631,12 +640,12 @@ PYBIND11_PLUGIN(ydk_)
         .def("get_session", &ydk::NetconfServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::NetconfServiceProvider::get_capabilities, return_value_policy::reference);
 
-
-    class_<ydk::gNMIServiceProvider, ydk::path::ServiceProvider>(providers, "gNMIServiceProvider")
+    class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
         .def(init<ydk::path::Repository&, string>(), arg("repo"), arg("address"))
         .def(init<string>(), arg("address"))
-        .def("invoke", &ydk::gNMIServiceProvider::invoke, return_value_policy::reference)
-        .def("get_root_schema", &ydk::gNMIServiceProvider::get_root_schema, return_value_policy::reference);
+        .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
+        .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
+        .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);
 
     class_<ydk::RestconfServiceProvider, ydk::ServiceProvider>(providers, "RestconfServiceProvider")
         .def(init<ydk::path::Repository&, string, string, string, int, ydk::EncodingFormat>(),

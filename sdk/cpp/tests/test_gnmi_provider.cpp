@@ -29,7 +29,7 @@ TEST_CASE("GNMICreateP")
 	ydk::path::Repository repo{};
 	gNMIServiceProvider provider{repo, "127.0.0.1:50051"};
 
-	CHECK_NOTHROW(provider.get_root_schema());
+	CHECK_NOTHROW(provider.get_encoding());
 }
 
 
@@ -38,5 +38,5 @@ TEST_CASE("GNMICreateNoRepoP")
 
 	gNMIServiceProvider provider{ "127.0.0.1:50051"};
 
-	CHECK_NOTHROW(provider.get_root_schema());
+	CHECK_NOTHROW(provider.get_encoding());
 }

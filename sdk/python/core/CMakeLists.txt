@@ -37,7 +37,7 @@ find_library(xslt_location xslt)
 find_library(pcre_location pcre)
 find_library(ssh_location ssh)
 find_package(Protobuf REQUIRED)
-find_package(grpc REQUIRED)
+find_package(GRPC REQUIRED)
 
 if(PYTHON_LIBRARY)
     message( "python library: ${PYTHON_LIBRARY}" )

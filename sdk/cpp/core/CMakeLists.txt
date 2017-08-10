@@ -97,6 +97,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 include(CPack)
+include(FindProtobuf)
 
 # include custom Modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
@@ -154,6 +155,7 @@ set(libydk_src
     src/path/netconf_session.cpp
     src/gnmi_client.cpp    
     src/gnmi_provider.cpp
+    src/gnmi_service.cpp
     src/path/gnmi_session.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
@@ -206,6 +208,7 @@ set(libydk_install_headers
     src/logging_callback.hpp
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
+    src/gnmi_service.hpp
     src/netconf_client.hpp
     src/netconf_provider.hpp
     src/netconf_service.hpp
@@ -345,6 +348,8 @@ set(yang_objs
     yang_types.c.o
 )
 
+set(protobuf_MODULE_COMPATIBLE TRUE)
+
 # Find dependent libraries
 find_library(curl_location curl)
 find_library(ssh_threads_location ssh_threads)
@@ -357,7 +362,6 @@ find_package(LibSSH REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
-find_library(PROTOBUF_LIBRARY Protobuf)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)
@@ -459,6 +463,7 @@ include_directories(
     ${LIBXML2_INCLUDE_DIR}
     ${libnetconf_headers_location}
     ${libnetconf_location}/headers
+    ${Protobuf_INCLUDE_DIR}
     ${libgnmi_generated_location}
     ${libyang_headers_location}
     ${libyang_location}/headers

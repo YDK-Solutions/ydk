@@ -26,6 +26,7 @@ set(bundle_tests_src
 	#test_netconf_operations.cpp
 	#test_executor_service.cpp
 	#test_netconf_service.cpp
+	#test_gnmi_service.cpp
 	#test_errors.cpp
 	#test_opendaylight.cpp
 	#test_xml_subtree.cpp

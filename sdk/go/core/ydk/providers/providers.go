@@ -41,12 +41,11 @@ type NetconfServiceProvider struct {
 }
 
 type RestconfServiceProvider struct {
-	Repo     types.Repository
+	Path     string
 	Address  string
 	Username string
 	Password string
 	Port     int
-	Encoding types.EncodingFormat
 
 	Private types.CServiceProvider
 }
@@ -64,6 +63,21 @@ func (provider *NetconfServiceProvider) Disconnect() {
 		return
 	}
 	path.DisconnectFromProvider(provider.Private)
+}
+
+func (provider *RestconfServiceProvider) GetPrivate() interface{} {
+	return provider.Private
+}
+
+func (provider *RestconfServiceProvider) Connect() {
+	provider.Private = path.ConnectToRestconfProvider(provider.Path, provider.Address, provider.Username, provider.Password, provider.Port)
+}
+
+func (provider *RestconfServiceProvider) Disconnect() {
+	if provider.Private.Private == nil {
+		return
+	}
+	path.DisconnectFromRestconfProvider(provider.Private)
 }
 
 type CodecServiceProvider struct {

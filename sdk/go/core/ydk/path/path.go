@@ -47,7 +47,7 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter stri
 		panic(1)
 	}
 
-	data := getDataPayload(entity, root_schema)
+	data := getDataPayload(entity, root_schema, provider)
 	defer C.free(unsafe.Pointer(data))
 
 	input := C.RpcInput(ydk_rpc)
@@ -60,7 +60,7 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter stri
 	return types.DataNode{C.RpcExecute(ydk_rpc, real_provider)}
 }
 
-func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode) *C.char {
+func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode, provider types.ServiceProvider) *C.char {
 	datanode := getDataNodeFromEntity(entity, root_schema)
 
 	if datanode == nil {
@@ -70,10 +70,12 @@ func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode) *C.char {
 	//for datanode != nil && C.DataNodeGetParent(datanode) != nil {
 	//	datanode = C.DataNodeGetParent(datanode)
 	//}
+	cprovider := provider.GetPrivate().(types.CServiceProvider).Private.(C.ServiceProvider)
+	cencoding := C.ServiceProviderGetEncoding(cprovider)
 
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
-	var data *C.char = C.CodecEncode(codec, datanode, C.XML, 1)
+	var data *C.char = C.CodecEncode(codec, datanode, cencoding, 1)
 
 	return (data)
 }
@@ -130,10 +132,41 @@ func DisconnectFromProvider(provider types.CServiceProvider) {
 	C.NetconfServiceProviderFree(real_provider)
 }
 
+func ConnectToRestconfProvider(Path, Address, Username, Password string, port int) types.CServiceProvider {
+	var path *C.char = C.CString(Path)
+	defer C.free(unsafe.Pointer(path))
+	var address *C.char = C.CString(Address)
+	defer C.free(unsafe.Pointer(address))
+	var username *C.char = C.CString(Username)
+	defer C.free(unsafe.Pointer(username))
+	var password *C.char = C.CString(Password)
+	defer C.free(unsafe.Pointer(password))
+	var cport C.int = C.int(port)
+
+	var p C.ServiceProvider
+
+	crepo := C.RepositoryInitWithPath(path)
+	p = C.RestconfServiceProviderInitWithRepo(crepo, address, username, password, cport)
+
+	if p == nil {
+		panic("Could not connect to " + Address)
+	}
+
+	cprovider := types.CServiceProvider{Private: p}
+	return cprovider
+}
+
+func DisconnectFromRestconfProvider(provider types.CServiceProvider) {
+	real_provider := provider.Private.(C.ServiceProvider)
+	C.RestconfServiceProviderFree(real_provider)
+}
+
 func InitCodecServiceProvider(entity types.Entity, repo types.Repository) types.RootSchemaNode {
 	caps := entity.GetAugmentCapabilitiesFunction()()
 
 	var repo_path *C.char
+	defer C.free(unsafe.Pointer(repo_path))
+
 	if len(repo.Path) > 0 {
 		fmt.Printf("CodecServiceProvider using YANG models in %v\n", repo.Path)
 		repo_path = C.CString(repo.Path)
@@ -174,6 +207,7 @@ func CodecServiceEncode(entity types.Entity, root_schema types.RootSchemaNode, e
 	defer C.CodecFree(codec)
 
 	var payload *C.char
+	defer C.free(unsafe.Pointer(payload))
 
 	switch encoding {
 	case types.XML:
@@ -193,6 +227,7 @@ func CodecServiceDecode(root_schema types.RootSchemaNode, payload string, encodi
 	defer C.CodecFree(codec)
 
 	var real_payload = C.CString(payload)
+	defer C.free(unsafe.Pointer(real_payload))
 	var real_data_node C.DataNode
 
 	switch encoding {

@@ -51,31 +51,38 @@ static string format_notification_response(string prefix_to_prepend, string path
 static ::gnmi::SetRequest allocate_set_request_path(string operation, ::gnmi::SetRequest request, vector<string> root_path, json config_payload);
 
 
-int gNMIClient::connect(string address) 
+int gNMIClient::connect(string address, bool is_secure) 
 {
-    // Authenticates server 
-    /*string server_cert;
-    ifstream rf("ems.pem");
-
-    server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
-
-    grpc::SslCredentialsOptions ssl_opts;
-    grpc::ChannelArguments      args;
-
-    ssl_opts.pem_root_certs = server_cert;
-    args.SetSslTargetNameOverride("ems.cisco.com");
-
-    // ToDo Authenticate client at server
-    /*ifstream kf("client.key");
-    ifstream cf("client.pem");
-    client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
-    client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
-    ssl_opts = {server_cert, client_key, client_cert};
+    if(is_secure) 
+    {
+        // Authenticate Server at Client
+        string server_cert;
+        ifstream rf("ems.pem");
     
+        server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
+    
+        grpc::SslCredentialsOptions ssl_opts;
+        grpc::ChannelArguments      args;
+    
+        ssl_opts.pem_root_certs = server_cert;
+        args.SetSslTargetNameOverride("ems.cisco.com");
 
-    auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
-    grpc::CreateCustomChannel(address, channel_creds, args);*/
-    grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
+        std::cout << "In gnmi_connect server cert: " << server_cert << std::endl;
+    
+        // TODO: Authenticate Client at Server
+        /* string client_key, client_cert;
+        ifstream kf("client.key");
+        ifstream cf("client.pem");
+        client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
+        client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
+        ssl_opts = {server_cert, client_key, client_cert};*/
+    
+        auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
+        grpc::CreateCustomChannel(address, channel_creds, args);
+
+    } else {
+        grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
+    }
     get_capabilities();
     return EXIT_SUCCESS;
 }
@@ -352,7 +359,7 @@ static string format_notification_response(string prefix_to_prepend, string path
 {
     string reply_to_parse;
 
-    // Update again when payload format from the server(IOS XR) is made consistent with different request paths
+    // TODO: Update again when payload format from the server(IOS XR) is made consistent with different request paths
     if (flag.path_has_value)
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "[" + value + "]" + "}}");        
     else if (flag.prefix_has_value)

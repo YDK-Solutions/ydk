@@ -24,10 +24,18 @@
 #ifndef GNMI_SERVICE_HPP
 #define GNMI_SERVICE_HPP
 
+#include <iostream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
+
+#include "codec_service.hpp"
+#include "entity_data_node_walker.hpp"
+#include "errors.hpp"
 #include "gnmi_provider.hpp"
+#include "logger.hpp"
+#include "path_api.hpp"
 #include "types.hpp"
 
 namespace ydk
@@ -45,10 +53,8 @@ namespace ydk
 	    public:
 	        gNMIService(std::string address);
 	        virtual ~gNMIService();
-    		std::string get(gNMIServiceProvider& provider, Entity& filter);
-    		std::string set(gNMIServiceProvider& provider, Entity& filter, std::string operation);
-    	private:
-    		std::unique_ptr<gNMIClient> client;
+    		std::shared_ptr<path::DataNode> get(gNMIServiceProvider& provider, Entity& filter);
+    		bool set(gNMIServiceProvider& provider, Entity& filter, std::string operation);
 	};
 }
 #endif /* GNMI_SERVICE_HPP */

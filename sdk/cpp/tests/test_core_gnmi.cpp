@@ -24,9 +24,9 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#include "path_api.hpp"
-#include "config.hpp"
 #include "catch.hpp"
+#include "config.hpp"
+#include "path_api.hpp"
 
 const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
 const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";

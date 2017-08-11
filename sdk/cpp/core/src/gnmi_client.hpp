@@ -51,6 +51,7 @@ using grpc::Status;
 
 namespace ydk 
 {
+
     class gNMIClient 
     {
     public:
@@ -63,7 +64,7 @@ namespace ydk
         gNMIClient(std::shared_ptr<Channel> channel);
         ~gNMIClient();
 
-        int connect(std::string address);
+        int connect(std::string address, bool is_secure);
         std::string execute_wrapper(const std::string & payload, std::string operation);
         std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
         std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);

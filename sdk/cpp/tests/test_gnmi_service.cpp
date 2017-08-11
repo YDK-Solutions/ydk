@@ -20,30 +20,21 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#include <fstream>
-#include <iostream>
-#include <memory>
-#include <spdlog/spdlog.h>
-#include <string.h>
 
 #include "config.hpp"
 #include "catch.hpp"
-#include "ydk/crud_service.hpp"
-#include "ydk/gnmi_provider.hpp"
 #include "ydk/gnmi_service.hpp"
-#include "ydk/path_api.hpp"
-#include <ydk_ydktest/openconfig_bgp.hpp>
+#include "ydk_ydktest/openconfig_bgp.hpp"
+//#include <ydk_ydktest/ydktest_sanity.hpp>
+//#include <ydk/types.hpp>
 
 using namespace std;
 using namespace ydk;
 using namespace path;
 
-//#include <ydk_ydktest/ydktest_sanity.hpp>
-//#include <ydk/types.hpp>
-
+using namespace std;
 using namespace ydk;
 //using namespace ydktest;
-using namespace std;
 
 void config_bgp(openconfig::openconfig_bgp::Bgp bgp)
 {
@@ -71,7 +62,7 @@ TEST_CASE("gnmi_service_get")
 
     // Get Request 
     auto get_reply = gs.get(provider, filter);
-    REQUIRE(!get_reply.empty());
+    REQUIRE(get_reply);
 
 }
 
@@ -90,11 +81,11 @@ TEST_CASE("gnmi_service_create")
     openconfig::openconfig_bgp::Bgp bgp = {};
     config_bgp(bgp);
     auto create_reply = gs.set(provider, bgp, "gnmi_create");
-    REQUIRE(!create_reply.empty());
+    REQUIRE(create_reply);
 
     // Get Request
     auto get_after_create_reply = gs.get(provider, filter);
-    REQUIRE(!get_after_create_reply.empty());
+    REQUIRE(get_after_create_reply);
 }
 
 TEST_CASE("gnmi_service_delete")
@@ -111,9 +102,9 @@ TEST_CASE("gnmi_service_delete")
 
     // Set Delete Request
     auto delete_reply = gs.set(provider, bgp, "gnmi_delete");
-    REQUIRE(!delete_reply.empty());
+    REQUIRE(delete_reply);
 
     // Get Request
     auto get_after_delete_reply = gs.get(provider, filter);
-    REQUIRE(!get_after_delete_reply.empty());
+    REQUIRE(get_after_delete_reply);
 }

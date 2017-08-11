@@ -38,7 +38,9 @@ namespace ydk
         } SecureChannelArguments;
 
         gNMIServiceProvider(path::Repository & repo, const std::string& address);
+        gNMIServiceProvider(path::Repository & repo, const std::string& address, bool is_secure);
         gNMIServiceProvider(const std::string& address);
+        gNMIServiceProvider(const std::string& address, bool is_secure);
         virtual ~gNMIServiceProvider();
 
         virtual EncodingFormat get_encoding() const;

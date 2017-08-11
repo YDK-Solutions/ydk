@@ -21,11 +21,9 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <memory>
 #include <fstream>
 #include <libyang/libyang.h>
 
-#include "../gnmi_client.hpp"
 #include "../gnmi_provider.hpp"
 #include "../ietf_parser.hpp"
 #include "../logger.hpp"
@@ -57,16 +55,15 @@ namespace ydk
 	    static string get_commit_rpc_payload();
 	    static shared_ptr<path::DataNode> handle_edit_reply(string reply, gNMIClient & client, bool candidate_supported, string operation);
 
-	    static gNMISession::SecureChannelArguments get_channel_credentials();
 	    static bool is_config(path::Rpc & rpc);
 	    static string get_filter_payload(path::Rpc & ydk_rpc);
 	    static string get_gnmi_payload(path::DataNode & input, string data_tag, string data_value);
 	    static string get_config_payload(path::RootSchemaNode & root_schema, path::Rpc & rpc);   
-	    static shared_ptr<path::DataNode> handle_read_reply(string reply, path::RootSchemaNode & root_schema);
+	    static gNMISession::SecureChannelArguments get_channel_credentials();
 	    
 	    const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 
-	    // debug functions
+	    // Debug Functions
 	    void gNMISession::print_paths(ydk::path::SchemaNode& sn) const
 	    {
 	        YLOG_DEBUG("{}", (sn.get_path()).c_str());
@@ -81,31 +78,48 @@ namespace ydk
 	          print_paths(*p);
 	    }
 
-	    // Create a default SSL ChannelCredentials object.
-	    //gNMIServiceProvider::SecureChannelArguments input_args = get_channel_credentials(); 
-
-	    gNMISession::gNMISession(const std::string& address)
-	        //: client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, input_args.args)))
-	        : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
+	    // Secure
+    	// Create a default SSL ChannelCredentials object
+    	gNMISession::SecureChannelArguments input_args = get_channel_credentials(); 
+	    gNMISession::gNMISession(const std::string& address, bool is_secure)
+	        : client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, input_args.args)))
 	    {
 	        path::Repository repo;       
-	        initialize(repo, address);
-	        YLOG_DEBUG("Connected to {} using ssh", address);
+	        initialize(repo, address, is_secure);
+	        YLOG_DEBUG("Connected to {} using Secure Channel", address);
 	    }
 
-	    gNMISession::gNMISession(path::Repository & repo, const std::string& address)
-	        //: client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, input_args.args)))
+	    gNMISession::gNMISession(path::Repository & repo, const std::string& address, bool is_secure)
+	        : client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, input_args.args)))
+	    {
+	        initialize(repo, address, is_secure);
+	        YLOG_DEBUG("Connected to {} using Secure Channel", address);
+	    }
+	    	
+	    // Unsecure
+	    gNMISession::gNMISession(const std::string& address)
 	        : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
 	    {
-	        initialize(repo, address);
-	        YLOG_DEBUG("Connected to {} using ssh", address);
+	        path::Repository repo; 
+	        bool is_secure = false;      
+	        initialize(repo, address, is_secure);
+	        YLOG_DEBUG("Connected to {}", address);
+	    }
+    
+	    gNMISession::gNMISession(path::Repository & repo, const std::string& address)
+	        : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
+	    {
+	    	bool is_secure = false;
+	        initialize(repo, address, is_secure);
+	        YLOG_DEBUG("Connected to {}", address);
 	    }
 
 	    gNMISession::~gNMISession() = default;
 
-	    void gNMISession::initialize(path::Repository & repo, const std::string& address) {
+	    void gNMISession::initialize(path::Repository & repo, const std::string& address, bool is_secure) 
+	    {
 	        IetfCapabilitiesParser capabilities_parser{};
-	        client->connect(address);
+	        client->connect(address,is_secure);
 	        server_capabilities = client->get_capabilities();
 
 	        root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
@@ -117,30 +131,34 @@ namespace ydk
 	        }
 	    }
 
-	    gNMISession::SecureChannelArguments get_channel_credentials() 
+	    gNMISession::SecureChannelArguments get_channel_credentials()
 	    {
-	        /*string server_cert, client_key, client_cert;
+	    	// Authenticate Server at Client
+	        string server_cert;
 	        ifstream rf("ems.pem");
 
 	        server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
 
+	        std::cout << "In gnmi_session server cert: " << server_cert << std::endl;
+
 	        grpc::SslCredentialsOptions ssl_opts;
 	        grpc::ChannelArguments      args;
-	        gNMIServiceProvider::SecureChannelArguments input_args;
+	        gNMISession::SecureChannelArguments input_args;
 	        ssl_opts.pem_root_certs = server_cert;
 	        args.SetSslTargetNameOverride("ems.cisco.com");
 
-	        // ToDo Authenticate client at server
+	        // TODO: Authenticate client at server
+	        /* string client_key, client_cert;
 	        ifstream kf("client.key");
 	        ifstream cf("client.pem");
 	        client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
 	        client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
-	        ssl_opts = {server_cert, client_key, client_cert};
+	        ssl_opts = {server_cert, client_key, client_cert};*/
 	        
 	        auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
 	        input_args.channel_creds = channel_creds;
 	        input_args.args = args;
-	        return input_args;*/
+	        return input_args;
 	    }
 
 	    EncodingFormat gNMISession::get_encoding() const
@@ -165,7 +183,6 @@ namespace ydk
 	        path::SchemaNode* update_schema = get_schema_for_operation(*root_schema, "ydk:update");
 	        path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
 
-	        //for now we only support crud rpc's
 	        path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
 	        shared_ptr<path::DataNode> datanode = nullptr;
 	        
@@ -198,7 +215,6 @@ namespace ydk
 
 	    shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, string operation) const
 	    {
-	        //for now we only support crud rpc's
 	        bool candidate_supported = is_candidate_supported(server_capabilities);
 	        auto gnmi_rpc = create_rpc_instance(*root_schema, "ietf-netconf:edit-config");
 	        auto & input = create_rpc_input(*gnmi_rpc);
@@ -206,7 +222,7 @@ namespace ydk
 	        create_input_error_option(input);
 	        string config_payload = get_config_payload(*root_schema, ydk_rpc);
 
-	        ly_verb(LY_LLSILENT); //turn off libyang logging at the beginning
+	        ly_verb(LY_LLSILENT); // turn off libyang logging at the beginning
 	        string gnmi_payload = get_gnmi_payload(input, "config", config_payload);
 	        ly_verb(LY_LLVRB); // enable libyang logging after payload has been created
 
@@ -223,7 +239,7 @@ namespace ydk
 
 	        if(candidate_supported)
 	        {
-	            //need to send the commit request
+	            // TODO: Send the commit request
 	            string commit_payload = get_commit_rpc_payload();
 
 	            YLOG_DEBUG( "Executing Commit RPC: {}", commit_payload);
@@ -238,7 +254,7 @@ namespace ydk
 	                throw(YCPPServiceProviderError{reply});
 	            }
 	        }
-	        //no error no output for edit-config
+	        // No error no output for edit-config
 	        return nullptr;
 	    }
 
@@ -265,7 +281,7 @@ namespace ydk
 	        return reply;
 	    }
 	    
-	    static shared_ptr<path::DataNode> handle_read_reply(string reply, path::RootSchemaNode & root_schema)
+	    shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::RootSchemaNode & root_schema) const
 	    {
 	        path::Codec codec_service{};
 	        auto empty_data = reply.find("data");

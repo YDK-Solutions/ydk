@@ -21,17 +21,17 @@
 //
 //////////////////////////////////////////////////////////////////
 
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <spdlog/spdlog.h>
+
 #include "ydk/path_api.hpp"
 #include "ydk/gnmi_provider.hpp"
 #include "ydk/gnmi_service.hpp"
 #include "args_parser.h"
 #include "ydk/crud_service.hpp"
 #include "ydk_openconfig/openconfig_bgp.hpp"
-
-#include <spdlog/spdlog.h>
-#include <fstream>
 
 using namespace std;
 using namespace ydk;
@@ -63,8 +63,7 @@ int main(int argc, char* argv[])
     address.append(":");
     address.append(port);
     bool verbose = (args[4]=="--verbose");
-    std::cout << "verbose: " << verbose << std::endl;
-    if(true)
+    if(verbose)
     {
         auto logger = spdlog::stdout_color_mt("ydk");
         logger->set_level(spdlog::level::debug);
@@ -72,28 +71,50 @@ int main(int argc, char* argv[])
 
     ydk::path::Repository repo{"/usr/local/share/ydk/0.0.0.0\:50051/"};
 
-    gNMIServiceProvider provider{repo, address};
-
+    bool is_secure = true;	
     gNMIService gs{"127.0.0.1:50051"};
-
     openconfig::openconfig_bgp::Bgp filter = {};
 
-    // Get Request 
-    gs.get(provider, filter);
+    if(is_secure)
+    {
+    	gNMIServiceProvider provider{repo, address, is_secure};
+    	// Get Request 
+	    gs.get(provider, filter);
 
-    // Set Create Request
-    openconfig::openconfig_bgp::Bgp bgp = {};
-    config_bgp(bgp);
-    gs.set(provider, bgp, "gnmi_create");
+	    // Set Create Request
+	    openconfig::openconfig_bgp::Bgp bgp = {};
+	    config_bgp(bgp);
+	    gs.set(provider, bgp, "gnmi_create");
 
-    // Get Request
-    gs.get(provider, filter);
+	    // Get Request
+	    gs.get(provider, filter);
 
-    // Set Delete Request
-    gs.set(provider, bgp, "gnmi_delete");
+	    // Set Delete Request
+	    gs.set(provider, bgp, "gnmi_delete");
 
-    // Get Request
-    gs.get(provider, filter);
+	    // Get Request
+	    gs.get(provider, filter);
+    }
+    else
+    {
+    	gNMIServiceProvider provider{repo, address};
+    	// Get Request 
+	    gs.get(provider, filter);
+
+	    // Set Create Request
+	    openconfig::openconfig_bgp::Bgp bgp = {};
+	    config_bgp(bgp);
+	    gs.set(provider, bgp, "gnmi_create");
+
+	    // Get Request
+	    gs.get(provider, filter);
+
+	    // Set Delete Request
+	    gs.set(provider, bgp, "gnmi_delete");
+
+	    // Get Request
+	    gs.get(provider, filter);
+    }
 
     return 0;
 }

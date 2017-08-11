@@ -20,16 +20,7 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-
-#include <iostream>
-#include <sstream>
-
 #include "gnmi_service.hpp"
-#include "entity_data_node_walker.hpp"
-#include "errors.hpp"
-#include "path_api.hpp"
-#include "codec_service.hpp"
-#include "logger.hpp"
 
 using namespace std;
 
@@ -40,11 +31,10 @@ using grpc::SslCredentialsOptions;
 
 namespace ydk {
 
-static string get_gnmi_payload(gNMIServiceProvider& provider, Entity & entity);
-static string set_gnmi_payload(gNMIServiceProvider& provider, Entity & entity);
+static shared_ptr<path::DataNode> execute_get_gnmi(gNMIServiceProvider& provider, Entity & entity);
+static string execute_set_gnmi(gNMIServiceProvider& provider, Entity & entity);
 
 gNMIService::gNMIService(string address)
-: client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
 {
 }
 
@@ -53,62 +43,52 @@ gNMIService::~gNMIService()
 }
 
 //get
-string gNMIService::get(gNMIServiceProvider& provider, Entity& filter)
+shared_ptr<path::DataNode> gNMIService::get(gNMIServiceProvider& provider, Entity& filter)
 {
     YLOG_INFO("Executing get RPC");
-    string gnmi_payload = get_gnmi_payload(provider, filter);
-    string reply = client->execute_wrapper(gnmi_payload, "read");
-    YLOG_DEBUG("=============Reply payload received from device=============");
-    YLOG_DEBUG("{}", reply);
-    YLOG_DEBUG("\n");
-    return reply;
+    return execute_get_gnmi(provider, filter);
 }
 
 //set
-string gNMIService::set(gNMIServiceProvider& provider, Entity& filter, string operation)
+bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, string operation)
 {
     YLOG_INFO("Executing set RPC");
-    string gnmi_payload = set_gnmi_payload(provider, filter);
-    string reply = client->execute_wrapper(gnmi_payload, operation);
+    string gnmi_payload = execute_set_gnmi(provider, filter);
+    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(gnmi_payload, operation);
     YLOG_DEBUG("=============Reply payload received from device=============");
-    YLOG_DEBUG("{}", reply);
-    YLOG_DEBUG("\n");
-    return reply;
+    YLOG_DEBUG("{}\n", reply);
+    if(!reply.empty()) return true;
+    else return false;
 }
 
-static string get_gnmi_payload(gNMIServiceProvider& provider, Entity & entity)
+static shared_ptr<path::DataNode> execute_get_gnmi(gNMIServiceProvider& provider, Entity & entity)
 {
     path::Codec codec_service{};
-
     path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
-    YLOG_DEBUG("Created root_schema");
     path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
-    YLOG_DEBUG("Created datanode");
 
     string payload{"\"filter\":"};
-    YLOG_DEBUG("Payload: {}", payload);
+    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
+    YLOG_DEBUG("===========Generating Target Payload============");
+    YLOG_DEBUG("{}\n", payload.c_str());
+    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(payload, "read");
+    if(reply.find_last_of(":}") != string::npos) {
+        reply.erase(reply.find_last_of(":"), 1);
+    }
+    auto output = (dynamic_cast<const path::gNMISession&>(provider.get_session())).handle_read_reply(reply, root_schema);
+    return output;
+}
+
+static string execute_set_gnmi(gNMIServiceProvider& provider, Entity & entity)
+{
+    path::Codec codec_service{};
+    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
+    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
+
+    string payload{"\"filter\":"};
     payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
     YLOG_DEBUG("===========Generating Target Payload============");
     YLOG_DEBUG("{}", payload.c_str());
-    YLOG_DEBUG("\n");
-    return payload;
-}
-
-static string set_gnmi_payload(gNMIServiceProvider& provider, Entity & entity)
-{
-    path::Codec codec_service{};
-
-    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
-    YLOG_DEBUG("Created root_schema");
-    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
-    YLOG_DEBUG("Created datanode");
-
-    string payload{"\"filter\":"};
-    YLOG_DEBUG("Payload: {}", payload);
-    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
-    YLOG_DEBUG("===========Generating Target Payload============");
-    YLOG_DEBUG("{}", payload.c_str());
-    YLOG_DEBUG("\n");
     return payload;
 }
 }

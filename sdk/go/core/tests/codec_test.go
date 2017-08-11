@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	xml_bgp_payload = `<bgp xmlns="http://openconfig.net/yang/bgp">
+	xmlBgpPayload = `<bgp xmlns="http://openconfig.net/yang/bgp">
   <global>
     <config>
       <as>65172</as>
@@ -41,7 +41,7 @@ const (
 </bgp>
 `
 
-	json_bgp_payload = `{
+	jsonBgpPayload = `{
   "openconfig-bgp:bgp": {
     "global": {
       "afi-safis": {
@@ -71,7 +71,7 @@ const (
 }
 `
 
-	xml_runner_payload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+	xmlRunnerPayload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <two-list>
     <ldata>
       <number>21</number>
@@ -100,7 +100,7 @@ const (
   </two-list>
 </runner>
 `
-	json_runner_payload = `{
+	jsonRunnerPayload = `{
   "ydktest-sanity:runner": {
     "two-list": {
       "ldata": [
@@ -248,7 +248,7 @@ func (suite *CodecTestSuite) TestXMLEncode() {
 	suite.Provider.Encoding = types.XML
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlBgpPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -260,10 +260,10 @@ func (suite *CodecTestSuite) TestXMLDecode() {
 
 		suite.Provider.Encoding = types.XML
 
-		entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-		bgp_decoded := entity.(*ysanity_bgp.Bgp)
+		entity := suite.Codec.Decode(&suite.Provider, xmlBgpPayload)
+		bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-		suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+		suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 	}
 }
 
@@ -275,19 +275,19 @@ func (suite *CodecTestSuite) TestXMLEncodeDecode() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 	entity := suite.Codec.Decode(&suite.Provider, payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestXMLDecodeEncode() {
 	suite.Provider.Encoding = types.XML
 
-	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
-	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+	entity := suite.Codec.Decode(&suite.Provider, xmlBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgpDecodec)
 
-	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlBgpPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -298,7 +298,7 @@ func (suite *CodecTestSuite) TestJSONEncode() {
 	suite.Provider.Encoding = types.JSON
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonBgpPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -308,10 +308,10 @@ func (suite *CodecTestSuite) TestJSONDecode() {
 
 	suite.Provider.Encoding = types.JSON
 
-	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	entity := suite.Codec.Decode(&suite.Provider, jsonBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestJSONDecodeEncode() {
@@ -320,11 +320,11 @@ func (suite *CodecTestSuite) TestJSONDecodeEncode() {
 
 	suite.Provider.Encoding = types.JSON
 
-	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
-	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+	entity := suite.Codec.Decode(&suite.Provider, jsonBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgpDecodec)
 
-	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonBgpPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -336,9 +336,9 @@ func (suite *CodecTestSuite) TestJSONEncodeDecode() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 	entity := suite.Codec.Decode(&suite.Provider, payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestXMLEncode1() {
@@ -348,7 +348,7 @@ func (suite *CodecTestSuite) TestXMLEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result := equalPayload(payload, xml_runner_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlRunnerPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -363,7 +363,7 @@ func (suite *CodecTestSuite) TestJSONEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result := equalPayload(payload, json_runner_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonRunnerPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 

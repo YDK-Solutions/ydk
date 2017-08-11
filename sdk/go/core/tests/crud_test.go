@@ -32,8 +32,8 @@ func (suite *NETCONFTestSuite) TearDownSuite() {
 }
 
 func (suite *NETCONFTestSuite) TearDownTest() {
-	bgp_delete := ysanity_bgp.Bgp{}
-	suite.CRUD.Delete(&suite.Provider, &bgp_delete)
+	bgpDelete := ysanity_bgp.Bgp{}
+	suite.CRUD.Delete(&suite.Provider, &bgpDelete)
 }
 
 func (suite *NETCONFTestSuite) BeforeTest(suiteName, testName string) {
@@ -45,29 +45,29 @@ func (suite *NETCONFTestSuite) TestTemplate() {
 }
 
 func (suite *NETCONFTestSuite) TestCreateRead() {
-	bgp_create := ysanity_bgp.Bgp{}
-	bgp_create.Global.Config.As = 65172 //types.Delete
-	bgp_create.Global.Config.RouterId = "1.2.3.4"
+	bgpCreate := ysanity_bgp.Bgp{}
+	bgpCreate.Global.Config.As = 65172 //types.Delete
+	bgpCreate.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.Enabled = true
-	bgp_create.Global.AfiSafis.AfiSafi = append(bgp_create.Global.AfiSafis.AfiSafi, ipv6_afisafi)
+	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.Enabled = true
+	bgpCreate.Global.AfiSafis.AfiSafi = append(bgpCreate.Global.AfiSafis.AfiSafi, ipv6Afisafi)
 
-	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.Enabled = true
-	bgp_create.Global.AfiSafis.AfiSafi = append(bgp_create.Global.AfiSafis.AfiSafi, ipv4_afisafi)
+	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.Enabled = true
+	bgpCreate.Global.AfiSafis.AfiSafi = append(bgpCreate.Global.AfiSafis.AfiSafi, ipv4Afisafi)
 
-	create_result := suite.CRUD.Create(&suite.Provider, &bgp_create)
-	suite.Equal(create_result, true)
-	bgp_filter := ysanity_bgp.Bgp{}
-	data := suite.CRUD.Read(&suite.Provider, &bgp_filter)
-	bgp_read := data.(*ysanity_bgp.Bgp)
+	createResult := suite.CRUD.Create(&suite.Provider, &bgpCreate)
+	suite.Equal(createResult, true)
+	bgpFilter := ysanity_bgp.Bgp{}
+	data := suite.CRUD.Read(&suite.Provider, &bgpFilter)
+	bgpRead := data.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(bgp_read, &bgp_create), true)
+	suite.Equal(types.EntityEqual(bgpRead, &bgpCreate), true)
 }
 
 func TestNETCONFTestSuite(t *testing.T) {

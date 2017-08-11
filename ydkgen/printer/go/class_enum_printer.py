@@ -22,8 +22,6 @@ class_enum_printer.py
 """
 
 from ydkgen.api_model import Enum
-from ydkgen.common import get_module_name
-from ydkgen.printer.meta_data_util import get_enum_class_docstring
 
 class EnumPrinter(object):
 
@@ -31,27 +29,24 @@ class EnumPrinter(object):
         self.ctx = ctx
 
     def print_enum(self, enum_class):
-        assert isinstance(enum_class, Enum)
         self._print_enum_header(enum_class)
         self._print_enum_body(enum_class)
         self._print_enum_trailer(enum_class)
 
     def _print_enum_header(self, enum_class):
+        self._print_docstring(enum_class)
         self.ctx.writeln('type %s string' % enum_class.qualified_go_name())
         self.ctx.bline()
         self.ctx.writeln('const (')
         self.ctx.lvl_inc()
 
     def _print_enum_body(self, enum_class):
-        self._print_enum_literals(enum_class.qualified_go_name(), enum_class)
-
-    def _print_enum_literals(self, enum_class_prefix, enum_class):
+        enum_class_prefix = enum_class.qualified_go_name()
         for enum_literal in enum_class.literals:
             self._print_enum_literal(enum_class_prefix, enum_literal)
 
     def _print_enum_literal(self, enum_class_prefix, enum_literal):
         name = enum_literal.name
-        value = enum_literal.value
         self.ctx.writeln('%s_%s %s = "%s"' % (enum_class_prefix,
                                             name,
                                             enum_class_prefix,
@@ -61,3 +56,20 @@ class EnumPrinter(object):
         self.ctx.lvl_dec()
         self.ctx.writeln(')')
         self.ctx.bline()
+
+    def _print_docstring(self, enum_class):
+        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
+        self.ctx.writeln('// %s' % enum_class.qualified_go_name())
+        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
+        enum_class_prefix = enum_class.qualified_go_name()
+
+        for c in enum_class.comment.split('\n'):
+            self.ctx.writeln('// %s' % c)
+
+        for l in enum_class.literals:
+            self.ctx.writeln('// %s_%s:' % (enum_class_prefix, l.go_name()))
+            if l.comment is not None:
+                length = len(enum_class_prefix) + len(l.go_name()) + 2
+                for c in l.comment.split('\n'):
+                    self.ctx.writeln('// %s%s' % (' ' * length, c))
+        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')

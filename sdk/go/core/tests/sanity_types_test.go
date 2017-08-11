@@ -40,8 +40,8 @@ func (suite *SanityTypesTestSuite) TestStatusEnum() {
 	runner.Ytypes.BuiltInT.Status = ysanity.Runner_Ytypes_BuiltInT_Status_not_connected
 	suite.CRUD.Create(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	runner_read := entity.(*ysanity.Runner)
-	suite.Equal(runner_read.Ytypes.BuiltInT.Status, "not connected")
+	runnerRead := entity.(*ysanity.Runner)
+	suite.Equal(runnerRead.Ytypes.BuiltInT.Status, "not connected")
 }
 
 func (suite *SanityTypesTestSuite) TestEmbeddedEnum() {
@@ -49,8 +49,8 @@ func (suite *SanityTypesTestSuite) TestEmbeddedEnum() {
 	runner.Ytypes.BuiltInT.EmbededEnum = ysanity.Runner_Ytypes_BuiltInT_EmbededEnum_zero
 	suite.CRUD.Create(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	runner_read := entity.(*ysanity.Runner)
-	suite.Equal(runner_read.Ytypes.BuiltInT.EmbededEnum, "zero")
+	runnerRead := entity.(*ysanity.Runner)
+	suite.Equal(runnerRead.Ytypes.BuiltInT.EmbededEnum, "zero")
 }
 
 func (suite *SanityTypesTestSuite) TestEnum() {
@@ -58,8 +58,8 @@ func (suite *SanityTypesTestSuite) TestEnum() {
 	runner.Ytypes.BuiltInT.EnumValue = ysanity.YdkEnumTest_not_set
 	suite.CRUD.Create(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	runner_read := entity.(*ysanity.Runner)
-	suite.Equal(runner_read.Ytypes.BuiltInT.EnumValue, "not-set")
+	runnerRead := entity.(*ysanity.Runner)
+	suite.Equal(runnerRead.Ytypes.BuiltInT.EnumValue, "not-set")
 }
 
 func (suite *SanityTypesTestSuite) TestBitsPos1() {
@@ -67,8 +67,8 @@ func (suite *SanityTypesTestSuite) TestBitsPos1() {
 	runner.Ytypes.BuiltInT.BitsValue = map[string]bool{"disable-nagle": true, "auto-sense-speed": true}
 	suite.CRUD.Create(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	runner_read := entity.(*ysanity.Runner)
-	suite.Equal(runner_read.Ytypes.BuiltInT.BitsValue, "disable-nagle auto-sense-speed")
+	runnerRead := entity.(*ysanity.Runner)
+	suite.Equal(runnerRead.Ytypes.BuiltInT.BitsValue, "disable-nagle auto-sense-speed")
 }
 
 func (suite *SanityTypesTestSuite) TestBitsPos2() {
@@ -76,8 +76,8 @@ func (suite *SanityTypesTestSuite) TestBitsPos2() {
 	runner.Ytypes.BuiltInT.BitsValue = map[string]bool{"disable-nagle": true, "auto-sense-speed": false}
 	suite.CRUD.Create(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	runner_read := entity.(*ysanity.Runner)
-	suite.Equal(runner_read.Ytypes.BuiltInT.BitsValue, "disable-nagle")
+	runnerRead := entity.(*ysanity.Runner)
+	suite.Equal(runnerRead.Ytypes.BuiltInT.BitsValue, "disable-nagle")
 }
 
 func TestSanityTypesTestSuite(t *testing.T) {

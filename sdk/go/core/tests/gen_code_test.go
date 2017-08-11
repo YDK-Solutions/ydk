@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	xml_payload = `<bgp xmlns="http://openconfig.net/yang/bgp">
+	xmlPayload = `<bgp xmlns="http://openconfig.net/yang/bgp">
   <global>
     <afi-safis>
       <afi-safi>
@@ -54,17 +54,17 @@ func configBgp(bgp *ysanity_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
+	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6Afisafi)
 
-	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
+	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4Afisafi)
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
@@ -78,10 +78,10 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
-	entity := suite.Codec.Decode(&suite.Provider, xml_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	entity := suite.Codec.Decode(&suite.Provider, xmlPayload)
+	bgpDecoded := entity.(*ysanity_bgp.Bgp)
 
-	p := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+	p := suite.Codec.Encode(&suite.Provider, bgpDecoded)
 	fmt.Printf("In TestGenCodeXMlDecoding, payload = %v", p)
 }
 

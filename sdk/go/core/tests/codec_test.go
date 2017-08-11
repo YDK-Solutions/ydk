@@ -147,24 +147,20 @@ func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(int
 	err = um([]byte(s1), &o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
-		return false
 	}
 	err = um([]byte(s2), &o2)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
-		return false
 	}
 
 	// Unmarshal and Marshal the payload in case list items in payload are not sorted
 	p1, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
-		return false
 	}
 	p2, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
-		return false
 	}
 
 	return string(p1) == string(p2)
@@ -192,17 +188,17 @@ func config(bgp *ysanity_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
+	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6Afisafi)
 
-	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
+	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4Afisafi)
 }
 
 func configRunner(runner *ysanity.Runner) {

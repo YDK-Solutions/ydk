@@ -21,8 +21,6 @@ class_enum_printer.py
 
 """
 
-from ydkgen.api_model import Enum
-
 class EnumPrinter(object):
 
     def __init__(self, ctx):

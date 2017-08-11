@@ -20,7 +20,7 @@ source_printer.py
  prints Go classes
 
 """
-from ydkgen.api_model import Class, Enum, Package, snake_case
+from ydkgen.api_model import Class, Enum, snake_case
 from ydkgen.common import sort_classes_at_same_level
 
 from .function_printer import FunctionPrinter

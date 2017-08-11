@@ -20,7 +20,7 @@ class_path_printer.py
 Prints Go class methods
 
 """
-from ydkgen.api_model import Package
+from ydkgen.api_model import Bits, Enum, Package
 from .function_printer import FunctionPrinter
 
 class GetSegmentPathPrinter(FunctionPrinter):
@@ -71,34 +71,106 @@ class GetEntityPathPrinter(FunctionPrinter):
         else:
             pass
 
-        if len(self.leafs) > 0:
-            self.ctx.writeln('var leafData types.LeafData')
-            self.ctx.bline()
-
+        has_single_leaf = False
         for leaf in self.leafs:
             if not leaf.is_many:
-                self._print_check_leaf(leaf)
+                has_single_leaf = True
+
+        if has_single_leaf:
+            self.ctx.writeln('var leafData types.LeafData')
+            self.ctx.bline()
+            for leaf in self.leafs:
+                if not leaf.is_many:
+                    self._print_check_leaf(leaf)
 
         self.ctx.writeln('return entityPath')
 
     def _print_check_leaf(self, leaf):
+        self._print_check_leaf_switch_header(leaf)
+        self._print_check_leaf_switch_case_block(leaf)
+        self._print_check_leaf_switch_default_block(leaf)
+        self._print_check_leaf_switch_trailer(leaf)
+
+    def _print_check_leaf_switch_header(self, leaf):
         leaf_var = (self.class_alias, leaf.go_name())
         self.ctx.writeln('if %s.%s != nil {' % leaf_var)
         self.ctx.lvl_inc()
+
+    def _print_check_leaf_switch_case_block(self, leaf):
+        leaf_var = (self.class_alias, leaf.go_name())
         self.ctx.writeln('switch %s.%s.(type) {' % leaf_var)
         self.ctx.writeln('case types.YFilter:')
         self.ctx.lvl_inc()
-        line = 'leafData = types.LeafData{IsSet: %s, %s: %s}'
-        self.ctx.writeln(line % ('false', 'Filter', '%s.%s.(types.YFilter)' % leaf_var))
+        fvalue = 'Filter: %s.%s.(types.YFilter)' % leaf_var
+        self.ctx.writeln("leafData = types.LeafData{IsSet: false, %s}" % fvalue)
         self.ctx.lvl_dec()
+
+    def _print_check_leaf_switch_default_block(self, leaf):
+        leaf_var = (self.class_alias, leaf.go_name())
         self.ctx.writeln('default:')
         self.ctx.lvl_inc()
-        self.ctx.writeln(line % ('true', 'Value', 'fmt.Sprintf("%%v", %s.%s)' % leaf_var))
+        self.ctx.writeln('var v string')
+
+        if isinstance(leaf.property_type, Enum):
+            self._print_check_leaf_enum(leaf)
+        elif isinstance(leaf.property_type, Bits):
+            self._print_check_leaf_bits(leaf)
+        else:
+            self.ctx.writeln('v = fmt.Sprintf("%%v", %s.%s)' % leaf_var)
+        self.ctx.writeln("leafData = types.LeafData{IsSet: true, Value: v}")
         self.ctx.lvl_dec()
-        var_name = ('entityPath.ValuePaths', 'entityPath.ValuePaths')
-        line = '%s = append(%s, types.NameLeafData{Name: "%%s", Data: leafData})' % var_name
-        self.ctx.writeln(line % leaf.stmt.arg)
+
+    def _print_check_leaf_switch_trailer(self, leaf):
+        self.ctx.writeln("entityPath.ValuePaths = "
+                         "append(entityPath.ValuePaths, "
+                         "types.NameLeafData{Name: \"%s\", Data: leafData})" %
+                         leaf.stmt.arg)
         self.ctx.writeln('}')
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()
+
+    def _print_check_leaf_enum(self, leaf):
+        leaf_var = (self.class_alias, leaf.go_name())
+        valid_enum_values = [e.stmt.arg for e in leaf.property_type.literals]
+        venums = '","'.join(valid_enum_values)
+        self.ctx.writeln('valid_enum_values := []string{"%s"}' % (venums))
+        self.ctx.writeln("found := false")
+        self.ctx.writeln('for _, e := range valid_enum_values {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('if e == fmt.Sprintf("%%v", %s.%s) {' % leaf_var)
+        self.ctx.lvl_inc()
+        self.ctx.writeln('v = e')
+        self.ctx.writeln('found = true')
+        self.ctx.writeln('break')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+
+        self.ctx.writeln('if !found {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln("panic(fmt.Sprintf(\""
+                         "Wrong enum value %%v, %s.%s\"))" % leaf_var)
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+
+    def _print_check_leaf_bits(self, leaf):
+        leaf_var = (self.class_alias, leaf.go_name())
+        valid_bits = list(leaf.property_type._dictionary.keys())
+        self.ctx.writeln('valid_bits := []string{"%s"}' % '", "'.join(valid_bits))
+        self.ctx.writeln('var used_bits []string')
+        self.ctx.writeln('m := %s.%s.(map[string]bool)' % leaf_var)
+        self.ctx.writeln('for _, vb := range valid_bits {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('enabled, ok := m[vb]')
+
+        self.ctx.writeln('if ok && enabled {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('used_bits = append(used_bits, vb)')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.writeln('v = strings.Join(used_bits, " ")')

@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	xml_bgp_payload = `<bgp xmlns="http://openconfig.net/yang/bgp">
+	xmlBgpPayload = `<bgp xmlns="http://openconfig.net/yang/bgp">
   <global>
     <config>
       <as>65172</as>
@@ -41,7 +41,7 @@ const (
 </bgp>
 `
 
-	json_bgp_payload = `{
+	jsonBgpPayload = `{
   "openconfig-bgp:bgp": {
     "global": {
       "afi-safis": {
@@ -71,7 +71,7 @@ const (
 }
 `
 
-	xml_runner_payload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+	xmlRunnerPayload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <two-list>
     <ldata>
       <number>21</number>
@@ -100,7 +100,7 @@ const (
   </two-list>
 </runner>
 `
-	json_runner_payload = `{
+	jsonRunnerPayload = `{
   "ydktest-sanity:runner": {
     "two-list": {
       "ldata": [
@@ -147,24 +147,20 @@ func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(int
 	err = um([]byte(s1), &o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
-		return false
 	}
 	err = um([]byte(s2), &o2)
 	if err != nil {
 		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
-		return false
 	}
 
 	// Unmarshal and Marshal the payload in case list items in payload are not sorted
 	p1, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
-		return false
 	}
 	p2, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
-		return false
 	}
 
 	return string(p1) == string(p2)
@@ -192,17 +188,17 @@ func config(bgp *ysanity_bgp.Bgp) {
 	bgp.Global.Config.As = 65172 //types.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
-	ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
-	ipv6_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6_afisafi)
+	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv6_Unicast{}
+	ipv6Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6Afisafi)
 
-	ipv4_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
-	ipv4_afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
-	ipv4_afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4_afisafi)
+	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.Ipv4_Unicast{}
+	ipv4Afisafi.Config.Enabled = true
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4Afisafi)
 }
 
 func configRunner(runner *ysanity.Runner) {
@@ -248,20 +244,23 @@ func (suite *CodecTestSuite) TestXMLEncode() {
 	suite.Provider.Encoding = types.XML
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlBgpPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
 func (suite *CodecTestSuite) TestXMLDecode() {
-	bgp := ysanity_bgp.Bgp{}
-	config(&bgp)
 
-	suite.Provider.Encoding = types.XML
+	for i := 0; i < 100; i++ {
+		bgp := ysanity_bgp.Bgp{}
+		config(&bgp)
 
-	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+		suite.Provider.Encoding = types.XML
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+		entity := suite.Codec.Decode(&suite.Provider, xmlBgpPayload)
+		bgpDecodec := entity.(*ysanity_bgp.Bgp)
+
+		suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
+	}
 }
 
 func (suite *CodecTestSuite) TestXMLEncodeDecode() {
@@ -272,19 +271,19 @@ func (suite *CodecTestSuite) TestXMLEncodeDecode() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 	entity := suite.Codec.Decode(&suite.Provider, payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestXMLDecodeEncode() {
 	suite.Provider.Encoding = types.XML
 
-	entity := suite.Codec.Decode(&suite.Provider, xml_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
-	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+	entity := suite.Codec.Decode(&suite.Provider, xmlBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgpDecodec)
 
-	result := equalPayload(payload, xml_bgp_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlBgpPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -295,7 +294,7 @@ func (suite *CodecTestSuite) TestJSONEncode() {
 	suite.Provider.Encoding = types.JSON
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonBgpPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -305,10 +304,10 @@ func (suite *CodecTestSuite) TestJSONDecode() {
 
 	suite.Provider.Encoding = types.JSON
 
-	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	entity := suite.Codec.Decode(&suite.Provider, jsonBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestJSONDecodeEncode() {
@@ -317,11 +316,11 @@ func (suite *CodecTestSuite) TestJSONDecodeEncode() {
 
 	suite.Provider.Encoding = types.JSON
 
-	entity := suite.Codec.Decode(&suite.Provider, json_bgp_payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
-	payload := suite.Codec.Encode(&suite.Provider, bgp_decoded)
+	entity := suite.Codec.Decode(&suite.Provider, jsonBgpPayload)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
+	payload := suite.Codec.Encode(&suite.Provider, bgpDecodec)
 
-	result := equalPayload(payload, json_bgp_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonBgpPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -333,9 +332,9 @@ func (suite *CodecTestSuite) TestJSONEncodeDecode() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 	entity := suite.Codec.Decode(&suite.Provider, payload)
-	bgp_decoded := entity.(*ysanity_bgp.Bgp)
+	bgpDecodec := entity.(*ysanity_bgp.Bgp)
 
-	suite.Equal(types.EntityEqual(&bgp, bgp_decoded), true)
+	suite.Equal(types.EntityEqual(&bgp, bgpDecodec), true)
 }
 
 func (suite *CodecTestSuite) TestXMLEncode1() {
@@ -345,7 +344,7 @@ func (suite *CodecTestSuite) TestXMLEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result := equalPayload(payload, xml_runner_payload, xml.Unmarshal, xml.Marshal)
+	result := equalPayload(payload, xmlRunnerPayload, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
 }
 
@@ -360,7 +359,7 @@ func (suite *CodecTestSuite) TestJSONEncode1() {
 
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 
-	result := equalPayload(payload, json_runner_payload, json.Unmarshal, json.Marshal)
+	result := equalPayload(payload, jsonRunnerPayload, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
 }
 

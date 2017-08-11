@@ -20,11 +20,12 @@ source_printer.py
  prints Go classes
 
 """
-from ydkgen.api_model import Class, Package, snake_case
+from ydkgen.api_model import Class, Enum, snake_case
 from ydkgen.common import sort_classes_at_same_level
 
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
+from .class_enum_printer import EnumPrinter
 from .class_has_data_printer import ClassDataFilterPrinter
 from .class_get_entity_path_printer import GetEntityPathPrinter, GetSegmentPathPrinter
 from .class_get_child_printer import ClassGetChildPrinter
@@ -38,6 +39,7 @@ class ClassPrinter(object):
         self.bundle_name = bundle_name
         self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
+        self.enum_printer = EnumPrinter(ctx)
 
     def print_output(self, clazz):
         leafs = []
@@ -46,6 +48,7 @@ class ClassPrinter(object):
         self._print_class_constructor(clazz, leafs, children)
         self._print_class_method_definitions(clazz, leafs, children)
         self._print_child_classes(clazz)
+        self._print_child_enums(clazz)
 
     def _print_class_constructor(self, clazz, leafs, children):
         ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
@@ -170,3 +173,11 @@ class ClassPrinter(object):
         for clazz in sorted_classes:
             cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
             cp.print_output(clazz)
+
+    def _print_child_enums(self, parent):
+        enumz = []
+        enumz.extend([nested_enum for nested_enum in parent.owned_elements
+                        if isinstance(nested_enum, Enum)])
+
+        for nested_enum in sorted(enumz, key=lambda e: e.name):
+            self.enum_printer.print_enum(nested_enum)

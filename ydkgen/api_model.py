@@ -225,7 +225,13 @@ class NamedElement(Element):
         if self.stmt is None:
             raise Exception('element is not yet defined')
 
-        name = camel_case(self.stmt.arg)
+        if isinstance(self, Enum):
+            stmt = self.stmt.parent
+        else:
+            stmt = self.stmt
+
+        name = camel_case(stmt.arg)
+
         if case == 'UpperCamel':
             return name
         elif case == 'lowerCamel':
@@ -238,12 +244,13 @@ class NamedElement(Element):
         ''' get the Go qualified name (sans package name) '''
         if self.stmt.keyword == 'identity':
             return camel_snake(self.stmt.arg)
+
         names = []
         element = self
         while element is not None and not isinstance(element, Package):
             if isinstance(element, Deviation):
                 element = element.owner
-            names.append(camel_case(element.stmt.arg))
+            names.append(element.go_name())
             element = element.owner
         return '_'.join(reversed(names))
 
@@ -796,7 +803,6 @@ class Enum(DataType):
             literal = EnumLiteral(self.iskeyword)
             literal.stmt = enum_stmt
             self.literals.append(literal)
-
 
 class EnumLiteral(NamedElement):
 

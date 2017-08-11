@@ -20,6 +20,7 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
+
 #include <memory>
 #include <fstream>
 #include <libyang/libyang.h>
@@ -225,7 +226,7 @@ namespace ydk
 	            //need to send the commit request
 	            string commit_payload = get_commit_rpc_payload();
 
-	            YLOG_DEBUG( "Executing commit RPC: {}", commit_payload);
+	            YLOG_DEBUG( "Executing Commit RPC: {}", commit_payload);
 	            reply = client.execute_wrapper(commit_payload, operation);
 
 	            YLOG_DEBUG("=============Reply payload received from device=============");
@@ -270,7 +271,7 @@ namespace ydk
 	        auto empty_data = reply.find("data");
 	        if(empty_data == string::npos)
 	        {
-	            YLOG_DEBUG( "Found empty data tag");
+	            YLOG_DEBUG("Found empty data tag");
 	            return nullptr;
 	        }
 

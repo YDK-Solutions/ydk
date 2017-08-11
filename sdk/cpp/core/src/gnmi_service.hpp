@@ -21,56 +21,34 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include <sstream>
-#include <memory>
-#include <libyang/libyang.h>
+#ifndef GNMI_SERVICE_HPP
+#define GNMI_SERVICE_HPP
 
-#include "entity_data_node_walker.hpp"
-#include "errors.hpp"
-#include "ietf_parser.hpp"
-#include "gnmi_client.hpp"
+#include <map>
+#include <memory>
+#include <string>
 #include "gnmi_provider.hpp"
 #include "types.hpp"
-#include "ydk_yang.hpp"
-#include "logger.hpp"
-
-using namespace std;
-using namespace ydk;
 
 namespace ydk
 {
 
-    gNMIServiceProvider::gNMIServiceProvider(const string& address)
-        : session{address}
-    {
-        YLOG_INFO("Connected to {}", address);
-    }
+	namespace core
+	{
+		class DataNode;
+	}
 
-    gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo, const string& address)
-        : session{repo, address}
-    {
-        YLOG_INFO("Connected to {}", address);
-    }
+	class Entity;
 
-    gNMIServiceProvider::~gNMIServiceProvider()
-    {
-        YLOG_INFO("Disconnected from device");
-    }
-
-    EncodingFormat gNMIServiceProvider::get_encoding() const
-    {
-        return EncodingFormat::JSON;
-    }
-
-    const path::Session& gNMIServiceProvider::get_session() const
-    {
-        return session;
-    }
-
-    std::vector<std::string> gNMIServiceProvider::get_capabilities() const
-    {
-        return session.get_capabilities();
-    }
-
+	class gNMIService
+	{
+	    public:
+	        gNMIService(std::string address);
+	        virtual ~gNMIService();
+    		std::string get(gNMIServiceProvider& provider, Entity& filter);
+    		std::string set(gNMIServiceProvider& provider, Entity& filter, std::string operation);
+    	private:
+    		std::unique_ptr<gNMIClient> client;
+	};
 }
+#endif /* GNMI_SERVICE_HPP */

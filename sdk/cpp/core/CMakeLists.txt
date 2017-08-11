@@ -156,6 +156,7 @@ set(libydk_src
     src/gnmi_client.cpp    
     src/gnmi_provider.cpp
     src/path/gnmi_session.cpp
+    src/gnmi_service.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
     src/opendaylight_provider.cpp
@@ -207,6 +208,7 @@ set(libydk_install_headers
     src/logging_callback.hpp
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
+    src/gnmi_service.hpp
     src/netconf_client.hpp
     src/netconf_provider.hpp
     src/netconf_service.hpp

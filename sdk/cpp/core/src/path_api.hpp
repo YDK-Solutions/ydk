@@ -1054,8 +1054,7 @@ public:
     typedef struct SecureChannelArguments
     {
     std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-    grpc::ChannelArguments args;
-        
+    grpc::ChannelArguments args;        
     } SecureChannelArguments;
     gNMISession(Repository & repo,
                    const std::string& address);
@@ -1068,10 +1067,10 @@ public:
     virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
     virtual std::vector<std::string> get_capabilities() const;
     virtual EncodingFormat get_encoding() const;
+    virtual std::string execute_payload(const std::string & payload, std::string operation) const;
 
 private:
     void initialize(Repository& repo, const std::string& address);
-    std::string execute_payload(const std::string & payload, std::string operation) const;
     std::shared_ptr<path::DataNode> handle_edit(path::Rpc& ydk_rpc, std::string operation) const;
     std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc, std::string operation) const;
     void print_root_paths(ydk::path::RootSchemaNode& rsn) const;

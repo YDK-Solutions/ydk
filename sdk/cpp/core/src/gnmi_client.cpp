@@ -1,18 +1,25 @@
-/*  ----------------------------------------------------------------
- Copyright 2017 Cisco Systems
-
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
- http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- ------------------------------------------------------------------*/
+/// YANG Development Kit
+// Copyright 2016 Cisco Systems. All rights reserved
+//
+////////////////////////////////////////////////////////////////
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+//
+//////////////////////////////////////////////////////////////////
 
 #include "types.hpp"
 #include "json.hpp"
@@ -37,6 +44,7 @@ gNMIClient::gNMIClient(shared_ptr<Channel> channel) : stub_(gNMI::NewStub(channe
 static bool check_capabilities_status(Status status);
 static string parse_get_request_payload(string payload);
 static json parse_set_request_payload(string payload);
+static json parse_gnmi_set_request_payload(string payload);
 static vector<string> get_path_from_payload_filter(string payload_filter, vector<string> container);
 static string check_if_path_has_value(string element);
 static string format_notification_response(string prefix_to_prepend, string path_to_prepend, string value);
@@ -99,7 +107,7 @@ void gNMIClient::parse_capabilities_modeldata(::gnmi::CapabilityResponse* respon
     ::gnmi::ModelData modeldata;
     string cap, name, organization, version; 
 
-    YLOG_DEBUG("====Capabilities Response Received====\n{}", response->DebugString().c_str());
+    YLOG_DEBUG("====Capabilities Response Received====");
     for (int i = 0, n = response->supported_models_size(); i < n; i++) 
     {
         cap.clear();
@@ -118,12 +126,12 @@ void gNMIClient::parse_capabilities_modeldata(::gnmi::CapabilityResponse* respon
         {
             string revision = version.c_str();
             revision = revision.substr(revision.find(":") + 1,string::npos);
-            YLOG_DEBUG("Version: {}", revision);
+            YLOG_DEBUG("Revision: {}", revision);
             cap.append("&revision=" + revision);
+            YLOG_DEBUG("              ------------       ");
+            YLOG_DEBUG("");
         }
         capabilities.push_back(cap);
-        YLOG_DEBUG("              ------------       ");
-        YLOG_DEBUG("");
     }   
 }
 
@@ -179,8 +187,13 @@ static vector<string> parse_get_request_payload(string payload, vector<string> p
     string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "null");
     if (payload_filter == "null") {
         payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get/filter"_json_pointer, "null");
-    }
-    YLOG_DEBUG("payload_filter: {}", payload_filter);
+        if(payload_filter == "null") {
+            string delim = ":{\"";
+            int filter_len = payload.find_last_of("\"") - (payload.find(delim) + delim.length());
+            auto filter = payload.substr(payload.find(delim) + delim.length(), filter_len);
+            payload_filter = filter;
+        }
+    } 
 
     string path_elem;
     istringstream payload_filter_value(payload_filter);
@@ -209,8 +222,15 @@ json parse_set_request_payload(string payload)
 {
     auto payload_to_parse = json::parse("{" + payload + "}");
     json config_payload = json::parse(payload_to_parse.value("/rpc/ietf-netconf:edit-config/config"_json_pointer, "Empty Config"));
-    YLOG_DEBUG("json payload: {}", config_payload.dump());
+    YLOG_DEBUG("JSON Payload: {}", config_payload.dump());
+    return config_payload;
+}
 
+json parse_gnmi_set_request_payload(string payload) 
+{
+    auto payload_to_parse = json::parse("{" + payload + "}");
+    json default_payload = json::parse("{\"value\":\"null\"}");
+    json config_payload = payload_to_parse.value("/filter"_json_pointer, default_payload);
     return config_payload;
 }
 
@@ -220,14 +240,14 @@ json parse_set_request_payload(string payload)
     ::gnmi::Update* update;
     ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
 
-    if(operation == "delete")
+    if((operation == "delete")||(operation == "gnmi_delete"))
     {
         ::gnmi::Path* delete_path = request.add_delete_(); 
         for(int i = 0; i < root_path.size(); ++i)
         {
             delete_path->add_element(root_path[i]);  
         }   
-    } else if (operation == "create")
+    } else if ((operation == "create")||(operation == "gnmi_create"))
     {
         update = request.add_update();
         for(int i = 0; i < root_path.size(); ++i)
@@ -246,9 +266,13 @@ json parse_set_request_payload(string payload)
 
 ::gnmi::SetRequest gNMIClient::populate_set_request(::gnmi::SetRequest request, string payload, string operation) 
 {   
-    YLOG_DEBUG("Payload {}\n operation {}", payload, operation);
-    json config_payload = parse_set_request_payload(payload);
-
+    YLOG_DEBUG("Payload {}\n Operation {}", payload, operation);
+    json config_payload;
+    if ((operation == "gnmi_create")||(operation == "gnmi_delete")){
+        config_payload = parse_gnmi_set_request_payload(payload);
+    } else {
+        config_payload = parse_set_request_payload(payload);
+    }
     string path_elem;
     vector<string> root_path;
     istringstream payload_config_value(config_payload.dump());
@@ -393,8 +417,9 @@ string gNMIClient::execute_wrapper(const string & payload, string operation)
         request = populate_get_request(request, payload);
         YLOG_DEBUG("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
         string reply = execute_get_payload(request, &response);
+        YLOG_DEBUG("Get Operation {} Succeeded", operation);
         return reply;
-    } else if ((operation == "create")||(operation == "update")||(operation == "delete"))
+    } else if ((operation == "create")||(operation == "update")||(operation == "delete")||(operation == "gnmi_create")||(operation == "gnmi_delete"))
     {   
         ::gnmi::SetRequest request;
         ::gnmi::SetResponse response;
@@ -402,6 +427,7 @@ string gNMIClient::execute_wrapper(const string & payload, string operation)
         request = populate_set_request(request, payload, operation);
         YLOG_DEBUG("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
         string reply = execute_set_payload(request, &response);
+        YLOG_DEBUG("Set Operation {} Succeeded", operation);
         return reply;
 
     }
@@ -411,17 +437,16 @@ string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* r
 {
     grpc::ClientContext context;
     grpc::Status status;
-
     status = stub_->Get(&context, request, response);
     YLOG_DEBUG("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 
     {
-        YLOG_ERROR("Get RPC Status not OK");
+        YLOG_ERROR("Get RPC Status Not OK");
         throw(YCPPError{status.error_message()});
     } 
     else 
     {
-        YLOG_DEBUG("Get RPC Passed");
+        YLOG_DEBUG("Get RPC OK");
         string reply = parse_get_response(response); 
         return reply;
     }
@@ -431,7 +456,6 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
 {
     grpc::ClientContext context;
     grpc::Status status;
-
     status = stub_->Set(&context, request, response);
     YLOG_DEBUG("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 
@@ -441,7 +465,7 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
     } 
     else 
     {
-        YLOG_DEBUG("Set RPC Passed");
+        YLOG_DEBUG("Set RPC OK");
         string reply = parse_set_response(response); 
         return reply;
     }

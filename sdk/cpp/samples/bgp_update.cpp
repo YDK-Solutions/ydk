@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     NetconfServiceProvider provider{host, username, password, port};
     CrudService crud{};
 
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp = make_unique<openconfig_bgp::Bgp>();
     bgp->global->config->as = 65172;
     bgp->global->config->router_id = "1.2.1.4";
 

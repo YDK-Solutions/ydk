@@ -34,7 +34,7 @@ using namespace ydk;
 using namespace std;
 
 
-void config_bgp(openconfig_bgp::Bgp* bgp)
+void config_bgp(openconfig::openconfig_bgp::Bgp* bgp)
 {
     // Set the Global AS
     bgp->global->config->as = 65172;
@@ -48,7 +48,7 @@ void config_bgp(openconfig_bgp::Bgp* bgp)
 //  afi_safi->parent = bgp->global->afi_safis.get();
 //  bgp->global->afi_safis->afi_safi.push_back(move(afi_safi));
 
-    auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto neighbor = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
     neighbor->neighbor_address = "6.7.8.9";
     neighbor->config->neighbor_address = "6.7.8.9";
     neighbor->config->peer_as = 65001;
@@ -59,7 +59,7 @@ void config_bgp(openconfig_bgp::Bgp* bgp)
     neighbor->parent = bgp->neighbors.get();
     bgp->neighbors->neighbor.push_back(move(neighbor));
 
-    auto peer_group = make_unique<openconfig_bgp::Bgp::PeerGroups::PeerGroup>();
+    auto peer_group = make_unique<openconfig::openconfig_bgp::Bgp::PeerGroups::PeerGroup>();
     peer_group->peer_group_name = "IBGP";
     peer_group->config->peer_group_name = "IBGP";
     //peer_group->config->auth_password = "password";
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
         RestconfServiceProvider provider{repo, "localhost", "admin", "admin", 12306, EncodingFormat::JSON};
         CrudService crud{};
 
-        auto bgp = make_unique<openconfig_bgp::Bgp>();
+        auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
         config_bgp(bgp.get());
         bool reply = crud.create(provider, *bgp);
 

@@ -97,6 +97,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 include(CPack)
+include(FindProtobuf)
 
 # include custom Modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
@@ -116,7 +117,7 @@ endif()
 
 set(HOME_DIRECTORY $ENV{HOME})
 
-set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
 
@@ -129,7 +130,7 @@ else()
     option(ENABLE_VALGRIND_TESTS "Build tests with valgrind" OFF)
 endif()
 
-# Set LibYDK variables
+# Set LibYDK variables7y4
 set(libydk_src
     src/bits.cpp
     src/codec_provider.cpp
@@ -152,6 +153,10 @@ set(libydk_src
     src/netconf_provider.cpp
     src/netconf_service.cpp
     src/path/netconf_session.cpp
+    src/gnmi_client.cpp    
+    src/gnmi_provider.cpp
+    src/path/gnmi_session.cpp
+    src/gnmi_service.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
     src/opendaylight_provider.cpp
@@ -201,6 +206,9 @@ set(libydk_install_headers
     src/executor_service.hpp
     src/filters.hpp
     src/logging_callback.hpp
+    src/gnmi_provider.hpp
+    src/gnmi_client.hpp
+    src/gnmi_service.hpp
     src/netconf_client.hpp
     src/netconf_provider.hpp
     src/netconf_service.hpp
@@ -278,6 +286,16 @@ set(netconf_objs
     yinparser.o
 )
 
+# Set gNMI variables
+set(libgnmi_headers
+    ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.grpc.pb.h
+    ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.pb.h)
+
+set(libgnmi_sources
+    ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.grpc.pb.cc
+    ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.pb.cc)
+
+
 # Set LibYang variables
 set(libyang_location ${CMAKE_CURRENT_BINARY_DIR}/project_libyang/src/project_libyang)
 
@@ -330,6 +348,8 @@ set(yang_objs
     yang_types.c.o
 )
 
+set(protobuf_MODULE_COMPATIBLE TRUE)
+
 # Find dependent libraries
 find_library(curl_location curl)
 find_library(ssh_threads_location ssh_threads)
@@ -339,6 +359,9 @@ find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_package(LibXml2 REQUIRED)
 find_package(LibSSH REQUIRED)
+find_package(PythonLibs REQUIRED)
+find_package(Protobuf REQUIRED)
+find_package(GRPC REQUIRED)
 
 # Add LibNetconf
 set(libnetconf_include_location include/libnetconf)
@@ -378,6 +401,25 @@ endforeach(netconf_obj)
 add_library(libnetconf STATIC IMPORTED)
 set_property(TARGET libnetconf PROPERTY IMPORTED_LOCATION ${libnetconf_archive})
 add_dependencies(libnetconf project_libnetconf)
+
+
+# Add LibgNMI
+set(libgnmi_generated_location ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated)
+set(libgnmi_include_location include/libgnmi)
+
+# Download gNMI proto
+file(DOWNLOAD "https://raw.githubusercontent.com/shgandhi/reference/master/rpc/gnmi/gnmi.proto" ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/gnmi.proto)
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/)
+
+execute_process(COMMAND  which grpc_cpp_plugin OUTPUT_VARIABLE GRPC_CPP_PLUGIN)
+string(STRIP ${GRPC_CPP_PLUGIN} GRPC_CPP_PLUGIN)
+
+# Compile gNMI proto to generate headers and sources
+execute_process(COMMAND protoc -I ./project_libgnmi --grpc_out=./project_libgnmi/generated/ --plugin=protoc-gen-grpc=${GRPC_CPP_PLUGIN} ./project_libgnmi/gnmi.proto)
+execute_process(COMMAND protoc -I ./project_libgnmi --cpp_out=./project_libgnmi/generated/ ./project_libgnmi/gnmi.proto)
+
+install(FILES ${libgnmi_headers} ${libgnmi_sources} DESTINATION ${libgnmi_include_location})
 
 # Add LibYang
 set(libyang_include_location include/libyang)
@@ -421,12 +463,18 @@ include_directories(
     ${LIBXML2_INCLUDE_DIR}
     ${libnetconf_headers_location}
     ${libnetconf_location}/headers
+    ${Protobuf_INCLUDE_DIR}
+    ${libgnmi_generated_location}
     ${libyang_headers_location}
     ${libyang_location}/headers
     ${PROJECT_SOURCE_DIR}/src
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+set(libgnmi_client_sources "src/gnmi_client.cpp" ${libgnmi_headers} ${libgnmi_sources})
+add_library(gnmi STATIC ${libgnmi_client_sources})
+target_link_libraries(gnmi grpc++_unsecure grpc gpr ${PROTOBUF_LIBRARY})
 
 add_library(ydk STATIC ${libydk_src} ${libnetconf_inc_objs} ${libyang_inc_objs})
 
@@ -441,12 +489,15 @@ target_link_libraries(ydk
     ${dl_location}
     libnetconf
     libyang
+    gnmi
+    ${PYTHON_LIBRARIES}
 )
 
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)
 set_property(TARGET ydk PROPERTY CXX_STANDARD_REQUIRED ON)
 
 install(TARGETS ydk DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS gnmi DESTINATION ${LIB_INSTALL_DIR})
 install(FILES ${libydk_install_headers} DESTINATION ${INCLUDE_INSTALL_DIR})
 install(FILES ${SPDLOG_HEADERS} DESTINATION ${spdlog_include_location})
 install(FILES ${SPDLOG_DETAILS_HEADERS} DESTINATION ${spdlog_details_include_location})

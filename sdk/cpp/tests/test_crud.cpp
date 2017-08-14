@@ -15,53 +15,38 @@
  ------------------------------------------------------------------*/
 
 #include <string.h>
-#include <memory>
 #include <iostream>
-#include <spdlog/spdlog.h>
 
-#include "ydk/path_api.hpp"
-#include "ydk/netconf_provider.hpp"
-#include "ydk/gnmi_provider.hpp"
-#include "ydk/crud_service.hpp"
+#include "netconf_provider.hpp"
+#include "crud_service.hpp"
 #include "catch.hpp"
-#include "ydk_ydktest/openconfig_bgp.hpp"
+
+#include <ydk_ydktest/openconfig_bgp.hpp>
 
 #include "config.hpp"
 
 using namespace ydk;
+using namespace ydktest;
 using namespace std;
 
-void gnmi_config_bgp(openconfig::openconfig_bgp::Bgp* bgp)
-{
-    // Set the Global AS
-    bgp->global->config->as = 65172;
 
-    auto neighbor = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
-    neighbor->neighbor_address = "172.16.255.2";
-    neighbor->config->neighbor_address = "172.16.255.2";
-    neighbor->config->peer_as = 65172;
-    neighbor->parent = bgp->neighbors.get();
-    bgp->neighbors->neighbor.push_back(move(neighbor));
-}
-
-
-void config_bgp(openconfig::openconfig_bgp::Bgp* bgp)
+void config_bgp(openconfig_bgp::Bgp* bgp)
 {
     // Set the Global AS
     bgp->global->config->as = 65001;
     bgp->global->config->router_id = "1.2.3.4";
 
-    auto afi_safi = make_unique<openconfig::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
+    auto afi_safi = make_unique<openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
     afi_safi->afi_safi_name = "openconfig-bgp-types:L3VPN_IPV4_UNICAST";
     afi_safi->config->afi_safi_name = "openconfig-bgp-types:L3VPN_IPV4_UNICAST";
     afi_safi->config->enabled = true;
     afi_safi->parent = bgp->global->afi_safis.get();
     bgp->global->afi_safis->afi_safi.push_back(move(afi_safi));
 
-    auto neighbor = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     neighbor->neighbor_address = "6.7.8.9";
     neighbor->config->neighbor_address = "6.7.8.9";
-    //neighbor->config->enabled = true;
+    neighbor->config->enabled = true;
     neighbor->config->peer_as = 65001;
     neighbor->config->local_as = 65001;
     neighbor->config->peer_group = "IBGP";
@@ -69,7 +54,7 @@ void config_bgp(openconfig::openconfig_bgp::Bgp* bgp)
     neighbor->parent = bgp->neighbors.get();
     bgp->neighbors->neighbor.push_back(move(neighbor));
 
-    auto peer_group = make_unique<openconfig::openconfig_bgp::Bgp::PeerGroups::PeerGroup>();
+    auto peer_group = make_unique<openconfig_bgp::Bgp::PeerGroups::PeerGroup>();
     peer_group->peer_group_name = "IBGP";
     peer_group->config->peer_group_name = "IBGP";
     peer_group->config->auth_password = "password";
@@ -86,7 +71,7 @@ TEST_CASE("bgp_create_delete")
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp);
     REQUIRE(reply);
 
@@ -95,27 +80,12 @@ TEST_CASE("bgp_create_delete")
     REQUIRE(reply);
 }
 
-TEST_CASE("gnmi_bgp_create_delete")
-{
-    ydk::path::Repository repo{TEST_HOME};
-    gNMIServiceProvider provider{repo, "127.0.0.1:50051"};
-    CrudService crud{};
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
-    bool reply = crud.delete_(provider, *bgp);
-    REQUIRE(reply);
-
-    gnmi_config_bgp(bgp.get());
-    reply = crud.create(provider, *bgp);
-    REQUIRE(reply);
-}
-
-
 TEST_CASE("bgp_read_delete")
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp_set = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_set = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp_set);
     REQUIRE(reply);
 
@@ -124,10 +94,10 @@ TEST_CASE("bgp_read_delete")
 
     REQUIRE(reply);
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     auto bgp_read = crud.read_config(provider, *bgp_filter);
     REQUIRE(bgp_read!=nullptr);
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
+    openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
     REQUIRE(bgp_read_ptr!=nullptr);
 
     REQUIRE(*(bgp_read_ptr) == *(bgp_set));
@@ -145,41 +115,12 @@ TEST_CASE("bgp_read_delete")
     cout<<*bgp_read_ptr<<endl;
 }
 
-TEST_CASE("gnmi_bgp_read_delete")
-{
-    ydk::path::Repository repo{TEST_HOME};
-    gNMIServiceProvider provider{repo, "127.0.0.1:50051"};
-    CrudService crud{};
-    auto bgp_set = make_unique<openconfig::openconfig_bgp::Bgp>();
-    bool reply = crud.delete_(provider, *bgp_set);
-    REQUIRE(reply);
-
-    gnmi_config_bgp(bgp_set.get());
-    reply = crud.create(provider, *bgp_set);
-
-    REQUIRE(reply);
-
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
-    auto bgp_read = crud.read_config(provider, *bgp_filter);
-    REQUIRE(bgp_read!=nullptr);
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
-    REQUIRE(bgp_read_ptr!=nullptr);
-
-    REQUIRE(*(bgp_read_ptr) == *(bgp_set));
-
-    CHECK(bgp_set->global->config->as == bgp_read_ptr->global->config->as);
-    CHECK(bgp_set->neighbors->neighbor[0]->neighbor_address == bgp_read_ptr->neighbors->neighbor[0]->neighbor_address);
-    CHECK(bgp_set->neighbors->neighbor[0]->config->local_as == bgp_read_ptr->neighbors->neighbor[0]->config->local_as);
-    cout<<*bgp_set<<endl<<endl;
-    cout<<*bgp_read_ptr<<endl;
-}
-
 TEST_CASE("bgp_update_delete")
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp);
     REQUIRE(reply);
 
@@ -187,7 +128,7 @@ TEST_CASE("bgp_update_delete")
     reply = crud.create(provider, *bgp);
     REQUIRE(reply);
 
-    auto bgp_update = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_update = make_unique<openconfig_bgp::Bgp>();
     bgp_update->global->config->as = 65210;
     reply = crud.update(provider, *bgp_update);
     REQUIRE(reply);
@@ -198,7 +139,7 @@ TEST_CASE("bgp_set_leaf")
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp);
     REQUIRE(reply);
 
@@ -207,26 +148,12 @@ TEST_CASE("bgp_set_leaf")
     REQUIRE(reply);
 }
 
-TEST_CASE("gnmi_bgp_set_leaf")
-{
-    ydk::path::Repository repo{TEST_HOME};
-    gNMIServiceProvider provider{repo, "127.0.0.1:50051"};
-    CrudService crud{};
-    auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
-    bool reply = crud.delete_(provider, *bgp);
-    REQUIRE(reply);
-
-    bgp->global->config->as = 65210;
-    reply = crud.create(provider, *bgp);
-    REQUIRE(reply);
-}
-
 TEST_CASE("bgp_read_create")
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp_set = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_set = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp_set);
     REQUIRE(reply);
 
@@ -236,10 +163,10 @@ TEST_CASE("bgp_read_create")
 
     REQUIRE(reply);
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     auto bgp_read = crud.read_config(provider, *bgp_filter);
     REQUIRE(bgp_read!=nullptr);
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
+    openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
     REQUIRE(bgp_read_ptr!=nullptr);
 
     REQUIRE(*(bgp_read_ptr) == *(bgp_set));
@@ -250,50 +177,23 @@ TEST_CASE("bgp_read_create")
     REQUIRE(reply);
 }
 
-TEST_CASE("gnmi_bgp_read_create")
-{
-    ydk::path::Repository repo{TEST_HOME};
-    gNMIServiceProvider provider{repo, "127.0.0.1:50051"};
-    CrudService crud{};
-    auto bgp_set = make_unique<openconfig::openconfig_bgp::Bgp>();
-    bool reply = crud.delete_(provider, *bgp_set);
-    REQUIRE(reply);
-
-    gnmi_config_bgp(bgp_set.get());
-    reply = crud.create(provider, *bgp_set);
-
-    REQUIRE(reply);
-
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
-    auto bgp_read = crud.read_config(provider, *bgp_filter);
-    REQUIRE(bgp_read!=nullptr);
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
-    REQUIRE(bgp_read_ptr!=nullptr);
-
-    REQUIRE(*(bgp_read_ptr) == *(bgp_set));
-
-    bgp_read_ptr->global->config->as = 65172;
-    reply = crud.create(provider, *bgp_read_ptr);
-    REQUIRE(reply);
-}
-
 TEST_CASE("read_leaves")
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
 
-    auto bgp_delete = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_delete = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp_delete);
     REQUIRE(reply);
 
-    auto bgp_create = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_create = make_unique<openconfig_bgp::Bgp>();
     bgp_create->global->config->as = 65001;
     bgp_create->global->config->router_id = "1.1.1.1";
     reply = crud.create(provider, *bgp_create);
     REQUIRE(reply);
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     bgp_filter->global->config->as.yfilter = YFilter::read;
     bgp_filter->global->config->router_id.yfilter = YFilter::read;
 
@@ -307,20 +207,20 @@ TEST_CASE("read_leaf")
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
 
-    auto bgp_delete = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_delete = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp_delete);
     REQUIRE(reply);
 
-    auto bgp_create = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_create = make_unique<openconfig_bgp::Bgp>();
     bgp_create->global->config->as = 65001;
     bgp_create->global->config->router_id = "1.1.1.1";
     reply = crud.create(provider, *bgp_create);
     REQUIRE(reply);
 
-    auto bgp_cfg = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_cfg = make_unique<openconfig_bgp::Bgp>();
     bgp_cfg->global->config->as = 65001;
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     bgp_filter->global->config->as.yfilter = YFilter::read;
 
     auto bgp_read = crud.read(provider, *bgp_filter);
@@ -332,18 +232,18 @@ TEST_CASE("bgp_read_non_top")
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     CrudService crud{};
-    auto bgp_set = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_set = make_unique<openconfig_bgp::Bgp>();
     bool reply = crud.delete_(provider, *bgp_set);
     REQUIRE(reply);
 
     bgp_set->global->config->as = 65001;
     bgp_set->global->config->router_id = "1.2.3.4";
-    auto d = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto d = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     d->neighbor_address = "1.2.3.4";
     d->config->neighbor_address = "1.2.3.4";
     d->parent = bgp_set->neighbors.get();
     bgp_set->neighbors->neighbor.push_back(move(d));
-    auto q = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto q = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     q->neighbor_address = "1.2.3.5";
     q->config->neighbor_address = "1.2.3.5";
     // need to set parent pointer explicitly, otherwise the equal operator
@@ -353,10 +253,10 @@ TEST_CASE("bgp_read_non_top")
     reply = crud.create(provider, *bgp_set);
     REQUIRE(reply);
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     auto bgp_read = crud.read_config(provider, *(bgp_filter));
     REQUIRE(bgp_read!=nullptr);
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
+    openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
     REQUIRE(bgp_read_ptr!=nullptr);
 
     cout<<*bgp_set<<endl<<endl;

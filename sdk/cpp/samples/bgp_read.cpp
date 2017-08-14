@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     NetconfServiceProvider provider{host, username, password, port};
     CrudService crud{};
 
-    auto bgp_filter = make_unique<openconfig::openconfig_bgp::Bgp>();
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
     auto bgp_read = crud.read_config(provider, *bgp_filter);
     if(bgp_read == nullptr)
     {
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    openconfig::openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig::openconfig_bgp::Bgp*>(bgp_read.get());
+    openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
 
     cout << "=================================================="<<endl;
     cout << "BGP configuration: " << endl<<endl;
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
     for(size_t index=0; index < bgp_read_ptr->neighbors->neighbor.size(); index++)
     {
-        openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor & neighbor = *(bgp_read_ptr->neighbors->neighbor[index]);
+        openconfig_bgp::Bgp::Neighbors::Neighbor & neighbor = *(bgp_read_ptr->neighbors->neighbor[index]);
 
         cout << "Neighbor address: " << neighbor.neighbor_address <<endl;
         cout << "Neighbor local AS: " <<  neighbor.config->local_as << endl;
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
     for(size_t index=0; index < bgp_read_ptr->global->afi_safis->afi_safi.size(); index++)
     {
-        openconfig::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi & afi_safi = *(bgp_read_ptr->global->afi_safis->afi_safi[index]);
+        openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi & afi_safi = *(bgp_read_ptr->global->afi_safis->afi_safi[index]);
 
         cout << "AFI-SAFI name: " << afi_safi.afi_safi_name <<endl;
         cout << "AFI-SAFI config name: " <<  afi_safi.config->afi_safi_name <<endl;
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     for(size_t index=0; index < bgp_read_ptr->peer_groups->peer_group.size(); index++)
     {
-        openconfig::openconfig_bgp::Bgp::PeerGroups::PeerGroup & peer_group = *(bgp_read_ptr->peer_groups->peer_group[index]);
+        openconfig_bgp::Bgp::PeerGroups::PeerGroup & peer_group = *(bgp_read_ptr->peer_groups->peer_group[index]);
 
         cout << "Peer group name: " << peer_group.peer_group_name << endl;
         cout << "Peer group type: " << peer_group.config->peer_type << endl<<endl;

@@ -41,29 +41,49 @@ type NetconfServiceProvider struct {
 }
 
 type RestconfServiceProvider struct {
-	Repo     types.Repository
+	Path     string
 	Address  string
 	Username string
 	Password string
 	Port     int
-	Encoding types.EncodingFormat
 
 	Private types.CServiceProvider
 }
 
+// GetPrivate returns private pointer for NetconfServiceProvider
 func (provider *NetconfServiceProvider) GetPrivate() interface{} {
 	return provider.Private
 }
 
+// Connect to NetconfServiceProvider using Repo/Address/Username/Password/Port
 func (provider *NetconfServiceProvider) Connect() {
 	provider.Private = path.ConnectToProvider(provider.Repo, provider.Address, provider.Username, provider.Password, provider.Port)
 }
 
+// Disconnect from NetconfServiceProvider
 func (provider *NetconfServiceProvider) Disconnect() {
 	if provider.Private.Private == nil {
 		return
 	}
 	path.DisconnectFromProvider(provider.Private)
+}
+
+// GetPrivate returns private pointer for RestconfServiceProvider
+func (provider *RestconfServiceProvider) GetPrivate() interface{} {
+	return provider.Private
+}
+
+// Connect to RestconfServiceProvider using Path/Address/Username/Password/Port
+func (provider *RestconfServiceProvider) Connect() {
+	provider.Private = path.ConnectToRestconfProvider(provider.Path, provider.Address, provider.Username, provider.Password, provider.Port)
+}
+
+// Disconnect from RestconfServiceProvider
+func (provider *RestconfServiceProvider) Disconnect() {
+	if provider.Private.Private == nil {
+		return
+	}
+	path.DisconnectFromRestconfProvider(provider.Private)
 }
 
 type CodecServiceProvider struct {
@@ -73,6 +93,7 @@ type CodecServiceProvider struct {
 	RootSchemaTable map[string]types.RootSchemaNode
 }
 
+// Initialize CodecServiceProvider
 func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
 	bundle_name := entity.GetBundleName()
 	if len(provider.RootSchemaTable) == 0 {
@@ -86,10 +107,12 @@ func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
 	}
 }
 
+// GetEncoding returns encoding format for CodecServiceProvider
 func (provider *CodecServiceProvider) GetEncoding() types.EncodingFormat {
 	return provider.Encoding
 }
 
+// GetRootSchemaNode returns root schema node for entity
 func (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity) types.RootSchemaNode {
 	root_schema_node, ok := provider.RootSchemaTable[entity.GetBundleName()]
 	if !ok {

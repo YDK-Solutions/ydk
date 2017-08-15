@@ -75,7 +75,11 @@ void RepositoryFree(Repository);
 ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
 ServiceProvider NetconfServiceProviderInit(const char * address, const char * username, const char * password, int port);
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
+EncodingFormat ServiceProviderGetEncoding(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
+ServiceProvider RestconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
+void RestconfServiceProviderFree(ServiceProvider);
+
 
 Codec CodecInit(void);
 void CodecFree(Codec);

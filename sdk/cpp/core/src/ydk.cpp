@@ -26,6 +26,7 @@
 
 #include "crud_service.hpp"
 #include "netconf_provider.hpp"
+#include "restconf_provider.hpp"
 #include "path_api.hpp"
 #include "path/path_private.hpp"
 #include "types.hpp"
@@ -229,6 +230,29 @@ void NetconfServiceProviderFree(ServiceProvider provider)
     }
 }
 
+ServiceProvider RestconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port)
+{
+    try
+    {
+        ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
+        ydk::RestconfServiceProvider * real_provider = new ydk::RestconfServiceProvider(*real_repo, address, username, password, port);
+        return static_cast<void*>(real_provider);
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
+void RestconfServiceProviderFree(ServiceProvider provider)
+{
+    ydk::RestconfServiceProvider * real_provider = static_cast<ydk::RestconfServiceProvider*>(provider);
+    if(real_provider != NULL)
+    {
+        delete real_provider;
+    }
+}
+
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
 {
     try
@@ -240,6 +264,18 @@ RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
     catch(...)
     {
         return NULL;
+    }
+}
+
+EncodingFormat ServiceProviderGetEncoding(ServiceProvider provider)
+{
+    ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
+    auto encoding = real_provider->get_encoding();
+    if (encoding == ydk::EncodingFormat::XML) {
+        return EncodingFormat::XML;
+    }
+    else {
+        return EncodingFormat::JSON;
     }
 }
 

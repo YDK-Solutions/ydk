@@ -13,8 +13,7 @@ import (
 type SanityLevelsTestSuite struct {
 	suite.Suite
 	Provider providers.NetconfServiceProvider
-
-	CRUD services.CrudService
+	CRUD     services.CrudService
 }
 
 func (suite *SanityLevelsTestSuite) SetupSuite() {

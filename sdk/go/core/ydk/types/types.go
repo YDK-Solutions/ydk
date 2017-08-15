@@ -229,6 +229,10 @@ type CServiceProvider struct {
 	Private interface{}
 }
 
+type COpenDaylightServiceProvider struct {
+	Private interface{}
+}
+
 type Repository struct {
 	Path    string
 	Private interface{}

@@ -30,6 +30,20 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
+type OpenDaylightServiceProvider struct {
+	Path 	 	   string
+	Address  	   string
+	Username 	   string
+	Password 	   string
+	Port     	   int
+	EncodingFormat types.EncodingFormat
+	Protocol 	   types.Protocol
+
+	Private  	   types.COpenDaylightServiceProvider
+	// keep alive
+	ProvidersHolder []types.ServiceProvider
+}
+
 type NetconfServiceProvider struct {
 	Repo     types.Repository
 	Address  string
@@ -48,6 +62,47 @@ type RestconfServiceProvider struct {
 	Port     int
 
 	Private types.CServiceProvider
+}
+
+// GetPrivate returns private pointer for OpenDaylightServiceProvider
+func (provider *OpenDaylightServiceProvider) GetPrivate() interface{} {
+	return provider.Private
+}
+
+// Connect to OpenDaylightServiceProvider using Path/Address/Username/Password/Port
+func (provider *OpenDaylightServiceProvider) Connect() {
+	provider.Private = path.ConnectToOpenDaylightProvider(provider.Path, provider.Address, provider.Username, provider.Password, provider.Port, provider.EncodingFormat, provider.Protocol)
+}
+
+// GetNodeIds returns OpenDaylightServiceProvider Node ids
+func (provider *OpenDaylightServiceProvider) GetNodeIds() []string {
+	return path.OpenDaylightServiceProviderGetNodeIds(provider.Private)
+}
+
+// GetNodeProvider returns Node provider by Id
+func (provider *OpenDaylightServiceProvider) GetNodeProvider(nodeId string) types.ServiceProvider {
+	p := path.OpenDaylightServiceProviderGetNodeProvider(provider.Private, nodeId)
+	if provider.Protocol == types.Restconf {
+		nodeProvider := RestconfServiceProvider{Path: provider.Path, Address: provider.Address, Password: provider.Password, Username: provider.Username, Port: provider.Port}
+		nodeProvider.Private = p
+		provider.ProvidersHolder = append(provider.ProvidersHolder, &nodeProvider)
+		return &nodeProvider
+	} else {
+		repo := types.Repository{}
+		repo.Path = provider.Path
+		nodeProvider := NetconfServiceProvider{Repo: repo, Address: provider.Address, Password: provider.Password, Username: provider.Username, Port: provider.Port}
+		nodeProvider.Private = p
+		provider.ProvidersHolder = append(provider.ProvidersHolder, &nodeProvider)
+		return &nodeProvider
+	}
+}
+
+// Disconnect from OpenDaylightServiceProvider
+func (provider *OpenDaylightServiceProvider) Disconnect() {
+	if provider.Private.Private == nil {
+		return
+	}
+	path.DisconnectFromOpenDaylightProvider(provider.Private)
 }
 
 // GetPrivate returns private pointer for NetconfServiceProvider

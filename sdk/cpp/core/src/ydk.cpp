@@ -26,6 +26,7 @@
 
 #include "crud_service.hpp"
 #include "netconf_provider.hpp"
+#include "opendaylight_provider.hpp"
 #include "restconf_provider.hpp"
 #include "path_api.hpp"
 #include "path/path_private.hpp"
@@ -253,6 +254,63 @@ void RestconfServiceProviderFree(ServiceProvider provider)
     }
 }
 
+OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol)
+{
+    try
+    {
+        ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
+        ydk::EncodingFormat real_encoding;
+        if (encoding == XML) {
+            real_encoding = ydk::EncodingFormat::XML;
+        }
+        else {
+            real_encoding = ydk::EncodingFormat::JSON;
+        }
+        ydk::Protocol real_protocol;
+        if (protocol == Netconf) {
+            real_protocol = ydk::Protocol::netconf;
+        }
+        else {
+            real_protocol = ydk::Protocol::restconf;
+        }
+        ydk::OpenDaylightServiceProvider * real_provider = new ydk::OpenDaylightServiceProvider(*real_repo, address, username, password, port, real_encoding, real_protocol);
+        return static_cast<void*>(real_provider);
+    }
+    catch(...)
+    {
+        return NULL;
+    }
+}
+
+void OpenDaylightServiceProviderFree(OpenDaylightServiceProvider provider)
+{
+    ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
+    if(real_provider != NULL)
+    {
+        delete real_provider;
+    }
+}
+
+ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServiceProvider provider, const char * node_id)
+{
+    ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
+    ydk::path::ServiceProvider * node_provider = &real_provider->get_node_provider(string(node_id));
+    return static_cast<void*>(node_provider);
+}
+
+const char* OpenDaylightServiceProviderGetNodeIdByIndex(OpenDaylightServiceProvider provider, int idx)
+{
+    ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
+    if ((size_t)idx < real_provider->get_node_ids().size())
+    {
+        return string_to_array(real_provider->get_node_ids()[idx]);
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
 {
     try
@@ -272,10 +330,10 @@ EncodingFormat ServiceProviderGetEncoding(ServiceProvider provider)
     ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
     auto encoding = real_provider->get_encoding();
     if (encoding == ydk::EncodingFormat::XML) {
-        return EncodingFormat::XML;
+        return XML;
     }
     else {
-        return EncodingFormat::JSON;
+        return JSON;
     }
 }
 

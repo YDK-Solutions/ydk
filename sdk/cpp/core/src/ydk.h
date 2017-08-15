@@ -38,6 +38,7 @@ typedef void* RootSchemaNode;
 typedef void* RootSchemaWrapper;
 typedef void* Codec;
 typedef void* ServiceProvider;
+typedef void* OpenDaylightServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
 
@@ -64,6 +65,12 @@ typedef enum LogLevel
     ERROR
 } LogLevel;
 
+typedef enum Protocol
+{
+    Netconf = 0,
+    Restconf
+} Protocol;
+
 Capability CapabilityCreate(const char* mod, const char* rev);
 void CapabilityFree(Capability);
 
@@ -77,9 +84,14 @@ ServiceProvider NetconfServiceProviderInit(const char * address, const char * us
 RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
 EncodingFormat ServiceProviderGetEncoding(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
+
 ServiceProvider RestconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
 void RestconfServiceProviderFree(ServiceProvider);
 
+OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol);
+void OpenDaylightServiceProviderFree(OpenDaylightServiceProvider);
+ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServiceProvider provider, const char * node_id);
+const char* OpenDaylightServiceProviderGetNodeIdByIndex(OpenDaylightServiceProvider provider, int idx);
 
 Codec CodecInit(void);
 void CodecFree(Codec);

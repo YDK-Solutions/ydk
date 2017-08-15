@@ -242,6 +242,77 @@ func CodecServiceDecode(root_schema types.RootSchemaNode, payload string, encodi
 	return ReadDatanode(top_entity, data_node)
 }
 
+func ConnectToOpenDaylightProvider(Path, Address, Username, Password string, port int, encoding types.EncodingFormat, protocol types.Protocol) types.COpenDaylightServiceProvider {
+	var path *C.char = C.CString(Path)
+	defer C.free(unsafe.Pointer(path))
+	var address *C.char = C.CString(Address)
+	defer C.free(unsafe.Pointer(address))
+	var username *C.char = C.CString(Username)
+	defer C.free(unsafe.Pointer(username))
+	var password *C.char = C.CString(Password)
+	defer C.free(unsafe.Pointer(password))
+	var cport C.int = C.int(port)
+
+	var p C.OpenDaylightServiceProvider
+	crepo := C.RepositoryInitWithPath(path)
+
+	var cencoding C.EncodingFormat
+	if encoding == types.XML {
+		cencoding = C.XML
+	} else {
+		cencoding = C.JSON
+	}
+
+	var cprotocol C.Protocol
+	if protocol == types.Netconf {
+		cprotocol = C.Netconf
+	} else {
+		cprotocol = C.Restconf
+	}
+
+	p = C.OpenDaylightServiceProviderInitWithRepo(crepo, address, username, password, cport, cencoding, cprotocol)
+
+	if p == nil {
+		panic("Could not connect to " + Address)
+	}
+
+	cprovider := types.COpenDaylightServiceProvider{Private: p}
+	return cprovider
+}
+
+func DisconnectFromOpenDaylightProvider(provider types.COpenDaylightServiceProvider) {
+	real_provider := provider.Private.(C.OpenDaylightServiceProvider)
+	C.OpenDaylightServiceProviderFree(real_provider)
+}
+
+func OpenDaylightServiceProviderGetNodeIds(provider types.COpenDaylightServiceProvider) []string {
+	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
+	var ids []string
+	id := 0
+	for {
+		cid := C.int(id)
+		nodeId := C.OpenDaylightServiceProviderGetNodeIdByIndex(cprovider, cid)
+		defer C.free(unsafe.Pointer(nodeId))
+		if nodeId != nil {
+			ids = append(ids, C.GoString(nodeId))
+			id ++
+		} else {
+			break
+		}
+	}
+	return ids
+}
+
+func OpenDaylightServiceProviderGetNodeProvider(provider types.COpenDaylightServiceProvider, nodeId string) types.CServiceProvider {
+	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
+	cnodeId := C.CString(nodeId)
+	defer C.free(unsafe.Pointer(cnodeId))
+	var nodeProvider C.ServiceProvider
+	nodeProvider = C.OpenDaylightServiceProviderGetNodeProvider(realProvider, cnodeId)
+	cnodeProvider := types.CServiceProvider{Private: nodeProvider}
+	return cnodeProvider
+}
+
 //////////////////////////////////////////////////////////////////////////
 // DataNode from Entity
 //////////////////////////////////////////////////////////////////////////

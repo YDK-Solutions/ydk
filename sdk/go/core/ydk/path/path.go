@@ -285,17 +285,17 @@ func DisconnectFromOpenDaylightProvider(provider types.COpenDaylightServiceProvi
 	C.OpenDaylightServiceProviderFree(real_provider)
 }
 
-func OpenDaylightServiceProviderGetNodeIds(provider types.COpenDaylightServiceProvider) []string {
+func OpenDaylightServiceProviderGetNodeIDs(provider types.COpenDaylightServiceProvider) []string {
 	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
 	var ids []string
 	id := 0
 	for {
 		cid := C.int(id)
-		nodeId := C.OpenDaylightServiceProviderGetNodeIdByIndex(cprovider, cid)
-		defer C.free(unsafe.Pointer(nodeId))
-		if nodeId != nil {
-			ids = append(ids, C.GoString(nodeId))
-			id ++
+		nodeID := C.OpenDaylightServiceProviderGetNodeIDByIndex(cprovider, cid)
+		defer C.free(unsafe.Pointer(nodeID))
+		if nodeID != nil {
+			ids = append(ids, C.GoString(nodeID))
+			id++
 		} else {
 			break
 		}
@@ -303,12 +303,12 @@ func OpenDaylightServiceProviderGetNodeIds(provider types.COpenDaylightServicePr
 	return ids
 }
 
-func OpenDaylightServiceProviderGetNodeProvider(provider types.COpenDaylightServiceProvider, nodeId string) types.CServiceProvider {
+func OpenDaylightServiceProviderGetNodeProvider(provider types.COpenDaylightServiceProvider, nodeID string) types.CServiceProvider {
 	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
-	cnodeId := C.CString(nodeId)
-	defer C.free(unsafe.Pointer(cnodeId))
+	cnodeID := C.CString(nodeID)
+	defer C.free(unsafe.Pointer(cnodeID))
 	var nodeProvider C.ServiceProvider
-	nodeProvider = C.OpenDaylightServiceProviderGetNodeProvider(realProvider, cnodeId)
+	nodeProvider = C.OpenDaylightServiceProviderGetNodeProvider(realProvider, cnodeID)
 	cnodeProvider := types.CServiceProvider{Private: nodeProvider}
 	return cnodeProvider
 }

@@ -91,7 +91,7 @@ void RestconfServiceProviderFree(ServiceProvider);
 OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol);
 void OpenDaylightServiceProviderFree(OpenDaylightServiceProvider);
 ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServiceProvider provider, const char * node_id);
-const char* OpenDaylightServiceProviderGetNodeIdByIndex(OpenDaylightServiceProvider provider, int idx);
+const char* OpenDaylightServiceProviderGetNodeIDByIndex(OpenDaylightServiceProvider provider, int idx);
 
 Codec CodecInit(void);
 void CodecFree(Codec);

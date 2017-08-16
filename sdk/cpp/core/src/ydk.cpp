@@ -298,7 +298,7 @@ ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServicePr
     return static_cast<void*>(node_provider);
 }
 
-const char* OpenDaylightServiceProviderGetNodeIdByIndex(OpenDaylightServiceProvider provider, int idx)
+const char* OpenDaylightServiceProviderGetNodeIDByIndex(OpenDaylightServiceProvider provider, int idx)
 {
     ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
     if ((size_t)idx < real_provider->get_node_ids().size())

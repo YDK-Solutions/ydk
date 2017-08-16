@@ -30,6 +30,22 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
+// OpenDaylightServiceProvider A service provider to be used to communicate with an OpenDaylight instance: https://www.opendaylight.org
+type OpenDaylightServiceProvider struct {
+	Path           string
+	Address        string
+	Username       string
+	Password       string
+	Port           int
+	EncodingFormat types.EncodingFormat
+	Protocol       types.Protocol
+
+	Private types.COpenDaylightServiceProvider
+	// keep alive
+	ProvidersHolder []types.ServiceProvider
+}
+
+// NetconfServiceProvider Implementation of ServiceProvider for the NETCONF protocol: https://tools.ietf.org/html/rfc6241
 type NetconfServiceProvider struct {
 	Repo     types.Repository
 	Address  string
@@ -40,6 +56,7 @@ type NetconfServiceProvider struct {
 	Private types.CServiceProvider
 }
 
+// RestconfServiceProvider Implementation of ServiceProvider for the RESTCONF protocol: https://tools.ietf.org/html/draft-ietf-netconf-restconf-18
 type RestconfServiceProvider struct {
 	Path     string
 	Address  string
@@ -48,6 +65,46 @@ type RestconfServiceProvider struct {
 	Port     int
 
 	Private types.CServiceProvider
+}
+
+// GetPrivate returns private pointer for OpenDaylightServiceProvider
+func (provider *OpenDaylightServiceProvider) GetPrivate() interface{} {
+	return provider.Private
+}
+
+// Connect to OpenDaylightServiceProvider using Path/Address/Username/Password/Port
+func (provider *OpenDaylightServiceProvider) Connect() {
+	provider.Private = path.ConnectToOpenDaylightProvider(provider.Path, provider.Address, provider.Username, provider.Password, provider.Port, provider.EncodingFormat, provider.Protocol)
+}
+
+// GetNodeIDs returns OpenDaylightServiceProvider Node IDs
+func (provider *OpenDaylightServiceProvider) GetNodeIDs() []string {
+	return path.OpenDaylightServiceProviderGetNodeIDs(provider.Private)
+}
+
+// GetNodeProvider returns Node provider by ID
+func (provider *OpenDaylightServiceProvider) GetNodeProvider(nodeID string) types.ServiceProvider {
+	p := path.OpenDaylightServiceProviderGetNodeProvider(provider.Private, nodeID)
+	if provider.Protocol == types.Restconf {
+		nodeProvider := RestconfServiceProvider{Path: provider.Path, Address: provider.Address, Password: provider.Password, Username: provider.Username, Port: provider.Port}
+		nodeProvider.Private = p
+		provider.ProvidersHolder = append(provider.ProvidersHolder, &nodeProvider)
+		return &nodeProvider
+	}
+	repo := types.Repository{}
+	repo.Path = provider.Path
+	nodeProvider := NetconfServiceProvider{Repo: repo, Address: provider.Address, Password: provider.Password, Username: provider.Username, Port: provider.Port}
+	nodeProvider.Private = p
+	provider.ProvidersHolder = append(provider.ProvidersHolder, &nodeProvider)
+	return &nodeProvider
+}
+
+// Disconnect from OpenDaylightServiceProvider
+func (provider *OpenDaylightServiceProvider) Disconnect() {
+	if provider.Private.Private == nil {
+		return
+	}
+	path.DisconnectFromOpenDaylightProvider(provider.Private)
 }
 
 // GetPrivate returns private pointer for NetconfServiceProvider
@@ -86,6 +143,7 @@ func (provider *RestconfServiceProvider) Disconnect() {
 	path.DisconnectFromRestconfProvider(provider.Private)
 }
 
+// CodecServiceProvider Encode and decode to XML/JSON format
 type CodecServiceProvider struct {
 	Repo     types.Repository
 	Encoding types.EncodingFormat

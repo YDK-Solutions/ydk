@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"github.com/CiscoDevNet/ydk-go/ydk"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
@@ -11,7 +10,7 @@ import (
 	"testing"
 )
 
-const testHome = "../../../cpp/core/tests/models"
+const TestHome = "../../../cpp/core/tests/models"
 
 type RestconfProviderTestSuite struct {
 	suite.Suite
@@ -22,7 +21,7 @@ type RestconfProviderTestSuite struct {
 func (suite *RestconfProviderTestSuite) SetupSuite() {
 	suite.CRUD = services.CrudService{}
 	suite.Provider = providers.RestconfServiceProvider{
-		Path:     testHome,
+		Path:     TestHome,
 		Address:  "localhost",
 		Username: "admin",
 		Password: "admin",
@@ -48,6 +47,5 @@ func (suite *RestconfProviderTestSuite) TestCreateDelRead() {
 }
 
 func TestRestconfProviderTestSuite(t *testing.T) {
-	ydk.EnableLogging(ydk.Debug)
 	suite.Run(t, new(RestconfProviderTestSuite))
 }

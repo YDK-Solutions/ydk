@@ -92,7 +92,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
                     || error_message.str().find("does not satisfy the constraint")!= std::string::npos)
             {
                 YLOG_ERROR("Libyang ERROR: {}", error_message.str());
-                throw(YCPPModelError{error_message.str()});
+                throw(YCPPModelError{});
             }
             YLOG_ERROR("Libyang ERROR: {}", error_message.str());
             break;
@@ -118,8 +118,6 @@ ydk::path::Repository::Repository()
 ydk::path::Repository::Repository(const std::string& search_dir)
   : path{search_dir}, using_temp_directory(false)
 {
- //     auto console = spdlog::stdout_color_mt("ydk");
- //     console->set_level(spdlog::level::debug);
 
     if (!file_exists(path))
     {

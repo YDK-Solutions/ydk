@@ -25,6 +25,7 @@
 //////////////////////////////////////////////////////////////////
 
 #include "crud_service.hpp"
+#include "errors.hpp"
 #include "netconf_provider.hpp"
 #include "opendaylight_provider.hpp"
 #include "restconf_provider.hpp"
@@ -33,6 +34,8 @@
 #include "types.hpp"
 
 #include <iostream>
+#include <typeinfo>
+#include <stdexcept>
 #include <spdlog/spdlog.h>
 
 #include "ydk.h"
@@ -121,7 +124,18 @@ static ydk::EncodingFormat get_real_encoding(EncodingFormat encoding)
         case XML:
             return ydk::EncodingFormat::XML;
         case JSON:
-                return ydk::EncodingFormat::JSON;
+            return ydk::EncodingFormat::JSON;
+    }
+}
+
+static ydk::Protocol get_real_protocol(Protocol protocol)
+{
+    switch(protocol)
+    {
+        case Netconf:
+            return ydk::Protocol::netconf;
+        case Restconf:
+            return ydk::Protocol::restconf;
     }
 }
 
@@ -132,14 +146,121 @@ static const char* string_to_array(const string & str)
     return cstr;
 }
 
+static void handle_error_message(YDKState* state, const char * message)
+{
+    state->error_occurred = true;
+    if (state->error_message)
+    {
+        delete state->error_message;
+    }
+    state->error_message = new char [strlen(message)+1];
+    std::strcpy(state->error_message, message);
+}
+
+static void handle_error(YDKState* state)
+{
+    try
+    {
+        throw;
+    }
+    catch (const ydk::YCPPClientError & e) {
+        state->error_type = YDK_CLIENT_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPServiceProviderError & e) {
+        state->error_type = YDK_SERVICE_PROVIDER_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPServiceError & e) {
+        state->error_type = YDK_SERVICE_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPIllegalStateError & e) {
+        state->error_type = YDK_ILLEGAL_STATE_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPInvalidArgumentError & e) {
+        state->error_type = YDK_INVALID_ARGUMENT_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPOperationNotSupportedError & e) {
+        state->error_type = YDK_OPERATION_NOTSUPPORTED_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPModelError & e) {
+        state->error_type = YDK_MODEL_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch (const ydk::YCPPError & e) {
+        state->error_type = YDK_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch(const ydk::path::YCPPCoreError & e) {
+        state->error_type = YDK_CORE_ERROR;
+        handle_error_message(state, e.what());
+    }
+    catch(const ydk::path::YCPPCodecError & e) {
+        state->error_type = YDK_CODEC_ERROR;
+        handle_error_message(state, e.what());
+    }
+}
+
+YDKState* ydk_state_factory()
+{
+    YDKState* state = new YDKState();
+    state->error_occurred = false;
+    state->error_message = nullptr;
+    state->error_type = YDK_ERROR_NONE;
+    return state;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Exported functions
 //////////////////////////////////////////////////////////////////////////
 
-Repository RepositoryInitWithPath(const char* path)
+YDKStatePtr YDKStateCreate(void)
 {
-    ydk::path::Repository* real_repo = new ydk::path::Repository(path);
-    return static_cast<void*>(real_repo);
+    YDKState* state = ydk_state_factory();
+    return static_cast<void*>(state);
+}
+
+void YDKStateFree(YDKStatePtr ptr)
+{
+    YDKState* real_state = static_cast<YDKState*>(ptr);
+    if (real_state->error_message)
+    {
+        delete real_state->error_message;
+    }
+    delete real_state;
+}
+
+const char* YDKStateGetErrorMessage(YDKStatePtr state)
+{
+    return static_cast<YDKState*>(state)->error_message;
+}
+
+YDKErrorType YDKStateGetErrorType(YDKStatePtr state)
+{
+    return static_cast<YDKState*>(state)->error_type;
+}
+
+boolean YDKStateErrorOccurred(YDKStatePtr state)
+{
+    YDKState* real_state = static_cast<YDKState*>(state);
+    return real_state->error_occurred;
+}
+
+Repository RepositoryInitWithPath(YDKStatePtr state, const char* path)
+{
+    try {
+        ydk::path::Repository* real_repo = new ydk::path::Repository(path);
+        return static_cast<void*>(real_repo);
+    }
+    catch (...) {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
+        return NULL;
+    }
 }
 
 Repository RepositoryInit()
@@ -148,7 +269,7 @@ Repository RepositoryInit()
     return static_cast<void*>(real_repo);
 }
 
-RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository repo, const Capability caps[], int caps_size) {
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(YDKStatePtr state, Repository repo, const Capability caps[], int caps_size) {
     try
     {
         std::vector<ydk::path::Capability> real_caps;
@@ -161,6 +282,8 @@ RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository repo, const Capab
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -174,7 +297,7 @@ void RepositoryFree(Repository repo)
     }
 }
 
-Capability CapabilityCreate(const char* mod, const char* rev) {
+Capability CapabilityCreate(YDKStatePtr state, const char* mod, const char* rev) {
     try
     {
         ydk::path::Capability * real_cap = new ydk::path::Capability(mod, rev);
@@ -182,6 +305,8 @@ Capability CapabilityCreate(const char* mod, const char* rev) {
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -195,29 +320,33 @@ void CapabilityFree(Capability cap)
     }
 }
 
-ServiceProvider NetconfServiceProviderInit(const char * address, const char * username, const char * password, int port)
+ServiceProvider NetconfServiceProviderInit(YDKStatePtr state, const char * address, const char * username, const char * password, int port, const char * protocol)
 {
     try
     {
-        ydk::NetconfServiceProvider * real_provider = new ydk::NetconfServiceProvider(address, username, password, port);
+        ydk::NetconfServiceProvider * real_provider = new ydk::NetconfServiceProvider(address, username, password, port, protocol);
         return static_cast<void*>(real_provider);
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port)
+ServiceProvider NetconfServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, const char * protocol)
 {
     try
     {
         ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
-        ydk::NetconfServiceProvider * real_provider = new ydk::NetconfServiceProvider(*real_repo, address, username, password, port);
+        ydk::NetconfServiceProvider * real_provider = new ydk::NetconfServiceProvider(*real_repo, address, username, password, port, protocol);
         return static_cast<void*>(real_provider);
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -231,16 +360,19 @@ void NetconfServiceProviderFree(ServiceProvider provider)
     }
 }
 
-ServiceProvider RestconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port)
+ServiceProvider RestconfServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, const char* config_url_root, const char* state_url_root)
 {
     try
     {
         ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
-        ydk::RestconfServiceProvider * real_provider = new ydk::RestconfServiceProvider(*real_repo, address, username, password, port);
+        ydk::EncodingFormat real_encoding = get_real_encoding(encoding);
+        ydk::RestconfServiceProvider * real_provider = new ydk::RestconfServiceProvider(*real_repo, address, username, password, port, real_encoding, config_url_root, state_url_root);
         return static_cast<void*>(real_provider);
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -254,30 +386,21 @@ void RestconfServiceProviderFree(ServiceProvider provider)
     }
 }
 
-OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol)
+OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol)
 {
     try
     {
         ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
-        ydk::EncodingFormat real_encoding;
-        if (encoding == XML) {
-            real_encoding = ydk::EncodingFormat::XML;
-        }
-        else {
-            real_encoding = ydk::EncodingFormat::JSON;
-        }
-        ydk::Protocol real_protocol;
-        if (protocol == Netconf) {
-            real_protocol = ydk::Protocol::netconf;
-        }
-        else {
-            real_protocol = ydk::Protocol::restconf;
-        }
+        ydk::EncodingFormat real_encoding = get_real_encoding(encoding);
+        ydk::Protocol real_protocol = get_real_protocol(protocol);
+
         ydk::OpenDaylightServiceProvider * real_provider = new ydk::OpenDaylightServiceProvider(*real_repo, address, username, password, port, real_encoding, real_protocol);
         return static_cast<void*>(real_provider);
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -291,14 +414,23 @@ void OpenDaylightServiceProviderFree(OpenDaylightServiceProvider provider)
     }
 }
 
-ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServiceProvider provider, const char * node_id)
+ServiceProvider OpenDaylightServiceProviderGetNodeProvider(YDKStatePtr state, OpenDaylightServiceProvider provider, const char * node_id)
 {
-    ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
-    ydk::path::ServiceProvider * node_provider = &real_provider->get_node_provider(string(node_id));
-    return static_cast<void*>(node_provider);
+    try
+    {
+        ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
+        ydk::path::ServiceProvider * node_provider = &real_provider->get_node_provider(string(node_id));
+        return static_cast<void*>(node_provider);
+    }
+    catch(...)
+    {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
+        return NULL;
+    }
 }
 
-const char* OpenDaylightServiceProviderGetNodeIDByIndex(OpenDaylightServiceProvider provider, int idx)
+const char* OpenDaylightServiceProviderGetNodeIDByIndex(YDKStatePtr state, OpenDaylightServiceProvider provider, int idx)
 {
     ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
     if ((size_t)idx < real_provider->get_node_ids().size())
@@ -311,16 +443,18 @@ const char* OpenDaylightServiceProviderGetNodeIDByIndex(OpenDaylightServiceProvi
     }
 }
 
-RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider provider)
+RootSchemaNode ServiceProviderGetRootSchema(YDKStatePtr state, ServiceProvider provider)
 {
     try
     {
-    ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
-    ydk::path::RootSchemaNode* root_schema = &real_provider->get_root_schema();
-    return static_cast<void*>(root_schema);
+        ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
+        ydk::path::RootSchemaNode* root_schema = &real_provider->get_root_schema();
+        return static_cast<void*>(root_schema);
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -352,7 +486,7 @@ void CodecFree(Codec codec)
     }
 }
 
-const char* CodecEncode(Codec codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
+const char* CodecEncode(YDKStatePtr state, Codec codec, DataNode datanode, EncodingFormat encoding, boolean pretty)
 {
     try
     {
@@ -365,11 +499,13 @@ const char* CodecEncode(Codec codec, DataNode datanode, EncodingFormat encoding,
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-DataNode CodecDecode(Codec codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
+DataNode CodecDecode(YDKStatePtr state, Codec codec, RootSchemaNode root_schema, const char* payload, EncodingFormat encoding)
 {
     try
     {
@@ -381,11 +517,13 @@ DataNode CodecDecode(Codec codec, RootSchemaNode root_schema, const char* payloa
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-DataNode RootSchemaNodeCreate(RootSchemaNode root_schema, const char* path)
+DataNode RootSchemaNodeCreate(YDKStatePtr state, RootSchemaNode root_schema, const char* path)
 {
     try
     {
@@ -396,6 +534,8 @@ DataNode RootSchemaNodeCreate(RootSchemaNode root_schema, const char* path)
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -406,7 +546,7 @@ RootSchemaNode RootSchemaWrapperUnwrap(RootSchemaWrapper wrapper)
     return static_cast<void*>(unwrap(real_wrapper));
 }
 
-Rpc RootSchemaNodeRpc(RootSchemaNode root_schema, const char* path)
+Rpc RootSchemaNodeRpc(YDKStatePtr state, RootSchemaNode root_schema, const char* path)
 {
     try
     {
@@ -417,11 +557,13 @@ Rpc RootSchemaNodeRpc(RootSchemaNode root_schema, const char* path)
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-DataNode RpcInput(Rpc rpc)
+DataNode RpcInput(YDKStatePtr state, Rpc rpc)
 {
     try
     {
@@ -434,11 +576,13 @@ DataNode RpcInput(Rpc rpc)
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-DataNode RpcExecute(Rpc rpc, ServiceProvider provider)
+DataNode RpcExecute(YDKStatePtr state, Rpc rpc, ServiceProvider provider)
 {
     try
     {
@@ -452,11 +596,13 @@ DataNode RpcExecute(Rpc rpc, ServiceProvider provider)
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
 
-DataNode DataNodeCreate(DataNode datanode, const char* path, const char* value)
+DataNode DataNodeCreate(YDKStatePtr state, DataNode datanode, const char* path, const char* value)
 {
     try
     {
@@ -468,6 +614,8 @@ DataNode DataNodeCreate(DataNode datanode, const char* path, const char* value)
     }
     catch(...)
     {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
         return NULL;
     }
 }
@@ -603,3 +751,4 @@ LogLevel GetLoggingLevel(void)
             return ERROR;
     }
 }
+

@@ -25,7 +25,8 @@ func (suite *RestconfProviderTestSuite) SetupSuite() {
 		Address:  "localhost",
 		Username: "admin",
 		Password: "admin",
-		Port:     12306}
+		Port:     12306,
+		Encoding: types.JSON}
 	suite.Provider.Connect()
 }
 

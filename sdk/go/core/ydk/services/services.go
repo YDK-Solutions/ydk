@@ -76,7 +76,7 @@ func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.
 	// 2. get data node from root schema
 	root_schema_node := provider.GetRootSchemaNode(entity)
 	// 3. encode and return payload
-	return path.CodecServiceEncode(entity, root_schema_node, provider.GetEncoding())
+	return path.CodecServiceEncode(provider.GetState(), entity, root_schema_node, provider.GetEncoding())
 }
 
 func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
@@ -87,7 +87,7 @@ func (c *CodecService) Decode(provider types.CodecServiceProvider, payload strin
 	provider.Initialize(top_entity)
 	root_schema := provider.GetRootSchemaNode(top_entity)
 	// 3. populate and return entity
-	return path.CodecServiceDecode(root_schema, payload, provider.GetEncoding(), top_entity)
+	return path.CodecServiceDecode(provider.GetState(), root_schema, payload, provider.GetEncoding(), top_entity)
 }
 
 // get top entity's name and namespace from payload

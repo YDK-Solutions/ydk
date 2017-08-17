@@ -85,17 +85,18 @@ void NetconfServiceProvider::initialize_client(const string& address, const stri
     if (protocol.compare(PROTOCOL_SSH) == 0)
     {
         client = make_unique<NetconfSSHClient>(username, password, address, port);
+        model_provider = make_unique<NetconfModelProvider>(*client);
     }
     else if (protocol.compare(PROTOCOL_TCP) == 0)
     {
         client = make_unique<NetconfTCPClient>(username, password, address, port);
+        model_provider = make_unique<NetconfModelProvider>(*client);
     }
     else
     {
         YLOG_ERROR("Protocol {} not supported.", protocol);
-        throw(YCPPOperationNotSupportedError{"Protocol is not supported!"});
+        throw(YCPPOperationNotSupportedError{"Protocol '" + protocol + "' is not supported!"});
     }
-    model_provider = make_unique<NetconfModelProvider>(*client);
 }
 
 void NetconfServiceProvider::initialize(path::Repository & repo)

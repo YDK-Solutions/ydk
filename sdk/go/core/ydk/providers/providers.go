@@ -197,15 +197,15 @@ func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
 		path.AddCState(&provider.State)
 	}
 
-	bundle_name := entity.GetBundleName()
+	bundleName := entity.GetBundleName()
 	if len(provider.RootSchemaTable) == 0 {
 		provider.RootSchemaTable = make(map[string]types.RootSchemaNode)
 	}
-	_, ok := provider.RootSchemaTable[bundle_name]
+	_, ok := provider.RootSchemaTable[bundleName]
 	if !ok {
-		fmt.Printf("CodecServiceProvider initialized with %v bundle\n", bundle_name)
-		root_schema_node := path.InitCodecServiceProvider(&provider.State, entity, provider.Repo)
-		provider.RootSchemaTable[bundle_name] = root_schema_node
+		fmt.Printf("CodecServiceProvider initialized with %v bundle\n", bundleName)
+		rootSchemaNode := path.InitCodecServiceProvider(&provider.State, entity, provider.Repo)
+		provider.RootSchemaTable[bundleName] = rootSchemaNode
 	}
 }
 
@@ -221,9 +221,9 @@ func (provider *CodecServiceProvider) GetState() *types.State {
 
 // GetRootSchemaNode returns root schema node for entity
 func (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity) types.RootSchemaNode {
-	root_schema_node, ok := provider.RootSchemaTable[entity.GetBundleName()]
+	rootSchemaNode, ok := provider.RootSchemaTable[entity.GetBundleName()]
 	if !ok {
 		panic("Root schema node not found in provider!")
 	}
-	return root_schema_node
+	return rootSchemaNode
 }

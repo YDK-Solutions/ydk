@@ -70,27 +70,28 @@ func operationSucceeded(node types.DataNode) bool {
 type CodecService struct {
 }
 
+// Encode converts entity object to XML/JSON payload
 func (c *CodecService) Encode(provider types.CodecServiceProvider, entity types.Entity) string {
 	// 1. initialize provider, set root schema node for entity
 	provider.Initialize(entity)
 	// 2. get data node from root schema
-	root_schema_node := provider.GetRootSchemaNode(entity)
+	rootSchemaNode := provider.GetRootSchemaNode(entity)
 	// 3. encode and return payload
-	return path.CodecServiceEncode(provider.GetState(), entity, root_schema_node, provider.GetEncoding())
+	return path.CodecServiceEncode(provider.GetState(), entity, rootSchemaNode, provider.GetEncoding())
 }
 
+// Decode converts XML/JSON object to entity object
 func (c *CodecService) Decode(provider types.CodecServiceProvider, payload string) types.Entity {
-	// 1. parse payload, get top_entity
+	// 1. parse payload, get topEntity
 	nmsp := getEntityLookupKey(provider, payload)
-	top_entity := ydk.GetTopEntity(nmsp)
-	// 2. initialize repository, fetch root_schema
-	provider.Initialize(top_entity)
-	root_schema := provider.GetRootSchemaNode(top_entity)
+	topEntity := ydk.GetTopEntity(nmsp)
+	// 2. initialize repository, fetch rootSchema
+	provider.Initialize(topEntity)
+	rootSchema := provider.GetRootSchemaNode(topEntity)
 	// 3. populate and return entity
-	return path.CodecServiceDecode(provider.GetState(), root_schema, payload, provider.GetEncoding(), top_entity)
+	return path.CodecServiceDecode(provider.GetState(), rootSchema, payload, provider.GetEncoding(), topEntity)
 }
 
-// get top entity's name and namespace from payload
 func getEntityLookupKey(provider types.CodecServiceProvider, payload string) string {
 	var nmsp string
 	encoding := provider.GetEncoding()

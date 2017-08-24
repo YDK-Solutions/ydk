@@ -56,6 +56,7 @@ class ClassPrinter(object):
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_has_data(clazz, leafs, children)
         self._print_class_get_filter(clazz)
+        self._print_class_set_filter(clazz)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_entity_path(clazz, leafs)
         self._print_class_get_child(clazz, leafs, children)
@@ -87,6 +88,13 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetFilter', return_type='types.YFilter')
         fp.ctx.writeln('return %s.Filter' % fp.class_alias)
+        fp.print_function_trailer()
+
+    # SetFilter
+    def _print_class_set_filter(self, clazz):
+        fp = FunctionPrinter(self.ctx, clazz)
+        fp.print_function_header_helper('SetFilter', args='yfilter types.YFilter')
+        fp.ctx.writeln('%s.Filter = yfilter' % fp.class_alias)
         fp.print_function_trailer()
 
     # GetSegmentPath

@@ -21,6 +21,7 @@ Prints Go class methods
 
 """
 from ydkgen.api_model import Bits, Enum, Package
+from ydkgen.common import is_empty_prop
 from .function_printer import FunctionPrinter
 
 class GetSegmentPathPrinter(FunctionPrinter):
@@ -115,7 +116,7 @@ class GetEntityPathPrinter(FunctionPrinter):
             self._print_check_leaf_enum(leaf)
         elif isinstance(leaf.property_type, Bits):
             self._print_check_leaf_bits(leaf)
-        else:
+        elif not is_empty_prop(leaf):
             self.ctx.writeln('v = fmt.Sprintf("%%v", %s.%s)' % leaf_var)
         self.ctx.writeln("leafData = types.LeafData{IsSet: true, Value: v}")
         self.ctx.lvl_dec()

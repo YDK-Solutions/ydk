@@ -34,34 +34,47 @@ import "C"
 import (
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"strings"
 	"unsafe"
 )
 
-func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter string, data_tag string, set_config_flag bool) types.DataNode {
-	wrapped_provider := provider.GetPrivate().(types.CServiceProvider)
-	real_provider := wrapped_provider.Private.(C.ServiceProvider)
-	root_schema := C.ServiceProviderGetRootSchema(real_provider)
+func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
+	state := provider.GetState()
+	cstate := getCState(state)
+	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
+	realProvider := wrappedProvider.Private.(C.ServiceProvider)
+	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
+	panicOnCStateError(cstate)
 
-	ydk_rpc := C.RootSchemaNodeRpc(root_schema, C.CString(Filter))
-	if root_schema == nil {
+	ydkRpc := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(Filter))
+	panicOnCStateError(cstate)
+
+	if rootSchema == nil {
 		panic(1)
 	}
 
-	data := getDataPayload(entity, root_schema, provider)
+	data := getDataPayload(state, entity, rootSchema, provider)
 	defer C.free(unsafe.Pointer(data))
 
-	input := C.RpcInput(ydk_rpc)
+	input := C.RpcInput(*cstate, ydkRpc)
+	panicOnCStateError(cstate)
 
-	if set_config_flag {
-		C.DataNodeCreate(input, C.CString("only-config"), C.CString(""))
+	if setConfigFlag {
+		C.DataNodeCreate(*cstate, input, C.CString("only-config"), C.CString(""))
+		panicOnCStateError(cstate)
 	}
 
-	C.DataNodeCreate(input, C.CString(data_tag), data)
-	return types.DataNode{C.RpcExecute(ydk_rpc, real_provider)}
+	C.DataNodeCreate(*cstate, input, C.CString(dataTag), data)
+	panicOnCStateError(cstate)
+
+	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRpc, realProvider)}
+	panicOnCStateError(cstate)
+
+	return dataNode
 }
 
-func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode, provider types.ServiceProvider) *C.char {
-	datanode := getDataNodeFromEntity(entity, root_schema)
+func getDataPayload(state *types.State, entity types.Entity, rootSchema C.RootSchemaNode, provider types.ServiceProvider) *C.char {
+	datanode := getDataNodeFromEntity(state, entity, rootSchema)
 
 	if datanode == nil {
 		return nil
@@ -75,7 +88,8 @@ func getDataPayload(entity types.Entity, root_schema C.RootSchemaNode, provider 
 
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
-	var data *C.char = C.CodecEncode(codec, datanode, cencoding, 1)
+	var data *C.char = C.CodecEncode(*getCState(state), codec, datanode, cencoding, 1)
+	panicOnCStateError(getCState(state))
 
 	return (data)
 }
@@ -88,21 +102,22 @@ func getTopEntityFromFilter(filter types.Entity) types.Entity {
 	return getTopEntityFromFilter(filter.GetParent())
 }
 
-func ReadDatanode(filter types.Entity, read_data_node types.DataNode) types.Entity {
-	if read_data_node.Private == nil {
+func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
+	if readDataNode.Private == nil {
 		return nil
 	}
 
-	top_entity := getTopEntityFromFilter(filter)
-	fmt.Printf("Reading top entity: '%s'\n", top_entity.GetSegmentPath())
+	topEntity := getTopEntityFromFilter(filter)
+	fmt.Printf("Reading top entity: '%s'\n", topEntity.GetSegmentPath())
 
-	c_children := C.DataNodeGetChildren(read_data_node.Private.(C.DataNode))
-	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(c_children.datanodes))[:c_children.count:c_children.count]
-	getEntityFromDataNode(children[0], top_entity)
-	return top_entity
+	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
+	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
+	getEntityFromDataNode(children[0], topEntity)
+	return topEntity
 }
 
-func ConnectToProvider(repo types.Repository, Address, Username, Password string, port int) types.CServiceProvider {
+// ConnectToNetconfProvider connects to NETCONF service provider and returns types.CServiceProvider
+func ConnectToNetconfProvider(state *types.State, repo types.Repository, Address, Username, Password string, port int, Protocol string) types.CServiceProvider {
 	var address *C.char = C.CString(Address)
 	defer C.free(unsafe.Pointer(address))
 	var username *C.char = C.CString(Username)
@@ -111,28 +126,43 @@ func ConnectToProvider(repo types.Repository, Address, Username, Password string
 	defer C.free(unsafe.Pointer(password))
 	var cport C.int = C.int(port)
 
+	var cprotocol *C.char = C.CString(Protocol)
+	defer C.free(unsafe.Pointer(cprotocol))
+
+	AddCState(state)
+	cstate := getCState(state)
+
 	var p C.ServiceProvider
 
 	if len(repo.Path) > 0 {
 		var path *C.char = C.CString(repo.Path)
-		repo := C.RepositoryInitWithPath(path)
-		p = C.NetconfServiceProviderInitWithRepo(repo, address, username, password, cport)
+		repo := C.RepositoryInitWithPath(*cstate, path)
+		panicOnCStateError(cstate)
+		p = C.NetconfServiceProviderInitWithRepo(*cstate, repo, address, username, password, cport, cprotocol)
+		panicOnCStateError(cstate)
 	} else {
-		p = C.NetconfServiceProviderInit(address, username, password, cport)
+		p = C.NetconfServiceProviderInit(*cstate, address, username, password, cport, cprotocol)
+		panicOnCStateError(cstate)
 	}
-	if p == nil {
-		panic("Could not connect to " + Address)
-	}
+
 	cprovider := types.CServiceProvider{Private: p}
 	return cprovider
 }
 
-func DisconnectFromProvider(provider types.CServiceProvider) {
-	real_provider := provider.Private.(C.ServiceProvider)
-	C.NetconfServiceProviderFree(real_provider)
+// DisconnectFromNetconfProvider disconnects from NETCONF device and frees types.CServiceProvider passed in
+func DisconnectFromNetconfProvider(provider types.CServiceProvider) {
+	realProvider := provider.Private.(C.ServiceProvider)
+	C.NetconfServiceProviderFree(realProvider)
 }
 
-func ConnectToRestconfProvider(Path, Address, Username, Password string, port int) types.CServiceProvider {
+// CleanUpErrorState cleans up memory for CState
+func CleanUpErrorState(state *types.State) {
+	realState := getCState(state)
+	C.YDKStateFree(*realState)
+}
+
+// ConnectToRestconfProvider connects to RESTCONF device and returns types.CServiceProvider
+func ConnectToRestconfProvider(state *types.State, Path, Address, Username, Password string, port int, encoding types.EncodingFormat, stateURLRoot, configURLRoot string) types.CServiceProvider {
 	var path *C.char = C.CString(Path)
 	defer C.free(unsafe.Pointer(path))
 	var address *C.char = C.CString(Address)
@@ -143,63 +173,78 @@ func ConnectToRestconfProvider(Path, Address, Username, Password string, port in
 	defer C.free(unsafe.Pointer(password))
 	var cport C.int = C.int(port)
 
+	cencoding := getCEncoding(encoding)
+
+	var cstateURLRoot *C.char = C.CString(stateURLRoot)
+	defer C.free(unsafe.Pointer(cstateURLRoot))
+
+	var cconfigURLRoot *C.char = C.CString(configURLRoot)
+	defer C.free(unsafe.Pointer(cconfigURLRoot))
+
+	AddCState(state)
+	cstate := getCState(state)
+
 	var p C.ServiceProvider
 
-	crepo := C.RepositoryInitWithPath(path)
-	p = C.RestconfServiceProviderInitWithRepo(crepo, address, username, password, cport)
-
-	if p == nil {
-		panic("Could not connect to " + Address)
-	}
+	crepo := C.RepositoryInitWithPath(*getCState(state), path)
+	panicOnCStateError(cstate)
+	p = C.RestconfServiceProviderInitWithRepo(*cstate, crepo, address, username, password, cport, cencoding, cstateURLRoot, cconfigURLRoot)
+	panicOnCStateError(cstate)
 
 	cprovider := types.CServiceProvider{Private: p}
 	return cprovider
 }
 
+// DisconnectFromRestconfProvider disconnects from RESTCONF device and frees types.CServiceProvider passed in
 func DisconnectFromRestconfProvider(provider types.CServiceProvider) {
-	real_provider := provider.Private.(C.ServiceProvider)
-	C.RestconfServiceProviderFree(real_provider)
+	realProvider := provider.Private.(C.ServiceProvider)
+	C.RestconfServiceProviderFree(realProvider)
 }
 
-func InitCodecServiceProvider(entity types.Entity, repo types.Repository) types.RootSchemaNode {
+// InitCodecServiceProvider initializes CodecServiceProvider and returns root schema node parsed from repository
+func InitCodecServiceProvider(state *types.State, entity types.Entity, repo types.Repository) types.RootSchemaNode {
 	caps := entity.GetAugmentCapabilitiesFunction()()
 
-	var repo_path *C.char
-	defer C.free(unsafe.Pointer(repo_path))
+	var repoPath *C.char
+	defer C.free(unsafe.Pointer(repoPath))
 
 	if len(repo.Path) > 0 {
 		fmt.Printf("CodecServiceProvider using YANG models in %v\n", repo.Path)
-		repo_path = C.CString(repo.Path)
+		repoPath = C.CString(repo.Path)
 	} else {
-		yang_path := entity.GetBundleYangModelsLocation()
-		fmt.Printf("CodecServiceProvider using YANG models in %v\n", yang_path)
-		repo_path = C.CString(yang_path)
+		yangPath := entity.GetBundleYangModelsLocation()
+		fmt.Printf("CodecServiceProvider using YANG models in %v\n", yangPath)
+		repoPath = C.CString(yangPath)
 	}
 
-	real_caps := make([]C.Capability, 0)
-	var real_cap C.Capability
+	realCaps := make([]C.Capability, 0)
+	var realCap C.Capability
 	for mod, rev := range caps {
-		real_cap = C.CapabilityCreate(C.CString(mod), C.CString(rev))
-		defer C.CapabilityFree(real_cap)
-		real_caps = append(real_caps, real_cap)
+		realCap = C.CapabilityCreate(*getCState(state), C.CString(mod), C.CString(rev))
+		panicOnCStateError(getCState(state))
+		defer C.CapabilityFree(realCap)
+		realCaps = append(realCaps, realCap)
 	}
 
-	real_repo := C.RepositoryInitWithPath(repo_path)
+	realRepo := C.RepositoryInitWithPath(*getCState(state), repoPath)
+	panicOnCStateError(getCState(state))
 
-	repo.Private = real_repo
-	root_schema_wrapper := C.RepositoryCreateRootSchemaWrapper(real_repo, &real_caps[0], C.int(len(real_caps)))
+	repo.Private = realRepo
+	rootSchemaWrapper := C.RepositoryCreateRootSchemaWrapper(*getCState(state), realRepo, &realCaps[0], C.int(len(realCaps)))
+	panicOnCStateError(getCState(state))
 
-	root_schema_node := types.RootSchemaNode{Private: root_schema_wrapper}
-	return root_schema_node
+	rootSchemaNode := types.RootSchemaNode{Private: rootSchemaWrapper}
+	return rootSchemaNode
 }
 
-func CodecServiceEncode(entity types.Entity, root_schema types.RootSchemaNode, encoding types.EncodingFormat) string {
-	root_schema_wrapper := root_schema.Private.(C.RootSchemaWrapper)
-	real_root_schema := C.RootSchemaWrapperUnwrap(root_schema_wrapper)
+// CodecServiceEncode encodes entity to XML/JSON payloads based on encoding format passed in
+func CodecServiceEncode(state *types.State, entity types.Entity, rootSchema types.RootSchemaNode, encoding types.EncodingFormat) string {
+	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
+	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
 
-	data_node := getDataNodeFromEntity(entity, real_root_schema)
+	dataNode := getDataNodeFromEntity(state, entity, realRootSchema)
 
-	if data_node == nil {
+	if dataNode == nil {
 		return ""
 	}
 
@@ -211,38 +256,44 @@ func CodecServiceEncode(entity types.Entity, root_schema types.RootSchemaNode, e
 
 	switch encoding {
 	case types.XML:
-		payload = C.CodecEncode(codec, data_node, C.XML, 1)
+		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.XML, 1)
+		panicOnCStateError(getCState(state))
 	case types.JSON:
-		payload = C.CodecEncode(codec, data_node, C.JSON, 1)
+		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.JSON, 1)
+		panicOnCStateError(getCState(state))
 	}
 
 	return C.GoString(payload)
 }
 
-func CodecServiceDecode(root_schema types.RootSchemaNode, payload string, encoding types.EncodingFormat, top_entity types.Entity) types.Entity {
-	root_schema_wrapper := root_schema.Private.(C.RootSchemaWrapper)
-	real_root_schema := C.RootSchemaWrapperUnwrap(root_schema_wrapper)
+// CodecServiceDecode decodes XML/JSON payloads passed in to entity
+func CodecServiceDecode(state *types.State, rootSchema types.RootSchemaNode, payload string, encoding types.EncodingFormat, topEntity types.Entity) types.Entity {
+	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
+	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
 
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
 
-	var real_payload = C.CString(payload)
-	defer C.free(unsafe.Pointer(real_payload))
-	var real_data_node C.DataNode
+	var realPayload = C.CString(payload)
+	defer C.free(unsafe.Pointer(realPayload))
+	var realDataNode C.DataNode
 
 	switch encoding {
 	case types.XML:
-		real_data_node = C.CodecDecode(codec, real_root_schema, real_payload, C.XML)
+		realDataNode = C.CodecDecode(*getCState(state), codec, realRootSchema, realPayload, C.XML)
+		panicOnCStateError(getCState(state))
 	case types.JSON:
-		real_data_node = C.CodecDecode(codec, real_root_schema, real_payload, C.JSON)
+		realDataNode = C.CodecDecode(*getCState(state), codec, realRootSchema, realPayload, C.JSON)
+		panicOnCStateError(getCState(state))
 	}
 
-	var data_node = types.DataNode{Private: real_data_node}
+	var dataNode = types.DataNode{Private: realDataNode}
 
-	return ReadDatanode(top_entity, data_node)
+	return ReadDatanode(topEntity, dataNode)
 }
 
-func ConnectToOpenDaylightProvider(Path, Address, Username, Password string, port int, encoding types.EncodingFormat, protocol types.Protocol) types.COpenDaylightServiceProvider {
+// ConnectToOpenDaylightProvider connects to OpenDaylight device and returns types.COpenDaylightServiceProvier
+func ConnectToOpenDaylightProvider(state *types.State, Path, Address, Username, Password string, port int, encoding types.EncodingFormat, protocol types.Protocol) types.COpenDaylightServiceProvider {
 	var path *C.char = C.CString(Path)
 	defer C.free(unsafe.Pointer(path))
 	var address *C.char = C.CString(Address)
@@ -253,45 +304,39 @@ func ConnectToOpenDaylightProvider(Path, Address, Username, Password string, por
 	defer C.free(unsafe.Pointer(password))
 	var cport C.int = C.int(port)
 
+	AddCState(state)
+	cstate := getCState(state)
+
 	var p C.OpenDaylightServiceProvider
-	crepo := C.RepositoryInitWithPath(path)
+	crepo := C.RepositoryInitWithPath(*getCState(state), path)
+	panicOnCStateError(getCState(state))
 
-	var cencoding C.EncodingFormat
-	if encoding == types.XML {
-		cencoding = C.XML
-	} else {
-		cencoding = C.JSON
-	}
+	cencoding := getCEncoding(encoding)
 
-	var cprotocol C.Protocol
-	if protocol == types.Netconf {
-		cprotocol = C.Netconf
-	} else {
-		cprotocol = C.Restconf
-	}
+	cprotocol := getCProtocol(protocol)
 
-	p = C.OpenDaylightServiceProviderInitWithRepo(crepo, address, username, password, cport, cencoding, cprotocol)
-
-	if p == nil {
-		panic("Could not connect to " + Address)
-	}
+	p = C.OpenDaylightServiceProviderInitWithRepo(*cstate, crepo, address, username, password, cport, cencoding, cprotocol)
+	panicOnCStateError(cstate)
 
 	cprovider := types.COpenDaylightServiceProvider{Private: p}
 	return cprovider
 }
 
+// DisconnectFromOpenDaylightProvider disconnects from OpenDaylight device and frees memory allocated
 func DisconnectFromOpenDaylightProvider(provider types.COpenDaylightServiceProvider) {
-	real_provider := provider.Private.(C.OpenDaylightServiceProvider)
-	C.OpenDaylightServiceProviderFree(real_provider)
+	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
+	C.OpenDaylightServiceProviderFree(realProvider)
 }
 
-func OpenDaylightServiceProviderGetNodeIDs(provider types.COpenDaylightServiceProvider) []string {
+// OpenDaylightServiceProviderGetNodeIDS returns node ids available
+func OpenDaylightServiceProviderGetNodeIDs(state *types.State, provider types.COpenDaylightServiceProvider) []string {
 	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
 	var ids []string
 	id := 0
 	for {
 		cid := C.int(id)
-		nodeID := C.OpenDaylightServiceProviderGetNodeIDByIndex(cprovider, cid)
+		nodeID := C.OpenDaylightServiceProviderGetNodeIDByIndex(*getCState(state), cprovider, cid)
+		panicOnCStateError(getCState(state))
 		defer C.free(unsafe.Pointer(nodeID))
 		if nodeID != nil {
 			ids = append(ids, C.GoString(nodeID))
@@ -303,12 +348,15 @@ func OpenDaylightServiceProviderGetNodeIDs(provider types.COpenDaylightServicePr
 	return ids
 }
 
-func OpenDaylightServiceProviderGetNodeProvider(provider types.COpenDaylightServiceProvider, nodeID string) types.CServiceProvider {
+// OpenDaylightServiceProviderGetNodeProvider returns service provider based on node id passed in
+func OpenDaylightServiceProviderGetNodeProvider(state *types.State, provider types.COpenDaylightServiceProvider, nodeID string) types.CServiceProvider {
 	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
 	cnodeID := C.CString(nodeID)
 	defer C.free(unsafe.Pointer(cnodeID))
 	var nodeProvider C.ServiceProvider
-	nodeProvider = C.OpenDaylightServiceProviderGetNodeProvider(realProvider, cnodeID)
+	nodeProvider = C.OpenDaylightServiceProviderGetNodeProvider(*getCState(state), realProvider, cnodeID)
+	panicOnCStateError(getCState(state))
+
 	cnodeProvider := types.CServiceProvider{Private: nodeProvider}
 	return cnodeProvider
 }
@@ -316,7 +364,7 @@ func OpenDaylightServiceProviderGetNodeProvider(provider types.COpenDaylightServ
 //////////////////////////////////////////////////////////////////////////
 // DataNode from Entity
 //////////////////////////////////////////////////////////////////////////
-func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.DataNode {
+func getDataNodeFromEntity(state *types.State, entity types.Entity, rootSchema C.RootSchemaNode) C.DataNode {
 	if entity == nil {
 		return nil
 	}
@@ -324,77 +372,82 @@ func getDataNodeFromEntity(entity types.Entity, root_schema C.RootSchemaNode) C.
 		entity = parent
 	}
 
-	root_path := entity.GetEntityPath(nil)
-	path := C.CString(root_path.Path)
+	rootPath := entity.GetEntityPath(nil)
+	path := C.CString(rootPath.Path)
 	defer C.free(unsafe.Pointer(path))
 
-	root_data_node := C.RootSchemaNodeCreate(root_schema, path)
+	rootDataNode := C.RootSchemaNodeCreate(*getCState(state), rootSchema, path)
+	panicOnCStateError(getCState(state))
 
 	if types.IsSet(entity.GetFilter()) {
 		p1 := C.CString(string(entity.GetFilter()))
 		defer C.free(unsafe.Pointer(p1))
-		C.DataNodeAddAnnotation(root_data_node, p1)
+		C.DataNodeAddAnnotation(rootDataNode, p1)
 	}
 
-	populateNameValues(root_data_node, root_path)
-	walkChildren(entity, root_data_node)
-	return root_data_node
+	populateNameValues(state, rootDataNode, rootPath)
+	walkChildren(state, entity, rootDataNode)
+	return rootDataNode
 }
 
-func walkChildren(entity types.Entity, data_node C.DataNode) {
+func walkChildren(state *types.State, entity types.Entity, dataNode C.DataNode) {
 	children := entity.GetChildren()
 
 	fmt.Printf("Got %d entity children\n", len(children))
 
-	for child_name := range children {
+	for childName := range children {
 
-		fmt.Printf("Lookin at entity child '%s'\n", children[child_name].GetSegmentPath())
+		fmt.Printf("Lookin at entity child '%s'\n", children[childName].GetSegmentPath())
 
-		if children[child_name].HasDataOrFilter() {
-			populateDataNode(children[child_name], data_node)
+		if children[childName].HasDataOrFilter() {
+			populateDataNode(state, children[childName], dataNode)
 		}
 	}
 	fmt.Println()
 }
 
-func populateDataNode(entity types.Entity, parent_data_node C.DataNode) {
+func populateDataNode(state *types.State, entity types.Entity, parentDataNode C.DataNode) {
 	path := entity.GetEntityPath(entity.GetParent())
 	p := C.CString(path.Path)
 	defer C.free(unsafe.Pointer(p))
 	ep := C.CString("")
 	defer C.free(unsafe.Pointer(ep))
 
-	data_node := C.DataNodeCreate(parent_data_node, p, ep)
-	if data_node == nil {
+	dataNode := C.DataNodeCreate(*getCState(state), parentDataNode, p, ep)
+	panicOnCStateError(getCState(state))
+
+	if dataNode == nil {
 		panic("Datanode could not be created for: " + path.Path)
 	}
 
 	if types.IsSet(entity.GetFilter()) {
 		p1 := C.CString(string(entity.GetFilter()))
 		defer C.free(unsafe.Pointer(p1))
-		C.DataNodeAddAnnotation(data_node, p1)
+		C.DataNodeAddAnnotation(dataNode, p1)
 	}
 
-	populateNameValues(data_node, path)
-	walkChildren(entity, data_node)
+	populateNameValues(state, dataNode, path)
+	walkChildren(state, entity, dataNode)
 }
 
-func populateNameValues(data_node C.DataNode, path types.EntityPath) {
-	for _, name_value := range path.ValuePaths {
+func populateNameValues(state *types.State, dataNode C.DataNode, path types.EntityPath) {
+	for _, nameValue := range path.ValuePaths {
 		var result C.DataNode
-		leaf_data := name_value.Data
-		p := C.CString(name_value.Name)
-		fmt.Printf("got leaf {%s: %s}\n", name_value.Name, name_value.Data.Value)
+		leafData := nameValue.Data
+		p := C.CString(nameValue.Name)
+		fmt.Printf("got leaf {%s: %s}\n", nameValue.Name, nameValue.Data.Value)
 
-		if leaf_data.IsSet {
-			p1 := C.CString(leaf_data.Value)
-			result = C.DataNodeCreate(data_node, p, p1)
-			C.DataNodeCreate(data_node, p, p1)
+		if leafData.IsSet {
+			p1 := C.CString(leafData.Value)
+			result = C.DataNodeCreate(*getCState(state), dataNode, p, p1)
+			panicOnCStateError(getCState(state))
+			C.DataNodeCreate(*getCState(state), dataNode, p, p1)
+			panicOnCStateError(getCState(state))
 			C.free(unsafe.Pointer(p1))
 		}
 
-		if types.IsSet(leaf_data.Filter) {
-			p1 := C.CString(string(name_value.Data.Filter))
+		if types.IsSet(leafData.Filter) {
+			p1 := C.CString(string(nameValue.Data.Filter))
 			defer C.free(unsafe.Pointer(p1))
 			C.DataNodeAddAnnotation(result, p1)
 		}
@@ -410,44 +463,120 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 		return
 	}
 
-	c_children := C.DataNodeGetChildren(node)
-	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(c_children.datanodes))[:c_children.count:c_children.count]
-	fmt.Printf("Got %d datanode children\n", c_children.count)
+	cchildren := C.DataNodeGetChildren(node)
+	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
+	fmt.Printf("Got %d datanode children\n", cchildren.count)
 
-	for _, child_data_node := range children {
-		child_name := C.GoString(C.DataNodeGetArgument(child_data_node))
-		fmt.Printf("Lookin at child datanode: '%s'\n", child_name)
+	for _, childDataNode := range children {
+		childName := C.GoString(C.DataNodeGetArgument(childDataNode))
+		fmt.Printf("Lookin at child datanode: '%s'\n", childName)
 
-		if dataNodeIsLeaf(child_data_node) {
+		if dataNodeIsLeaf(childDataNode) {
 
-			value := C.GoString(C.DataNodeGetValue(child_data_node))
-			fmt.Printf("Creating leaf '%s' with value '%s'\n", child_name, value)
-			entity.SetValue(child_name, value)
+			value := C.GoString(C.DataNodeGetValue(childDataNode))
+			fmt.Printf("Creating leaf '%s' with value '%s'\n", childName, value)
+			entity.SetValue(childName, value)
 		} else {
 
-			var child_entity types.Entity
-			if dataNodeIsList(child_data_node) {
-				segment_path := C.GoString(C.DataNodeGetSegmentPath(child_data_node))
-				fmt.Printf("Creating child list instance '%s'\n", segment_path)
-				child_entity = entity.GetChildByName(child_name, segment_path)
+			var childEntity types.Entity
+			if dataNodeIsList(childDataNode) {
+				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
+				fmt.Printf("Creating child list instance '%s'\n", segmentPath)
+				childEntity = entity.GetChildByName(childName, segmentPath)
 			} else {
-				fmt.Printf("Creating child node '%s'\n", child_name)
-				child_entity = entity.GetChildByName(child_name, "")
+				fmt.Printf("Creating child node '%s'\n", childName)
+				childEntity = entity.GetChildByName(childName, "")
 			}
-			if child_entity == nil {
+			if childEntity == nil {
 				panic("Could not create child entity!")
 			}
-			child_entity.SetParent(entity)
-			getEntityFromDataNode(child_data_node, child_entity)
+			childEntity.SetParent(entity)
+			getEntityFromDataNode(childDataNode, childEntity)
 		}
 	}
 }
 
-func dataNodeIsLeaf(data_node C.DataNode) bool {
-	return C.GoString(C.DataNodeGetKeyword(data_node)) == "leaf" ||
-		C.GoString(C.DataNodeGetKeyword(data_node)) == "leaf-list"
+func dataNodeIsLeaf(dataNode C.DataNode) bool {
+	return C.GoString(C.DataNodeGetKeyword(dataNode)) == "leaf" ||
+		C.GoString(C.DataNodeGetKeyword(dataNode)) == "leaf-list"
 }
 
-func dataNodeIsList(data_node C.DataNode) bool {
-	return C.GoString(C.DataNodeGetKeyword(data_node)) == "list"
+func dataNodeIsList(dataNode C.DataNode) bool {
+	return C.GoString(C.DataNodeGetKeyword(dataNode)) == "list"
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Error Handling
+//////////////////////////////////////////////////////////////////////////
+
+// AddCState creates and add cstate to *types.State
+func AddCState(state *types.State) {
+	cstate := C.YDKStateCreate()
+	state.Private = types.CState{Private: cstate}
+}
+
+func checkState(cstate *C.YDKStatePtr) error {
+	var cerrorOccurred C.boolean
+	cerrorOccurred = C.YDKStateErrorOccurred(*cstate)
+	if cerrorOccurred == 0 {
+		return nil
+	}
+
+	rawErrMsg := C.GoString(C.YDKStateGetErrorMessage(*cstate))
+	i := strings.Index(rawErrMsg, ":")
+	errMsg := rawErrMsg[i+1:]
+
+	var cerrorType C.YDKErrorType
+	cerrorType = C.YDKStateGetErrorType(*cstate)
+
+	switch cerrorType {
+	case C.YDK_CLIENT_ERROR:
+		return &types.YGOClientError{Msg: errMsg}
+	case C.YDK_SERVICE_PROVIDER_ERROR:
+		return &types.YGOServiceProviderError{Msg: errMsg}
+	case C.YDK_SERVICE_ERROR:
+		return &types.YGOServiceError{Msg: errMsg}
+	case C.YDK_ILLEGAL_STATE_ERROR:
+		return &types.YGOIllegalStateError{Msg: errMsg}
+	case C.YDK_INVALID_ARGUMENT_ERROR:
+		return &types.YGOInvalidArgumentError{Msg: errMsg}
+	case C.YDK_OPERATION_NOTSUPPORTED_ERROR:
+		return &types.YGOOperationNotSupportedError{Msg: errMsg}
+	case C.YDK_MODEL_ERROR:
+		return &types.YGOModelError{Msg: errMsg}
+	case C.YDK_CORE_ERROR:
+		return &types.YGOCoreError{Msg: errMsg}
+	case C.YDK_CODEC_ERROR:
+		return &types.YGOCodecError{Msg: errMsg}
+	default:
+		return &types.YGOError{Msg: errMsg}
+	}
+}
+
+func getCProtocol(protocol types.Protocol) C.Protocol {
+	if protocol == types.Netconf {
+		return C.Netconf
+	} else {
+		return C.Restconf
+	}
+}
+
+func getCState(state *types.State) *C.YDKStatePtr {
+	statePtr := state.Private.(types.CState).Private.(C.YDKStatePtr)
+	return &statePtr
+}
+
+func getCEncoding(encoding types.EncodingFormat) C.EncodingFormat {
+	if encoding == types.XML {
+		return C.XML
+	} else {
+		return C.JSON
+	}
+}
+
+func panicOnCStateError(cstate *C.YDKStatePtr) {
+	err := checkState(cstate)
+	if err != nil {
+		panic(err.Error())
+	}
 }

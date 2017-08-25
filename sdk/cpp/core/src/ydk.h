@@ -41,6 +41,7 @@ typedef void* ServiceProvider;
 typedef void* OpenDaylightServiceProvider;
 typedef void* Capability;
 typedef void* Repository;
+typedef void* YDKStatePtr;
 
 typedef struct DataNodeChildren
 {
@@ -71,41 +72,67 @@ typedef enum Protocol
     Restconf
 } Protocol;
 
-Capability CapabilityCreate(const char* mod, const char* rev);
+typedef enum YDKErrorType {
+    YDK_ERROR_NONE = 0,
+    YDK_ERROR,
+    YDK_CORE_ERROR,
+    YDK_CODEC_ERROR,
+    YDK_CLIENT_ERROR,
+    YDK_SERVICE_PROVIDER_ERROR,
+    YDK_SERVICE_ERROR,
+    YDK_ILLEGAL_STATE_ERROR,
+    YDK_INVALID_ARGUMENT_ERROR,
+    YDK_OPERATION_NOTSUPPORTED_ERROR,
+    YDK_MODEL_ERROR
+} YDKErrorType;
+
+typedef struct YDKState {
+    boolean error_occurred;
+    char* error_message;
+    YDKErrorType error_type;
+} YDKState;
+
+YDKStatePtr YDKStateCreate(void);
+const char * YDKStateGetErrorMessage(YDKStatePtr);
+YDKErrorType YDKStateGetErrorType(YDKStatePtr);
+boolean YDKStateErrorOccurred(YDKStatePtr);
+void YDKStateFree(YDKStatePtr);
+
+Capability CapabilityCreate(YDKStatePtr state, const char* mod, const char* rev);
 void CapabilityFree(Capability);
 
-Repository RepositoryInitWithPath(const char*);
+Repository RepositoryInitWithPath(YDKStatePtr, const char*);
 Repository RepositoryInit(void);
-RootSchemaWrapper RepositoryCreateRootSchemaWrapper(Repository, const Capability caps[], int caps_size);
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(YDKStatePtr state, Repository, const Capability caps[], int caps_size);
 void RepositoryFree(Repository);
 
-ServiceProvider NetconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
-ServiceProvider NetconfServiceProviderInit(const char * address, const char * username, const char * password, int port);
-RootSchemaNode ServiceProviderGetRootSchema(ServiceProvider);
+ServiceProvider NetconfServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, const char * protocol);
+ServiceProvider NetconfServiceProviderInit(YDKStatePtr state, const char * address, const char * username, const char * password, int port, const char * protocol);
+RootSchemaNode ServiceProviderGetRootSchema(YDKStatePtr, ServiceProvider);
 EncodingFormat ServiceProviderGetEncoding(ServiceProvider);
 void NetconfServiceProviderFree(ServiceProvider);
 
-ServiceProvider RestconfServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port);
+ServiceProvider RestconfServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, const char* config_url_root, const char* state_url_root);
 void RestconfServiceProviderFree(ServiceProvider);
 
-OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol);
+OpenDaylightServiceProvider OpenDaylightServiceProviderInitWithRepo(YDKStatePtr state, Repository repo, const char * address, const char * username, const char * password, int port, EncodingFormat encoding, Protocol protocol);
 void OpenDaylightServiceProviderFree(OpenDaylightServiceProvider);
-ServiceProvider OpenDaylightServiceProviderGetNodeProvider(OpenDaylightServiceProvider provider, const char * node_id);
-const char* OpenDaylightServiceProviderGetNodeIDByIndex(OpenDaylightServiceProvider provider, int idx);
+ServiceProvider OpenDaylightServiceProviderGetNodeProvider(YDKStatePtr state, OpenDaylightServiceProvider provider, const char * node_id);
+const char* OpenDaylightServiceProviderGetNodeIDByIndex(YDKStatePtr state, OpenDaylightServiceProvider provider, int idx);
 
-Codec CodecInit(void);
+Codec CodecInit();
 void CodecFree(Codec);
-const char* CodecEncode(Codec, DataNode, EncodingFormat, boolean);
-DataNode CodecDecode(Codec, RootSchemaNode, const char*, EncodingFormat);
+const char* CodecEncode(YDKStatePtr state, Codec, DataNode, EncodingFormat, boolean);
+DataNode CodecDecode(YDKStatePtr state, Codec, RootSchemaNode, const char*, EncodingFormat);
 
-DataNode RootSchemaNodeCreate(RootSchemaNode, const char*);
-Rpc RootSchemaNodeRpc(RootSchemaNode, const char*);
+DataNode RootSchemaNodeCreate(YDKStatePtr, RootSchemaNode, const char*);
+Rpc RootSchemaNodeRpc(YDKStatePtr state, RootSchemaNode, const char*);
 RootSchemaNode RootSchemaWrapperUnwrap(RootSchemaWrapper);
 
-DataNode RpcInput(Rpc);
-DataNode RpcExecute(Rpc, ServiceProvider);
+DataNode RpcInput(YDKStatePtr, Rpc);
+DataNode RpcExecute(YDKStatePtr, Rpc, ServiceProvider);
 
-DataNode DataNodeCreate(DataNode, const char*, const char*);
+DataNode DataNodeCreate(YDKStatePtr, DataNode, const char*, const char*);
 const char* DataNodeGetArgument(DataNode);
 const char* DataNodeGetKeyword(DataNode);
 const char* DataNodeGetPath(DataNode);
@@ -115,8 +142,11 @@ void DataNodeAddAnnotation(DataNode, const char*);
 DataNodeChildren DataNodeGetChildren(DataNode);
 const char* DataNodeGetSegmentPath(DataNode);
 
+// what if duplicates? where to initialize?
 void EnableLogging(LogLevel);
+// void EnableLogging(YDKState*, LogLevel);
 LogLevel GetLoggingLevel(void);
+// LogLevel GetLoggingLevel(YDKState*, void);
 
 #ifdef __cplusplus
 }

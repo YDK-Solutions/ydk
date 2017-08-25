@@ -42,7 +42,10 @@ const (
 )
 
 type Empty struct {
-	set bool
+}
+
+func (e *Empty) String() string {
+	return ""
 }
 
 type LeafData struct {
@@ -202,12 +205,14 @@ type ServiceProvider interface {
 	GetPrivate() interface{}
 	Connect()
 	Disconnect()
+	GetState() *State
 }
 
 type CodecServiceProvider interface {
 	Initialize(Entity)
 	GetEncoding() EncodingFormat
 	GetRootSchemaNode(Entity) RootSchemaNode
+	GetState() *State
 }
 
 type Protocol int
@@ -236,6 +241,116 @@ type COpenDaylightServiceProvider struct {
 type Repository struct {
 	Path    string
 	Private interface{}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Errors
+//////////////////////////////////////////////////////////////////////////
+
+type YGO_ERROR_TYPE int
+
+const (
+	YGO_ERROR_TYPE_NONE YGO_ERROR_TYPE = iota
+	YGO_ERROR_TYPE_ERROR
+	YGO_ERROR_TYPE_CLIENT_ERROR
+	YGO_ERROR_TYPE_SERVICE_PROVIDER_ERROR
+	YGO_ERROR_TYPE_SERVICE_ERROR
+	YGO_ERROR_TYPE_ILLEGAL_STATE_ERROR
+	YGO_ERROR_TYPE_INVALID_ARGUMENT_ERROR
+	YGO_ERROR_TYPE_OPERATION_NOTSUPPORTED_ERROR
+	YGO_ERROR_TYPE_MODEL_ERROR
+)
+
+type State struct {
+	Private interface{}
+}
+
+type CState struct {
+	Private interface{}
+}
+
+type CError interface {
+	Error() string
+}
+
+type YGOError struct {
+	Msg string
+}
+
+func (e *YGOError) Error() string {
+	return "YGOError:" + e.Msg
+}
+
+type YGOClientError struct {
+	Msg string
+}
+
+func (e *YGOClientError) Error() string {
+	return "YGOClientError:" + e.Msg
+}
+
+type YGOServiceProviderError struct {
+	Msg string
+}
+
+func (e *YGOServiceProviderError) Error() string {
+	return "YGOServiceProviderError:" + e.Msg
+}
+
+type YGOServiceError struct {
+	Msg string
+}
+
+func (e *YGOServiceError) Error() string {
+	return "YGOServiceError:" + e.Msg
+}
+
+type YGOIllegalStateError struct {
+	Msg string
+}
+
+func (e *YGOIllegalStateError) Error() string {
+	return "YGOIllegalStateError:" + e.Msg
+}
+
+type YGOInvalidArgumentError struct {
+	Msg string
+}
+
+func (e *YGOInvalidArgumentError) Error() string {
+	return "YGOInvalidArgumentError:" + e.Msg
+}
+
+type YGOOperationNotSupportedError struct {
+	Msg string
+}
+
+func (e *YGOOperationNotSupportedError) Error() string {
+	return "YGOOperationNotSupportedError:" + e.Msg
+}
+
+type YGOModelError struct {
+	Msg string
+}
+
+func (e *YGOModelError) Error() string {
+	return "YGOModelError:" + e.Msg
+}
+
+type YGOCoreError struct {
+	Msg string
+}
+
+func (e *YGOCoreError) Error() string {
+	return "YGOCoreError:" + e.Msg
+}
+
+type YGOCodecError struct {
+	Msg string
+}
+
+func (e *YGOCodecError) Error() string {
+	return "YGOCodecError" + e.Msg
 }
 
 //////////////////////////////////////////////////////////////////////////

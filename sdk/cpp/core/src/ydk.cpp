@@ -224,6 +224,14 @@ YDKStatePtr YDKStateCreate(void)
     return static_cast<void*>(state);
 }
 
+void YDKStateClear(YDKStatePtr ptr) {
+    YDKState* real_state = static_cast<YDKState*>(ptr);
+    delete real_state->error_message;
+    real_state->error_occurred = false;
+    real_state->error_message = nullptr;
+    real_state->error_type = YDK_ERROR_NONE;
+}
+
 void YDKStateFree(YDKStatePtr ptr)
 {
     YDKState* real_state = static_cast<YDKState*>(ptr);

@@ -76,23 +76,23 @@ func (suite *DeleteTestSuite) BeforeTest(suiteName, testName string) {
 	fmt.Printf("%v: %v ...\n", suiteName, testName)
 }
 
-// func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
-// 	runnerCreate := ysanity.Runner{}
-// 	runnerCreate.One.Name = "runner.One.Name"
-// 	runnerCreate.Two.Name = "runner.Two.Name"
-// 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
+func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
+	runnerCreate := ysanity.Runner{}
+	runnerCreate.One.Name = "runner.One.Name"
+	runnerCreate.Two.Name = "runner.Two.Name"
+	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
-// 	// Use YFilter Delete and CRUD update to remove leaf
-// 	runnerUpdate := ysanity.Runner{}
-// 	runnerUpdate.One.Name = types.Delete
-// 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	// Use YFilter Delete and CRUD update to remove leaf
+	runnerUpdate := ysanity.Runner{}
+	runnerUpdate.One.Name = types.Delete
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-// 	runnerCmp := ysanity.Runner{}
-// 	runnerCmp.Two.Name = "runner.Two.Name"
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	runnerCmp := ysanity.Runner{}
+	runnerCmp.Two.Name = "runner.Two.Name"
 
-// 	suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
-// }
+	suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
+}
 
 // TODO: leaf-list encoding error
 // func (suite *DeleteTestSuite) TestDeleteOnLeafListSlice() {
@@ -152,45 +152,45 @@ func (suite *DeleteTestSuite) BeforeTest(suiteName, testName string) {
 //     suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
 // }
 
-// func (suite *DeleteTestSuite) TestDeleteOnListWithIdentitykey() {
-// 	runner := ysanity.Runner{}
-// 	il := ysanity.Runner_OneList_IdentityList{}
-// 	il.Config.Id = ysanity.Child_Identity{}
-// 	il.IdRef = ysanity.Child_Identity{}
+func (suite *DeleteTestSuite) TestDeleteOnListWithIdentitykey() {
+	runner := ysanity.Runner{}
+	il := ysanity.Runner_OneList_IdentityList{}
+	il.Config.Id = ysanity.Child_Identity{}
+	il.IdRef = ysanity.Child_Identity{}
 
-// 	runner.OneList.IdentityList = append(runner.OneList.IdentityList, il)
-// 	suite.CRUD.Create(&suite.Provider, &runner)
+	runner.OneList.IdentityList = append(runner.OneList.IdentityList, il)
+	suite.CRUD.Create(&suite.Provider, &runner)
 
-// 	runnerUpdate := ysanity.Runner{}
-// 	k := ysanity.Runner_OneList_IdentityList{}
-// 	k.Config.Id = ysanity.Child_Identity{}
-// 	k.IdRef = ysanity.Child_Identity{}
-// 	k.Filter = types.Delete
-// 	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, k)
-// 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	runnerUpdate := ysanity.Runner{}
+	k := ysanity.Runner_OneList_IdentityList{}
+	k.Config.Id = ysanity.Child_Identity{}
+	k.IdRef = ysanity.Child_Identity{}
+	k.Filter = types.Delete
+	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, k)
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 
-// 	suite.Equal(types.EntityEqual(entityRead, &ysanity.Runner{}), true)
-// }
+	suite.Equal(types.EntityEqual(entityRead, &ysanity.Runner{}), true)
+}
 
-// func (suite *DeleteTestSuite) TestDeleteOnContainer() {
-// 	runnerCreate := ysanity.Runner{}
-// 	runnerCreate.One.Name = "runner.One.Name"
-// 	runnerCreate.Two.Name = "runner.Two.Name"
-// 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
+func (suite *DeleteTestSuite) TestDeleteOnContainer() {
+	runnerCreate := ysanity.Runner{}
+	runnerCreate.One.Name = "runner.One.Name"
+	runnerCreate.Two.Name = "runner.Two.Name"
+	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
-// 	runnerUpdate := ysanity.Runner{}
-// 	runnerUpdate.Two.Filter = types.Delete
-// 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	runnerUpdate := ysanity.Runner{}
+	runnerUpdate.Two.Filter = types.Delete
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
-// 	runnerCmp := ysanity.Runner{}
-// 	runnerCmp.One.Name = "runner.One.Name"
+	runnerCmp := ysanity.Runner{}
+	runnerCmp.One.Name = "runner.One.Name"
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 
-// 	suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
-// }
+	suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
+}
 
 // TODO: Delete whole list using YFilter
 // func (suite *DeleteTestSuite) TestDeleteOnNestedList() {

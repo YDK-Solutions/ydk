@@ -576,6 +576,7 @@ func getCEncoding(encoding types.EncodingFormat) C.EncodingFormat {
 func panicOnCStateError(cstate *C.YDKStatePtr) {
 	err := checkState(cstate)
 	if err != nil {
+		C.YDKStateClear(*cstate)
 		panic(err.Error())
 	}
 }

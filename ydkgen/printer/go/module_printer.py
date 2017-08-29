@@ -79,7 +79,7 @@ class ModulePrinter(FilePrinter):
         self.ctx.writeln('import (')
         self.ctx.lvl_inc()
         self._print_static_imports(package)
-        self._print_derived_imports(package)
+        # self._print_derived_imports(package)
         self.ctx.lvl_dec()
         self.ctx.writeln(')')
         self.ctx.bline()

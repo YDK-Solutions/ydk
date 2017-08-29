@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
@@ -100,6 +101,15 @@ const (
   </two-list>
 </runner>
 `
+
+	xmlRunnerPayload2 = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <ytypes>
+    <built-in-t>
+      <enum-value>local</enum-value>
+    </built-in-t>
+  </ytypes>
+</runner>`
+
 	jsonRunnerPayload = `{
   "ydktest-sanity:runner": {
     "two-list": {
@@ -137,6 +147,12 @@ const (
   }
 }
 `
+
+	jsonRunnerPayload2 = `{
+  "ydktest-sanity:built-in-t": {
+    "enum-value": "local"
+  }
+}`
 )
 
 func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(interface{}) ([]byte, error)) bool {
@@ -153,7 +169,7 @@ func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(int
 		panic(fmt.Sprintf("Error unmashalling string 1: %s", err.Error()))
 	}
 
-	// Unmarshal and Marshal the payload in case list items in payload are not sorted
+	// Unmarshal and Marshal the payload in case list items in payload shows in random order
 	p1, err := m(o1)
 	if err != nil {
 		panic(fmt.Sprintf("Error mashalling object 1: %s", err.Error()))
@@ -185,7 +201,7 @@ func (suite *CodecTestSuite) TearDownSuite() {
 }
 
 func config(bgp *ysanity_bgp.Bgp) {
-	bgp.Global.Config.As = 65172 //types.Delete
+	bgp.Global.Config.As = 65172
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
@@ -349,7 +365,14 @@ func (suite *CodecTestSuite) TestXMLEncode1() {
 }
 
 func (suite *CodecTestSuite) TestXMLEncode2() {
-	// TODO: enum
+	suite.Provider.Encoding = types.XML
+	r1 := ysanity.Runner{}
+	r1.Ytypes.BuiltInT.EnumValue = ysanity.YdkEnumTest_local
+
+	payload := suite.Codec.Encode(&suite.Provider, &r1)
+	result := equalPayload(payload, xmlRunnerPayload2, xml.Unmarshal, xml.Marshal)
+	suite.Equal(result, true)
+	fmt.Println(payload)
 }
 
 func (suite *CodecTestSuite) TestJSONEncode1() {
@@ -364,9 +387,18 @@ func (suite *CodecTestSuite) TestJSONEncode1() {
 }
 
 func (suite *CodecTestSuite) TestJSONEncode2() {
-	// TODO: enum
+	suite.Provider.Encoding = types.JSON
+	r1 := ysanity.Runner{}
+	r1.Ytypes.BuiltInT.EnumValue = ysanity.YdkEnumTest_local
+
+	payload := suite.Codec.Encode(&suite.Provider, &r1)
+	result := equalPayload(payload, jsonRunnerPayload2, json.Unmarshal, json.Marshal)
+	suite.Equal(result, true)
 }
 
 func TestCodecTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(CodecTestSuite))
 }

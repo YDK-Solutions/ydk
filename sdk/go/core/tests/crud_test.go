@@ -46,7 +46,7 @@ func (suite *NETCONFTestSuite) TestTemplate() {
 
 func (suite *NETCONFTestSuite) TestCreateRead() {
 	bgpCreate := ysanity_bgp.Bgp{}
-	bgpCreate.Global.Config.As = 65172 //types.Delete
+	bgpCreate.Global.Config.As = 65172
 	bgpCreate.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}

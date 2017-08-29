@@ -657,13 +657,16 @@ DataNodeChildren DataNodeGetChildren(DataNode datanode)
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
 
-    std::vector<shared_ptr<ydk::path::DataNode>> children = real_datanode->children();
-    DataNode* child_array = new DataNode[children.size()];
-    for(size_t i=0; i < children.size(); i++)
-    {
-        child_array[i] = wrap(children[i]);
+    if (real_datanode != nullptr) {
+        std::vector<shared_ptr<ydk::path::DataNode>> children = real_datanode->children();
+        DataNode* child_array = new DataNode[children.size()];
+        for(size_t i=0; i < children.size(); i++)
+        {
+            child_array[i] = wrap(children[i]);
+        }
+        return {child_array, static_cast<int>(children.size())};
     }
-    return {child_array, static_cast<int>(children.size())};
+    return {nullptr, 0};
 }
 
 void DataNodeAddAnnotation(DataNode datanode, const char* operation)

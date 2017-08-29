@@ -111,6 +111,11 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	fmt.Printf("Reading top entity: '%s'\n", topEntity.GetSegmentPath())
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
+
+	if cchildren.count == C.int(0) {
+		return topEntity
+	}
+
 	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
 	getEntityFromDataNode(children[0], topEntity)
 	return topEntity
@@ -379,11 +384,7 @@ func getDataNodeFromEntity(state *types.State, entity types.Entity, rootSchema C
 	rootDataNode := C.RootSchemaNodeCreate(*getCState(state), rootSchema, path)
 	panicOnCStateError(getCState(state))
 
-	if types.IsSet(entity.GetFilter()) {
-		p1 := C.CString(string(entity.GetFilter()))
-		defer C.free(unsafe.Pointer(p1))
-		C.DataNodeAddAnnotation(rootDataNode, p1)
-	}
+	addDataNodeFilterAnnotation(&rootDataNode, entity.GetFilter())
 
 	populateNameValues(state, rootDataNode, rootPath)
 	walkChildren(state, entity, rootDataNode)
@@ -420,11 +421,7 @@ func populateDataNode(state *types.State, entity types.Entity, parentDataNode C.
 		panic("Datanode could not be created for: " + path.Path)
 	}
 
-	if types.IsSet(entity.GetFilter()) {
-		p1 := C.CString(string(entity.GetFilter()))
-		defer C.free(unsafe.Pointer(p1))
-		C.DataNodeAddAnnotation(dataNode, p1)
-	}
+	addDataNodeFilterAnnotation(&dataNode, entity.GetFilter())
 
 	populateNameValues(state, dataNode, path)
 	walkChildren(state, entity, dataNode)
@@ -441,16 +438,10 @@ func populateNameValues(state *types.State, dataNode C.DataNode, path types.Enti
 			p1 := C.CString(leafData.Value)
 			result = C.DataNodeCreate(*getCState(state), dataNode, p, p1)
 			panicOnCStateError(getCState(state))
-			C.DataNodeCreate(*getCState(state), dataNode, p, p1)
-			panicOnCStateError(getCState(state))
 			C.free(unsafe.Pointer(p1))
 		}
 
-		if types.IsSet(leafData.Filter) {
-			p1 := C.CString(string(nameValue.Data.Filter))
-			defer C.free(unsafe.Pointer(p1))
-			C.DataNodeAddAnnotation(result, p1)
-		}
+		addDataNodeFilterAnnotation(&result, leafData.Filter)
 		C.free(unsafe.Pointer(p))
 	}
 }
@@ -503,6 +494,14 @@ func dataNodeIsLeaf(dataNode C.DataNode) bool {
 
 func dataNodeIsList(dataNode C.DataNode) bool {
 	return C.GoString(C.DataNodeGetKeyword(dataNode)) == "list"
+}
+
+func addDataNodeFilterAnnotation(dataNode *C.DataNode, yfilter types.YFilter) {
+	if types.IsSet(yfilter) && yfilter != types.Read {
+		p := C.CString(fmt.Sprintf("%s", yfilter))
+		defer C.free(unsafe.Pointer(p))
+		C.DataNodeAddAnnotation(*dataNode, p)
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

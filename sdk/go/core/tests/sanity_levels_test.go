@@ -266,11 +266,11 @@ func (suite *SanityLevelsTestSuite) TestThreeListPos() {
 }
 
 func (suite *SanityLevelsTestSuite) TestNestedNaming() {
-	n_1 := ysanity.Runner_NestedNaming_NestedNaming{}
-	n_2 := ysanity.Runner_NestedNaming{}
-	n_1.NestedNaming.NestedNaming = 1
-	n_2.NestedNaming.NestedNaming.NestedNaming = 1
-	suite.Equal(n_1.NestedNaming.NestedNaming, n_2.NestedNaming.NestedNaming.NestedNaming)
+	n1 := ysanity.Runner_NestedNaming_NestedNaming{}
+	n2 := ysanity.Runner_NestedNaming{}
+	n1.NestedNaming.NestedNaming = 1
+	n2.NestedNaming.NestedNaming.NestedNaming = 1
+	suite.Equal(n1.NestedNaming.NestedNaming, n2.NestedNaming.NestedNaming.NestedNaming)
 }
 
 func (suite *SanityLevelsTestSuite) TestInbtwListPos() {

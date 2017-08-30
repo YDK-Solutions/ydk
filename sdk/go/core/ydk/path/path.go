@@ -38,7 +38,8 @@ import (
 	"unsafe"
 )
 
-func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
+// ExecuteRPC executes payload converted from entity
+func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
 	state := provider.GetState()
 	cstate := getCState(state)
 	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
@@ -46,7 +47,7 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter stri
 	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
 	panicOnCStateError(cstate)
 
-	ydkRpc := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(Filter))
+	ydkRPC := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(Filter))
 	panicOnCStateError(cstate)
 
 	if rootSchema == nil {
@@ -56,7 +57,7 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter stri
 	data := getDataPayload(state, entity, rootSchema, provider)
 	defer C.free(unsafe.Pointer(data))
 
-	input := C.RpcInput(*cstate, ydkRpc)
+	input := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
 	if setConfigFlag {
@@ -67,7 +68,7 @@ func ExecuteRpc(provider types.ServiceProvider, entity types.Entity, Filter stri
 	C.DataNodeCreate(*cstate, input, C.CString(dataTag), data)
 	panicOnCStateError(cstate)
 
-	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRpc, realProvider)}
+	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
 
 	return dataNode
@@ -102,6 +103,7 @@ func getTopEntityFromFilter(filter types.Entity) types.Entity {
 	return getTopEntityFromFilter(filter.GetParent())
 }
 
+// ReadDatanode using datanode to populate entity
 func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
 	if readDataNode.Private == nil {
 		return nil

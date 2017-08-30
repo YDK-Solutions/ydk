@@ -52,7 +52,6 @@ class ModulePrinter(FilePrinter):
             self._print_element(elem)
 
     def print_extra(self, package):
-        # self._print_enums(package, multi_file.class_list)
         pass
 
     def print_trailer(self, package):

@@ -54,16 +54,30 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
     commit_id = str(repo.head.commit)
+
+    if language == 'python':
+        cblock_language = 'sh'
+    elif language in ('cpp', 'go') :
+        cblock_language = 'bash'
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
+
     # modify about_ydk.rst page
-    for line in fileinput.input(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'r+w'):
-        if 'git clone repo-url' in line:
-            print(line.replace('repo-url', 'https://{0}.git'.format(url)), end='')
-        elif 'git checkout commit-id' in line:
-            print(line.replace('commit-id', '{}'.format(commit_id)), end='')
-        elif 'version-id' in line:
-            print(line.replace('version-id', '{}'.format(release.replace('release=', ''))), end='')
-        else:
-            print(line, end='')
+    lines = ''
+    with open(os.path.join(ydk_root, 'sdk', '_docsgen_common', 'about_ydk.rst'), 'r+') as fd:
+        lines = fd.read()
+    if 'git clone repo-url' in lines:
+        lines = lines.replace('repo-url', 'https://{0}.git'.format(url))
+    if 'git checkout commit-id' in lines:
+        lines = lines.replace('commit-id', '{}'.format(commit_id))
+    if 'version-id' in lines:
+        lines = lines.replace('version-id', '{}'.format(release.replace('release=', '')))
+    if 'language-version' in lines:
+        lines = lines.replace('language-version', language)
+    if 'code-block-language' in lines:
+        lines = lines.replace('code-block-language', cblock_language)
+    with open(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'w+') as fd:
+        fd.write(lines)
 
 
 def get_release_version(output_directory, language):
@@ -145,6 +159,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     os.mkdir(py_api_doc)
     # print about YDK page
     print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
+    
     if is_core:
         copy_docs_from_bundles(output_directory, py_api_doc_gen)
     # build docs

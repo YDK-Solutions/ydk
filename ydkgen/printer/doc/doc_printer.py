@@ -91,8 +91,9 @@ class DocPrinter(object):
         self._print_header(clazz)
         # Body
         self.ctx.lvl_inc()
-        self._print_bases(clazz)
-        self._print_class_hierarchy(clazz)
+        if self.lang != 'go':
+            self._print_bases(clazz)
+            self._print_class_hierarchy(clazz)
         if clazz.stmt.search_one('presence') is not None:
             self._append('This class is a :ref:`presence class<presence-class>`\n')
         if clazz.stmt.keyword != 'rpc':
@@ -148,7 +149,7 @@ class DocPrinter(object):
     def _print_toctree_section(self, elements, title):
         if len(elements) == 0:
             return
-        if len(title) > 0:
+        if len(title) > 0 and self.lang != 'go':
             self._append('**{}**\n'.format(title))
         self._append('.. toctree::')
         self.ctx.lvl_inc()

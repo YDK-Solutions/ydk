@@ -74,25 +74,25 @@ func (suite *FilterReadTestSuite) TearDownSuite() {
 func (suite *FilterReadTestSuite) TearDownTest() {
 }
 
-// func (suite *FilterReadTestSuite) Test1() {
-// 	// Read on top container returns all data
-// 	a := filterread.A{}
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+func (suite *FilterReadTestSuite) Test1() {
+	// Read on top container returns all data
+	a := filterread.A{}
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := getInitEntity()
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	initEntity := getInitEntity()
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
-// func (suite *FilterReadTestSuite) Test2() {
-// 	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
-// 	// `a.A1` is a content match node. Reads on `a` returns all data.
-// 	a := filterread.A{}
-// 	a.A1 = "a.A1"
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+func (suite *FilterReadTestSuite) Test2() {
+	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
+	// `a.A1` is a content match node. Reads on `a` returns all data.
+	a := filterread.A{}
+	a.A1 = "a.A1"
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := getInitEntity()
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	initEntity := getInitEntity()
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
 func (suite *FilterReadTestSuite) Test3() {
 	// Read on leaf
@@ -105,43 +105,43 @@ func (suite *FilterReadTestSuite) Test3() {
 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
 }
 
-// func (suite *FilterReadTestSuite) Test4() {
-// 	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
-// 	// `a.B.B1` is a content match node.
-// 	a := filterread.A{}
-// 	a.B.B1 = "a.B.B1"
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+func (suite *FilterReadTestSuite) Test4() {
+	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
+	// `a.B.B1` is a content match node.
+	a := filterread.A{}
+	a.B.B1 = "a.B.B1"
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := filterread.A{}
-// 	initEntity.B.B1 = "a.B.B1"
-// 	initEntity.B.B2 = "a.B.B2"
-// 	initEntity.B.B3 = "a.B.B3"
+	initEntity := filterread.A{}
+	initEntity.B.B1 = "a.B.B1"
+	initEntity.B.B2 = "a.B.B2"
+	initEntity.B.B3 = "a.B.B3"
 
-// 	initEntity.B.F = filterread.A_B_F{}
-// 	initEntity.B.F.F1 = "a.B.F.F1"
-// 	initEntity.B.C = filterread.A_B_C{}
-// 	initEntity.B.D.D1 = "a.B.D.D1"
-// 	initEntity.B.D.D2 = "a.B.D.D2"
-// 	initEntity.B.D.D3 = "a.B.D.D3"
-// 	initEntity.B.D.E.E1 = "a.B.D.E.E1"
-// 	initEntity.B.D.E.E2 = "a.B.D.E.E2"
+	initEntity.B.F = filterread.A_B_F{}
+	initEntity.B.F.F1 = "a.B.F.F1"
+	initEntity.B.C = filterread.A_B_C{}
+	initEntity.B.D.D1 = "a.B.D.D1"
+	initEntity.B.D.D2 = "a.B.D.D2"
+	initEntity.B.D.D3 = "a.B.D.D3"
+	initEntity.B.D.E.E1 = "a.B.D.E.E1"
+	initEntity.B.D.E.E2 = "a.B.D.E.E2"
 
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
-// func (suite *FilterReadTestSuite) Test5() {
-// 	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
-// 	// `a.B.D.E.E1` is a content match node.
-// 	a := filterread.A{}
-// 	a.B.D.E.E1 = "a.B.D.E.E1"
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+func (suite *FilterReadTestSuite) Test5() {
+	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
+	// `a.B.D.E.E1` is a content match node.
+	a := filterread.A{}
+	a.B.D.E.E1 = "a.B.D.E.E1"
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := filterread.A{}
-// 	initEntity.B.D.E.E1 = "a.B.D.E.E1"
-// 	initEntity.B.D.E.E2 = "a.B.D.E.E2"
+	initEntity := filterread.A{}
+	initEntity.B.D.E.E1 = "a.B.D.E.E1"
+	initEntity.B.D.E.E2 = "a.B.D.E.E2"
 
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
 // // empty presence container encoding error
 // // func (suite *FilterReadTestSuite) Test6() {
@@ -156,38 +156,38 @@ func (suite *FilterReadTestSuite) Test3() {
 // //     suite.Equal(types.EntityEqual(entity, &initEntity), true)
 // // }
 
-// func (suite *FilterReadTestSuite) Test7() {
-// 	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
-// 	// `item1.Number`, `item2.Number` is a content match node.
-// 	a := filterread.A{}
-// 	item1 := filterread.A_Lst{}
-// 	item2 := filterread.A_Lst{}
-// 	item1.Number = 1
-// 	item2.Number = 2
-// 	a.Lst = append(a.Lst, item1)
-// 	a.Lst = append(a.Lst, item2)
+func (suite *FilterReadTestSuite) Test7() {
+	// According to https://tools.ietf.org/html/rfc6241#section-6.2.5,
+	// `item1.Number`, `item2.Number` is a content match node.
+	a := filterread.A{}
+	item1 := filterread.A_Lst{}
+	item2 := filterread.A_Lst{}
+	item1.Number = 1
+	item2.Number = 2
+	a.Lst = append(a.Lst, item1)
+	a.Lst = append(a.Lst, item2)
 
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := filterread.A{}
-// 	item1.Value = "l1.Value"
-// 	item2.Value = "l2.Value"
-// 	initEntity.Lst = append(initEntity.Lst, item1)
-// 	initEntity.Lst = append(initEntity.Lst, item2)
+	initEntity := filterread.A{}
+	item1.Value = "l1.Value"
+	item2.Value = "l2.Value"
+	initEntity.Lst = append(initEntity.Lst, item1)
+	initEntity.Lst = append(initEntity.Lst, item2)
 
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
-// func (suite *FilterReadTestSuite) Test8() {
-// 	a := filterread.A{}
-// 	a.B.F = filterread.A_B_F{}
-// 	a.B.F.F1 = "a.B.F.F1"
-// 	entity := suite.CRUD.Read(&suite.Provider, &a)
+func (suite *FilterReadTestSuite) Test8() {
+	a := filterread.A{}
+	a.B.F = filterread.A_B_F{}
+	a.B.F.F1 = "a.B.F.F1"
+	entity := suite.CRUD.Read(&suite.Provider, &a)
 
-// 	initEntity := a
+	initEntity := a
 
-// 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
-// }
+	suite.Equal(types.EntityEqual(entity, &initEntity), true)
+}
 
 func (suite *FilterReadTestSuite) BeforeTest(suiteName, testName string) {
 	fmt.Printf("%v: %v ...\n", suiteName, testName)

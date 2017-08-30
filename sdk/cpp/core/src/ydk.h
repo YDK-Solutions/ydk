@@ -96,6 +96,7 @@ YDKStatePtr YDKStateCreate(void);
 const char * YDKStateGetErrorMessage(YDKStatePtr);
 YDKErrorType YDKStateGetErrorType(YDKStatePtr);
 boolean YDKStateErrorOccurred(YDKStatePtr);
+void YDKStateClear(YDKStatePtr ptr);
 void YDKStateFree(YDKStatePtr);
 
 Capability CapabilityCreate(YDKStatePtr state, const char* mod, const char* rev);

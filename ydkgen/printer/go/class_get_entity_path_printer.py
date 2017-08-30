@@ -153,7 +153,7 @@ class GetEntityPathPrinter(FunctionPrinter):
         self.ctx.writeln('if !found {')
         self.ctx.lvl_inc()
         self.ctx.writeln("panic(fmt.Sprintf(\""
-                         "Wrong enum value %%v, %s\"))" % leaf_var)
+                         "Wrong enum value '%%v'\", %s))" % leaf_var)
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
 

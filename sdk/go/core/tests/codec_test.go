@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
+	"github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/oc_pattern"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
@@ -153,6 +154,11 @@ const (
     "enum-value": "local"
   }
 }`
+
+	xmlOCPatternPayload = `<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
+  <a>Hello</a>
+</oc-A>
+`
 )
 
 func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(interface{}) ([]byte, error)) bool {
@@ -394,6 +400,18 @@ func (suite *CodecTestSuite) TestJSONEncode2() {
 	payload := suite.Codec.Encode(&suite.Provider, &r1)
 	result := equalPayload(payload, jsonRunnerPayload2, json.Unmarshal, json.Marshal)
 	suite.Equal(result, true)
+}
+
+func (suite *CodecTestSuite) TestXMLDecodeOCPattern() {
+	suite.Provider.Encoding = types.XML
+	objA := oc_pattern.OcA{}
+
+	objA.A = "Hello"
+
+	entity := suite.Codec.Decode(&suite.Provider, xmlOCPatternPayload)
+	ocA := entity.(*oc_pattern.OcA)
+
+	suite.Equal(types.EntityEqual(entity, ocA), true)
 }
 
 func TestCodecTestSuite(t *testing.T) {

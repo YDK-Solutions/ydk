@@ -213,7 +213,7 @@ ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_payload(const std::stri
     else
     {
         auto module_names = get_module_names_from_json_payload(payload);
-        auto modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, module_names, m_name_lookup);
+        modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, module_names, m_name_lookup);
     }
 
     populate_new_schemas(modules);

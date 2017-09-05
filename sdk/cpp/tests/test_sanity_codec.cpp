@@ -299,6 +299,7 @@ TEST_CASE("multiple_encode")
     CHECK(payload_map["runner2"] == XML_RUNNER_PAYLOAD_2);
 }
 
+// YCPPCoreError: YCPPCodecError:Unknown element "oc-A".. Path:
 TEST_CASE("test_oc_pattern")
 {
 //TODO

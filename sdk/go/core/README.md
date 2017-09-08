@@ -14,10 +14,10 @@ $ cd -
 
 Then execute the below to run the samples
 ```
-$ go run samples/cgo_path/cgo_path.gp
+$ go run samples/cgo_path/cgo_path.go
 ```
 ```
-$ go run samples/bgp_create/bgp_create.gp
+$ go run samples/bgp_create/bgp_create.go
 ```
 ```
 $ go run samples/bgp_read/bgp_read.go
@@ -29,6 +29,6 @@ $ cd ../../..
 $ ./generate.py --bundle profiles/test/ydktest-cpp.json --go
 $ cp -r gen-api/go/ydktest-bundle/ydk/models/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/models
 $ go get gopkg.in/stretchr/testify.v1
-$ cd tests
+$ cd sdk/go/core/tests
 $ go test
 ```

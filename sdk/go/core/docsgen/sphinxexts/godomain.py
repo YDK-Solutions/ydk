@@ -25,13 +25,6 @@ from sphinx.util import logging
 from sphinx.util.nodes import make_refnode
 from sphinx.util.docfields import Field, GroupedField, TypedField
 
-if False:
-    # For type annotation
-    from typing import Any, Dict, Iterable, Iterator, List, Tuple, Union  # NOQA
-    from sphinx.application import Sphinx  # NOQA
-    from sphinx.builders import Builder  # NOQA
-    from sphinx.environment import BuildEnvironment  # NOQA
-
 logger = logging.getLogger(__name__)
 
 
@@ -106,7 +99,6 @@ class GoXrefMixin(object):
                   ):
         # type: (...) -> nodes.Node
 
-        
         result = super(GoXrefMixin, self).make_xref(rolename, domain, target,  # type: ignore
                                                     innernode, contnode, env)
         
@@ -191,14 +183,16 @@ class GoObject(ObjectDescription):
 
     allow_nesting = False
 
-    def get_signature_prefix(self, sig):
+    @staticmethod
+    def get_signature_prefix(sig):
         # type: (unicode) -> unicode
         """May return a prefix to put before the object name in the
         signature.
         """
         return ''
 
-    def needs_arglist(self):
+    @staticmethod
+    def needs_arglist():
         # type: () -> bool
         """May return true if an empty argument list is to be generated even if
         the document contains none.
@@ -286,7 +280,7 @@ class GoObject(ObjectDescription):
             signode += addnodes.desc_annotation(' ' + anno, ' ' + anno)
         return fullname, name_prefix
 
-    def get_index_text(self, pkgname, name):
+    def get_index_text(self, pkgname, name_struct):
         # type: (unicode, unicode) -> unicode
         """Return the text for the index entry of the object."""
         raise NotImplementedError('must be implemented in inherited struct')
@@ -419,17 +413,9 @@ class GoStructmember(GoObject):
     Description of a struct member (functions, attributes).
     """
 
-    def needs_arglist(self):
-        # type: () -> bool
-        return False
-
-    def get_signature_prefix(self, sig):
-        # type: (unicode) -> unicode
-        return ''
-
     def get_index_text(self, pkgname, name_struct):
         # type: (unicode, unicode) -> unicode
-        name, struct = name_struct
+        name = name_struct[0]
         add_packages = self.env.config.add_module_names
         if self.objtype in ('function', 'func'):
             try:
@@ -526,7 +512,9 @@ class GoCurrentPackage(Directive):
 
 
 class GoXRefRole(XRefRole):
-    def process_link(self, env, refnode, has_explicit_title, title, target):
+
+    @staticmethod
+    def process_link(env, refnode, has_explicit_title, title, target):
         # type: (BuildEnvironment, nodes.Node, bool, unicode, unicode) -> Tuple[unicode, unicode]  # NOQA
         refnode['go:package'] = env.ref_context.get('go:package')
         refnode['go:struct'] = env.ref_context.get('go:struct')
@@ -682,7 +670,7 @@ class GoDomain(Domain):
             if data[0] in docnames:
                 self.data['packages'][pkgname] = data
 
-    def find_obj(self, env, pkgname, structname, name, type, searchmode=0):
+    def find_obj(self, env, pkgname, structname, name, typ, searchmode=0):
         # type: (BuildEnvironment, unicode, unicode, unicode, unicode, int) -> List[Tuple[unicode, Any]]  # NOQA
         """Find a Go object for "name", perhaps using the given package
         and/or structname.  Returns a list of (name, object entry) tuples.
@@ -699,10 +687,10 @@ class GoDomain(Domain):
 
         newname = None
         if searchmode == 1:
-            if type is None:
+            if typ is None:
                 objtypes = list(self.object_types)
             else:
-                objtypes = self.objtypes_for_role(type)
+                objtypes = self.objtypes_for_role(typ)
             if objtypes is not None:
                 if pkgname and structname:
                     fullname = pkgname + '/' + structname + '/' + name
@@ -724,7 +712,7 @@ class GoDomain(Domain):
             # NOTE: searching for exact match, object type is not considered
             if name in objects:
                 newname = name
-            elif type == 'pkg':
+            elif typ == 'pkg':
                 # only exact matches allowed for packages
                 return []
             elif structname and structname + '/' + name in objects:
@@ -735,24 +723,24 @@ class GoDomain(Domain):
                     pkgname + '/' + structname + '/' + name in objects:
                 newname = pkgname + '/' + structname + '/' + name
             # special case: builtin exceptions have package "exceptions" set
-            elif type == 'exc' and '/' not in name and \
+            elif typ == 'exc' and '/' not in name and \
                     'exceptions.' + name in objects:
                 newname = 'exceptions.' + name
             # special case: object methods
-            elif type in ('func', 'meth') and '/' not in name and \
+            elif typ in ('func', 'meth') and '/' not in name and \
                     'object.' + name in objects:
                 newname = 'object.' + name
         if newname is not None:
             matches.append((newname, objects[newname]))
         return matches
 
-    def resolve_xref(self, env, fromdocname, builder, type, target, node, contnode):
+    def resolve_xref(self, env, fromdocname, builder, typ, target, node, contnode):
         # type: (BuildEnvironment, unicode, Builder, unicode, unicode, nodes.Node, nodes.Node) -> nodes.Node  # NOQA
         pkgname = node.get('go:package')
         structname = node.get('go:struct')
         searchmode = node.hasattr('refspecific') and 1 or 0
         matches = self.find_obj(env, pkgname, structname, target,
-                                type, searchmode)
+                                typ, searchmode)
         if not matches:
             return None
         elif len(matches) > 1:
@@ -805,11 +793,12 @@ class GoDomain(Domain):
         # type: () -> Iterator[Tuple[unicode, unicode, unicode, unicode, unicode, int]]
         for pkgname, info in iteritems(self.data['packages']):
             yield (pkgname, pkgname, 'package', info[0], 'package-' + pkgname, 0)
-        for refname, (docname, type) in iteritems(self.data['objects']):
-            if type != 'package':  # packages are already handled
-                yield (refname, refname, type, docname, refname, 1)
+        for refname, (docname, typ) in iteritems(self.data['objects']):
+            if typ != 'package':  # packages are already handled
+                yield (refname, refname, typ, docname, refname, 1)
 
-    def get_full_qualified_name(self, node):
+    @staticmethod
+    def get_full_qualified_name(node):
         # type: (nodes.Node) -> unicode
         pkgname = node.get('go:package')
         structname = node.get('go:struct')

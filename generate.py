@@ -159,7 +159,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     os.mkdir(py_api_doc)
     # print about YDK page
     print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
-    
+
     if is_core:
         copy_docs_from_bundles(output_directory, py_api_doc_gen)
     # build docs

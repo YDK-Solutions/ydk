@@ -7,6 +7,4 @@ YDK API
 
     services/services.rst
     providers/providers.rst
-    filters.rst
-    types.rst
-    exceptions.rst
+    types/_types_api.rst

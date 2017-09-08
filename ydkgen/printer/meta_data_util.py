@@ -609,7 +609,7 @@ def get_class_crossref_tag(name, named_element, language):
             named_element.fully_qualified_cpp_name())
     elif language == 'go':
         template = get_tag_template('go', 'class', True)
-        link = '%s/%s' % (named_element.get_py_mod_name().replace('.', '/'), 
+        link = '%s/%s' % (named_element.get_py_mod_name().replace('.', '/'),
                           named_element.qualified_go_name())
         return template % (name, link)
     else:

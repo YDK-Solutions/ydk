@@ -61,6 +61,7 @@ class Element(object):
 class Deviation(Element):
     def __init__(self, iskeyword):
         Element.__init__(self)
+        self.name = None
         self._stmt = None
         self.d_type = None
         self.d_target = None
@@ -73,6 +74,7 @@ class Deviation(Element):
     @stmt.setter
     def stmt(self, stmt):
         self._stmt = stmt
+        self.name = stmt.arg
 
     def qn(self):
         names = []

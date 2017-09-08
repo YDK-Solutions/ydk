@@ -38,6 +38,8 @@ class EntityLookUpPrinter(FilePrinter):
         self._print_include_guard_header(get_include_guard_name('entity_lookup'))
         self.ctx.writeln('#include <map>')
         self.ctx.writeln('#include <string>')
+        self.ctx.writeln('#include <vector>')
+        self.ctx.writeln('#include <unordered_map>')
         self.ctx.bline()
         self.ctx.writeln('namespace %s' % bundle_name)
         self.ctx.writeln('{')
@@ -55,7 +57,7 @@ class EntityLookUpPrinter(FilePrinter):
         self._init_headers(packages)
         self._init_insert_stmts(packages)
         self._print_headers()
-        self._print_capabilities_lookup_func()
+        self._print_capabilities_lookup_tables_func()
         self._print_namespace_identity_lookup(packages)
         self.ctx.writelns('}\n')
 
@@ -72,29 +74,36 @@ class EntityLookUpPrinter(FilePrinter):
     def _init_insert_stmts(self, packages):
         capability_lookup = set()
         for package in packages:
-            mod_rev_tuple = self._get_module_revision(package)
-            capability_lookup.add(mod_rev_tuple)
+            info_tuple = self._get_module_info(package)
+            capability_lookup.add(info_tuple)
         self.capability_lookup = capability_lookup
 
-    def _get_module_revision(self, package):
+    def _get_module_info(self, package):
         revision = ""
+        namespace = ""
+        # get namespace, get module name
         revision_stmt = package.stmt.search_one('revision')
         if revision_stmt:
             revision = revision_stmt.arg
+
+        namespace_stmt = package.stmt.search_one('namespace')
+        if namespace_stmt:
+            namespace = namespace_stmt.arg
+
         module_name = package.stmt.arg
 
-        return (module_name, revision)
+        return (module_name, revision, namespace)
 
     def _print_headers(self):
         for header in self.headers:
             self.ctx.writeln(header)
 
-    def _print_capabilities_lookup_func(self):
-        self._print_capabilities_lookup_func_header()
-        self._print_capabilities_lookup_func_body()
-        self._print_capabilities_lookup_func_trailer()
+    def _print_capabilities_lookup_tables_func(self):
+        self._print_capabilities_lookup_tables_func_header()
+        self._print_capabilities_lookup_tables_func_body()
+        self._print_capabilities_lookup_tables_func_trailer()
 
-    def _print_capabilities_lookup_func_header(self):
+    def _print_capabilities_lookup_tables_func_header(self):
         self.ctx.bline()
         self.ctx.writeln('namespace %s' % self.bundle_name)
         self.ctx.writeln('{')
@@ -105,19 +114,29 @@ class EntityLookUpPrinter(FilePrinter):
         self.ctx.bline()
         self.ctx.lvl_inc()
 
-    def _print_capabilities_lookup_func_body(self):
+    def _print_capabilities_lookup_tables_func_body(self):
         self.ctx.bline()
-        for (module_name, revision) in self.capability_lookup:
-            self._print_push_back_statement(module_name, revision)
+        self.ctx.writeln("ydk::ydk_global_capabilities_lookup_tables.clear();")
+        self.ctx.writeln("std::unordered_map<std::string, ydk::path::Capability> name_lookup;")
+        self.ctx.writeln("std::unordered_map<std::string, ydk::path::Capability> namespace_lookup;")
+
+        for (module_name, revision, namespace) in self.capability_lookup:
+            self._print_map_insert_statement(module_name, revision, namespace)
+
+        self.ctx.writeln("ydk::ydk_global_capabilities_lookup_tables.push_back(name_lookup);")
+        self.ctx.writeln("ydk::ydk_global_capabilities_lookup_tables.push_back(namespace_lookup);")
         self.ctx.bline()
 
-    def _print_push_back_statement(self, module_name, revision):
-        self.ctx.writeln("ydk::ydk_global_capabilities.push_back("
-                         "ydk::path::Capability{std::string{\"%s\"},"
-                         "\"%s\", {}, {}});"
-                         % (module_name, revision))
+    def _print_map_insert_statement(self, module_name, revision, namespace):
+        self.ctx.writeln("name_lookup.insert(std::make_pair<std::string, ydk::path::Capability>("
+                         "std::string(\"%s\"), ydk::path::Capability{std::string{\"%s\"}, \"%s\", {}, {}}"
+                         "));" % (module_name, module_name, revision))
+        if namespace != "":
+            self.ctx.writeln("namespace_lookup.insert(std::make_pair<std::string, ydk::path::Capability>("
+                             "std::string(\"%s\"), ydk::path::Capability{std::string{\"%s\"}, \"%s\", {}, {}}"
+                             "));" % (namespace, module_name, revision))
 
-    def _print_capabilities_lookup_func_trailer(self):
+    def _print_capabilities_lookup_tables_func_trailer(self):
         self.ctx.lvl_dec()
         self.ctx.writelns('}\n')
 

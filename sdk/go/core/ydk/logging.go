@@ -30,6 +30,7 @@ package ydk
 //#include <ydk/ydk.h>
 import "C"
 
+// LogLevel indicates what level of logging to output
 type LogLevel int
 
 const (
@@ -39,6 +40,7 @@ const (
 	Error
 )
 
+// EnableLogging enables logging on the code that runs in C++
 func EnableLogging(level LogLevel) {
 	switch level {
 	case Debug:

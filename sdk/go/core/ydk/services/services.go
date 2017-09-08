@@ -40,25 +40,36 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 )
 
+// CrudService supports CRUD operations on entities.
 type CrudService struct {
 }
 
+// Create the entity.
+// Returns whether the operation was successful or not (bool)
 func (c *CrudService) Create(provider types.ServiceProvider, entity types.Entity) bool {
 	return operationSucceeded(path.ExecuteRPC(provider, entity, "ydk:create", "entity", false))
 }
 
+// Update the entity.
+// Returns whether the operation was successful or not (bool)
 func (c *CrudService) Update(provider types.ServiceProvider, entity types.Entity) bool {
 	return operationSucceeded(path.ExecuteRPC(provider, entity, "ydk:update", "entity", false))
 }
 
+// Delete the entity.
+// Returns whether the operation was successful or not (bool)
 func (c *CrudService) Delete(provider types.ServiceProvider, entity types.Entity) bool {
 	return operationSucceeded(path.ExecuteRPC(provider, entity, "ydk:delete", "entity", false))
 }
 
+// Read the entity.
+// Returns the entity as identified by the given filter (types.Entity)
 func (c *CrudService) Read(provider types.ServiceProvider, filter types.Entity) types.Entity {
 	return path.ReadDatanode(filter, path.ExecuteRPC(provider, filter, "ydk:read", "filter", true))
 }
 
+// ReadConfig only reads config.
+// Returns the entity as identified by the given filter (types.Entity)
 func (c *CrudService) ReadConfig(provider types.ServiceProvider, filter types.Entity) types.Entity {
 	return path.ReadDatanode(filter, path.ExecuteRPC(provider, filter, "ydk:read", "filter", false))
 }
@@ -67,6 +78,7 @@ func operationSucceeded(node types.DataNode) bool {
 	return node.Private != nil
 }
 
+// CodecService supports encoding and decoding Go model API objects of type
 type CodecService struct {
 }
 

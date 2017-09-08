@@ -1,6 +1,5 @@
 About YDK
 =========
-
 A Software Development Kit that provides API's that are modeled in YANG.
 
 License
@@ -17,17 +16,15 @@ Version
 -------
 Version : version-id
 
-This ydk-language-version is generated using `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>`_.
+This ydk-go is generated using `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>`_.
 
-To check out the version of ydk-gen used to generate this ydk-language-version, use the below commands:
+To check out the version of ydk-gen used to generate this ydk-go, use the below commands:
 
-.. code-block:: bash
-    :linenos:
+.. code-block:: sh
 
     $ git clone repo-url
     $ git checkout commit-id
 
-
 Changelog
 ----------
- - `Changelog <https://github.com/CiscoDevNet/ydk-language-version/blob/master/CHANGES.md>`_
+ - `Changelog <https://github.com/CiscoDevNet/ydk-go/blob/master/CHANGES.md>`_

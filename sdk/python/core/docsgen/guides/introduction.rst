@@ -14,7 +14,7 @@ Applications can be written using the python model API in conjunction with a ser
 Writing an app
 --------------
 
-In this example, we set some BGP configuration using the OpenConfig model, the CRUD (Create/Read/Update/Delete) service and the NETCONF service provider. The example in this document is a simplified version of the more complete sample that is available in ``samples/bgp.py``. That more complete sample can be run with the below steps:
+In this example, we set some BGP configuration using the OpenConfig model, the CRUD (Create/Read/Update/Delete) service and the NETCONF service provider. The example in this document is a simplified version of the more complete sample that is available in ``samples/bgp.py``. The more complete sample can be run with the below steps:
 
 .. code-block:: sh
 

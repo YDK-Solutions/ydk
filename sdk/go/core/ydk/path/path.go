@@ -38,7 +38,8 @@ import (
 	"unsafe"
 )
 
-// ExecuteRPC executes payload converted from entity
+// ExecuteRPC executes payload converted from entity.
+// Returns a data node (types.DataNode) representing the result of the executed rpc.
 func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
 	state := provider.GetState()
 	cstate := getCState(state)
@@ -103,7 +104,8 @@ func getTopEntityFromFilter(filter types.Entity) types.Entity {
 	return getTopEntityFromFilter(filter.GetParent())
 }
 
-// ReadDatanode using datanode to populate entity
+// ReadDatanode populates entity by reading the top level entity from a given data node.
+// Returns the top entity (types.Entity) from readDataNode.
 func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
 	if readDataNode.Private == nil {
 		return nil
@@ -123,7 +125,8 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	return topEntity
 }
 
-// ConnectToNetconfProvider connects to NETCONF service provider and returns types.CServiceProvider
+// ConnectToNetconfProvider connects to NETCONF service provider by creating a connection to the provider using given address, username, password, and port.
+// Returns the connected service provider (types.CServiceProvider).
 func ConnectToNetconfProvider(state *types.State, repo types.Repository, Address, Username, Password string, port int, Protocol string) types.CServiceProvider {
 	var address *C.char = C.CString(Address)
 	defer C.free(unsafe.Pointer(address))
@@ -156,19 +159,20 @@ func ConnectToNetconfProvider(state *types.State, repo types.Repository, Address
 	return cprovider
 }
 
-// DisconnectFromNetconfProvider disconnects from NETCONF device and frees types.CServiceProvider passed in
+// DisconnectFromNetconfProvider disconnects from NETCONF device and frees the given service provider.
 func DisconnectFromNetconfProvider(provider types.CServiceProvider) {
 	realProvider := provider.Private.(C.ServiceProvider)
 	C.NetconfServiceProviderFree(realProvider)
 }
 
-// CleanUpErrorState cleans up memory for CState
+// CleanUpErrorState cleans up memory for CState.
 func CleanUpErrorState(state *types.State) {
 	realState := getCState(state)
 	C.YDKStateFree(*realState)
 }
 
-// ConnectToRestconfProvider connects to RESTCONF device and returns types.CServiceProvider
+// ConnectToRestconfProvider connects to RESTCONF device by creating a connection to the provider using given path, address, username, password, and port.
+// Returns the connected service provider (types.CServiceProvider).
 func ConnectToRestconfProvider(state *types.State, Path, Address, Username, Password string, port int, encoding types.EncodingFormat, stateURLRoot, configURLRoot string) types.CServiceProvider {
 	var path *C.char = C.CString(Path)
 	defer C.free(unsafe.Pointer(path))
@@ -202,13 +206,14 @@ func ConnectToRestconfProvider(state *types.State, Path, Address, Username, Pass
 	return cprovider
 }
 
-// DisconnectFromRestconfProvider disconnects from RESTCONF device and frees types.CServiceProvider passed in
+// DisconnectFromRestconfProvider disconnects from RESTCONF device and frees the given service provider.
 func DisconnectFromRestconfProvider(provider types.CServiceProvider) {
 	realProvider := provider.Private.(C.ServiceProvider)
 	C.RestconfServiceProviderFree(realProvider)
 }
 
-// InitCodecServiceProvider initializes CodecServiceProvider and returns root schema node parsed from repository
+// InitCodecServiceProvider initializes CodecServiceProvider.
+// Returns root schema node (types.RootSchemaNode) parsed from repository.
 func InitCodecServiceProvider(state *types.State, entity types.Entity, repo types.Repository) types.RootSchemaNode {
 	caps := entity.GetAugmentCapabilitiesFunction()()
 
@@ -244,7 +249,8 @@ func InitCodecServiceProvider(state *types.State, entity types.Entity, repo type
 	return rootSchemaNode
 }
 
-// CodecServiceEncode encodes entity to XML/JSON payloads based on encoding format passed in
+// CodecServiceEncode encodes entity to XML/JSON payloads based on encoding format passed in.
+// Returns the resulting payload (string).
 func CodecServiceEncode(state *types.State, entity types.Entity, rootSchema types.RootSchemaNode, encoding types.EncodingFormat) string {
 	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
 	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
@@ -273,7 +279,8 @@ func CodecServiceEncode(state *types.State, entity types.Entity, rootSchema type
 	return C.GoString(payload)
 }
 
-// CodecServiceDecode decodes XML/JSON payloads passed in to entity
+// CodecServiceDecode decodes XML/JSON payloads passed in to entity.
+// Returns the top level entity (types.Entity) from resulting data node.
 func CodecServiceDecode(state *types.State, rootSchema types.RootSchemaNode, payload string, encoding types.EncodingFormat, topEntity types.Entity) types.Entity {
 	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
 	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
@@ -299,7 +306,8 @@ func CodecServiceDecode(state *types.State, rootSchema types.RootSchemaNode, pay
 	return ReadDatanode(topEntity, dataNode)
 }
 
-// ConnectToOpenDaylightProvider connects to OpenDaylight device and returns types.COpenDaylightServiceProvier
+// ConnectToOpenDaylightProvider connects to OpenDaylight device.
+// Returns the connected service provider (types.COpenDaylightServiceProvier).
 func ConnectToOpenDaylightProvider(state *types.State, Path, Address, Username, Password string, port int, encoding types.EncodingFormat, protocol types.Protocol) types.COpenDaylightServiceProvider {
 	var path *C.char = C.CString(Path)
 	defer C.free(unsafe.Pointer(path))
@@ -329,13 +337,14 @@ func ConnectToOpenDaylightProvider(state *types.State, Path, Address, Username, 
 	return cprovider
 }
 
-// DisconnectFromOpenDaylightProvider disconnects from OpenDaylight device and frees memory allocated
+// DisconnectFromOpenDaylightProvider disconnects from OpenDaylight device and frees allocated memory.
 func DisconnectFromOpenDaylightProvider(provider types.COpenDaylightServiceProvider) {
 	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
 	C.OpenDaylightServiceProviderFree(realProvider)
 }
 
-// OpenDaylightServiceProviderGetNodeIDS returns node ids available
+// OpenDaylightServiceProviderGetNodeIDS is a getter function for the node ids given the opendaylight service provider.
+// Returns node ids available ([]string).
 func OpenDaylightServiceProviderGetNodeIDs(state *types.State, provider types.COpenDaylightServiceProvider) []string {
 	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
 	var ids []string
@@ -355,7 +364,8 @@ func OpenDaylightServiceProviderGetNodeIDs(state *types.State, provider types.CO
 	return ids
 }
 
-// OpenDaylightServiceProviderGetNodeProvider returns service provider based on node id passed in
+// OpenDaylightServiceProviderGetNodeProvider is a getter function for the node provider given the opendaylight service provider and node id.
+// Returns service provider (types.CServiceProvider) based on given node id.
 func OpenDaylightServiceProviderGetNodeProvider(state *types.State, provider types.COpenDaylightServiceProvider, nodeID string) types.CServiceProvider {
 	realProvider := provider.Private.(C.OpenDaylightServiceProvider)
 	cnodeID := C.CString(nodeID)
@@ -510,7 +520,7 @@ func addDataNodeFilterAnnotation(dataNode *C.DataNode, yfilter types.YFilter) {
 // Error Handling
 //////////////////////////////////////////////////////////////////////////
 
-// AddCState creates and add cstate to *types.State
+// AddCState creates and adds cstate to *types.State.
 func AddCState(state *types.State) {
 	cstate := C.YDKStateCreate()
 	state.Private = types.CState{Private: cstate}

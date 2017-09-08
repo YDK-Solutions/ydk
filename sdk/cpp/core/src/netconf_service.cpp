@@ -106,7 +106,7 @@ bool NetconfService::commit(NetconfServiceProvider & provider, bool confirmed,
 
     if (persist_id > -1)
     {
-        rpc->input().create("persist", std::to_string(persist_id));
+        rpc->input().create("persist-id", std::to_string(persist_id));
     }
 
     auto read_datanode = (*rpc)(provider);

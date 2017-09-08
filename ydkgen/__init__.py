@@ -262,24 +262,6 @@ class YdkGenerator(object):
         logger.debug('Copying %s to %s' % (target_dir, gen_api_root))
         dir_util.copy_tree(target_dir, gen_api_root)
 
-        if self.language == 'go':
-            src_dir = os.path.join(self.ydk_root, 'sdk', '_docsgen_common')
-            dest_dir = os.path.join(gen_api_root, 'docsgen')
-
-            # Copy index.rst
-            lines = ''
-            with open('%s/index.rst' % src_dir, 'r+') as fd:
-                lines = fd.read()
-            with open('%s/index.rst' % dest_dir, 'w+') as fd:
-                fd.write(lines % self.language.title())
-
-            # Copy about_ydk.rst
-            lines = ''
-            with open('%s/about_ydk.rst' % src_dir, 'r+') as fd:
-                lines = fd.read()
-            with open('%s/about_ydk.rst' % dest_dir, 'w+') as fd:
-                fd.write(lines.format(self.language.title()))
-
 
     def _create_models_archive(self, bundle, target_dir):
         '''

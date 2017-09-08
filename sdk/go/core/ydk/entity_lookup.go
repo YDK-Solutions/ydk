@@ -32,10 +32,12 @@ import (
 
 var topEntityRegistry = make(map[string]reflect.Type)
 
+// RegisterEntity
 func RegisterEntity(name string, entity_type reflect.Type) {
 	topEntityRegistry[name] = entity_type
 }
 
+// GetTopEntity
 func GetTopEntity(name string) types.Entity {
 	_, ok := topEntityRegistry[name]
 	if !ok {

@@ -92,7 +92,7 @@ To install the ``cisco-ios-xr`` bundle, execute::
 
 Samples
 =======
-  To get started with using the YDK API, there are sample apps available in the `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cp/tree/master/core/samples>`_. For example, to run the ``bgp_create.cpp`` sample, execute::
+To get started with using the YDK API, there are sample apps available in the `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cpp/tree/master/core/samples>`_. For example, to run the ``bgp_create.cpp`` sample, execute::
 
     ydk-cpp$ cd core/samples
     samples$ mkdir build && cd build

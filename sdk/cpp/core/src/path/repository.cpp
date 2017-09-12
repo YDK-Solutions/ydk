@@ -355,7 +355,7 @@ ydk::path::RepositoryPtr::get_new_ly_modules_from_lookup(ly_ctx* ctx,
 
                 if (m && new_module)
                 {
-                    YLOG_DEBUG("Added new libyang deivation module '{}'", std::string(m->name));
+                    YLOG_DEBUG("Added new libyang deviation module '{}'", std::string(m->name));
                     new_modules.emplace_back(m);
                 }
             }

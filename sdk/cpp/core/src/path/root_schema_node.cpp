@@ -249,7 +249,14 @@ ydk::path::RootSchemaNodeImpl::populate_augmented_schema_nodes(const struct lys_
             node = node->parent;
         }
 
-        populate_augmented_schema_node(ancestors, aug.child);
+        if(aug.child == nullptr)
+        {
+            YLOG_DEBUG("Augment child {} is null", aug.target_name);
+        }
+        else
+        {
+            populate_augmented_schema_node(ancestors, aug.child);
+        }
     }
 }
 

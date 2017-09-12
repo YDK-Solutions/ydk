@@ -24,6 +24,9 @@
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_bgp_types.hpp>
 
+#include <ydk_ydktest/openconfig_platform.hpp>
+#include <ydk_ydktest/openconfig_platform_types.hpp>
+
 #include "config.hpp"
 
 using namespace ydk;
@@ -266,5 +269,35 @@ TEST_CASE("bgp_read_non_top")
     cout<<*bgp_read_ptr<<endl;
 
     REQUIRE(*(bgp_read_ptr) == *(bgp_set));
+
+}
+
+TEST_CASE("oc_platform")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+    openconfig_platform::Components comps {};
+    bool reply = crud.delete_(provider, comps);
+    REQUIRE(reply);
+
+    auto comp =  make_shared<openconfig_platform::Components::Component>();
+    comp->name = "test";
+    comp->config->name = "test";
+    comp->transceiver->config->enabled = true;
+    comps.component.push_back(comp);
+    reply = crud.update(provider, comps);
+    REQUIRE(reply);
+
+    openconfig_platform::Components fil{};
+    auto data = crud.read(provider, fil);
+    REQUIRE(data != nullptr);
+    openconfig_platform::Components * comp_r = dynamic_cast<openconfig_platform::Components*>(data.get());
+    REQUIRE(comp_r != nullptr);
+    REQUIRE(comp_r->component[0]->name == comp->name);
+    REQUIRE(comp_r->component[0]->config->name == comp->config->name);
+
+    reply = crud.delete_(provider, fil);
+    REQUIRE(reply);
 
 }

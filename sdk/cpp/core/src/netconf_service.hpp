@@ -80,7 +80,7 @@ class NetconfService
 
         std::shared_ptr<Entity> get(NetconfServiceProvider& provider, Entity& filter);
 
-        bool kill_session(NetconfServiceProvider& provider, int session_id);
+        bool kill_session(NetconfServiceProvider& provider, unsigned int session_id);
 
         bool lock(NetconfServiceProvider& provider, DataStore target);
 

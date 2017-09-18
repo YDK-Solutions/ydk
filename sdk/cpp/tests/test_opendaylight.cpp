@@ -72,8 +72,8 @@ TEST_CASE("CreateODL")
 
     //Commented because of XR 611 issue with OC identity
     //  auto afi_safi = make_unique<openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
-    //  afi_safi->afi_safi_name = openconfig_bgp_types::L3Vpn_Ipv4_Unicast();
-    //  afi_safi->config->afi_safi_name = openconfig_bgp_types::L3Vpn_Ipv4_Unicast();
+    //  afi_safi->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
+    //  afi_safi->config->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
     //  afi_safi->config->enabled = false;
     //  afi_safi->parent = bgp->global->afi_safis.get();
     //  bgp->global->afi_safis->afi_safi.push_back(move(afi_safi));
@@ -85,7 +85,7 @@ TEST_CASE("CreateODL")
     neighbor->config->local_as = 65001;
     neighbor->config->peer_group = "IBGP";
     //neighbor->config->peer_type = "INTERNAL";
-    //neighbor->config->remove_private_as = openconfig_bgp_types::Private_As_Remove_All();
+    //neighbor->config->remove_private_as = openconfig_bgp_types::PRIVATEASREMOVEALL();
     neighbor->parent = bgp->neighbors.get();
     bgp->neighbors->neighbor.push_back(move(neighbor));
 
@@ -97,7 +97,7 @@ TEST_CASE("CreateODL")
     peer_group->config->peer_as = 65001;
     peer_group->config->local_as = 65001;
     //peer_group->config->peer_type = "INTERNAL";
-    //peer_group->config->remove_private_as = openconfig_bgp_types::Private_As_Remove_All();
+    //peer_group->config->remove_private_as = openconfig_bgp_types::PRIVATEASREMOVEALL();
     peer_group->parent = bgp->peer_groups.get();
     bgp->peer_groups->peer_group.push_back(move(peer_group));
 

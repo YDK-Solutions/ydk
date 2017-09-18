@@ -257,7 +257,7 @@ shared_ptr<Entity> NetconfService::get(NetconfServiceProvider& provider, Entity&
 }
 
 //kill_session
-bool NetconfService::kill_session(NetconfServiceProvider& provider, int session_id)
+bool NetconfService::kill_session(NetconfServiceProvider& provider, unsigned int session_id)
 {
     YLOG_INFO("Executing kill-session RPC");
 

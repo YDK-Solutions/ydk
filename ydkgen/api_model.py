@@ -876,12 +876,14 @@ def snake_case(input_text):
     return snake_case.lower()
 
 
+# capitalized input will not affected
 def camel_case(input_text):
     def _title(s):
         if len(s) > 0  and s.startswith(s[0].upper()):
             return s
         return s.title()
-    return ''.join([_title(word) for word in input_text.split('-')])
+    result = ''.join([_title(word) for word in input_text.split('-')])
+    return ''.join([_title(word) for word in result.split('_')])
 
 
 def escape_name(name):

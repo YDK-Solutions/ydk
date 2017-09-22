@@ -46,3 +46,9 @@ TEST_CASE("CreateNoRepoPTCP")
     NetconfSession session{ "127.0.0.1", "admin", "admin", 12307, "tcp"};
     CHECK_NOTHROW(session.get_root_schema());
 }
+
+TEST_CASE("CreateNoRepoPTimeOut")
+{
+    NetconfSession session{ "127.0.0.1", "admin", "admin", 12307, 99};
+    CHECK_NOTHROW(session.get_root_schema());
+}

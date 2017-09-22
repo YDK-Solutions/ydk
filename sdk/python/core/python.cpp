@@ -287,22 +287,26 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("invoke", &ydk::path::Session::invoke, return_value_policy::reference);
 
     class_<ydk::path::NetconfSession, ydk::path::Session>(path, "NetconfSession")
-        .def(init<ydk::path::Repository&, const std::string&, const std::string, const std::string, int, const std::string&, bool>(),
+        .def(init<ydk::path::Repository&, const std::string&, const std::string, const std::string, int, const std::string&, bool, int>(),
              arg("repo"),
              arg("address"),
              arg("username"),
              arg("password"),
              arg("port") = 830,
              arg("protocol") = string("ssh"),
-             arg("on_demand") = true)
-        .def(init<const std::string&, const std::string&, const std::string&, int, const std::string&, bool, bool>(),
+             arg("on_demand") = true,
+             arg("timeout") = -1
+        )
+        .def(init<const std::string&, const std::string&, const std::string&, int, const std::string&, bool, bool, int>(),
              arg("address"),
              arg("username"),
              arg("password"),
              arg("port") = 830,
              arg("protocol") = string("ssh"),
              arg("on_demand") = true,
-             arg("common_cache") = false)
+             arg("common_cache") = false,
+             arg("timeout") = -1
+        )
         .def("get_root_schema", &ydk::path::NetconfSession::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::NetconfSession::invoke, return_value_policy::reference)
         .def("get_capabilities", &ydk::path::NetconfSession::get_capabilities, return_value_policy::reference);

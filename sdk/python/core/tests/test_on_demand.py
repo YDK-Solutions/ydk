@@ -121,8 +121,24 @@ class SanityYang(unittest.TestCase):
         tmp_dir = tempfile.mkdtemp()
         repo = Repository(tmp_dir)
 
-        cls.ncc_empty_repo = NetconfServiceProvider(repo, cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand)
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc_empty_repo = NetconfServiceProvider(
+            repo,
+            cls.hostname,
+            cls.username,
+            cls.password,
+            cls.port,
+            cls.protocol,
+            cls.on_demand,
+            cls.timeout)
+        cls.ncc = NetconfServiceProvider(
+            cls.hostname,
+            cls.username,
+            cls.password,
+            cls.port,
+            cls.protocol,
+            cls.on_demand,
+            cls.common_cache,
+            cls.timeout)
         cls.crud = CRUDService()
 
         cls.codec_provider = CodecServiceProvider()
@@ -159,9 +175,14 @@ class SanityYang(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    device, non_demand, common_cache = get_device_info()
+    device, non_demand, common_cache, timeout = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityYang, device=device, non_demand=non_demand, common_cache=common_cache))
+    suite.addTest(ParametrizedTestCase.parametrize(
+        SanityYang,
+        device=device,
+        non_demand=non_demand,
+        common_cache=common_cache,
+        timeout=timeout))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

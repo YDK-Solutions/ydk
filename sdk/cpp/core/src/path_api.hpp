@@ -1043,7 +1043,6 @@ private:
                            int timeout);
     std::string execute_payload(const std::string & payload) const;
 private:
-    int session_timeout;
     std::unique_ptr<NetconfClient> client;
     std::unique_ptr<ModelProvider> model_provider;
     std::shared_ptr<RootSchemaNode> root_schema;

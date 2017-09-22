@@ -131,4 +131,4 @@ Documentation and Support
 
 Release Notes
 ===============
-The current YDK release version is 0.6.0 (alpha). YDK-Cpp is licensed under the Apache 2.0 License.
+The current YDK release version is 0.6.1 (alpha). YDK-Cpp is licensed under the Apache 2.0 License.

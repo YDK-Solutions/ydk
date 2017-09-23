@@ -48,10 +48,11 @@ NetconfServiceProvider::NetconfServiceProvider(const string& address,
                                                int port,
                                                const string& protocol,
                                                bool on_demand,
-                                               bool common_cache)
-    : session{address, username, password, port, protocol, on_demand, common_cache}
+                                               bool common_cache,
+                                               int timeout)
+    : session{address, username, password, port, protocol, on_demand, common_cache, timeout}
 {
-    YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
+    YLOG_INFO("Connected to {} on port {} using {} with timeout of {}", address, port, protocol, timeout);
 }
 
 NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo,
@@ -60,10 +61,11 @@ NetconfServiceProvider::NetconfServiceProvider(path::Repository & repo,
                                                const string& password,
                                                int port,
                                                const string& protocol,
-                                               bool on_demand)
-    : session{repo, address, username, password, port, protocol, on_demand}
+                                               bool on_demand,
+                                               int timeout)
+    : session{repo, address, username, password, port, protocol, on_demand, timeout}
 {
-    YLOG_INFO("Connected to {} on port {} using {}", address, port, protocol);
+    YLOG_INFO("Connected to {} on port {} using {} with timeout of ", address, port, protocol, timeout);
 }
 
 NetconfServiceProvider::~NetconfServiceProvider()

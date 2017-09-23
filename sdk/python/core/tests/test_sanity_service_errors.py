@@ -136,7 +136,15 @@ class SanityCRUD(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc = NetconfServiceProvider(
+            cls.hostname,
+            cls.username,
+            cls.password,
+            cls.port,
+            cls.protocol,
+            cls.on_demand,
+            cls.common_cache,
+            cls.timeout)
         cls.crud = CRUDService()
 
     def setUp(self):
@@ -209,7 +217,15 @@ class SanityExecutor(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc = NetconfServiceProvider(
+            cls.hostname,
+            cls.username,
+            cls.password,
+            cls.port,
+            cls.protocol,
+            cls.on_demand,
+            cls.common_cache,
+            cls.timeout)
         cls.executor = ExecutorService()
         cls.codec = CodecService()
         cls.codec_provider = CodecServiceProvider(type=EncodingFormat.XML)
@@ -258,7 +274,15 @@ class SanityNetconf(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, cls.port, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc = NetconfServiceProvider(
+            cls.hostname,
+            cls.username,
+            cls.password,
+            cls.port,
+            cls.protocol,
+            cls.on_demand,
+            cls.common_cache,
+            cls.timeout)
         cls.netconf_service = NetconfService()
 
     def setUp(self):
@@ -469,12 +493,17 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
 
 if __name__ == '__main__':
-    device, non_demand, common_cache = get_device_info()
+    device, non_demand, common_cache, timeout = get_device_info()
 
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
     for testCase in [SanityCRUD, SanityExecutor, SanityNetconf, SanityCodec]:
-        suite.addTest(ParametrizedTestCase.parametrize(testCase, device=device, non_demand=non_demand, common_cache=common_cache))
+        suite.addTest(ParametrizedTestCase.parametrize(
+            testCase,
+            device=device,
+            non_demand=non_demand,
+            common_cache=common_cache,
+            timeout=timeout))
     res=unittest.TextTestRunner(verbosity=2).run(suite)
     # sys.exit expects an integer, will throw libc++ abi error if use:
     # ret = res.wasSuccessful() # <-- ret is a bool

@@ -49,7 +49,7 @@ class ParametrizedTestCase(unittest.TestCase):
         super(ParametrizedTestCase, self).__init__(methodName)
 
     @staticmethod
-    def parametrize(testcase_klass, device, non_demand, common_cache):
+    def parametrize(testcase_klass, device, non_demand, common_cache, timeout):
         """ Create a suite containing all tests taken from the given
             subclass, passing them the parameter 'param'.
         """
@@ -61,6 +61,7 @@ class ParametrizedTestCase(unittest.TestCase):
         testcase_klass.protocol = device.scheme
         testcase_klass.on_demand = not non_demand
         testcase_klass.common_cache = common_cache
+        testcase_klass.timeout = timeout
         testnames = testloader.getTestCaseNames(testcase_klass)
         suite = unittest.TestSuite()
         for name in testnames:
@@ -78,11 +79,13 @@ def get_device_info():
                         dest="common_cache", action="store_true")
     parser.add_argument("device", nargs='?',
                         help="NETCONF device (ssh://user:password@host:port)")
+    parser.add_argument("--timeout", help="timeout in microseconds, -1 for infinite timeout, 0 for non-blocking",
+                        dest="timeout", action='store', type=int, default=-1)
 
     args = parser.parse_args()
     if not args.device:
         args.device = "ssh://admin:admin@127.0.0.1:12022"
     device = urlparse(args.device)
-    return device, args.non_demand, args.common_cache
+    return device, args.non_demand, args.common_cache, args.timeout
 
 

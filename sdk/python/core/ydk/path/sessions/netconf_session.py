@@ -26,18 +26,21 @@ class NetconfSession(_NetconfSession):
     """
 
     def __init__(self, address, username, password, port=830, protocol="ssh",
-                       on_demand=True, common_cache=False, repo=None):
+                       on_demand=True, common_cache=False, timeout=-1, repo=None):
         if repo is None:
             super(NetconfSession, self).__init__(address, username, password,
                                                  port, protocol, on_demand,
-                                                 common_cache)
+                                                 common_cache, timeout)
         else:
             super(NetconfSession, self).__init__(repo, address, username,
                                                  password, port, protocol,
-                                                 on_demand)
+                                                 on_demand, timeout)
 
     def get_root_schema(self):
         return super(NetconfSession, self).get_root_schema()
 
     def invoke(self, rpc):
         return super(NetconfSession, self).invoke(rpc)
+
+    def get_capabilities(self):
+        return super(NetconfSession, self).get_capabilities()

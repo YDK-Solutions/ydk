@@ -33,7 +33,15 @@ class SanityTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.ncc = NetconfServiceProvider(cls.hostname, cls.username, cls.password, 12023, cls.protocol, cls.on_demand, cls.common_cache)
+        cls.ncc = NetconfServiceProvider(
+            cls.hostname,
+            cls.username,
+            cls.password,
+            12023,
+            cls.protocol,
+            cls.on_demand,
+            cls.common_cache,
+            cls.timeout)
         cls.crud = CRUDService()
 
     def test_bgp(self):
@@ -48,9 +56,14 @@ class SanityTest(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    device, non_demand, common_cache = get_device_info()
+    device, non_demand, common_cache, timeout = get_device_info()
 
     suite = unittest.TestSuite()
-    suite.addTest(ParametrizedTestCase.parametrize(SanityTest, device=device, non_demand=non_demand, common_cache=common_cache))
+    suite.addTest(ParametrizedTestCase.parametrize(
+        SanityTest,
+        device=device,
+        non_demand=non_demand,
+        common_cache=common_cache,
+        timeout=timeout))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

@@ -34,14 +34,16 @@ public:
                                const std::string& password,
                                int port = 830,
                                const std::string& protocol = "ssh",
-                               bool on_demand = true);
+                               bool on_demand = true,
+                               int timeout = -1);
         NetconfServiceProvider(const std::string& address,
                                const std::string& username,
                                const std::string& password,
                                int port = 830,
                                const std::string& protocol = "ssh",
                                bool on_demand = true,
-                               bool common_cache = false);
+                               bool common_cache = false,
+                               int timeout = -1);
         ~NetconfServiceProvider();
         EncodingFormat get_encoding() const;
         const path::Session& get_session() const;

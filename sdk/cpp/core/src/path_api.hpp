@@ -1011,7 +1011,8 @@ public:
                    const std::string& password,
                    int port = 830,
                    const std::string& protocol = "ssh",
-                   bool on_demand = true);
+                   bool on_demand = true,
+                   int timeout = -1);
 
     NetconfSession(const std::string& address,
                    const std::string& username,
@@ -1019,7 +1020,8 @@ public:
                    int port = 830,
                    const std::string& protocol = "ssh",
                    bool on_demand = true,
-                   bool common_cache = false);
+                   bool common_cache = false,
+                   int timeout = -1);
 
     virtual ~NetconfSession();
 
@@ -1037,7 +1039,8 @@ private:
                            const std::string& username,
                            const std::string& password,
                            int port,
-                           const std::string& protocol);
+                           const std::string& protocol,
+                           int timeout);
     std::string execute_payload(const std::string & payload) const;
 private:
     std::unique_ptr<NetconfClient> client;

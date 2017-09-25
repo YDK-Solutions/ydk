@@ -11,6 +11,7 @@ Issue tracker is ONLY used for reporting bugs. Please use the [YDK Community](ht
 ## Steps to Reproduce
 
 
+
 ## Your Script
 
 <!--- copy paste your script below -->
@@ -26,3 +27,8 @@ Enable [logging](http://ydk.cisco.com/py/docs/guides/introduction.html#logging) 
 ```
 
 ```
+
+## System Information
+<!-- Please include python version, operating system and processor architecture -->
+
+

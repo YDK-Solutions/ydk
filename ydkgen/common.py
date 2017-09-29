@@ -236,7 +236,7 @@ def sort_classes_at_same_level(classes):
     if len(classes) <= 1:
         return classes
 
-    classes = sorted(classes, key=lambda cls: cls.name)
+    #classes = sorted(classes, key=lambda cls: cls.name)
     classes_processed = []
     classes_not_processed = OrderedDict()
     for clazz in classes:

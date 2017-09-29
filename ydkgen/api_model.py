@@ -857,7 +857,7 @@ def get_properties(owned_elements):
     props.extend(key_props)
 
     non_key_props = [p for p in all_props if not p.is_key()]
-    props.extend(sorted(non_key_props, key=lambda p: p.name))
+    props.extend(non_key_props)
 
     return props
 

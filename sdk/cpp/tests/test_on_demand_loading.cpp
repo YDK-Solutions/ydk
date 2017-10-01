@@ -22,6 +22,9 @@
 //////////////////////////////////////////////////////////////////
 
 #include <string>
+#include <ydk/codec_provider.hpp>
+#include <ydk/codec_service.hpp>
+#include <ydk_ydktest/ietf_aug_base_1.hpp>
 #include "ydk/path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
@@ -125,4 +128,12 @@ TEST_CASE("on_demand_loading_xml")
 
     auto cpython = codec.decode(root_schema, AUGMENTED_XML_PAYLOAD, ydk::EncodingFormat::XML);
     REQUIRE(cpython);
+}
+
+TEST_CASE("on_demand_provider_loading_xml")
+{
+    CodecServiceProvider codec_provider{EncodingFormat::XML};
+    CodecService codec_service{};
+    auto cpython = std::make_shared<ydktest::ietf_aug_base_1::Cpython>();
+    codec_service.decode(codec_provider, AUGMENTED_XML_PAYLOAD, cpython);
 }

@@ -237,13 +237,16 @@ ydk::path::RootSchemaNodeImpl::populate_new_schemas(std::vector<const lys_module
 void
 ydk::path::RootSchemaNodeImpl::populate_augmented_schema_nodes(const struct lys_module* module)
 {
-    for (int i = 0; i < module->augment_size; i++) {
+    for (int i = 0; i < module->augment_size; i++)
+    {
         auto aug = module->augment[i];
         std::vector<lys_node*> ancestors;
         lys_node* node = aug.target;
 
-        while(node) {
-            if (node->nodetype != LYS_USES) {
+        while(node)
+        {
+            if (node->nodetype != LYS_USES)
+            {
                 ancestors.emplace_back(node);
             }
             node = node->parent;
@@ -265,9 +268,27 @@ ydk::path::RootSchemaNodeImpl::populate_augmented_schema_node(std::vector<lys_no
     YLOG_DEBUG("Populating augmented schema node '{}'", std::string(target->name));
 
     lys_node* root = ancestors.back();
+    // quick fix: populate augmented top node if we have not already done so
+    bool found = false;
+    for (auto&c: m_children)
+    {
+        if (c->get_statement().arg == root->name)
+        {
+            found = true;
+            break;
+        }
+    }
+    if (found == false)
+    {
+        m_children.push_back(std::make_unique<SchemaNodeImpl>(this, const_cast<struct lys_node*>(root)));
+    }
+
+    // populate the rest of augmented schema nodes
     ancestors.pop_back();
-    for (auto& c: m_children) {
-        if (c->get_statement().arg == root->name) {
+    for (auto& c: m_children)
+    {
+        if (c->get_statement().arg == root->name)
+        {
             reinterpret_cast<SchemaNodeImpl*>(c.get())->populate_augmented_schema_node(ancestors, target);
         }
     }

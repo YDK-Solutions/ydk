@@ -172,6 +172,14 @@ public:
         );
     }
 
+    std::vector<std::string> get_order_of_children() const override {
+        PYBIND11_OVERLOAD(
+            std::vector<std::string>,
+            ydk::Entity,
+            get_order_of_children
+        );
+    }
+
     bool has_leaf_or_child_of_name(const std::string & name) const override {
         PYBIND11_OVERLOAD_PURE(
             bool,
@@ -498,6 +506,7 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("has_data", &ydk::Entity::has_data, return_value_policy::reference)
         .def("has_operation", &ydk::Entity::has_operation, return_value_policy::reference)
         .def("get_children", &ydk::Entity::get_children, return_value_policy::reference)
+        .def("get_order_of_children", &ydk::Entity::get_order_of_children, return_value_policy::reference)
         .def("clone_ptr", &ydk::Entity::clone_ptr)
         .def("__eq__", [](ydk::Entity& left, ydk::Entity& right)
                          {

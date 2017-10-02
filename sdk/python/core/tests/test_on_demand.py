@@ -167,11 +167,15 @@ class SanityYang(unittest.TestCase):
 
     def test_on_demand_loading_xml(self):
         self.codec_provider.encoding = EncodingFormat.XML
-        self.codec.decode(self.codec_provider, AUGMENTED_XML_PAYLOAD)
+        entity1 = self.codec.decode(self.codec_provider, AUGMENTED_XML_PAYLOAD)
+        self.assertEqual(entity1.lib.ydktest_aug_4.ydktest_aug_nested_4.aug_four.get()=="aug four", True)
+
 
     def test_on_demand_loading_json(self):
         self.codec_provider.encoding = EncodingFormat.JSON
-        self.codec.decode(self.codec_provider, AUGMENTED_JSON_PAYLOAD)
+        entity1 = self.codec.decode(self.codec_provider, AUGMENTED_JSON_PAYLOAD)
+        self.assertEqual(entity1.doc.aug_5_identityref.get(), "ydktest-aug-ietf-5:aug-identity")
+
 
 
 if __name__ == '__main__':

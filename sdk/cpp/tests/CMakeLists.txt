@@ -14,6 +14,8 @@ set(bundle_tests_src
         test_restconf_client.cpp
         testsanitynctest.cpp
         test_crud.cpp
+        test_core_gnmi.cpp
+        #test_gnmi_provider.cpp
         test_on_demand_loading.cpp
         test_sanity_levels.cpp
         test_sanity_types.cpp
@@ -40,6 +42,8 @@ find_library(dl_location dl)
 find_library(ydk_location ydk)
 find_library(ydk_ydktest_location ydk_ydktest)
 find_library(ydk_ydktest_new_location ydk_ydktest_new)
+find_package(Protobuf REQUIRED)
+find_package(GRPC REQUIRED)
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -70,7 +74,9 @@ target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
     ${xslt_location}
     ${pthread_location}
     ${dl_location}
+    ${GRPC_GRPC++_LIBRARY}
     -rdynamic
+    ${PROTOBUF_LIBRARY}
 )
 
 add_test(NAME ${PROJECT_NAME} COMMAND $<TARGET_FILE:${YDK_UNITTEST_TARGET_NAME}>)

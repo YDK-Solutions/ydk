@@ -27,6 +27,7 @@
 #include <ydk/entity_util.hpp>
 #include <ydk/executor_service.hpp>
 #include <ydk/filters.hpp>
+#include <ydk/gnmi_provider.hpp>
 #include <ydk/logging_callback.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/netconf_service.hpp>
@@ -903,6 +904,13 @@ PYBIND11_MODULE(ydk_, ydk)
             arg("repo"), arg("address"), arg("username"), arg("password"), arg("port"), arg("encoding"))
         .def("get_node_provider", &ydk::OpenDaylightServiceProvider::get_node_provider, return_value_policy::reference)
         .def("get_node_ids", &ydk::OpenDaylightServiceProvider::get_node_ids, return_value_policy::reference);
+
+    class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
+        .def(init<ydk::path::Repository&, string>(), arg("repo"), arg("address"))
+        .def(init<string>(), arg("address"))
+        .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
+        .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
+        .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);
 
     class_<ydk::CrudService>(services, "CRUDService")
         .def(init<>())

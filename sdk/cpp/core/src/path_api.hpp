@@ -38,8 +38,14 @@
 #include "types.hpp"
 #include "validation_service.hpp"
 
+namespace grpc {
+class ChannelCredentials;
+class ChannelArguments;
+}
+
 namespace ydk {
 
+class gNMIClient;
 class NetconfClient;
 class RestconfClient;
 
@@ -1126,6 +1132,46 @@ private:
         std::string state_url_root;
 };
 
+
+class gNMISession : public Session {
+public:
+    typedef struct SecureChannelArguments
+    {
+        std::shared_ptr<grpc::ChannelCredentials> channel_creds;
+        std::shared_ptr<grpc::ChannelArguments> args;
+    } SecureChannelArguments;
+
+    gNMISession(Repository & repo,
+                   const std::string& address, bool is_secure);
+
+    gNMISession(Repository & repo,
+                   const std::string& address);
+
+    gNMISession(const std::string& address, bool is_secure);
+
+    gNMISession(const std::string& address);
+
+    virtual ~gNMISession();
+
+    virtual RootSchemaNode& get_root_schema() const;
+    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    virtual std::vector<std::string> get_capabilities() const;
+    virtual EncodingFormat get_encoding() const;
+    virtual std::string execute_payload(const std::string & payload, std::string operation) const;
+    virtual std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
+
+private:
+    void initialize(Repository& repo, const std::string& address, bool is_secure);
+    std::shared_ptr<path::DataNode> handle_edit(path::Rpc& ydk_rpc, std::string operation) const;
+    std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc, std::string operation) const;
+    void print_root_paths(ydk::path::RootSchemaNode& rsn) const;
+    void print_paths(ydk::path::SchemaNode& sn) const;
+
+private:
+    std::unique_ptr<gNMIClient> client;
+    std::shared_ptr<RootSchemaNode> root_schema;
+    std::vector<std::string> server_capabilities;
+};
 
 ///
 ///

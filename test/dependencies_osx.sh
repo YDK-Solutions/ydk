@@ -59,11 +59,37 @@ function install_fpm {
     gem install --no-ri --no-rdoc fpm
 }
 
+function install_protobuf {
+    print_msg "Installing protobuf and protoc"
+
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
+    unzip protobuf-cpp-3.3.0.zip
+    cd protobuf-cpp-3.3.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo update_dyld_shared_cache
+}
+
+function install_grpc {
+    print_msg "Installing grpc"
+
+    LIBTOOL=glibtool LIBTOOLIZE=glibtoolize make
+    git clone -b 1.4.5 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    make
+    sudo make install
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 install_dependencies
 install_confd
 install_fpm
+install_protobuf
+install_grpc
 
 sudo easy_install pip
 sudo pip install virtualenv

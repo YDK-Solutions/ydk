@@ -28,6 +28,8 @@ find_library(xslt_location xslt)
 find_library(pcre_location pcre)
 find_library(ssh_location ssh)
 find_package(PythonLibs)
+find_package(Protobuf REQUIRED)
+find_package(GRPC REQUIRED)
 
 if(PYBIND11_INCLUDE)
     message( "pybind11 include: ${PYBIND11_INCLUDE}")
@@ -63,4 +65,6 @@ target_link_libraries(ydk_
             ${ssh_location}
             ${PYTHON_LIBRARIES}
             -rdynamic
+            ${GRPC_GRPC++_LIBRARY}
+            ${PROTOBUF_LIBRARY}
             )

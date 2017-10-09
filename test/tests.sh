@@ -130,6 +130,19 @@ function init_py_env {
     pip install -r requirements.txt coverage
 }
 
+function init_gnmi_server {
+    print_msg "starting gnmi server"
+    mkdir -p test/gnmi_server/build && cd test/gnmi_server/build
+    cmake .. && make
+    ./gnmi_server &
+    local status=$?
+    if [ $status -ne 0 ]; then
+        print_msg "Could not start gnmi server"
+        exit $status
+    fi
+    cd -
+}
+
 function init_go_env {
     print_msg "Initializing Go env"
 
@@ -645,7 +658,8 @@ init_py_env
 init_confd_ydktest
 init_rest_server
 init_tcp_server
-init_go_env
+==== BASE ====
+==== BASE ====
 
 ######################################
 # Install/test core

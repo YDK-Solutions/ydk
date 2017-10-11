@@ -84,13 +84,13 @@ func (suite *NetconfServiceTestSuite) TestLockUnlockFail() {
 }
 
 func (suite *NetconfServiceTestSuite) TestValidate() {
-	op := suite.NS.Validate(&suite.Provider, nil, types.Candidate, "")
+	op := suite.NS.Validate(&suite.Provider, types.Candidate, nil, "")
 	suite.Equal(op, true)
 
 	runner := ysanity.Runner{}
 	runner.One.Number = 1
 	runner.One.Name = "runner:one:name"
-	op = suite.NS.Validate(&suite.Provider, &runner, -1, "")
+	op = suite.NS.Validate(&suite.Provider, -1, &runner, "")
 	suite.Equal(op, true)
 }
 

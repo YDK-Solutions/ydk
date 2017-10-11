@@ -38,9 +38,10 @@ import (
 	"unsafe"
 )
 
+
 // ExecuteRPC executes payload converted from entity.
 // Returns a data node (types.DataNode) representing the result of the executed rpc.
-func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
+func ExecuteRPC(provider types.ServiceProvider, Filter string, data map[string]interface{}, setConfigFlag bool) types.DataNode {
 	state := provider.GetState()
 	cstate := getCState(state)
 	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
@@ -55,9 +56,6 @@ func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter stri
 		panic(1)
 	}
 
-	data := getDataPayload(state, entity, rootSchema, provider)
-	defer C.free(unsafe.Pointer(data))
-
 	input := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
@@ -66,8 +64,20 @@ func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter stri
 		panicOnCStateError(cstate)
 	}
 
-	C.DataNodeCreate(*cstate, input, C.CString(dataTag), data)
-	panicOnCStateError(cstate)
+	var dataTag string = ""
+	var value interface{} = nil
+	for dataTag, value = range data {
+		dataValue := C.CString("")
+		switch v := value.(type){
+		case string:
+			dataValue = C.CString(value.(string))
+		default:
+			_ = v
+			dataValue = getDataPayload(state, value.(types.Entity), rootSchema, provider)
+			defer C.free(unsafe.Pointer(dataValue))
+		}
+		C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+	}
 
 	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
@@ -472,7 +482,7 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 
 	for _, childDataNode := range children {
 		childName := C.GoString(C.DataNodeGetArgument(childDataNode))
-		fmt.Printf("Lookin at child datanode: '%s'\n", childName)
+		fmt.Printf("Looking at child datanode: '%s'\n", childName)
 
 		if dataNodeIsLeaf(childDataNode) {
 

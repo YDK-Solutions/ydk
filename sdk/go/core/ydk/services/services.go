@@ -107,6 +107,18 @@ func (c *CodecService) Decode(provider types.CodecServiceProvider, payload strin
 	return path.CodecServiceDecode(provider.GetState(), rootSchema, payload, provider.GetEncoding(), topEntity)
 }
 
+// ExecutorService provides the functionality to execute RPCs
+type ExecutorService struct {
+}
+
+// ExecuteRpc creates the entity represented by rpcEntity
+// Any expected return data uses topEntity as a filter
+func (es *ExecutorService) ExecuteRpc (
+	provider types.ServiceProvider, rpcEntity, topEntity types.Entity) types.Entity {
+
+	return path.ExecuteRpcEntity(provider, rpcEntity, topEntity)
+}
+
 // NetconfService implements the NETCONF Protocol Operations: https://tools.ietf.org/html/rfc6241
 type NetconfService struct {
 }

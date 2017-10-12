@@ -84,6 +84,27 @@ Codec
 	:return: the decoded entity object
 	:rtype: :go:struct:`Entity<ydk/types/Entity>`
 
+Executor
+--------
+
+.. go:struct:: ExecutorService
+
+	Provides the functionality to execute RPCs
+
+.. function:: (es *ExecutorService) ExecuteRpc (provider types.ServiceProvider, rpcEntity, topEntity types.Entity)
+
+	Create the entity
+
+	:param provider: An instance of :go:struct:`ServiceProvider`
+	:param rpcEntity: An instance of :go:struct:`Entity<ydk/types/Entity>` representing an RPC entity
+	:param topEntity: Provide an instance of :go:struct:`Entity<ydk/types/Entity>` only when expecting data to be returned
+	:return: Any data the resulting from the operation when provided topEntity parameter
+	:rtype: :go:struct:`Entity<ydk/types/Entity>` or ``nil``
+	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+
+	Possible Errors:
+	* a server side error
+	* there isn't enough information in the entity to prepare the message (eg. missing keys)
 
 Netconf
 -------

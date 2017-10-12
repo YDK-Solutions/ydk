@@ -106,6 +106,95 @@ func getDataPayload(state *types.State, entity types.Entity, rootSchema C.RootSc
 	return (data)
 }
 
+func ExecuteRpcEntity(provider types.ServiceProvider, rpcEntity, topEntity types.Entity) types.Entity {
+	state := provider.GetState()
+	cstate := getCState(state)
+	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
+	realProvider := wrappedProvider.Private.(C.ServiceProvider)
+	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
+	panicOnCStateError(cstate)
+
+	ydkRPC := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(rpcEntity.GetSegmentPath()))
+	panicOnCStateError(cstate)
+
+	if rootSchema == nil {
+		panic(1)
+	}
+
+	rpcInput := C.RpcInput(*cstate, ydkRPC)
+	panicOnCStateError(cstate)
+
+	child := rpcEntity.GetChildByName("input", "")
+	walkRpcChildren(state, child, rpcInput, "")
+
+	readDataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
+	panicOnCStateError(cstate)
+
+	output := rpcEntity.GetChildByName("output", "")
+
+	if (output == nil || readDataNode.Private == nil) {
+		return nil
+	}
+	return ReadDatanode(topEntity, readDataNode)
+}
+
+func walkRpcChildren(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	fmt.Printf("Walking Rpc Children...\n")
+	if(rpcEntity != nil) {
+		children := rpcEntity.GetChildren()
+		entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+		fmt.Printf("Got %d entity children in '%s'\n", len(children), entityPath.Path)
+		fmt.Printf("Got %d leafs in '%s'\n", len(entityPath.ValuePaths), entityPath.Path)
+
+		if (path != "") {
+			path = fmt.Sprintf("%s/", path)
+		}
+
+		if (entityPath.Path != "input") {
+			path = fmt.Sprintf("%s%s", path, entityPath.Path)
+		}
+
+		if (path != "") {
+			fmt.Printf("Path: %s\n", path)
+		}
+
+		for childName, _ := range children {
+			fmt.Printf("Looking at entity child '%s'\n", children[childName].GetSegmentPath())
+			walkRpcChildren(state, children[childName], rpcInput, path)
+		}
+
+		// if there are leafs, create from entity path
+		if (len(entityPath.ValuePaths) != 0) {
+			createFromEntityPath(state, rpcEntity, rpcInput, path)
+		}
+
+		createFromChildren(state, children, rpcInput)
+	}
+}
+
+func createFromEntityPath(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+	for _, nameValue := range entityPath.ValuePaths {
+		fmt.Printf("Creating leaf '%s' with value '%s' in '%s'\n", nameValue.Name, nameValue.Data.Value, entityPath.Path)
+
+		tempPath := ""
+		if (path != "") {
+			tempPath = fmt.Sprintf("%s/", path)
+		}
+		tempPath = fmt.Sprintf("%s%s", tempPath, nameValue.Name)
+		C.DataNodeCreate(*getCState(state), rpcInput, C.CString(tempPath), C.CString(nameValue.Data.Value))
+	}
+}
+
+func createFromChildren(state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
+	for childName, child := range children {
+		if (len(child.GetChildren()) == 0) {
+			fmt.Printf("Creating child '%s' : %s\n", childName, child.GetEntityPath(child.GetParent()).Path)
+			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
+		}
+	}
+}
+
 func getTopEntityFromFilter(filter types.Entity) types.Entity {
 	if filter.GetParent() == nil {
 		return filter
@@ -420,7 +509,7 @@ func walkChildren(state *types.State, entity types.Entity, dataNode C.DataNode) 
 
 	for childName := range children {
 
-		fmt.Printf("Lookin at entity child '%s'\n", children[childName].GetSegmentPath())
+		fmt.Printf("Looking at entity child '%s'\n", children[childName].GetSegmentPath())
 
 		if children[childName].HasDataOrFilter() {
 			populateDataNode(state, children[childName], dataNode)

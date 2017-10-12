@@ -2,6 +2,8 @@ package test
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
@@ -51,7 +53,7 @@ func (suite *NetconfServiceTestSuite) TestEditCommitGet() {
 	readEntity := suite.NS.GetConfig(&suite.Provider, types.Candidate, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 
-	// // Commit
+	// Commit
 	op = suite.NS.Commit(&suite.Provider, false, -1, -1, -1)
 	suite.Equal(op, true)
 
@@ -94,28 +96,24 @@ func (suite *NetconfServiceTestSuite) TestValidate() {
 	suite.Equal(op, true)
 }
 
-func (suite *NetconfServiceTestSuite) TestCommitDiscard(){
+func (suite *NetconfServiceTestSuite) TestDiscardChanges(){
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
 	runner.Two.Name = "runner:two:name"
 
+	// EditConfig
 	op := suite.NS.EditConfig(&suite.Provider, types.Candidate, &runner, "", "", "")
 	suite.Equal(op, true)
 
+	// DiscardChanges
 	op = suite.NS.DiscardChanges(&suite.Provider)
 	suite.Equal(op, true)
 
-	op = suite.NS.EditConfig(&suite.Provider, types.Candidate, &runner, "", "", "")
-	suite.Equal(op, true)
-
-	op = suite.NS.Commit(&suite.Provider, false, -1, -1, -1)
-	suite.Equal(op, true)
-
-	readEntity := suite.NS.Get(&suite.Provider, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+	// GetConfig
+	readEntity := suite.NS.GetConfig(&suite.Provider, types.Candidate, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(readEntity, &ysanity.Runner{}), true)
 }
 
-// skipped in python/cpp
 func (suite *NetconfServiceTestSuite) TestConfirmedCommit() {
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
@@ -127,8 +125,26 @@ func (suite *NetconfServiceTestSuite) TestConfirmedCommit() {
 	op = suite.NS.Commit(&suite.Provider, true, 120, -1, -1)
 	suite.Equal(op, true)
 
-	// op = suite.NS.CancelCommit(&suite.Provider, -1)
-	// suite.Equal(op, true)
+	readEntity := suite.NS.Get(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+}
+
+// skip
+func (suite *NetconfServiceTestSuite) TestCancelCommit() {
+	suite.T().Skip("No message id in cancel commit payload")
+
+	runner := ysanity.Runner{}
+	runner.Two.Number = 2
+	runner.Two.Name = "runner:two:name"
+
+	op := suite.NS.EditConfig(&suite.Provider, types.Candidate, &runner, "", "", "")
+	suite.Equal(op, true)
+
+	op = suite.NS.Commit(&suite.Provider, true, 120, -1, -1)
+	suite.Equal(op, true)
+
+	op = suite.NS.CancelCommit(&suite.Provider, -1)
+	suite.Equal(op, true)
 
 	readEntity := suite.NS.Get(&suite.Provider, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
@@ -172,6 +188,7 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 }
 
+// skip
 func (suite *NetconfServiceTestSuite) TestDeleteConfig() {
 	suite.T().Skip("startup not enabled in ConfD")
 
@@ -201,11 +218,24 @@ func (suite *NetconfServiceTestSuite) TestCloseSession() {
 	suite.Equal(op, true)
 }
 
-
+// skip
 func (suite *NetconfServiceTestSuite) TestKillSession() {
-	funcDidPanic, panicValue := didPanic(func() { suite.NS.KillSession(&suite.Provider, 1) })
+	suite.T().Skip("session-id not recognized")
+
+	op := suite.NS.Lock(&suite.Provider, types.Candidate)
+	suite.Equal(op, true)
+
+	funcDidPanic, panicValue := didPanic(func() { suite.NS.Lock(&suite.Provider, types.Candidate) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp("<session-id>", panicValue)
+
+	sessionIdStr := strings.Split(panicValue, "<session-id>")[1]
+	sessionIdStr = strings.Split(sessionIdStr, "</session-id>")[0]
+	sessionId, err := strconv.Atoi(sessionIdStr)
+	suite.Equal(err, nil)
+
+	op = suite.NS.KillSession(&suite.Provider, sessionId)
+	suite.Equal(op, true)
 }
 
 func TestNetconfServiceTestSuite(t *testing.T) {
@@ -213,25 +243,4 @@ func TestNetconfServiceTestSuite(t *testing.T) {
 		ydk.EnableLogging(ydk.Debug)
 	}
 	suite.Run(t, new(NetconfServiceTestSuite))
-}
-
-
-// didPanic returns true if the function passed to it panics. Otherwise, it returns false.
-func didPanic(panicTestFunc func()) (bool, string) {
-
-	didPanic := false
-	var message interface{}
-	func() {
-
-		defer func() {
-			if message = recover(); message != nil {
-				didPanic = true
-			}
-		}()
-
-		// call the target function
-		panicTestFunc()
-
-	}()
-	return didPanic, message.(string)
 }

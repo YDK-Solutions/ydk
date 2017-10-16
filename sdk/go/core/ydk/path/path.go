@@ -33,6 +33,7 @@ import "C"
 
 import (
 	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"strings"
 	"unsafe"
@@ -139,12 +140,12 @@ func ExecuteRpcEntity(provider types.ServiceProvider, rpcEntity, topEntity types
 }
 
 func walkRpcChildren(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
-	fmt.Printf("Walking Rpc Children...\n")
+	ydk.YLogInfo("Walking Rpc Children...")
 	if(rpcEntity != nil) {
 		children := rpcEntity.GetChildren()
 		entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
-		fmt.Printf("Got %d entity children in '%s'\n", len(children), entityPath.Path)
-		fmt.Printf("Got %d leafs in '%s'\n", len(entityPath.ValuePaths), entityPath.Path)
+		ydk.YLogInfo(fmt.Sprintf("Got %d entity children in '%s'", len(children), entityPath.Path))
+		ydk.YLogInfo(fmt.Sprintf("Got %d leafs in '%s'", len(entityPath.ValuePaths), entityPath.Path))
 
 		if (path != "") {
 			path = fmt.Sprintf("%s/", path)
@@ -155,11 +156,11 @@ func walkRpcChildren(state *types.State, rpcEntity types.Entity, rpcInput C.Data
 		}
 
 		if (path != "") {
-			fmt.Printf("Path: %s\n", path)
+			ydk.YLogInfo(fmt.Sprintf("Path: %s", path))
 		}
 
 		for childName, _ := range children {
-			fmt.Printf("Looking at entity child '%s'\n", children[childName].GetSegmentPath())
+			ydk.YLogInfo(fmt.Sprintf("Looking at entity child '%s'", children[childName].GetSegmentPath()))
 			walkRpcChildren(state, children[childName], rpcInput, path)
 		}
 
@@ -175,7 +176,8 @@ func walkRpcChildren(state *types.State, rpcEntity types.Entity, rpcInput C.Data
 func createFromEntityPath(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 	entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
 	for _, nameValue := range entityPath.ValuePaths {
-		fmt.Printf("Creating leaf '%s' with value '%s' in '%s'\n", nameValue.Name, nameValue.Data.Value, entityPath.Path)
+		ydk.YLogInfo(fmt.Sprintf("Creating leaf '%s' with value '%s' in '%s'",
+			nameValue.Name, nameValue.Data.Value, entityPath.Path))
 
 		tempPath := ""
 		if (path != "") {
@@ -189,7 +191,8 @@ func createFromEntityPath(state *types.State, rpcEntity types.Entity, rpcInput C
 func createFromChildren(state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
 	for childName, child := range children {
 		if (len(child.GetChildren()) == 0) {
-			fmt.Printf("Creating child '%s' : %s\n", childName, child.GetEntityPath(child.GetParent()).Path)
+			ydk.YLogInfo(fmt.Sprintf("Creating child '%s' : %s",
+				childName, child.GetEntityPath(child.GetParent()).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
 		}
 	}
@@ -211,7 +214,7 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	}
 
 	topEntity := getTopEntityFromFilter(filter)
-	fmt.Printf("Reading top entity: '%s'\n", topEntity.GetSegmentPath())
+	ydk.YLogInfo(fmt.Sprintf("Reading top entity: '%s'", topEntity.GetSegmentPath()))
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
 
@@ -320,11 +323,11 @@ func InitCodecServiceProvider(state *types.State, entity types.Entity, repo type
 	defer C.free(unsafe.Pointer(repoPath))
 
 	if len(repo.Path) > 0 {
-		fmt.Printf("CodecServiceProvider using YANG models in %v\n", repo.Path)
+		ydk.YLogInfo(fmt.Sprintf("CodecServiceProvider using YANG models in %v", repo.Path))
 		repoPath = C.CString(repo.Path)
 	} else {
 		yangPath := entity.GetBundleYangModelsLocation()
-		fmt.Printf("CodecServiceProvider using YANG models in %v\n", yangPath)
+		ydk.YLogInfo(fmt.Sprintf("CodecServiceProvider using YANG models in %v", yangPath))
 		repoPath = C.CString(yangPath)
 	}
 
@@ -505,17 +508,17 @@ func getDataNodeFromEntity(state *types.State, entity types.Entity, rootSchema C
 func walkChildren(state *types.State, entity types.Entity, dataNode C.DataNode) {
 	children := entity.GetChildren()
 
-	fmt.Printf("Got %d entity children\n", len(children))
+	ydk.YLogInfo(fmt.Sprintf("Got %d entity children", len(children)))
 
 	for childName := range children {
 
-		fmt.Printf("Looking at entity child '%s'\n", children[childName].GetSegmentPath())
+		ydk.YLogInfo(fmt.Sprintf("Looking at entity child '%s'", children[childName].GetSegmentPath()))
 
 		if children[childName].HasDataOrFilter() {
 			populateDataNode(state, children[childName], dataNode)
 		}
 	}
-	fmt.Println()
+	ydk.YLogInfo("")
 }
 
 func populateDataNode(state *types.State, entity types.Entity, parentDataNode C.DataNode) {
@@ -543,7 +546,7 @@ func populateNameValues(state *types.State, dataNode C.DataNode, path types.Enti
 		var result C.DataNode
 		leafData := nameValue.Data
 		p := C.CString(nameValue.Name)
-		fmt.Printf("got leaf {%s: %s}\n", nameValue.Name, nameValue.Data.Value)
+		ydk.YLogInfo(fmt.Sprintf("got leaf {%s: %s}", nameValue.Name, nameValue.Data.Value))
 
 		if leafData.IsSet {
 			p1 := C.CString(leafData.Value)
@@ -567,26 +570,26 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 
 	cchildren := C.DataNodeGetChildren(node)
 	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-	fmt.Printf("Got %d datanode children\n", cchildren.count)
+	ydk.YLogInfo(fmt.Sprintf("Got %d datanode children", cchildren.count))
 
 	for _, childDataNode := range children {
 		childName := C.GoString(C.DataNodeGetArgument(childDataNode))
-		fmt.Printf("Looking at child datanode: '%s'\n", childName)
+		ydk.YLogInfo(fmt.Sprintf("Looking at child datanode: '%s'", childName))
 
 		if dataNodeIsLeaf(childDataNode) {
 
 			value := C.GoString(C.DataNodeGetValue(childDataNode))
-			fmt.Printf("Creating leaf '%s' with value '%s'\n", childName, value)
+			ydk.YLogInfo(fmt.Sprintf("Creating leaf '%s' with value '%s'", childName, value))
 			entity.SetValue(childName, value)
 		} else {
 
 			var childEntity types.Entity
 			if dataNodeIsList(childDataNode) {
 				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
-				fmt.Printf("Creating child list instance '%s'\n", segmentPath)
+				ydk.YLogInfo(fmt.Sprintf("Creating child list instance '%s'", segmentPath))
 				childEntity = entity.GetChildByName(childName, segmentPath)
 			} else {
-				fmt.Printf("Creating child node '%s'\n", childName)
+				ydk.YLogInfo(fmt.Sprintf("Creating child node '%s'", childName))
 				childEntity = entity.GetChildByName(childName, "")
 			}
 			if childEntity == nil {

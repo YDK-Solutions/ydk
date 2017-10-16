@@ -149,6 +149,11 @@ void EnableLogging(LogLevel);
 LogLevel GetLoggingLevel(void);
 // LogLevel GetLoggingLevel(YDKState*, void);
 
+void YLogInfo(const char*);
+void YLogDebug(const char*);
+void YLogWarn(const char*);
+void YLogError(const char*);
+
 #ifdef __cplusplus
 }
 #endif

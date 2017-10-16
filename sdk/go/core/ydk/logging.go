@@ -29,6 +29,7 @@ package ydk
 // #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
 //#include <ydk/ydk.h>
 import "C"
+import "fmt"
 
 // LogLevel indicates what level of logging to output
 type LogLevel int
@@ -55,4 +56,24 @@ func EnableLogging(level LogLevel) {
 	case Error:
 		C.EnableLogging(C.ERROR)
 	}
+}
+
+func YLogInfo(msg string){
+	msg = fmt.Sprintf("[Go] %s", msg)
+    C.YLogInfo(C.CString(msg));
+}
+
+func YLogDebug(msg string){
+	msg = fmt.Sprintf("[Go] %s", msg)
+    C.YLogDebug(C.CString(msg));
+}
+
+func YLogWarn(msg string){
+	msg = fmt.Sprintf("[Go] %s", msg)
+    C.YLogWarn(C.CString(msg));
+}
+
+func YLogError(msg string){
+	msg = fmt.Sprintf("[Go] %s", msg)
+    C.YLogError(C.CString(msg));
 }

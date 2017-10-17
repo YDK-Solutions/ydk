@@ -232,7 +232,9 @@ func (suite *ExecutorServiceTestSuite) TestCancelCommit() {
 	suite.Equal(readEntity, nil)
 }
 
+// skip
 func (suite *ExecutorServiceTestSuite) TestCopyConfig() {
+	suite.T().Skip("Crashes ConfD connection")
 	suite.CodecProvider.Encoding = types.XML
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2

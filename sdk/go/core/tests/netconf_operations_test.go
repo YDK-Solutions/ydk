@@ -6,7 +6,6 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -72,14 +71,12 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 	// create duplicate value raises error
 	// The payload errMsg is hardcoded with message-id of certain value.
 	// Please change corresponding message-id if new tests are added/enabled.
-	errMsg := `YGOServiceProviderError: <?xml version="1.0" encoding="UTF-8"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
-  <rpc-error>
+	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>data-exists</error-tag>
     <error-severity>error</error-severity>
     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata[ydkut:number='1']
+    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='[1-2]']
   </error-path>
     <error-info>
       <bad-element>ldata</bad-element>
@@ -87,7 +84,10 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
   </rpc-error>
 </rpc-reply>
 `
-	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Update(&suite.Provider, &runnerCreate) })
+	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerCreate) })
+	suite.Equal(funcDidPanic, true)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp(errMsg, panicValue)
 }
 
 func (suite *NETCONFOperationsTestSuite) TestDelete() {
@@ -116,14 +116,12 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	// delete again raises error
 	// The payload errMsg is hardcoded with message-id of certain value.
 	// Please change corresponding message-id if new tests are added/enabled.
-	errMsg := `YGOServiceProviderError: <?xml version="1.0" encoding="UTF-8"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="12">
-  <rpc-error>
+	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>data-missing</error-tag>
     <error-severity>error</error-severity>
     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata[ydkut:number='1']
+    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='[1-2]']
   </error-path>
     <error-info>
       <bad-element>ldata</bad-element>
@@ -131,7 +129,10 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
   </rpc-error>
 </rpc-reply>
 `
-	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) })
+	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) })
+	suite.Equal(funcDidPanic, true)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp(errMsg, panicValue)
 }
 
 func (suite *NETCONFOperationsTestSuite) TestRemove() {

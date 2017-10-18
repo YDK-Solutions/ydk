@@ -232,9 +232,7 @@ func (suite *ExecutorServiceTestSuite) TestCancelCommit() {
 	suite.Equal(readEntity, nil)
 }
 
-// skip
 func (suite *ExecutorServiceTestSuite) TestCopyConfig() {
-	suite.T().Skip("Crashes ConfD connection")
 	suite.CodecProvider.Encoding = types.XML
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
@@ -256,7 +254,8 @@ func (suite *ExecutorServiceTestSuite) TestCopyConfig() {
 	getConfigRpc.Input.Source.Candidate = types.Empty{}
 	getConfigRpc.Input.Filter = filterXML
 
-	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
+	readEntity = suite.ExecutorService.ExecuteRpc(
+		&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 
 	// Modify Candidate via CopyConfig from runner
@@ -268,23 +267,30 @@ func (suite *ExecutorServiceTestSuite) TestCopyConfig() {
 	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &copyRpc, nil)
 	suite.Equal(readEntity, nil)
 
-	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
+	readEntity = suite.ExecutorService.ExecuteRpc(
+		&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 
-	// Modify Running via CopyConfig from Candidate
+	// Modify Candidate via CopyConfig from Running
 	copyRpc = ietfNetconf.CopyConfig{}
-	copyRpc.Input.Target.Running = types.Empty{}
-	copyRpc.Input.Source.Candidate = types.Empty{}
+	copyRpc.Input.Target.Candidate = types.Empty{}
+	copyRpc.Input.Source.Running = types.Empty{}
 
 	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &copyRpc, nil)
 	suite.Equal(readEntity, nil)
 
 	getConfigRpc = ietfNetconf.GetConfig{}
-	getConfigRpc.Input.Source.Running = types.Empty{}
+	getConfigRpc.Input.Source.Candidate = types.Empty{}
 	getConfigRpc.Input.Filter = filterXML
 
-	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
+	readEntity = suite.ExecutorService.ExecuteRpc(
+		&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+
+	// DiscardChanges
+	readEntity = suite.ExecutorService.ExecuteRpc(
+		&suite.NetconfProvider, &ietfNetconf.DiscardChanges{}, nil)
+	suite.Equal(readEntity, nil)
 }
 
 // skip

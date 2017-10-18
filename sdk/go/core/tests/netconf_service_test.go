@@ -150,13 +150,10 @@ func (suite *NetconfServiceTestSuite) TestCancelCommit() {
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 }
 
-// skip
 // TODO: Problems found with path functions:
 //			readEntity changes with getFilter
 //			EntityEqual(readEntity, &runner) returns true, even after the above
 func (suite *NetconfServiceTestSuite) TestCopyConfig() {
-	suite.T().Skip("Crashes ConfD connection")
-
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
 	runner.Two.Name = "runner:two:name"
@@ -183,12 +180,16 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 	getFilter = ysanity.Runner{}
 
-	// Modify Running via CopyConfig from Candidate
-	op = suite.NS.CopyConfig(&suite.Provider, types.Running, types.Candidate, nil, "")
+	// Modify Candidate via CopyConfig from Running
+	op = suite.NS.CopyConfig(&suite.Provider, types.Candidate, types.Running, nil, "")
 	suite.Equal(op, true)
 
-	readEntity = suite.NS.GetConfig(&suite.Provider, types.Running, &getFilter)
-	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+	readEntity = suite.NS.GetConfig(&suite.Provider, types.Candidate, &getFilter)
+	suite.Equal(types.EntityEqual(readEntity, &ysanity.Runner{}), true)
+
+	// DiscardChanges
+	op = suite.NS.DiscardChanges(&suite.Provider)
+	suite.Equal(op, true)
 }
 
 // skip

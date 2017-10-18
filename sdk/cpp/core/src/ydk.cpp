@@ -26,6 +26,7 @@
 
 #include "crud_service.hpp"
 #include "errors.hpp"
+#include "logger.hpp"
 #include "netconf_provider.hpp"
 #include "opendaylight_provider.hpp"
 #include "restconf_provider.hpp"
@@ -761,5 +762,25 @@ LogLevel GetLoggingLevel(void)
         case spdlog::level::err:
             return ERROR;
     }
+}
+
+void YLogInfo(const char* msg)
+{
+    ydk::YLOG_INFO(msg);
+}
+
+void YLogDebug(const char* msg)
+{
+    ydk::YLOG_DEBUG(msg);
+}
+
+void YLogWarn(const char* msg)
+{
+    ydk::YLOG_WARN(msg);
+}
+
+void YLogError(const char* msg)
+{
+    ydk::YLOG_ERROR(msg);
 }
 

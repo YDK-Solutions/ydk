@@ -33,14 +33,16 @@ import "C"
 
 import (
 	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"strings"
 	"unsafe"
 )
 
+
 // ExecuteRPC executes payload converted from entity.
 // Returns a data node (types.DataNode) representing the result of the executed rpc.
-func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter string, dataTag string, setConfigFlag bool) types.DataNode {
+func ExecuteRPC(provider types.ServiceProvider, Filter string, data map[string]interface{}, setConfigFlag bool) types.DataNode {
 	state := provider.GetState()
 	cstate := getCState(state)
 	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
@@ -55,9 +57,6 @@ func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter stri
 		panic(1)
 	}
 
-	data := getDataPayload(state, entity, rootSchema, provider)
-	defer C.free(unsafe.Pointer(data))
-
 	input := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
@@ -66,8 +65,20 @@ func ExecuteRPC(provider types.ServiceProvider, entity types.Entity, Filter stri
 		panicOnCStateError(cstate)
 	}
 
-	C.DataNodeCreate(*cstate, input, C.CString(dataTag), data)
-	panicOnCStateError(cstate)
+	var dataTag string = ""
+	var value interface{} = nil
+	for dataTag, value = range data {
+		dataValue := C.CString("")
+		switch v := value.(type){
+		case string:
+			dataValue = C.CString(value.(string))
+		default:
+			_ = v
+			dataValue = getDataPayload(state, value.(types.Entity), rootSchema, provider)
+			defer C.free(unsafe.Pointer(dataValue))
+		}
+		C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+	}
 
 	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
@@ -96,6 +107,97 @@ func getDataPayload(state *types.State, entity types.Entity, rootSchema C.RootSc
 	return (data)
 }
 
+func ExecuteRpcEntity(provider types.ServiceProvider, rpcEntity, topEntity types.Entity) types.Entity {
+	state := provider.GetState()
+	cstate := getCState(state)
+	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
+	realProvider := wrappedProvider.Private.(C.ServiceProvider)
+	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
+	panicOnCStateError(cstate)
+
+	ydkRPC := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(rpcEntity.GetSegmentPath()))
+	panicOnCStateError(cstate)
+
+	if rootSchema == nil {
+		panic(1)
+	}
+
+	rpcInput := C.RpcInput(*cstate, ydkRPC)
+	panicOnCStateError(cstate)
+
+	child := rpcEntity.GetChildByName("input", "")
+	walkRpcChildren(state, child, rpcInput, "")
+
+	readDataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
+	panicOnCStateError(cstate)
+
+	output := rpcEntity.GetChildByName("output", "")
+
+	if (output == nil || readDataNode.Private == nil) {
+		return nil
+	}
+	return ReadDatanode(topEntity, readDataNode)
+}
+
+func walkRpcChildren(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	ydk.YLogDebug("Walking Rpc Children...")
+	if(rpcEntity != nil) {
+		children := rpcEntity.GetChildren()
+		entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+		ydk.YLogDebug(fmt.Sprintf("Got %d entity children in '%s'", len(children), entityPath.Path))
+		ydk.YLogDebug(fmt.Sprintf("Got %d leafs in '%s'", len(entityPath.ValuePaths), entityPath.Path))
+
+		if (path != "") {
+			path = fmt.Sprintf("%s/", path)
+		}
+
+		if (entityPath.Path != "input") {
+			path = fmt.Sprintf("%s%s", path, entityPath.Path)
+		}
+
+		if (path != "") {
+			ydk.YLogDebug(fmt.Sprintf("Path: %s", path))
+		}
+
+		for childName, _ := range children {
+			ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", children[childName].GetSegmentPath()))
+			walkRpcChildren(state, children[childName], rpcInput, path)
+		}
+
+		// if there are leafs, create from entity path
+		if (len(entityPath.ValuePaths) != 0) {
+			createFromEntityPath(state, rpcEntity, rpcInput, path)
+		}
+
+		createFromChildren(state, children, rpcInput)
+	}
+}
+
+func createFromEntityPath(state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+	for _, nameValue := range entityPath.ValuePaths {
+		ydk.YLogDebug(fmt.Sprintf("Creating leaf '%s' with value '%s' in '%s'",
+			nameValue.Name, nameValue.Data.Value, entityPath.Path))
+
+		tempPath := ""
+		if (path != "") {
+			tempPath = fmt.Sprintf("%s/", path)
+		}
+		tempPath = fmt.Sprintf("%s%s", tempPath, nameValue.Name)
+		C.DataNodeCreate(*getCState(state), rpcInput, C.CString(tempPath), C.CString(nameValue.Data.Value))
+	}
+}
+
+func createFromChildren(state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
+	for childName, child := range children {
+		if (len(child.GetChildren()) == 0) {
+			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
+				childName, child.GetEntityPath(child.GetParent()).Path))
+			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
+		}
+	}
+}
+
 func getTopEntityFromFilter(filter types.Entity) types.Entity {
 	if filter.GetParent() == nil {
 		return filter
@@ -112,7 +214,7 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	}
 
 	topEntity := getTopEntityFromFilter(filter)
-	fmt.Printf("Reading top entity: '%s'\n", topEntity.GetSegmentPath())
+	ydk.YLogDebug(fmt.Sprintf("Reading top entity: '%s'", topEntity.GetSegmentPath()))
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
 
@@ -221,11 +323,11 @@ func InitCodecServiceProvider(state *types.State, entity types.Entity, repo type
 	defer C.free(unsafe.Pointer(repoPath))
 
 	if len(repo.Path) > 0 {
-		fmt.Printf("CodecServiceProvider using YANG models in %v\n", repo.Path)
+		ydk.YLogDebug(fmt.Sprintf("CodecServiceProvider using YANG models in %v", repo.Path))
 		repoPath = C.CString(repo.Path)
 	} else {
 		yangPath := entity.GetBundleYangModelsLocation()
-		fmt.Printf("CodecServiceProvider using YANG models in %v\n", yangPath)
+		ydk.YLogDebug(fmt.Sprintf("CodecServiceProvider using YANG models in %v", yangPath))
 		repoPath = C.CString(yangPath)
 	}
 
@@ -406,17 +508,17 @@ func getDataNodeFromEntity(state *types.State, entity types.Entity, rootSchema C
 func walkChildren(state *types.State, entity types.Entity, dataNode C.DataNode) {
 	children := entity.GetChildren()
 
-	fmt.Printf("Got %d entity children\n", len(children))
+	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
 
 	for childName := range children {
 
-		fmt.Printf("Lookin at entity child '%s'\n", children[childName].GetSegmentPath())
+		ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", children[childName].GetSegmentPath()))
 
 		if children[childName].HasDataOrFilter() {
 			populateDataNode(state, children[childName], dataNode)
 		}
 	}
-	fmt.Println()
+	ydk.YLogDebug("")
 }
 
 func populateDataNode(state *types.State, entity types.Entity, parentDataNode C.DataNode) {
@@ -444,7 +546,7 @@ func populateNameValues(state *types.State, dataNode C.DataNode, path types.Enti
 		var result C.DataNode
 		leafData := nameValue.Data
 		p := C.CString(nameValue.Name)
-		fmt.Printf("got leaf {%s: %s}\n", nameValue.Name, nameValue.Data.Value)
+		ydk.YLogDebug(fmt.Sprintf("got leaf {%s: %s}", nameValue.Name, nameValue.Data.Value))
 
 		if leafData.IsSet {
 			p1 := C.CString(leafData.Value)
@@ -468,26 +570,26 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 
 	cchildren := C.DataNodeGetChildren(node)
 	children := (*[1 << 30]C.DataNode)(unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-	fmt.Printf("Got %d datanode children\n", cchildren.count)
+	ydk.YLogDebug(fmt.Sprintf("Got %d datanode children", cchildren.count))
 
 	for _, childDataNode := range children {
 		childName := C.GoString(C.DataNodeGetArgument(childDataNode))
-		fmt.Printf("Lookin at child datanode: '%s'\n", childName)
+		ydk.YLogDebug(fmt.Sprintf("Looking at child datanode: '%s'", childName))
 
 		if dataNodeIsLeaf(childDataNode) {
 
 			value := C.GoString(C.DataNodeGetValue(childDataNode))
-			fmt.Printf("Creating leaf '%s' with value '%s'\n", childName, value)
+			ydk.YLogDebug(fmt.Sprintf("Creating leaf '%s' with value '%s'", childName, value))
 			entity.SetValue(childName, value)
 		} else {
 
 			var childEntity types.Entity
 			if dataNodeIsList(childDataNode) {
 				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
-				fmt.Printf("Creating child list instance '%s'\n", segmentPath)
+				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s'", segmentPath))
 				childEntity = entity.GetChildByName(childName, segmentPath)
 			} else {
-				fmt.Printf("Creating child node '%s'\n", childName)
+				ydk.YLogDebug(fmt.Sprintf("Creating child node '%s'", childName))
 				childEntity = entity.GetChildByName(childName, "")
 			}
 			if childEntity == nil {

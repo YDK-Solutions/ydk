@@ -6,7 +6,6 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -38,7 +37,7 @@ func (suite *NETCONFOperationsTestSuite) BeforeTest(suiteName, testName string) 
 
 func (suite *NETCONFOperationsTestSuite) TestReplace() {
 	runner := ysanity.Runner{}
-	runner.Filter = types.Delete
+	runner.YFilter = types.Delete
 	suite.CRUD.Update(&suite.Provider, &runner)
 
 	runnerCreate := ysanity.Runner{}
@@ -47,7 +46,7 @@ func (suite *NETCONFOperationsTestSuite) TestReplace() {
 
 	runnerUpdate := ysanity.Runner{}
 	runnerUpdate.Ytypes.BuiltInT.Number8 = 25
-	runnerUpdate.Filter = types.Replace
+	runnerUpdate.YFilter = types.Replace
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -60,10 +59,10 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 	e2 := ysanity.Runner_OneList_Ldata{}
 	e1.Number = 1
 	e1.Name = "foo"
-	e1.Filter = types.Create
+	e1.YFilter = types.Create
 	e2.Number = 2
 	e2.Name = "bar"
-	e2.Filter = types.Create
+	e2.YFilter = types.Create
 
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
@@ -72,14 +71,12 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 	// create duplicate value raises error
 	// The payload errMsg is hardcoded with message-id of certain value.
 	// Please change corresponding message-id if new tests are added/enabled.
-	errMsg := `YGOServiceProviderError: <?xml version="1.0" encoding="UTF-8"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
-  <rpc-error>
+	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>data-exists</error-tag>
     <error-severity>error</error-severity>
     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata[ydkut:number='1']
+    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='[1-2]']
   </error-path>
     <error-info>
       <bad-element>ldata</bad-element>
@@ -87,7 +84,10 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
   </rpc-error>
 </rpc-reply>
 `
-	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Update(&suite.Provider, &runnerCreate) })
+	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerCreate) })
+	suite.Equal(funcDidPanic, true)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp(errMsg, panicValue)
 }
 
 func (suite *NETCONFOperationsTestSuite) TestDelete() {
@@ -96,10 +96,10 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	e2 := ysanity.Runner_OneList_Ldata{}
 	e1.Number = 1
 	e1.Name = "foo"
-	e1.Filter = types.Create
+	e1.YFilter = types.Create
 	e2.Number = 2
 	e2.Name = "bar"
-	e2.Filter = types.Create
+	e2.YFilter = types.Create
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
@@ -108,7 +108,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	runnerUpdate := ysanity.Runner{}
 	eU1 := ysanity.Runner_OneList_Ldata{}
 	eU1.Number = 1
-	eU1.Filter = types.Delete
+	eU1.YFilter = types.Delete
 	runnerUpdate.OneList.Ldata = append(runnerUpdate.OneList.Ldata, eU1)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 	fmt.Println("TestDelete finished Update")
@@ -116,14 +116,12 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	// delete again raises error
 	// The payload errMsg is hardcoded with message-id of certain value.
 	// Please change corresponding message-id if new tests are added/enabled.
-	errMsg := `YGOServiceProviderError: <?xml version="1.0" encoding="UTF-8"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="12">
-  <rpc-error>
+	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>data-missing</error-tag>
     <error-severity>error</error-severity>
     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata[ydkut:number='1']
+    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='[1-2]']
   </error-path>
     <error-info>
       <bad-element>ldata</bad-element>
@@ -131,17 +129,20 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
   </rpc-error>
 </rpc-reply>
 `
-	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) })
+	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) })
+	suite.Equal(funcDidPanic, true)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp(errMsg, panicValue)
 }
 
 func (suite *NETCONFOperationsTestSuite) TestRemove() {
 	runnerCreate := ysanity.Runner{}
 	runnerCreate.Ytypes.BuiltInT.Number8 = 25
-	runnerCreate.Filter = types.Merge
+	runnerCreate.YFilter = types.Merge
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
 
 	runnerUpdate := ysanity.Runner{}
-	runnerUpdate.Filter = types.Remove
+	runnerUpdate.YFilter = types.Remove
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	// remove again without any error
@@ -155,7 +156,7 @@ func (suite *NETCONFOperationsTestSuite) TestMerge() {
 
 	runnerUpdate := ysanity.Runner{}
 	runnerUpdate.Ytypes.BuiltInT.Number8 = 32
-	runnerUpdate.Filter = types.Merge
+	runnerUpdate.YFilter = types.Merge
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})

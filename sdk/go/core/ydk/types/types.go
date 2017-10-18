@@ -199,6 +199,17 @@ func (y *YLeafList) GetNameLeafdata() [](NameLeafData) {
 	return result
 }
 
+// DataStore is a complete set of configuration data that is required to get a
+// device from its initial default state into a desired operational state
+type DataStore int
+
+const (
+	Candidate DataStore = iota
+	Running
+	Startup
+	Url
+)
+
 // EncodingFormat represents the encoding format
 type EncodingFormat int
 

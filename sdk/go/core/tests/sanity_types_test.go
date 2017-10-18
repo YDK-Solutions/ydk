@@ -7,7 +7,6 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"strconv"
 	"testing"
@@ -282,9 +281,7 @@ func (suite *SanityTypesTestSuite) TestListMaxElements() {
 	runner.OneList.Ldata = elems
 	// The payload errMsg is hardcoded with message-id of certain value.
 	// Please change corresponding message-id if new tests are added/enabled.
-	errMsg := `YGOServiceProviderError: <?xml version="1.0" encoding="UTF-8"?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="68">
-  <rpc-error>
+	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>operation-failed</error-tag>
     <error-severity>error</error-severity>
@@ -303,7 +300,10 @@ func (suite *SanityTypesTestSuite) TestListMaxElements() {
   </rpc-error>
 </rpc-reply>
 `
-	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Create(&suite.Provider, &runner) })
+	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Create(&suite.Provider, &runner) })
+	suite.Equal(funcDidPanic, true)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp(errMsg, panicValue)
 }
 
 func (suite *SanityTypesTestSuite) TestSubmodule() {

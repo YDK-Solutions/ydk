@@ -42,7 +42,7 @@ func (suite *FiltersTestSuite) TestReadOnRefClass() {
 	suite.CRUD.Create(&suite.Provider, &r1)
 
 	r2 := ysanity.Runner{}
-	r2.One.Filter = types.Read
+	r2.One.YFilter = types.Read
 	entity := suite.CRUD.Read(&suite.Provider, &r2)
 
 	suite.Equal(types.EntityEqual(entity, &r1), true)

@@ -218,6 +218,11 @@ Only directory examples are shown below.
 
 ## Second step: Generate & install the core
 
+On executing `pip install ydk-cisco-ios-xr`, you will be able to install the latest released PyPi version of all the `ydk` packages.
+
+**Note:** 
+There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.
+
 First, generate the core and install it:
 
 For C++ or Python, the below step is required:

@@ -165,7 +165,7 @@ func (suite *DeleteTestSuite) TestDeleteOnListWithIdentitykey() {
 	k := ysanity.Runner_OneList_IdentityList{}
 	k.Config.Id = ysanity.Child_Identity{}
 	k.IdRef = ysanity.Child_Identity{}
-	k.Filter = types.Delete
+	k.YFilter = types.Delete
 	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, k)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
@@ -181,7 +181,7 @@ func (suite *DeleteTestSuite) TestDeleteOnContainer() {
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
 	runnerUpdate := ysanity.Runner{}
-	runnerUpdate.Two.Filter = types.Delete
+	runnerUpdate.Two.YFilter = types.Delete
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	runnerCmp := ysanity.Runner{}
@@ -217,7 +217,7 @@ func (suite *DeleteTestSuite) TestDeleteOnListElement() {
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
 	runnerUpdate := runnerCreate
-	runnerUpdate.InbtwList.Ldata[1].Filter = types.Delete
+	runnerUpdate.InbtwList.Ldata[1].YFilter = types.Delete
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -249,8 +249,8 @@ func (suite *DeleteTestSuite) TestDeleteOnListElements() {
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	runnerUpdate := entity.(*ysanity.Runner)
-	runnerUpdate.OneList.Ldata[1].Filter = types.Delete
-	runnerUpdate.OneList.Ldata[2].Filter = types.Delete
+	runnerUpdate.OneList.Ldata[1].YFilter = types.Delete
+	runnerUpdate.OneList.Ldata[2].YFilter = types.Delete
 
 	suite.CRUD.Update(&suite.Provider, runnerUpdate)
 

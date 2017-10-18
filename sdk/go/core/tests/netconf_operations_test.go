@@ -37,7 +37,7 @@ func (suite *NETCONFOperationsTestSuite) BeforeTest(suiteName, testName string) 
 
 func (suite *NETCONFOperationsTestSuite) TestReplace() {
 	runner := ysanity.Runner{}
-	runner.Filter = types.Delete
+	runner.YFilter = types.Delete
 	suite.CRUD.Update(&suite.Provider, &runner)
 
 	runnerCreate := ysanity.Runner{}
@@ -46,7 +46,7 @@ func (suite *NETCONFOperationsTestSuite) TestReplace() {
 
 	runnerUpdate := ysanity.Runner{}
 	runnerUpdate.Ytypes.BuiltInT.Number8 = 25
-	runnerUpdate.Filter = types.Replace
+	runnerUpdate.YFilter = types.Replace
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -59,10 +59,10 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 	e2 := ysanity.Runner_OneList_Ldata{}
 	e1.Number = 1
 	e1.Name = "foo"
-	e1.Filter = types.Create
+	e1.YFilter = types.Create
 	e2.Number = 2
 	e2.Name = "bar"
-	e2.Filter = types.Create
+	e2.YFilter = types.Create
 
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
@@ -96,10 +96,10 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	e2 := ysanity.Runner_OneList_Ldata{}
 	e1.Number = 1
 	e1.Name = "foo"
-	e1.Filter = types.Create
+	e1.YFilter = types.Create
 	e2.Number = 2
 	e2.Name = "bar"
-	e2.Filter = types.Create
+	e2.YFilter = types.Create
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
@@ -108,7 +108,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	runnerUpdate := ysanity.Runner{}
 	eU1 := ysanity.Runner_OneList_Ldata{}
 	eU1.Number = 1
-	eU1.Filter = types.Delete
+	eU1.YFilter = types.Delete
 	runnerUpdate.OneList.Ldata = append(runnerUpdate.OneList.Ldata, eU1)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 	fmt.Println("TestDelete finished Update")
@@ -138,11 +138,11 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 func (suite *NETCONFOperationsTestSuite) TestRemove() {
 	runnerCreate := ysanity.Runner{}
 	runnerCreate.Ytypes.BuiltInT.Number8 = 25
-	runnerCreate.Filter = types.Merge
+	runnerCreate.YFilter = types.Merge
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
 
 	runnerUpdate := ysanity.Runner{}
-	runnerUpdate.Filter = types.Remove
+	runnerUpdate.YFilter = types.Remove
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	// remove again without any error
@@ -156,7 +156,7 @@ func (suite *NETCONFOperationsTestSuite) TestMerge() {
 
 	runnerUpdate := ysanity.Runner{}
 	runnerUpdate.Ytypes.BuiltInT.Number8 = 32
-	runnerUpdate.Filter = types.Merge
+	runnerUpdate.YFilter = types.Merge
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})

@@ -355,7 +355,7 @@ if __name__ == '__main__':
                 options.groupings_as_class,
                 options.gentests,
                 language,
-                'bundle').generate(adhoc_bundle_file)
+                'bundle', options.one_class_per_module).generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
 
         if options.bundle:

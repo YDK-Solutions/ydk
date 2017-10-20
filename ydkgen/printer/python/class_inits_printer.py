@@ -21,8 +21,8 @@ class_inits_printer.py
 
 """
 from pyang.types import PathTypeSpec
-from ydkgen.api_model import Bits, Class, Package, DataType, Enum
-from ydkgen.common import get_module_name, has_list_ancestor, is_top_level_class, snake_case
+from ydkgen.api_model import Bits, Class, Package, DataType, Enum, snake_case
+from ydkgen.common import get_module_name, has_list_ancestor, is_top_level_class
 from .class_get_entity_path_printer import GetAbsolutePathPrinter, GetSegmentPathPrinter
 
 

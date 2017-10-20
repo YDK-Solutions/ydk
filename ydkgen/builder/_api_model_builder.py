@@ -24,7 +24,7 @@ from pyang import statements
 
 from ._types_extractor import TypesExtractor
 from ydkgen.common import YdkGenException
-from ydkgen.api_model import AnyXml, Enum, Class, Bits, Package, Property, Deviation
+from ydkgen.api_model import AnyXml, Enum, Class, Bits, Package, Property, Deviation, snake_case
 
 
 class ApiModelBuilder(object):
@@ -646,12 +646,6 @@ def name_matches_ancestor(name, parent_element):
         return False
 
     return name_matches_ancestor(name, parent_element.owner)
-
-
-def snake_case(input_text):
-    s = input_text.replace('-', '_')
-    s = s.replace('.', '_')
-    return s.lower()
 
 
 def disambiguate_class_name_from_ancestors_and_siblings(language, clazz, parent_element):

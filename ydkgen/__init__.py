@@ -263,7 +263,6 @@ class YdkGenerator(object):
         dir_util.copy_tree(target_dir, gen_api_root)
 
 
-<<<<<<< HEAD
 def _filter_bundle_from_packages(pkgs, bundle):
     bundle_packages = []
     bundle_package_names = [x.name for x in bundle.models]

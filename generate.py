@@ -56,9 +56,9 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     commit_id = str(repo.head.commit)
 
     if language == 'python':
-        cblock_language = 'sh'
+        code_block_language = 'sh'
     elif language in ('cpp', 'go') :
-        cblock_language = 'bash'
+        code_block_language = 'bash'
     else:
         raise Exception('Language {0} not yet supported'.format(language))
 
@@ -75,7 +75,7 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     if 'language-version' in lines:
         lines = lines.replace('language-version', language)
     if 'code-block-language' in lines:
-        lines = lines.replace('code-block-language', cblock_language)
+        lines = lines.replace('code-block-language', code_block_language)
     with open(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'w+') as fd:
         fd.write(lines)
 
@@ -387,7 +387,8 @@ if __name__ == '__main__':
                 options.groupings_as_class,
                 options.gentests,
                 language,
-                'bundle')
+                'bundle',
+                options.one_class_per_module)
 
             output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)

@@ -104,7 +104,6 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
 def get_type_doc(meta_info_data, type_depth):
     properties_description = []
 
-    # from pdb import set_trace; set_trace()
     if len(meta_info_data.children) > 0:
         if type_depth == 1:
             properties_description.append('\t**type**\: one of the below types:\n\n')
@@ -555,12 +554,6 @@ def get_py_module_tag(named_element):
                        named_element.name)
 
 
-# def get_currentmodule_tag(named_element):
-#     template = get_tag_template('py', 'currentmodule', False)
-#     return template % (named_element.get_py_mod_name())
-
-#######
-
 def get_module_tag(named_element, language):
     template = get_tag_template(language, 'module', False)
     if language == 'py':
@@ -580,7 +573,6 @@ def get_currentmodule_tag(named_element, language):
         return template % (named_element.get_py_mod_name().replace('.', '/'))
     else:
         raise Exception('Language {0} not yet supported'.format(language))
-#######
 
 
 def get_class_tag(named_element, language):

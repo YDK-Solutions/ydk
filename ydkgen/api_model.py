@@ -897,9 +897,9 @@ def _modify_nested_container_with_same_name(named_element):
         return named_element.name
 
 def snake_case(input_text):
-    snake_case = input_text.replace('-', '_')
-    snake_case = snake_case.replace('.', '_')
-    return snake_case.lower()
+    s = input_text.replace('-', '_')
+    s = s.replace('.', '_')
+    return s.lower()
 
 # capitalized input will not affected
 def camel_case(input_text):

@@ -22,7 +22,7 @@ printer_factory.py
 """
 from ydkgen.printer.cpp.cpp_bindings_printer import CppBindingsPrinter
 from ydkgen.printer.python.python_bindings_printer import PythonBindingsPrinter
-
+from ydkgen.printer.go.go_bindings_printer import GoBindingsPrinter
 
 class PrinterFactory(object):
 
@@ -31,5 +31,7 @@ class PrinterFactory(object):
             return CppBindingsPrinter
         elif language == 'python':
             return PythonBindingsPrinter
+        elif language == 'go':
+            return GoBindingsPrinter
         else:
             raise Exception('Language {0} not yet supported'.format(language))

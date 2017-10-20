@@ -7,16 +7,16 @@ YDK Python provides a new interface in the form of Path API, which can be used t
 
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   annotation.rst
-   capability.rst
-   codec.rst
-   data_node.rst
-   repository.rst
-   root_schema_node.rst
-   rpc.rst
-   schema_node.rst
-   statement.rst
-   netconf_session.rst
-   restconf_session.rst
+    annotation.rst
+    capability.rst
+    codec.rst
+    data_node.rst
+    repository.rst
+    root_schema_node.rst
+    rpc.rst
+    schema_node.rst
+    statement.rst
+    netconf_session.rst
+    restconf_session.rst

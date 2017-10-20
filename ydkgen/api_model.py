@@ -21,8 +21,6 @@
  Translation process converts the YANG model to classes defined in this module.
 """
 from __future__ import absolute_import
-
-
 from pyang.types import UnionTypeSpec
 
 
@@ -225,6 +223,39 @@ class NamedElement(Element):
             names.append(element.name)
             element = element.owner
         return pkg.bundle_name + '::' + '::'.join(reversed(names))
+
+    def go_name(self, case = 'UpperCamel'):
+        if self.stmt is None:
+            raise Exception('element is not yet defined')
+
+        if isinstance(self, Enum):
+            stmt = self.stmt.parent
+        else:
+            stmt = self.stmt
+
+        name = camel_case(stmt.arg)
+
+        if case == 'UpperCamel':
+            return name
+        elif case == 'lowerCamel':
+            return '%s%s' % (name[0].lower(), name[1:])
+        else:
+            supported = 'Currently Supporting: UpperCamel, lowerCamel'
+            raise Exception('{0} case is not supported\n{1}'.format(case, supported))
+
+    def qualified_go_name(self):
+        ''' get the Go qualified name (sans package name) '''
+        if self.stmt.keyword == 'identity':
+            return camel_snake(self.stmt.arg)
+
+        names = []
+        element = self
+        while element is not None and not isinstance(element, Package):
+            if isinstance(element, Deviation):
+                element = element.owner
+            names.append(element.go_name())
+            element = element.owner
+        return '_'.join(reversed(names))
 
 
 class Package(NamedElement):
@@ -776,7 +807,6 @@ class Enum(DataType):
             literal.stmt = enum_stmt
             self.literals.append(literal)
 
-
 class EnumLiteral(NamedElement):
 
     """ Represents an enumeration literal. """
@@ -845,7 +875,6 @@ def get_top_pkg(pkg):
 
     return pkg
 
-
 def get_properties(owned_elements):
     """ get all properties from the owned_elements. """
     props = []
@@ -861,20 +890,16 @@ def get_properties(owned_elements):
 
     return props
 
-
 def _modify_nested_container_with_same_name(named_element):
     if named_element.owner.name.rstrip('_') == named_element.name:
         return '%s_' % named_element.owner.name
     else:
         return named_element.name
 
-
-
 def snake_case(input_text):
     snake_case = input_text.replace('-', '_')
     snake_case = snake_case.replace('.', '_')
     return snake_case.lower()
-
 
 # capitalized input will not affected
 def camel_case(input_text):
@@ -888,6 +913,8 @@ def camel_case(input_text):
         result = '_'+result;
     return result
 
+def camel_snake(input_text):
+    return '_'.join([word.title() for word in input_text.split('-')])
 
 def escape_name(name):
     name = name.replace('+', '__PLUS__')

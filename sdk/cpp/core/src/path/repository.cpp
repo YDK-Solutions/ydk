@@ -94,7 +94,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
                     || error_message.str().find("does not satisfy the constraint")!= std::string::npos)
             {
                 YLOG_ERROR("Libyang ERROR: {}", error_message.str());
-                throw(YCPPModelError{error_message.str()});
+                throw(YCPPModelError{});
             }
             YLOG_ERROR("Libyang ERROR: {}", error_message.str());
             break;
@@ -120,6 +120,7 @@ ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option
 ydk::path::RepositoryPtr::RepositoryPtr(const std::string& search_dir, path::ModelCachingOption caching_option)
   : path{search_dir}, using_temp_directory(false), caching_option(caching_option)
 {
+
     if (!file_exists(path))
     {
         YLOG_ERROR("Path {} is not a valid directory.", search_dir);

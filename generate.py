@@ -54,16 +54,30 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
     commit_id = str(repo.head.commit)
+
+    if language == 'python':
+        cblock_language = 'sh'
+    elif language in ('cpp', 'go') :
+        cblock_language = 'bash'
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
+
     # modify about_ydk.rst page
-    for line in fileinput.input(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'r+w'):
-        if 'git clone repo-url' in line:
-            print(line.replace('repo-url', 'https://{0}.git'.format(url)), end='')
-        elif 'git checkout commit-id' in line:
-            print(line.replace('commit-id', '{}'.format(commit_id)), end='')
-        elif 'version-id' in line:
-            print(line.replace('version-id', '{}'.format(release.replace('release=', ''))), end='')
-        else:
-            print(line, end='')
+    lines = ''
+    with open(os.path.join(ydk_root, 'sdk', '_docsgen_common', 'about_ydk.rst'), 'r+') as fd:
+        lines = fd.read()
+    if 'git clone repo-url' in lines:
+        lines = lines.replace('repo-url', 'https://{0}.git'.format(url))
+    if 'git checkout commit-id' in lines:
+        lines = lines.replace('commit-id', '{}'.format(commit_id))
+    if 'version-id' in lines:
+        lines = lines.replace('version-id', '{}'.format(release.replace('release=', '')))
+    if 'language-version' in lines:
+        lines = lines.replace('language-version', language)
+    if 'code-block-language' in lines:
+        lines = lines.replace('code-block-language', cblock_language)
+    with open(os.path.join(py_api_doc_gen, 'about_ydk.rst'), 'w+') as fd:
+        fd.write(lines)
 
 
 def get_release_version(output_directory, language):
@@ -71,6 +85,10 @@ def get_release_version(output_directory, language):
         return get_py_release_version(output_directory)
     elif language == 'cpp':
         return get_cpp_release_version(output_directory)
+    elif language == 'go':
+        return get_go_release_version(output_directory)
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_py_release_version(output_directory):
@@ -99,6 +117,9 @@ def get_cpp_release_version(output_directory):
     release = "release=%s" % version_string
     version = "version=%s" % version_string
     return (release, version)
+
+def get_go_release_version(output_directory):
+    return ("release=test", "version=test")
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):
@@ -138,6 +159,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     os.mkdir(py_api_doc)
     # print about YDK page
     print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
+
     if is_core:
         copy_docs_from_bundles(output_directory, py_api_doc_gen)
     # build docs
@@ -283,6 +305,13 @@ if __name__ == '__main__':
         help="Generate C++ SDK")
 
     parser.add_argument(
+        "-g", "--go",
+        action="store_true",
+        # dest="go",
+        default=False,
+        help="Generate Go SDK")
+
+    parser.add_argument(
         "-v", "--verbose",
         action="store_true",
         default=False,
@@ -340,6 +369,8 @@ if __name__ == '__main__':
     language = ''
     if options.cpp:
         language = 'cpp'
+    elif options.go:
+        language = 'go'
     elif options.python:
         language = 'python'
 
@@ -349,34 +380,42 @@ if __name__ == '__main__':
                 options.adhoc_bundle_name,
                 options.adhoc_bundle)
             init_verbose_logger()
-            output_directory = YdkGenerator(
+
+            generator = YdkGenerator(
                 output_directory,
                 ydk_root,
                 options.groupings_as_class,
                 options.gentests,
                 language,
-                'bundle', options.one_class_per_module).generate(adhoc_bundle_file)
+                'bundle')
+
+            output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
 
         if options.bundle:
-            output_directory = (YdkGenerator(
-                                output_directory,
-                                ydk_root,
-                                options.groupings_as_class,
-                                options.gentests,
-                                language,
-                                'bundle',
-                                options.one_class_per_module).generate(options.bundle))
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.groupings_as_class,
+                options.gentests,
+                language,
+                'bundle',
+                options.one_class_per_module)
+
+            output_directory = (generator.generate(options.bundle))
 
         if options.core:
-            output_directory = (YdkGenerator(
-                                output_directory,
-                                ydk_root,
-                                options.groupings_as_class,
-                                options.gentests,
-                                language,
-                                'core',
-                                options.one_class_per_module).generate(options.core))
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.groupings_as_class,
+                options.gentests,
+                language,
+                'core',
+                options.one_class_per_module)
+
+            output_directory = (generator.generate(options.core))
+
     except YdkGenException as e:
         print('Error(s) occurred in YdkGenerator()!')
         if options.verbose:
@@ -392,7 +431,10 @@ if __name__ == '__main__':
 
     if options.cpp:
         create_shared_libraries(output_directory)
-    else:
+    elif options.go:
+        # todo: implement go packaging with the output_directory
+        pass
+    elif options.python:
         create_pip_packages(output_directory)
 
     minutes_str, seconds_str = _get_time_taken(start_time)

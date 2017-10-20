@@ -7,6 +7,7 @@ enable_testing()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
+        test_c_api.cpp
         test_core_netconf.cpp
         test_netconf_ssh_client.cpp
         test_netconf_tcp_client.cpp

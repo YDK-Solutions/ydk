@@ -24,14 +24,15 @@ from operator import attrgetter
 
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.common import get_rst_file_name, is_config_stmt
-from ydkgen.printer.meta_data_util import (get_bits_class_docstring,
-                                           get_class_bases,
-                                           get_class_crossref_tag,
-                                           get_class_docstring,
-                                           get_class_tag,
-                                           get_enum_class_docstring,
-                                           get_langage_spec_tags
-                                           )
+from ydkgen.printer.meta_data_util import (
+    get_bits_class_docstring,
+    get_class_bases,
+    get_class_crossref_tag,
+    get_class_docstring,
+    get_class_tag,
+    get_enum_class_docstring,
+    get_langage_spec_tags
+)
 
 
 class DocPrinter(object):
@@ -90,8 +91,9 @@ class DocPrinter(object):
         self._print_header(clazz)
         # Body
         self.ctx.lvl_inc()
-        self._print_bases(clazz)
-        self._print_class_hierarchy(clazz)
+        if self.lang != 'go':
+            self._print_bases(clazz)
+            self._print_class_hierarchy(clazz)
         if clazz.stmt.search_one('presence') is not None:
             self._append('This class is a :ref:`presence class<presence-class>`\n')
         if clazz.stmt.keyword != 'rpc':
@@ -147,7 +149,7 @@ class DocPrinter(object):
     def _print_toctree_section(self, elements, title):
         if len(elements) == 0:
             return
-        if len(title) > 0:
+        if len(title) > 0 and self.lang != 'go':
             self._append('**{}**\n'.format(title))
         self._append('.. toctree::')
         self.ctx.lvl_inc()

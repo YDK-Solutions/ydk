@@ -422,9 +422,9 @@ string gNMIClient::execute_wrapper(const string & payload, string operation)
         ::gnmi::GetResponse response;
 
         request = populate_get_request(request, payload);
-        YLOG_DEBUG("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
+        YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
         string reply = execute_get_payload(request, &response);
-        YLOG_DEBUG("Get Operation {} Succeeded", operation);
+        YLOG_INFO("Get Operation {} Succeeded", operation);
         return reply;
     } else if ((operation == "create")||(operation == "update")||(operation == "delete")||(operation == "gnmi_create")||(operation == "gnmi_delete"))
     {   
@@ -432,9 +432,9 @@ string gNMIClient::execute_wrapper(const string & payload, string operation)
         ::gnmi::SetResponse response;
 
         request = populate_set_request(request, payload, operation);
-        YLOG_DEBUG("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
+        YLOG_INFO("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
         string reply = execute_set_payload(request, &response);
-        YLOG_DEBUG("Set Operation {} Succeeded", operation);
+        YLOG_INFO("Set Operation {} Succeeded", operation);
         return reply;
 
     }
@@ -445,7 +445,7 @@ string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* r
     grpc::ClientContext context;
     grpc::Status status;
     status = stub_->Get(&context, request, response);
-    YLOG_DEBUG("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
+    YLOG_INFO("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 
     {
         YLOG_ERROR("Get RPC Status Not OK");
@@ -464,7 +464,7 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
     grpc::ClientContext context;
     grpc::Status status;
     status = stub_->Set(&context, request, response);
-    YLOG_DEBUG("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
+    YLOG_INFO("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 
     {
         YLOG_ERROR("Set RPC Status not OK");

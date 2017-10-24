@@ -222,23 +222,6 @@ static shared_ptr<path::DataNode> handle_edit_reply(string reply, gNMIClient & c
         throw(YCPPServiceProviderError{reply});
     }
 
-    if(candidate_supported)
-    {
-        // TODO: Send the commit request
-        string commit_payload = get_commit_rpc_payload();
-
-        YLOG_DEBUG( "Executing Commit RPC: {}", commit_payload);
-        reply = client.execute_wrapper(commit_payload, operation);
-
-        YLOG_DEBUG("=============Reply payload received from device=============");
-        YLOG_DEBUG("{}", reply.c_str());
-        YLOG_DEBUG("\n");
-        if(reply.find("Success") == string::npos)
-        {
-            YLOG_ERROR("RPC error occurred: {}", reply);
-            throw(YCPPServiceProviderError{reply});
-        }
-    }
     // No error no output for edit-config
     return nullptr;
 }
@@ -272,7 +255,7 @@ shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::Ro
     auto empty_data = reply.find("data");
     if(empty_data == string::npos)
     {
-        YLOG_DEBUG("Found empty data tag");
+        YLOG_INFO("Found empty data tag");
         return nullptr;
     }
 

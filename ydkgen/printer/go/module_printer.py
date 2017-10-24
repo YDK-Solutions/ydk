@@ -31,13 +31,12 @@ from ydkgen.common import convert_to_reStructuredText
 
 class ModulePrinter(FilePrinter):
 
-    def __init__(self, ctx, bundle_name, sort_clazz, identity_subclasses):
+    def __init__(self, ctx, bundle_name, identity_subclasses):
         super(ModulePrinter, self).__init__(ctx)
         self.bundle_name = bundle_name
-        self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
-        self.class_printer = ClassPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
-        self.identity_printer = IdentityPrinter(ctx, bundle_name, sort_clazz, identity_subclasses)
+        self.class_printer = ClassPrinter(ctx, bundle_name, identity_subclasses)
+        self.identity_printer = IdentityPrinter(ctx, bundle_name, identity_subclasses)
         self.enum_printer = EnumPrinter(ctx)
 
     def print_header(self, package):

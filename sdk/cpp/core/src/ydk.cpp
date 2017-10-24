@@ -428,7 +428,7 @@ ServiceProvider OpenDaylightServiceProviderGetNodeProvider(YDKStatePtr state, Op
     try
     {
         ydk::OpenDaylightServiceProvider * real_provider = static_cast<ydk::OpenDaylightServiceProvider*>(provider);
-        ydk::path::ServiceProvider * node_provider = &real_provider->get_node_provider(string(node_id));
+        ydk::ServiceProvider * node_provider = &real_provider->get_node_provider(string(node_id));
         return static_cast<void*>(node_provider);
     }
     catch(...)
@@ -456,8 +456,8 @@ RootSchemaNode ServiceProviderGetRootSchema(YDKStatePtr state, ServiceProvider p
 {
     try
     {
-        ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
-        ydk::path::RootSchemaNode* root_schema = &real_provider->get_root_schema();
+        ydk::ServiceProvider * real_provider = static_cast<ydk::ServiceProvider*>(provider);
+        ydk::path::RootSchemaNode* root_schema = &real_provider->get_session().get_root_schema();
         return static_cast<void*>(root_schema);
     }
     catch(...)
@@ -470,7 +470,7 @@ RootSchemaNode ServiceProviderGetRootSchema(YDKStatePtr state, ServiceProvider p
 
 EncodingFormat ServiceProviderGetEncoding(ServiceProvider provider)
 {
-    ydk::path::ServiceProvider * real_provider = static_cast<ydk::path::ServiceProvider*>(provider);
+    ydk::ServiceProvider * real_provider = static_cast<ydk::ServiceProvider*>(provider);
     auto encoding = real_provider->get_encoding();
     if (encoding == ydk::EncodingFormat::XML) {
         return XML;
@@ -537,7 +537,7 @@ DataNode RootSchemaNodeCreate(YDKStatePtr state, RootSchemaNode root_schema, con
     try
     {
         ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
-        ydk::path::DataNode * datanode = &real_root_schema->create(path);
+        ydk::path::DataNode * datanode = &real_root_schema->create_datanode(path);
 
         return static_cast<void*>(wrap(datanode));
     }
@@ -560,7 +560,7 @@ Rpc RootSchemaNodeRpc(YDKStatePtr state, RootSchemaNode root_schema, const char*
     try
     {
         ydk::path::RootSchemaNode * real_root_schema = (ydk::path::RootSchemaNode*)root_schema;
-        shared_ptr<ydk::path::Rpc> rpc = real_root_schema->rpc(path);
+        shared_ptr<ydk::path::Rpc> rpc = real_root_schema->create_rpc(path);
 
         return static_cast<void*>(wrap(rpc));
     }
@@ -579,7 +579,7 @@ DataNode RpcInput(YDKStatePtr state, Rpc rpc)
         RpcWrapper* rpc_wrapper = (RpcWrapper*)rpc;
         ydk::path::Rpc* real_rpc = unwrap(rpc_wrapper);
 
-        ydk::path::DataNode * input = &real_rpc->input();
+        ydk::path::DataNode * input = &real_rpc->get_input_node();
 
         return static_cast<void*>(wrap(input));
     }
@@ -598,8 +598,8 @@ DataNode RpcExecute(YDKStatePtr state, Rpc rpc, ServiceProvider provider)
         RpcWrapper* rpc_wrapper = (RpcWrapper*)rpc;
         ydk::path::Rpc* real_rpc = unwrap(rpc_wrapper);
 
-        ydk::path::ServiceProvider * real_provider = (ydk::path::ServiceProvider *) provider;
-        std::shared_ptr<ydk::path::DataNode> result = (*real_rpc)(*real_provider);
+        ydk::ServiceProvider * real_provider = (ydk::ServiceProvider *) provider;
+        std::shared_ptr<ydk::path::DataNode> result = (*real_rpc)((*real_provider).get_session());
 
         return static_cast<void*>(wrap(result));
     }
@@ -617,7 +617,7 @@ DataNode DataNodeCreate(YDKStatePtr state, DataNode datanode, const char* path, 
     {
         DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
         ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-        ydk::path::DataNode * result = &real_datanode->create(path, value);
+        ydk::path::DataNode * result = &real_datanode->create_datanode(path, value);
 
         return static_cast<void*>(wrap(result));
     }
@@ -633,7 +633,7 @@ const char* DataNodeGetArgument(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    string s = real_datanode->schema().statement().arg;
+    string s = real_datanode->get_schema_node().get_statement().arg;
     return string_to_array(s);
 }
 
@@ -641,7 +641,7 @@ const char* DataNodeGetKeyword(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    string s = real_datanode->schema().statement().keyword;
+    string s = real_datanode->get_schema_node().get_statement().keyword;
     return string_to_array(s);
 }
 
@@ -649,7 +649,7 @@ const char* DataNodeGetPath(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    string s = real_datanode->path();
+    string s = real_datanode->get_path();
     return string_to_array(s);
 }
 
@@ -657,7 +657,7 @@ const char* DataNodeGetValue(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    string s = real_datanode->get();
+    string s = real_datanode->get_value();
     return string_to_array(s);
 }
 
@@ -667,7 +667,7 @@ DataNodeChildren DataNodeGetChildren(DataNode datanode)
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
 
     if (real_datanode != nullptr) {
-        std::vector<shared_ptr<ydk::path::DataNode>> children = real_datanode->children();
+        std::vector<shared_ptr<ydk::path::DataNode>> children = real_datanode->get_children();
         DataNode* child_array = new DataNode[children.size()];
         for(size_t i=0; i < children.size(); i++)
         {
@@ -695,7 +695,7 @@ DataNode DataNodeGetParent(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    ydk::path::DataNode* parent = real_datanode->parent();
+    ydk::path::DataNode* parent = real_datanode->get_parent();
     return static_cast<void*>(wrap(parent));
 }
 
@@ -703,7 +703,7 @@ const char* DataNodeGetSegmentPath(DataNode datanode)
 {
     DataNodeWrapper* datanode_wrapper = (DataNodeWrapper*)datanode;
     ydk::path::DataNode* real_datanode = unwrap(datanode_wrapper);
-    string path = real_datanode->path();
+    string path = real_datanode->get_path();
     std::vector<std::string> segments = ydk::path::segmentalize(path);
     return string_to_array(segments.back());
 }

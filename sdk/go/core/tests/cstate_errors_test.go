@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -89,7 +90,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongProtocol() {
 		Port:     12022,
 		Protocol: "/dev/null"}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YGOOperationNotSupportedError: Protocol '%s' is not supported!", provider.Protocol)
+	errMsg := "YGOOperationNotSupportedError: Protocol is not supported!"
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -161,5 +162,8 @@ func (suite *CStateErrorsTestSuite) TestCodecInvalidDecode2() {
 }
 
 func TestCStateErrorsTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(CStateErrorsTestSuite))
 }

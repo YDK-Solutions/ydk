@@ -75,32 +75,32 @@ func (suite *ErrorsTestSuite) TestInvalidInt32() {
 
 func (suite *ErrorsTestSuite) TestInvalidUint8() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number8 = -1
+	runner.Ytypes.BuiltInT.UNumber8 = -1
 	errMsg := fmt.Sprintf(`YGOModelError: Invalid value "%v" in "u_number8" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/u_number8`,
-		runner.Ytypes.BuiltInT.U_Number8)
+		runner.Ytypes.BuiltInT.UNumber8)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Create(&suite.Provider, &runner) })
 }
 
 func (suite *ErrorsTestSuite) TestInvalidUint16() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number16 = "non uint16"
+	runner.Ytypes.BuiltInT.UNumber16 = "non uint16"
 	errMsg := fmt.Sprintf(`YGOModelError: Invalid value "%v" in "u_number16" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/u_number16`,
-		runner.Ytypes.BuiltInT.U_Number16)
+		runner.Ytypes.BuiltInT.UNumber16)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Create(&suite.Provider, &runner) })
 }
 
 func (suite *ErrorsTestSuite) TestInvalidUint32() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number32 = 4294967296
+	runner.Ytypes.BuiltInT.UNumber32 = 4294967296
 	errMsg := fmt.Sprintf(`YGOModelError: Invalid value "%v" in "u_number32" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/u_number32`,
-		runner.Ytypes.BuiltInT.U_Number32)
+		runner.Ytypes.BuiltInT.UNumber32)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Create(&suite.Provider, &runner) })
 }
 
 // Invalid test case, go int64 range: -9223372036854775808 through 9223372036854775807
 // func (suite *ErrorsTestSuite) TestInvalidUint64() {
 // 	runner := ysanity.Runner{}
-// 	runner.Ytypes.BuiltInT.U_Number64 = 18446744073709551616
+// 	runner.Ytypes.BuiltInT.UNumber64 = 18446744073709551616
 // 	suite.CRUD.Create(&suite.Provider, &runner)
 // }
 

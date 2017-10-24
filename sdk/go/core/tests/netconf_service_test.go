@@ -213,7 +213,7 @@ func (suite *NetconfServiceTestSuite) TestCloseSession() {
 
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Lock(&suite.Provider, types.Running) })
 	suite.Equal(funcDidPanic, true)
-	suite.Equal(panicValue, "YGOClientError: RPC error occured")
+	suite.Equal(panicValue, "YGOClientError: Could not send payload")
 
 	suite.Provider.Connect()
 

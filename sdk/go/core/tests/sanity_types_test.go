@@ -75,7 +75,7 @@ func (suite *SanityTypesTestSuite) TestInt64() {
 
 func (suite *SanityTypesTestSuite) TestUInt8() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number8 = 0
+	runner.Ytypes.BuiltInT.UNumber8 = 0
 	suite.CRUD.Create(&suite.Provider, &runner)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -84,7 +84,7 @@ func (suite *SanityTypesTestSuite) TestUInt8() {
 
 func (suite *SanityTypesTestSuite) TestUInt16() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number16 = 65535
+	runner.Ytypes.BuiltInT.UNumber16 = 65535
 	suite.CRUD.Create(&suite.Provider, &runner)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -93,7 +93,7 @@ func (suite *SanityTypesTestSuite) TestUInt16() {
 
 func (suite *SanityTypesTestSuite) TestUInt32() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number32 = 5927
+	runner.Ytypes.BuiltInT.UNumber32 = 5927
 	suite.CRUD.Create(&suite.Provider, &runner)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -102,7 +102,7 @@ func (suite *SanityTypesTestSuite) TestUInt32() {
 
 func (suite *SanityTypesTestSuite) TestUInt64() {
 	runner := ysanity.Runner{}
-	runner.Ytypes.BuiltInT.U_Number64 = 184467440737551615
+	runner.Ytypes.BuiltInT.UNumber64 = 184467440737551615
 	suite.CRUD.Create(&suite.Provider, &runner)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})

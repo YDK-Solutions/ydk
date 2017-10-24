@@ -21,10 +21,9 @@ identity_printer.py
 """
 
 class IdentityPrinter(object):
-    def __init__(self, ctx, bundle_name, sort_clazz, identity_subclasses):
+    def __init__(self, ctx, bundle_name, identity_subclasses):
         self.ctx = ctx
         self.bundle_name = bundle_name
-        self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
 
     def print_identity(self, clazz):

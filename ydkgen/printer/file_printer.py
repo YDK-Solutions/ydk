@@ -47,7 +47,7 @@ class _Stack:
 
 class FilePrinter(object):
     def __init__(self, ctx):
-        self.ctx=ctx
+        self.ctx = ctx
         self._start_tab = _Stack()
 
     def _start_tab_leak_check(self):

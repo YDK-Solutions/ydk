@@ -36,8 +36,8 @@ from ..doc import DocPrinter
 
 class GoBindingsPrinter(LanguageBindingsPrinter):
 
-    def __init__(self, ydk_root_dir, bundle, generate_tests, sort_clazz):
-        super(GoBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, sort_clazz)
+    def __init__(self, ydk_root_dir, bundle, generate_tests, one_class_per_module):
+        super(GoBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
 
     def print_files(self):
         only_modules = [package.stmt for package in self.packages]
@@ -93,7 +93,7 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
         go_module_file_name = '%s/%s.go' % (path, package.name)
         with open(go_module_file_name, 'w+') as file_descriptor:
             self.ypy_ctx.fd = file_descriptor
-            mp = ModulePrinter(self.ypy_ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
+            mp = ModulePrinter(self.ypy_ctx, self.bundle_name, self.identity_subclasses)
             mp.print_output(package)
 
     def _print_go_rst_toc(self):

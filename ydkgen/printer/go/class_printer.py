@@ -34,10 +34,9 @@ from .class_set_value_printer import ClassSetValuePrinter
 
 
 class ClassPrinter(object):
-    def __init__(self, ctx, bundle_name, sort_clazz, identity_subclasses):
+    def __init__(self, ctx, bundle_name, identity_subclasses):
         self.ctx = ctx
         self.bundle_name = bundle_name
-        self.sort_clazz = sort_clazz
         self.identity_subclasses = identity_subclasses
         self.enum_printer = EnumPrinter(ctx)
 
@@ -176,10 +175,10 @@ class ClassPrinter(object):
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]
-        sorted_classes = sort_classes_at_same_level(unsorted_classes, self.sort_clazz)
+        sorted_classes = sort_classes_at_same_level(unsorted_classes)
 
         for clazz in sorted_classes:
-            cp = ClassPrinter(self.ctx, self.bundle_name, self.sort_clazz, self.identity_subclasses)
+            cp = ClassPrinter(self.ctx, self.bundle_name, self.identity_subclasses)
             cp.print_output(clazz)
 
     def _print_child_enums(self, parent):

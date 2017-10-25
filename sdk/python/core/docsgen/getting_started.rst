@@ -26,7 +26,7 @@ Centos (Fedora-based)
 
 .. code-block:: sh
 
-   $ sudo yum install epel-release
+   $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.1/libydk-0.6.1-1.x86_64.rpm
    $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
 

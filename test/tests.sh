@@ -62,7 +62,7 @@ function run_test {
 function init_env {
     print_msg "init_env"
 
-    export YDKGEN_HOME=`pwd` && cd $YDKGEN_HOME
+    cd $YDKGEN_HOME
 
     PY_GENERATE="$1"
     PY_TEST="$2"
@@ -108,6 +108,28 @@ function init_tcp_server {
         print_msg "Could not start tcp server"
         exit $status
     fi
+}
+
+function init_go_env {
+    print_msg "init_go_env"
+
+    print_msg "${GOPATH}"
+    print_msg "${GOROOT}"
+
+    export PATH=$PATH:$GOPATH/bin
+    export PATH=$PATH:$GOROOT/bin
+
+    cd $YDKGEN_HOME
+
+    if [[ -z "${GOPATH// }" ]]; then
+        export GOPATH="`pwd`/golang"
+    else
+        export GOPATH="`pwd`/golang:$GOPATH"
+    fi
+
+    go get github.com/stretchr/testify
+
+    cd -
 }
 
 function py_sanity_ydktest {
@@ -391,6 +413,30 @@ function cpp_sanity_ydktest_test {
     fi
 }
 
+function go_samples {
+    print_msg "go_samples"
+
+    export CXX=/usr/bin/clang++
+    export CC=/usr/bin/clang
+
+    print_msg "CC: ${CC}"
+    print_msg "CXX: ${CXX}"
+
+    cd $YDKGEN_HOME/sdk/go/core/samples
+    run_exec_test go run cgo_path/cgo_path.go
+    run_exec_test go run bgp_create/bgp_create.go
+    run_exec_test go run bgp_read/bgp_read.go
+    run_exec_test go run bgp_delete/bgp_delete.go
+    cd -
+}
+
+function go_behavioral_tests {
+    print_msg "go_behavioral_tests"
+    cd $YDKGEN_HOME/sdk/go/core/tests
+    run_exec_test go test
+    cd -
+}
+
 function teardown_env {
     print_msg "teardown_env"
     deactivate
@@ -420,6 +466,22 @@ function cpp_tests {
     cpp_sanity_core_test
     cpp_sanity_ydktest
     teardown_env
+}
+
+function go_tests {
+    print_msg "go_tests"
+
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+
+    # TODO: go get
+    cd $YDKGEN_HOME
+
+    mkdir -p golang/src/github.com/CiscoDevNet/ydk-go/ydk
+    cp -r sdk/go/core/ydk/* golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_exec_test ./generate.py --bundle profiles/test/ydktest-cpp.json --go
+    cp -r gen-api/go/ydktest-bundle/ydk/* golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    go_samples
+    go_behavioral_tests
 }
 
 function cpp_test_gen_test {
@@ -485,12 +547,17 @@ function test_gen_tests {
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
+export YDKGEN_HOME="`pwd`"
+
 init_rest_server
 init_tcp_server
+init_go_env
 
 cpp_tests
 py_tests
+go_tests
 # test_gen_tests
+
 cd $YDKGEN_HOME
 print_msg "gathering cpp coverage"
 print_msg "combining python coverage"

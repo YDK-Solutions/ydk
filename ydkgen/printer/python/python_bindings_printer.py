@@ -24,8 +24,8 @@ from __future__ import print_function
 import os, shutil
 from distutils import dir_util
 
-from ydkgen.api_model import Bits, Class, Enum, Package
-from ydkgen.common import get_rst_file_name, snake_case
+from ydkgen.api_model import Bits, Class, Enum, Package, snake_case
+from ydkgen.common import get_rst_file_name
 
 from .import_test_printer import ImportTestPrinter
 from .module_printer import ModulePrinter

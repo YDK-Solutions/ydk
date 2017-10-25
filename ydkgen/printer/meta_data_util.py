@@ -491,6 +491,14 @@ def get_primitive_type_tag(typ, language):
         ('cpp', 'Empty'): ':cpp:class:`Empty<ydk::Empty>`',
         ('cpp', 'Enum'): ':cpp:class:`Enum<ydk::Enum>`',
         ('cpp', 'Identity'): ':cpp:class:`Identity<ydk::Identity>`',
+
+        ('go', 'int'): 'int',
+        ('go', 'str'): 'string',
+        ('go', 'bool'): 'bool',
+        ('go', 'Decimal64'): ':go:struct:`Decimal64<Ydk_Decimal64>`',
+        ('go', 'Empty'): ':go:struct:`Empty<Ydk_Empty>`',
+        ('go', 'Enum'): ':go:struct:`Enum<Ydk_Enum>`',
+        ('go', 'Identity'): ':go:struct:`Identity<Ydk_Identity>`',
     }
     try:
         return TYPE_TAG_MAP[(language, typ)]
@@ -502,12 +510,17 @@ def get_primitive_type_tag(typ, language):
 def get_tag_template(language, domain, crossref):
     TEMPLATES = {
         ('py', 'class', False): '.. py:class:: %s\n',
+        ('py', 'class', True): ' :py:class:`%s <%s.%s>`',
         ('py', 'module', False): '.. py:module:: %s.%s\n',
         ('py', 'currentmodule', False): '.. py:currentmodule:: %s\n',
-        ('cpp', 'class', False): '.. cpp:class:: %s\n',
 
-        ('py', 'class', True): ' :py:class:`%s <%s.%s>`',
+        ('cpp', 'class', False): '.. cpp:class:: %s\n',
         ('cpp', 'class', True): ' :cpp:class:`%s <%s>`',
+
+        ('go', 'class', False): '.. go:struct:: %s()\n',
+        ('go', 'class', True): ' :go:struct:`%s <%s>`',
+        ('py', 'module', False): '.. go:package:: %s.%s\n',
+        ('go', 'currentmodule', False): '.. go:package:: %s\n',
     }
     try:
         return TEMPLATES[(language, domain, crossref)]
@@ -525,6 +538,10 @@ def _get_list_tag(language, mtype):
             return ':cpp:class:`ValueList<ydk::ValueList>` of '
         else:
             return '``std::vector`` of '
+    elif language == 'go':
+        return 'slice of '
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 def _get_list_doc_link_tag(meta_info_data, attribute, language, mtype):
     template = '%s %%s' % _get_list_tag(language, mtype)
@@ -537,9 +554,25 @@ def get_py_module_tag(named_element):
                        named_element.name)
 
 
-def get_py_currentmodule_tag(named_element):
-    template = get_tag_template('py', 'currentmodule', False)
-    return template % (named_element.get_py_mod_name())
+def get_module_tag(named_element, language):
+    template = get_tag_template(language, 'module', False)
+    if language == 'py':
+        return template % (named_element.get_py_mod_name(),
+            named_element.name)
+    elif language == 'go':
+        return template % (named_element.get_py_mod_name().replace('.', '/'),
+            named_element.name)
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
+
+def get_currentmodule_tag(named_element, language):
+    template = get_tag_template(language, 'currentmodule', False)
+    if language == 'py':
+        return template % (named_element.get_py_mod_name())
+    elif language == 'go':
+        return template % (named_element.get_py_mod_name().replace('.', '/'))
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_class_tag(named_element, language):
@@ -549,18 +582,30 @@ def get_class_tag(named_element, language):
     elif language == 'cpp':
         template = get_tag_template('cpp', 'class', False)
         return template % named_element.qualified_cpp_name()
+    elif language == 'go':
+        template = get_tag_template('go', 'class', False)
+        return template % named_element.qualified_go_name()
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_class_crossref_tag(name, named_element, language):
     if language == 'py':
         template = get_tag_template('py', 'class', True)
         return template % (name,
-                           named_element.get_py_mod_name(),
-                           named_element.qn())
+            named_element.get_py_mod_name(),
+            named_element.qn())
     elif language == 'cpp':
         template = get_tag_template('cpp', 'class', True)
         return template % (name,
-                           named_element.fully_qualified_cpp_name())
+            named_element.fully_qualified_cpp_name())
+    elif language == 'go':
+        template = get_tag_template('go', 'class', True)
+        link = '%s/%s' % (named_element.get_py_mod_name().replace('.', '/'),
+                          named_element.qualified_go_name())
+        return template % (name, link)
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_bits_class_docstring(bitz):
@@ -580,20 +625,29 @@ def get_bits_doc_link(bitz, language):
         return get_class_crossref_tag(bitz.name, bitz, language)
     elif language == 'cpp':
         return ':cpp:class:`Bits<ydk::Bits>`\n\t%s' % get_bits_class_docstring(bitz)
+    elif language == 'go':
+        return get_class_crossref_tag(bitz.name, bitz, language)
+    else:
+        raise Exception('Language {0} not yet supported'.format(language))
 
 
 def get_langage_spec_tags(named_element, language):
     tags = []
-    if language == 'py':
+    if language in ('py', 'go'):
         if isinstance(named_element, Package):
-            tags.append(get_py_module_tag(named_element))
+            # tags.append(get_py_module_tag(named_element))
+            tags.append(get_module_tag(named_element, language))
         else:
-            tags.append(get_py_currentmodule_tag(named_element))
+            tags.append(get_currentmodule_tag(named_element, language))
     return tags
 
 
 def get_class_bases(clazz, language):
     bases = []
+
+    if language not in ('py', 'cpp', 'go'):
+        raise Exception('Language {0} not yet supported'.format(language))
+
     if language == 'py':
         bases.append(':py:class:`Entity<ydk.types.Entity>`')
     if isinstance(clazz, Enum):
@@ -602,6 +656,8 @@ def get_class_bases(clazz, language):
         bases.append(get_primitive_type_tag('Identity', language))
     elif language == 'cpp':
         bases.append(':cpp:class:`Entity<ydk::Entity>`')
+    elif language == 'go':
+        pass
 
     if hasattr(clazz, 'extends'):
         for item in clazz.extends:

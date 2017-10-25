@@ -20,8 +20,8 @@ entity_lookup_printer.py
  Prints top entity lookup map
 
 """
-from ydkgen.api_model import Class
-from ydkgen.common import snake_case, get_include_guard_name, get_module_name
+from ydkgen.api_model import snake_case, Class
+from ydkgen.common import get_include_guard_name, get_module_name
 from ydkgen.printer.file_printer import FilePrinter
 
 

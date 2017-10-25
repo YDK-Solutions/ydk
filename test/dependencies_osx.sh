@@ -39,6 +39,7 @@ function install_dependencies {
 
     brew install libssh
     brew link libssh
+
 }
 
 function install_confd {

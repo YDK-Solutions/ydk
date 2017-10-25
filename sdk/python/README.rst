@@ -29,7 +29,7 @@ Ubuntu (Debian-based) - The following packages must be present in your system be
 
 Centos (Fedora-based) - The following packages must be present in your system before installing YDK-Py::
 
-   $ sudo yum install epel-release libssh-devel gcc-c++
+   $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.1/libydk-0.6.1-1.x86_64.rpm
    $ sudo ln –fs /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin:$PATH
 

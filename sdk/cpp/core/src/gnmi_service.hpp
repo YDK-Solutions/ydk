@@ -24,17 +24,6 @@
 #ifndef GNMI_SERVICE_HPP
 #define GNMI_SERVICE_HPP
 
-#include <iostream>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-
-#include "codec_service.hpp"
-#include "entity_data_node_walker.hpp"
-#include "errors.hpp"
-#include "gnmi_provider.hpp"
-#include "logger.hpp"
 #include "path_api.hpp"
 #include "types.hpp"
 
@@ -50,3 +39,4 @@ namespace ydk
 	};
 }
 #endif /* GNMI_SERVICE_HPP */
+

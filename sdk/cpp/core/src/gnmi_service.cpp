@@ -20,6 +20,11 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
+#include "codec_service.hpp"
+#include "entity_data_node_walker.hpp"
+#include "errors.hpp"
+#include "logger.hpp"
+#include "gnmi_provider.hpp"
 #include "gnmi_service.hpp"
 
 using namespace std;

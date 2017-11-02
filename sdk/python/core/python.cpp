@@ -28,6 +28,7 @@
 #include <ydk/executor_service.hpp>
 #include <ydk/filters.hpp>
 #include <ydk/gnmi_provider.hpp>
+#include <ydk/gnmi_service.hpp>
 #include <ydk/logging_callback.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/netconf_service.hpp>
@@ -456,6 +457,15 @@ PYBIND11_MODULE(ydk_, ydk)
              arg("state_url_root"))
         .def("get_root_schema", &ydk::path::RestconfSession::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::RestconfSession::invoke, return_value_policy::reference);
+
+    class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
+        .def(init<ydk::path::Repository&, const std::string&>(),
+             arg("repo"),
+             arg("address"))
+        .def(init<const std::string&>(),
+             arg("address"))
+        .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
+        .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference);
 
     class_<ydk::path::Statement>(path, "Statement")
         .def(init<const string &, const string &>(), arg("keyword"), arg("arg"))
@@ -987,6 +997,11 @@ PYBIND11_MODULE(ydk_, ydk)
             arg("source_config"),
             return_value_policy::reference);
 
+    class_<ydk::gNMIService>(services, "gNMIService")
+	    .def(init<>())
+	    .def("get", &ydk::gNMIService::get, arg("provider"), arg("filter"), return_value_policy::reference)
+    	.def("set", &ydk::gNMIService::set, arg("provider"), arg("entity"), arg("operation"), return_value_policy::reference);
+
     class_<ydk::XmlSubtreeCodec>(entity_utils, "XmlSubtreeCodec")
         .def(init<>())
         .def("encode", &ydk::XmlSubtreeCodec::encode, return_value_policy::reference)
@@ -1004,3 +1019,4 @@ PYBIND11_MODULE(ydk_, ydk)
     setup_logging();
 
 };
+

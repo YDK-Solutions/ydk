@@ -19,7 +19,9 @@ from .crud_service import CRUDService
 from .netconf_service import NetconfService
 from .executor_service import ExecutorService
 from ydk.ext.services import Datastore
+from ydk.ext.services import gNMIService
 
 
 __all__ = [ "CodecService", "CRUDService",
-            "ExecutorService", "NetconfService", "Datastore" ]
+            "ExecutorService", "NetconfService",
+            "gNMIService", "Datastore" ]

@@ -2,11 +2,11 @@ CRUD Service
 ============
 
 
-YDK CRUDService provides Create/Read/Update/Delete funcionalities.
+YDK CRUDService provides Create/Read/Update/Delete functionalities.
 
-.. py:class:: ydk.services.CRUDService()
+.. py:class:: ydk.services.CRUDService
 
-    Supports CRUD operations on entities.
+    Supports CRUD operations on model API entities.
 
     .. py:method:: create(provider, entity)
 

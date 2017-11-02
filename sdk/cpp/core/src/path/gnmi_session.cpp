@@ -53,7 +53,7 @@ static void create_input_source(path::DataNode & input, bool config);
 static void create_input_error_option(path::DataNode & input);
 static string get_read_rpc_name(bool config);
 static string get_commit_rpc_payload();
-static shared_ptr<path::DataNode> handle_edit_reply(string reply, gNMIClient & client, bool candidate_supported, string operation);
+static shared_ptr<path::DataNode> handle_edit_reply(const string & reply, gNMIClient & client, bool candidate_supported, const string & operation);
 
 static bool is_config(path::Rpc & rpc);
 static string get_filter_payload(path::Rpc & ydk_rpc);
@@ -198,7 +198,7 @@ shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
     return datanode;
 }
 
-shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, string operation) const
+shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const
 {
     bool candidate_supported = is_candidate_supported(server_capabilities);
     auto gnmi_rpc = create_rpc_instance(*root_schema, "ietf-netconf:edit-config");
@@ -214,7 +214,7 @@ shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, string o
     return handle_edit_reply(execute_payload(gnmi_payload, operation), *client, candidate_supported, operation);
 }
 
-static shared_ptr<path::DataNode> handle_edit_reply(string reply, gNMIClient & client, bool candidate_supported, string operation)
+static shared_ptr<path::DataNode> handle_edit_reply(const string & reply, gNMIClient & client, bool candidate_supported, const std::string & operation)
 {
     if(reply.find("Success") == string::npos)
     {
@@ -227,7 +227,7 @@ static shared_ptr<path::DataNode> handle_edit_reply(string reply, gNMIClient & c
 }
 
 
-shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, string operation) const
+shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, const std::string & operation) const
 {
     //for now we only support crud rpc's
     bool config = is_config(ydk_rpc);
@@ -240,7 +240,7 @@ shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, string o
     return handle_read_reply(execute_payload(gnmi_payload, operation), *root_schema);
 }
 
-string gNMISession::execute_payload(const string & payload, string operation) const
+string gNMISession::execute_payload(const string & payload, const string & operation) const
 {
     string reply = client->execute_wrapper(payload, operation);
     YLOG_DEBUG("=============Reply payload received from device=============");

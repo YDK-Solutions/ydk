@@ -916,8 +916,7 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("get_node_ids", &ydk::OpenDaylightServiceProvider::get_node_ids, return_value_policy::reference);
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
-        .def(init<ydk::path::Repository&, string>(), arg("repo"), arg("address"))
-        .def(init<string>(), arg("address"))
+        .def(init<ydk::path::Repository&, string, bool>(), arg("repo"), arg("address"), arg("is_secure"))
         .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);

@@ -19,10 +19,12 @@ from ydk.ext.providers import ServiceProvider
 from ydk.ext.providers import NetconfServiceProvider
 from ydk.ext.providers import RestconfServiceProvider
 from ydk.ext.providers import OpenDaylightServiceProvider
+from ydk.ext.providers import gNMIServiceProvider
 
 
 __all__ = [ "ServiceProvider",
             "CodecServiceProvider",
             "NetconfServiceProvider",
             "RestconfServiceProvider",
-            "OpenDaylightServiceProvider" ]
+            "OpenDaylightServiceProvider",
+            "gNMIServiceProvider"]

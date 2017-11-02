@@ -17,6 +17,7 @@
 from ydk.ext.path import Annotation
 from ydk.ext.path import Capability
 from ydk.ext.path import Codec
+from ydk.ext.path import gNMISession
 from ydk.ext.path import DataNode
 from ydk.ext.path import Repository
 from ydk.ext.path import RootSchemaNode
@@ -33,6 +34,7 @@ __all__ = [ "Annotation",
             "Capability",
             "Codec",
             "DataNode",
+            "gNMISession",
             "NetconfSession",
             "Repository",
             "RestconfSession",

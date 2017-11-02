@@ -55,9 +55,9 @@ shared_ptr<path::DataNode> gNMIService::get(gNMIServiceProvider& provider, Entit
 }
 
 //set
-bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, string operation)
+bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const string & operation)
 {
-    YLOG_INFO("Executing set RPC");
+    YLOG_INFO("Executing set RPC with {} operation", operation);
     string gnmi_payload = execute_set_gnmi(provider, filter);
     string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(gnmi_payload, operation);
     YLOG_DEBUG("=============Reply payload received from device=============");

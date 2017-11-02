@@ -35,7 +35,7 @@ namespace ydk
 	        gNMIService();
 	        ~gNMIService();
     		std::shared_ptr<path::DataNode> get(gNMIServiceProvider& provider, Entity& filter);
-    		bool set(gNMIServiceProvider& provider, Entity& filter, std::string operation);
+    		bool set(gNMIServiceProvider& provider, Entity& filter, const std::string & operation);
 	};
 }
 #endif /* GNMI_SERVICE_HPP */

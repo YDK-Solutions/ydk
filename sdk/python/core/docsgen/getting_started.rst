@@ -19,16 +19,15 @@ Ubuntu (Debian-based)
 .. code-block:: sh
 
    $ sudo apt-get install gdebi-core
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.3/libydk_0.6.3-1_amd64.deb
-   $ sudo gdebi libydk_0.6.3-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-alpha/libydk_0.8.0-1_amd64.deb
+   $ sudo gdebi libydk_0.8.0-1_amd64.deb
 
 Centos (Fedora-based)
 
 .. code-block:: sh
 
    $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.3/libydk-0.6.3-1.x86_64.rpm
-   $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-alpha/libydk-0.8.0-1.x86_64.rpm
 
 Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
 
@@ -43,8 +42,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh libxml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.3/libydk-0.6.3-Darwin.pkg
-   $ sudo installer -pkg libydk-0.6.3-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/libydk-0.8.0-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 
 Windows
 -------
@@ -64,10 +63,11 @@ How to install
 ==============
 Quick Install
 -------------
-You can install the latest model packages from the Python package index.  Note that, in some systems, you need to install the new package as root.  You get a fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) (depending on whether you're developing for an IOS XR or IOS XE platform) which automatically installs all other YDK-related packages (``ydk``, ``openconfig`` and ``ietf`` packages):
+You can install the latest model packages from the DevHub artifactory and Python package index.  Note that, in some systems, you need to install the new package as root.  You get a fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) (depending on whether you're developing for an IOS XR or IOS XE platform) which automatically installs all other YDK-related packages (``ydk``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -75,25 +75,34 @@ Alternatively, you can perform a partial installation.  If you only want to inst
 
 .. code-block:: sh
 
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
 
 .. code-block:: sh
 
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source
 ----------------------
-If you prefer not to use the YDK packages in the Python package index, you need to install manually the ``ydk`` core package and then the model bundles you plan to use.  To install the ``ydk`` core package, execute:
+If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``ydk`` core package and then the model bundles you plan to use.  To install the ``ydk`` core package, execute:
 
 .. code-block:: sh
 
-    $ cd core
+    $ git clone https://github.com/CiscoDevNet/ydk-gen.git -b gnmi
+    $ cd ydk-gen/sdk/python/core
     core$ python setup.py sdist
     core$ pip install dist/ydk*.gz
 
-Once you have installed the ``ydk`` core package, you can install one more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
+Once you have installed the ``ydk`` core package, you can install one more model bundles. The source code for the model bundles can be got by running:
+
+.. code-block:: sh
+
+    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.6.2
+
+Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
 
 .. code-block:: sh
 

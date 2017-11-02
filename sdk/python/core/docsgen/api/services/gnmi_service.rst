@@ -14,7 +14,7 @@ YDK gNMIService provides Set/Get functionalities.
 
         :param provider: (:py:class:`gNMIServiceProvider<ydk.providers.gNMIServiceProvider>`) Provider instance.
         :param entity: (:py:class:`Entity<ydk.types.Entity>`) Entity instance.
-        :param operation: (``str``) Supported gNMI operations include: ``create``, ``update`` and ``delete``.
+        :param operation: (``str``) Supported gNMI operations include: ``gnmi_create``, ``gnmi_delete``.
         :return: ``True`` if successful, ``False`` if not.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
@@ -69,4 +69,4 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` with ``gNM
 
     bgp = openconfig_bgp.Bgp()
 
-    bgp_read = gnmi_service.get(provider, bgp) # Perform get operation
+    bgp_read = gnmi_service.get(provider, bgp, 'create') # Perform get operation

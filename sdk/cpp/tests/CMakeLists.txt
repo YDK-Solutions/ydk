@@ -15,7 +15,8 @@ set(bundle_tests_src
         testsanitynctest.cpp
         test_crud.cpp
         test_core_gnmi.cpp
-        #test_gnmi_provider.cpp
+        test_gnmi_provider.cpp
+        test_gnmi_service.cpp
         test_on_demand_loading.cpp
         test_sanity_levels.cpp
         test_sanity_types.cpp

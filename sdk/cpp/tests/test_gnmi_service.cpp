@@ -23,10 +23,10 @@
 
 #include "config.hpp"
 #include "catch.hpp"
+#include <ydk/gnmi_provider.hpp>
 #include <ydk/gnmi_service.hpp>
-#include "ydk_ydktest/openconfig_bgp.hpp"
-//#include <ydk_ydktest/ydktest_sanity.hpp>
-//#include <ydk/types.hpp>
+#include <ydk_ydktest/openconfig_bgp.hpp>
+
 
 using namespace std;
 using namespace ydk;
@@ -34,13 +34,13 @@ using namespace path;
 
 using namespace std;
 using namespace ydk;
-//using namespace ydktest;
+using namespace ydktest;
 
-void config_bgp(openconfig::openconfig_bgp::Bgp bgp)
+void config_bgp(openconfig_bgp::Bgp bgp)
 {
     bgp.global->config->as = 65172;
     
-    auto neighbor = make_unique<openconfig::openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     neighbor->neighbor_address = "172.16.255.2";
     neighbor->config->neighbor_address = "172.16.255.2";
     neighbor->config->peer_as = 65172;
@@ -55,10 +55,10 @@ TEST_CASE("gnmi_service_get")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1:50051";
 
-    gNMIServiceProvider provider{repo, address};
-    gNMIService gs{address};
+    gNMIServiceProvider provider{repo, address, true};
+    gNMIService gs{};
 
-    openconfig::openconfig_bgp::Bgp filter = {};
+    openconfig_bgp::Bgp filter = {};
 
     // Get Request 
     auto get_reply = gs.get(provider, filter);
@@ -70,15 +70,15 @@ TEST_CASE("gnmi_service_create")
 {
 	// session
     path::Repository repo{TEST_HOME};
-    string address = "127.0.0.1:50051";
+    string address = "pavarotti:57400";
 
-    gNMIServiceProvider provider{repo, address};
-    gNMIService gs{address};
+    gNMIServiceProvider provider{repo, address, true};
+    gNMIService gs{};
 
-    openconfig::openconfig_bgp::Bgp filter = {};
+    openconfig_bgp::Bgp filter = {};
 
     // Set Create Request
-    openconfig::openconfig_bgp::Bgp bgp = {};
+    openconfig_bgp::Bgp bgp = {};
     config_bgp(bgp);
     auto create_reply = gs.set(provider, bgp, "gnmi_create");
     REQUIRE(create_reply);
@@ -95,10 +95,10 @@ TEST_CASE("gnmi_service_delete")
     string address = "127.0.0.1:50051";
 
     gNMIServiceProvider provider{repo, address};
-    gNMIService gs{address};
+    gNMIService gs{};
 
-    openconfig::openconfig_bgp::Bgp filter = {};
-    openconfig::openconfig_bgp::Bgp bgp = {};
+    openconfig_bgp::Bgp filter = {};
+    openconfig_bgp::Bgp bgp = {};
 
     // Set Delete Request
     auto delete_reply = gs.set(provider, bgp, "gnmi_delete");

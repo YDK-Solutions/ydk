@@ -118,13 +118,13 @@ TEST_CASE("gnmi_bgp_create")
 
     ydk::path::Codec s{};
 
-    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
-//    //first delete
-    std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.create_rpc("ydk:delete") };
-    auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-    delete_rpc->get_input_node().create_datanode("entity", json);
-    //call delete
-    (*delete_rpc)(session);
+//    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
+////    //first delete
+//    std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.create_rpc("ydk:delete") };
+//    auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
+//    delete_rpc->get_input_node().create_datanode("entity", json);
+//    //call delete
+//    (*delete_rpc)(session);
 //
 //    auto & as = bgp.create_datanode("global/config/as", "65172");
 //
@@ -145,15 +145,15 @@ TEST_CASE("gnmi_bgp_create")
 //    (*create_rpc)(session);
 
     //call read
-//    std::shared_ptr<ydk::path::Rpc> read_rpc{schema.create_rpc("ydk:read")};
-//    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
-//    auto json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
-//    REQUIRE( !json.empty() );
-//    read_rpc->get_input_node().create_datanode("filter", "{\"openconfig-bgp:bgp\":{}}");
-//    auto read_result = (*read_rpc)(session);
-//    REQUIRE(read_result != nullptr);
-//    gnmi_print_tree(read_result.get(),"");
-//    json = s.encode(*read_result, ydk::EncodingFormat::JSON, false);
+    std::shared_ptr<ydk::path::Rpc> read_rpc{schema.create_rpc("ydk:read")};
+    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
+    auto json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
+    REQUIRE( !json.empty() );
+    read_rpc->get_input_node().create_datanode("filter", "{\"openconfig-bgp:bgp\":{}}");
+    auto read_result = (*read_rpc)(session);
+    REQUIRE(read_result != nullptr);
+    gnmi_print_tree(read_result.get(),"");
+    json = s.encode(*read_result, ydk::EncodingFormat::JSON, false);
 //    REQUIRE(json == gnmi_expected_bgp_read);
 //
 //    //call update (update equiv. create in gnmi)

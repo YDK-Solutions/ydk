@@ -29,14 +29,17 @@
 
 namespace ydk
 {
-	class gNMIService
-	{
-	    public:
-	        gNMIService();
-	        ~gNMIService();
-    		std::shared_ptr<path::DataNode> get(gNMIServiceProvider& provider, Entity& filter);
-    		bool set(gNMIServiceProvider& provider, Entity& filter, const std::string & operation);
-	};
+class gNMIServiceProvider;
+
+class gNMIService
+{
+    public:
+        gNMIService();
+        ~gNMIService();
+        std::shared_ptr<Entity> get(gNMIServiceProvider& provider, Entity& filter);
+        bool set(gNMIServiceProvider& provider, Entity& filter, const std::string & operation);
+};
+
 }
 #endif /* GNMI_SERVICE_HPP */
 

@@ -98,6 +98,7 @@ function install_protobuf {
     make check
     sudo make install
     sudo ldconfig
+    cd -
 }
 
 function install_grpc {
@@ -109,6 +110,7 @@ function install_grpc {
     sudo ldconfig
     make
     sudo make install
+    cd -
 }
 
 ########################## EXECUTION STARTS HERE #############################

@@ -12,6 +12,35 @@ System Requirements
 ===================
 Please follow the below instructions to install the system requirements before installing YDK-Py:
 
+gNMI Requirements
+------------------
+
+Install protobuf
+
+.. code-block:: sh
+
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
+    unzip protobuf-cpp-3.3.0.zip
+    cd protobuf-3.3.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
+    cd -
+
+Install gRPC
+
+.. code-block:: sh
+
+    git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make
+    sudo make install
+    cd -
+
 Linux
 -----
 Ubuntu (Debian-based)

@@ -41,6 +41,12 @@ Install gRPC
     sudo make install
     cd -
 
+**Note:** There is an open issue with gRPC on Centos/Fedora which requires an extra step. See `this issue <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
+
+.. code-block:: sh
+
+   $ sudo ln -s /usr/local/lib/libgrpc++.so.1.7.2 /usr/local/lib/libgrpc++.so.1
+
 Linux
 -----
 Ubuntu (Debian-based)

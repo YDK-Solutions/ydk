@@ -6,7 +6,7 @@ gNMI Service Provider
 
     Constructs an instance of the ``gNMIServiceProvider`` to connect to a `gNMI <https://github.com/openconfig/gnmi>`_ server. This has clean up methods implemented in its destructor. So, the user does not need to worry about closing the gNMI session.
 
-    :param repo: Instance of :py:class:`Repository<ydk.path.Repository>` with path to local directory containing all the yang models supported on the gNMI server
+    :param repo: Instance of :py:class:`Repository<ydk.path.Repository>` with path to local directory containing the the `ydk yang model <https://raw.githubusercontent.com/CiscoDevNet/ydk-gen/1344b3f22d746764f17536ac4e666836de4ba84d/sdk/cpp/core/tests/models/ydk%402016-02-26.yang>`_ along with all the yang models supported on the gNMI server
     :param address: IP address & port of the device supporting a gNMI interface in the format ``ip-address:port``
     :param is_secure: Indicates usage of gNMI secure channel. **Note:** When using ``is_secure=True``, the certificate file from the server (with a name like ``ems.pem``) needs to be copied to the location of your python script
 

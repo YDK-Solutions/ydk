@@ -23,6 +23,13 @@ $ tar -xvf libydk-0.5.4-Darwin.tar.gz
 $ pkgbuild --root libydk-0.5.4-Darwin --identifier com.cisco.libydk --version 0.5.4 --install-location /usr/local libydk_0.5.4_Darwin.pkg
 ```
 
+## CentOS
+Need to install the below package to build RPM:
+
+```
+$ sudo yum install redhat-lsb
+```
+
 # Note
 The following variables are hardcoded in the CMakeLists.txt file and may need to be modified depending on the desired package/bundle:
 * CPACK_PACKAGE_NAME

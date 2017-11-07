@@ -19,9 +19,9 @@ Install protobuf
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
-    unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-3.3.0
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.4.0.zip
+    unzip protobuf-cpp-3.4.0.zip
+    cd protobuf-3.4.0
     ./configure
     make
     make check
@@ -33,7 +33,7 @@ Install gRPC
 
 .. code-block:: sh
 
-    git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
+    git clone -b v1.7.0 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     sudo ldconfig
@@ -41,11 +41,12 @@ Install gRPC
     sudo make install
     cd -
 
-**Note:** There is an open issue with gRPC on Centos/Fedora which requires an extra step. See `this issue <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
+**Note:** There is an open issue with gRPC on Centos/Fedora which requires an extra step before running any YDK gNMI app. See `this issue <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
 
 .. code-block:: sh
 
-   $ sudo ln -s /usr/local/lib/libgrpc++.so.1.7.2 /usr/local/lib/libgrpc++.so.1
+   $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/location_where_grpc_is_downloaded/grpc/libs/opt:/location_where_protobuf_is_downloaded/protobuf-3.3.0/src/.libs:/usr/local/lib64
+
 
 Linux
 -----

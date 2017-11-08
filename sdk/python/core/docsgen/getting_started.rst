@@ -19,7 +19,7 @@ Install protobuf
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.4.0.zip
+    wget https://github.com/google/protobuf/releases/download/v3.4.0/protobuf-cpp-3.4.0.zip
     unzip protobuf-cpp-3.4.0.zip
     cd protobuf-3.4.0
     ./configure

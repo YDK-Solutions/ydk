@@ -239,8 +239,13 @@ def create_shared_libraries(output_directory):
         shutil.rmtree(cmake_build_dir)
     os.makedirs(cmake_build_dir)
     os.chdir(cmake_build_dir)
-    try:
-        subprocess.check_call(['cmake', '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_C_COMPILER=/usr/bin/clang', '-DCMAKE_CXX_COMPILER=/usr/bin/clang++', '..'])
+    try:        
+        cmake3_installed = (0 == subprocess.call(['which', 'cmake3'], stdout=subprocess.PIPE, stderr=subprocess.PIPE))
+        if(cmake3_installed):
+            cmake_executable = 'cmake3'
+        else:
+            cmake_executable = 'cmake'
+        subprocess.check_call([cmake_executable, '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_C_COMPILER=/usr/bin/clang', '-DCMAKE_CXX_COMPILER=/usr/bin/clang++', '..'])
     except subprocess.CalledProcessError as e:
         print('\nERROR: Failed to create shared library!\n')
         sys.exit(e.returncode)

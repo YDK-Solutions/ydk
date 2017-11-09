@@ -61,8 +61,8 @@ NetconfServiceProvider
         :param repo: Reference to an instance of :cpp:class:`Repository<ydk::path::Repository>`
         :param address: IP address of the device supporting a netconf interface.
         :param username: Username to log in to the device.
-        :param private_key_path: Path to private key file.
-        :param public_key_path: Path to public key file.
+        :param private_key_path: Either relative or absolute path to private key file.
+        :param public_key_path: Either relative or absolute path to public key file.
         :param port: Device port used to access the netconf interface. Default value is 830.
         :param on_demand: On demand downloading by default.
         :param timeout: The timeout in microseconds, -1 for infinite timeout, 0 for non-blocking
@@ -81,8 +81,8 @@ NetconfServiceProvider
 
         :param address: IP address of the device supporting a netconf interface
         :param username: Username to log in to the device
-        :param private_key_path: Path to private key file.
-        :param public_key_path: Path to public key file.
+        :param private_key_path: Either relative or absolute path to private key file.
+        :param public_key_path: Either relative or absolute path to public key file.
         :param port: Device port used to access the netconf interface. Default value is 830
         :param on_demand: On demand downloading by default.
         :param common_cache: Use common caching directory if enabled.

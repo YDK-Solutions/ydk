@@ -141,32 +141,6 @@ NetconfSession::NetconfSession(const string& address,
        address, port, timeout);
 }
 
-// NetconfSession::NetconfSession(
-//     const std::string& address,
-//     const std::string& username,
-//     path::Repository&  repo,
-//     const std::string& private_key_path,
-//     const std::string& public_key_path,
-//     int port,
-//     bool on_demand,
-//     bool common_cache,
-//     int timeout);
-// {
-//     // initialize client
-//     initialize_client_with_key(
-//         address, username, private_key_path, public_key_path, port, timeout);
-    
-//     // initialize repo
-//     if (repo == "")
-//     {
-//         auto caching_option = common_cache ? path::ModelCachingOption::COMMON : path::ModelCachingOption::PER_DEVICE;
-//         path::Repository repo(caching_option);
-//     }
-//     initialize_repo(repo, on_demand)
-//     YLOG_INFO("Connected to {} on port {} using SSH with timeout of {}",
-//         address, port, timeout);
-// }
-
 void NetconfSession::initialize_client_with_key(const string& address,
                                        const string& username,
                                        const string& private_key_path,

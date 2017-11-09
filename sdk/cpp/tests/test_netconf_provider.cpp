@@ -50,15 +50,6 @@ TEST_CASE("get_capabilities")
     CHECK_NOTHROW(provider.get_capabilities());
 }
 
-// TEST_CASE("CreateKeybaseAuthRepo_Domingo")
-// {
-//     ydk::path::Repository repo{};
-//     const string& private_key_path = "../domingo_sshkey";
-//     const string& public_key_path = "../domingo_sshkey.pub";
-//     NetconfServiceProvider provider{repo, "domingo", "admin", private_key_path, public_key_path};
-//     CHECK_NOTHROW(provider.get_encoding());
-// }
-
 TEST_CASE("CreateKeybaseAuthRepo_ConfD")
 {
     ydk::path::Repository repo{};

@@ -65,15 +65,6 @@ class SanityTest(unittest.TestCase):
             public_key_path = public,
             port = self.port)
 
-        # private = "%s/domingo_sshkey" % dir_path
-        # public = "%s/domingo_sshkey.pub" % dir_path
-        # provider = NetconfServiceProvider(
-        #     address='domingo',
-        #     username='admin',
-        #     private_key_path = private,
-        #     public_key_path = public,
-        #     port=830)
-
         session = provider.get_session()
         self.assertEqual(session is not None, True)
 

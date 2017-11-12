@@ -3,7 +3,6 @@
 #include <memory>
 #include "../src/path_api.hpp"
 #include "../src/gnmi_provider.hpp"
-#include "ydk/crud_service.hpp"
 //#include "ydk_openconfig/openconfig_bgp.hpp"
 //#include "args_parser.h"
 #include <spdlog/spdlog.h>
@@ -43,7 +42,6 @@ int main(int argc, char* argv[]) {
 
     gNMIServiceProvider sp{repo, address};
 
-    CrudService crud{};
 
 //    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
 //    auto bgp_read = crud.read_config(sp, *bgp_filter);

@@ -81,7 +81,7 @@ func (c *CrudService) Read(
 
 	data := map[string]interface{} { "filter": filter }
 	return path.ReadDatanode(
-		filter, path.ExecuteRPC(provider, "ydk:read", data, true))
+		filter, path.ExecuteRPC(provider, "ydk:read", data, false))
 }
 
 // ReadConfig only reads config.
@@ -91,7 +91,7 @@ func (c *CrudService) ReadConfig(
 
 	data := map[string]interface{} { "filter": filter }
 	return path.ReadDatanode(
-		filter, path.ExecuteRPC(provider, "ydk:read", data, false))
+		filter, path.ExecuteRPC(provider, "ydk:read", data, true))
 }
 
 // CodecService supports encoding and decoding Go model API objects of type

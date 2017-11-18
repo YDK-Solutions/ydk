@@ -57,11 +57,8 @@ class ApiModelBuilder(object):
             module.i_package = package
             package.stmt = module
 
-            broken_name = package.name.split('_')
-            if broken_name[0] == self.bundle_name and self.language == 'go':
-                package.bundle_name = broken_name[0]
-                broken_name = broken_name[1:]
-                package.name = '_'.join(broken_name)
+            if self.language == 'go':
+                package.name = get_go_package_name(package.name, self.bundle_name)
             deviation_packages.append(package)
 
         for module in only_modules:
@@ -69,11 +66,8 @@ class ApiModelBuilder(object):
             module.i_package = package
             package.stmt = module
 
-            broken_name = package.name.split('_')
-            if broken_name[0] == self.bundle_name and self.language == 'go':
-                package.bundle_name = broken_name[0]
-                broken_name = broken_name[1:]
-                package.name = '_'.join(broken_name)
+            if self.language == 'go':
+                package.name = get_go_package_name(package.name, self.bundle_name)
             self._create_expanded_api_model(module, package, deviation_packages)
             packages.append(package)
 
@@ -423,11 +417,8 @@ class GroupingClassApiModelBuilder(ApiModelBuilder):
             m.i_package = p
             p.stmt = m
 
-            broken_name = p.name.split('_')
-            if broken_name[0] == self.bundle_name and self.language == 'go':
-                p.bundle_name = broken_name[0]
-                broken_name = broken_name[1:]
-                p.name = '_'.join(broken_name)
+            if self.language == 'go':
+                package.name = get_go_package_name(package.name, self.bundle_name)
             self._create_grouping_class_api_model(m, p)
             packages.append(p)
 
@@ -625,14 +616,22 @@ class SubModuleBuilder(object):
             sub.i_package = package
             package.stmt = sub
 
-            broken_name = package.name.split('_')
-            if broken_name[0] == bundle_name and language == 'go':
-                package.bundle_name = broken_name[0]
-                broken_name = broken_name[1:]
-                package.name = '_'.join(broken_name)
+            if language == 'go':
+                package.name = get_go_package_name(package.name, bundle_name)
             packages.append(package)
 
         return packages
+
+
+def get_go_package_name(package_name, bundle_name):
+    pname = package_name.lower()
+    bname = bundle_name.lower()
+
+    if (pname.startswith(bname)):
+        i = len(bname) + 1
+        pname = pname[i:]
+
+    return pname
 
 
 def name_matches_ancestor(name, parent_element):

@@ -802,6 +802,9 @@ class Enum(DataType):
             desc = leaf_or_typedef.search_one('description')
             if desc is not None:
                 self.comment = desc.arg
+            else:
+                self.comment = ""
+
         for enum_stmt in stmt.search('enum'):
             literal = EnumLiteral(self.iskeyword)
             literal.stmt = enum_stmt

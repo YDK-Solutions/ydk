@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/protocol"
@@ -47,7 +48,7 @@ func (suite *OpenDaylightProviderTestSuite) TestReadODL() {
 
 	provider := suite.Provider.GetNodeProvider("xr")
 
-	entity := suite.CRUD.Read(provider, &bgp)
+	entity := suite.CRUD.ReadConfig(provider, &bgp)
 
 	bgpRead := entity.(*oc_bgp.Bgp)
 
@@ -87,5 +88,8 @@ func (suite *OpenDaylightProviderTestSuite) TestCreateODL() {
 }
 
 func TestOpenDaylightProviderTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(OpenDaylightProviderTestSuite))
 }

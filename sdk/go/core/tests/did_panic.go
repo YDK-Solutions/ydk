@@ -17,5 +17,8 @@ func didPanic(panicTestFunc func()) (bool, string) {
 		panicTestFunc()
 
 	}()
+	if message == nil {
+		message = ""
+	}
 	return didPanic, message.(string)
 }

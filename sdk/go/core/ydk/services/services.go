@@ -487,7 +487,7 @@ func getEntityLookupKey(
 	switch encoding {
 
 	case encodingFmt.XML:
-		fmt.Println("Using XML encoding...")
+		ydk.YLogDebug("Using XML encoding...")
 
 		type XMLObj struct {
 			XMLName xml.Name
@@ -496,25 +496,25 @@ func getEntityLookupKey(
 		var xmlObj XMLObj
 		err := xml.Unmarshal([]byte(payload), &xmlObj)
 		if err != nil {
-			fmt.Println("Error parsing XML: ", err)
+			ydk.YLogError(fmt.Sprintf("Error parsing XML: ", err))
 			panic(err)
 		}
 
 		nmsp = fmt.Sprintf("%v", xmlObj.XMLName)
 
 	case encodingFmt.JSON:
-		fmt.Println("Using JSON encoding...")
+		ydk.YLogDebug("Using JSON encoding...")
 
 		var jsonObj interface{}
 		err := json.Unmarshal([]byte(payload), &jsonObj)
 		if err != nil {
-			fmt.Println("Error parsing JSON: ", err)
+			ydk.YLogError(fmt.Sprintf("Error parsing JSON: ", err))
 			panic(err)
 		}
 
 		items := jsonObj.(map[string]interface{})
 		if len(items) != 1 {
-			fmt.Println("List of payload not supported")
+			ydk.YLogError("List of payload not supported")
 			panic("List of payload not supported")
 		}
 

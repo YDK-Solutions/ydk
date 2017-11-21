@@ -379,7 +379,7 @@ func (suite *CodecTestSuite) TestXMLEncode2() {
 	payload := suite.Codec.Encode(&suite.Provider, &r1)
 	result := equalPayload(payload, xmlRunnerPayload2, xml.Unmarshal, xml.Marshal)
 	suite.Equal(result, true)
-	fmt.Println(payload)
+	ydk.YLogDebug(payload)
 }
 
 func (suite *CodecTestSuite) TestJSONEncode1() {

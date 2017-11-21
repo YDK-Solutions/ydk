@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -104,7 +105,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
 	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
-	fmt.Println("TestDelete finished Create")
+	ydk.YLogDebug("TestDelete finished Create")
 
 	runnerUpdate := ysanity.Runner{}
 	eU1 := ysanity.Runner_OneList_Ldata{}
@@ -112,7 +113,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	eU1.YFilter = yfilter.Delete
 	runnerUpdate.OneList.Ldata = append(runnerUpdate.OneList.Ldata, eU1)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
-	fmt.Println("TestDelete finished Update")
+	ydk.YLogDebug("TestDelete finished Update")
 
 	// delete again raises error
 	// The payload errMsg is hardcoded with message-id of certain value.

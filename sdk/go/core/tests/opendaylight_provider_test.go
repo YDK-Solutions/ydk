@@ -44,7 +44,7 @@ func (suite *OpenDaylightProviderTestSuite) TestReadODL() {
 
 	nodeIDs := suite.Provider.GetNodeIDs()
 
-	fmt.Printf("nodeIDs: %v\n", nodeIDs)
+	ydk.YLogDebug(fmt.Sprintf("nodeIDs: %v\n", nodeIDs))
 
 	provider := suite.Provider.GetNodeProvider("xr")
 
@@ -52,9 +52,9 @@ func (suite *OpenDaylightProviderTestSuite) TestReadODL() {
 
 	bgpRead := entity.(*oc_bgp.Bgp)
 
-	fmt.Println("BGP configuration: ")
-	fmt.Printf("AS: %v\n", bgpRead.Global.Config.As)
-	fmt.Printf("Router ID: %v\n", bgpRead.Global.Config.RouterId)
+	ydk.YLogDebug("BGP configuration: ")
+	ydk.YLogDebug(fmt.Sprintf("AS: %v\n", bgpRead.Global.Config.As))
+	ydk.YLogDebug(fmt.Sprintf("Router ID: %v\n", bgpRead.Global.Config.RouterId))
 
 	suite.Equal(bgpRead.Global.Config.As, "65172")
 	suite.Equal(bgpRead.Global.Config.RouterId, "1.2.3.4")

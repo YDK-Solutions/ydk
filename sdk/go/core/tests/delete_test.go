@@ -196,7 +196,7 @@ func (suite *DeleteTestSuite) TestDeleteOnContainer() {
 // TODO: Delete whole list using YFilter
 // func (suite *DeleteTestSuite) TestDeleteOnNestedList() {
 // 	runnerCreate := getNestedObject()
-// 	fmt.Println(ee22)
+// 	ydk.YLogDebug(ee22)
 // 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
 //     entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})

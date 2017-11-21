@@ -365,15 +365,15 @@ func (suite *ExecutorServiceTestSuite) TestKillSession() {
 	suite.Equal(funcDidPanic, true)
 	suite.Regexp("<session-id>", panicValue)
 
-	sessionIdStr := strings.Split(panicValue, "<session-id>")[1]
-	sessionIdStr = strings.Split(sessionIdStr, "</session-id>")[0]
-	sessionId, err := strconv.Atoi(sessionIdStr)
+	sessionIDStr := strings.Split(panicValue, "<session-id>")[1]
+	sessionIDStr = strings.Split(sessionIDStr, "</session-id>")[0]
+	sessionID, err := strconv.Atoi(sessionIDStr)
 	suite.Equal(err, nil)
 
-	fmt.Println(sessionId)
+	ydk.YLogDebug(sessionIDStr)
 
 	killRpc := ietfNetconf.KillSession{}
-	killRpc.Input.SessionId = sessionId
+	killRpc.Input.SessionId = sessionID
 
 	readEntity = suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &killRpc, nil)
 	suite.Equal(readEntity, nil)

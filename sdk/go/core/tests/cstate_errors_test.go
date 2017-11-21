@@ -123,7 +123,7 @@ func (suite *CStateErrorsTestSuite) TestOpenDaylightInvalidNodeID() {
 	odlProvider.Connect()
 
 	nodeIDs := odlProvider.GetNodeIDs()
-	fmt.Printf("nodeIDS: %v\n", nodeIDs)
+	ydk.YLogDebug(fmt.Sprintf("nodeIDS: %v", nodeIDs))
 
 	nodeID := "xe"
 	errMsg := fmt.Sprintf("YGOServiceProviderError: Invalid node id %v", nodeID)

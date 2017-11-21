@@ -237,12 +237,12 @@ func (suite *NetconfServiceTestSuite) TestKillSession() {
 	suite.Equal(funcDidPanic, true)
 	suite.Regexp("<session-id>", panicValue)
 
-	sessionIdStr := strings.Split(panicValue, "<session-id>")[1]
-	sessionIdStr = strings.Split(sessionIdStr, "</session-id>")[0]
-	sessionId, err := strconv.Atoi(sessionIdStr)
+	sessionIDStr := strings.Split(panicValue, "<session-id>")[1]
+	sessionIDStr = strings.Split(sessionIDStr, "</session-id>")[0]
+	sessionID, err := strconv.Atoi(sessionIDStr)
 	suite.Equal(err, nil)
 
-	op = suite.NS.KillSession(&suite.Provider, sessionId)
+	op = suite.NS.KillSession(&suite.Provider, sessionID)
 	suite.Equal(op, true)
 }
 

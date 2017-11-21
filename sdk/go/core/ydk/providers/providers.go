@@ -26,6 +26,7 @@ package providers
 
 import (
 	"fmt"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
@@ -205,7 +206,8 @@ func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
 	}
 	_, ok := provider.RootSchemaTable[bundleName]
 	if !ok {
-		fmt.Printf("CodecServiceProvider initialized with %v bundle\n", bundleName)
+		ydk.YLogDebug(fmt.Sprintf(
+			"CodecServiceProvider initialized with %v bundle", bundleName))
 		rootSchemaNode := path.InitCodecServiceProvider(&provider.State, entity, provider.Repo)
 		provider.RootSchemaTable[bundleName] = rootSchemaNode
 	}

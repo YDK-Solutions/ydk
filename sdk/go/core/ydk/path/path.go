@@ -148,7 +148,9 @@ func ExecuteRPCEntity(
 	panicOnCStateError(cstate)
 
 	child := rpcEntity.GetChildByName("input", "")
-	walkRPCChildren(state, child, rpcInput, "")
+	if (child != nil && child.HasDataOrFilter()) {
+		walkRPCChildren(state, child, rpcInput, "")
+	}
 
 	readDataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
@@ -186,9 +188,13 @@ func walkRPCChildren(
 		}
 
 		for childName, _ := range children {
-			ydk.YLogDebug(fmt.Sprintf(
-				"Looking at entity child '%s'", children[childName].GetSegmentPath()))
-			walkRPCChildren(state, children[childName], rpcInput, path)
+			if (children[childName] != nil &&
+				children[childName].HasDataOrFilter()) {
+
+				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'",
+					children[childName].GetSegmentPath()))
+				walkRPCChildren(state, children[childName], rpcInput, path)
+			}
 		}
 
 		// if there are leafs, create from entity path
@@ -225,7 +231,7 @@ func createFromChildren(
 	state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
 
 	for childName, child := range children {
-		if (len(child.GetChildren()) == 0) {
+		if(child.HasDataOrFilter()) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
 				childName, child.GetEntityPath(child.GetParent()).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))

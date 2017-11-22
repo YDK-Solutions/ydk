@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
+	// "github.com/CiscoDevNet/ydk-go/ydk/models/ietf/interfaces"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -52,13 +53,13 @@ func getNestedObject() ysanity.Runner {
 	return runner
 }
 
-type DeleteTestSuite struct {
+type CrudTestSuite struct {
 	suite.Suite
 	Provider providers.NetconfServiceProvider
 	CRUD     services.CrudService
 }
 
-func (suite *DeleteTestSuite) SetupSuite() {
+func (suite *CrudTestSuite) SetupSuite() {
 	suite.CRUD = services.CrudService{}
 	suite.Provider = providers.NetconfServiceProvider{
 		Address:  "127.0.0.1",
@@ -68,16 +69,40 @@ func (suite *DeleteTestSuite) SetupSuite() {
 	suite.Provider.Connect()
 }
 
-func (suite *DeleteTestSuite) TearDownSuite() {
+func (suite *CrudTestSuite) TearDownSuite() {
 	suite.Provider.Disconnect()
 }
 
-func (suite *DeleteTestSuite) BeforeTest(suiteName, testName string) {
+func (suite *CrudTestSuite) BeforeTest(suiteName, testName string) {
 	suite.CRUD.Delete(&suite.Provider, &ysanity.Runner{})
 	fmt.Printf("%v: %v ...\n", suiteName, testName)
 }
 
-func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
+// todo: Read and ReadConfig both not working for OneReadOnly
+// func (suite *CrudTestSuite) TestReadOnlyContainer() {
+// 	intrfaces := interfaces.Interfaces{}
+// 	intrfaces.Interface = make([]interfaces.Interfaces_Interface, 1)
+
+// 	funcDidPanic, panicValue := didPanic(func() {
+// 		suite.CRUD.ReadConfig(&suite.Provider, &intrfaces) })
+
+// 	fmt.Println(intrfaces)
+
+// 	runner := ysanity.Runner{}
+// 	runner.OneReadOnly.Name = "runner.OneReadOnly.Name"
+
+// 	suite.CRUD.Read(&suite.Provider, &runner)
+// 	fmt.Println(runner)
+
+// 	// Try ReadConfig, expecting failure
+// 	funcDidPanic, panicValue = didPanic(func() {
+// 		suite.CRUD.ReadConfig(&suite.Provider, &runner) })
+
+// 	suite.Equal(funcDidPanic, true)
+// 	fmt.Println(panicValue)
+// }
+
+func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 	runnerCreate := ysanity.Runner{}
 	runnerCreate.One.Name = "runner.One.Name"
 	runnerCreate.Two.Name = "runner.Two.Name"
@@ -96,7 +121,7 @@ func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
 }
 
 // TODO: leaf-list encoding error
-// func (suite *DeleteTestSuite) TestDeleteOnLeafListSlice() {
+// func (suite *CrudTestSuite) TestDeleteOnLeafListSlice() {
 //     runnerCreate := ysanity.Runner{}
 //     runnerCreate.One.Name = "runner.One.Name"
 //     // TODO: leaf-list encoding error
@@ -124,7 +149,7 @@ func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
 // }
 
 // TODO: delete leaf from leaf-list
-// func (suite *DeleteTestSuite) TestDeleteOnLeafList() {
+// func (suite *CrudTestSuite) TestDeleteOnLeafList() {
 //     runnerCreate := ysanity.Runner{}
 //     runnerCreate.One.Name = "runner.One.Name"
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "0")
@@ -153,7 +178,7 @@ func (suite *DeleteTestSuite) TestDeleteObjectOnLeaf() {
 //     suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
 // }
 
-func (suite *DeleteTestSuite) TestDeleteOnListWithIdentitykey() {
+func (suite *CrudTestSuite) TestDeleteOnListWithIdentitykey() {
 	runner := ysanity.Runner{}
 	il := ysanity.Runner_OneList_IdentityList{}
 	il.Config.Id = ysanity.Child_Identity{}
@@ -175,7 +200,7 @@ func (suite *DeleteTestSuite) TestDeleteOnListWithIdentitykey() {
 	suite.Equal(types.EntityEqual(entityRead, &ysanity.Runner{}), true)
 }
 
-func (suite *DeleteTestSuite) TestDeleteOnContainer() {
+func (suite *CrudTestSuite) TestDeleteOnContainer() {
 	runnerCreate := ysanity.Runner{}
 	runnerCreate.One.Name = "runner.One.Name"
 	runnerCreate.Two.Name = "runner.Two.Name"
@@ -194,7 +219,7 @@ func (suite *DeleteTestSuite) TestDeleteOnContainer() {
 }
 
 // TODO: Delete whole list using YFilter
-// func (suite *DeleteTestSuite) TestDeleteOnNestedList() {
+// func (suite *CrudTestSuite) TestDeleteOnNestedList() {
 // 	runnerCreate := getNestedObject()
 // 	ydk.YLogDebug(ee22)
 // 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
@@ -213,7 +238,7 @@ func (suite *DeleteTestSuite) TestDeleteOnContainer() {
 //     suite.Equal(types.EntityEqual(entity, &runnerCmp), true)
 // }
 
-func (suite *DeleteTestSuite) TestDeleteOnListElement() {
+func (suite *CrudTestSuite) TestDeleteOnListElement() {
 	runnerCreate := getNestedObject()
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
@@ -229,7 +254,7 @@ func (suite *DeleteTestSuite) TestDeleteOnListElement() {
 	suite.Equal(types.EntityEqual(entity, &runnerCmp), true)
 }
 
-func (suite *DeleteTestSuite) TestDeleteOnListElements() {
+func (suite *CrudTestSuite) TestDeleteOnListElements() {
 	runnerCreate := ysanity.Runner{}
 	runnerCreate.One.Name = "one"
 	foo := ysanity.Runner_OneList_Ldata{}
@@ -264,7 +289,7 @@ func (suite *DeleteTestSuite) TestDeleteOnListElements() {
 }
 
 // TODO: Delete list using YFilter
-// func (suite *DeleteTestSuite) TestDeleteOnList() {
+// func (suite *CrudTestSuite) TestDeleteOnList() {
 //     runnerCreate := ysanity.Runner{}
 //     runnerCreate.One.Name = "one"
 //     foo := ysanity.Runner_OneList_Ldata{}
@@ -292,6 +317,6 @@ func (suite *DeleteTestSuite) TestDeleteOnListElements() {
 //     suite.Equal(types.EntityEqual(entity, &runnerCmp), true)
 // }
 
-func TestDeleteTestSuite(t *testing.T) {
-	suite.Run(t, new(DeleteTestSuite))
+func TestCrudTestSuite(t *testing.T) {
+	suite.Run(t, new(CrudTestSuite))
 }

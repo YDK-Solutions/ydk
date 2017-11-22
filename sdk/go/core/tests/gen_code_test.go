@@ -4,9 +4,10 @@ import (
 	"fmt"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
-	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -51,7 +52,7 @@ func (suite *GenCodeTestSuite) TearDownSuite() {
 }
 
 func configBgp(bgp *ysanity_bgp.Bgp) {
-	bgp.Global.Config.As = 65172 //types.Delete
+	bgp.Global.Config.As = 65172 // yfilter.Delete
 	bgp.Global.Config.RouterId = "1.2.3.4"
 
 	ipv6Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
@@ -71,10 +72,11 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
 	bgp := ysanity_bgp.Bgp{}
 	configBgp(&bgp)
 
-	suite.Provider.Encoding = types.XML
+	suite.Provider.Encoding = encoding.XML
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
-	fmt.Printf("In TestGenCodeXMLEncoding, payload = %v", payload)
+	ydk.YLogDebug(fmt.Sprintf(
+		"In TestGenCodeXMLEncoding, payload = %v", payload))
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
@@ -82,7 +84,7 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
 	bgpDecoded := entity.(*ysanity_bgp.Bgp)
 
 	p := suite.Codec.Encode(&suite.Provider, bgpDecoded)
-	fmt.Printf("In TestGenCodeXMlDecoding, payload = %v", p)
+	ydk.YLogDebug(fmt.Sprintf("In TestGenCodeXMlDecoding, payload = %v", p))
 }
 
 func TestGenCodeTestSuite(t *testing.T) {

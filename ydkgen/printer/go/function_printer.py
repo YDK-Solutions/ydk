@@ -27,7 +27,10 @@ class FunctionPrinter(object):
         self.leafs = leafs
         self.children = children
 
-        self.class_alias = clazz.go_name(case='lowerCamel')
+        identifier = clazz.go_name(case='lowerCamel')
+        if clazz.iskeyword(identifier):
+            identifier = "self"
+        self.class_alias = identifier
 
     def print_all(self):
         self.print_function_header()

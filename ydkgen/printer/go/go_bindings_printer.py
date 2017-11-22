@@ -83,10 +83,6 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
         #     self._print_tests(package, self.test_dir)
 
     def _print_go_module(self, package, path):
-        # broken_name = package.name.split('_')
-        # if broken_name[0] == self.bundle_name:
-        #     broken_name = broken_name[1:]
-        #     package.name = '_'.join(broken_name)
         path = '%s/%s' % (path, package.name)
         self.initialize_output_directory(path)
 

@@ -27,7 +27,8 @@ using namespace ydk;
 using namespace std;
 #define NC_VERB_VERBOSE 2
 
-TEST_CASE("tcp_xr")
+// NOTE: The ./ ensures this test has to be explicitly run by name
+TEST_CASE("./tcp_xr")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -61,7 +62,7 @@ TEST_CASE("tcp_xr")
 }
 
 
-TEST_CASE("tcp_create")
+TEST_CASE("./tcp_create")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -73,7 +74,7 @@ TEST_CASE("tcp_create")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("tcp_edit_get_config")
+TEST_CASE("./tcp_edit_get_config")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -153,7 +154,7 @@ TEST_CASE("tcp_edit_get_config")
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 }
 
-TEST_CASE("tcp_validate")
+TEST_CASE("./tcp_validate")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -174,7 +175,7 @@ TEST_CASE("tcp_validate")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("tcp_lock_unlock")
+TEST_CASE("./tcp_lock_unlock")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -215,7 +216,7 @@ TEST_CASE("tcp_lock_unlock")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("tcp_rpc_error")
+TEST_CASE("./tcp_rpc_error")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -268,7 +269,7 @@ TEST_CASE("tcp_rpc_error")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("tcp_device_not_connected_execute")
+TEST_CASE("./tcp_device_not_connected_execute")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     try
@@ -291,7 +292,7 @@ TEST_CASE("tcp_device_not_connected_execute")
 
 }
 
-TEST_CASE("tcp_rpc_invalid")
+TEST_CASE("./tcp_rpc_invalid")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int ok = 0;
@@ -318,7 +319,7 @@ TEST_CASE("tcp_rpc_invalid")
 }
 
 // TCP Client does not validate any input
-// TEST_CASE("tcp_wrong_xml")
+// TEST_CASE("./tcp_wrong_xml")
 // {
 //     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
 //     int OK = 0;
@@ -342,7 +343,7 @@ TEST_CASE("tcp_rpc_invalid")
 //     REQUIRE(result == OK);
 // }
 
-TEST_CASE("tcp_correct_xml_wrong_rpc")
+TEST_CASE("./tcp_correct_xml_wrong_rpc")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -358,7 +359,7 @@ TEST_CASE("tcp_correct_xml_wrong_rpc")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("tcp_empty_rpc")
+TEST_CASE("./tcp_empty_rpc")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -379,7 +380,7 @@ TEST_CASE("tcp_empty_rpc")
 }
 
 // Timeout error
-TEST_CASE("tcp_multiple_clients")
+TEST_CASE("./tcp_multiple_clients")
 {
     NetconfTCPClient client1{"admin", "admin", "127.0.0.1", 12307};
     NetconfTCPClient client2{"admin", "admin", "127.0.0.1", 12307};

@@ -55,9 +55,9 @@ def get_child_container_classes(clazz, one_class_per_module):
     for prop in clazz.properties():
         if prop.stmt.keyword == 'container':
             if one_class_per_module:
-                m.append('"%s" : ("%s", %s.%s)'%(get_qualified_yang_name(prop), prop.name, clazz.name, prop.property_type.name))
+                m.append('"%s" : ("%s", %s.%s)'%(get_qualified_yang_name(prop.property_type), prop.name, clazz.name, prop.property_type.name))
             else:
-                m.append('"%s" : ("%s", %s)'%(get_qualified_yang_name(prop), prop.name, prop.property_type.qn()))
+                m.append('"%s" : ("%s", %s)'%(get_qualified_yang_name(prop.property_type), prop.name, prop.property_type.qn()))
     return '%s' % (', '.join(m))
 
 
@@ -66,9 +66,9 @@ def get_child_list_classes(clazz, one_class_per_module):
     for prop in clazz.properties():
         if prop.stmt.keyword == 'list':
             if one_class_per_module:
-                m.append('"%s" : ("%s", %s.%s)' % (get_qualified_yang_name(prop), prop.name, clazz.name, prop.property_type.name))
+                m.append('"%s" : ("%s", %s.%s)' % (get_qualified_yang_name(prop.property_type), prop.name, clazz.name, prop.property_type.name))
             else:
-                m.append('"%s" : ("%s", %s)' % (get_qualified_yang_name(prop), prop.name, prop.property_type.qn()))
+                m.append('"%s" : ("%s", %s)' % (get_qualified_yang_name(prop.property_type), prop.name, prop.property_type.qn()))
     return '%s' % (', '.join(m))
 
 

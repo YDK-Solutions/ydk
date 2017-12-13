@@ -303,6 +303,50 @@ class SanityYang(unittest.TestCase):
         r_2 = self.codec.decode(self.provider, payload, subtree=True)
         self.assertEqual(r_1, r_2)
 
+    def test_embedded_quote_leaflist_value(self):
+        xml = '''<routing-policy xmlns="http://openconfig.net/yang/routing-policy">
+  <defined-sets>
+    <bgp-defined-sets xmlns="http://openconfig.net/yang/bgp-policy">
+      <community-sets>
+        <community-set>
+          <community-set-name>COMMUNITY-SET1</community-set-name>
+          <config>
+            <community-set-name>COMMUNITY-SET1</community-set-name>
+            <community-member>ios-regex '^65172:17...$'</community-member>
+            <community-member>65172:16001</community-member>
+          </config>
+          <state>
+            <community-set-name>COMMUNITY-SET1</community-set-name>
+            <community-member>ios-regex '^65172:17...$'</community-member>
+            <community-member>65172:16001</community-member>
+          </state>
+        </community-set>
+      </community-sets>
+    </bgp-defined-sets>
+  </defined-sets>
+</routing-policy>
+'''
+        from ydk.models.ydktest import openconfig_routing_policy \
+            as oc_routing_policy
+        routing_policy = oc_routing_policy.RoutingPolicy()
+
+        com = oc_routing_policy.RoutingPolicy.DefinedSets.BgpDefinedSets.CommunitySets.CommunitySet()
+        com.community_set_name = "COMMUNITY-SET1"
+        com.config.community_set_name = "COMMUNITY-SET1"
+        com.config.community_member.append("ios-regex '^65172:17...$'")
+        com.config.community_member.append("65172:16001")
+
+        com.state.community_set_name = "COMMUNITY-SET1"
+        com.state.community_member.append("ios-regex '^65172:17...$'")
+        com.state.community_member.append("65172:16001")
+
+        routing_policy.defined_sets.bgp_defined_sets.community_sets.community_set.append(com)
+        xml_provider = CodecServiceProvider(type='xml')
+        payload = self.codec.encode(xml_provider, routing_policy)
+        self.assertEqual(xml, payload)
+        routing_policy_decode = self.codec.decode(xml_provider, payload)
+        self.assertEqual(routing_policy, routing_policy_decode)
+
     @assert_with_error("Subtree option can only be used with XML encoding", YPYServiceError)
     def test_decode_invalid_subtree_1(self):
         self.provider.encoding = EncodingFormat.JSON

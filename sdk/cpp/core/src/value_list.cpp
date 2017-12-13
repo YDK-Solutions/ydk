@@ -59,7 +59,7 @@ string to_string(YType t)
     return "";
 }
 
-YLeafList::YLeafList(YType type, string name)
+YLeafList::YLeafList(YType type, const std::string & name)
     : yfilter(YFilter::not_set), type(type), name(name)
 {
 }

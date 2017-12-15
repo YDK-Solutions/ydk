@@ -659,7 +659,4 @@ find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 print_msg "combining python coverage for Linux"
-export CODECOV_TOKEN="c97cfa46-2486-4114-a4c6-4eb057cf2365"
 coverage combine > /dev/null || echo "Coverage not combined"
-# Upload python report to CodeCov
-bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

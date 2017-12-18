@@ -353,6 +353,14 @@ function py_sanity_ydktest {
     py_sanity_ydktest_gen
     py_sanity_ydktest_test
     py_sanity_ydktest_install
+    py_sanity_doc_gen
+}
+
+function py_sanity_doc_gen {
+   print_msg "Generating docs"
+   run_test generate.py --core --cpp --generate-doc &> /dev/null
+   run_test generate.py --core --go --generate-doc &> /dev/null
+   run_test generate.py --core --python --generate-doc &> /dev/null
 }
 
 function py_sanity_ydktest_gen {

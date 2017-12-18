@@ -58,7 +58,7 @@ func (suite *SanityLevelsTestSuite) TestOneLevelPos() {
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(entityRead.HasDataOrFilter(), false)
+	suite.Equal(types.HasDataOrFilter(entityRead), false)
 }
 
 func (suite *SanityLevelsTestSuite) TestTwoLevelPos() {
@@ -85,7 +85,7 @@ func (suite *SanityLevelsTestSuite) TestTwoLevelPos() {
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(entityRead.HasDataOrFilter(), false)
+	suite.Equal(types.HasDataOrFilter(entityRead), false)
 }
 
 func (suite *SanityLevelsTestSuite) TestThreeLevelPos() {
@@ -115,7 +115,7 @@ func (suite *SanityLevelsTestSuite) TestThreeLevelPos() {
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(entityRead.HasDataOrFilter(), false)
+	suite.Equal(types.HasDataOrFilter(entityRead), false)
 }
 
 func (suite *SanityLevelsTestSuite) TestOneListNegDupKeyPos() {

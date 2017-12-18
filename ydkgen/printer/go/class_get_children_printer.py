@@ -41,7 +41,6 @@ class ClassGetChildrenPrinter(FunctionPrinter):
                 path = get_qualified_yang_name(child)
                 self.ctx.writeln('children["%s"] = &%s.%s' % (
                     path, self.class_alias, child.go_name()))
-        self.ctx.bline()
         self.ctx.writeln('return children')
 
     def _print_many(self, child):

@@ -27,6 +27,7 @@ package types
 import (
 	"reflect"
 	"sort"
+	"strings"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/ytype"
@@ -81,33 +82,260 @@ type EntityPath struct {
 // AugmentCapabilitiesFunction
 type AugmentCapabilitiesFunction func() map[string]string
 
+// // Entity is a basic type that represents containers in YANG
+// type Entity interface {
+// 	GetEntityPath(Entity) EntityPath
+// 	GetSegmentPath() string
+
+// 	HasDataOrFilter() bool
+
+// 	SetValue(string, string)
+// 	GetChildByName(string, string) Entity
+
+// 	GetChildren() map[string]Entity
+
+// 	SetParent(Entity)
+// 	GetParent() Entity
+
+// 	GetAugmentCapabilitiesFunction() AugmentCapabilitiesFunction
+// 	GetBundleYangModelsLocation() string
+// 	GetBundleName() string
+
+// 	GetYangName() string
+// 	GetParentYangName() string
+
+// 	GetFilter() yfilter.YFilter
+// }
+
+
+// // Entity is a basic type that represents containers in YANG
+// type Entity interface {
+// 	GetSegmentPath()	string
+
+// 	GetChildren() 		*map[string]Entity
+// 	GetLeafs()			*map[string]interface{}
+
+// 	SetParent(Entity)
+// 	GetParent() 		Entity
+
+// 	GetAugmentCapabilitiesFunction() AugmentCapabilitiesFunction
+// 	GetBundleYangModelsLocation() string
+// 	GetBundleName() 	string
+
+// 	GetYangName() 		string
+// 	GetParentYangName() string
+
+// 	GetFilter() 		yfilter.YFilter
+// 	SetFilter(yfilter.YFilter)
+// }
+
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetEntityPath(Entity) EntityPath
-	GetSegmentPath() string
+	GetSegmentPath() 				string
 
-	HasDataOrFilter() bool
+	// HasDataOrFilter() 				bool
 
 	SetValue(string, string)
-	GetChildByName(string, string) Entity
+	GetChildByName(string, string) 	Entity
 
-	GetChildren() map[string]Entity
+	GetChildren() 					map[string]Entity
+	GetLeafs()						map[string]interface{}
 
 	SetParent(Entity)
-	GetParent() Entity
+	GetParent() 					Entity
 
 	GetAugmentCapabilitiesFunction() AugmentCapabilitiesFunction
-	GetBundleYangModelsLocation() string
-	GetBundleName() string
+	GetBundleYangModelsLocation() 	string
+	GetBundleName() 				string
 
-	GetYangName() string
-	GetParentYangName() string
+	GetYangName() 					string
+	GetParentYangName() 			string
 
-	GetFilter() yfilter.YFilter
+	GetFilter() 					yfilter.YFilter
 }
 
 // Entity is a basic type that represents containers in YANG
 type Bits map[string]bool
+
+// type BitsList struct {
+// 	Value []map[string]bool
+// }
+
+// func isSlice(i interface{}) bool {
+// 	return reflect.TypeOf(i).Kind() == reflect.Slice
+// }
+
+// func isBits(i interface{}) bool {
+// 	return reflect.TypeOf(i) == reflect.TypeOf(make(map[string]bool))
+// }
+
+// func isBitsList(i interface{}) bool {
+// 	return reflect.TypeOf(i) == reflect.TypeOf(BitsList{})
+// }
+
+func getGoName(name string) string {
+	goName := name
+	goName = strings.Replace(goName, "_", " ", -1)
+	goName = strings.Replace(goName, "-", " ", -1)
+	goName = strings.Title(goName)
+	goName = strings.Replace(goName, " ", "", -1)
+	if string(name[0]) == "_" {
+		goName = "_" + goName
+	}
+	return goName
+}
+
+func HasDataOrFilter(entity Entity) bool {
+	if (entity.GetFilter() != yfilter.NotSet) {
+		return true
+	}
+
+	children := entity.GetChildren()
+	leafs := entity.GetLeafs()
+
+	// children
+	for _, child := range children {
+		if (child.GetFilter() != yfilter.NotSet || HasDataOrFilter(child)) {
+			return true
+		}
+	}
+
+	v := reflect.ValueOf(entity).Elem()
+
+	// checking leafs
+	for name, _ := range leafs {
+		goName := getGoName(name)
+		// goName := name
+		// goName = strings.Replace(goName, "_", " ", -1)
+		// goName = strings.Replace(goName, "-", " ", -1)
+		// goName = strings.Title(goName)
+		// goName = strings.Replace(goName, " ", "", -1)
+		// if string(name[0]) == "_" {
+		// 	goName = "_" + goName
+		// }
+		field := v.FieldByName(goName)
+
+		if field.Kind() != reflect.Slice {
+			if !field.IsNil() { return true }
+		} else {
+			for _, l := range field.Interface().([]interface{}) {
+				if l != nil { return true }
+			}
+		}
+	}
+
+	return false
+}
+
+// func GetEntityPath(entity Entity) EntityPath {
+// 	entityPath := EntityPath{Path: entity.GetSegmentPath()}
+// 	leafs := entity.GetLeafs()
+// 	v := reflect.ValueOf(entity).Elem()
+
+// 	// leafs
+// 	var leafData LeafData
+// 	for name, leaf := range *leafs {
+// 		goName := name
+// 		goName = strings.Replace(goName, "_", " ", -1)
+// 		goName = strings.Replace(goName, "-", " ", -1)
+// 		goName = strings.Title(goName)
+// 		goName = strings.Replace(goName, " ", "", -1)
+// 		if string(name[0]) == "_" {
+// 			goName = "_" + goName
+// 		}
+// 		field := v.FieldByName(goName)
+
+// 		// if (leaf != nil && !isSlice(leaf)) {
+// 		if leaf != nil && field.Kind() != reflect.Slice {
+// 			switch leaf.(type) {
+// 			case yfilter.YFilter:
+// 				// yfilter
+// 				leafData = LeafData{
+// 					IsSet: true, Filter: leaf.(yfilter.YFilter)}
+// 			case map[string]bool:
+// 				// bits
+// 				var used_bits []string
+// 				for bit, enabled := range(leaf.(map[string]bool)) {
+// 					if enabled {
+// 						used_bits = append(used_bits, bit)
+// 					}
+// 				}
+// 				v := strings.Join(used_bits, " ")
+// 				leafData = LeafData{IsSet: true, Value: v}
+// 			default:
+// 				var v string
+// 				if reflect.TypeOf(leaf) != reflect.TypeOf(Empty{}) {
+// 					v = fmt.Sprintf("%v", (*leafs)[name])
+// 				}
+// 				leafData = LeafData{
+// 					IsSet: true, Value: v}
+// 			}
+// 			entityPath.ValuePaths = append(
+// 				entityPath.ValuePaths,
+// 				NameLeafData{Name: name, Data: leafData})
+// 		}
+// 	}
+
+// 	return entityPath
+// }
+
+// func GetChildByName(
+// 	entity Entity,
+// 	childYangName string,
+// 	segmentPath string) Entity {
+
+// 	children, childlists := entity.GetChildren()
+
+// 	// child
+// 	if child, ok := (*children)[childYangName]; ok {
+// 		return child
+// 	}
+
+// 	// childlist
+// 	if childlist, ok := (*childlists)[childYangName]; ok {
+// 		if len(childlist) > 0 && entity.GetSegmentPath() == childYangName {
+// 			return childlist[0]
+// 		}
+// 	}
+
+// 	return nil
+// }
+
+// func SetValue(entity Entity, valuePath string, value interface{}) {
+// 	goName := valuePath
+// 	goName = strings.Replace(goName, "_", " ", -1)
+// 	goName = strings.Replace(goName, "-", " ", -1)
+// 	goName = strings.Title(goName)
+// 	goName = strings.Replace(goName, " ", "", -1)
+// 	if string(valuePath[0]) == "_" {
+// 		goName = "_" + goName
+// 	}
+
+// 	s := reflect.ValueOf(entity).Elem()
+// 	v := s.FieldByName(goName)
+// 	if v.IsValid() {
+// 		if v.Type() == reflect.TypeOf(make(map[string]bool)) {
+// 			bits := v.Interface().(map[string]bool)
+// 			bits[value.(string)] = true
+
+// 			v.Set(reflect.ValueOf(bits))
+// 		} else if v.Type() == reflect.TypeOf(BitsList{}) {
+// 			bitsValue := make(map[string]bool)
+// 			bitsValue[value.(string)] = true
+			
+// 			bitslist := v.Interface().(BitsList)
+// 			bitslist.Value = append(bitslist.Value, bitsValue)
+
+// 			v.Set(reflect.ValueOf(bitslist))
+// 		} else if v.Kind() == reflect.Slice {
+
+// 			v.Set(reflect.Append(v, reflect.ValueOf(value)))
+// 		} else {
+// 			v.Set(reflect.ValueOf(value))
+// 		}
+// 	}
+// }
 
 // Decimal64 represents a YANG built-in Decimal64 type
 type Decimal64 struct {
@@ -464,7 +692,8 @@ func deepValueEqual(e1, e2 Entity) bool {
 	ret := true
 	for k, c1 := range children1 {
 		marker[k] = true
-		if c1.HasDataOrFilter() {
+		if HasDataOrFilter(c1) {
+		// if c1.HasDataOrFilter() {
 			c2, ok := children2[k]
 			if ok && deepValueEqual(c1, c2) {
 				ret = ret && nameValuesEqual(c1, c2)

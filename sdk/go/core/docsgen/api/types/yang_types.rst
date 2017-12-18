@@ -221,10 +221,6 @@ YANG Container and List
 
         :return: (``string``) A Go string.
 
-    .. function:: HasDataOrFilter()
-
-        :return: (``bool``) A Go boolean.
-
     .. function:: SetValue(string, string)
 
     .. function:: GetChildByName(string, string)
@@ -264,3 +260,8 @@ YANG Container and List
     .. function:: GetFilter()
 
         :return: :ref:`YFilter <y-filter>`
+
+
+.. function:: HasDataOrFilter(entity Entity)
+
+    :return: (``bool``) A Go boolean.

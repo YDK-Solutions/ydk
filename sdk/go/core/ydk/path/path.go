@@ -150,7 +150,7 @@ func ExecuteRPCEntity(
 	panicOnCStateError(cstate)
 
 	child := rpcEntity.GetChildByName("input", "")
-	if (child != nil && child.HasDataOrFilter()) {
+	if (child != nil && types.HasDataOrFilter(child)) {
 		walkRPCChildren(state, child, rpcInput, "")
 	}
 
@@ -191,7 +191,7 @@ func walkRPCChildren(
 
 		for childName, _ := range children {
 			if (children[childName] != nil &&
-				children[childName].HasDataOrFilter()) {
+				types.HasDataOrFilter(children[childName])) {
 
 				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'",
 					children[childName].GetSegmentPath()))
@@ -233,7 +233,7 @@ func createFromChildren(
 	state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
 
 	for childName, child := range children {
-		if(child.HasDataOrFilter()) {
+		if types.HasDataOrFilter(child) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
 				childName, child.GetEntityPath(child.GetParent()).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
@@ -628,7 +628,7 @@ func walkChildren(
 		ydk.YLogDebug(fmt.Sprintf(
 			"Looking at entity child '%s'", children[childName].GetSegmentPath()))
 
-		if children[childName].HasDataOrFilter() {
+		if types.HasDataOrFilter(children[childName]) {
 			populateDataNode(state, children[childName], dataNode)
 		}
 	}

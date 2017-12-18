@@ -26,7 +26,7 @@ from ydkgen.common import sort_classes_at_same_level
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_enum_printer import EnumPrinter
-from .class_has_data_printer import ClassDataFilterPrinter
+# from .class_has_data_printer import ClassDataFilterPrinter
 from .class_get_entity_path_printer import GetEntityPathPrinter, GetSegmentPathPrinter
 from .class_get_child_printer import ClassGetChildPrinter
 from .class_get_children_printer import ClassGetChildrenPrinter
@@ -53,13 +53,14 @@ class ClassPrinter(object):
         ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
 
     def _print_class_method_definitions(self, clazz, leafs, children):
-        self._print_class_has_data(clazz, leafs, children)
+        # self._print_class_has_data(clazz, leafs, children)
         self._print_class_get_filter(clazz)
         self._print_class_set_filter(clazz)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_entity_path(clazz, leafs)
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
+        self._print_class_get_leafs(clazz, leafs)
         self._print_class_set_value(clazz, leafs)
         self._print_bundle_name_function(clazz)
         self._print_yang_name_function(clazz)
@@ -115,6 +116,18 @@ class ClassPrinter(object):
     def _print_class_get_children(self, clazz, leafs, children):
         fp = ClassGetChildrenPrinter(self.ctx, clazz, leafs, children)
         fp.print_all()
+
+    # GetLeafs
+    def _print_class_get_leafs(self, clazz, leafs):
+        fp = FunctionPrinter(self.ctx, clazz)
+        fp.print_function_header_helper('GetLeafs', return_type='map[string]interface{}')
+        fp.ctx.writeln('leafs := make(map[string]interface{})')
+        for leaf in leafs:
+            fp.ctx.writeln('leafs["{1}"] = {0}.{2}'.format(
+                fp.class_alias, leaf.stmt.arg, leaf.go_name()))
+        # fp.ctx.bline()
+        fp.ctx.writeln('return leafs')
+        fp.print_function_trailer()
 
     # SetValue
     def _print_class_set_value(self, clazz, leafs):

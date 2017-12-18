@@ -82,6 +82,7 @@ type EntityPath struct {
 // AugmentCapabilitiesFunction
 type AugmentCapabilitiesFunction func() map[string]string
 
+// ORIGINAL vvv
 // // Entity is a basic type that represents containers in YANG
 // type Entity interface {
 // 	GetEntityPath(Entity) EntityPath
@@ -108,6 +109,7 @@ type AugmentCapabilitiesFunction func() map[string]string
 // }
 
 
+// NEW ENTITY vvv
 // // Entity is a basic type that represents containers in YANG
 // type Entity interface {
 // 	GetSegmentPath()	string
@@ -136,7 +138,7 @@ type Entity interface {
 
 	// HasDataOrFilter() 				bool
 
-	SetValue(string, string)
+	// SetValue(string, string)
 	GetChildByName(string, string) 	Entity
 
 	GetChildren() 					map[string]Entity
@@ -158,9 +160,9 @@ type Entity interface {
 // Entity is a basic type that represents containers in YANG
 type Bits map[string]bool
 
-// type BitsList struct {
-// 	Value []map[string]bool
-// }
+type BitsList struct {
+	Value []map[string]bool
+}
 
 // func isSlice(i interface{}) bool {
 // 	return reflect.TypeOf(i).Kind() == reflect.Slice
@@ -206,14 +208,6 @@ func HasDataOrFilter(entity Entity) bool {
 	// checking leafs
 	for name, _ := range leafs {
 		goName := getGoName(name)
-		// goName := name
-		// goName = strings.Replace(goName, "_", " ", -1)
-		// goName = strings.Replace(goName, "-", " ", -1)
-		// goName = strings.Title(goName)
-		// goName = strings.Replace(goName, " ", "", -1)
-		// if string(name[0]) == "_" {
-		// 	goName = "_" + goName
-		// }
 		field := v.FieldByName(goName)
 
 		if field.Kind() != reflect.Slice {
@@ -302,40 +296,32 @@ func HasDataOrFilter(entity Entity) bool {
 // 	return nil
 // }
 
-// func SetValue(entity Entity, valuePath string, value interface{}) {
-// 	goName := valuePath
-// 	goName = strings.Replace(goName, "_", " ", -1)
-// 	goName = strings.Replace(goName, "-", " ", -1)
-// 	goName = strings.Title(goName)
-// 	goName = strings.Replace(goName, " ", "", -1)
-// 	if string(valuePath[0]) == "_" {
-// 		goName = "_" + goName
-// 	}
+func SetValue(entity Entity, valuePath string, value interface{}) {
+	goName := getGoName(valuePath)
+	s := reflect.ValueOf(entity).Elem()
+	v := s.FieldByName(goName)
+	if v.IsValid() {
+		if v.Type() == reflect.TypeOf(make(map[string]bool)) {
+			bits := v.Interface().(map[string]bool)
+			bits[value.(string)] = true
 
-// 	s := reflect.ValueOf(entity).Elem()
-// 	v := s.FieldByName(goName)
-// 	if v.IsValid() {
-// 		if v.Type() == reflect.TypeOf(make(map[string]bool)) {
-// 			bits := v.Interface().(map[string]bool)
-// 			bits[value.(string)] = true
-
-// 			v.Set(reflect.ValueOf(bits))
-// 		} else if v.Type() == reflect.TypeOf(BitsList{}) {
-// 			bitsValue := make(map[string]bool)
-// 			bitsValue[value.(string)] = true
+			v.Set(reflect.ValueOf(bits))
+		} else if v.Type() == reflect.TypeOf(BitsList{}) {
+			bitsValue := make(map[string]bool)
+			bitsValue[value.(string)] = true
 			
-// 			bitslist := v.Interface().(BitsList)
-// 			bitslist.Value = append(bitslist.Value, bitsValue)
+			bitslist := v.Interface().(BitsList)
+			bitslist.Value = append(bitslist.Value, bitsValue)
 
-// 			v.Set(reflect.ValueOf(bitslist))
-// 		} else if v.Kind() == reflect.Slice {
+			v.Set(reflect.ValueOf(bitslist))
+		} else if v.Kind() == reflect.Slice {
 
-// 			v.Set(reflect.Append(v, reflect.ValueOf(value)))
-// 		} else {
-// 			v.Set(reflect.ValueOf(value))
-// 		}
-// 	}
-// }
+			v.Set(reflect.Append(v, reflect.ValueOf(value)))
+		} else {
+			v.Set(reflect.ValueOf(value))
+		}
+	}
+}
 
 // Decimal64 represents a YANG built-in Decimal64 type
 type Decimal64 struct {

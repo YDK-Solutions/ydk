@@ -30,7 +30,7 @@ from .class_enum_printer import EnumPrinter
 from .class_get_entity_path_printer import GetEntityPathPrinter, GetSegmentPathPrinter
 from .class_get_child_printer import ClassGetChildPrinter
 from .class_get_children_printer import ClassGetChildrenPrinter
-from .class_set_value_printer import ClassSetValuePrinter
+# from .class_set_value_printer import ClassSetValuePrinter
 
 
 class ClassPrinter(object):
@@ -61,7 +61,7 @@ class ClassPrinter(object):
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_get_leafs(clazz, leafs)
-        self._print_class_set_value(clazz, leafs)
+        # self._print_class_set_value(clazz, leafs)
         self._print_bundle_name_function(clazz)
         self._print_yang_name_function(clazz)
         self._print_yang_models_function(clazz)

@@ -151,6 +151,7 @@ func ExecuteRPCEntity(
 
 	child := rpcEntity.GetChildByName("input", "")
 	if (child != nil && types.HasDataOrFilter(child)) {
+	// if (child != nil && child.HasDataOrFilter()) {
 		walkRPCChildren(state, child, rpcInput, "")
 	}
 
@@ -192,6 +193,7 @@ func walkRPCChildren(
 		for childName, _ := range children {
 			if (children[childName] != nil &&
 				types.HasDataOrFilter(children[childName])) {
+				// children[childName].HasDataOrFilter()) {
 
 				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'",
 					children[childName].GetSegmentPath()))
@@ -234,6 +236,7 @@ func createFromChildren(
 
 	for childName, child := range children {
 		if types.HasDataOrFilter(child) {
+		// if(child.HasDataOrFilter()) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
 				childName, child.GetEntityPath(child.GetParent()).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
@@ -629,6 +632,7 @@ func walkChildren(
 			"Looking at entity child '%s'", children[childName].GetSegmentPath()))
 
 		if types.HasDataOrFilter(children[childName]) {
+		// if children[childName].HasDataOrFilter() {
 			populateDataNode(state, children[childName], dataNode)
 		}
 	}
@@ -708,7 +712,8 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 			value := C.GoString(C.DataNodeGetValue(childDataNode))
 			ydk.YLogDebug(fmt.Sprintf(
 				"Creating leaf '%s' with value '%s'", childName, value))
-			entity.SetValue(childName, value)
+			types.SetValue(entity, childName, value)
+			// entity.SetValue(childName, value)
 		} else {
 
 			var childEntity types.Entity

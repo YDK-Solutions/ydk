@@ -172,7 +172,8 @@ func walkRPCChildren(
 	ydk.YLogDebug("Walking Rpc Children...")
 	if(rpcEntity != nil) {
 		children := rpcEntity.GetChildren()
-		entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+		entityPath := types.GetEntityPath(rpcEntity)
+		// entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
 		ydk.YLogDebug(fmt.Sprintf(
 			"Got %d entity children in '%s'", len(children), entityPath.Path))
 		ydk.YLogDebug(fmt.Sprintf(
@@ -213,7 +214,8 @@ func walkRPCChildren(
 func createFromEntityPath(
 	state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 
-	entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
+	entityPath := types.GetEntityPath(rpcEntity)
+	// entityPath := rpcEntity.GetEntityPath(rpcEntity.GetParent())
 	for _, nameValue := range entityPath.ValuePaths {
 		ydk.YLogDebug(fmt.Sprintf("Creating leaf '%s' with value '%s' in '%s'",
 			nameValue.Name, nameValue.Data.Value, entityPath.Path))
@@ -238,7 +240,8 @@ func createFromChildren(
 		if types.HasDataOrFilter(child) {
 		// if(child.HasDataOrFilter()) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
-				childName, child.GetEntityPath(child.GetParent()).Path))
+				childName, types.GetEntityPath(child).Path))
+				// childName, child.GetEntityPath(child.GetParent()).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
 		}
 	}
@@ -606,7 +609,8 @@ func getDataNodeFromEntity(
 		entity = parent
 	}
 
-	rootPath := entity.GetEntityPath(nil)
+	rootPath := types.GetEntityPath(entity)
+	// rootPath := entity.GetEntityPath(nil)
 	path := C.CString(rootPath.Path)
 	defer C.free(unsafe.Pointer(path))
 
@@ -642,7 +646,8 @@ func walkChildren(
 func populateDataNode(
 	state *types.State, entity types.Entity, parentDataNode C.DataNode) {
 
-	path := entity.GetEntityPath(entity.GetParent())
+	path := types.GetEntityPath(entity)
+	// path := entity.GetEntityPath(entity.GetParent())
 	p := C.CString(path.Path)
 	defer C.free(unsafe.Pointer(p))
 	ep := C.CString("")

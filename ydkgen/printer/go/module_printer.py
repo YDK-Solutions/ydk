@@ -94,8 +94,6 @@ class ModulePrinter(FilePrinter):
         self.ctx.bline()
 
     def _print_static_imports(self, package):
-        if self._has_bits(package):
-            self.ctx.writeln('"strings"')
         has_top_entity = False
         for c in package.owned_elements:
             if isinstance(c, Class) and not c.is_identity():

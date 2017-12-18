@@ -57,7 +57,7 @@ class ClassPrinter(object):
         self._print_class_get_filter(clazz)
         self._print_class_set_filter(clazz)
         self._print_class_get_segment_path(clazz)
-        self._print_class_get_entity_path(clazz, leafs)
+        # self._print_class_get_entity_path(clazz, leafs)
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_get_leafs(clazz, leafs)

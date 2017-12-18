@@ -213,10 +213,6 @@ YANG Container and List
 
     Basic type that represents containers in YANG
 
-    .. function:: GetEntityPath(Entity)
-
-        :return: :go:struct:`EntityPath`
-
     .. function:: GetSegmentPath()
 
         :return: (``string``) A Go string.
@@ -264,6 +260,9 @@ YANG Container and List
 
     :return: (``bool``) A Go boolean.
 
+.. function:: GetEntityPath(entity Entity)
+
+    :return: :go:struct:`EntityPath`
 
 .. function:: SetValue(entity Entity, valuePath string, value interface{})
 

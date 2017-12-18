@@ -25,6 +25,7 @@
 package types
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strings"
@@ -133,7 +134,7 @@ type AugmentCapabilitiesFunction func() map[string]string
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
-	GetEntityPath(Entity) EntityPath
+	// GetEntityPath(Entity) EntityPath
 	GetSegmentPath() 				string
 
 	// HasDataOrFilter() 				bool
@@ -222,57 +223,50 @@ func HasDataOrFilter(entity Entity) bool {
 	return false
 }
 
-// func GetEntityPath(entity Entity) EntityPath {
-// 	entityPath := EntityPath{Path: entity.GetSegmentPath()}
-// 	leafs := entity.GetLeafs()
-// 	v := reflect.ValueOf(entity).Elem()
+func GetEntityPath(entity Entity) EntityPath {
+	entityPath := EntityPath{Path: entity.GetSegmentPath()}
+	leafs := entity.GetLeafs()
+	v := reflect.ValueOf(entity).Elem()
 
-// 	// leafs
-// 	var leafData LeafData
-// 	for name, leaf := range *leafs {
-// 		goName := name
-// 		goName = strings.Replace(goName, "_", " ", -1)
-// 		goName = strings.Replace(goName, "-", " ", -1)
-// 		goName = strings.Title(goName)
-// 		goName = strings.Replace(goName, " ", "", -1)
-// 		if string(name[0]) == "_" {
-// 			goName = "_" + goName
-// 		}
-// 		field := v.FieldByName(goName)
+	// leafs
+	var leafData LeafData
+	for name, leaf := range leafs {
+		goName := getGoName(name)
+		field := v.FieldByName(goName)
 
-// 		// if (leaf != nil && !isSlice(leaf)) {
-// 		if leaf != nil && field.Kind() != reflect.Slice {
-// 			switch leaf.(type) {
-// 			case yfilter.YFilter:
-// 				// yfilter
-// 				leafData = LeafData{
-// 					IsSet: true, Filter: leaf.(yfilter.YFilter)}
-// 			case map[string]bool:
-// 				// bits
-// 				var used_bits []string
-// 				for bit, enabled := range(leaf.(map[string]bool)) {
-// 					if enabled {
-// 						used_bits = append(used_bits, bit)
-// 					}
-// 				}
-// 				v := strings.Join(used_bits, " ")
-// 				leafData = LeafData{IsSet: true, Value: v}
-// 			default:
-// 				var v string
-// 				if reflect.TypeOf(leaf) != reflect.TypeOf(Empty{}) {
-// 					v = fmt.Sprintf("%v", (*leafs)[name])
-// 				}
-// 				leafData = LeafData{
-// 					IsSet: true, Value: v}
-// 			}
-// 			entityPath.ValuePaths = append(
-// 				entityPath.ValuePaths,
-// 				NameLeafData{Name: name, Data: leafData})
-// 		}
-// 	}
+		// if (leaf != nil && !isSlice(leaf)) {
+		if leaf != nil && field.Kind() != reflect.Slice {
+			switch leaf.(type) {
+			case yfilter.YFilter:
+				// yfilter
+				leafData = LeafData{
+					IsSet: true, Filter: leaf.(yfilter.YFilter)}
+			case map[string]bool:
+				// bits
+				var used_bits []string
+				for bit, enabled := range(leaf.(map[string]bool)) {
+					if enabled {
+						used_bits = append(used_bits, bit)
+					}
+				}
+				v := strings.Join(used_bits, " ")
+				leafData = LeafData{IsSet: true, Value: v}
+			default:
+				var v string
+				if reflect.TypeOf(leaf) != reflect.TypeOf(Empty{}) {
+					v = fmt.Sprintf("%v", leafs[name])
+				}
+				leafData = LeafData{
+					IsSet: true, Value: v}
+			}
+			entityPath.ValuePaths = append(
+				entityPath.ValuePaths,
+				NameLeafData{Name: name, Data: leafData})
+		}
+	}
 
-// 	return entityPath
-// }
+	return entityPath
+}
 
 // func GetChildByName(
 // 	entity Entity,
@@ -642,10 +636,12 @@ func sortValuePaths(v []NameLeafData) []NameLeafData {
 }
 
 func nameValuesEqual(e1, e2 Entity) bool {
-	value_path1 := e1.GetEntityPath(e1.GetParent()).ValuePaths
-	value_path2 := e2.GetEntityPath(e2.GetParent()).ValuePaths
-	path1 := sortValuePaths(value_path1)
-	path2 := sortValuePaths(value_path2)
+	valuePath1 := GetEntityPath(e1).ValuePaths
+	valuePath2 := GetEntityPath(e2).ValuePaths
+	// valuePath1 := e1.GetEntityPath(e1.GetParent()).ValuePaths
+	// valuePath2 := e2.GetEntityPath(e2.GetParent()).ValuePaths
+	path1 := sortValuePaths(valuePath1)
+	path2 := sortValuePaths(valuePath2)
 
 	if len(path1) != len(path2) {
 		return false

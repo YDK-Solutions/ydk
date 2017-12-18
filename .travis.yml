@@ -23,13 +23,13 @@ before_install:
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                            ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3                   ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./test/dependencies_osx.sh             ; fi
-    - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./test/dependencies_linux.sh         ; fi
+    - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./test/dependencies_ubuntu.sh         ; fi
     - if [[ "$DOCKER" == "true" ]]; then docker pull ${OS_TYPE}:${OS_VERSION}                                       ; fi
 
 script:
     - if [[ "$DOCKER" != "true" ]]; then ./test/tests.sh ;fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/tests.sh" ; fi
-    - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "ubuntu" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_linux.sh && ./test/tests.sh" ; fi
+    - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "ubuntu" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_ubuntu.sh && ./test/tests.sh" ; fi
 
 after_success:
     - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports" # Upload python report to CodeCov

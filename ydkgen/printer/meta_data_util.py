@@ -411,20 +411,20 @@ def _get_identity_docstring(identity_subclasses, property_type, language):
 
 
 def get_length_limits(length_type):
-    assert isinstance(length_type, LengthTypeSpec)
     prange = []
-    for m_min, m_max in length_type.lengths:
-        pmin = None
-        pmax = None
-        if m_min == 'min':
-            pmin = '0'
-        else:
-            pmin = m_min
-        if m_max == 'max':
-            pmax = '18446744073709551615'
-        else:
-            pmax = m_max
-        prange.append((pmin, pmax))
+    if isinstance(length_type, LengthTypeSpec):
+        for m_min, m_max in length_type.lengths:
+            pmin = None
+            pmax = None
+            if m_min == 'min':
+                pmin = '0'
+            else:
+                pmin = m_min
+            if m_max == 'max':
+                pmax = '18446744073709551615'
+            else:
+                pmax = m_max
+            prange.append((pmin, pmax))
     return prange
 
 
@@ -529,7 +529,7 @@ def get_tag_template(language, domain, crossref):
 
         ('go', 'class', False): '.. go:struct:: %s()\n',
         ('go', 'class', True): ' :go:struct:`%s <%s>`',
-        ('py', 'module', False): '.. go:package:: %s.%s\n',
+        ('go', 'module', False): '.. go:package:: %s.%s\n',
         ('go', 'currentmodule', False): '.. go:package:: %s\n',
     }
     try:
@@ -537,7 +537,7 @@ def get_tag_template(language, domain, crossref):
     except KeyError:
         raise EmitError("Invalid language, domain, crossref combination for"
                         "rst documentation\n"
-                        "language = %s, type = %s" % (language, domain, crossref))
+                        "language = %s, domain = %s, crossref = %s" % (language, domain, crossref))
 
 
 def _get_list_tag(language, mtype):

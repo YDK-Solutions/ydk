@@ -69,6 +69,13 @@ class DocPrinter(object):
         self.ctx.writelns(self.lines)
         del self.lines
 
+    def _collect_all_augments(self, stmt, augments):
+        for substmt in stmt.substmts:
+            if substmt.keyword == 'augment':
+                augments.add(substmt.i_target_node.i_class)
+            if substmt.substmts.__len__ > 0:
+                self._collect_all_augments(substmt, augments)
+
     def _print_package_rst(self, package):
         self._print_header(package)
         # Body / Package Comment
@@ -77,6 +84,22 @@ class DocPrinter(object):
             self._append('Revision: {0}\n'.format(package.revision))
         if package.comment is not None:
             self._append(package.comment)
+
+        # Adding augment references
+        augments = set()
+        self._collect_all_augments(package.stmt, augments)
+        if augments.__len__() > 0:
+            self.ctx.bline()
+            if augments.__len__() == 1:
+                aug_class = augments[0]
+                line = '\nThis module contains augment: ' + get_class_crossref_tag(aug_class.qn(), aug_class, self.lang) + '\n'
+                self._append(line)
+            else:
+                line = '\nThis module contains the following augments:\n'
+                self._append(line)
+                for aug_class in augments:
+                    line = '\t - ' + get_class_crossref_tag(aug_class.qn(), aug_class, self.lang) + '\n'
+                    self._append(line)
 
     def _print_bits_rst(self, bitz):
         if self.lang != 'py':

@@ -26,11 +26,9 @@ from ydkgen.common import sort_classes_at_same_level
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_enum_printer import EnumPrinter
-# from .class_has_data_printer import ClassDataFilterPrinter
-from .class_get_entity_path_printer import GetEntityPathPrinter, GetSegmentPathPrinter
+from .class_get_entity_path_printer import GetSegmentPathPrinter
 from .class_get_child_printer import ClassGetChildPrinter
 from .class_get_children_printer import ClassGetChildrenPrinter
-# from .class_set_value_printer import ClassSetValuePrinter
 
 
 class ClassPrinter(object):
@@ -53,15 +51,12 @@ class ClassPrinter(object):
         ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
 
     def _print_class_method_definitions(self, clazz, leafs, children):
-        # self._print_class_has_data(clazz, leafs, children)
         self._print_class_get_filter(clazz)
         self._print_class_set_filter(clazz)
         self._print_class_get_segment_path(clazz)
-        # self._print_class_get_entity_path(clazz, leafs)
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_get_leafs(clazz, leafs)
-        # self._print_class_set_value(clazz, leafs)
         self._print_bundle_name_function(clazz)
         self._print_yang_name_function(clazz)
         self._print_yang_models_function(clazz)
@@ -78,33 +73,21 @@ class ClassPrinter(object):
             elif ptype is not None:
                 leafs.append(prop)
 
-    # HasDataOrFilter
-    def _print_class_has_data(self, clazz, leafs, children):
-        fp = ClassDataFilterPrinter(self.ctx, clazz, leafs, children)
-        fp.print_all()
-
     # GetFilter
     def _print_class_get_filter(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetFilter', return_type='yfilter.YFilter')
-        fp.ctx.writeln('return %s.YFilter' % fp.class_alias)
-        fp.print_function_trailer()
+        rstmt = '%s.YFilter' % fp.class_alias
+        fp.quick_print('GetFilter', return_type='yfilter.YFilter', return_stmt=rstmt)
 
     # SetFilter
     def _print_class_set_filter(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('SetFilter', args='yfilter yfilter.YFilter')
-        fp.ctx.writeln('%s.YFilter = yfilter' % fp.class_alias)
-        fp.print_function_trailer()
+        stmt = '%s.YFilter = yf' % fp.class_alias
+        fp.quick_print('SetFilter', args='yf yfilter.YFilter', stmt=stmt)
 
     # GetSegmentPath
     def _print_class_get_segment_path(self, clazz):
         fp = GetSegmentPathPrinter(self.ctx, clazz)
-        fp.print_all()
-
-    # GetEntityPath
-    def _print_class_get_entity_path(self, clazz, leafs):
-        fp = GetEntityPathPrinter(self.ctx, clazz, leafs)
         fp.print_all()
 
     # GetChildByName
@@ -125,36 +108,27 @@ class ClassPrinter(object):
         for leaf in leafs:
             fp.ctx.writeln('leafs["{1}"] = {0}.{2}'.format(
                 fp.class_alias, leaf.stmt.arg, leaf.go_name()))
-        # fp.ctx.bline()
         fp.ctx.writeln('return leafs')
         fp.print_function_trailer()
-
-    # SetValue
-    def _print_class_set_value(self, clazz, leafs):
-        fp = ClassSetValuePrinter(self.ctx, clazz, leafs)
-        fp.print_all()
 
     # GetBundleName
     def _print_bundle_name_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetBundleName', return_type='string')
-        fp.ctx.writeln('return "%s"' % self.bundle_name.lower())
-        fp.print_function_trailer()
+        rstmt = '"%s"' % self.bundle_name.lower()
+        fp.quick_print('GetBundleName', return_type='string', return_stmt=rstmt)
 
     # GetYangName
     def _print_yang_name_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetYangName', return_type='string')
-        fp.ctx.writeln('return "%s"' % fp.class_alias)
-        fp.print_function_trailer()
+        rstmt = '"%s"' % fp.clazz.stmt.arg
+        fp.quick_print('GetYangName', return_type='string', return_stmt=rstmt)
 
     # GetBundleYangModelsLocation
     def _print_yang_models_function(self, clazz):
         bundle_name = snake_case(self.bundle_name)
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetBundleYangModelsLocation', return_type='string')
-        fp.ctx.writeln('return %s.GetModelsPath()' % bundle_name)
-        fp.print_function_trailer()
+        rstmt = '%s.GetModelsPath()' % bundle_name
+        fp.quick_print('GetBundleYangModelsLocation', return_type='string', return_stmt=rstmt)
 
     # GetAugmentCapabilitiesFunction
     def _print_capabilities_lookup_function(self, clazz):
@@ -162,29 +136,26 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper(
             'GetAugmentCapabilitiesFunction', return_type='types.AugmentCapabilitiesFunction')
-        fp.ctx.writeln("return %s.%sAugmentLookupTables" % (bundle_name, bundle_name.title()))
+        fp.ctx.write("return %s.%sAugmentLookupTables " % (bundle_name, bundle_name.title()))
         fp.print_function_trailer()
 
     # SetParent
     def _print_set_parent_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('SetParent', args='parent types.Entity')
-        fp.ctx.writeln('%s.parent = parent' % fp.class_alias)
-        fp.print_function_trailer()
+        stmt = '%s.parent = parent' % fp.class_alias
+        fp.quick_print('SetParent', args='parent types.Entity', stmt=stmt)
 
     # GetParent
     def _print_get_parent_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetParent', return_type='types.Entity')
-        fp.ctx.writeln('return %s.parent' % fp.class_alias)
-        fp.print_function_trailer()
+        rstmt = '%s.parent' % fp.class_alias
+        fp.quick_print('GetParent', return_type='types.Entity', return_stmt=rstmt)
 
-    # GetYangName
+    # GetParentYangName
     def _print_get_parent_yang_name_function(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetParentYangName', return_type='string')
-        fp.ctx.writeln('return "%s"' % clazz.owner.stmt.arg)
-        fp.print_function_trailer()
+        rstmt = '"%s"' % clazz.owner.stmt.arg
+        fp.quick_print('GetParentYangName', return_type='string', return_stmt=rstmt)
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

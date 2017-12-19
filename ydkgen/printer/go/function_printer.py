@@ -32,6 +32,20 @@ class FunctionPrinter(object):
             identifier = "self"
         self.class_alias = identifier
 
+    def quick_print(self, name, args='', return_type=' ', stmt='', return_stmt=''):
+        if return_type != ' ':
+            return_type = ' %s ' % return_type
+        if (return_stmt != ''):
+            stmt = 'return %s' % return_stmt
+        self.ctx.writeln('func (%s *%s) %s(%s)%s{ %s }' % (
+            self.class_alias,
+            self.clazz.qualified_go_name(),
+            name,
+            args,
+            return_type,
+            stmt))
+        self.ctx.bline()
+
     def print_all(self):
         self.print_function_header()
         self.print_function_body()

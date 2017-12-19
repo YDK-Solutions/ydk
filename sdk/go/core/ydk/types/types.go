@@ -142,12 +142,11 @@ func HasDataOrFilter(entity Entity) bool {
 	v := reflect.ValueOf(entity).Elem()
 
 	// checking leafs
-	for name, _ := range leafs {
+	for name, leaf := range leafs {
 		goName := getGoName(name)
 		field := v.FieldByName(goName)
-
 		if field.Kind() != reflect.Slice {
-			if !field.IsNil() { return true }
+			if leaf != nil { return true }
 		} else {
 			for _, l := range field.Interface().([]interface{}) {
 				if l != nil { return true }

@@ -91,9 +91,9 @@ class DocPrinter(object):
         if augments.__len__() > 0:
             self.ctx.bline()
             if augments.__len__() == 1:
-                aug_class = augments[0]
-                line = '\nThis module contains augment: ' + get_class_crossref_tag(aug_class.qn(), aug_class, self.lang) + '\n'
-                self._append(line)
+                for aug_class in augments:
+                    line = '\nThis module contains augment: ' + get_class_crossref_tag(aug_class.qn(), aug_class, self.lang) + '\n'
+                    self._append(line)
             else:
                 line = '\nThis module contains the following augments:\n'
                 self._append(line)

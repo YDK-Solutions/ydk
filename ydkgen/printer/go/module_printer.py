@@ -61,7 +61,9 @@ class ModulePrinter(FilePrinter):
         if comment is not None:
             comment = comment.arg
             for line in comment.split('\n'):
-                self.ctx.writeln("// %s" % convert_to_reStructuredText(line))
+                if isinstance(line, bytes):
+                    line = line.decode('utf-8')
+                self.ctx.writeln("// %s" % line)
 
     def _print_element(self, elem):
         if isinstance(elem, Enum):

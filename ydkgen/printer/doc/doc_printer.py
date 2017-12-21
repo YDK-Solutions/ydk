@@ -72,8 +72,10 @@ class DocPrinter(object):
     def _collect_all_augments(self, stmt, augments):
         for substmt in stmt.substmts:
             if substmt.keyword == 'augment':
-                augments.add(substmt.i_target_node.i_class)
-            if substmt.substmts.__len__ > 0:
+                if hasattr(substmt.i_target_node, 'i_class') \
+                   and substmt.i_target_node.i_class is not None:
+                    augments.add(substmt.i_target_node.i_class)
+            if len(substmt.substmts) > 0:
                 self._collect_all_augments(substmt, augments)
 
     def _print_package_rst(self, package):
@@ -88,9 +90,9 @@ class DocPrinter(object):
         # Adding augment references
         augments = set()
         self._collect_all_augments(package.stmt, augments)
-        if augments.__len__() > 0:
+        if len(augments) > 0:
             self.ctx.bline()
-            if augments.__len__() == 1:
+            if len(augments) == 1:
                 for aug_class in augments:
                     line = '\nThis module contains augment: ' + get_class_crossref_tag(aug_class.qn(), aug_class, self.lang) + '\n'
                     self._append(line)

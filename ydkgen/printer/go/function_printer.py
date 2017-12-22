@@ -17,7 +17,7 @@
 """
 source_printer.py
 
- prints Go classes
+ prints Go functions
 
 """
 class FunctionPrinter(object):
@@ -32,6 +32,31 @@ class FunctionPrinter(object):
             identifier = "self"
         self.class_alias = identifier
 
+    # This method should be called on any class inheriting FunctionPrinter
+    # which will print the function header and body defined in such class.
+    def print_all(self):
+        self.print_function_header()
+        self.print_function_body()
+        self.print_function_trailer()
+
+    def print_function_trailer(self):
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
+
+    # This method is meant to assist in printing a function header by any
+    # class implementing FunctionPrinter or by the quick_print method.
+    def print_function_header_helper(self, name, args='', return_type=' '):
+        if return_type != ' ':
+            return_type = ' %s ' % return_type
+
+        self.ctx.writeln('func (%s *%s) %s(%s)%s{' % (
+            self.class_alias, self.clazz.qualified_go_name(),
+            name, args, return_type))
+        self.ctx.lvl_inc()
+
+    # This method is meant to be called to quickly print any getter/setter function
+    # to forgo defining a new class.
     def quick_print(self, name, args='', return_type=' ', stmt='', return_stmt=''):
         if return_type != ' ':
             return_type = ' %s ' % return_type
@@ -44,23 +69,4 @@ class FunctionPrinter(object):
             args,
             return_type,
             stmt))
-        self.ctx.bline()
-
-    def print_all(self):
-        self.print_function_header()
-        self.print_function_body()
-        self.print_function_trailer()
-
-    def print_function_header_helper(self, name, args='', return_type=' '):
-        if return_type != ' ':
-            return_type = ' %s ' % return_type
-
-        self.ctx.writeln('func (%s *%s) %s(%s)%s{' % (
-            self.class_alias, self.clazz.qualified_go_name(),
-            name, args, return_type))
-        self.ctx.lvl_inc()
-
-    def print_function_trailer(self):
-        self.ctx.lvl_dec()
-        self.ctx.writeln('}')
         self.ctx.bline()

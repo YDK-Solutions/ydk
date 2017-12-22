@@ -607,7 +607,6 @@ func deepValueEqual(e1, e2 Entity) bool {
 	for k, c1 := range children1 {
 		marker[k] = true
 		if HasDataOrFilter(c1) {
-		// if c1.HasDataOrFilter() {
 			c2, ok := children2[k]
 			if ok && deepValueEqual(c1, c2) {
 				ret = ret && nameValuesEqual(c1, c2)

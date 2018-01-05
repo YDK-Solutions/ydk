@@ -21,7 +21,7 @@ source_printer.py
 
 """
 from ydkgen.api_model import Class, Enum, snake_case
-from ydkgen.common import sort_classes_at_same_level
+from ydkgen.common import get_qualified_yang_name, sort_classes_at_same_level
 
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
@@ -53,6 +53,7 @@ class ClassPrinter(object):
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_filter(clazz)
         self._print_class_set_filter(clazz)
+        self._print_class_get_go_name(clazz, leafs, children)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
@@ -84,6 +85,17 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         stmt = '%s.YFilter = yf' % fp.class_alias
         fp.quick_print('SetFilter', args='yf yfilter.YFilter', stmt=stmt)
+
+    # GetFieldNameFromYang
+    def _print_class_get_go_name(self, clazz, leafs, children):
+        fp = FunctionPrinter(self.ctx, clazz)
+        fp.print_function_header_helper('GetGoName', args='yname string', return_type='string')
+        for leaf in leafs:
+            fp.ctx.writeln('if yname == "%s" { return "%s" }' % (leaf.stmt.arg, leaf.go_name()))
+        for child in children:
+            fp.ctx.writeln('if yname == "%s" { return "%s" }' % (get_qualified_yang_name(child), child.go_name()))
+        fp.ctx.writeln('return ""')
+        fp.print_function_trailer()
 
     # GetSegmentPath
     def _print_class_get_segment_path(self, clazz):

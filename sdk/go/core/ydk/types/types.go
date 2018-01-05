@@ -85,6 +85,7 @@ type AugmentCapabilitiesFunction func() map[string]string
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
+	GetGoName(string)				string
 	GetSegmentPath() 				string
 	GetChildByName(string, string) 	Entity
 
@@ -111,18 +112,6 @@ type BitsList struct {
 	Value []map[string]bool
 }
 
-func getGoName(name string) string {
-	goName := name
-	goName = strings.Replace(goName, "_", " ", -1)
-	goName = strings.Replace(goName, "-", " ", -1)
-	goName = strings.Title(goName)
-	goName = strings.Replace(goName, " ", "", -1)
-	if string(name[0]) == "_" {
-		goName = "_" + goName
-	}
-	return goName
-}
-
 // HasDataOrFilter returns a bool representing whether the entity or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
 	if (entity.GetFilter() != yfilter.NotSet) {
@@ -143,8 +132,9 @@ func HasDataOrFilter(entity Entity) bool {
 
 	// checking leafs
 	for name, leaf := range leafs {
-		goName := getGoName(name)
+		goName := entity.GetGoName(name)
 		field := v.FieldByName(goName)
+
 		if field.Kind() != reflect.Slice {
 			if leaf != nil { return true }
 		} else {
@@ -166,7 +156,7 @@ func GetEntityPath(entity Entity) EntityPath {
 	// leafs
 	var leafData LeafData
 	for name, leaf := range leafs {
-		goName := getGoName(name)
+		goName := entity.GetGoName(name)
 		field := v.FieldByName(goName)
 
 		if leaf != nil && field.Kind() != reflect.Slice {
@@ -224,7 +214,8 @@ func GetChildByName(
 
 // SetValue sets the leaf value for given entity, valuePath, and value args
 func SetValue(entity Entity, valuePath string, value interface{}) {
-	goName := getGoName(valuePath)
+	goName := entity.GetGoName(valuePath)
+
 	s := reflect.ValueOf(entity).Elem()
 	v := s.FieldByName(goName)
 	if v.IsValid() {

@@ -30,7 +30,7 @@ class ClassGetChildPrinter(FunctionPrinter):
 
     def print_function_header(self):
         self.print_function_header_helper(
-            'GetChildByName', 'child_yang_name string, segment_path string', 'types.Entity')
+            'GetChildByName', 'childYangName string, segmentPath string', 'types.Entity')
 
     def print_function_body(self):
         for child in self.children:
@@ -38,7 +38,7 @@ class ClassGetChildPrinter(FunctionPrinter):
         self.ctx.writeln('return nil')
 
     def _print_check_child(self, child):
-        self.ctx.writeln('if child_yang_name == "%s" {' % get_qualified_yang_name(child))
+        self.ctx.writeln('if childYangName == "%s" {' % get_qualified_yang_name(child))
         self.ctx.lvl_inc()
         if child.is_many:
             self._print_check_many(child)
@@ -51,7 +51,7 @@ class ClassGetChildPrinter(FunctionPrinter):
         self.ctx.writeln('for _, c := range %s.%s {' % (
             self.class_alias, child.go_name()))
         self.ctx.lvl_inc()
-        self.ctx.writeln('if %s.GetSegmentPath() == segment_path {' % self.class_alias)
+        self.ctx.writeln('if %s.GetSegmentPath() == segmentPath {' % self.class_alias)
         self.ctx.lvl_inc();     self.ctx.writeln('return &c');
         self.ctx.lvl_dec();     self.ctx.writeln('}')
         self.ctx.lvl_dec();     self.ctx.writeln('}')

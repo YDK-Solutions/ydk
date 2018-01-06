@@ -25,7 +25,8 @@ foreach(test_name IN LISTS core_tests)
         pcre
         ssh_threads
         xml2
-        ssh)
+        ssh
+        dl)
     
     add_test(NAME ${test_name} COMMAND $<TARGET_FILE:${test_name}>)
 endforeach(test_name)

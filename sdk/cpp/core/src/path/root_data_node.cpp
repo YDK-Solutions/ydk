@@ -220,7 +220,7 @@ ydk::path::RootDataImpl::find(const std::string& path)
     schema_path+=path;
 
     YLOG_DEBUG("Looking for schema nodes path in root: '{}'", schema_path);
-    const struct lys_node* found_snode = ly_ctx_get_node(m_node->schema->module->ctx, nullptr, schema_path.c_str());
+    const struct lys_node* found_snode = ly_ctx_get_node(m_node->schema->module->ctx, nullptr, schema_path.c_str(), 1);
 
     if(found_snode)
     {

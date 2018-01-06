@@ -165,11 +165,9 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
             break;
         case ydk::ValidationService::Option::GET_CONFIG:
             option_str="GET-CONFIG";
-            ly_option = LYD_OPT_GETCONFIG;
+            ly_option = LYD_OPT_GETCONFIG | LYD_OPT_NOAUTODEL;
             break;
-
     }
-    ly_option = ly_option | LYD_OPT_NOAUTODEL;
 
     YLOG_INFO("Validation called on {} with option {}", dn.get_path(), option_str);
 

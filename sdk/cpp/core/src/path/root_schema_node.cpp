@@ -316,7 +316,7 @@ ydk::path::RootSchemaNodeImpl::find(const std::string& path)
     std::string full_path{"/"};
     full_path+=path;
 
-    const struct lys_node* found_node = ly_ctx_get_node(m_ctx, nullptr, full_path.c_str());
+    const struct lys_node* found_node = ly_ctx_get_node(m_ctx, nullptr, full_path.c_str(), 1);
 
     if (found_node){
         auto p = reinterpret_cast<SchemaNode*>(found_node->priv);

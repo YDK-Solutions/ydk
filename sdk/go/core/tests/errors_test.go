@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/stretchr/testify/assert"
@@ -129,10 +130,14 @@ func (suite *ErrorsTestSuite) TestInvalidBoolean() {
 func (suite *ErrorsTestSuite) TestInvalidEnum() {
 	runner := ysanity.Runner{}
 	runner.Ytypes.BuiltInT.EnumValue = "non enum"
-	errMsg := fmt.Sprintf(`Wrong enum value '%v'`, runner.Ytypes.BuiltInT.EnumValue)
+	errMsg := fmt.Sprintf(`YGOModelError: Invalid value "%v" in "enum-value" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/enum-value`,
+		runner.Ytypes.BuiltInT.EnumValue)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { suite.CRUD.Create(&suite.Provider, &runner) })
 }
 
 func TestErrorsTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(ErrorsTestSuite))
 }

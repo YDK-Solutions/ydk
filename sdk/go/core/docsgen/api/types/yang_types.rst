@@ -213,19 +213,9 @@ YANG Container and List
 
     Basic type that represents containers in YANG
 
-    .. function:: GetEntityPath(Entity)
-
-        :return: :go:struct:`EntityPath`
-
     .. function:: GetSegmentPath()
 
         :return: (``string``) A Go string.
-
-    .. function:: HasDataOrFilter()
-
-        :return: (``bool``) A Go boolean.
-
-    .. function:: SetValue(string, string)
 
     .. function:: GetChildByName(string, string)
 
@@ -264,3 +254,16 @@ YANG Container and List
     .. function:: GetFilter()
 
         :return: :ref:`YFilter <y-filter>`
+
+
+.. function:: HasDataOrFilter(entity Entity)
+
+    :return: (``bool``) A Go boolean.
+
+.. function:: GetEntityPath(entity Entity)
+
+    :return: :go:struct:`EntityPath`
+
+.. function:: SetValue(entity Entity, valuePath string, value interface{})
+
+    SetValue(), given an entity, sets the leaf specified by valuePath to the given value

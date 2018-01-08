@@ -44,9 +44,7 @@ class ClassConstructorPrinter(FunctionPrinter):
         self._print_inits()
 
     def _print_docstring(self):
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
         self.ctx.writeln('// %s' % self.clazz.qualified_go_name())
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
         lines = []
         # class comment
 
@@ -59,7 +57,6 @@ class ClassConstructorPrinter(FunctionPrinter):
 
         for l in lines:
             self.ctx.writeln('// %s' % l)
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
 
     def _print_inits(self):
         self._print_leaf_inits()

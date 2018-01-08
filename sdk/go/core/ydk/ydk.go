@@ -1,4 +1,5 @@
-// Package protocol provides support for the Protocol type.
+// Package ydk provides support for usage of Go API including
+// path, providers, services, and types.
 //
 // YANG Development Kit Copyright 2017 Cisco Systems. All rights reserved.
 // Licensed to the Apache Software Foundation (ASF) under one
@@ -16,13 +17,4 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-package protocol
-
-// Protocol represents the protocol to use to connect to a device
-type Protocol int
-
-// Protocol constants.
-const (
-	Restconf Protocol = iota
-	Netconf
-)
+package ydk

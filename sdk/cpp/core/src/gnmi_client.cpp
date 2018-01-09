@@ -57,14 +57,21 @@ int gNMIClient::connect(string address, bool is_secure)
     {
         // Authenticate Server at Client
         string server_cert;
-        ifstream rf("ems.pem");
+        string server_key;
+
+        ifstream p("ems.pem");
+        ifstream k("ems.key");
     
-        server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
+        server_cert.assign((istreambuf_iterator<char>(p)),(istreambuf_iterator<char>()));
+        server_key.assign((istreambuf_iterator<char>(k)),(istreambuf_iterator<char>()));
+
     
         grpc::SslCredentialsOptions ssl_opts;
         grpc::ChannelArguments      args;
     
         ssl_opts.pem_root_certs = server_cert;
+        ssl_opts.pem_private_key = server_key;
+
         args.SetSslTargetNameOverride("ems.cisco.com");
 
         YLOG_DEBUG("In gnmi_connect server cert: {}", server_cert);

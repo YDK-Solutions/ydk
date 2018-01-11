@@ -535,7 +535,7 @@ TEST_CASE("test_leafref_pos")
     REQUIRE(reply);
 
     //CREATE
-    r_1->ydktest_sanity_one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+    r_1->ydktest_sanity_one->name = "1.2.3.4";
     r_1->two->sub1->number = 21;
     r_1->three->sub1->sub2->number = 311;
     auto e_1  = make_unique<ydktest_sanity::Runner::InbtwList::Ldata>();
@@ -573,11 +573,11 @@ TEST_CASE("test_leafref_pos")
     r_1->inbtw_list->ldata.push_back(move(e_1));
     r_1->inbtw_list->ldata.push_back(move(e_2));
 
-    r_1->leaf_ref->ref_one_name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+    r_1->leaf_ref->ref_one_name = "1.2.3.4";
     r_1->leaf_ref->ref_two_sub1_number = 21;
     r_1->leaf_ref->ref_three_sub1_sub2_number = r_1->three->sub1->sub2->number.get();
-    r_1->leaf_ref->one->name_of_one = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
-    r_1->leaf_ref->one->two->self_ref_one_name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+    r_1->leaf_ref->one->name_of_one = "1.2.3.4";
+    r_1->leaf_ref->one->two->self_ref_one_name = "1.2.3.4";
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
 
@@ -592,7 +592,7 @@ TEST_CASE("test_leafref_pos")
     REQUIRE(r_1->inbtw_list->ldata[1]->name == r_2->inbtw_list->ldata[1]->name);
     REQUIRE(r_1->inbtw_list->ldata[0]->subc->subc_subl1[0]->number == r_1->inbtw_list->ldata[0]->subc->subc_subl1[0]->number);
     REQUIRE(r_1->inbtw_list->ldata[0]->subc->subc_subl1[0]->name == r_1->inbtw_list->ldata[0]->subc->subc_subl1[0]->name);
-        REQUIRE(*r_1 == *r_2);
+    REQUIRE(*r_1 == *r_2);
 }
 
 TEST_CASE("aug_one_pos")
@@ -707,6 +707,3 @@ TEST_CASE("aug_leaf")
     ydktest_sanity::Runner* r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
     REQUIRE(r_2->ydktest_sanity_one->augmented_leaf==r_1->ydktest_sanity_one->augmented_leaf);
 }
-
-
-

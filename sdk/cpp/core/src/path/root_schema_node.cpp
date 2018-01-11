@@ -39,6 +39,9 @@ static void get_namespaces_from_xml_doc(xmlNodePtr root, std::unordered_set<std:
         if (curr->type == XML_ELEMENT_NODE && curr->ns && curr->ns->href)
         {
             namespaces.insert(std::string{reinterpret_cast<const char*>(curr->ns->href)});
+            if (curr->nsDef && curr->nsDef->href) {
+            	namespaces.insert(std::string{reinterpret_cast<const char*>(curr->nsDef->href)});
+            }
         }
         get_namespaces_from_xml_doc(curr->children, namespaces);
     }
@@ -316,7 +319,7 @@ ydk::path::RootSchemaNodeImpl::find(const std::string& path)
     std::string full_path{"/"};
     full_path+=path;
 
-    const struct lys_node* found_node = ly_ctx_get_node(m_ctx, nullptr, full_path.c_str(), 1);
+    const struct lys_node* found_node = ly_ctx_get_node(m_ctx, nullptr, full_path.c_str(), 0);
 
     if (found_node){
         auto p = reinterpret_cast<SchemaNode*>(found_node->priv);

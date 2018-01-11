@@ -308,6 +308,7 @@ set(yang_objs
     common.c.o
     context.c.o
     dict.c.o
+    extensions.c.o
     log.c.o
     parser.c.o
     parser_json.c.o

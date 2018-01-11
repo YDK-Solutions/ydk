@@ -308,15 +308,10 @@ ydk::path::DataNodeImpl::find(const std::string& path)
     if(m_node == nullptr) {
         return results;
     }
-    std::string spath{path};
 
-    auto s = get_schema_node().get_statement();
-    if(s.keyword == "rpc"){
-        spath="input/" + spath;
-    }
-    YLOG_DEBUG("Getting child schema with path '{}' in {}", spath, m_node->schema->name);
+    YLOG_DEBUG("Getting child schema with path '{}' in {}", path, m_node->schema->name);
     const lys_node* found_snode =
-        ly_ctx_get_node(m_node->schema->module->ctx, m_node->schema, spath.c_str(), 1);
+        ly_ctx_get_node(m_node->schema->module->ctx, m_node->schema, path.c_str(), 0);
 
     if(found_snode)
     {
@@ -334,7 +329,6 @@ ydk::path::DataNodeImpl::find(const std::string& path)
             }
             ly_set_free(result_set);
         }
-
     }
 
     return results;

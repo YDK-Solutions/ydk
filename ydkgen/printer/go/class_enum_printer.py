@@ -35,7 +35,7 @@ class EnumPrinter(object):
         self._print_docstring(enum_class)
         self.ctx.writeln('type %s string' % enum_class.qualified_go_name())
         self.ctx.bline()
-        self.ctx.writeln('const (')
+        self.ctx.write('const (')
         self.ctx.lvl_inc()
 
     def _print_enum_body(self, enum_class):
@@ -45,6 +45,11 @@ class EnumPrinter(object):
 
     def _print_enum_literal(self, enum_class_prefix, enum_literal):
         name = enum_literal.name
+
+        self.ctx.bline()
+        if enum_literal.comment is not None:
+            for c in enum_literal.comment.split('\n'):
+                self.ctx.writeln('// %s' % c)
         self.ctx.writeln('%s_%s %s = "%s"' % (enum_class_prefix,
                                             name,
                                             enum_class_prefix,
@@ -56,19 +61,13 @@ class EnumPrinter(object):
         self.ctx.bline()
 
     def _print_docstring(self, enum_class):
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
-        self.ctx.writeln('// %s' % enum_class.qualified_go_name())
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
         enum_class_prefix = enum_class.qualified_go_name()
 
-        if enum_class.comment is not None:
+        comment = ''
+        if enum_class.comment not in (None, ''):
             for c in enum_class.comment.split('\n'):
-                self.ctx.writeln('// %s' % c)
-
-        for l in enum_class.literals:
-            self.ctx.writeln('// %s_%s:' % (enum_class_prefix, l.go_name()))
-            if l.comment is not None:
-                length = len(enum_class_prefix) + len(l.go_name()) + 2
-                for c in l.comment.split('\n'):
-                    self.ctx.writeln('// %s%s' % (' ' * length, c))
-        self.ctx.writeln('//////////////////////////////////////////////////////////////////////////')
+                comment = '// %s\n' % c
+            comment = '// %s represents %s' % (enum_class.qualified_go_name(), comment[3:])
+            self.ctx.write(comment)
+        else:
+            self.ctx.writeln('// %s' % enum_class.qualified_go_name())

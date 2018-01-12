@@ -276,20 +276,26 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 func ConnectToNetconfProvider(
 	state *types.State,
 	repo types.Repository,
-	Address, Username, Password string,
+	address, username, password string,
 	port int,
-	Protocol string) types.CServiceProvider {
+	protocol string,
+	onDemand, commonCache bool) types.CServiceProvider {
 
-	var address *C.char = C.CString(Address)
-	defer C.free(unsafe.Pointer(address))
-	var username *C.char = C.CString(Username)
-	defer C.free(unsafe.Pointer(username))
-	var password *C.char = C.CString(Password)
-	defer C.free(unsafe.Pointer(password))
+	var caddress *C.char = C.CString(address)
+	defer C.free(unsafe.Pointer(caddress))
+	var cusername *C.char = C.CString(username)
+	defer C.free(unsafe.Pointer(cusername))
+	var cpassword *C.char = C.CString(password)
+	defer C.free(unsafe.Pointer(cpassword))
 	var cport C.int = C.int(port)
 
-	var cprotocol *C.char = C.CString(Protocol)
+	var cprotocol *C.char = C.CString(protocol)
 	defer C.free(unsafe.Pointer(cprotocol))
+
+	var cOnDemand C.boolean = 0
+	if onDemand { cOnDemand = 1 }
+	var cCommonCache C.boolean = 0
+	if commonCache { cCommonCache = 1 }
 
 	AddCState(state)
 	cstate := getCState(state)
@@ -300,12 +306,12 @@ func ConnectToNetconfProvider(
 		var path *C.char = C.CString(repo.Path)
 		repo := C.RepositoryInitWithPath(*cstate, path)
 		panicOnCStateError(cstate)
-		p = C.NetconfServiceProviderInitWithRepo(
-			*cstate, repo, address, username, password, cport, cprotocol)
+		p = C.NetconfServiceProviderInitWithOnDemandRepo(
+			*cstate, repo, caddress, cusername, cpassword, cport, cprotocol, cOnDemand)
 		panicOnCStateError(cstate)
 	} else {
-		p = C.NetconfServiceProviderInit(
-			*cstate, address, username, password, cport, cprotocol)
+		p = C.NetconfServiceProviderInitWithOnDemand(
+			*cstate, caddress, cusername, cpassword, cport, cprotocol, cOnDemand, cCommonCache)
 		panicOnCStateError(cstate)
 	}
 

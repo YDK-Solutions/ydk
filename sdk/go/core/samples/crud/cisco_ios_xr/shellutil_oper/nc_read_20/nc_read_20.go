@@ -61,7 +61,7 @@ func processSystemTime(sysTime shellutilOper.SystemTime) string {
 	var showSysTime bytes.Buffer
 	fmt.Fprintln(&showSysTime, "Host:", sysTime.Uptime.HostName)
 	fmt.Fprintln(&showSysTime, 
-		"System time:", clockTime, date.Location().String(), clockDate)
+		"System time:", clockTime, sysTime.Clock.TimeZone.(string), clockDate)
 	fmt.Fprintln(&showSysTime, "Time source:", sysTime.Clock.TimeSource)
 	fmt.Fprintln(&showSysTime, "System uptime:", clockDelta)
 
@@ -69,7 +69,7 @@ func processSystemTime(sysTime shellutilOper.SystemTime) string {
 }
 
 func getDate(sysTime shellutilOper.SystemTime) time.Time {
-	loc, err := time.LoadLocation(sysTime.Clock.TimeZone.(string))
+	loc, err := time.LoadLocation("")
 	if (err != nil) {
 		panic(err.Error())
 	}

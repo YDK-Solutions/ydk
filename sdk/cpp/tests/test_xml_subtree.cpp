@@ -312,3 +312,26 @@ auto r = crud.read_config(provider, *v);
 REQUIRE(r!=nullptr);
 REQUIRE(*r==*g);
 }
+
+TEST_CASE("test_no_key_list")
+{
+std::string payload=R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <no-key-list>
+    <test>abc</test>
+  </no-key-list>
+  <no-key-list>
+    <test>xyz</test>
+  </no-key-list>
+</runner>)";
+
+ydk::path::Repository repo{TEST_HOME};
+ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+
+CodecService c{};
+CodecServiceProvider cp{EncodingFormat::XML};
+XmlSubtreeCodec xml_codec{};
+
+auto no_key = xml_codec.decode(payload, make_shared<ydktest_sanity::Runner>());
+auto no_key_payload = xml_codec.encode(*no_key, session.get_root_schema());
+REQUIRE(payload==no_key_payload);
+}

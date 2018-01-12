@@ -227,8 +227,8 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
                 lyd_unlink(first_node_created);
                 lyd_free(first_node_created);
             }
-            YLOG_ERROR("Invalid path: {}", segments[i]);
-            throw(YCPPModelError{"Invalid path: " + segments[i]});
+            YLOG_ERROR("Could not create data node: {} for path: '{}', value: '{}'", segments[i], path, value);
+            throw(YCPPModelError{"Could not create data node: " + segments[i]});
         }
         else if (!first_node_created)
         {

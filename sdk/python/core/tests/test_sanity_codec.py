@@ -347,6 +347,20 @@ class SanityYang(unittest.TestCase):
         routing_policy_decode = self.codec.decode(xml_provider, payload)
         self.assertEqual(routing_policy, routing_policy_decode)
 
+    def test_list_no_keys(self):
+        payload = '''<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <no-key-list>
+    <test>abc</test>
+  </no-key-list>
+  <no-key-list>
+    <test>xyz</test>
+  </no-key-list>
+</runner>'''
+        xml_provider = CodecServiceProvider(type='xml')
+        no_key = self.codec.decode(xml_provider, payload)
+        no_key_payload = self.codec.encode(xml_provider, no_key, subtree=True)
+        self.assertEqual(payload, no_key_payload)
+
     @assert_with_error("Subtree option can only be used with XML encoding", YPYServiceError)
     def test_decode_invalid_subtree_1(self):
         self.provider.encoding = EncodingFormat.JSON

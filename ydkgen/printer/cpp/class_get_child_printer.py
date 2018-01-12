@@ -55,18 +55,6 @@ class ClassGetChildPrinter(object):
         self.ctx.writeln('}')
 
     def _print_class_get_child_many(self, child):
-        self.ctx.writeln('for(auto const & c : %s)' % child.name)
-        self.ctx.writeln('{')
-        self.ctx.lvl_inc()
-        self.ctx.writeln('std::string segment = c->get_segment_path();')
-        self.ctx.writeln('if(segment_path == segment)')
-        self.ctx.writeln('{')
-        self.ctx.lvl_inc()
-        self.ctx.writeln('return c;')
-        self.ctx.lvl_dec()
-        self.ctx.writeln('}')
-        self.ctx.lvl_dec()
-        self.ctx.writeln('}')
         self.ctx.writeln('auto c = std::make_shared<%s>();' % (child.property_type.qualified_cpp_name()))
         self.ctx.writeln('c->parent = this;')
         self.ctx.writeln('%s.push_back(c);' % child.name)

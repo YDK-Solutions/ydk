@@ -41,27 +41,21 @@ using namespace ydk;
 namespace ydk
 {
 
-    gNMIServiceProvider::gNMIServiceProvider(const string& address)
-        : session{address}
+    gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
+                   const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port)
+        : session{repo, address, username, password, port}
     {
         YLOG_INFO("Connected to {}", address);
     }
 
-    gNMIServiceProvider::gNMIServiceProvider(const string& address, bool is_secure)
-        : session{address, is_secure}
-    {
-        YLOG_INFO("Connected to {} via Secure Channel", address);
-    }
-
-
-    gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo, const string& address)
-        : session{repo, address}
-    {
-        YLOG_INFO("Connected to {}", address);
-    }
-
-    gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo, const string& address, bool is_secure)
-        : session{repo, address, is_secure}
+    gNMIServiceProvider::gNMIServiceProvider(const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port)
+        : session{address, username, password, port}
     {
         YLOG_INFO("Connected to {} via Secure Channel", address);
     }

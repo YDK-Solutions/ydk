@@ -459,11 +459,17 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("invoke", &ydk::path::RestconfSession::invoke, return_value_policy::reference);
 
     class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
-        .def(init<ydk::path::Repository&, const std::string&>(),
+        .def(init<ydk::path::Repository&, const std::string&, const std::string&, const std::string&, int>(),
              arg("repo"),
-             arg("address"))
-        .def(init<const std::string&>(),
-             arg("address"))
+             arg("address"),
+             arg("username"),
+             arg("password"),
+             arg("port"))
+        .def(init<const std::string&, const std::string&, const std::string&, int>(),
+             arg("address"),
+             arg("username"),
+             arg("password"),
+             arg("port"))
         .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference);
 
@@ -916,7 +922,8 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("get_node_ids", &ydk::OpenDaylightServiceProvider::get_node_ids, return_value_policy::reference);
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
-        .def(init<ydk::path::Repository&, string, bool>(), arg("repo"), arg("address"), arg("is_secure"))
+        .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),
+            arg("repo"), arg("address"), arg("username"), arg("password"), arg("port"))
         .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);

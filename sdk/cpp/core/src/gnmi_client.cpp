@@ -37,7 +37,8 @@ using grpc::SslCredentialsOptions;
 vector<string> capabilities;
 gNMIClient::PathPrefixValueFlags flag;
 
-gNMIClient::gNMIClient(shared_ptr<Channel> channel) : stub_(gNMI::NewStub(channel))
+gNMIClient::gNMIClient(shared_ptr<Channel> channel, const std::string & username, const  std::string & password)
+ : stub_(gNMI::NewStub(channel)), username(username), password(password)
 {
 }
 
@@ -51,45 +52,40 @@ static string format_notification_response(string prefix_to_prepend, const std::
 static ::gnmi::SetRequest allocate_set_request_path(const string & operation, ::gnmi::SetRequest request, vector<string> root_path, json config_payload);
 
 
-int gNMIClient::connect(string address, bool is_secure) 
+int gNMIClient::connect(string address)
 {
-    if(is_secure) 
-    {
-        // Authenticate Server at Client
-        string server_cert;
-        string server_key;
+    // Authenticate Server at Client
+    string server_cert;
+    string server_key;
 
-        ifstream p("ems.pem");
-        ifstream k("ems.key");
-    
-        server_cert.assign((istreambuf_iterator<char>(p)),(istreambuf_iterator<char>()));
-        server_key.assign((istreambuf_iterator<char>(k)),(istreambuf_iterator<char>()));
+    ifstream p("ems.pem");
+    ifstream k("ems.key");
 
-    
-        grpc::SslCredentialsOptions ssl_opts;
-        grpc::ChannelArguments      args;
-    
-        ssl_opts.pem_root_certs = server_cert;
-        ssl_opts.pem_private_key = server_key;
+    server_cert.assign((istreambuf_iterator<char>(p)),(istreambuf_iterator<char>()));
+    server_key.assign((istreambuf_iterator<char>(k)),(istreambuf_iterator<char>()));
 
-        args.SetSslTargetNameOverride("ems.cisco.com");
 
-        YLOG_DEBUG("In gnmi_connect server cert: {}", server_cert);
-    
-        // TODO: Authenticate Client at Server
-        /* string client_key, client_cert;
-        ifstream kf("client.key");
-        ifstream cf("client.pem");
-        client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
-        client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
-        ssl_opts = {server_cert, client_key, client_cert};*/
-    
-        auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
-        grpc::CreateCustomChannel(address, channel_creds, args);
+    grpc::SslCredentialsOptions ssl_opts;
+    grpc::ChannelArguments      args;
 
-    } else {
-        grpc::CreateChannel(address, grpc::InsecureChannelCredentials());
-    }
+    ssl_opts.pem_root_certs = server_cert;
+    ssl_opts.pem_private_key = server_key;
+
+    args.SetSslTargetNameOverride("ems.cisco.com");
+
+    YLOG_DEBUG("In gnmi_connect server cert: {}", server_cert);
+
+    // TODO: Authenticate Client at Server
+    /* string client_key, client_cert;
+    ifstream kf("client.key");
+    ifstream cf("client.pem");
+    client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
+    client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
+    ssl_opts = {server_cert, client_key, client_cert};*/
+
+    auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
+    grpc::CreateCustomChannel(address, channel_creds, args);
+
     get_capabilities();
     return EXIT_SUCCESS;
 }
@@ -184,6 +180,8 @@ vector<string> gNMIClient::get_capabilities()
     CapabilityRequest request;
     CapabilityResponse response;
     grpc::ClientContext context;
+    context.AddMetadata("username", username);
+    context.AddMetadata("password", password);
     grpc::Status status = stub_->Capabilities(&context, request, &response);
 
     check_capabilities_status(status);
@@ -452,6 +450,8 @@ string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* r
 {
     grpc::ClientContext context;
     grpc::Status status;
+    context.AddMetadata("username", username);
+    context.AddMetadata("password", password);
     status = stub_->Get(&context, request, response);
     YLOG_INFO("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 
@@ -471,6 +471,8 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
 {
     grpc::ClientContext context;
     grpc::Status status;
+    context.AddMetadata("username", username);
+    context.AddMetadata("password", password);
     status = stub_->Set(&context, request, response);
     YLOG_INFO("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
     if (!(status.ok())) 

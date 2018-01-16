@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
     ydk::path::Repository repo{};
 
-    gNMIServiceProvider sp{repo, address};
+    gNMIServiceProvider sp{repo, address, "admin", "admin", 57400};
 
 
 //    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();

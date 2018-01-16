@@ -1142,14 +1142,15 @@ public:
     } SecureChannelArguments;
 
     gNMISession(Repository & repo,
-                   const std::string& address, bool is_secure);
+                   const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 57400);
 
-    gNMISession(Repository & repo,
-                   const std::string& address);
-
-    gNMISession(const std::string& address, bool is_secure);
-
-    gNMISession(const std::string& address);
+    gNMISession(const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 57400);
 
     virtual ~gNMISession();
 
@@ -1161,7 +1162,7 @@ public:
     virtual std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
 
 private:
-    void initialize(Repository& repo, const std::string& address, bool is_secure);
+    void initialize(Repository& repo, const std::string& address, const std::string& username, const std::string& password, int port);
     std::shared_ptr<path::DataNode> handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const;
     std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc, const std::string & operation) const;
     void print_root_paths(ydk::path::RootSchemaNode& rsn) const;

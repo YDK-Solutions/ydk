@@ -51,7 +51,7 @@ TEST_CASE("gnmi_test_json_payload"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
@@ -113,7 +113,7 @@ TEST_CASE("gnmi_bgp_create")
 {
     ydk::path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
 
-    ydk::path::gNMISession session{repo,"pavarotti:57400", true};
+    ydk::path::gNMISession session{repo,"pavarotti:57400", "admin", "admin"};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
@@ -169,7 +169,7 @@ TEST_CASE("gnmi_core_validate")
 {
     ydk::path::Repository repo{};
 
-    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     auto & runner = schema.create_datanode("ietf-netconf:validate", "");
@@ -188,7 +188,7 @@ TEST_CASE("gnmi_bgp_xr_openconfig"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::path::gNMISession session{repo,"127.0.0.1:50051"};
+    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};

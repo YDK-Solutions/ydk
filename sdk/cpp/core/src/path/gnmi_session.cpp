@@ -66,45 +66,38 @@ const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 // Secure
 // Create a default SSL ChannelCredentials object
 gNMISession::SecureChannelArguments input_args = get_channel_credentials();
-gNMISession::gNMISession(const std::string& address, bool is_secure)
-    : client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, *(input_args.args))))
+gNMISession::gNMISession(const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port)
 {
     path::Repository repo;
-    initialize(repo, address, is_secure);
-    YLOG_DEBUG("Connected to {} using Secure Channel", address);
+    initialize(repo, address, username, password, port);
+    YLOG_DEBUG("Connected to {} using Secure Channel", address, username, password, port);
 }
 
-gNMISession::gNMISession(path::Repository & repo, const std::string& address, bool is_secure)
-    : client(make_unique<gNMIClient>(grpc::CreateCustomChannel(address, input_args.channel_creds, *(input_args.args))))
+gNMISession::gNMISession(Repository & repo,
+                   const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port)
 {
-    initialize(repo, address, is_secure);
-    YLOG_DEBUG("Connected to {} using Secure Channel", address);
-}
 
-// Unsecure
-gNMISession::gNMISession(const std::string& address)
-    : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
-{
-    path::Repository repo;
-    bool is_secure = false;
-    YLOG_DEBUG("Connected to {}", address);
-    initialize(repo, address, is_secure);
-}
-
-gNMISession::gNMISession(path::Repository & repo, const std::string& address)
-    : client(make_unique<gNMIClient>(grpc::CreateChannel(address, grpc::InsecureChannelCredentials())))
-{
-    bool is_secure = false;
-    YLOG_DEBUG("Connected to {}", address);
-    initialize(repo, address, is_secure);
+    initialize(repo, address, username, password, port);
+    YLOG_DEBUG("Connected to {} using Secure Channel", address, username, password, port);
 }
 
 gNMISession::~gNMISession() = default;
 
-void gNMISession::initialize(path::Repository & repo, const std::string& address, bool is_secure)
+void gNMISession::initialize(path::Repository & repo, const std::string& address, const std::string& username, const std::string& password, int port)
 {
     IetfCapabilitiesParser capabilities_parser{};
-    client->connect(address,is_secure);
+
+    std::ostringstream address_buffer{};
+    address_buffer << address << ":" << port;
+
+    client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
+    client->connect(address);
     server_capabilities = client->get_capabilities();
 
     root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));

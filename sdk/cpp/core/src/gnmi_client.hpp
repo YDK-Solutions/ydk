@@ -61,10 +61,10 @@ namespace ydk
             bool prefix_has_value;
         } PathPrefixValueFlags;
 
-        gNMIClient(std::shared_ptr<Channel> channel);
+        gNMIClient(std::shared_ptr<Channel> channel, const std::string & username, const std::string & password);
         ~gNMIClient();
 
-        int connect(std::string address, bool is_secure);
+        int connect(std::string address);
         std::string execute_wrapper(const std::string & payload, const std::string& operation);
         std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
         std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
@@ -82,7 +82,10 @@ namespace ydk
         std::string parse_set_response(::gnmi::SetResponse* response); 
         ::gnmi::GetRequest populate_get_request(::gnmi::GetRequest request, const std::string& payload);
         ::gnmi::SetRequest populate_set_request(::gnmi::SetRequest request, const std::string& payload, const std::string& operation);
+
         std::unique_ptr<gNMI::Stub> stub_;
+        std::string username;
+        std::string password;
     };
 }
 

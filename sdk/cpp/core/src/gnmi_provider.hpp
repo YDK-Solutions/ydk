@@ -37,10 +37,14 @@ namespace ydk
             grpc::ChannelArguments args;
         } SecureChannelArguments;
 
-        gNMIServiceProvider(path::Repository & repo, const std::string& address);
-        gNMIServiceProvider(path::Repository & repo, const std::string& address, bool is_secure);
-        gNMIServiceProvider(const std::string& address);
-        gNMIServiceProvider(const std::string& address, bool is_secure);
+        gNMIServiceProvider(path::Repository & repo, const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 57400);
+        gNMIServiceProvider(const std::string& address,
+                   const std::string& username,
+                   const std::string& password,
+                   int port = 57400);
         virtual ~gNMIServiceProvider();
 
         virtual EncodingFormat get_encoding() const;

@@ -28,7 +28,7 @@ string address = "127.0.0.1:50051";
 
 TEST_CASE("gnmi_xr")
 {
-    gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
+    gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()), "admin", "admin");
 
     int ok = 0;
 

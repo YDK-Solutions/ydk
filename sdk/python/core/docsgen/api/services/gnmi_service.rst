@@ -63,10 +63,10 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` with ``gNM
 
     gnmi_service = gNMIService()
     repository = Repository('/Users/test/yang_models_location')
-    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1:57400', is_secure=True)
+    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', username='admin', password='admin')
 
     capabilities = provider.get_capabilities() # Get list of capabilities
 
     bgp = openconfig_bgp.Bgp()
 
-    bgp_read = gnmi_service.get(provider, bgp, 'create') # Perform get operation
+    bgp_read = gnmi_service.get(provider, bgp) # Perform get operation

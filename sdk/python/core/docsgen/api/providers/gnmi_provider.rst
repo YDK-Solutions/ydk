@@ -2,13 +2,15 @@ gNMI Service Provider
 ========================
 
 
-.. py:class:: ydk.providers.gNMIServiceProvider(repo, address, is_secure)
+.. py:class:: ydk.providers.gNMIServiceProvider(repo, address, username, password, port=57400)
 
-    Constructs an instance of the ``gNMIServiceProvider`` to connect to a `gNMI <https://github.com/openconfig/gnmi>`_ server. This has clean up methods implemented in its destructor. So, the user does not need to worry about closing the gNMI session.
+    Constructs an instance of the ``gNMIServiceProvider`` to connect to a `gNMI <https://github.com/openconfig/gnmi>`_ server. By default, the provider works in secure TLS mode. The certificate file (with the name ``ems.pem``) and the key (with the name ``ems.key``) needs to be copied to the location of your python script
 
     :param repo: Instance of :py:class:`Repository<ydk.path.Repository>` with path to local directory containing the the `ydk yang model <https://raw.githubusercontent.com/CiscoDevNet/ydk-gen/1344b3f22d746764f17536ac4e666836de4ba84d/sdk/cpp/core/tests/models/ydk%402016-02-26.yang>`_ along with all the yang models supported on the gNMI server
-    :param address: IP address & port of the device supporting a gNMI interface in the format ``ip-address:port``
-    :param is_secure: Indicates usage of gNMI secure channel. **Note:** When using ``is_secure=True``, the certificate file from the server (with a name like ``ems.pem``) needs to be copied to the location of your python script
+    :param address: Host address of the device supporting a gNMI interface
+    :param username: Username
+    :param password: Password
+    :param port: Port on which the gNMI interface can be accessed on the device. If not specified, the default value of ``57400`` is used
 
     .. py:method:: get_capabilities()
 
@@ -50,8 +52,10 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` is shown b
     from ydk.services import CRUDService
 
     crud = CRUDService()
-    repository = Repository('/Users/test/yang_models_location') # Location of directory where yang models from the server are downloaded
-    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1:57400', is_secure=True)
+    # Create repository with location of directory where yang models from the server are downloaded
+    repository = Repository('/Users/test/yang_models_location')
+    # Instantiate provider
+    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', username='admin', password='admin')
 
     capabilities = provider.get_capabilities() # Get list of capabilities
 

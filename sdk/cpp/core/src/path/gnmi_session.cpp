@@ -99,8 +99,9 @@ void gNMISession::initialize(path::Repository & repo, const std::string& address
     client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
     client->connect(address);
     server_capabilities = client->get_capabilities();
+    std::vector<std::string> empty_caps;
 
-    root_schema = repo.create_root_schema(capabilities_parser.parse(server_capabilities));
+    root_schema = repo.create_root_schema(capabilities_parser.parse(empty_caps));
 
     if(root_schema.get() == nullptr)
     {

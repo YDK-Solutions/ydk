@@ -464,12 +464,12 @@ PYBIND11_MODULE(ydk_, ydk)
              arg("address"),
              arg("username"),
              arg("password"),
-             arg("port"))
+             arg("port")=57400)
         .def(init<const std::string&, const std::string&, const std::string&, int>(),
              arg("address"),
              arg("username"),
              arg("password"),
-             arg("port"))
+             arg("port")=57400)
         .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
         .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference);
 
@@ -923,7 +923,7 @@ PYBIND11_MODULE(ydk_, ydk)
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
         .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),
-            arg("repo"), arg("address"), arg("username"), arg("password"), arg("port"))
+            arg("repo"), arg("address"), arg("username"), arg("password"), arg("port")=57400)
         .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);

@@ -136,7 +136,7 @@ def iscppkeyword(word):
                     'const', 'continue', 'double', 'else', 'value', 'namespace',
                     'operation', 'volatile', 'register', 'short', 'extern',
                     'mutable', 'unsigned', 'struct', 'switch', 'void', 'typedef',
-                    'typeid', 'using', 'char', 'goto', 'not','clock')
+                    'typeid', 'using', 'char', 'goto', 'not','clock', 'major')
 
 def isgokeyword(word):
     return word in (

@@ -22,6 +22,7 @@
 //////////////////////////////////////////////////////////////////
 #include "codec_service.hpp"
 #include "entity_data_node_walker.hpp"
+#include "entity_util.hpp"
 #include "errors.hpp"
 #include "logger.hpp"
 #include "gnmi_provider.hpp"
@@ -36,8 +37,7 @@ using grpc::SslCredentialsOptions;
 
 namespace ydk {
 
-static shared_ptr<Entity> execute_get_gnmi(gNMIServiceProvider& provider, Entity & entity);
-static string execute_set_gnmi(gNMIServiceProvider& provider, Entity & entity);
+static string get_data_payload(gNMIServiceProvider& provider, Entity & entity);
 static shared_ptr<Entity> read_datanode(Entity & filter, shared_ptr<path::DataNode> read_data_node);
 static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 
@@ -50,14 +50,23 @@ gNMIService::~gNMIService()
 }
 
 //get
-shared_ptr<Entity> gNMIService::get(gNMIServiceProvider& provider, Entity& filter)
+shared_ptr<Entity> gNMIService::get(gNMIServiceProvider& provider, Entity& filter, bool only_config) const
 {
     YLOG_INFO("Executing get RPC");
-    return execute_get_gnmi(provider, filter);
+    std::pair<std::string, std::string> prefix_pair;
+    std::vector<PathElem> path_container;
+    parse_entity_to_prefix_and_paths(filter, prefix_pair, path_container);
+
+    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
+
+    auto & client = (dynamic_cast<const path::gNMISession&>(provider.get_session())).get_client();
+    string reply = client.execute_get_operation(prefix_pair, path_container, only_config);
+    auto output = (dynamic_cast<const path::gNMISession&>(provider.get_session())).handle_read_reply(reply, root_schema);
+    return read_datanode(filter, output);
 }
 
 //set
-bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const string & operation)
+bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const string & operation) const
 {
     if(operation != "gnmi_create" && operation != "gnmi_delete")
     {
@@ -65,30 +74,44 @@ bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const strin
         throw(YCPPServiceProviderError{operation + " operation not supported"});
     }
     YLOG_INFO("Executing set RPC with {} operation", operation);
-    string gnmi_payload = execute_set_gnmi(provider, filter);
-    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(gnmi_payload, operation);
-    YLOG_DEBUG("=============Reply payload received from device=============");
-    YLOG_DEBUG("{}\n", reply);
-    if(!reply.empty()) return true;
-    else return false;
+    string data_payload = get_data_payload(provider, filter);
+
+    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(data_payload, operation, true);
+    if(!reply.empty())
+        return true;
+    return false;
 }
 
-static shared_ptr<Entity> execute_get_gnmi(gNMIServiceProvider& provider, Entity & entity)
+//subscribe
+void gNMIService::subscribe(gNMIServiceProvider& provider,
+                            Entity& filter,
+                            const std::string & list_mode,
+                            long long qos,
+                            const std::string & mode,
+                            int sample_interval,
+                            std::function<void(const std::string &)> func) const
 {
-    path::Codec codec_service{};
-    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
-    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
+    if(list_mode != "ONCE" && list_mode != "STREAM" && list_mode != "POLL")
+    {
+        YLOG_ERROR("{} list mode not supported", mode);
+        throw(YCPPServiceProviderError{list_mode + " list mode not supported"});
+    }
 
-    string payload{"\"filter\":"};
-    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
-    YLOG_DEBUG("===========Generating Target Payload============");
-    YLOG_DEBUG("{}\n", payload.c_str());
-    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(payload, "read");
-    auto output = (dynamic_cast<const path::gNMISession&>(provider.get_session())).handle_read_reply(reply, root_schema);
-    return read_datanode(entity, output);
+    if(mode != "ON_CHANGE" && mode != "SAMPLE" && mode!= "TARGET_DEFINED")
+    {
+        YLOG_ERROR("{} mode not supported", mode);
+        throw(YCPPServiceProviderError{mode + " mode not supported"});
+    }
+
+    YLOG_INFO("Executing subscribe RPC in {} list mode", list_mode);
+    std::pair<std::string, std::string> prefix_pair;
+    std::vector<PathElem> path_container;
+    parse_entity_to_prefix_and_paths(filter, prefix_pair, path_container);
+    auto & client = (dynamic_cast<const path::gNMISession&>(provider.get_session())).get_client();
+    client.execute_subscribe_operation(prefix_pair, path_container, list_mode, qos, sample_interval, mode, func);
 }
 
-static string execute_set_gnmi(gNMIServiceProvider& provider, Entity & entity)
+static string get_data_payload(gNMIServiceProvider& provider, Entity & entity)
 {
     path::Codec codec_service{};
     path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();

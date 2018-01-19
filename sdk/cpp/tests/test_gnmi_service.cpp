@@ -24,9 +24,11 @@
 #include "config.hpp"
 #include "catch.hpp"
 #include <ydk/gnmi_provider.hpp>
+#include <ydk/crud_service.hpp>
 #include <ydk/gnmi_service.hpp>
 #include <ydk_ydktest/openconfig_bgp.hpp>
-
+#include <ydk_ydktest/openconfig_interfaces.hpp>
+#include <ydk/filters.hpp>
 
 using namespace std;
 using namespace ydk;
@@ -49,43 +51,79 @@ void config_bgp(openconfig_bgp::Bgp bgp)
     bgp.neighbors->neighbor.push_back(move(neighbor));
 }
 
-TEST_CASE("gnmi_service_get")
+void read_sub(const string & s)
+{
+    cout<<s<<endl;
+}
+
+TEST_CASE("gnmi_service_subscribe")
 {
     // session
-    path::Repository repo{TEST_HOME};
+    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
     string address = "127.0.0.1:50051";
 
-    gNMIServiceProvider provider{repo, address, true};
+    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
     gNMIService gs{};
 
-    openconfig_bgp::Bgp filter = {};
+    openconfig_interfaces::Interfaces filter = {};
+    auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    i->yfilter = YFilter::read;
+//    i->name = "Loopback0";
+//    i->config->name = "Loopback0";
+//    i->config->description = "test";
+    filter.interface.push_back(i);
 
     // Get Request 
-    auto get_reply = gs.get(provider, filter);
-    REQUIRE(get_reply);
+    gs.subscribe(provider, filter, "ONCE", 10, "ON_CHANGE", 100000, read_sub);
 
 }
 
 TEST_CASE("gnmi_service_create")
 {
-	// session
-    path::Repository repo{TEST_HOME};
-    string address = "pavarotti:57400";
+    // session
+    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
+    string address = "127.0.0.1:50051";
 
-    gNMIServiceProvider provider{repo, address, true};
+    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
     gNMIService gs{};
 
-    openconfig_bgp::Bgp filter = {};
+    openconfig_interfaces::Interfaces filter = {};
+    auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    i->name = "Loopback0";
+    i->config->name = "Loopback0";
+    filter.interface.push_back(i);
 
+    // Get Request 
+    auto get_reply = gs.set(provider, filter, "gnmi_create");
+    REQUIRE(get_reply);
+
+}
+
+TEST_CASE("gnmi_service_get")
+{
+	// session
+    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
+    string address = "pavarotti:57400";
+
+    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
+    gNMIService gs{};
+
+//    openconfig_bgp::Bgp filter = {};
+    openconfig_interfaces::Interfaces filter = {};
     // Set Create Request
     openconfig_bgp::Bgp bgp = {};
-    config_bgp(bgp);
-    auto create_reply = gs.set(provider, bgp, "gnmi_create");
-    REQUIRE(create_reply);
+//    config_bgp(bgp);
+    bgp.global->config->yfilter = YFilter::read;
+//    auto create_reply = gs.set(provider, bgp, "gnmi_create");
+//    REQUIRE(create_reply);
 
     // Get Request
-    auto get_after_create_reply = gs.get(provider, filter);
-    REQUIRE(get_after_create_reply);
+
+//    auto get_after_create_reply = gs.get(provider, bgp, true);
+
+//    REQUIRE(get_after_create_reply);
+    CrudService crud{};
+    auto r = crud.read_config(provider, bgp);
 }
 
 TEST_CASE("gnmi_service_delete")
@@ -94,7 +132,7 @@ TEST_CASE("gnmi_service_delete")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1:50051";
 
-    gNMIServiceProvider provider{repo, address};
+    gNMIServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 50051};
     gNMIService gs{};
 
     openconfig_bgp::Bgp filter = {};
@@ -105,6 +143,6 @@ TEST_CASE("gnmi_service_delete")
     REQUIRE(delete_reply);
 
     // Get Request
-    auto get_after_delete_reply = gs.get(provider, filter);
+    auto get_after_delete_reply = gs.get(provider, filter, false);
     REQUIRE(get_after_delete_reply);
 }

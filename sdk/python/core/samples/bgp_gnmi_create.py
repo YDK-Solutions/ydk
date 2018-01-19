@@ -55,9 +55,12 @@ if __name__ == "__main__":
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    repo = Repository("/usr/local/share/ydk/0.0.0.0:50051/")
     # create gNMI provider
-    provider = gNMIServiceProvider(repo, address="127.0.0.1:50051")
+    repository = Repository('/Users/abhirame/.ydk/pavarotti:830')
+    provider = gNMIServiceProvider(repo=repository,
+                                      address=device.hostname,
+                                      username=device.username,
+                                      password=device.password)    
     # create CRUD service
     crud = CRUDService()
     bgp = oc_bgp.Bgp() 

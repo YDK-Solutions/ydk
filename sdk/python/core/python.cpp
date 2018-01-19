@@ -15,6 +15,7 @@
  ------------------------------------------------------------------*/
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/functional.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
@@ -1006,7 +1007,14 @@ PYBIND11_MODULE(ydk_, ydk)
     class_<ydk::gNMIService>(services, "gNMIService")
 	    .def(init<>())
 	    .def("get", &ydk::gNMIService::get, arg("provider"), arg("filter"), return_value_policy::reference)
-    	.def("set", &ydk::gNMIService::set, arg("provider"), arg("entity"), arg("operation"), return_value_policy::reference);
+    	.def("set", &ydk::gNMIService::set, arg("provider"), arg("entity"), arg("operation"), return_value_policy::reference)
+    	.def("subscribe", &ydk::gNMIService::subscribe, arg("provider"),
+    	                                                arg("filter"),
+    	                                                arg("list_mode"),
+    	                                                arg("qos"),
+    	                                                arg("mode"),
+    	                                                arg("sample_interval"),
+    	                                                arg("callback_function"));
 
     class_<ydk::XmlSubtreeCodec>(entity_utils, "XmlSubtreeCodec")
         .def(init<>())

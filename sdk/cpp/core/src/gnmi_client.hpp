@@ -47,46 +47,63 @@ using gnmi::GetRequest;
 using gnmi::GetResponse;
 using gnmi::SetRequest;
 using gnmi::SetResponse;
+using gnmi::SubscribeRequest;
+using gnmi::SubscribeResponse;
 using grpc::Status;
 
 namespace ydk 
 {
 
-    class gNMIClient 
+class Entity;
+
+class gNMIClient
+{
+public:
+    typedef struct PathPrefixValueFlags
     {
-    public:
-        typedef struct PathPrefixValueFlags
-        {
-            bool path_has_value;
-            bool prefix_has_value;
-        } PathPrefixValueFlags;
+        bool path_has_value;
+        bool prefix_has_value;
+    } PathPrefixValueFlags;
 
-        gNMIClient(std::shared_ptr<Channel> channel, const std::string & username, const std::string & password);
-        ~gNMIClient();
+    gNMIClient(std::shared_ptr<Channel> channel, const std::string & username, const std::string & password);
+    ~gNMIClient();
 
-        int connect(std::string address);
-        std::string execute_wrapper(const std::string & payload, const std::string& operation);
-        std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
-        std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
-        std::vector<std::string> get_capabilities();
-    
-    private:
-        std::string get_path_from_update(::gnmi::Update update);
-        std::string get_prefix_from_notification(::gnmi::Notification notification);
-        std::string get_value_from_update(::gnmi::Update update);
-        bool has_gnmi_version(::gnmi::CapabilityResponse* response);
-        void parse_capabilities_modeldata(::gnmi::CapabilityResponse* response);
-        void parse_capabilities_encodings(::gnmi::CapabilityResponse* response);
-        bool parse_capabilities(::gnmi::CapabilityResponse* response);
-        std::string parse_get_response(::gnmi::GetResponse* response); 
-        std::string parse_set_response(::gnmi::SetResponse* response); 
-        ::gnmi::GetRequest populate_get_request(::gnmi::GetRequest request, const std::string& payload);
-        ::gnmi::SetRequest populate_set_request(::gnmi::SetRequest request, const std::string& payload, const std::string& operation);
+    int connect();
+    std::string execute_wrapper(const std::string & payload, const std::string& operation, bool is_config);
+    std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
+    std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
 
-        std::unique_ptr<gNMI::Stub> stub_;
-        std::string username;
-        std::string password;
-    };
+    std::string execute_get_operation(std::pair<std::string, std::string> & prefix,
+                                    std::vector<PathElem> & path_container, bool only_config);
+    void execute_subscribe_operation(std::pair<std::string, std::string> & prefix,
+                                    std::vector<PathElem> & path_container,
+                                    const std::string & list_mode,
+                                    long long qos,
+                                    int sample_interval,
+                                    const std::string & mode,
+                                    std::function<void(const std::string &)> func);
+    std::vector<std::string> get_capabilities();
+
+private:
+    std::string get_path_from_update(::gnmi::Update update);
+    std::string get_prefix_from_notification(::gnmi::Notification notification);
+    std::string get_value_from_update(::gnmi::Update update);
+
+    bool has_gnmi_version(::gnmi::CapabilityResponse* response);
+    void parse_capabilities_modeldata(::gnmi::CapabilityResponse* response);
+    void parse_capabilities_encodings(::gnmi::CapabilityResponse* response);
+    void parse_capabilities(::gnmi::CapabilityResponse* response);
+
+    std::string parse_get_response(::gnmi::GetResponse* response);
+    std::string parse_set_response(::gnmi::SetResponse* response);
+    std::string parse_subscribe_response(::gnmi::SubscribeResponse* response);
+
+    void populate_set_request(::gnmi::SetRequest & request, const std::string& payload, const std::string& operation);
+
+    std::unique_ptr<gNMI::Stub> stub_;
+    std::string username;
+    std::string password;
+};
 }
 
 #endif /* _YDK_GNMI_CLIENT_H_ */

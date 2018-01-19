@@ -30,10 +30,28 @@ namespace ydk
 {
 class Entity;
 
+struct PathKey
+{
+    std::string name;
+    std::string value;
+
+    PathKey(const std::string & name, const std::string & value);
+};
+
+struct PathElem
+{
+    std::string path;
+    std::vector<PathKey> keys;
+    PathElem(const std::string & path, std::vector<PathKey> keys);
+
+};
+
 std::string get_relative_entity_path(const Entity* current_node, const Entity* ancestor, const std::string & path);
 bool is_set(const YFilter & yfilter);
 
 const EntityPath get_entity_path(const Entity & entity, Entity* ancestor);
+
+void parse_entity_to_prefix_and_paths(Entity& entity, std::pair<std::string, std::string> & prefix, std::vector<PathElem> & path_container);
 
 }
 

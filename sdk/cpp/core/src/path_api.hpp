@@ -1152,14 +1152,15 @@ public:
                    const std::string& password,
                    int port = 57400);
 
-    virtual ~gNMISession();
+    ~gNMISession();
 
-    virtual RootSchemaNode& get_root_schema() const;
-    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
-    virtual std::vector<std::string> get_capabilities() const;
-    virtual EncodingFormat get_encoding() const;
-    virtual std::string execute_payload(const std::string & payload, const std::string & operation) const;
-    virtual std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
+    RootSchemaNode& get_root_schema() const;
+    std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    std::vector<std::string> get_capabilities() const;
+    EncodingFormat get_encoding() const;
+    std::string execute_payload(const std::string & payload, const std::string & operation, bool is_config) const;
+    std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
+    gNMIClient & get_client() const;
 
 private:
     void initialize(Repository& repo, const std::string& address, const std::string& username, const std::string& password, int port);

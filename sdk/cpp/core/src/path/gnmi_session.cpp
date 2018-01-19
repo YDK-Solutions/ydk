@@ -47,17 +47,11 @@ static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_sch
 static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name);
 static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc);
 
-static bool is_candidate_supported(vector<string> capabilities);
-static void create_input_target(path::DataNode & input, bool candidate_supported);
-static void create_input_source(path::DataNode & input, bool config);
-static void create_input_error_option(path::DataNode & input);
 static string get_read_rpc_name(bool config);
-static string get_commit_rpc_payload();
-static shared_ptr<path::DataNode> handle_edit_reply(const string & reply, gNMIClient & client, bool candidate_supported, const string & operation);
+static shared_ptr<path::DataNode> handle_edit_reply(const string & reply);
 
 static bool is_config(path::Rpc & rpc);
 static string get_filter_payload(path::Rpc & ydk_rpc);
-static string get_gnmi_payload(path::DataNode & input, string data_tag, string data_value);
 static string get_config_payload(path::RootSchemaNode & root_schema, path::Rpc & rpc);
 static gNMISession::SecureChannelArguments get_channel_credentials();
 
@@ -97,7 +91,7 @@ void gNMISession::initialize(path::Repository & repo, const std::string& address
     address_buffer << address << ":" << port;
 
     client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
-    client->connect(address);
+    client->connect();
     server_capabilities = client->get_capabilities();
     std::vector<std::string> empty_caps;
 
@@ -194,21 +188,12 @@ shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
 
 shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const
 {
-    bool candidate_supported = is_candidate_supported(server_capabilities);
-    auto gnmi_rpc = create_rpc_instance(*root_schema, "ietf-netconf:edit-config");
-    auto & input = create_rpc_input(*gnmi_rpc);
-    create_input_target(input, candidate_supported);
-    create_input_error_option(input);
     string config_payload = get_config_payload(*root_schema, ydk_rpc);
 
-    ly_verb(LY_LLSILENT); // turn off libyang logging at the beginning
-    string gnmi_payload = get_gnmi_payload(input, "config", config_payload);
-    ly_verb(LY_LLVRB); // enable libyang logging after payload has been created
-
-    return handle_edit_reply(execute_payload(gnmi_payload, operation), *client, candidate_supported, operation);
+    return handle_edit_reply(execute_payload(config_payload, operation, false));
 }
 
-static shared_ptr<path::DataNode> handle_edit_reply(const string & reply, gNMIClient & client, bool candidate_supported, const std::string & operation)
+static shared_ptr<path::DataNode> handle_edit_reply(const string & reply)
 {
     if(reply.find("Success") == string::npos)
     {
@@ -223,20 +208,16 @@ static shared_ptr<path::DataNode> handle_edit_reply(const string & reply, gNMICl
 
 shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, const std::string & operation) const
 {
-    //for now we only support crud rpc's
     bool config = is_config(ydk_rpc);
-    auto gnmi_rpc = create_rpc_instance(*root_schema, get_read_rpc_name(config));
-    auto & input = create_rpc_input(*gnmi_rpc);
-    create_input_source(input, config);
+
     string filter_value = get_filter_payload(ydk_rpc);
-    string gnmi_payload = get_gnmi_payload(input, "filter", filter_value);
-    shared_ptr<path::DataNode> datanode = nullptr;
-    return handle_read_reply(execute_payload(gnmi_payload, operation), *root_schema);
+
+    return handle_read_reply(execute_payload(filter_value, operation, config), *root_schema);
 }
 
-string gNMISession::execute_payload(const string & payload, const string & operation) const
+string gNMISession::execute_payload(const string & payload, const string & operation, bool is_config) const
 {
-    string reply = client->execute_wrapper(payload, operation);
+    string reply = client->execute_wrapper(payload, operation, is_config);
     YLOG_DEBUG("=============Reply payload received from device=============");
     YLOG_DEBUG("{}", reply.c_str());
     YLOG_DEBUG("\n");
@@ -278,28 +259,9 @@ shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::Ro
     return datanode;
 }
 
-static void create_input_target(path::DataNode & input, bool candidate_supported)
+gNMIClient & gNMISession::get_client() const
 {
-    if(candidate_supported){
-        input.create_datanode("target/candidate", "");
-    }
-    else {
-        input.create_datanode("target/running", "");
-    }
-}
-
-static bool is_candidate_supported(vector<string> capabilities)
-{
-    if(find(capabilities.begin(), capabilities.end(), TEMP_CANDIDATE) != capabilities.end()){
-        //candidate is supported
-        return true;
-    }
-    return false;
-}
-
-static void create_input_error_option(path::DataNode & input)
-{
-    input.create_datanode("error-option", "rollback-on-error");
+    return *client;
 }
 
 static string get_config_payload(path::RootSchemaNode & root_schema,
@@ -332,13 +294,6 @@ static string get_config_payload(path::RootSchemaNode & root_schema,
     return config_payload;
 }
 
-static string get_commit_rpc_payload()
-{
-    return "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-           "<commit/>"
-           "</rpc>";
-}
-
 static bool is_config(path::Rpc & rpc)
 {
     if(!rpc.get_input_node().find("only-config").empty())
@@ -346,39 +301,6 @@ static bool is_config(path::Rpc & rpc)
         return true;
     }
     return false;
-}
-
-static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name)
-{
-    auto rpc = shared_ptr<path::Rpc>(root_schema.create_rpc(rpc_name));
-    if(rpc == nullptr)
-    {
-        YLOG_ERROR("Cannot create payload for RPC: {}", rpc_name);
-        throw(YCPPIllegalStateError{"Cannot create payload for RPC: "+ rpc_name});
-    }
-    return rpc;
-}
-
-static string get_read_rpc_name(bool config)
-{
-    if(config)
-    {
-        return "ietf-netconf:get-config";
-    }
-    return "ietf-netconf:get";
-}
-
-static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc)
-{
-    return gnmi_rpc.get_input_node();
-}
-
-static void create_input_source(path::DataNode & input, bool config)
-{
-    if(config)
-    {
-        input.create_datanode("source/running");
-    }
 }
 
 static string get_filter_payload(path::Rpc & ydk_rpc)

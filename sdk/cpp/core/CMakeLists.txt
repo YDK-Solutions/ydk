@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.8.0 LANGUAGES C CXX)
+project(ydk VERSION 0.8.1 LANGUAGES C CXX)
 
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The library for  YDK API.")
@@ -408,7 +408,7 @@ ExternalProject_Add(
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     DOWNLOAD_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     DOWNLOAD_NAME "gnmi.proto"
-    DOWNLOAD_COMMAND curl https://raw.githubusercontent.com/shgandhi/reference/master/rpc/gnmi/gnmi.proto > gnmi.proto
+    DOWNLOAD_COMMAND curl https://raw.githubusercontent.com/abhikeshav/reference/master/rpc/gnmi/gnmi.proto > gnmi.proto
     CONFIGURE_COMMAND ""
     SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"

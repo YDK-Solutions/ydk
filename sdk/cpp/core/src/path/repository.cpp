@@ -280,7 +280,7 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
         YLOG_INFO("Path where models are to be downloaded: {}", path);
     }
     YLOG_DEBUG("Creating libyang context in path: {}", path);
-    struct ly_ctx* ctx = ly_ctx_new(path.c_str(), 0);
+    struct ly_ctx* ctx = ly_ctx_new(path.c_str(), LY_CTX_ALLIMPLEMENTED);
 
     if(!ctx) {
         YLOG_ERROR("Could not create repository in: {}", path);

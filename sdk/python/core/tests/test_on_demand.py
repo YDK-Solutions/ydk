@@ -40,7 +40,7 @@ from test_utils import get_device_info
 
 AUGMENTED_XML_PAYLOAD = """<cpython xmlns="http://cisco.com/ns/yang/ietf-aug-base-1">
   <doc>
-    <aug-5-identityref xmlns="http://cisco.com/ns/yang/yaug-five">aug-identity</aug-5-identityref>
+    <aug-5-identityref xmlns:yaug-five="http://cisco.com/ns/yang/yaug-five">yaug-five:derived-aug-identity</aug-5-identityref>
     <disutils>
       <four-aug-list xmlns="http://cisco.com/ns/yang/yaug-four">
         <enabled>true</enabled>
@@ -92,7 +92,7 @@ AUGMENTED_JSON_PAYLOAD = """{
       "ydktest-aug-ietf-2:ydktest-aug-2": {
         "aug-two": "aug two"
       },
-      "aug-5-identityref": "ydktest-aug-ietf-5:aug-identity"
+      "ydktest-aug-ietf-5:aug-5-identityref": "ydktest-aug-ietf-5:derived-aug-identity"
     },
     "lib": {
       "ydktest-aug-ietf-4:ydktest-aug-4": {

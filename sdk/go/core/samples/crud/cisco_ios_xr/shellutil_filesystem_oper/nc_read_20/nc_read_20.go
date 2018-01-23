@@ -129,8 +129,7 @@ func main() {
 
 	// read data from NETCONF device
 	fileSystem := fileSys.FileSystem{}
-	result := service.Read(&provider, &fileSystem)
+	service.Read(&provider, &fileSystem)
 
-	fmt.Println(result)
 	fmt.Println(processFileSystem(fileSystem))
 }

@@ -167,7 +167,7 @@ namespace ydk {
             enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
             if (!enlarged_data) {
                 YLOG_ERROR("Could not download model: {}", model_name);
-                throw(std::bad_alloc{});
+                throw(YCPPIllegalStateError{"Could not download model: " + model_name});
             }
             memcpy(enlarged_data, data, len);
             enlarged_data[len] = enlarged_data[len + 1] = '\0';
@@ -222,7 +222,7 @@ namespace ydk {
                         return get_enlarged_data(model_data, yang_file_path);
                     } else {
                         YLOG_ERROR("Cannot open file {}", yang_file_path);
-                        throw(YCPPIllegalStateError("Cannot open file"));
+                        throw(YCPPIllegalStateError("Cannot open file " + yang_file_path));
                     }
 
                 }
@@ -283,7 +283,7 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
 
     if(!ctx) {
         YLOG_ERROR("Could not create repository in: {}", path);
-        throw(std::bad_alloc{});
+        throw(YCPPIllegalStateError{"Could not create repository in: " + path});
     }
 
     //set module callback (only if there is a model provider)

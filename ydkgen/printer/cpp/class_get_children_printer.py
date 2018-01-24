@@ -30,6 +30,7 @@ class ClassGetChildrenPrinter(object):
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
         self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> children{};')
+        self.ctx.writeln('char count=0;')
         for child in children:
             self._print_class_get_child(child)
         self.ctx.writeln('return children;')
@@ -45,10 +46,18 @@ class ClassGetChildrenPrinter(object):
         self.ctx.bline()
 
     def _print_class_get_child_many(self, child):
+        self.ctx.writeln('count = 0;')
         self.ctx.writeln('for (auto const & c : %s)' % child.name)
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
+        self.ctx.writeln('if(children.find(c->get_segment_path()) == children.end())')
+        self.ctx.lvl_inc()
         self.ctx.writeln('children[c->get_segment_path()] = c;')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('else')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('children[c->get_segment_path()+count++] = c;')
+        self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
 

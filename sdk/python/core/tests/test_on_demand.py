@@ -174,7 +174,7 @@ class SanityYang(unittest.TestCase):
     def test_on_demand_loading_json(self):
         self.codec_provider.encoding = EncodingFormat.JSON
         entity1 = self.codec.decode(self.codec_provider, AUGMENTED_JSON_PAYLOAD)
-        self.assertEqual(entity1.doc.aug_5_identityref.get(), "ydktest-aug-ietf-5:aug-identity")
+        self.assertEqual(entity1.doc.aug_5_identityref.get(), "ydktest-aug-ietf-5:derived-aug-identity")
 
 
 

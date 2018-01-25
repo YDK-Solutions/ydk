@@ -383,13 +383,21 @@ add_library(libnetconf STATIC IMPORTED)
 set_property(TARGET libnetconf PROPERTY IMPORTED_LOCATION ${libnetconf_archive})
 add_dependencies(libnetconf project_libnetconf)
 
+if(LIBYANG_PLUGINS_DIR)
+    set(LIBYANG_EXT_PLUGINS_DIR ${LIBYANG_PLUGINS_DIR})
+else()
+    set(LIBYANG_EXT_PLUGINS_DIR ${LIB_INSTALL_DIR}/libyang)
+endif()
+set(LIBYANG_PLUGINS_INSTALL_DIR ${CPACK_PACKAGE_INSTALL_DIRECTORY}/${LIBYANG_EXT_PLUGINS_DIR})
+message("Set libyang plugin installation directory to: ${LIBYANG_PLUGINS_INSTALL_DIR}")
+
 # Add LibYang
 set(libyang_include_location include/libyang)
 set(libyang_headers_location ${CMAKE_CURRENT_BINARY_DIR}/project_libyang/headers)
 ExternalProject_Add(project_libyang
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/project_libyang"
     URL "https://github.com/ygorelik/libyang/archive/master.zip"
-    CMAKE_ARGS -DSTATIC=true -DCMAKE_BUILD_TYPE=Debug
+    CMAKE_ARGS -DSTATIC=true -DCMAKE_BUILD_TYPE=Debug -DPLUGINS_DIR=${LIBYANG_PLUGINS_INSTALL_DIR}
     INSTALL_DIR "${libyang_location}"
     INSTALL_COMMAND mkdir -p ${libyang_headers_location}/libyang && cp ${libyang_headers} ${libyang_headers_location}/libyang
 )
@@ -454,12 +462,6 @@ set(libyang_extension_lib
 	${libyang_build_location}/src/extensions/metadata.so
 	${libyang_build_location}/src/extensions/nacm.so
 )
-
-if(PLUGINS_DIR)
-    set(LIBYANG_EXT_PLUGINS_DIR ${PLUGINS_DIR})
-else()
-    set(LIBYANG_EXT_PLUGINS_DIR ${LIB_INSTALL_DIR}/libyang)
-endif()
 
 install(TARGETS ydk DESTINATION ${LIB_INSTALL_DIR})
 install(FILES ${libydk_install_headers} DESTINATION ${INCLUDE_INSTALL_DIR})

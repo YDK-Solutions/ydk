@@ -392,8 +392,6 @@ func InitCodecServiceProvider(
 	entity types.Entity,
 	repo types.Repository) types.RootSchemaNode {
 
-	caps := entity.GetAugmentCapabilitiesFunction()()
-
 	var repoPath *C.char
 	defer C.free(unsafe.Pointer(repoPath))
 
@@ -408,14 +406,25 @@ func InitCodecServiceProvider(
 		repoPath = C.CString(yangPath)
 	}
 
-	realCaps := make([]C.Capability, 0)
-	var realCap C.Capability
-	for mod, rev := range caps {
-		realCap = C.CapabilityCreate(
-			*getCState(state), C.CString(mod), C.CString(rev))
-		panicOnCStateError(getCState(state))
-		defer C.CapabilityFree(realCap)
-		realCaps = append(realCaps, realCap)
+	capabilities := entity.GetCapabilitiesTable()
+	namespaces := entity.GetNamespaceTable()
+	lookupTableKeys := make([]*C.char, 0)
+	lookupTableValues := make([]C.Capability, 0)
+	for name, revision := range capabilities {
+		var cname *C.char = C.CString(name)
+		lookupTableKeys = append(lookupTableKeys, cname)
+
+		capability := C.CapabilityCreate(
+			*getCState(state), C.CString(name), C.CString(revision))
+		defer C.CapabilityFree(capability)
+		lookupTableValues = append(lookupTableValues, capability)
+
+		namespace, ok := namespaces[name]
+		if ok {
+			var cnamespace *C.char = C.CString(namespace)
+			lookupTableKeys = append(lookupTableKeys, cnamespace)
+			lookupTableValues = append(lookupTableValues, capability)
+		}
 	}
 
 	realRepo := C.RepositoryInitWithPath(*getCState(state), repoPath)
@@ -423,7 +432,11 @@ func InitCodecServiceProvider(
 
 	repo.Private = realRepo
 	rootSchemaWrapper := C.RepositoryCreateRootSchemaWrapper(
-		*getCState(state), realRepo, &realCaps[0], C.int(len(realCaps)))
+		*getCState(state),
+		realRepo,
+		&lookupTableKeys[0],
+		&lookupTableValues[0],
+		C.int(len(lookupTableKeys)))
 	panicOnCStateError(getCState(state))
 
 	rootSchemaNode := types.RootSchemaNode{Private: rootSchemaWrapper}

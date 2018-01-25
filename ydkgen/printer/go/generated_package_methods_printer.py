@@ -39,7 +39,8 @@ class GeneratedPackageMethodsPrinter(object):
     def print_output(self):
         self.print_header()
         self.print_imports()
-        self.print_lookup_table_function()
+        self.print_get_capabilities()
+        self.print_get_namespaces()
         self.print_get_yang_location()
 
     def print_header(self):
@@ -57,8 +58,8 @@ class GeneratedPackageMethodsPrinter(object):
         self.ctx.writeln(')')
         self.ctx.bline()
 
-    def print_lookup_table_function(self):
-        self.ctx.writeln('func %sAugmentLookupTables() map[string]string {' % self.bundle_name.title())
+    def print_get_capabilities(self):
+        self.ctx.writeln('func GetCapabilities() map[string]string {')
         self.ctx.lvl_inc()
         self.ctx.writeln('caps := make(map[string]string)')
         for package in self.packages:
@@ -66,6 +67,21 @@ class GeneratedPackageMethodsPrinter(object):
         self.ctx.writeln('return caps')
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
+        self.ctx.bline()
+
+    def print_get_namespaces(self):
+        self.ctx.writeln('func GetNamespaces() map[string]string {')
+        self.ctx.lvl_inc()
+        self.ctx.writeln('namespaces := make(map[string]string)')
+        for package in self.packages:
+            namespace = package.stmt.search_one('namespace')
+            if namespace is None:
+                continue
+            self.ctx.writeln('namespaces["%s"] = "%s"' % (package.stmt.arg, namespace.arg))
+        self.ctx.writeln('return namespaces')
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+        self.ctx.bline()
 
     def print_get_yang_location(self):
         self.ctx.writeln('func GetModelsPath() string {')

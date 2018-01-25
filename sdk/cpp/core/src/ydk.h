@@ -104,7 +104,7 @@ void CapabilityFree(Capability);
 
 Repository RepositoryInitWithPath(YDKStatePtr, const char*);
 Repository RepositoryInit(void);
-RootSchemaWrapper RepositoryCreateRootSchemaWrapper(YDKStatePtr state, Repository, const Capability caps[], int caps_size);
+RootSchemaWrapper RepositoryCreateRootSchemaWrapper(YDKStatePtr state, Repository, const char* keys[], const Capability values[], int size);
 void RepositoryFree(Repository);
 
 ServiceProvider NetconfServiceProviderInit(YDKStatePtr state, const char * address, const char * username, const char * password, int port, const char * protocol);

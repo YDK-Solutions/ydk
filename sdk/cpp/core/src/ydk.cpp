@@ -281,16 +281,20 @@ Repository RepositoryInit()
 RootSchemaWrapper RepositoryCreateRootSchemaWrapper(
     YDKStatePtr state,
     Repository repo,
-    const Capability caps[],
-    int caps_size) {
+    const char* keys[],
+    const Capability values[],
+    int size) {
     try
     {
         std::vector<ydk::path::Capability> real_caps;
-        for(int i = 0; i < caps_size; i++) {
-            real_caps.push_back(*static_cast<ydk::path::Capability*>(caps[i]));
+        std::unordered_map<std::string, ydk::path::Capability> lookup_tables;
+        for(int i = 0; i < size; i++) {
+            ydk::path::Capability cap = *static_cast<ydk::path::Capability*>(values[i]);
+            lookup_tables.insert(make_pair(keys[i], cap));
         }
+
         ydk::path::Repository* real_repo = static_cast<ydk::path::Repository*>(repo);
-        std::shared_ptr<ydk::path::RootSchemaNode> schema_node = real_repo->create_root_schema(real_caps);
+        std::shared_ptr<ydk::path::RootSchemaNode> schema_node = real_repo->create_root_schema(lookup_tables, real_caps);
         return static_cast<void*>(wrap(schema_node));
     }
     catch(...)

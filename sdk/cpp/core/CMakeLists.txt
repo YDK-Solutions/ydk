@@ -458,9 +458,9 @@ target_link_libraries(ydk
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)
 set_property(TARGET ydk PROPERTY CXX_STANDARD_REQUIRED ON)
 set(libyang_extension_lib 
-	${libyang_build_location}/src/extensions/libyang_ext_test.so
-	${libyang_build_location}/src/extensions/metadata.so
-	${libyang_build_location}/src/extensions/nacm.so
+	${libyang_build_location}/src/extensions/libyang_ext_test${CMAKE_SHARED_LIBRARY_SUFFIX}
+	${libyang_build_location}/src/extensions/metadata${CMAKE_SHARED_LIBRARY_SUFFIX}
+	${libyang_build_location}/src/extensions/nacm${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
 
 install(TARGETS ydk DESTINATION ${LIB_INSTALL_DIR})

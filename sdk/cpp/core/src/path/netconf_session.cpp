@@ -263,7 +263,7 @@ std::shared_ptr<path::DataNode> NetconfSession::handle_netconf_operation(path::R
     netconf_payload = payload + netconf_payload + "</rpc>";
 
     YLOG_INFO("=============Generating payload to send to device=============");
-    YLOG_INFO("{}", netconf_payload);
+    YLOG_INFO("\n{}", netconf_payload);
     YLOG_INFO("\n");
 
     std::string reply = execute_payload(netconf_payload);
@@ -312,7 +312,7 @@ std::string NetconfSession::execute_payload(const std::string & payload) const
 {
     std::string reply = client->execute_payload(payload);
     YLOG_INFO("=============Reply payload received from device=============");
-    YLOG_INFO("{}", reply);
+    YLOG_INFO("\n{}", reply);
     YLOG_INFO("\n");
     return reply;
 }
@@ -335,8 +335,8 @@ static path::DataNode& create_rpc_input(path::Rpc & netconf_rpc)
 static string get_commit_rpc_payload()
 {
     return "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
-           "<commit/>"
-           "</rpc>";
+           "\n  <commit/>"
+           "\n</rpc>\n";
 }
 
 static bool is_candidate_supported(vector<string> capabilities)
@@ -424,11 +424,11 @@ static string get_netconf_payload(path::DataNode & input, const string &  data_t
     path::Codec codec_service{};
     input.create_datanode(data_tag, data_value);
 
-    std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"};
+    std::string payload{"<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"};
     payload+=codec_service.encode(input, EncodingFormat::XML, true);
     payload+="</rpc>";
     YLOG_INFO("=============Generating payload to send to device=============");
-    YLOG_INFO(payload.c_str());
+    YLOG_INFO("\n{}", payload.c_str());
     YLOG_INFO("\n");
     return payload;
 }
@@ -446,11 +446,12 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
         //need to send the commit request
         string commit_payload = get_commit_rpc_payload();
 
-        YLOG_INFO( "Executing commit RPC: {}", commit_payload);
+        YLOG_INFO( "=============Executing commit=============");
+        YLOG_INFO("\n{}", commit_payload);
         reply = client.execute_payload(commit_payload);
 
         YLOG_INFO("=============Reply payload received from device=============");
-        YLOG_INFO(reply.c_str());
+        YLOG_INFO("\n{}", reply.c_str());
         YLOG_INFO("\n");
         if(reply.find("<ok/>") == std::string::npos)
         {

@@ -99,6 +99,8 @@ class ValueBuilder(object):
         """
         identities = set()
         self._collect_identities(self.type_spec, identities)
+        if(len(identities) == 0):
+            return ''
         identity = choice(list(identities))
         identity_value = '{}()'.format(get_qn(self.lang, identity))
         return IdentityValue(val=identity_value, identity=identity)

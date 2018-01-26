@@ -103,6 +103,8 @@ class FixtureBuilder(object):
 
     def _add_identity_import(self, identity_id, imports):
         """Add import statement for identity."""
+        if identity_id not in self.identity_subclasses:
+            return
         for subclass in self.identity_subclasses[identity_id]:
             imports.add(self._get_import_stmt(subclass))
             if id(subclass) in self.identity_subclasses:

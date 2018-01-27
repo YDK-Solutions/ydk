@@ -30,7 +30,7 @@ from ydk.ext.types import YType
 from ydk.ext.types import Entity as _Entity
 from ydk.ext.types import LeafDataList
 from ydk.filters import YFilter as _YFilter
-from ydk.errors import YPYModelError as _YPYModelError
+from ydk.errors import YModelError as _YModelError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
 
 
@@ -89,7 +89,7 @@ class YLeafList(_YLeafList):
 
     def set(self, other):
         if not isinstance(other, YLeafList):
-            raise _YPYModelError("Invalid value '{}' in '{}'"
+            raise _YModelError("Invalid value '{}' in '{}'"
                             .format(other, self.leaf_name))
         else:
             super(YLeafList, self).clear()
@@ -306,14 +306,14 @@ class Entity(_Entity):
         if obj is None or isinstance(obj, (_YLeaf, YLeafList, YList)):
             return
         if not isinstance(value, obj.__class__):
-            raise _YPYModelError("Invalid value '{!s}' in '{}'"
+            raise _YModelError("Invalid value '{!s}' in '{}'"
                                  .format(value, obj))
 
     def _perform_setattr(self, clazz, leaf_names, name, value):
         self._check_monkey_patching_error(name, value)
         with _handle_type_error():
             if name in self.__dict__ and isinstance(self.__dict__[name], YList):
-                raise _YPYModelError("Attempt to assign value of '{}' to YList ldata. "
+                raise _YModelError("Attempt to assign value of '{}' to YList ldata. "
                                     "Please use list append or extend method."
                                     .format(value))
             if isinstance(value, _Enum.YLeaf):

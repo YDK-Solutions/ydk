@@ -26,8 +26,8 @@ Instances of this class represent the Root of the SchemaTree.
 
         :param path: The path expression.
         :return: Vector of :cpp:class:`SchemaNode<SchemaNode>`  that satisfies the criterion.
-        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, See error code for details.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
+        :raises: :cpp:class:`YPathError<YPathError>` if the path expression in invalid, See error code for details.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the argument is invalid.
 
     .. cpp:function:: virtual SchemaNode* get_parent() const noexcept
 
@@ -62,8 +62,8 @@ Instances of this class represent the Root of the SchemaTree.
         :param path: The XPath expression identifying the node relative to the root of the schema tree.
         :param value: The string representation of the value to set.
         :return: Reference to :cpp:class:`DataNode<DataNode>` created.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
-        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` In case the argument is invalid.
+        :raises: :cpp:class:`YPathError<YPathError>` In case the path is invalid.
 
     .. cpp:function:: virtual DataNode& create_datanode(const std::string& path) const
 
@@ -79,8 +79,8 @@ Instances of this class represent the Root of the SchemaTree.
 
         :param path: The XPath expression identifying the node.
         :return: Reference to :cpp:class:`DataNode<DataNode>` created.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
-        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` In case the argument is invalid.
+        :raises: :cpp:class:`YPathError<YPathError>` In case the path is invalid.
 
     .. cpp:function:: virtual Statement get_statement() const
 
@@ -106,5 +106,5 @@ Instances of this class represent the Root of the SchemaTree.
 
         :param path: The path to the rpc schema node
         :return: Pointer to :cpp:class:`Rpc<Rpc>` or ``nullptr``.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
-        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path is invalid.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the argument is invalid.
+        :raises: :cpp:class:`YPathError<YPathError>` if the path is invalid.

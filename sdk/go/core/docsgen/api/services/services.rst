@@ -100,7 +100,7 @@ Executor
 	:param topEntity: Provide an instance of :go:struct:`Entity<ydk/types/Entity>` only when expecting data to be returned
 	:return: Any data the resulting from the operation when provided topEntity parameter
 	:rtype: :go:struct:`Entity<ydk/types/Entity>` or ``nil``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 	Possible Errors:
 	* a server side error
@@ -121,7 +121,7 @@ Netconf
 	:param persistID: An ``int``
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) CloseSession(provider ServiceProvider)
 
@@ -130,7 +130,7 @@ Netconf
 	:param provider: An instance of :go:struct:`NetconfServiceProvider<ydk/types/NetconfServiceProvider>`
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) Commit(
 	provider ServiceProvider, confirmed bool, confirmTimeOut, persist, persistID int)
@@ -144,7 +144,7 @@ Netconf
 	:param persistID: An ``int`` that is given in order to commit a persistent confirmed commit
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) CopyConfig(
 	provider ServiceProvider, target, sourceDS DataStore, sourceEntity Entity, url string)
@@ -159,7 +159,7 @@ Netconf
 	:param url: A ``string`` representing the configuration url
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) DeleteConfig(provider ServiceProvider, target DataStore, url string)
 
@@ -170,7 +170,7 @@ Netconf
 	:param url: A ``string`` representing the configuration url
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) DiscardChanges(provider ServiceProvider)
 
@@ -179,7 +179,7 @@ Netconf
 	:param provider: An instance of :go:struct:`NetconfServiceProvider<ydk/types/NetconfServiceProvider>`
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) EditConfig(
     provider ServiceProvider, target DataStore, config Entity, defaultOper, testOp, errorOp string)
@@ -194,7 +194,7 @@ Netconf
 	:param errOp: A ``string`` that can be set to ``stop-on-error``, ``continue-on-error``, or ``rollback-on-error``
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) GetConfig(provider ServiceProvider, source DataStore, filter Entity)
 
@@ -205,7 +205,7 @@ Netconf
 	:param filter: An instance of :go:struct:`Entity<ydk/types/Entity>` which specifies the portion of the system configuration and state data to retrieve
 	:return: The requested data
 	:rtype: :go:struct:`Entity<ydk/types/Entity>`
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) Get(provider ServiceProvider, filter Entity)
 
@@ -215,7 +215,7 @@ Netconf
 	:param filter: An instance of :go:struct:`Entity<ydk/types/Entity>` which specifies the portion of the system configuration and state data to retrieve
 	:return: The requested data
 	:rtype: :go:struct:`Entity<ydk/types/Entity>`
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) KillSession(provider ServiceProvider, sessionID int)
 
@@ -225,7 +225,7 @@ Netconf
 	:param sessionID: An ``int`` that is the session identifier of the NETCONF session to be terminated
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) Lock(provider ServiceProvider, target DataStore)
 
@@ -235,7 +235,7 @@ Netconf
 	:param target: An instance of :go:struct:`DataStore<ydk/types/DataStore>` representing the configuration to lock
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) Unlock(provider ServiceProvider, target DataStore)
 
@@ -245,7 +245,7 @@ Netconf
 	:param target: An instance of :go:struct:`DataStore<ydk/types/DataStore>` representing the configuration to unlock
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred
 
 .. function:: (ns *NetconfService) Validate(
 	provider ServiceProvider, sourceDS DataStore, sourceEntity Entity, url string)
@@ -258,4 +258,4 @@ Netconf
 	:param url: A ``string`` representing the configuration url
 	:return: whether or not the operation succeeded
 	:rtype: ``bool``
-	:raises: `YGOError<ydk/errors/YGOError>` If error has occurred
+	:raises: `YError<ydk/errors/YError>` If error has occurred

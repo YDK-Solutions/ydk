@@ -19,7 +19,7 @@ Codec Service
         :param pretty: Optionally produce formatted output.
         :param subtree: Subtree filter.
         :return: Encoded payload.
-        :raises YCPPError: If an error has occurred
+        :raises YError: If an error has occurred
 
     .. cpp:function:: std::map<std::string, std::string> encode(CodecServiceProvider & provider, std::map<std::string, std::shared_ptr<Entity>> & entity, bool pretty=false)
 
@@ -29,7 +29,7 @@ Codec Service
         :param entity: A map of `Entity` class defined under same bundle
         :param pretty: Optionally produce formatted output
         :return: A map of encodec payload.
-        :raises YCPPError: If an error has occurred
+        :raises YError: If an error has occurred
 
     .. cpp:function:: std::shared_ptr<ydk::Entity> decode(CodecServiceProvider & provider, const std::string & payload, bool subtree=false)
 
@@ -39,7 +39,7 @@ Codec Service
         :param payload: Payload to be decoded.
         :param subtree: Subtree filter.
         :return: Pointer to the decoded `Entity`.
-        :raises YCPPError: If an error has occurred
+        :raises YError: If an error has occurred
 
     .. cpp:function:: std::map<std::string, std::shared_ptr<Entity>> decode(CodecServiceProvider & provider, std::map<std::string, std::string> & payload_map, std::map<std::string, std::shared_ptr<Entity>> entity_map)
 
@@ -49,4 +49,4 @@ Codec Service
         :param payload_map: Module name payload map.
         :param entity_map: Module name entity map.
         :return: A ``std::map`` of the decoded `Entity`.
-        :raises YCPPError: If an error has occurred.
+        :raises YError: If an error has occurred.

@@ -302,7 +302,7 @@ func (suite *SanityTypesTestSuite) TestListMaxElements() {
 `
 	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Create(&suite.Provider, &runner) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp("YServiceProviderError:", panicValue)
 	suite.Regexp(errMsg, panicValue)
 }
 

@@ -164,43 +164,43 @@ static void handle_error(YDKState* state)
     {
         throw;
     }
-    catch (const ydk::YCPPClientError & e) {
+    catch (const ydk::YClientError & e) {
         state->error_type = YDK_CLIENT_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPServiceProviderError & e) {
+    catch (const ydk::YServiceProviderError & e) {
         state->error_type = YDK_SERVICE_PROVIDER_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPServiceError & e) {
+    catch (const ydk::YServiceError & e) {
         state->error_type = YDK_SERVICE_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPIllegalStateError & e) {
+    catch (const ydk::YIllegalStateError & e) {
         state->error_type = YDK_ILLEGAL_STATE_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPInvalidArgumentError & e) {
+    catch (const ydk::YInvalidArgumentError & e) {
         state->error_type = YDK_INVALID_ARGUMENT_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPOperationNotSupportedError & e) {
+    catch (const ydk::YOperationNotSupportedError & e) {
         state->error_type = YDK_OPERATION_NOTSUPPORTED_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPModelError & e) {
+    catch (const ydk::YModelError & e) {
         state->error_type = YDK_MODEL_ERROR;
         handle_error_message(state, e.what());
     }
-    catch (const ydk::YCPPError & e) {
+    catch (const ydk::YError & e) {
         state->error_type = YDK_ERROR;
         handle_error_message(state, e.what());
     }
-    catch(const ydk::path::YCPPCoreError & e) {
+    catch(const ydk::path::YCoreError & e) {
         state->error_type = YDK_CORE_ERROR;
         handle_error_message(state, e.what());
     }
-    catch(const ydk::path::YCPPCodecError & e) {
+    catch(const ydk::path::YCodecError & e) {
         state->error_type = YDK_CODEC_ERROR;
         handle_error_message(state, e.what());
     }

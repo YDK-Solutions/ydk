@@ -1,8 +1,8 @@
-YCPPDataValidationError
+YDataValidationError
 =======================
 
 
-.. cpp:class:: ydk::path::YCPPDataValidationError : public YCPPCoreError
+.. cpp:class:: ydk::path::YDataValidationError : public YCoreError
 
     Exception that encapsulates the validation errors on a data tree.
 
@@ -10,7 +10,7 @@ YCPPDataValidationError
 
         List of validation errors specific to this node.
 
-    .. cpp:function:: YCPPDataValidationError()
+    .. cpp:function:: YDataValidationError()
 
     .. cpp:enum-class:: Error
 

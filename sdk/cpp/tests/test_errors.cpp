@@ -36,7 +36,7 @@ using namespace std;
             || Catch::Contains("Unexpected character") \
             || Catch::Contains("does not satisfy the constraint") \
             || Catch::Contains("is an invalid value") \
-            || Catch::Contains("YCPPModelError")
+            || Catch::Contains("YModelError")
 
 
 TEST_CASE("int8_invalid")

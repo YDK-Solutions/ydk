@@ -34,7 +34,7 @@ except:
 
 from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64,  YLeaf, Bits
-from ydk.errors import  YPYModelError, YPYServiceProviderError
+from ydk.errors import  YModelError, YServiceProviderError
 try:
     from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
 except:
@@ -426,7 +426,7 @@ class SanityTest(unittest.TestCase):
     @unittest.skip('No unique check')
     def test_leaflist_unique(self):
         runner = Runner()
-        with self.assertRaises(YPYModelError):
+        with self.assertRaises(YModelError):
             for i in range(3):
                 runner.ytypes.built_in_t.llstring.append(0)
 
@@ -440,7 +440,7 @@ class SanityTest(unittest.TestCase):
             l.name = str(i)
             elems.append(l)
         runner.one_list.ldata.extend(elems)
-        with self.assertRaises(YPYServiceProviderError):
+        with self.assertRaises(YServiceProviderError):
             self.crud.create(self.ncc, runner)
 
     def test_submodule(self):

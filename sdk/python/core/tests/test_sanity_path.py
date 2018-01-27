@@ -48,11 +48,11 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
         create_rpc = self.root_schema.create_rpc("ydk:delete")
         create_rpc.get_input_node().create_datanode("entity", xml)
-        # RuntimeError: YCPPCoreError: YCPPCodecError:Schema node not found.. Path: input/config if invoked
+        # RuntimeError: YCoreError: YCodecError:Schema node not found.. Path: input/config if invoked
         # create_rpc(self.nc_session)
 
     def tearDown(self):
-        # RuntimeError: YCPPCoreError: YCPPCodecError:Schema node not found.. Path: input/config if invoked
+        # RuntimeError: YCoreError: YCodecError:Schema node not found.. Path: input/config if invoked
         self._delete_runner()
 
     def test_leafs(self):

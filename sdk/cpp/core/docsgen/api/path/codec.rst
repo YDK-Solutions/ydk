@@ -16,7 +16,7 @@ Codec
         :param format: format to encode to, either :cpp:enumerator:`JSON<EncodingFormat::JSON>` or :cpp:enumerator:`XML<EncodingFormat::XML>`
         :param pretty: The output is indented for human consumption if pretty is ``true``
         :return: The encoded string
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the arguments are invalid
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the arguments are invalid
 
     .. cpp:function:: std::shared_ptr<DataNode> decode(const RootSchemaNode& root_schema, const std::string& buffer, Format format)
 
@@ -26,7 +26,7 @@ Codec
         :param buffer: The string representation of the :cpp:class:`DataNode<DataNode>`
         :param format: Decode format
         :return: The :cpp:class:`DataNode<DataNode>` instantiated or ``nullptr`` in case of error.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the arguments are invalid.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the arguments are invalid.
 
     .. cpp:function:: std::shared_ptr<DataNode> decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format)
 
@@ -36,7 +36,7 @@ Codec
         :param buffer: The string representation of the :cpp:class:`DataNode<DataNode>`
         :param format: Decode format
         :return: The :cpp:class:`DataNode<DataNode>` instantiated or ``nullptr`` in case of error.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the arguments are invalid.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the arguments are invalid.
 
 
     .. cpp:function:: virtual ~Codec()

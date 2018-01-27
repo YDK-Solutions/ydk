@@ -15,7 +15,7 @@ Codec Service
         :param pretty: (:py:class:`EncodingFormat<ydk.types.EncodingFormat>`)Formats the payload in a readable way with idnentation
         :param subtree: (``bool``) Can be used to encode XML subtree filters to use with netconf ``get``/``get-config`` operations
         :return: Either a single ``str`` for a single encoded payload or a dictionary of ``str``
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if error has occurred.
+        :raises: :py:exc:`YError<ydk.errors.YError>` if error has occurred.
 
     .. py:method:: decode(provider, payload, subtree=False)
 
@@ -25,4 +25,4 @@ Codec Service
         :param payload: (``str`` or dict of ``str`` and ``str``) Either a single encoded payload or a dictionary of payloads.
         :param subtree: (``bool``) Can be used to decode XML subtree filters to use with netconf ``get``/``get-config`` operations
         :return: Either a single decoded instance of :py:class:`Entity<ydk.types.Entity>` or a dictionary of decoded :py:class:`Entity<ydk.types.Entity>`
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if error has occurred.
+        :raises: :py:exc:`YError<ydk.errors.YError>` if error has occurred.

@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
         if(reply) cout << "Create yfilter success" << endl << endl; else cout << "Operation failed" << endl << endl;
     }
-    catch(YCPPError & e)
+    catch(YError & e)
     {
         cerr << "Error details: "<<e<<endl;
     }

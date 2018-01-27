@@ -285,9 +285,9 @@ TEST_CASE("./tcp_device_not_connected_execute")
                  "</rpc>");
         REQUIRE(s== "");
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not execute payload. Not connected to 127.0.0.1");
+        REQUIRE(e.err_msg=="YClientError: Could not execute payload. Not connected to 127.0.0.1");
     }
 
 }
@@ -310,9 +310,9 @@ TEST_CASE("./tcp_rpc_invalid")
              "</rpc>");
         REQUIRE(NULL != strstr(reply.c_str(), ""));
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: could not build payload");
+        REQUIRE(e.err_msg=="YClientError: could not build payload");
     }
 
     REQUIRE(result == ok);
@@ -334,9 +334,9 @@ TEST_CASE("./tcp_rpc_invalid")
 //          );
 //         REQUIRE(reply== "");
 //     }
-//     catch (YCPPError & e)
+//     catch (YError & e)
 //     {
-//         REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+//         REQUIRE(e.err_msg=="YClientError: Could not build payload");
 //     }
 
 
@@ -372,9 +372,9 @@ TEST_CASE("./tcp_empty_rpc")
         string reply = client.execute_payload("");
         REQUIRE(reply== "");
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YClientError: Could not build payload");
     }
     REQUIRE(result == OK);
 }

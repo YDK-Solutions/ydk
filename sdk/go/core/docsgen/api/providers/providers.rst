@@ -1,8 +1,14 @@
+.. _ydk-providers:
+
 Serivce Providers
 =================
 
 .. go:package:: ydk/providers
     :synopsis: Service Providers API
+
+.. code-block:: sh
+
+   import "github.com/CiscoDevNet/ydk-go/ydk/providers"
 
 .. contents:: Table of Contents
 
@@ -35,7 +41,7 @@ Open Daylight
 
 	.. attribute:: EncodingFormat
 
-		An instance of :go:struct:`EncodingFormat<ydk/types/EncodingFormat>`
+		An instance of :ref:`encoding-format-ydk`
 
 	.. attribute:: Protocol
 
@@ -47,7 +53,7 @@ Open Daylight
 
 	.. attribute:: ProvidersHolder
 
-		A slice ([] :go:struct:`ServiceProvider<ydk/types/ServiceProvider>`)
+		A slice ([] :ref:`ServiceProvider <types-service-provider>`)
 
 	.. attribute:: State
 
@@ -56,7 +62,7 @@ Open Daylight
 .. function:: (provider *OpenDaylightServiceProvider) GetPrivate()
 
 	:return: private pointer for OpenDaylightServiceProvider
-	:rtype: interface{}
+	:rtype: ``interface{}``
 
 .. function:: (provider *OpenDaylightServiceProvider) Connect()
 
@@ -65,12 +71,12 @@ Open Daylight
 .. function:: (provider *OpenDaylightServiceProvider) GetNodeIDs()
 
 	:return: OpenDaylightServiceProvider Node IDs
-	:rtype: []string
+	:rtype: [] ``string``
 
 .. function:: (provider *OpenDaylightServiceProvider) GetNodeProvider(nodeID string)
 
 	:return: Node provider by ID
-	:rtype: :go:struct:`ServiceProvider<ydk/types/ServiceProvider>`
+	:rtype: :ref:`ServiceProvider <types-service-provider>`
 
 .. function:: (provider *OpenDaylightServiceProvider) GetState()
 
@@ -124,7 +130,7 @@ Netconf
 .. function:: (provider *NetconfServiceProvider) GetPrivate()
 
 	:return: private pointer for NetconfServiceProvider
-	:rtype: interface{}
+	:rtype: ``interface{}``
 
 .. function:: (provider *NetconfServiceProvider) Connect()
 	
@@ -169,7 +175,7 @@ Restconf
 
 	.. attribute:: Encoding
 
-		An instance of :go:struct:`EncodingFormat<ydk/types/EncodingFormat>`
+		An instance of :ref:`encoding-format-ydk`
 
 	.. attribute:: StateURLRoot
 
@@ -190,7 +196,7 @@ Restconf
 .. function:: (provider *RestconfServiceProvider) GetPrivate()
 	
 	:return: private pointer for RestconfServiceProvider
-	:rtype: interface{}
+	:rtype: ``interface{}``
 
 .. function:: (provider *RestconfServiceProvider) Connect()
 
@@ -219,11 +225,11 @@ Codec
 
 	.. attribute:: Encoding
 
-		An instance of :go:struct:`EncodingFormat<ydk/types/EncodingFormat>`
+		An instance of :ref:`encoding-format-ydk`
 
 	.. attribute:: RootSchemaTable
 
-		An instance of map[string] :go:struct:`RootSchemaNode<ydk/types/RootSchemaNode>`
+		An instance of ``map[string]RootSchemaNode`` (see docs for :go:struct:`RootSchemaNode<ydk/types/RootSchemaNode>`)
 
 	.. attribute:: State
 
@@ -236,7 +242,7 @@ Codec
 .. function:: (provider *CodecServiceProvider) GetEncoding()
 
 	:return: the encoding format for CodecServiceProvider
-	:rtype: :go:struct:`EncodingFormat<ydk/types/EncodingFormat>`
+	:rtype: :ref:`encoding-format-ydk`
 
 .. function:: (provider *CodecServiceProvider) GetState()
 

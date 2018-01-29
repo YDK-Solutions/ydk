@@ -88,12 +88,7 @@ function pip_check_install {
 function init_confd {
     cd $1
     print_msg "Initializing confd in $(pwd)"
-    confd_rc=$(find ~ -name confdrc)
-    if [[ -z $confd_rc ]]; then
-        print_msg "Cannot find confdrc resource file in user file system. Exiting"
-        exit 1
-    fi
-    source $confd_rc
+    source $YDKGEN_HOME/../confd/confdrc
     run_exec_test make stop > /dev/null
     run_exec_test make clean > /dev/null
     run_exec_test make all > /dev/null

@@ -89,6 +89,8 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
 
         keys = clazz.get_key_props()
         attribute_title = prop.name
+        if language == 'go':
+            attribute_title = prop.go_name()
         if prop in keys:
             attribute_title = '%s  <key>' % attribute_title
         properties_description.append('.. attribute:: %s\n\n' % (attribute_title))
@@ -159,7 +161,9 @@ def get_enum_class_docstring(enumz):
 
     literals_description = []
     for enum_literal in enumz.literals:
-        literals_description.append(".. data:: %s = %s\n" % (enum_literal.name, enum_literal.value))
+        literals_description.append('.. data:: %s_%s\n' % (
+            enumz.qualified_go_name(),
+            enum_literal.name))
         if enum_literal.comment is not None:
             for line in enum_literal.comment.split("\n"):
                 literals_description.append("\t%s\n\n" % line)
@@ -613,7 +617,7 @@ def get_class_crossref_tag(name, named_element, language):
         template = get_tag_template('go', 'class', True)
         link = '%s/%s' % (named_element.get_py_mod_name().replace('.', '/'),
                           named_element.qualified_go_name())
-        return template % (name, link)
+        return template % (named_element.qualified_go_name(), link)
     else:
         raise Exception('Language {0} not yet supported'.format(language))
 

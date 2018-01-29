@@ -131,8 +131,10 @@ class DocPrinter(object):
                 self._append('This class represents state data.\n')
         else:
             self._append('This class defines parameters to the RPC operation\n')
-        self._print_docstring(clazz, get_class_docstring(
-            clazz, self.lang, identity_subclasses=self.identity_subclasses))
+
+        docstring = get_class_docstring(
+            clazz, self.lang, identity_subclasses=self.identity_subclasses)
+        self._print_docstring(clazz, docstring)
         self.ctx.lvl_dec()
 
     def _print_enum_rst(self, enumz):
@@ -140,8 +142,8 @@ class DocPrinter(object):
         self._print_header(enumz)
         # Body
         self.ctx.lvl_inc()
-        self._print_bases(enumz)
-        self._print_docstring(enumz, get_enum_class_docstring(enumz))
+        docstring = get_enum_class_docstring(enumz)
+        self._print_docstring(enumz, docstring)
         self.ctx.lvl_dec()
 
     def _append(self, line):

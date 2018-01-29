@@ -98,7 +98,7 @@ These are how YANG types are represented in Go.
 
     Represents a YANG built-in decimal64 type.
 
-    .. attribute:: value
+    .. attribute:: Value
 
         A string representation for decimal value.
 

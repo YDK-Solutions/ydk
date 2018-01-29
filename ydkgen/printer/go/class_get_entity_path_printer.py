@@ -47,7 +47,8 @@ class GetSegmentPathPrinter(FunctionPrinter):
             if key_prop.stmt.i_module.arg != self.clazz.stmt.i_module.arg:
                 prefix = '%s:' % (key_prop.stmt.i_module.arg)
 
-            predicate = '{0}"[%s%s=\\""{0}fmt.Sprintf("%%v", %s.%s){0}"\\"]"'
+            predicate = '''{0}"[%s%s='"{0}fmt.Sprintf("%%v", %s.%s){0}"']"'''
+
             predicate = predicate.format(' + ') % (
                 prefix, key_prop.stmt.arg, self.class_alias, key_prop.go_name())
             path.append(predicate)

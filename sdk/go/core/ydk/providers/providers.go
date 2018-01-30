@@ -45,12 +45,14 @@ type OpenDaylightServiceProvider struct {
 
 // NetconfServiceProvider Implementation of ServiceProvider for the NETCONF protocol: https://tools.ietf.org/html/rfc6241
 type NetconfServiceProvider struct {
-	Repo     types.Repository
-	Address  string
-	Username string
-	Password string
-	Port     int
-	Protocol string
+	Repo     	types.Repository
+	Address  	string
+	Username 	string
+	Password 	string
+	Port     	int
+	Protocol 	string
+	OnDemand 	bool
+	CommonCache	bool
 
 	Private types.CServiceProvider
 	State   types.State
@@ -132,7 +134,16 @@ func (provider *NetconfServiceProvider) Connect() {
 	if len(provider.Protocol) == 0 {
 		provider.Protocol = "ssh"
 	}
-	provider.Private = path.ConnectToNetconfProvider(&provider.State, provider.Repo, provider.Address, provider.Username, provider.Password, provider.Port, provider.Protocol)
+	provider.Private = path.ConnectToNetconfProvider(
+		&provider.State,
+		provider.Repo,
+		provider.Address,
+		provider.Username,
+		provider.Password,
+		provider.Port,
+		provider.Protocol,
+		provider.OnDemand,
+		provider.CommonCache)
 }
 
 // GetState returns error state from NetconfServiceProvider

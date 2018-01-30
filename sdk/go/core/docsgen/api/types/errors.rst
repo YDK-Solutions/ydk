@@ -5,6 +5,10 @@ Errors
 .. go:package:: ydk/types
     :synopsis: YDK Go Errors
 
+.. code-block:: sh
+
+   import "github.com/CiscoDevNet/ydk-go/ydk/types"
+
 .. attribute:: Y_ERROR_TYPE
 
     Represents YDK Go error types with underlying type ``int``
@@ -49,18 +53,22 @@ Errors
 
     .. attribute:: Private
 
-        Type is interface{}
+        Type is ``interface{}``
 
 .. go:struct:: CState
 
     .. attribute:: Private
 
-        Type is interface{}
+        Type is ``interface{}``
 
-.. interface -- is this necessary?
-.. go:struct:: CError
+.. _errors-cerror:
+.. object:: CError
 
-    TODO
+    CError is an interface type that represents a basic error in Go.
+
+    .. function:: Error()
+
+        :rtype: ``string``
 
 .. go:struct:: YError
 

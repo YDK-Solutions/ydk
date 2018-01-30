@@ -36,9 +36,11 @@ from ydkgen.printer.meta_data_util import (
 
 
 class DocPrinter(object):
-    def __init__(self, ctx, language):
+    def __init__(self, ctx, language, bundle_name=None, bundle_version=None):
         self.ctx = ctx
         self.lang = language
+        self.bundle_name = bundle_name
+        self.bundle_version = bundle_version
 
     def print_module_documentation(self, named_element, identity_subclasses):
         self.identity_subclasses = identity_subclasses
@@ -58,10 +60,11 @@ class DocPrinter(object):
         self.ctx.writelns(self.lines)
         del self.lines
 
-    def print_table_of_contents(self, packages, bundle_name, bundle_version):
+    def print_table_of_contents(self, packages):
         self.lines = []
-        title = '{0} bundle API'.format(bundle_name)
-        description = '\nModel API documentation for the {0} bundle.\n Version: **{1}**.\n'.format(bundle_name, bundle_version)
+        title = '{0} bundle API'.format(self.bundle_name)
+        description = '\nModel API documentation for the {0} bundle.\n Version: **{1}**.\n'.format(
+            self.bundle_name, self.bundle_version)
         self._print_title(title)
         self._append(description)
         self._print_toctree(sorted(packages, key=attrgetter('name')), is_package=True)
@@ -128,8 +131,10 @@ class DocPrinter(object):
                 self._append('This class represents state data.\n')
         else:
             self._append('This class defines parameters to the RPC operation\n')
-        self._print_docstring(clazz, get_class_docstring(
-            clazz, self.lang, identity_subclasses=self.identity_subclasses))
+
+        docstring = get_class_docstring(
+            clazz, self.lang, identity_subclasses=self.identity_subclasses)
+        self._print_docstring(clazz, docstring)
         self.ctx.lvl_dec()
 
     def _print_enum_rst(self, enumz):
@@ -137,8 +142,8 @@ class DocPrinter(object):
         self._print_header(enumz)
         # Body
         self.ctx.lvl_inc()
-        self._print_bases(enumz)
-        self._print_docstring(enumz, get_enum_class_docstring(enumz))
+        docstring = get_enum_class_docstring(enumz)
+        self._print_docstring(enumz, docstring)
         self.ctx.lvl_dec()
 
     def _append(self, line):
@@ -152,9 +157,22 @@ class DocPrinter(object):
     def _print_header(self, named_element):
         # Title
         title = named_element.name
+        import_stmt = None
         if isinstance(named_element, Package) and named_element.stmt.keyword == 'module':
-            title = '%s module' % title
+            template = '%s module'
+            if self.lang == 'go':
+                template = 'package %s'
+                import_stmt = 'import "github.com/CiscoDevNet/ydk-go/ydk/models/%s/%s"\n' % (
+                    self.bundle_name, named_element.name)
+            title = template % title
         self._print_title(title)
+
+        if import_stmt is not None and self.lang == 'go':
+            self._append('\n')
+            self._append('.. code-block:: sh\n')
+            self.ctx.lvl_inc()
+            self._append(import_stmt)
+            self.ctx.lvl_dec()
 
         # TOC Tree
         if not isinstance(named_element, Enum):

@@ -61,7 +61,8 @@ class ClassPrinter(object):
         self._print_bundle_name_function(clazz)
         self._print_yang_name_function(clazz)
         self._print_yang_models_function(clazz)
-        self._print_capabilities_lookup_function(clazz)
+        self._print_get_capabilities_table(clazz)
+        self._print_get_namespace_table(clazz)
         self._print_set_parent_function(clazz)
         self._print_get_parent_function(clazz)
         self._print_get_parent_yang_name_function(clazz)
@@ -142,13 +143,22 @@ class ClassPrinter(object):
         rstmt = '%s.GetModelsPath()' % bundle_name
         fp.quick_print('GetBundleYangModelsLocation', return_type='string', return_stmt=rstmt)
 
-    # GetAugmentCapabilitiesFunction
-    def _print_capabilities_lookup_function(self, clazz):
+    # GetCapabilitiesTable
+    def _print_get_capabilities_table(self, clazz):
         bundle_name = snake_case(self.bundle_name)
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper(
-            'GetAugmentCapabilitiesFunction', return_type='types.AugmentCapabilitiesFunction')
-        fp.ctx.write("return %s.%sAugmentLookupTables " % (bundle_name, bundle_name.title()))
+            'GetCapabilitiesTable', return_type='map[string]string')
+        fp.ctx.write("return %s.GetCapabilities() " % (bundle_name))
+        fp.print_function_trailer()
+
+    # GetNamespaceTable
+    def _print_get_namespace_table(self, clazz):
+        bundle_name = snake_case(self.bundle_name)
+        fp = FunctionPrinter(self.ctx, clazz)
+        fp.print_function_header_helper(
+            'GetNamespaceTable', return_type='map[string]string')
+        fp.ctx.write("return %s.GetNamespaces() " % (bundle_name))
         fp.print_function_trailer()
 
     # SetParent

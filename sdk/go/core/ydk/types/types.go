@@ -75,9 +75,6 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
-// AugmentCapabilitiesFunction
-type AugmentCapabilitiesFunction func() map[string]string
-
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetGoName(string)				string
@@ -90,7 +87,8 @@ type Entity interface {
 	SetParent(Entity)
 	GetParent() 					Entity
 
-	GetAugmentCapabilitiesFunction() AugmentCapabilitiesFunction
+	GetCapabilitiesTable() 			map[string]string
+	GetNamespaceTable() 			map[string]string
 	GetBundleYangModelsLocation() 	string
 	GetBundleName() 				string
 

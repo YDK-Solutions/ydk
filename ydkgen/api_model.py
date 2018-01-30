@@ -224,25 +224,28 @@ class NamedElement(Element):
             element = element.owner
         return pkg.bundle_name + '::' + '::'.join(reversed(names))
 
-    def go_name(self, case = 'UpperCamel'):
+    def go_name(self):
         if self.stmt is None:
             raise Exception('element is not yet defined')
+        if hasattr(self, 'goName'):
+            return self.goName
 
-        name = self.name
-        if isinstance(self, Property):
-            name = camel_case(self.name)
-        if case == 'UpperCamel':
-            return name
-        elif case == 'lowerCamel':
-            return '%s%s' % (name[0].lower(), name[1:])
-        else:
-            supported = 'Currently Supporting: UpperCamel, lowerCamel'
-            raise Exception('{0} case is not supported\n{1}'.format(case, supported))
+        name = camel_case(self.name)
+        if self.iskeyword(name):
+            name = '_%s' % name
+        if name.startswith('_'):
+            self.name = '%s%s' % ('Y', name)
+        self.goName = name
+
+        return self.goName
 
     def qualified_go_name(self):
         ''' get the Go qualified name (sans package name) '''
         if self.stmt.keyword == 'identity':
             return self.go_name()
+
+        if hasattr(self, 'qualifiedGoName'):
+            return self.qualifiedGoName
 
         names = []
         element = self
@@ -251,7 +254,8 @@ class NamedElement(Element):
                 element = element.owner
             names.append(element.go_name())
             element = element.owner
-        return '_'.join(reversed(names))
+        self.qualifiedGoName = '_'.join(reversed(names))
+        return self.qualifiedGoName
 
 
 class Package(NamedElement):
@@ -528,8 +532,8 @@ class Class(NamedElement):
         name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
         name = camel_case(name)
 
-        if self.iskeyword(name) or self.iskeyword(name.lower()):
-            name = '%s_' % name
+        if self.iskeyword(name):
+            name = '_%s' % name
         self.name = name
 
         if self.name.startswith('_'):
@@ -712,6 +716,7 @@ class Property(NamedElement):
         self._stmt = stmt
         #name = snake_case(stmt.arg)
         name = snake_case(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
         self.name = name

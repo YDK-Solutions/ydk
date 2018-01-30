@@ -27,7 +27,8 @@ class FunctionPrinter(object):
         self.leafs = leafs
         self.children = children
 
-        identifier = clazz.go_name(case='lowerCamel')
+        name = clazz.go_name()
+        identifier = '%s%s' % (name[0].lower(), name[1:])
         if clazz.iskeyword(identifier):
             identifier = "self"
         self.class_alias = identifier

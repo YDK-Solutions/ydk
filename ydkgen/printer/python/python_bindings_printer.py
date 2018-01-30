@@ -247,7 +247,8 @@ def emit_module_documentation(ctx, named_element, identity_subclasses):
 
 
 def emit_table_of_contents(ctx, packages, extra_args):
-    DocPrinter(ctx, 'py').print_table_of_contents(packages, extra_args[0], extra_args[1])
+    bundle_name, bundle_version = extra_args
+    DocPrinter(ctx, 'py', bundle_name, bundle_version).print_table_of_contents(packages)
 
 
 def emit_module(ctx, package, extra_args):

@@ -391,21 +391,17 @@ function py_sanity_ydktest_test {
     cd $YDKGEN_HOME
     cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
-    # Skip coverage tests on MacOS
-    #
-    if [[ ${os_type} == "Linux" ]] ; then
-        print_msg "Uninstall ydk py core from pip for testing with coverage"
-        pip uninstall ydk -y
-        export OLDPYTHONPATH=$PYTHONPATH
+    print_msg "Uninstall ydk py core from pip for testing with coverage"
+    pip uninstall ydk -y
+    export OLDPYTHONPATH=$PYTHONPATH
 
-        print_msg "Build & copy cpp-wrapper to sdk directory to gather coverage"
-        cd $YDKGEN_HOME
-        cd sdk/python/core/ && python setup.py build
-        print_msg "Set new python path to gather coverage"
-        export PYTHONPATH=$PYTHONPATH:$(pwd)
-        cp build/lib*/*.so .
-        cd -
-    fi
+    print_msg "Build & copy cpp-wrapper to sdk directory to gather coverage"
+    cd $YDKGEN_HOME
+    cd sdk/python/core/ && python setup.py build
+    print_msg "Set new python path to gather coverage"
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
+    cp build/lib*/*.so .
+    cd -
 
     run_test sdk/python/core/tests/test_sanity_codec.py
 
@@ -414,19 +410,15 @@ function py_sanity_ydktest_test {
 
     stop_tcp_server
 
-    # Skip coverage tests on MacOS
-    #
-    if [[ ${os_type} == "Linux" ]] ; then
-        print_msg "Restore old python path"
-        export PYTHONPATH=$OLDPYTHONPATH
+    print_msg "Restore old python path"
+    export PYTHONPATH=$OLDPYTHONPATH
 
-        cd sdk/python/core/
-        rm -f *.so
-        print_msg "Restore ydk py core to pip"
-        pip install dist/ydk*.tar.gz
+    cd sdk/python/core/
+    rm -f *.so
+    print_msg "Restore ydk py core to pip"
+    pip install dist/ydk*.tar.gz
 
-        cd $YDKGEN_HOME
-    fi
+    cd $YDKGEN_HOME
 }
 
 function py_sanity_ydktest_test_netconf_ssh {

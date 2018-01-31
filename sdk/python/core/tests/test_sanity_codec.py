@@ -371,6 +371,18 @@ class SanityYang(unittest.TestCase):
         self.provider.encoding = EncodingFormat.JSON
         self.codec.encode(self.provider, ysanity.Runner(), subtree=True)
 
+    def test_encode_decode_typedefs(self):
+        from ydk.models.ydktest import ydktest_sanity_typedefs as ysanity_typedefs
+        system_encode = ysanity_typedefs.System()
+        system_encode.mode = ysanity_typedefs.TopMode.stand_alone
+        system_encode.id = 22;
+        
+        self.provider.encoding = EncodingFormat.XML
+        payload = self.codec.encode(self.provider, system_encode)
+        
+        system_decode = self.codec.decode(self.provider, payload)
+        self.assertEqual(system_encode, system_decode)
+
 if __name__ == '__main__':
     import sys
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)

@@ -22,6 +22,7 @@
 #include <ydk/path_api.hpp>
 #include <ydk_ydktest/ydktest_sanity.hpp>
 #include <ydk_ydktest/ydktest_sanity_types.hpp>
+#include <ydk_ydktest/ydktest_sanity_typedefs.hpp>
 #include <ydk_ydktest/oc_pattern.hpp>
 
 #include <ydk_ydktest_new/ietf_system.hpp>
@@ -261,6 +262,23 @@ config_runner_1(ydktest_sanity::Runner *runner)
 
     runner->two_list->ldata.push_back(std::move(l_1));
     runner->two_list->ldata.push_back(std::move(l_2));
+}
+
+TEST_CASE("typedef_encode")
+{
+    CodecServiceProvider codec_provider{EncodingFormat::XML};
+    CodecService codec_service{};
+
+    // Create class System and set values for its members
+    auto system = std::make_unique<ydktest_sanity_typedefs::System>();
+    system->id = 22;
+    system->mode = ydktest_sanity_typedefs::TopMode::stand_alone;
+
+    std::string xml = codec_service.encode(codec_provider, *system, true);
+
+    auto system_decoded = codec_service.decode(codec_provider, xml, std::make_unique<ydktest_sanity_typedefs::System>());
+
+    CHECK(*system_decoded == *system);
 }
 
 TEST_CASE("single_encode")

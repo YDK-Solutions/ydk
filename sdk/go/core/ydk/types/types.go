@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
+	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/ytype"
 )
@@ -294,7 +295,7 @@ type ServiceProvider interface {
 	GetPrivate() interface{}
 	Connect()
 	Disconnect()
-	GetState() *State
+	GetState() *errors.State
 }
 
 // CodecServiceProvider
@@ -302,7 +303,7 @@ type CodecServiceProvider interface {
 	Initialize(Entity)
 	GetEncoding() encoding.EncodingFormat
 	GetRootSchemaNode(Entity) RootSchemaNode
-	GetState() *State
+	GetState() *errors.State
 }
 
 // DataNode represents a containment hierarchy
@@ -333,149 +334,6 @@ type COpenDaylightServiceProvider struct {
 type Repository struct {
 	Path    string
 	Private interface{}
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Errors
-//////////////////////////////////////////////////////////////////////////
-
-// Represents YDK Go error types
-type Y_ERROR_TYPE int
-
-const (
-	Y_ERROR_TYPE_NONE Y_ERROR_TYPE = iota
-	Y_ERROR_TYPE_ERROR
-	Y_ERROR_TYPE_CLIENT_ERROR
-	Y_ERROR_TYPE_SERVICE_PROVIDER_ERROR
-	Y_ERROR_TYPE_SERVICE_ERROR
-	Y_ERROR_TYPE_ILLEGAL_STATE_ERROR
-	Y_ERROR_TYPE_INVALID_ARGUMENT_ERROR
-	Y_ERROR_TYPE_OPERATION_NOTSUPPORTED_ERROR
-	Y_ERROR_TYPE_MODEL_ERROR
-)
-
-// State represents the error state
-type State struct {
-	Private interface{}
-}
-
-// CState represents the error state
-type CState struct {
-	Private interface{}
-}
-
-type CError interface {
-	Error() string
-}
-
-// YError is the basic error type in Go
-type YError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YError) Error() string {
-	return "YError:" + e.Msg
-}
-
-// YClientError is the error for client.
-type YClientError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YClientError) Error() string {
-	return "YClientError:" + e.Msg
-}
-
-// YServiceProviderError is the error for service provider.
-type YServiceProviderError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YServiceProviderError) Error() string {
-	return "YServiceProviderError:" + e.Msg
-}
-
-// YServiceError is the error for service.
-type YServiceError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YServiceError) Error() string {
-	return "YServiceError:" + e.Msg
-}
-
-// YIllegalStateError is raised when an operation/service is invoked on an object that is not in the right state.
-type YIllegalStateError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YIllegalStateError) Error() string {
-	return "YIllegalStateError:" + e.Msg
-}
-
-// YInvalidArgumentError is raised when there is an invalid argument.
-type YInvalidArgumentError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YInvalidArgumentError) Error() string {
-	return "YInvalidArgumentError:" + e.Msg
-}
-
-// YOperationNotSupportedError is raised for an unsupported operation.
-type YOperationNotSupportedError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YOperationNotSupportedError) Error() string {
-	return "YOperationNotSupportedError:" + e.Msg
-}
-
-// YModelError is raised when a model constraint is violated.
-type YModelError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YModelError) Error() string {
-	return "YModelError:" + e.Msg
-}
-
-// YModelError is the error for core.
-type YCoreError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YCoreError) Error() string {
-	return "YCoreError:" + e.Msg
-}
-
-// YCodecError encapsualtes the validation errors for codec service.
-type YCodecError struct {
-	Msg string
-}
-
-// Error satisfies the error interface
-// Returns the error message (string)
-func (e *YCodecError) Error() string {
-	return "YCodecError" + e.Msg
 }
 
 //////////////////////////////////////////////////////////////////////////

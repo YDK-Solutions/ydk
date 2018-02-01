@@ -263,8 +263,8 @@ public:
     ///
     /// @param[in] dn The root of DataNode tree to validate.
     /// @param[in] option The context for validation.
-    /// @throws YValidationError if validation errors were detected.
-    /// @throws YInvalidArgumentError if the arguments are invalid.
+    /// @throws YCPPValidationError if validation errors were detected.
+    /// @throws YCPPInvalidArgumentError if the arguments are invalid.
     ///
     void validate(const DataNode & dn, ydk::ValidationService::Option option);
 };
@@ -287,7 +287,7 @@ public:
     /// @param[in] format to encode to.
     /// @param[in] pretty if true the output is indented for human consumption.
     /// @return The encoded string.
-    //  @throws YInvalidArgumentError if the arguments are invalid.
+    //  @throws YCPPInvalidArgumentError if the arguments are invalid.
     ///
     std::string encode(const DataNode & dn, EncodingFormat format, bool pretty);
 
@@ -298,22 +298,22 @@ public:
     /// @param[in] buffer The string representation of the DataNode.
     /// @param[in] format .Note ::TREE is not supported.
     /// @return The DataNode instantiated or nullptr in case of error.
-    /// @throws YInvalidArgumentError if the arguments are invalid.
+    /// @throws YCPPInvalidArgumentError if the arguments are invalid.
     ///
     std::shared_ptr<DataNode> decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
     std::shared_ptr<DataNode> decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format);
 };
 
 ///
-/// @brief Base class for Y Errors
+/// @brief Base class for YCPP Errors
 ///
 /// The subclasses give a specialized view of the error that has occurred.
 ///
-struct YCoreError : public ydk::YError
+struct YCPPCoreError : public ydk::YCPPError
 {
-    YCoreError();
+    YCPPCoreError();
 
-    YCoreError(const std::string& msg);
+    YCPPCoreError(const std::string& msg);
 
 };
 
@@ -322,7 +322,7 @@ struct YCoreError : public ydk::YError
 /// @brief Error that encapsualtes the validation errors
 ///        on a data tree
 ///
-struct YDataValidationError : public YCoreError
+struct YCPPDataValidationError : public YCPPCoreError
 {
     /// Data Validation Error Enum
     enum class Error {
@@ -359,7 +359,7 @@ struct YDataValidationError : public YCoreError
 
     };
 
-    YDataValidationError();
+    YCPPDataValidationError();
 
     /// List of pair<DataNode, ValidationError>. The Validation Error is specific to
     /// this node
@@ -367,7 +367,7 @@ struct YDataValidationError : public YCoreError
 
 };
 
-struct YPathError : public YCoreError
+struct YCPPPathError : public YCPPCoreError
 {
     enum class Error {
         SUCCESS,  /// no error
@@ -391,11 +391,11 @@ struct YPathError : public YCoreError
 
     Error err;
 
-    YPathError(YPathError::Error error_code);
+    YCPPPathError(YCPPPathError::Error error_code);
 
 };
 
-struct YCodecError : public YCoreError
+struct YCPPCodecError : public YCPPCoreError
 {
     enum class Error {
         SUCCESS,  /// no error
@@ -410,7 +410,7 @@ struct YCodecError : public YCoreError
 
     Error err;
 
-    YCodecError(YCodecError::Error merror);
+    YCPPCodecError(YCPPCodecError::Error merror);
 };
 
 ///
@@ -506,8 +506,8 @@ public:
     /// the given path expression. See @see howtopath
     /// @param path The path expression.
     /// @return vector of SchemaNode  that satisfies the criterion.
-    /// @throws YPathError if the path expression in invalid, See error code for details.
-    /// @throws YInvalidArgumentError if the argument is invalid.
+    /// @throws YCPPPathError if the path expression in invalid, See error code for details.
+    /// @throws YCPPInvalidArgumentError if the argument is invalid.
     ///
     virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
@@ -577,8 +577,8 @@ public:
     /// the given path expression. See @see howtopath
     /// @param path The path expression.
     /// @return vector of SchemaNode  that satisfies the criterion.
-    /// @throws YPathError if the path expression in invalid, See error code for details.
-    /// @throws YInvalidArgumentError if the argument is invalid.
+    /// @throws YCPPPathError if the path expression in invalid, See error code for details.
+    /// @throws YCPPInvalidArgumentError if the argument is invalid.
     ///
     virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
@@ -621,8 +621,8 @@ public:
     /// of the schema tree
     /// @param[in] value The string representation of the value to set.
     /// @return Pointer to DataNode created.
-    /// @throws YInvalidArgumentError In case the argument is invalid.
-    /// @throws YPathError In case the path is invalid.
+    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
+    /// @throws YCPPPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
 
@@ -640,8 +640,8 @@ public:
     ///
     /// @param[in] path The XPath expression identifying the node.
     /// @return DataNode created or nullptr
-    /// @throws YInvalidArgumentError In case the argument is invalid.
-    /// @throws YPathError In case the path is invalid.
+    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
+    /// @throws YCPPPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path)  = 0;
 
@@ -668,8 +668,8 @@ public:
     /// The path expression should point to a SchemaNode that represents the Rpc
     /// @param[in] path The path to the rpc schema node
     /// @return rpc or nullptr
-    /// @throws YInvalidArgumentError if the argument is invalid.
-    /// @throws YPathError if the path is invalid
+    /// @throws YCPPInvalidArgumentError if the argument is invalid.
+    /// @throws YCPPPathError if the path is invalid
     ///
     virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) = 0;
 };
@@ -720,8 +720,8 @@ public:
     /// @param[in] path The XPath expression identifying the node.
     /// @param[in] value The string representation of the value to set.
     /// @return Pointer to DataNode created.
-    /// @throws YInvalidArgumentError In case the argument is invalid.
-    /// @throws YPathError In case the path is invalid.
+    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
+    /// @throws YCPPPathError In case the path is invalid.
     ///
    virtual DataNode& create_datanode(const std::string& path);
 
@@ -739,8 +739,8 @@ public:
     ///
     /// @param[in] path The XPath expression identifying the node.
     /// @return Pointer to DataNode created.
-    /// @throws YInvalidArgumentError In case the argument is invalid.
-    /// @throws YPathError In case the path is invalid.
+    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
+    /// @throws YCPPPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
 
@@ -753,7 +753,7 @@ public:
     /// Note this method does not validate the value being set. To validate please see the ValidationService.
     ///
     /// @param[in] value The value to set. This should be the string representation of the YANG type.
-    /// @throws YInvalidArgumentError if the DataNode's value cannot be set (for example it represents
+    /// @throws YCPPInvalidArgumentError if the DataNode's value cannot be set (for example it represents
     /// a container)
     virtual void set_value(const std::string& value) = 0;
 
@@ -806,7 +806,7 @@ public:
     /// This method adds the annotation to this datanode
     ///
     /// @param[in] an The annotation to add to this DataNode
-    /// @throws YInvalidArgumentError In case the argument is invalid
+    /// @throws YCPPInvalidArgumentError In case the argument is invalid
     ///
     virtual void add_annotation(const Annotation& an) = 0;
 
@@ -921,7 +921,7 @@ public:
     ///
     /// Constructor
     /// @param[in] search_dir The path in the filesystem where yang files can be found.
-    /// @throws YInvalidArgumentError if the search_dir is not a valid directory in the
+    /// @throws YCPPInvalidArgumentError if the search_dir is not a valid directory in the
     /// filesystem
     Repository(const std::string& search_dir, ModelCachingOption caching_option = ModelCachingOption::PER_DEVICE);
 

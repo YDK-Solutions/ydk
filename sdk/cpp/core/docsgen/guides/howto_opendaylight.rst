@@ -119,12 +119,12 @@ Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudSer
    auto & provider = odl_provider.get_node_provider("xr");
    crud_service.create(provider, *bgp);
  }
- catch(YError & e)
+ catch(YCPPError & e)
  {
    cerr << "Error details: " << e.what() << endl;
  }
 
-Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YError<ydk::YError>`
+Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YCPPError<ydk::YCPPError>`
 
 Logging
 ----------------------

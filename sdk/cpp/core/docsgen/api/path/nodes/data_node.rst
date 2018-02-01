@@ -45,8 +45,8 @@ DataNode
         :param path: The XPath expression identifying the node.
         :param value: The string representation of the value to set.
         :return: Pointer to :cpp:class:`DataNode<DataNode>` created.
-        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` In case the argument is invalid.
-        :raises: :cpp:class:`YPathError<YPathError>` In case the path is invalid.
+        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
+        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
     .. cpp:function:: virtual DataNode& create_datanode(const std::string& path, const std::string& value)
 
@@ -64,8 +64,8 @@ DataNode
 
         :param path: The XPath expression identifying the node.
         :return: Pointer to :cpp:class:`DataNode<DataNode>` created.
-        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` In case the argument is invalid.
-        :raises: :cpp:class:`YPathError<YPathError>` In case the path is invalid.
+        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` In case the argument is invalid.
+        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` In case the path is invalid.
 
     .. cpp:function:: virtual void set_value(const std::string& value)
 
@@ -77,7 +77,7 @@ DataNode
             - This method does not validate the value being set. To validate please see the :cpp:class:`ValidationService<ValidationService>`.
 
         :param value: The value to set. This should be the string representation of the YANG type.
-        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the :cpp:class:`DataNode<DataNode>`'s value cannot be set (for example it represents a container)
+        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the :cpp:class:`DataNode<DataNode>`'s value cannot be set (for example it represents a container)
 
     .. cpp:function:: virtual std::string get_value() const
 
@@ -110,7 +110,7 @@ DataNode
         This method adds the annotation to this :cpp:class:`Datanode<DataNode>`.
 
         :param an: The annotation to add to this :cpp:class:`DataNode<DataNode>`.
-        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` in case the argument is invalid.
+        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` in case the argument is invalid.
 
     .. cpp:function:: virtual bool remove_annotation(const Annotation& an)
 

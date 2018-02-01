@@ -301,7 +301,7 @@ TEST_CASE("multiple_encode")
     CHECK(payload_map["runner2"] == XML_RUNNER_PAYLOAD_2);
 }
 
-// YCoreError: YCodecError:Unknown element "oc-A".. Path:
+// YCPPCoreError: YCPPCodecError:Unknown element "oc-A".. Path:
 TEST_CASE("test_oc_pattern")
 {
 //TODO
@@ -440,7 +440,7 @@ TEST_CASE("invalid_decode")
     CodecServiceProvider codec_provider{EncodingFormat::XML};
     CodecService codec_service{};
 
-    CHECK_THROWS_AS(codec_service.decode(codec_provider, invalid_xml, make_unique<ydktest_sanity::Runner>()), YModelError);
+    CHECK_THROWS_AS(codec_service.decode(codec_provider, invalid_xml, make_unique<ydktest_sanity::Runner>()), YCPPModelError);
 
 }
 

@@ -88,7 +88,7 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 `
 	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerCreate) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YServiceProviderError:", panicValue)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
 	suite.Regexp(errMsg, panicValue)
 }
 
@@ -133,7 +133,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 `
 	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YServiceProviderError:", panicValue)
+	suite.Regexp("YGOServiceProviderError:", panicValue)
 	suite.Regexp(errMsg, panicValue)
 }
 

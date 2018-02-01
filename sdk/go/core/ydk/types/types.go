@@ -340,18 +340,18 @@ type Repository struct {
 //////////////////////////////////////////////////////////////////////////
 
 // Represents YDK Go error types
-type Y_ERROR_TYPE int
+type YGO_ERROR_TYPE int
 
 const (
-	Y_ERROR_TYPE_NONE Y_ERROR_TYPE = iota
-	Y_ERROR_TYPE_ERROR
-	Y_ERROR_TYPE_CLIENT_ERROR
-	Y_ERROR_TYPE_SERVICE_PROVIDER_ERROR
-	Y_ERROR_TYPE_SERVICE_ERROR
-	Y_ERROR_TYPE_ILLEGAL_STATE_ERROR
-	Y_ERROR_TYPE_INVALID_ARGUMENT_ERROR
-	Y_ERROR_TYPE_OPERATION_NOTSUPPORTED_ERROR
-	Y_ERROR_TYPE_MODEL_ERROR
+	YGO_ERROR_TYPE_NONE YGO_ERROR_TYPE = iota
+	YGO_ERROR_TYPE_ERROR
+	YGO_ERROR_TYPE_CLIENT_ERROR
+	YGO_ERROR_TYPE_SERVICE_PROVIDER_ERROR
+	YGO_ERROR_TYPE_SERVICE_ERROR
+	YGO_ERROR_TYPE_ILLEGAL_STATE_ERROR
+	YGO_ERROR_TYPE_INVALID_ARGUMENT_ERROR
+	YGO_ERROR_TYPE_OPERATION_NOTSUPPORTED_ERROR
+	YGO_ERROR_TYPE_MODEL_ERROR
 )
 
 // State represents the error state
@@ -368,114 +368,114 @@ type CError interface {
 	Error() string
 }
 
-// YError is the basic error type in Go
-type YError struct {
+// YGOError is the basic error type in Go
+type YGOError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YError) Error() string {
-	return "YError:" + e.Msg
+func (e *YGOError) Error() string {
+	return "YGOError:" + e.Msg
 }
 
-// YClientError is the error for client.
-type YClientError struct {
+// YGOClientError is the error for client.
+type YGOClientError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YClientError) Error() string {
-	return "YClientError:" + e.Msg
+func (e *YGOClientError) Error() string {
+	return "YGOClientError:" + e.Msg
 }
 
-// YServiceProviderError is the error for service provider.
-type YServiceProviderError struct {
+// YGOServiceProviderError is the error for service provider.
+type YGOServiceProviderError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YServiceProviderError) Error() string {
-	return "YServiceProviderError:" + e.Msg
+func (e *YGOServiceProviderError) Error() string {
+	return "YGOServiceProviderError:" + e.Msg
 }
 
-// YServiceError is the error for service.
-type YServiceError struct {
+// YGOServiceError is the error for service.
+type YGOServiceError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YServiceError) Error() string {
-	return "YServiceError:" + e.Msg
+func (e *YGOServiceError) Error() string {
+	return "YGOServiceError:" + e.Msg
 }
 
-// YIllegalStateError is raised when an operation/service is invoked on an object that is not in the right state.
-type YIllegalStateError struct {
+// YGOIllegalStateError is raised when an operation/service is invoked on an object that is not in the right state.
+type YGOIllegalStateError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YIllegalStateError) Error() string {
-	return "YIllegalStateError:" + e.Msg
+func (e *YGOIllegalStateError) Error() string {
+	return "YGOIllegalStateError:" + e.Msg
 }
 
-// YInvalidArgumentError is raised when there is an invalid argument.
-type YInvalidArgumentError struct {
+// YGOInvalidArgumentError is raised when there is an invalid argument.
+type YGOInvalidArgumentError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YInvalidArgumentError) Error() string {
-	return "YInvalidArgumentError:" + e.Msg
+func (e *YGOInvalidArgumentError) Error() string {
+	return "YGOInvalidArgumentError:" + e.Msg
 }
 
-// YOperationNotSupportedError is raised for an unsupported operation.
-type YOperationNotSupportedError struct {
+// YGOOperationNotSupportedError is raised for an unsupported operation.
+type YGOOperationNotSupportedError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YOperationNotSupportedError) Error() string {
-	return "YOperationNotSupportedError:" + e.Msg
+func (e *YGOOperationNotSupportedError) Error() string {
+	return "YGOOperationNotSupportedError:" + e.Msg
 }
 
-// YModelError is raised when a model constraint is violated.
-type YModelError struct {
+// YGOModelError is raised when a model constraint is violated.
+type YGOModelError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YModelError) Error() string {
-	return "YModelError:" + e.Msg
+func (e *YGOModelError) Error() string {
+	return "YGOModelError:" + e.Msg
 }
 
-// YModelError is the error for core.
-type YCoreError struct {
+// YGOModelError is the error for core.
+type YGOCoreError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YCoreError) Error() string {
-	return "YCoreError:" + e.Msg
+func (e *YGOCoreError) Error() string {
+	return "YGOCoreError:" + e.Msg
 }
 
-// YCodecError encapsualtes the validation errors for codec service.
-type YCodecError struct {
+// YGOCodecError encapsualtes the validation errors for codec service.
+type YGOCodecError struct {
 	Msg string
 }
 
 // Error satisfies the error interface
 // Returns the error message (string)
-func (e *YCodecError) Error() string {
-	return "YCodecError" + e.Msg
+func (e *YGOCodecError) Error() string {
+	return "YGOCodecError" + e.Msg
 }
 
 //////////////////////////////////////////////////////////////////////////

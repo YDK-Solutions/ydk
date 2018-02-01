@@ -1,11 +1,11 @@
-YOperationNotSupportedError
+YCPPOperationNotSupportedError
 ==============================
 
 Operation Not Supported Exception.
 
 
-.. cpp:class:: ydk::YOperationNotSupportedError : public YError
+.. cpp:class:: ydk::YCPPOperationNotSupportedError : public YCPPError
 
     Thrown when an operation is not supported.
 
-    .. cpp:function:: YOperationNotSupportedError(const std::string& msg)
+    .. cpp:function:: YCPPOperationNotSupportedError(const std::string& msg)

@@ -171,7 +171,7 @@ void NetconfSession::initialize_client(const string& address,
     else
     {
         YLOG_ERROR("Protocol {} not supported.", protocol);
-        throw(YOperationNotSupportedError{"Protocol is not supported!"});
+        throw(YCPPOperationNotSupportedError{"Protocol is not supported!"});
     }
     model_provider = make_unique<NetconfModelProvider>(*client);
 }
@@ -205,7 +205,7 @@ void NetconfSession::initialize_repo(path::Repository & repo, bool on_demand)
     if(root_schema.get() == nullptr)
     {
         YLOG_ERROR("Root schema cannot be obtained");
-        throw(YIllegalStateError{"Root schema cannot be obtained"});
+        throw(YCPPIllegalStateError{"Root schema cannot be obtained"});
     }
 }
 
@@ -274,7 +274,7 @@ std::shared_ptr<path::DataNode> NetconfSession::handle_netconf_operation(path::R
     if(reply.find("<ok/>") == std::string::npos)
     {
         YLOG_ERROR("Did not receive OK reply from the device");
-        throw(YServiceProviderError{reply});
+        throw(YCPPServiceProviderError{reply});
     }
     return nullptr;
 }
@@ -322,7 +322,7 @@ static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_sch
     auto rpc = shared_ptr<path::Rpc>(root_schema.create_rpc(rpc_name));
     if(rpc == nullptr){
         YLOG_ERROR("Cannot create payload for RPC: {}", rpc_name);
-        throw(YIllegalStateError{"Cannot create payload for RPC: "+ rpc_name});
+        throw(YCPPIllegalStateError{"Cannot create payload for RPC: "+ rpc_name});
     }
     return rpc;
 }
@@ -380,7 +380,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
     auto entity = rpc.get_input_node().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
-        throw(YInvalidArgumentError{"Failed to get entity node"});
+        throw(YCPPInvalidArgumentError{"Failed to get entity node"});
     }
 
     path::DataNode* entity_node = entity[0].get();
@@ -391,7 +391,7 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
 
     if(!datanode){
         YLOG_ERROR("Failed to decode entity node");
-        throw(YInvalidArgumentError{"Failed to decode entity node"});
+        throw(YCPPInvalidArgumentError{"Failed to decode entity node"});
     }
 
     std::string config_payload {};
@@ -412,7 +412,7 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
     auto entity = ydk_rpc.get_input_node().find("filter");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node.");
-        throw(YInvalidArgumentError{"Failed to get entity node"});
+        throw(YCPPInvalidArgumentError{"Failed to get entity node"});
     }
 
     auto datanode = entity[0];
@@ -438,7 +438,7 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
     if(reply.find("<ok/>") == std::string::npos)
     {
         YLOG_ERROR("Did not receive OK reply from the device");
-        throw(YServiceProviderError{reply});
+        throw(YCPPServiceProviderError{reply});
     }
 
     if(candidate_supported)
@@ -456,7 +456,7 @@ static std::shared_ptr<path::DataNode> handle_edit_reply(string reply, NetconfCl
         if(reply.find("<ok/>") == std::string::npos)
         {
             YLOG_ERROR("RPC error occurred: {}", reply);
-            throw(YServiceProviderError{reply});
+            throw(YCPPServiceProviderError{reply});
         }
     }
 
@@ -484,14 +484,14 @@ static std::shared_ptr<path::DataNode> handle_netconf_get_output(const string & 
     if(data_start == std::string::npos)
     {
         YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply);
-        throw(YServiceProviderError{reply});
+        throw(YCPPServiceProviderError{reply});
     }
     data_start+= sizeof("<data>") - 1;
     auto data_end = reply.find("</data>", data_start);
     if(data_end == std::string::npos)
     {
         YLOG_ERROR( "No end data tag found in reply sent by device {}", reply);
-        throw(YError{"No end data tag found"});
+        throw(YCPPError{"No end data tag found"});
     }
 
     string data = reply.substr(data_start, data_end-data_start);
@@ -500,7 +500,7 @@ static std::shared_ptr<path::DataNode> handle_netconf_get_output(const string & 
 
     if(!datanode){
         YLOG_ERROR( "Codec service failed to decode datanode");
-        throw(YError{"Problems deserializing output"});
+        throw(YCPPError{"Problems deserializing output"});
     }
     return datanode;
 }
@@ -554,7 +554,7 @@ static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_sc
     if(c.empty())
     {
         YLOG_ERROR("CRUD create rpc schema not found!");
-        throw(YIllegalStateError{"CRUD create rpc schema not found!"});
+        throw(YCPPIllegalStateError{"CRUD create rpc schema not found!"});
     }
     return c[0];
 }

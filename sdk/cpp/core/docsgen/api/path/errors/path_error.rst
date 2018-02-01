@@ -1,14 +1,14 @@
-YPathError
+YCPPPathError
 =============
 
 
-.. cpp:class:: ydk::path::YPathError : public YCoreError
+.. cpp:class:: ydk::path::YCPPPathError : public YCPPCoreError
 
     Exception that encapsulates the validation errors for YDK Path.
 
     .. cpp:member:: Error err
 
-    .. cpp:function:: YPathError(YPathError::Error error_code)
+    .. cpp:function:: YCPPPathError(YCPPPathError::Error error_code)
 
     .. cpp:enum-class:: Error
 

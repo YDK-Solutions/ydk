@@ -122,9 +122,9 @@ service provider instance and our entity (``bgp_cfg``):
 
     try:
         crud_service.create(sp_instance, bgp_cfg)
-    except YError:
+    except YPYError:
 
-Note if there were any errors the above API will raise a YError exception.
+Note if there were any errors the above API will raise a YPYError exception.
 
 .. _howto-logging:
 

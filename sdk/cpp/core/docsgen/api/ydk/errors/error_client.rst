@@ -1,6 +1,6 @@
-YClientError
+YCPPClientError
 ===============
 
-.. cpp:class:: ydk::YClientError : public YError
+.. cpp:class:: ydk::YCPPClientError : public YCPPError
 
-    .. cpp:function:: YClientError(const std::string& msg)
+    .. cpp:function:: YCPPClientError(const std::string& msg)

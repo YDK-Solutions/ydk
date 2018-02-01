@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         write_json_config(json);
         cout << "Writing JSON config" << endl;
     }
-    catch(YError & e)
+    catch(YCPPError & e)
     {
         cerr << "Error details: " << e << endl;
     }

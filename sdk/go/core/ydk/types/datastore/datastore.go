@@ -50,6 +50,6 @@ func (ds DataStore) String() string {
 		return ""
 	}
 
-	err := types.YError{Msg: "Invalid DataStore value"}
+	err := types.YGOError{Msg: "Invalid DataStore value"}
 	panic(err.Error())
 }

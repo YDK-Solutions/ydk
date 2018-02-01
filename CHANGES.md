@@ -128,7 +128,7 @@ The [backward incompatible](http://ydk.cisco.com/py/docs/backward_compatibility.
  * Improved logging to indicate message directionality ([#388](https://github.com/CiscoDevNet/ydk-gen/pull/388))
  * Provide more details for validation error message for leaf-lists ([#398](https://github.com/CiscoDevNet/ydk-gen/pull/398))
  * Remove indirect python requirements from `setup.py` ([#392](https://github.com/CiscoDevNet/ydk-gen/pull/392))
- * If validation error occurs when decoding payload, include payload as an attribute of the `YModelError` raised ([#381](https://github.com/CiscoDevNet/ydk-gen/pull/381))
+ * If validation error occurs when decoding payload, include payload as an attribute of the `YPYModelError` raised ([#381](https://github.com/CiscoDevNet/ydk-gen/pull/381))
  * Update Python package generation and post YDK-Py on the Python package index - PyPi ([#404](https://github.com/CiscoDevNet/ydk-gen/issues/404), [#406](https://github.com/CiscoDevNet/ydk-gen/issues/406))
 
 #### C++
@@ -256,8 +256,8 @@ The [backward incompatible](http://ydk.cisco.com/py/docs/backward_compatibility.
 ### 2016-06-17 version 0.4.2
  * Error handling improvements
   * Fixed local validation to correctly check for types and values ([#116](https://github.com/CiscoDevNet/ydk-gen/issues/116))
-  * Introduced error hierarchy to represent errors from various components, viz.: YModelErrors, YServiceError, YServiceProviderError ([#133](https://github.com/CiscoDevNet/ydk-gen/issues/133))
-    * When raising YModelErrors, include errors dictionary with key as path to data, and value as tuple of error code and error message
+  * Introduced error hierarchy to represent errors from various components, viz.: YPYModelErrors, YPYServiceError, YPYServiceProviderError ([#133](https://github.com/CiscoDevNet/ydk-gen/issues/133))
+    * When raising YPYModelErrors, include errors dictionary with key as path to data, and value as tuple of error code and error message
   * Added more extensive negative test cases to ydk-gen to test handling of error ([#134](https://github.com/CiscoDevNet/ydk-gen/issues/134))
  * CRUD service / Codec service / Netconf service provider improvements
   * Added support for multiple objects to codec service ([#122](https://github.com/CiscoDevNet/ydk-gen/issues/122))

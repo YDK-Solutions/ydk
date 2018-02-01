@@ -238,7 +238,7 @@ YLeaf & YLeafList::operator [] (size_t key)
 {
     if(key >= values.size())
     {
-        throw(YInvalidArgumentError{"List index out of range"});
+        throw(YCPPInvalidArgumentError{"List index out of range"});
     }
     return values[key];
 }

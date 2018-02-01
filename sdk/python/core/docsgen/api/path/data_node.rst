@@ -26,7 +26,7 @@ DataNode
         This method adds the annotation to this Datanode.
 
         :param annotation: (:py:class:`Annotation<ydk.path.Annotation>`) Annotation to be added.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix in case the argument is invalid.
 
     .. py:method:: annotations()
 
@@ -49,8 +49,8 @@ DataNode
         :param path: (``str``) The XPath expression identifying the node.
         :param value: (``str``) The value to be set.
 
-        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalie.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises RuntimeError: With ``YCPPPathError`` prefix in case the path is invalie.
+        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix in case the argument is invalid.
 
     .. py:method:: find(path)
 
@@ -102,4 +102,4 @@ DataNode
             * This method does not validate the value being set.
 
         :param value: (``str``) The value to set. This should be the string representation of the YANG type.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).
+        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).

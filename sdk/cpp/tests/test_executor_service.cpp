@@ -56,7 +56,7 @@ TEST_CASE("es_close_session_rpc")
 
     CHECK_THROWS_AS(
         es.execute_rpc(provider, rpc2),
-        YClientError
+        YCPPClientError
     );
 }
 
@@ -144,7 +144,7 @@ TEST_CASE("es_delete_config_rpc")
 
     CHECK_THROWS_AS(
         es.execute_rpc(provider, rpc),
-        YServiceProviderError
+        YCPPServiceProviderError
     );
 
     // Discard Changes
@@ -265,7 +265,7 @@ TEST_CASE("es_kill_session_rpc")
    // std::shared_ptr<Entity> reply = es.execute_rpc(provider, rpc);
     CHECK_THROWS_AS(
         es.execute_rpc(provider, rpc),
-        YServiceProviderError
+        YCPPServiceProviderError
     );
 
     // Discard Changes

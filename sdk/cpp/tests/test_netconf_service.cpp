@@ -93,7 +93,7 @@ TEST_CASE("delete_config")
     DataStore target = DataStore::url;
 
 //    auto reply = ns.delete_config(session, target, "http://test");
-    CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YError);
+    CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YCPPError);
 }
 
 // discard_changes
@@ -161,7 +161,7 @@ TEST_CASE("kill_session")
     int session_id = 3;
 
 //    auto reply = ns.kill_session(session, session_id);
-    CHECK_THROWS_AS(ns.kill_session(provider, session_id), YError);
+    CHECK_THROWS_AS(ns.kill_session(provider, session_id), YCPPError);
 }
 
 // lock, unlock

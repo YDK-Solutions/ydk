@@ -33,101 +33,101 @@ static std::string get_libyang_error()
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// YError
+/// YCPPError
 /////////////////////////////////////////////////////////////////////////
-ydk::YError::YError(const std::string& msg) : err_msg{msg}
+ydk::YCPPError::YCPPError(const std::string& msg) : err_msg{msg}
 {
     what();
 }
 
-const char* ydk::YError::what() const noexcept
+const char* ydk::YCPPError::what() const noexcept
 {
     return err_msg.c_str();
 }
 
-std::ostream & ydk::operator<<(std::ostream &stream, const ydk::YError & e)
+std::ostream & ydk::operator<<(std::ostream &stream, const ydk::YCPPError & e)
 {
     stream << e.what();
     return stream;
 }
 
-std::ostream & ydk::operator<<(std::ostream &stream, ydk::YError & e)
+std::ostream & ydk::operator<<(std::ostream &stream, ydk::YCPPError & e)
 {
     stream << e.what();
     return stream;
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// YClientError
+/// YCPPClientError
 /////////////////////////////////////////////////////////////////////////
-ydk::YClientError::YClientError(const std::string& msg)
-    : YError{"YClientError: " + msg}
+ydk::YCPPClientError::YCPPClientError(const std::string& msg)
+    : YCPPError{"YCPPClientError: " + msg}
 {
 
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// YServiceProviderError
+/// YCPPServiceProviderError
 /////////////////////////////////////////////////////////////////////////
-ydk::YServiceProviderError::YServiceProviderError(const std::string& msg)
-    : YError{"YServiceProviderError: " + msg}
+ydk::YCPPServiceProviderError::YCPPServiceProviderError(const std::string& msg)
+    : YCPPError{"YCPPServiceProviderError: " + msg}
 {
 
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// YServiceError
+/// YCPPServiceError
 /////////////////////////////////////////////////////////////////////////
-ydk::YServiceError::YServiceError(const std::string& msg)
-    : YError{"YServiceError: " + msg}
+ydk::YCPPServiceError::YCPPServiceError(const std::string& msg)
+    : YCPPError{"YCPPServiceError: " + msg}
 {
 
 }
 
 /////////////////////////////////////////////////////////////////////////
-/// YCoreError
+/// YCPPCoreError
 /////////////////////////////////////////////////////////////////////////
-ydk::path::YCoreError::YCoreError(const std::string& msg) : ydk::YError{"YCoreError: " + msg}
-{
-
-}
-
-//////////////////////////////////////////////////////////////////////////
-/// YIllegalStateError
-//////////////////////////////////////////////////////////////////////////
-ydk::YIllegalStateError::YIllegalStateError(const std::string& msg) : ydk::YError{"YIllegalStateError: " + msg}
+ydk::path::YCPPCoreError::YCPPCoreError(const std::string& msg) : ydk::YCPPError{"YCPPCoreError: " + msg}
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-/// YInvalidArgumentError
+/// YCPPIllegalStateError
 //////////////////////////////////////////////////////////////////////////
-ydk::YInvalidArgumentError::YInvalidArgumentError(const std::string& msg) : ydk::YError{"YInvalidArgumentError: " + msg}
+ydk::YCPPIllegalStateError::YCPPIllegalStateError(const std::string& msg) : ydk::YCPPError{"YCPPIllegalStateError: " + msg}
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-/// YOperationNotSupportedError
+/// YCPPInvalidArgumentError
 //////////////////////////////////////////////////////////////////////////
-ydk::YOperationNotSupportedError::YOperationNotSupportedError(const std::string& msg) : ydk::YError{"YOperationNotSupportedError: " + msg}
+ydk::YCPPInvalidArgumentError::YCPPInvalidArgumentError(const std::string& msg) : ydk::YCPPError{"YCPPInvalidArgumentError: " + msg}
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-/// YDataValidationError
+/// YCPPOperationNotSupportedError
 //////////////////////////////////////////////////////////////////////////
-ydk::path::YDataValidationError::YDataValidationError() : ydk::path::YCoreError{"YDataValidationError:" + get_libyang_error()}
+ydk::YCPPOperationNotSupportedError::YCPPOperationNotSupportedError(const std::string& msg) : ydk::YCPPError{"YCPPOperationNotSupportedError: " + msg}
 {
 
 }
 
 //////////////////////////////////////////////////////////////////////////
-/// YPathError
+/// YCPPDataValidationError
 //////////////////////////////////////////////////////////////////////////
-ydk::path::YPathError::YPathError(ydk::path::YPathError::Error error_code) : ydk::path::YCoreError{"Data Validation Error"}, err{error_code}
+ydk::path::YCPPDataValidationError::YCPPDataValidationError() : ydk::path::YCPPCoreError{"YCPPDataValidationError:" + get_libyang_error()}
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+/// YCPPPathError
+//////////////////////////////////////////////////////////////////////////
+ydk::path::YCPPPathError::YCPPPathError(ydk::path::YCPPPathError::Error error_code) : ydk::path::YCPPCoreError{"Data Validation Error"}, err{error_code}
 {
 
 }
@@ -135,23 +135,23 @@ ydk::path::YPathError::YPathError(ydk::path::YPathError::Error error_code) : ydk
 
 
 /////////////////////////////////////////////////////////////////////////
-/// YCodecError
+/// YCPPCodecError
 /////////////////////////////////////////////////////////////////////////
-ydk::path::YCodecError::YCodecError(YCodecError::Error ec) : YCoreError("YCodecError:" + get_libyang_error()), err{ec}
+ydk::path::YCPPCodecError::YCPPCodecError(YCPPCodecError::Error ec) : YCPPCoreError("YCPPCodecError:" + get_libyang_error()), err{ec}
 {
 
 }
 
 
 /////////////////////////////////////////////////////////////////////////
-/// YModelError
+/// YCPPModelError
 /////////////////////////////////////////////////////////////////////////
-ydk::YModelError::YModelError() : ydk::YError{"YModelError: " + std::string(ly_errmsg()) + " Path: " + std::string(ly_errpath())}
+ydk::YCPPModelError::YCPPModelError() : ydk::YCPPError{"YCPPModelError: " + std::string(ly_errmsg()) + " Path: " + std::string(ly_errpath())}
 {
 
 }
 
-ydk::YModelError::YModelError(const std::string& msg) : ydk::YError{"YModelError: " + msg+" : " + get_libyang_error()}
+ydk::YCPPModelError::YCPPModelError(const std::string& msg) : ydk::YCPPError{"YCPPModelError: " + msg+" : " + get_libyang_error()}
 {
 
 }

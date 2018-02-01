@@ -1,11 +1,11 @@
-YCoreError
+YCPPCoreError
 =============
 
 
-.. cpp:class:: ydk::path::YCoreError : public ydk::YError
+.. cpp:class:: ydk::path::YCPPCoreError : public ydk::YCPPError
 
     The subclasses give a specialized view of the error that has occurred.
 
-    .. cpp:function:: YCoreError()
+    .. cpp:function:: YCPPCoreError()
 
-    .. cpp:function:: YCoreError(const std::string& msg)
+    .. cpp:function:: YCPPCoreError(const std::string& msg)

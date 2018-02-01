@@ -122,7 +122,7 @@ TEST_CASE("test_create")
     REQUIRE(reply);
 
     //CREATE AGAIN WITH ERROR
-    CHECK_THROWS_AS(crud.update(provider, *r_1), YServiceProviderError);
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }
 
 TEST_CASE("test_delete")
@@ -175,7 +175,7 @@ TEST_CASE("test_delete")
     e_1->number = 1;
     e_1->yfilter = YFilter::delete_;
     r_1->one_list->ldata.push_back(move(e_1));
-    CHECK_THROWS_AS(crud.update(provider, *r_1), YServiceProviderError);
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }
 
 TEST_CASE("test_remove")
@@ -255,7 +255,7 @@ TEST_CASE("delete_leaf")
     REQUIRE(reply);
 
     //DELETE AGAIN WITH ERROR
-    CHECK_THROWS_AS(crud.update(provider, r_2), YServiceProviderError);
+    CHECK_THROWS_AS(crud.update(provider, r_2), YCPPServiceProviderError);
 }
 
 
@@ -281,5 +281,5 @@ TEST_CASE("delete_leaflist")
     REQUIRE(reply);
 
     //DELETE AGAIN WITH ERROR
-    CHECK_THROWS_AS(crud.update(provider, *r_1), YServiceProviderError);
+    CHECK_THROWS_AS(crud.update(provider, *r_1), YCPPServiceProviderError);
 }

@@ -1,9 +1,9 @@
-YCPPInvalidArgumentError
+YInvalidArgumentError
 ========================
 
 
-.. cpp:class:: ydk::YCPPInvalidArgumentError : public YCPPError
+.. cpp:class:: ydk::YInvalidArgumentError : public YError
 
     Use the msg for the error.
 
-    .. cpp:function:: YCPPInvalidArgumentError(const std::string& msg)
+    .. cpp:function:: YInvalidArgumentError(const std::string& msg)

@@ -139,7 +139,7 @@ class SanityTest(unittest.TestCase):
         self.assertIsNotNone(reply)
         self.assertEqual(reply, runner)
 
-    @unittest.skip('YCPPServiceProviderError')
+    @unittest.skip('YServiceProviderError')
     def test_kill_session(self):
         rpc = ietf_netconf.KillSession()
         rpc.input.session_id = 3

@@ -16,4 +16,4 @@ Executor Service
         :param rpc_entity: An rpc instance of :cpp:class:`Entity<ydk::Entity>` class defined under a bundle.
         :param top_entity: Optional arg that should be provided when expecting data to be returned.
         :return: The requested data as :cpp:class:`Entity<ydk::Entity>` or nullptr if N/A.
-        :raises YCPPError: If an error has occurred.
+        :raises YError: If an error has occurred.

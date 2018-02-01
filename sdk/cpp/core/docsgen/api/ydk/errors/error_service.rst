@@ -1,9 +1,9 @@
-YCPPServiceError
+YServiceError
 ================
 
 
-.. cpp:class:: ydk::YCPPServiceError : public YCPPError
+.. cpp:class:: ydk::YServiceError : public YError
 
     Exception for service.
 
-    .. cpp:function:: YCPPServiceError(const std::string& msg)
+    .. cpp:function:: YServiceError(const std::string& msg)

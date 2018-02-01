@@ -54,7 +54,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
         containing this attribute is added to the configuration if
         and only if the configuration data does not already exist in
         the configuration datastore. If the configuration data
-        exists, an error (:go:struct:`YGOServiceProviderError<ydk/types/YGOServiceProviderError>`) will be thrown
+        exists, an error (:go:struct:`YServiceProviderError<ydk/types/YServiceProviderError>`) will be thrown
         with XML error message.
 
     .. attribute:: Remove
@@ -75,7 +75,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
         containing this attribute is deleted from the configuration
         if and only if the configuration data currently exists in
         the configuration datastore. If the configuration data does
-        not exist, an :go:struct:`YGOServiceProviderError<ydk/types/YGOServiceProviderError>` will be
+        not exist, an :go:struct:`YServiceProviderError<ydk/types/YServiceProviderError>` will be
         thrown with XML error message.
 
     .. attribute:: Replace

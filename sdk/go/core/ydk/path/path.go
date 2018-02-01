@@ -790,25 +790,25 @@ func checkState(cstate *C.YDKStatePtr) error {
 
 	switch cerrorType {
 	case C.YDK_CLIENT_ERROR:
-		return &types.YGOClientError{Msg: errMsg}
+		return &types.YClientError{Msg: errMsg}
 	case C.YDK_SERVICE_PROVIDER_ERROR:
-		return &types.YGOServiceProviderError{Msg: errMsg}
+		return &types.YServiceProviderError{Msg: errMsg}
 	case C.YDK_SERVICE_ERROR:
-		return &types.YGOServiceError{Msg: errMsg}
+		return &types.YServiceError{Msg: errMsg}
 	case C.YDK_ILLEGAL_STATE_ERROR:
-		return &types.YGOIllegalStateError{Msg: errMsg}
+		return &types.YIllegalStateError{Msg: errMsg}
 	case C.YDK_INVALID_ARGUMENT_ERROR:
-		return &types.YGOInvalidArgumentError{Msg: errMsg}
+		return &types.YInvalidArgumentError{Msg: errMsg}
 	case C.YDK_OPERATION_NOTSUPPORTED_ERROR:
-		return &types.YGOOperationNotSupportedError{Msg: errMsg}
+		return &types.YOperationNotSupportedError{Msg: errMsg}
 	case C.YDK_MODEL_ERROR:
-		return &types.YGOModelError{Msg: errMsg}
+		return &types.YModelError{Msg: errMsg}
 	case C.YDK_CORE_ERROR:
-		return &types.YGOCoreError{Msg: errMsg}
+		return &types.YCoreError{Msg: errMsg}
 	case C.YDK_CODEC_ERROR:
-		return &types.YGOCodecError{Msg: errMsg}
+		return &types.YCodecError{Msg: errMsg}
 	default:
-		return &types.YGOError{Msg: errMsg}
+		return &types.YError{Msg: errMsg}
 	}
 }
 

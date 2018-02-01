@@ -35,6 +35,6 @@ ValidationService
         :param provider: An instance of :cpp:class:`ServiceProvider<ydk::path::ServiceProvider>`
         :param entity: An instance of :cpp:class:`Entity<Entity>` class defined under a bundle
         :param option: An instance of type :cpp:class:`Option<Option>`
-        :raises YCPPError: If validation errors were detected
+        :raises YError: If validation errors were detected
 
     .. cpp:function:: virtual ~ValidationService()

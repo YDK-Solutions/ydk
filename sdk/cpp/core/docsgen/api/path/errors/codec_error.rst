@@ -1,14 +1,14 @@
-YCPPCodecError
+YCodecError
 ==============
 
 
-.. cpp:class:: ydk::path::YCPPCodecError : public YCPPCoreError
+.. cpp:class:: ydk::path::YCodecError : public YCoreError
 
     Exception that encapsulates the validation errors for YDK :cpp:class:`CodecService`.
 
     .. cpp:member: Error err
 
-    .. cpp:function:: YCPPCodecError(YCPPCodecError::Error merror)
+    .. cpp:function:: YCodecError(YCodecError::Error merror)
 
     .. cpp:enum-class:: Error
 

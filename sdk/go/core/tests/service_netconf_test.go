@@ -77,7 +77,7 @@ func (suite *NetconfServiceTestSuite) TestLockUnlockFail() {
 
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Unlock(&suite.Provider, datastore.Running) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp("YServiceProviderError:", panicValue)
 	errMsg := `<rpc-error>
     <error-type>application</error-type>
     <error-tag>operation-failed</error-tag>
@@ -217,7 +217,7 @@ func (suite *NetconfServiceTestSuite) TestCloseSession() {
 
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Lock(&suite.Provider, datastore.Running) })
 	suite.Equal(funcDidPanic, true)
-	suite.Equal(panicValue, "YGOClientError: Could not send payload")
+	suite.Equal(panicValue, "YClientError: Could not send payload")
 
 	suite.Provider.Connect()
 

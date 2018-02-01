@@ -8,7 +8,7 @@
   * Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664)) 
   * Improved formatting of payloads in logging output ([#670](https://github.com/CiscoDevNet/ydk-gen/issues/670))
 ##### Error handling improvements
-  * Fixed naming of errors across C++, Python and Go to be consistent. Changed YPYError, YCPPError etc to YError ([#669](https://github.com/CiscoDevNet/ydk-gen/issues/669), [#668](https://github.com/CiscoDevNet/ydk-gen/issues/668))
+  * Fixed naming of errors across C++ and Go to be consistent. Changed YCPPError, YError etc to YError ([#669](https://github.com/CiscoDevNet/ydk-gen/issues/669), [#668](https://github.com/CiscoDevNet/ydk-gen/issues/668))
   * Fixed warning in CMake build system to look for CMake version of `3.0.0` or greater ([#655](https://github.com/CiscoDevNet/ydk-gen/issues/655))
 ##### Documentation improvements
   * Improved documentation for models which augment other models ([#426](https://github.com/CiscoDevNet/ydk-gen/issues/426))

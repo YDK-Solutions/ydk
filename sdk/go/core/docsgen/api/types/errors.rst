@@ -96,106 +96,106 @@ Errors
     :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOServiceProviderError
+.. go:struct:: YServiceProviderError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOServiceProviderError) Error()
+.. function:: (e *YServiceProviderError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOServiceError
+.. go:struct:: YServiceError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOServiceError) Error()
+.. function:: (e *YServiceError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOIllegalStateError
+.. go:struct:: YIllegalStateError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOIllegalStateError) Error()
+.. function:: (e *YIllegalStateError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOInvalidArgumentError
+.. go:struct:: YInvalidArgumentError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOInvalidArgumentError) Error()
+.. function:: (e *YInvalidArgumentError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOOperationNotSupportedError
+.. go:struct:: YOperationNotSupportedError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOOperationNotSupportedError) Error()
+.. function:: (e *YOperationNotSupportedError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOModelError
+.. go:struct:: YModelError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOModelError) Error()
+.. function:: (e *YModelError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOCoreError
+.. go:struct:: YCoreError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOCoreError) Error()
+.. function:: (e *YCoreError) Error()
 
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``
 
-.. go:struct:: YGOCodecError
+.. go:struct:: YCodecError
 
     .. attribute:: Msg
 
         Represents the error message. Type is ``string``
 
-.. function:: (e *YGOCodecError) Error()
+.. function:: (e *YCodecError) Error()
     
     Satisfies the error interface
 
-    :return: Msg of given YGOError
+    :return: Msg of given YError
     :rtype: A Go ``string``

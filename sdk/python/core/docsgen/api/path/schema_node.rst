@@ -28,8 +28,8 @@ SchemaNode
         :param path: (``str``) The path expression.
         :return: List of schema node satisfies the criterion.
         :rtype: list of :py:class:`SchemaNode`
-        :raises RuntimeError: With ``YCPPPathError`` prefix if the path expression in invalid, see error code for details.
-        :raises RuntimeError: With ``YCPPInvalidArgumentError`` if the argument is invalid.
+        :raises RuntimeError: With ``YPathError`` prefix if the path expression in invalid, see error code for details.
+        :raises RuntimeError: With ``YInvalidArgumentError`` if the argument is invalid.
 
     .. py:method:: get_parent()
 

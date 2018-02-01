@@ -36,7 +36,7 @@ TEST_CASE("one_level_pos_set")
     auto r_1 = make_unique<ydktest_sanity::Runner>();
 
     r_1->ydktest_sanity_one->number = 1;
-    r_1->ydktest_sanity_one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+    r_1->ydktest_sanity_one->name = "1.2.3.4";
     bool reply = crud.create(provider, *r_1->ydktest_sanity_one);
     REQUIRE(reply);
 }
@@ -53,7 +53,7 @@ TEST_CASE("one_level_pos")
     REQUIRE(reply);
 
     r_1->ydktest_sanity_one->number = 1;
-    r_1->ydktest_sanity_one->name = "-|90|1-0|240|25-.-|90|199|200|25-.9|1-|1-9|240|250.-|99|199|2-9|25-";
+    r_1->ydktest_sanity_one->name = "1.2.3.4";
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
 

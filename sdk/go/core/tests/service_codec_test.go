@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	xmlBgpPayload = `<bgp xmlns="http://openconfig.net/yang/bgp">
+	xmlBgpPayload = `<?xml version="1.0"?><bgp xmlns="http://openconfig.net/yang/bgp">
   <global>
     <config>
       <as>65172</as>
@@ -75,7 +75,7 @@ const (
 }
 `
 
-	xmlRunnerPayload = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+	xmlRunnerPayload = `<?xml version="1.0"?><runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <two-list>
     <ldata>
       <number>21</number>
@@ -105,7 +105,7 @@ const (
 </runner>
 `
 
-	xmlRunnerPayload2 = `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+	xmlRunnerPayload2 = `<?xml version="1.0"?><runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <ytypes>
     <built-in-t>
       <enum-value>local</enum-value>
@@ -157,7 +157,7 @@ const (
   }
 }`
 
-	xmlOCPatternPayload = `<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
+	xmlOCPatternPayload = `<?xml version="1.0"?><oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
   <a>Hello</a>
 </oc-A>
 `

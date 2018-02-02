@@ -31,7 +31,7 @@ import logging
 
 from session_mgr import establish_session, init_logging
 from ydk.models.openconfig.openconfig_interfaces import Interfaces
-from ydk.errors import YError
+from ydk.errors import YPYError
 
 
 
@@ -102,7 +102,7 @@ def read_interfaces(crud_service, provider):
         interfaces = crud_service.read(provider, interfaces_filter)
         for interface in interfaces.interface:
             print_interface(interface)
-    except YError:
+    except YPYError:
         print('An error occurred reading interfaces.')
 
 
@@ -114,7 +114,7 @@ def create_interfaces_config(crud_service, provider):
 
     try:
         crud_service.create(provider, interface)
-    except YError:
+    except YPYError:
         print('An error occurred creating the interface.')
 
 

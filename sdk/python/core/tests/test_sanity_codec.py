@@ -376,10 +376,10 @@ class SanityYang(unittest.TestCase):
         system_encode = ysanity_typedefs.System()
         system_encode.mode = ysanity_typedefs.TopMode.stand_alone
         system_encode.id = 22;
-        
+
         self.provider.encoding = EncodingFormat.XML
         payload = self.codec.encode(self.provider, system_encode)
-        
+
         system_decode = self.codec.decode(self.provider, payload)
         self.assertEqual(system_encode, system_decode)
 

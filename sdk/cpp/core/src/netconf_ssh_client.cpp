@@ -110,7 +110,7 @@ int NetconfSSHClient::connect()
 std::string NetconfSSHClient::get_hostname_port()
 {
     ostringstream os;
-    os<<hostname<<":"<<port;
+    os<<hostname<<"_"<<port;
     return os.str();
 }
 

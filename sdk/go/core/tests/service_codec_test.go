@@ -9,6 +9,7 @@ import (
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
+	ysanity_typedefs "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity_typedefs"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -413,6 +414,21 @@ func (suite *CodecTestSuite) TestXMLDecodeOCPattern() {
 	ocA := entity.(*oc_pattern.OcA)
 
 	suite.Equal(types.EntityEqual(entity, ocA), true)
+}
+
+func (suite *CodecTestSuite) TestTypedefsXMLEncodeDecode() {
+	systemEncode := ysanity_typedefs.System{}
+	systemEncode.Id = 22
+	systemEncode.Mode = ysanity_typedefs.TopMode_stand_alone
+
+	suite.Provider.Encoding = encoding.XML
+
+	payload := suite.Codec.Encode(&suite.Provider, &systemEncode)
+
+	entity := suite.Codec.Decode(&suite.Provider, payload)
+	systemDecode := entity.(*ysanity_typedefs.System)
+
+	suite.Equal(types.EntityEqual(&systemEncode, systemDecode), true)
 }
 
 func TestCodecTestSuite(t *testing.T) {

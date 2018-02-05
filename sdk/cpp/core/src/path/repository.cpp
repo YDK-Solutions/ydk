@@ -41,8 +41,9 @@ namespace ydk
 {
 static bool file_exists(const std::string & path)
 {
-    struct stat st = {0};
+    struct stat st;
 
+    memset( &st, 0, sizeof(struct stat));
     return stat(path.c_str(), &st) == 0;
 }
 
@@ -279,7 +280,7 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
         YLOG_INFO("Path where models are to be downloaded: {}", path);
     }
     YLOG_DEBUG("Creating libyang context in path: {}", path);
-    struct ly_ctx* ctx = ly_ctx_new(path.c_str());
+    struct ly_ctx* ctx = ly_ctx_new(path.c_str(), LY_CTX_ALLIMPLEMENTED);
 
     if(!ctx) {
         YLOG_ERROR("Could not create repository in: {}", path);
@@ -289,7 +290,7 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
     //set module callback (only if there is a model provider)
     if(!model_providers.empty())
     {
-        ly_ctx_set_module_clb(ctx, get_module_callback, this);
+        ly_ctx_set_module_imp_clb(ctx, get_module_callback, this);
     }
 
     return ctx;
@@ -462,11 +463,11 @@ ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, co
 
     YLOG_DEBUG("Module '{}' Revision '{}'", module.c_str(), revision.c_str());
 
-    auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? 0 : revision.c_str());
+    auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str(), 1);
 
     if(!p)
     {
-        p = ly_ctx_load_module(ctx, module.c_str(), revision.empty() ? 0 : revision.c_str());
+        p = ly_ctx_load_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str());
     } else {
         YLOG_DEBUG("Cache hit Module '{}' Revision '{}'", module, revision);
         new_module = false;

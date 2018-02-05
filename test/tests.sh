@@ -31,7 +31,7 @@ PY_TEST="python3"
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** tests.sh | $1${NOCOLOR}"
+    echo -e "${RED}*** $(date): tests.sh | $1${NOCOLOR}"
 }
 
 function run_exec_test {
@@ -44,7 +44,7 @@ function run_exec_test {
 }
 
 function run_test_no_coverage {
-    print_msg "executing no coverage: $@"
+    print_msg "Executing: $@"
     python $@
     local status=$?
     if [ $status -ne 0 ]; then
@@ -54,11 +54,11 @@ function run_test_no_coverage {
 }
 
 function run_test {
-    if [[ $(command -v coverage) ]]; then
-        print_msg "executing with coverage: $@"
+    if [[ $(command -v coverage) && ${os_type} == "Linux" ]]; then
+        print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
-        print_msg "status is ${status}"
+        print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
             exit $status
         fi
@@ -73,7 +73,7 @@ function pip_check_install {
     if [[ $(uname) == "Linux" ]] ; then
         os_info=$(cat /etc/*-release)
         if [[ ${os_info} == *"fedora"* ]]; then
-            print_msg "custom pip install of $@ for centos"
+            print_msg "Custom pip install of $@ for CentOS"
             pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps $@
             return
         fi
@@ -101,28 +101,24 @@ function init_confd_ydktest {
 }
 
 function init_rest_server {
-    print_msg "starting rest server"
+    print_msg "Starting REST server"
     ./test/start_rest_server.sh
-    print_msg "Rest server started"
 }
 
 function init_tcp_server {
-    print_msg "starting TCP server"
+    print_msg "Starting TCP server"
     ./test/start_tcp_server.sh
-    print_msg "TCP server started"
     export TCP_SERVER_PID=$tcp_pid
-    echo $TCP_SERVER_PID
+    print_msg "TCP server started with PID: $TCP_SERVER_PID"
 }
 
 function stop_tcp_server {
-    print_msg "stopping TCP server process id: $TCP_SERVER_PID"
+    print_msg "Stopping TCP server with PID: $TCP_SERVER_PID"
     kill $TCP_SERVER_PID
 }
 
 function init_py_env {
-    print_msg "Initializing python env"
-    os_type=$(uname)
-    print_msg "OS: $os_type"
+    print_msg "Initializing Python environment"
     if [[ ${os_type} == "Darwin" ]] ; then
         virtualenv macos_pyenv -p python3.6
         source macos_pyenv/bin/activate
@@ -131,10 +127,10 @@ function init_py_env {
 }
 
 function init_go_env {
-    print_msg "Initializing Go env"
+    print_msg "Initializing Go environment"
 
-    print_msg "${GOPATH}"
-    print_msg "${GOROOT}"
+    print_msg "GOPATH is set to: ${GOPATH}"
+    print_msg "GOROOT is set to: ${GOROOT}"
 
     export PATH=$PATH:$GOPATH/bin
     export PATH=$PATH:$GOROOT/bin
@@ -146,7 +142,7 @@ function init_go_env {
         export GOPATH="$(pwd)/golang":$GOPATH
     fi
 
-    print_msg "new: ${GOPATH}"
+    print_msg "Changed GOPATH setting to: ${GOPATH}"
 
     go get github.com/stretchr/testify
 }
@@ -392,7 +388,8 @@ function py_sanity_ydktest_install {
 function py_sanity_ydktest_test {
     print_msg "py_sanity_ydktest_test"
 
-    cd $YDKGEN_HOME && cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
+    cd $YDKGEN_HOME
+    cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
     pip uninstall ydk -y
@@ -630,9 +627,11 @@ function py_test_gen {
 ######################################
 export YDKGEN_HOME="$(pwd)"
 
-print_msg "YDKGEN_HOME is ${YDKGEN_HOME}"
-print_msg "python location: $(which python)"
-print_msg "$(python -V)"
+os_type=$(uname)
+print_msg "Running OS type: $os_type"
+print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
+print_msg "Python location: $(which python)"
+$(python -V)
 
 CMAKE_BIN=cmake
 which cmake3
@@ -666,5 +665,8 @@ cd $YDKGEN_HOME
 find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
-print_msg "combining python coverage for Linux"
-coverage combine > /dev/null || echo "Coverage not combined"
+
+if [[ ${os_type} == "Linux" ]] ; then
+    print_msg "Combining Python coverage for Linux"
+    coverage combine > /dev/null || echo "Coverage not combined"
+fi

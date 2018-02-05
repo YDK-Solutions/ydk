@@ -308,20 +308,15 @@ ydk::path::DataNodeImpl::find(const std::string& path)
     if(m_node == nullptr) {
         return results;
     }
-    std::string spath{path};
 
-    auto s = get_schema_node().get_statement();
-    if(s.keyword == "rpc"){
-        spath="input/" + spath;
-    }
-    YLOG_DEBUG("Getting child schema with path '{}' in {}", spath, m_node->schema->name);
+    YLOG_DEBUG("Getting child schema with path '{}' in {}", path, m_node->schema->name);
     const lys_node* found_snode =
-        ly_ctx_get_node(m_node->schema->module->ctx, m_node->schema, spath.c_str());
+        ly_ctx_get_node(m_node->schema->module->ctx, m_node->schema, path.c_str(), 0);
 
     if(found_snode)
     {
         YLOG_DEBUG("Getting data nodes with path '{}'", path);
-        ly_set* result_set = lyd_find_xpath(m_node, path.c_str());
+        ly_set* result_set = lyd_find_path(m_node, path.c_str());
         if( result_set )
         {
             if (result_set->number > 0)
@@ -334,7 +329,6 @@ ydk::path::DataNodeImpl::find(const std::string& path)
             }
             ly_set_free(result_set);
         }
-
     }
 
     return results;
@@ -484,13 +478,16 @@ ydk::path::DataNodeImpl::remove_annotation(const ydk::path::Annotation& an)
 
     lyd_attr* attr = m_node->attr;
     while(attr){
-        lys_module *module = attr->module;
-        if(module){
-            Annotation an1{module->ns, attr->name, attr->value};
-            if (an == an1){
-                lyd_free_attr(m_node->schema->module->ctx, m_node, attr, 0);
-                return true;
-            }
+        lyd_node* node = attr->parent;
+        if (node && node->schema) {
+			lys_module* module = node->schema->module;
+			if(module){
+				Annotation an1{module->ns, attr->name, attr->value_str};
+				if (an == an1){
+					lyd_free_attr(m_node->schema->module->ctx, m_node, attr, 0);
+					return true;
+				}
+			}
         }
     }
 
@@ -505,15 +502,16 @@ ydk::path::DataNodeImpl::annotations()
     if(m_node) {
         lyd_attr* attr = m_node->attr;
         while(attr) {
-            lys_module *module = attr->module;
-            if(module) {
-                ann.emplace_back(module->ns, attr->name, attr->value);
-
+            lyd_node* node = attr->parent;
+            if (node && node->schema) {
+    			lys_module* module = node->schema->module;
+				if(module) {
+					ann.emplace_back(module->ns, attr->name, attr->value_str);
+				}
             }
             attr = attr->next;
         }
     }
-
 
     return ann;
 }

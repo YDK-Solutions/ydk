@@ -139,7 +139,7 @@ ydk::path::SchemaNodeImpl::find(const string& path)
     vector<SchemaNode*> ret;
     struct ly_ctx* ctx = m_node->module->ctx;
 
-    const struct lys_node* found_node = ly_ctx_get_node(ctx, m_node, path.c_str());
+    const struct lys_node* found_node = ly_ctx_get_node(ctx, m_node, path.c_str(), 0);
 
     if (found_node)
     {
@@ -260,6 +260,9 @@ ydk::path::SchemaNodeImpl::get_statement() const
         break;
     case LYS_ACTION:
         s.keyword = "action";
+        break;
+    case LYS_EXT:
+        s.keyword = "extension";
         break;
     case LYS_ANYDATA:
     case LYS_UNKNOWN:

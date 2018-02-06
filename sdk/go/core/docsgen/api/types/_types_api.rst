@@ -11,4 +11,3 @@ Types
     base_constants/yfilters.rst
     base_constants/ytype.rst
     ydk_types.rst
-    errors.rst

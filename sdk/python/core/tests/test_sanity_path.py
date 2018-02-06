@@ -128,6 +128,21 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )
 
+    def test_anyxml(self):
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?><bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
+
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?>
+            <bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

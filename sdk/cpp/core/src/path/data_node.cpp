@@ -114,11 +114,25 @@ ydk::path::DataNodeImpl::populate_new_schemas_from_path(const std::string& path)
 ydk::path::DataNode&
 ydk::path::DataNodeImpl::create_datanode(const std::string& path, const std::string& value)
 {
+    std::string v = value;
+    if(value.substr(0, 5) == "<?xml") {
+        for(unsigned int i = 5; i<value.length(); i++) {
+            if (value[i] == '>'){
+                v = value.substr(i+1);
+                break;
+            }
+        }
+
+        if(v != value){
+            YLOG_DEBUG("Replacing 'value' with '{}'", v);
+        }
+    }
+
     YLOG_DEBUG("Populating schemas for {}", path);
     populate_new_schemas_from_path(path);
-    YLOG_DEBUG("Populating schemas for {}", value);
-    populate_new_schemas_from_path(value);
-    return create_helper(path, value);
+    YLOG_DEBUG("Populating schemas for {}", v);
+    populate_new_schemas_from_path(v);
+    return create_helper(path, v);
 }
 
 ydk::path::DataNode&

@@ -361,6 +361,17 @@ class SanityYang(unittest.TestCase):
         no_key_payload = self.codec.encode(xml_provider, no_key, subtree=True)
         self.assertEqual(payload, no_key_payload)
 
+    def test_anyxml(self):
+        provider = CodecServiceProvider(type='xml')
+        payload = '<?xml version="1.0"?><runner xmlns="http://cisco.com/ns/yang/ydktest-sanity"/>'
+        result = self.codec.decode(provider, payload)
+        self.assertIsNotNone(result)
+
+        payload = '''<?xml version="1.0"?>
+        <runner xmlns="http://cisco.com/ns/yang/ydktest-sanity"/>'''
+        result = self.codec.decode(provider, payload)
+        self.assertIsNotNone(result)
+
     @assert_with_error("Subtree option can only be used with XML encoding", YPYServiceError)
     def test_decode_invalid_subtree_1(self):
         self.provider.encoding = EncodingFormat.JSON

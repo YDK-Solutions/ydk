@@ -65,16 +65,16 @@ ydk::path::SchemaNodeImpl::populate_augmented_schema_node(vector<lys_node*>& anc
         }
     }
     else {
-        while(node) {
-            auto p = node;
-            while(p && (p->nodetype == LYS_USES)) {
+        const struct lys_node *last = nullptr;
+        while (auto p = lys_getnext(last, node->parent, nullptr, 0)) {
+        	last = p;
+            while (p->nodetype == LYS_USES) {
                 p = p->child;
             }
             if (p) {
                 YLOG_DEBUG("Populating new schema node '{}'", string(p->name));
                 m_children.emplace_back(make_unique<SchemaNodeImpl>(this, const_cast<struct lys_node*>(p)));
             }
-            node = node->next;
         }
     }
 }

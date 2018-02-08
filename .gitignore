@@ -27,3 +27,4 @@ gen-api/
 *.sublime-project
 *.sublime-workspace
 *.idea
+scripts

@@ -679,7 +679,7 @@ module ydktest-sanity {
 
   container runner {
 
-    //uses nested-naming;
+    uses nested-naming;
 
     //container at 1,2,3 nested level
     uses one-level;
@@ -717,4 +717,21 @@ module ydktest-sanity {
         }
     }
   }
+  
+  container native {
+
+    leaf version {
+      description "Version";
+      type string;
+    }
+
+    leaf hostname {
+      description "Set system's network name";
+      type string;
+    }
+
+    uses config-interface-grouping;
+
+  } // native
+
 }

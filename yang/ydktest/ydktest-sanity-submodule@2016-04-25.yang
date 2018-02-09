@@ -60,4 +60,74 @@ submodule ydktest-sanity-submodule {
   container sub-test {
       uses one-sub-level;
   }
+  
+  grouping interface-common-grouping {
+    // interface * / description
+    leaf description {
+      description
+        "Interface specific description";
+      type string {
+        length "0..240";
+      }
+    }
+
+    // interface * / mtu
+    leaf mtu {
+      description
+        "Set the interface Maximum Transmission Unit (MTU)";
+      type uint16 {
+        range "64..18000";
+      }
+    }
+  }
+
+  grouping config-interface-grouping {
+    container interface { 
+      description
+        "Configure Interfaces";
+ 
+      // interface GigabitEthernet
+      list Gigabitethernet {
+        description
+          "GigabitEthernet IEEE 802.3z";
+        key "name";
+        leaf name {
+          type string;
+        }
+        leaf media-type {
+          description
+            "Media type";
+          type enumeration {
+            enum "auto-select";
+            enum "rj45";
+            enum "sfp";
+          }
+        }
+        uses interface-common-grouping;
+      }
+
+      // interface Loopback
+      list Loopback {
+        description
+          "Loopback interface";
+        key "name";
+        leaf name {
+          type uint32;
+        }
+        uses interface-common-grouping;
+      }
+
+      // interface Tunnel #
+      list Tunnel {
+        description
+          "Tunnel interface";
+        key "name";
+        leaf name {
+          type uint32;
+        }
+        uses interface-common-grouping;
+      }
+    }
+  }
+
 }

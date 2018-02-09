@@ -717,4 +717,21 @@ module ydktest-sanity {
         }
     }
   }
+  
+  container native {
+
+    leaf version {
+      description "Version";
+      type string;
+    }
+
+    leaf hostname {
+      description "Set system's network name";
+      type string;
+    }
+
+    uses config-interface-grouping;
+
+  } // native
+
 }

@@ -69,6 +69,7 @@ namespace ydk {
 
         public:
             std::string path;
+            std::vector<path::Capability> server_caps;
 
         private:
             ly_ctx* create_ly_context();
@@ -81,6 +82,8 @@ namespace ydk {
             const lys_module* load_module(ly_ctx* ctx, ydk::path::Capability& capability, bool& new_module);
             const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision);
             const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision, const std::vector<std::string>& features, bool& new_module);
+
+            void get_module_capabilities(ydk::path::Capability& capability);
 
          private:
             std::vector<ModelProvider*> model_providers;

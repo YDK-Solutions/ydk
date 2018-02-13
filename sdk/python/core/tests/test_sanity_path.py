@@ -128,22 +128,11 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )
 
-
-    def enable_logging(self):
-        import logging
-        log = logging.getLogger('ydk')
-        log.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-        handler.setFormatter(formatter)
-        log.addHandler(handler)
-        
     def test_create_gre_tunnel_on_demand(self):
-        #self.enable_logging()
+        #enable_logging()
 
         from ydk.models.ydktest import ydktest_sanity as ysanity
         from ydk.providers import NetconfServiceProvider
-        from ydk.services  import NetconfService, Datastore
         from ydk.services  import CRUDService
 
         provider = NetconfServiceProvider(
@@ -153,7 +142,7 @@ class SanityTest(unittest.TestCase):
             12022)
 
         native = ysanity.Native()
-        
+
         tunnel = native.interface.Tunnel()
         tunnel.name = 521
         tunnel.description = "test tunnel"
@@ -169,6 +158,15 @@ class SanityTest(unittest.TestCase):
         crud_service = CRUDService();
         crud_service.create(provider, native)
 
+def enable_logging():
+    import logging
+    log = logging.getLogger('ydk')
+    log.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+        
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()
 

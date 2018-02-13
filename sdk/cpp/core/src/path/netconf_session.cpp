@@ -194,19 +194,19 @@ void NetconfSession::initialize_repo(path::Repository & repo, bool on_demand)
 
     std::vector<path::Capability> yang_caps;
     std::vector<std::string> empty_caps;
-
+    std::vector<path::Capability> all_caps = capabilities_parser.parse(server_capabilities);
     if (on_demand)
         yang_caps = capabilities_parser.parse(empty_caps);
     else
-        yang_caps = capabilities_parser.parse(server_capabilities);
+        yang_caps = all_caps;
 
     root_schema = repo.create_root_schema(lookup_table, yang_caps);
-
     if(root_schema.get() == nullptr)
     {
         YLOG_ERROR("Root schema cannot be obtained");
         throw(YIllegalStateError{"Root schema cannot be obtained"});
     }
+    repo.set_server_capabilities(all_caps);
 }
 
 NetconfSession::~NetconfSession()

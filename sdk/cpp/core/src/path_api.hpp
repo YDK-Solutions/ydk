@@ -969,6 +969,7 @@ public:
     ///
     std::vector<ModelProvider*> get_model_providers() const;
 
+    void set_server_capabilities(std::vector<path::Capability> & serv_caps);
 
     std::string path;
  private:

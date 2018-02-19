@@ -35,8 +35,7 @@ function install_dependencies {
                  pcre \
                  wget \
                  xml2 \
-                 lcov \
-                 pybind11 > /dev/null
+                 lcov  > /dev/null
     brew install libssh
     brew link libssh
     brew rm -f --ignore-dependencies python python3

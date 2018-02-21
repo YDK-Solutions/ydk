@@ -3,9 +3,9 @@ NETCONF service
 
 .. py:class:: ydk.services.NetconfService
 
-    .. py:method:: cancel_commit(provider, persist_id=-1)
+    .. py:method:: cancel_commit(provider, persist_id=None)
 
-        Cancels an ongoing confirmed commit. If the ``persist_id`` parameter is not given, the operation **MUST** be issued on the same session that issued the confirmed commit.
+        Cancels an ongoing confirmed commit. If the ``persist_id`` parameter is None, the operation **MUST** be issued on the same session that issued the confirmed commit.
 
         :param provider: (:py:class:`NetconfServiceProvider<ydk.providers.NetconfServiceProvider>`) NETCONF provider instance.
         :param persist_id: (``int``) An ``int`` that cancels a persistent confirmed commit.
@@ -20,7 +20,7 @@ NETCONF service
         :return: ``True`` if the operation succeeds, else ``False``
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` If error has occurred
 
-    .. py:method:: commit(provider, confirmed=False, confirm_timeout=-1, persist=-1, persist_id=-1)
+    .. py:method:: commit(provider, confirmed=False, confirm_timeout=None, persist=None, persist_id=None)
 
         Instructs the device to implement the configuration data contained in the candidate configuration.
 

@@ -30,9 +30,11 @@ Linux
    $ wget http://devhub.cisco.com/artifactory/debian-ydk/0.7.0/artful/libydk_0.7.0-1_amd64.deb
    $ sudo gdebi libydk_0.7.0-1_amd64.deb
 
-**Centos (Fedora-based)** - The following packages must be present in your system before installing YDK-Py::
+**Centos (Fedora-based)** - The following packages must be present in your system before installing YDK-Py. Currently, only Centos7/RHEL7 are known to work::
 
+   # The below may not be required on Fedora27
    $ sudo yum install epel-release
+
    $ sudo yum install libssh-devel gcc-c++ python-devel
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.0/libydk-0.7.0-1.x86_64.rpm
 
@@ -77,12 +79,12 @@ You can download the latest python package from `here <https://www.python.org/do
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.0/libydk-0.7.0-Darwin.tar.gz
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.0/libydk-0.7.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.7.0-Darwin.pkg -target /
 
 Windows
 ~~~~~~~
-Currently, YDK-Py from release 0.7.0 onwards is not supported on Windows.
+Currently, ``YDK-Py`` from release ``0.6.0`` onwards is not supported on Windows.
 
 
 Python Requirements

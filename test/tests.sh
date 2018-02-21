@@ -123,7 +123,7 @@ function init_py_env {
         virtualenv macos_pyenv -p python3.6
         source macos_pyenv/bin/activate
     fi
-    pip install -r requirements.txt coverage
+    pip install -r requirements.txt coverage pybind11==2.2.1
 }
 
 function init_go_env {
@@ -195,8 +195,8 @@ function install_py_core {
     python setup.py sdist
     pip install dist/ydk*.tar.gz
 
-    print_msg "Generating py binaries"
-    sudo ./generate_python_binary.sh
+#    print_msg "Generating py binaries"
+#    sudo ./generate_python_binary.sh
 
     cd $YDKGEN_HOME
 }

@@ -469,7 +469,7 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, const std::string& revision, const std::vector<std::string>& features, bool& new_module)
 {
 
-    YLOG_DEBUG("Module '{}' Revision '{}'", module.c_str(), revision.c_str());
+    YLOG_DEBUG("Loading Module '{}' Revision '{}'", module.c_str(), revision.c_str());
 
     auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str(), 1);
 
@@ -485,9 +485,10 @@ ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, co
         YLOG_WARN("Unable to parse module: '{}'. This model cannot be used with YDK", module);
     }
 
-    for (auto f : features)
+    for (auto f : features) {
+        YLOG_DEBUG("Adding feature '{}'", f.c_str());
         lys_features_enable(p, f.c_str());
-
+    }
     return p;
 }
 
@@ -500,6 +501,7 @@ ydk::path::RepositoryPtr::get_module_capabilities(ydk::path::Capability & mod_ca
         {
             mod_cap.features = cap.features;
             mod_cap.deviations = cap.deviations;
+            break;
         }
     }
 }

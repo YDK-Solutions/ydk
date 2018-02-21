@@ -39,7 +39,7 @@ Path
     
     Connects to NETCONF service provider by creating a connection to the given provider using given address, username, password, and port.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param repo: (:go:struct:`Repository<ydk/types/Repository>`).
     :param address: (``string``) A Go string.
     :param username: (``string``) A Go string.
@@ -58,13 +58,13 @@ Path
     
     CleanUpErrorState cleans up memory for CState
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
 
 .. function:: ConnectToRestconfProvider(state *State, path, address, username, password string, port int)
     
     ConnectToRestconfProvider connects to RESTCONF device by creating a connection to the provider using given path, address, username, password, and port.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param path: (``string``) A Go string.
     :param address: (``string``) A Go string.
     :param username: (``string``) A Go string.
@@ -83,7 +83,7 @@ Path
 
     InitCodecServiceProvider initializes CodecServiceProvider
     
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param entity: :ref:`Entity <types-entity>`
     :param repo: (:go:struct:`Repository<ydk/types/Repository>`).
     :return: The root schema node parsed from repository
@@ -93,7 +93,7 @@ Path
 
     CodecServiceEncode encodes entity to XML/JSON payloads based on encoding format passed in
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param entity: (:ref:`Entity <types-entity>`).
     :param rootSchema: (:go:struct:`RootSchemaNode<ydk/types/RootSchemaNode>`).
     :param encoding: (:ref:`encoding-format-ydk`).
@@ -104,7 +104,7 @@ Path
 
     CodecServiceDecode decodes XML/JSON payloads passed in to entity.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param rootSchema: (:go:struct:`RootSchemaNode<ydk/types/RootSchemaNode>`).
     :param payload: (``string``) A Go string.
     :param encoding: (:ref:`encoding-format-ydk`).
@@ -116,7 +116,7 @@ Path
 
     ConnectToOpenDaylightProvider connects to OpenDaylight device.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param path: (``string``) A Go string.
     :param address: (``string``) A Go string.
     :param username: (``string``) A Go string.
@@ -137,7 +137,7 @@ Path
 
     A getter function for the node ids given the opendaylight service provider.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param provider: (:go:struct:`COpenDaylightServiceProvider<ydk/types/COpenDaylightServiceProvider>`).
     :returns: A slice of Go strings representing node ids.
     :rtype: ``[]string``
@@ -146,7 +146,7 @@ Path
 
     A getter function for the node provider given the opendaylight service provider and node id.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution
     :param provider: (:go:struct:`COpenDaylightServiceProvider<ydk/types/COpenDaylightServiceProvider>`).
     :param nodeID: (``string``) A Go string.
     :return: The service provider.
@@ -156,4 +156,4 @@ Path
 
     AddCState creates and adds cstate to given state.
 
-    :param state: (pointer to :go:struct:`State<ydk/types/State>`) Current state of execution
+    :param state: (pointer to :go:struct:`State<ydk/errors/State>`) Current state of execution

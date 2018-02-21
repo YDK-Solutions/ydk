@@ -477,3 +477,22 @@ TEST_CASE("embedded_quote_codec")
     auto rp_decode = codec_service.decode(codec_provider, xml, make_unique<openconfig_routing_policy::RoutingPolicy>());
     CHECK(*rp == *rp_decode);
 }
+
+TEST_CASE("TestSessionPathAnyxml")
+{
+    ydk::path::Codec s{};
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& root_schema = session.get_root_schema();
+
+    auto & schema = session.get_root_schema();
+
+    std::string xml = R"(<?xml version="1.0"?><runner xmlns="http://cisco.com/ns/yang/ydktest-sanity"><ytypes><built-in-t><bits-value>disable-nagle auto-sense-speed</bits-value></built-in-t></ytypes></runner>)";
+    auto a = s.decode(schema, xml, EncodingFormat::XML);
+    REQUIRE(a!=nullptr);
+
+    schema = session.get_root_schema();
+    xml = R"(<?xml version="1.0"?>
+    <runner xmlns="http://cisco.com/ns/yang/ydktest-sanity"><ytypes><built-in-t><bits-value>disable-nagle auto-sense-speed</bits-value></built-in-t></ytypes></runner>)";
+    a = s.decode(schema, xml, EncodingFormat::XML);
+    REQUIRE(a!=nullptr);
+}

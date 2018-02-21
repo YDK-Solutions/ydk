@@ -91,4 +91,4 @@ function install_fpm {
 
 install_dependencies
 install_confd
-install_fpm
+#install_fpm

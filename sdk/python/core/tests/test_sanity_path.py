@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import sys
 import unittest
+import logging
 
 from ydk.path.sessions import NetconfSession
 from ydk.path import Codec
@@ -128,8 +129,24 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )
 
+    def test_anyxml(self):
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?><bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
+
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?>
+            <bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
+
     def test_create_gre_tunnel_on_demand(self):
-        #enable_logging()
+        enable_logging(logging.ERROR)
 
         from ydk.models.ydktest import ydktest_sanity as ysanity
         from ydk.providers import NetconfServiceProvider
@@ -158,10 +175,9 @@ class SanityTest(unittest.TestCase):
         crud_service = CRUDService();
         crud_service.create(provider, native)
 
-def enable_logging():
-    import logging
+def enable_logging(level):
     log = logging.getLogger('ydk')
-    log.setLevel(logging.DEBUG)
+    log.setLevel(level)
     handler = logging.StreamHandler()
     formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
     handler.setFormatter(formatter)

@@ -26,7 +26,7 @@ YDK Types
 
     .. function:: GetState() 
 
-        :rtype: :go:struct:`*State<ydk/types/State>`
+        :rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. object:: CodecServiceProvider
 
@@ -44,7 +44,7 @@ YDK Types
 
     .. function:: GetState()
 
-        :rtype: :go:struct:`*State<ydk/types/State>`
+        :rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. go:struct:: DataNode
 

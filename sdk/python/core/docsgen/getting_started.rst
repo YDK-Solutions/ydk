@@ -20,17 +20,53 @@ Ubuntu (Debian-based)
 
    $ sudo apt-get install gdebi-core
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.0/libydk_0.7.0-1_amd64.deb
+   # Use the below for Ubuntu Artful
+   $ wget http://devhub.cisco.com/artifactory/debian-ydk/0.7.0/artful/libydk_0.7.0-1_amd64.deb
    $ sudo gdebi libydk_0.7.0-1_amd64.deb
 
 Centos (Fedora-based)
 
+**Note:** Currently, only Centos7/RHEL7 are known to work.
+
 .. code-block:: sh
 
-   $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
+   $ sudo yum install epel-release
+   $ sudo yum install libssh-devel gcc-c++ python-devel
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.0/libydk-0.7.0-1.x86_64.rpm
-   $ sudo ln –s /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin/cmake:$PATH
+
+   # Upgrade compiler to gcc 5.*
+   $ yum install centos-release-scl -y > /dev/null
+   $ yum install devtoolset-4-gcc* -y > /dev/null
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
 Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
+
+To install the core and bundles on Centos, please follow the below steps.
+
+``Python2.7``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.4``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.6``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xe
 
 macOS
 -----
@@ -42,7 +78,7 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install pkg-config libssh libxml2 curl pcre cmake
+   $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.0/libydk-0.7.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.7.0-Darwin.pkg -target /
 

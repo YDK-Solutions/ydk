@@ -57,7 +57,7 @@ Open Daylight
 
 	.. attribute:: State
 
-		An instance of :go:struct:`State<ydk/types/State>` which represents the error state of this provider
+		An instance of :go:struct:`State<ydk/errors/State>` which represents the error state of this provider
 
 .. function:: (provider *OpenDaylightServiceProvider) GetPrivate()
 
@@ -81,7 +81,7 @@ Open Daylight
 .. function:: (provider *OpenDaylightServiceProvider) GetState()
 
 	:return: error state from OpenDaylightServiceProvider
-	:rtype: :go:struct:`*State<ydk/types/State>`
+	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *OpenDaylightServiceProvider) Disconnect()
 
@@ -125,7 +125,7 @@ Netconf
 
 	.. attribute:: State
 
-		An instance of :go:struct:`State<ydk/types/State>`
+		An instance of :go:struct:`State<ydk/errors/State>`
 
 .. function:: (provider *NetconfServiceProvider) GetPrivate()
 
@@ -139,7 +139,7 @@ Netconf
 .. function:: (provider *NetconfServiceProvider) GetState()
 
 	:return: error state from NetconfServiceProvider
-	:rtype: :go:struct:`*State<ydk/types/State>`
+	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *NetconfServiceProvider) Disconnect()
 
@@ -191,7 +191,7 @@ Restconf
 
 	.. attribute:: State
 
-		An instance of :go:struct:`State<ydk/types/State>`
+		An instance of :go:struct:`State<ydk/errors/State>`
 
 .. function:: (provider *RestconfServiceProvider) GetPrivate()
 	
@@ -205,7 +205,7 @@ Restconf
 .. function:: (provider *RestconfServiceProvider) GetState()
 	
 	:return: error state from RestconfServiceProvider
-	:rtype: :go:struct:`*State<ydk/types/State>`
+	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *RestconfServiceProvider) Disconnect
 	
@@ -233,7 +233,7 @@ Codec
 
 	.. attribute:: State
 
-		An instance of :go:struct:`State<ydk/types/State>`
+		An instance of :go:struct:`State<ydk/errors/State>`
 
 .. function:: (provider *CodecServiceProvider) Initialize()
 
@@ -247,7 +247,7 @@ Codec
 .. function:: (provider *CodecServiceProvider) GetState()
 
 	:return: error state from CodecServiceProvider
-	:rtype: :go:struct:`*State<ydk/types/State>`
+	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity)
 

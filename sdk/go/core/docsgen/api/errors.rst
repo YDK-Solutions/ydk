@@ -1,13 +1,14 @@
-.. _types-errors:
+.. _ydk-errors:
+
 Errors
 ======
 
-.. go:package:: ydk/types
+.. go:package:: ydk/errors
     :synopsis: YDK Go Errors
 
 .. code-block:: sh
 
-   import "github.com/CiscoDevNet/ydk-go/ydk/types"
+   import "github.com/CiscoDevNet/ydk-go/ydk/errors"
 
 .. attribute:: Y_ERROR_TYPE
 
@@ -62,6 +63,7 @@ Errors
         Type is ``interface{}``
 
 .. _errors-cerror:
+
 .. object:: CError
 
     CError is an interface type that represents a basic error in Go.

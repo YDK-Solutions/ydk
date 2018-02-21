@@ -24,7 +24,7 @@ package path
 
 // #cgo CXXFLAGS: -g -std=c++11
 // #cgo darwin LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
+// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -lm -ldl
 // #include <ydk/ydk.h>
 // #include <stdlib.h>
 import "C"
@@ -32,6 +32,7 @@ import "C"
 import (
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
+	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	encodingFormat "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/protocol"
@@ -94,7 +95,7 @@ func ExecuteRPC(
 }
 
 func getDataPayload(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema C.RootSchemaNode,
 	provider types.ServiceProvider) *C.char {
@@ -164,7 +165,7 @@ func ExecuteRPCEntity(
 }
 
 func walkRPCChildren(
-	state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	state *errors.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 
 	ydk.YLogDebug("Walking Rpc Children...")
 	if(rpcEntity != nil) {
@@ -207,7 +208,7 @@ func walkRPCChildren(
 }
 
 func createFromEntityPath(
-	state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	state *errors.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 
 	entityPath := types.GetEntityPath(rpcEntity)
 	for _, nameValue := range entityPath.ValuePaths {
@@ -228,7 +229,7 @@ func createFromEntityPath(
 }
 
 func createFromChildren(
-	state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
+	state *errors.State, children map[string]types.Entity, rpcInput C.DataNode) {
 
 	for childName, child := range children {
 		if types.HasDataOrFilter(child) {
@@ -274,7 +275,7 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 // connection to the provider using given address, username, password, and port.
 // Returns the connected service provider (types.CServiceProvider).
 func ConnectToNetconfProvider(
-	state *types.State,
+	state *errors.State,
 	repo types.Repository,
 	address, username, password string,
 	port int,
@@ -292,8 +293,8 @@ func ConnectToNetconfProvider(
 	var cprotocol *C.char = C.CString(protocol)
 	defer C.free(unsafe.Pointer(cprotocol))
 
-	var cOnDemand C.boolean = 0
-	if onDemand { cOnDemand = 1 }
+	var cOnDemand C.boolean = 1
+	if onDemand { cOnDemand = 0 }
 	var cCommonCache C.boolean = 0
 	if commonCache { cCommonCache = 1 }
 
@@ -327,7 +328,7 @@ func DisconnectFromNetconfProvider(provider types.CServiceProvider) {
 }
 
 // CleanUpErrorState cleans up memory for CState.
-func CleanUpErrorState(state *types.State) {
+func CleanUpErrorState(state *errors.State) {
 	realState := getCState(state)
 	C.YDKStateFree(*realState)
 }
@@ -337,7 +338,7 @@ func CleanUpErrorState(state *types.State) {
 // and port.
 // Returns the connected service provider (types.CServiceProvider).
 func ConnectToRestconfProvider(
-	state *types.State,
+	state *errors.State,
 	Path, Address, Username, Password string,
 	port int, encoding encodingFormat.EncodingFormat,
 	stateURLRoot, configURLRoot string) types.CServiceProvider {
@@ -388,7 +389,7 @@ func DisconnectFromRestconfProvider(provider types.CServiceProvider) {
 // InitCodecServiceProvider initializes CodecServiceProvider.
 // Returns root schema node (types.RootSchemaNode) parsed from repository.
 func InitCodecServiceProvider(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	repo types.Repository) types.RootSchemaNode {
 
@@ -447,7 +448,7 @@ func InitCodecServiceProvider(
 // encoding format passed in.
 // Returns the resulting payload (string).
 func CodecServiceEncode(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema types.RootSchemaNode,
 	encoding encodingFormat.EncodingFormat) string {
@@ -482,7 +483,7 @@ func CodecServiceEncode(
 // CodecServiceDecode decodes XML/JSON payloads passed in to entity.
 // Returns the top level entity (types.Entity) from resulting data node.
 func CodecServiceDecode(
-	state *types.State,
+	state *errors.State,
 	rootSchema types.RootSchemaNode,
 	payload string,
 	encoding encodingFormat.EncodingFormat,
@@ -517,7 +518,7 @@ func CodecServiceDecode(
 // ConnectToOpenDaylightProvider connects to OpenDaylight device.
 // Returns the connected service provider (types.COpenDaylightServiceProvier).
 func ConnectToOpenDaylightProvider(
-	state *types.State,
+	state *errors.State,
 	Path, Address, Username, Password string,
 	port int,
 	encoding encodingFormat.EncodingFormat,
@@ -565,7 +566,7 @@ func DisconnectFromOpenDaylightProvider(
 // given the opendaylight service provider.
 // Returns node ids available ([]string).
 func OpenDaylightServiceProviderGetNodeIDs(
-	state *types.State, provider types.COpenDaylightServiceProvider) []string {
+	state *errors.State, provider types.COpenDaylightServiceProvider) []string {
 
 	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
 	var ids []string
@@ -589,7 +590,7 @@ func OpenDaylightServiceProviderGetNodeIDs(
 // node provider given the opendaylight service provider and node id.
 // Returns service provider (types.CServiceProvider) based on given node id.
 func OpenDaylightServiceProviderGetNodeProvider(
-	state *types.State,
+	state *errors.State,
 	provider types.COpenDaylightServiceProvider,
 	nodeID string) types.CServiceProvider {
 
@@ -609,7 +610,7 @@ func OpenDaylightServiceProviderGetNodeProvider(
 // DataNode from Entity
 //////////////////////////////////////////////////////////////////////////
 func getDataNodeFromEntity(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema C.RootSchemaNode) C.DataNode {
 
@@ -635,7 +636,7 @@ func getDataNodeFromEntity(
 }
 
 func walkChildren(
-	state *types.State, entity types.Entity, dataNode C.DataNode) {
+	state *errors.State, entity types.Entity, dataNode C.DataNode) {
 	children := entity.GetChildren()
 
 	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
@@ -653,7 +654,7 @@ func walkChildren(
 }
 
 func populateDataNode(
-	state *types.State, entity types.Entity, parentDataNode C.DataNode) {
+	state *errors.State, entity types.Entity, parentDataNode C.DataNode) {
 
 	path := types.GetEntityPath(entity)
 	p := C.CString(path.Path)
@@ -676,7 +677,7 @@ func populateDataNode(
 }
 
 func populateNameValues(
-	state *types.State, dataNode C.DataNode, path types.EntityPath) {
+	state *errors.State, dataNode C.DataNode, path types.EntityPath) {
 
 	for _, nameValue := range path.ValuePaths {
 		var result C.DataNode
@@ -768,10 +769,10 @@ func addDataNodeFilterAnnotation(dataNode *C.DataNode, yf yfilter.YFilter) {
 // Error Handling
 //////////////////////////////////////////////////////////////////////////
 
-// AddCState creates and adds cstate to *types.State.
-func AddCState(state *types.State) {
+// AddCState creates and adds cstate to *errors.State.
+func AddCState(state *errors.State) {
 	cstate := C.YDKStateCreate()
-	state.Private = types.CState{Private: cstate}
+	state.Private = errors.CState{Private: cstate}
 }
 
 func checkState(cstate *C.YDKStatePtr) error {
@@ -790,25 +791,25 @@ func checkState(cstate *C.YDKStatePtr) error {
 
 	switch cerrorType {
 	case C.YDK_CLIENT_ERROR:
-		return &types.YClientError{Msg: errMsg}
+		return &errors.YClientError{Msg: errMsg}
 	case C.YDK_SERVICE_PROVIDER_ERROR:
-		return &types.YServiceProviderError{Msg: errMsg}
+		return &errors.YServiceProviderError{Msg: errMsg}
 	case C.YDK_SERVICE_ERROR:
-		return &types.YServiceError{Msg: errMsg}
+		return &errors.YServiceError{Msg: errMsg}
 	case C.YDK_ILLEGAL_STATE_ERROR:
-		return &types.YIllegalStateError{Msg: errMsg}
+		return &errors.YIllegalStateError{Msg: errMsg}
 	case C.YDK_INVALID_ARGUMENT_ERROR:
-		return &types.YInvalidArgumentError{Msg: errMsg}
+		return &errors.YInvalidArgumentError{Msg: errMsg}
 	case C.YDK_OPERATION_NOTSUPPORTED_ERROR:
-		return &types.YOperationNotSupportedError{Msg: errMsg}
+		return &errors.YOperationNotSupportedError{Msg: errMsg}
 	case C.YDK_MODEL_ERROR:
-		return &types.YModelError{Msg: errMsg}
+		return &errors.YModelError{Msg: errMsg}
 	case C.YDK_CORE_ERROR:
-		return &types.YCoreError{Msg: errMsg}
+		return &errors.YCoreError{Msg: errMsg}
 	case C.YDK_CODEC_ERROR:
-		return &types.YCodecError{Msg: errMsg}
+		return &errors.YCodecError{Msg: errMsg}
 	default:
-		return &types.YError{Msg: errMsg}
+		return &errors.YError{Msg: errMsg}
 	}
 }
 
@@ -820,8 +821,8 @@ func getCProtocol(proto protocol.Protocol) C.Protocol {
 	}
 }
 
-func getCState(state *types.State) *C.YDKStatePtr {
-	statePtr := state.Private.(types.CState).Private.(C.YDKStatePtr)
+func getCState(state *errors.State) *C.YDKStatePtr {
+	statePtr := state.Private.(errors.CState).Private.(C.YDKStatePtr)
 	return &statePtr
 }
 

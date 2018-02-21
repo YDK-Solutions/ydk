@@ -27,6 +27,11 @@
 #include "path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
+#include "entity_data_node_walker.hpp"
+
+#include "ydk/crud_service.hpp"
+#include "ydk/netconf_provider.hpp"
+#include "ydk_ydktest/ydktest_sanity.hpp"
 
 const char* expected_bgp_output ="\
 <bgp xmlns=\"http://openconfig.net/yang/bgp\">\
@@ -67,6 +72,24 @@ const char* expected_bgp_output ="\
 
 const char* expected_bgp_read ="<bgp xmlns=\"http://openconfig.net/yang/bgp\"><global><config><as>65172</as></config><use-multiple-paths><state><enabled>false</enabled></state><ebgp><state><allow-multiple-as>false</allow-multiple-as><maximum-paths>1</maximum-paths></state></ebgp><ibgp><state><maximum-paths>1</maximum-paths></state></ibgp></use-multiple-paths><route-selection-options><state><always-compare-med>false</always-compare-med><ignore-as-path-length>false</ignore-as-path-length><external-compare-router-id>true</external-compare-router-id><advertise-inactive-routes>false</advertise-inactive-routes><enable-aigp>false</enable-aigp><ignore-next-hop-igp-metric>false</ignore-next-hop-igp-metric></state></route-selection-options><afi-safis><afi-safi><afi-safi-name xmlns:oc-bgp-types=\"http://openconfig.net/yang/bgp-types\">oc-bgp-types:L3VPN_IPV4_UNICAST</afi-safi-name><config><afi-safi-name xmlns:oc-bgp-types=\"http://openconfig.net/yang/bgp-types\">oc-bgp-types:L3VPN_IPV4_UNICAST</afi-safi-name><enabled>true</enabled></config><state><enabled>false</enabled></state><graceful-restart><state><enabled>false</enabled></state></graceful-restart><route-selection-options><state><always-compare-med>false</always-compare-med><ignore-as-path-length>false</ignore-as-path-length><external-compare-router-id>true</external-compare-router-id><advertise-inactive-routes>false</advertise-inactive-routes><enable-aigp>false</enable-aigp><ignore-next-hop-igp-metric>false</ignore-next-hop-igp-metric></state></route-selection-options><use-multiple-paths><state><enabled>false</enabled></state><ebgp><state><allow-multiple-as>false</allow-multiple-as><maximum-paths>1</maximum-paths></state></ebgp><ibgp><state><maximum-paths>1</maximum-paths></state></ibgp></use-multiple-paths><apply-policy><state><default-import-policy>REJECT_ROUTE</default-import-policy><default-export-policy>REJECT_ROUTE</default-export-policy></state></apply-policy></afi-safi></afi-safis><apply-policy><state><default-import-policy>REJECT_ROUTE</default-import-policy><default-export-policy>REJECT_ROUTE</default-export-policy></state></apply-policy></global><neighbors><neighbor><neighbor-address>172.16.255.2</neighbor-address><config><neighbor-address>172.16.255.2</neighbor-address><peer-as>65172</peer-as></config><state><enabled>true</enabled><route-flap-damping>false</route-flap-damping><send-community>NONE</send-community></state><timers><state><connect-retry>30.0</connect-retry><hold-time>90.0</hold-time><keepalive-interval>30.0</keepalive-interval><minimum-advertisement-interval>30.0</minimum-advertisement-interval></state></timers><transport><state><mtu-discovery>false</mtu-discovery><passive-mode>false</passive-mode></state></transport><error-handling><state><treat-as-withdraw>false</treat-as-withdraw></state></error-handling><logging-options><state><log-neighbor-state-changes>true</log-neighbor-state-changes></state></logging-options><ebgp-multihop><state><enabled>false</enabled></state></ebgp-multihop><route-reflector><state><route-reflector-client>false</route-reflector-client></state></route-reflector><as-path-options><state><allow-own-as>0</allow-own-as><replace-peer-as>false</replace-peer-as></state></as-path-options><add-paths><state><receive>false</receive></state></add-paths><use-multiple-paths><state><enabled>false</enabled></state><ebgp><state><allow-multiple-as>false</allow-multiple-as></state></ebgp></use-multiple-paths><apply-policy><state><default-import-policy>REJECT_ROUTE</default-import-policy><default-export-policy>REJECT_ROUTE</default-export-policy></state></apply-policy><afi-safis><afi-safi><afi-safi-name xmlns:oc-bgp-types=\"http://openconfig.net/yang/bgp-types\">oc-bgp-types:L3VPN_IPV4_UNICAST</afi-safi-name><config><afi-safi-name xmlns:oc-bgp-types=\"http://openconfig.net/yang/bgp-types\">oc-bgp-types:L3VPN_IPV4_UNICAST</afi-safi-name><enabled>true</enabled></config><state><enabled>false</enabled></state><graceful-restart><state><enabled>false</enabled></state></graceful-restart><apply-policy><state><default-import-policy>REJECT_ROUTE</default-import-policy><default-export-policy>REJECT_ROUTE</default-export-policy></state></apply-policy><use-multiple-paths><state><enabled>false</enabled></state><ebgp><state><allow-multiple-as>false</allow-multiple-as></state></ebgp></use-multiple-paths></afi-safi></afi-safis></neighbor></neighbors></bgp>";
 
+std::string xml_payload_ip =
+R"(
+    <native xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+      <interface>
+        <Loopback>
+          <name>2449</name>
+          <description>Interface Loopback2449</description>
+          <ipv4>
+            <address>
+              <ip>10.10.10.10</ip>
+              <netmask>255.255.255.255</netmask>
+            </address>
+          </ipv4>
+        </Loopback>
+      </interface>
+    </native>
+)";
+
 void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
     ydk::path::Statement s = dn->get_schema_node().get_statement();
@@ -78,13 +101,24 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
         child_indent+="  ";
         std::cout << indent << "<" << s.arg << ">" << std::endl;
         for(auto c : dn->get_children())
-        print_tree(c.get(), child_indent);
+            print_tree(c.get(), child_indent);
         std::cout << indent << "</" << s.arg << ">" << std::endl;
-
     }
 }
 
+TEST_CASE( "decode_encode_interfaces" )
+{
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& root = session.get_root_schema();
 
+    ydk::path::Codec s{};
+
+    auto data_node = s.decode(root, xml_payload_ip, ydk::EncodingFormat::XML);
+    REQUIRE(data_node != nullptr);
+
+    auto xml = s.encode( *data_node, ydk::EncodingFormat::XML, true);
+    std::cout<<xml<<std::endl;
+}
 
 TEST_CASE( "bgp_netconf_create" )
 {

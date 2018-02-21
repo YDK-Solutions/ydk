@@ -137,3 +137,26 @@ TEST_CASE("on_demand_provider_loading_xml")
     auto cpython = std::make_shared<ydktest::ietf_aug_base_1::Cpython>();
     codec_service.decode(codec_provider, AUGMENTED_XML_PAYLOAD, cpython);
 }
+
+TEST_CASE( "native_tunnel_create" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto & native = schema.create_datanode("ydktest-sanity:native");
+
+    auto & tunnelInt = native.create_datanode("interface/Tunnel[name='521']");
+
+    auto & tunnel = tunnelInt.create_datanode("ydktest-sanity-augm:tunnel");
+
+    auto & source = tunnel.create_datanode("source", "Lo222");
+
+    auto & destination = tunnel.create_datanode("destination", "2.3.4.5");
+
+    ydk::path::Codec s{};
+
+    auto xml = s.encode(native, ydk::EncodingFormat::XML, false);
+
+    std::cout << xml << std::endl;
+}

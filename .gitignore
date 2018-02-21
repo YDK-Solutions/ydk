@@ -27,3 +27,6 @@ gen-api/
 *.sublime-project
 *.sublime-workspace
 *.idea
+scripts
+sdk/cpp/core/tests/confd/ydktest/cli-history
+sdk/python/core/ydk/models/ydktest

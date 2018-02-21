@@ -23,9 +23,12 @@ class NetconfService(_NetconfService):
     def __init__(self):
         self._ns = _NetconfService()
 
-    def cancel_commit(self, provider, persist_id=-1):
-        if None in (provider, persist_id):
-            raise _YPYServiceError("provider and persist_id cannot be None")
+    def cancel_commit(self, provider, persist_id=None):
+        if provider is None:
+            raise _YPYServiceError("provider cannot be None")
+
+        if persist_id is None:
+            persist_id = -1
 
         with _handle_error():
             return self._ns.cancel_commit(provider, persist_id)
@@ -37,9 +40,18 @@ class NetconfService(_NetconfService):
         with _handle_error():
             return self._ns.close_session(provider)
 
-    def commit(self, provider, confirmed=False, confirm_timeout=-1, persist=-1, persist_id=-1):
+    def commit(self, provider, confirmed=False, confirm_timeout=None, persist=None, persist_id=None):
         if provider is None:
             raise _YPYServiceError("provider cannot be None")
+
+        if confirm_timeout is None:
+            confirm_timeout = -1
+
+        if persist is None:
+            persist = -1
+
+        if persist_id is None:
+            persist_id = -1
 
         with _handle_error():
             return self._ns.commit(provider, confirmed, confirm_timeout, persist, persist_id)

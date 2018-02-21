@@ -26,7 +26,7 @@ class NetconfSession(_NetconfSession):
     """
 
     def __init__(self, address, username, password, port=830, protocol="ssh",
-                       on_demand=True, common_cache=False, timeout=-1, repo=None):
+                       on_demand=True, common_cache=False, timeout=None, repo=None):
         if repo is None:
             super(NetconfSession, self).__init__(address, username, password,
                                                  port, protocol, on_demand,

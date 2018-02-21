@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import sys
 import unittest
+import logging
 
 from ydk.path.sessions import NetconfSession
 from ydk.path import Codec
@@ -144,6 +145,44 @@ class SanityTest(unittest.TestCase):
         datanode = get_rpc(self.nc_session)
         self.assertIsNotNone(datanode)
 
+    def test_create_gre_tunnel_on_demand(self):
+        enable_logging(logging.ERROR)
+
+        from ydk.models.ydktest import ydktest_sanity as ysanity
+        from ydk.providers import NetconfServiceProvider
+        from ydk.services  import CRUDService
+
+        provider = NetconfServiceProvider(
+            "127.0.0.1",
+            "admin",
+            "admin",
+            12022)
+
+        native = ysanity.Native()
+
+        tunnel = native.interface.Tunnel()
+        tunnel.name = 521
+        tunnel.description = "test tunnel"
+        
+        # Configure protocol-over-protocol tunneling
+        tunnel.tunnel.source = "1.2.3.4"
+        tunnel.tunnel.destination = "4.3.2.1"
+        tunnel.tunnel.bandwidth.receive = 100000
+        tunnel.tunnel.bandwidth.transmit = 100000
+        
+        native.interface.tunnel.append(tunnel)
+        
+        crud_service = CRUDService();
+        crud_service.create(provider, native)
+
+def enable_logging(level):
+    log = logging.getLogger('ydk')
+    log.setLevel(level)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+        
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()
 

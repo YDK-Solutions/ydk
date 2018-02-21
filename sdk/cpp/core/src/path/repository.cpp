@@ -111,7 +111,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
 }
 
 ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option)
-  : using_temp_directory(true), caching_option(caching_option)
+  : using_temp_directory(true), caching_option(caching_option), server_caps()
 {
     path = get_models_download_path();
     ly_set_log_clb(libyang_log_callback, 1);
@@ -119,7 +119,7 @@ ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option
 
 
 ydk::path::RepositoryPtr::RepositoryPtr(const std::string& search_dir, path::ModelCachingOption caching_option)
-  : path{search_dir}, using_temp_directory(false), caching_option(caching_option)
+  : path{search_dir}, using_temp_directory(false), caching_option(caching_option), server_caps()
 {
 
     if (!file_exists(path))
@@ -428,13 +428,19 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name)
 {
     bool new_module = true;
-    return load_module(ctx, module_name, "", {}, new_module);
+    std::string revision = "";
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, bool& new_module)
 {
-    return load_module(ctx, module_name, "", {}, new_module);
+    std::string revision = "";
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
 }
 
 const lys_module*
@@ -454,14 +460,16 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision)
 {
     bool new_module = true;
-    return load_module(ctx, module_name, revision, {}, new_module);
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, const std::string& revision, const std::vector<std::string>& features, bool& new_module)
 {
 
-    YLOG_DEBUG("Module '{}' Revision '{}'", module.c_str(), revision.c_str());
+    YLOG_DEBUG("Loading Module '{}' Revision '{}'", module.c_str(), revision.c_str());
 
     auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str(), 1);
 
@@ -477,10 +485,25 @@ ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, co
         YLOG_WARN("Unable to parse module: '{}'. This model cannot be used with YDK", module);
     }
 
-    for (auto f : features)
+    for (auto f : features) {
+        YLOG_DEBUG("Adding feature '{}'", f.c_str());
         lys_features_enable(p, f.c_str());
-
+    }
     return p;
+}
+
+void
+ydk::path::RepositoryPtr::get_module_capabilities(ydk::path::Capability & mod_cap)
+{
+    for (auto & cap: server_caps) {
+        if (cap.module == mod_cap.module &&
+            (mod_cap.revision == "" || cap.revision == mod_cap.revision))
+        {
+            mod_cap.features = cap.features;
+            mod_cap.deviations = cap.deviations;
+            break;
+        }
+    }
 }
 
 ///
@@ -568,5 +591,9 @@ std::vector<ydk::path::ModelProvider*> ydk::path::Repository::get_model_provider
     return m_priv_repo->get_model_providers();
 }
 
+void
+ydk::path::Repository::set_server_capabilities(std::vector<path::Capability> & serv_caps) {
+	m_priv_repo->server_caps = serv_caps;
+}
 ////////////////////////////////////////////////////////////////////////
 

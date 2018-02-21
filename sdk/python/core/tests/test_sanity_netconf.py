@@ -14,18 +14,23 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-"""test_sanity_rpc.py
-sanity test for netconf
+"""test_sanity_netconf.py
+sanity tests for netconf
 """
 from __future__ import absolute_import
 
 import sys
 import unittest
+import logging
 
 from ydk.errors import YPYModelError, YPYError, YPYServiceError
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
-from ydk.services import NetconfService, Datastore
+from ydk.services  import NetconfService, Datastore
+from ydk.services  import CRUDService
+from ydk.services  import CodecService
+from ydk.providers import CodecServiceProvider
+from ydk.ext.types import EncodingFormat
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -225,6 +230,40 @@ class SanityNetconf(ParametrizedTestCase):
                           self.ncc,
                           "invalid-input")
 
+    def test_sanity_crud_read_interface(self):
+        enable_logging(logging.ERROR)
+
+        address = ysanity.Native.Interface.Loopback.Ipv4.Address();
+        address.ip = "2.2.2.2"
+        address.netmask = "255.255.255.255"
+
+        loopback = ysanity.Native.Interface.Loopback()
+        loopback.name = 2222
+        loopback.ipv4.address.append(address)
+
+        native = ysanity.Native()
+        native.interface.loopback.append(loopback)
+
+        crud = CRUDService()
+        result = crud.create(self.ncc, native)
+
+        native_read = ysanity.Native()
+        interfaces = crud.read(self.ncc, native_read)
+
+        codec_service = CodecService()
+        codec_provider = CodecServiceProvider()
+        codec_provider.encoding = EncodingFormat.XML
+        xml_encode = codec_service.encode(codec_provider, interfaces)
+        # print(xml_encode)
+        # enable_logging(logging.ERROR)
+
+def enable_logging(level):
+    log = logging.getLogger('ydk')
+    log.setLevel(level)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

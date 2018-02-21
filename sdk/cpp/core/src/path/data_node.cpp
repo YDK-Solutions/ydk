@@ -27,19 +27,17 @@
 
 namespace ydk
 {
-namespace path
-{
-
-static void check_ly_schema_node_for_path(lyd_node* node, const std::string & path)
-{
-    if(node == nullptr || node->schema == nullptr || node->schema->priv == nullptr)
-    {
-        YLOG_ERROR("Couldn't fetch schema node {}!", path);
-        throw(YCoreError{"Couldn't fetch schema node " + path});
-    }
-}
-
-}
+	namespace path
+	{
+		static void check_ly_schema_node_for_path(lyd_node* node, const std::string & path)
+		{
+			if(node == nullptr || node->schema == nullptr || node->schema->priv == nullptr)
+			{
+				YLOG_ERROR("Could not fetch schema node '{}'", path);
+				throw(YCoreError{"Could not fetch schema node: " + path});
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -86,6 +84,7 @@ ydk::path::DataNodeImpl::~DataNodeImpl()
 const ydk::path::SchemaNode&
 ydk::path::DataNodeImpl::get_schema_node() const
 {
+	YLOG_DEBUG("get_schema_node: Getting schema node for '{}'", m_node->schema->name);
     check_ly_schema_node_for_path(m_node, get_path());
     auto schema_ptr = reinterpret_cast<const SchemaNode*>(m_node->schema->priv);
     return *schema_ptr;
@@ -106,6 +105,7 @@ ydk::path::DataNodeImpl::get_path() const
 void
 ydk::path::DataNodeImpl::populate_new_schemas_from_path(const std::string& path)
 {
+	YLOG_DEBUG("populate_new_schemas_from_path: Getting schema node for '{}'", m_node->schema->name);
     check_ly_schema_node_for_path(m_node, path);
     auto snode = reinterpret_cast<SchemaNodeImpl*>(m_node->schema->priv);
     snode->populate_new_schemas_from_path(path);

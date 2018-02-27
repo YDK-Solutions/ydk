@@ -102,13 +102,15 @@ function init_confd_ydktest {
 
 function init_rest_server {
     print_msg "Starting REST server"
-    ./test/start_rest_server.sh
+    pkill -f moco-runner
+    export REST_SERVER_PID=$(./test/start_rest_server.sh)
+    print_msg "REST server started with PID $REST_SERVER_PID"
 }
 
 function init_tcp_server {
     print_msg "Starting TCP server"
-    ./test/start_tcp_server.sh
-    export TCP_SERVER_PID=$tcp_pid
+    pkill -f tcp_proxy_server
+    export TCP_SERVER_PID=$(./test/start_tcp_server.sh)
     print_msg "TCP server started with PID: $TCP_SERVER_PID"
 }
 

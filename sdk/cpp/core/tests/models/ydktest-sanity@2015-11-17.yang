@@ -37,7 +37,6 @@ module ydktest-sanity {
      This module contains definitions
      for the following management objects:
 
-
      Copyright (c) 2013-2014 by Cisco Systems, Inc.
      All rights reserved.";
 
@@ -247,12 +246,12 @@ module ydktest-sanity {
         }
 
         leaf u_number8 {
-          description " 8 bit uinteger value type";
+          description " 8 bit uinteger value type, must be >=0 & <= 255";
           type uint8;
         }
 
         leaf u_number16 {
-          description "16 bit uinteger value type";
+          description "16 bit uinteger value type, must be >=0 & <= 65025";
           type uint16;
         }
 

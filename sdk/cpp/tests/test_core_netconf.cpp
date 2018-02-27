@@ -120,6 +120,26 @@ TEST_CASE( "decode_encode_interfaces" )
     std::cout<<xml<<std::endl;
 }
 
+TEST_CASE( "rpc_escape" )
+{
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022, "ssh", false};
+    ydk::path::RootSchemaNode& root = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    // create RPC in specified path
+    std::shared_ptr<ydk::path::Rpc> get_rpc { root.create_rpc("ietf-netconf-monitoring:get-schema") };
+
+    // create data node on RPC
+    get_rpc->get_input_node().create_datanode("identifier", "ydktest-sanity");
+
+    // execute RPC
+    auto result = (*get_rpc)(session);
+
+    // convert result DataNode to XML and print
+    auto yang = s.encode( *result, ydk::EncodingFormat::XML, true);
+    std::cout<<yang<<std::endl;
+}
+
 TEST_CASE( "bgp_netconf_create" )
 {
     ydk::path::Repository repo{TEST_HOME};

@@ -106,7 +106,7 @@ class SanityYang(unittest.TestCase):
 
         # use DELETE object to remove leaf one
         runner_update = runner_read
-        runner_update.ydktest_sanity_one.name.yfilter = YFilter.delete
+        runner_update.ydktest_sanity_one.name = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
         # manually create remaining runner with leaf two
@@ -128,7 +128,7 @@ class SanityYang(unittest.TestCase):
         runner_update.ytypes.built_in_t.llstring.append('0')
         runner_update.ytypes.built_in_t.llstring.append('3')
         # set yfilter
-        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
+        runner_update.ytypes.built_in_t.llstring = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -136,7 +136,7 @@ class SanityYang(unittest.TestCase):
         runner_compare = runner_create
         runner_compare.ydktest_sanity_one.name = 'one'
 
-        runner_compare.ytypes.built_in_t.llstring.clear()
+        runner_compare.ytypes.built_in_t.llstring = []
         runner_compare.ytypes.built_in_t.llstring.extend(['1', '2', '4'])
 
         self.assertEqual(runner_compare, runner_read)
@@ -150,7 +150,7 @@ class SanityYang(unittest.TestCase):
 
         runner_update = ysanity.Runner()
         runner_update.ytypes.built_in_t.llstring.append('3')
-        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
+        runner_update.ytypes.built_in_t.llstring = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -165,7 +165,7 @@ class SanityYang(unittest.TestCase):
         runner = ysanity.Runner()
         a1 = ysanity.Runner.OneList.IdentityList()
         a1.config.id = ysanity.ChildIdentity()
-        a1.id_ref =  a1.config.id.get()
+        a1.id_ref =  a1.config.id.to_string()
         runner.one_list.identity_list.append(a1)
         self.crud.create(self.ncc, runner)
 
@@ -174,7 +174,7 @@ class SanityYang(unittest.TestCase):
         runner_update = ysanity.Runner()
         k = ysanity.Runner.OneList.IdentityList()
         k.config.id = ysanity.ChildIdentity()
-        k.id_ref = k.config.id.get()
+        k.id_ref = k.config.id.to_string()
         k.yfilter = YFilter.delete
         runner_update.one_list.identity_list.append(k)
 

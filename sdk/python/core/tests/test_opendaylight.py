@@ -47,8 +47,8 @@ class SanityTest(unittest.TestCase):
         node_provider = self.odl.get_node_provider('xr')
         bgp_read = self.crud.read_config(node_provider, bgp_filter)
 
-        self.assertEqual(bgp_read.global_.config.as_.get(), '65172')
-        self.assertEqual(bgp_read.global_.config.router_id.get(), '1.2.3.4')
+        self.assertEqual(bgp_read.global_.config.as_, '65172')
+        self.assertEqual(bgp_read.global_.config.router_id, '1.2.3.4')
 
     def test_create_ODL(self):
         bgp = oc_bgp.Bgp()

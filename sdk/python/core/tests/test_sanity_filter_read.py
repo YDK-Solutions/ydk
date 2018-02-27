@@ -132,7 +132,7 @@ class SanityYang(unittest.TestCase):
     def test_CASE3(self):
         """Assign a READ object to `a.a1` should only return data on this leaf."""
         a = ysanity.A()
-        a.a1.yfilter = YFilter.read
+        a.a1 = YFilter.read
         a_read = self.crud.read(self.ncc, a)
         preconfig_a = ysanity.A()
         preconfig_a.a1 = "some value"

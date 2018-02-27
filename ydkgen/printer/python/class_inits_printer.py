@@ -119,26 +119,65 @@ class ClassInitsPrinter(object):
             self._print_class_absolute_path(clazz, leafs)
 
     def _print_init_leafs_and_leaflists(self, clazz, leafs):
-        yleafs = get_leafs(clazz)
-        yleaf_lists = get_leaf_lists(clazz)
+        if len(leafs) == 0:
+            self.ctx.writeln('self._leafs = {}')
+            return
+
+        self.ctx.writeln('self._leafs = {')
+        self.ctx.lvl_inc()
+        declarations = []
 
         for prop in leafs:
-            leaf_type = None
-            if prop in yleafs:
-                leaf_type = 'YLeaf'
-            elif prop in yleaf_lists:
-                leaf_type = 'YLeafList'
+            leaf_name = prop.name
+            ytype = self._get_type_name(prop.property_type)
 
-            self.ctx.bline()
+            leaf_type = 'YLeaf'
+            declaration_stmt =      'self.%s = None' % leaf_name
+            if prop.is_many:
+                leaf_type = 'YLeafList'
+                declaration_stmt =  'self.%s = []' % leaf_name
+            elif type(prop.property_type) is Bits:
+                declaration_stmt =  'self.%s = Bits()' % leaf_name
+
+            # comments = self._get_attribute_comment(prop, ytype)
+            # self.ctx.writelns(comments)
+            # self.ctx.bline()
+
+            yname = prop.stmt.arg
             if all((prop.stmt.top.arg != clazz.stmt.top.arg,
                     hasattr(prop.stmt.top, 'i_aug_targets') and
                     clazz.stmt.top in prop.stmt.top.i_aug_targets)):
-                name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
-            else:
-                name = prop.stmt.arg
+                yname = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
 
-            self.ctx.writeln('self.%s = %s(YType.%s, "%s")'
-                % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
+            self.ctx.writeln("'%s' : %s(YType.%s, '%s')," % (leaf_name, leaf_type, ytype, yname))
+            declarations.append(declaration_stmt)
+
+        self.ctx.lvl_dec()
+        self.ctx.writeln('}')
+
+        for line in declarations:
+            self.ctx.writeln(line)
+
+        # yleafs = get_leafs(clazz)
+        # yleaf_lists = get_leaf_lists(clazz)
+
+        # for prop in leafs:
+        #     leaf_type = None
+        #     if prop in yleafs:
+        #         leaf_type = 'YLeaf'
+        #     elif prop in yleaf_lists:
+        #         leaf_type = 'YLeafList'
+
+        #     self.ctx.bline()
+        #     if all((prop.stmt.top.arg != clazz.stmt.top.arg,
+        #             hasattr(prop.stmt.top, 'i_aug_targets') and
+        #             clazz.stmt.top in prop.stmt.top.i_aug_targets)):
+        #         name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
+        #     else:
+        #         name = prop.stmt.arg
+
+        #     self.ctx.writeln('self.%s = %s(YType.%s, "%s")'
+        #         % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
 
     def _print_children_imports(self, clazz, children):
         for child in children:

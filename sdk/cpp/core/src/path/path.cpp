@@ -92,6 +92,39 @@ static void escape_slashes(std::string& data)
 }
 }
 
+bool ydk::path::has_xml_escape_sequences(const std::string& xml)
+{
+	if (xml.find("&lt;") != std::string::npos  ||
+	    xml.find("&gt;") != std::string::npos  ||
+		xml.find("&amp;") != std::string::npos ||
+		xml.find("&quot;") != std::string::npos)
+    {
+        return true;
+    }
+    return false;
+}
+
+std::string ydk::path::replace_xml_escape_sequences(const std::string& xml)
+{
+    // Initialize table of conversion
+    std::vector<std::pair<std::string,std::string>> seqs_table;
+    seqs_table.push_back( std::make_pair( std::string("&lt;"),  std::string("<")) );
+    seqs_table.push_back( std::make_pair( std::string("&gt;"),  std::string(">")) );
+    seqs_table.push_back( std::make_pair( std::string("&amp;"), std::string("&")) );
+    seqs_table.push_back( std::make_pair( std::string("&quot;"),std::string("""")) );
+
+    std::string reply = xml;
+    for (std::pair<std::string,std::string> item : seqs_table)
+    {
+        size_t pos = 0;
+        while ((pos = reply.find(item.first, pos)) != std::string::npos)
+        {
+            reply = reply.replace(pos, item.first.length(), item.second);
+        }
+    }
+    return reply;
+}
+
 std::unordered_set<std::string> ydk::path::segmentalize_module_names(const std::string& value)
 {
     std::unordered_set<std::string> module_names;
@@ -237,8 +270,34 @@ ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat form
         std::free(buffer);
     }
 
-    return ret;
+    auto cdata_start = ret.find("<![CDATA[");
+    if (cdata_start == std::string::npos &&
+        ydk::path::has_xml_escape_sequences(ret))
+    {
+        // Convert data to CDATA
+        auto data_start = ret.find("<data");
+        if (data_start == std::string::npos)
+        {
+            return ret;
+        }
 
+        auto data_end = ret.find("</data>", data_start);
+        if (data_end == std::string::npos)
+        {
+            // we never should get here when 'data' tag is present
+            return ret;
+        }
+
+        auto data_start_end = ret.find(">", data_start);
+        data_start = data_start_end + 1;
+
+        std::string data = ret.substr(data_start, data_end - data_start);
+
+        data = replace_xml_escape_sequences(data);
+
+        ret = ret.substr(0, data_start_end+1) + "<![CDATA[" + data + "]]>" + ret.substr(data_end);
+    }
+    return ret;
 }
 
 static LYD_FORMAT get_ly_format(ydk::EncodingFormat format)

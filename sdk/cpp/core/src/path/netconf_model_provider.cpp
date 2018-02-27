@@ -29,6 +29,7 @@
 #include "../types.hpp"
 #include "../ydk_yang.hpp"
 #include "../logger.hpp"
+#include "path_private.hpp"
 
 using namespace std;
 using namespace ydk;
@@ -116,10 +117,10 @@ string NetconfModelProvider::get_model(const string& name, const string& version
     data_end -= 1;
     model = reply.substr(data_start, data_end-data_start+1);
 
-    //Remove <!CDATA[ if any
     auto cdata_start = model.find("<![CDATA[");
     if(cdata_start != string::npos)
     {
+        // Remove <!CDATA[ tag
         auto cdata_end = model.find("]]>", cdata_start);
         if(cdata_end != string::npos)
         {
@@ -128,6 +129,9 @@ string NetconfModelProvider::get_model(const string& name, const string& version
             model = model.substr(data_start, data_end - data_start);
         }
     }
+    else {	// Find and remove all XML escape sequences
+    	model = replace_xml_escape_sequences(model);
+    }
 
     return model;
 }
@@ -135,4 +139,3 @@ string NetconfModelProvider::get_model(const string& name, const string& version
 } //namespace path
 
 } //namespace ydk
-

@@ -279,10 +279,6 @@ class Entity(_Entity):
         for name in self._leafs:
             value = self.__dict__[name]
             leaf = self._leafs[name]
-            isNone = value is not None
-            isList = isinstance(value, list)
-            isBits = isinstance(value, Bits)
-            isBitsPop = isBits and len(value.get_bitmap) > 0
 
             if isinstance(value, _YFilter):
                 leaf.yfilter = value
@@ -290,10 +286,12 @@ class Entity(_Entity):
                     leaf_name_data.append(leaf.get_name_leafdata())
                 elif isinstance(leaf, _YLeafList):
                     leaf_name_data.extend(leaf.get_name_leafdata())
-            elif not any((isBits, isList, isNone)) or isBitsPop:
+            elif (type(value) not in (list, type(None), Bits)
+                or (isinstance(value, Bits) and len(value.get_bitmap()) > 0)):
+
                 leaf.set(value)
                 leaf_name_data.append(leaf.get_name_leafdata())
-            elif isList and len(value) > 0:
+            elif isinstance(value, list) and len(value) > 0:
                 l = _YLeafList(YType.str, leaf.name)
                 # l = self._leafs[name]
                 # Above results in YPYModelError:

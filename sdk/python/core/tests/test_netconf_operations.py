@@ -210,9 +210,6 @@ class SanityTest(unittest.TestCase):
         runner.ytypes.built_in_t.number8 = YFilter.delete
         self.crud.update(self.ncc, runner)
 
-        runner_empty = ysanity.Runner()
-        runner_read = self.crud.read(self.ncc, runner_empty)
-
         # DELETE AGAIN WITH ERROR
         self.crud.update(self.ncc, runner)
 

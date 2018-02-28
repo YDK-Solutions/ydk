@@ -29,7 +29,6 @@ from ydk.ext.types import YLeaf as _YLeaf
 from ydk.ext.types import YLeafList as _YLeafList
 from ydk.ext.types import YType
 from ydk.ext.types import Entity as _Entity
-from ydk.ext.types import LeafData
 from ydk.ext.types import LeafDataList
 from ydk.filters import YFilter as _YFilter
 from ydk.errors import YPYModelError as _YPYModelError
@@ -204,7 +203,7 @@ class Entity(_Entity):
     def has_data(self):
         for name, leaf in self._leafs.items():
             value = self.__dict__[name]
-            if type(value) is _YFilter:
+            if isinstance(value, _YFilter):
                 return True
             if isinstance(leaf, _YLeaf):
                 if value is not None:
@@ -280,24 +279,27 @@ class Entity(_Entity):
         for name in self._leafs:
             value = self.__dict__[name]
             leaf = self._leafs[name]
-            if type(value) is _YFilter:
+            isNone = value is not None
+            isList = isinstance(value, list)
+            isBits = isinstance(value, Bits)
+            isBitsPop = isBits and len(value.get_bitmap) > 0
+
+            if isinstance(value, _YFilter):
                 leaf.yfilter = value
                 if isinstance(leaf, _YLeaf):
                     leaf_name_data.append(leaf.get_name_leafdata())
                 elif isinstance(leaf, _YLeafList):
                     leaf_name_data.extend(leaf.get_name_leafdata())
-            elif (type(value) not in (list, type(None), Bits)
-                or (type(value) == Bits and len(value.get_bitmap()) > 0)):
-
+            elif not any((isBits, isList, isNone)) or isBitsPop:
                 leaf.set(value)
                 leaf_name_data.append(leaf.get_name_leafdata())
-            elif type(value) == list and len(value) > 0:
+            elif isList and len(value) > 0:
                 l = _YLeafList(YType.str, leaf.name)
                 # l = self._leafs[name]
-                # Above results in YPYModelError: 
-                #     Duplicate leaf-list item detected: 
-                #     /ydktest-sanity:runner/ytypes/built-in-t/enum-llist[.='local'] : 
-                #     No resolvents found for leafref "../config/id".. 
+                # Above results in YPYModelError:
+                #     Duplicate leaf-list item detected:
+                #     /ydktest-sanity:runner/ytypes/built-in-t/enum-llist[.='local'] :
+                #     No resolvents found for leafref "../config/id"..
                 #     Path: /ydktest-sanity:runner/one-list/identity-list/id-ref
                 for item in value:
                     l.append(item)
@@ -342,7 +344,7 @@ class Entity(_Entity):
                 self.__dict__[name] = value
 
                 leaf = self._leafs[name]
-                if type(value) is not _YFilter:
+                if not isinstance(value, _YFilter):
                     if isinstance(leaf, _YLeaf):
                         leaf.set(value)
                     elif isinstance(leaf, _YLeafList):

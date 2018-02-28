@@ -136,12 +136,8 @@ class ClassInitsPrinter(object):
             if prop.is_many:
                 leaf_type = 'YLeafList'
                 declaration_stmt =  'self.%s = []' % leaf_name
-            elif type(prop.property_type) is Bits:
+            elif isinstance(prop.property_type, Bits):
                 declaration_stmt =  'self.%s = Bits()' % leaf_name
-
-            # comments = self._get_attribute_comment(prop, ytype)
-            # self.ctx.writelns(comments)
-            # self.ctx.bline()
 
             yname = prop.stmt.arg
             if all((prop.stmt.top.arg != clazz.stmt.top.arg,
@@ -157,27 +153,6 @@ class ClassInitsPrinter(object):
 
         for line in declarations:
             self.ctx.writeln(line)
-
-        # yleafs = get_leafs(clazz)
-        # yleaf_lists = get_leaf_lists(clazz)
-
-        # for prop in leafs:
-        #     leaf_type = None
-        #     if prop in yleafs:
-        #         leaf_type = 'YLeaf'
-        #     elif prop in yleaf_lists:
-        #         leaf_type = 'YLeafList'
-
-        #     self.ctx.bline()
-        #     if all((prop.stmt.top.arg != clazz.stmt.top.arg,
-        #             hasattr(prop.stmt.top, 'i_aug_targets') and
-        #             clazz.stmt.top in prop.stmt.top.i_aug_targets)):
-        #         name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
-        #     else:
-        #         name = prop.stmt.arg
-
-        #     self.ctx.writeln('self.%s = %s(YType.%s, "%s")'
-        #         % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
 
     def _print_children_imports(self, clazz, children):
         for child in children:

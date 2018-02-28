@@ -125,7 +125,7 @@ function init_py_env {
         virtualenv macos_pyenv -p python3.6
         source macos_pyenv/bin/activate
     fi
-    pip install -r requirements.txt coverage pybind11==2.2.1
+    pip install -r requirements.txt coverage pybind11==2.2.2
 }
 
 function init_go_env {

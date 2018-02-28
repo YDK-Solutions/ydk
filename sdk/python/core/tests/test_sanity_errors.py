@@ -44,8 +44,8 @@ test_int16_invalid_pattern =  """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    11. \(self: ydk_.types.YLeaf, value: unicode\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.Enum.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , {}"""
@@ -60,8 +60,8 @@ test_int32_invalid_patern = """set\(\): incompatible function arguments. The fol
     8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    11. \(self: ydk_.types.YLeaf, value: unicode\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.Enum.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , \[\]"""
@@ -81,8 +81,8 @@ test_string_invalid_pattern = """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    11. \(self: ydk_.types.YLeaf, value: unicode\) -> None
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.Enum.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , \['name_str'\]"""

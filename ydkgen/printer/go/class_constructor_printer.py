@@ -68,7 +68,6 @@ class ClassConstructorPrinter(FunctionPrinter):
             self.ctx.bline()
             prop = self.leafs[index]
             index += 1
-            leaf_comments = []
 
             leaf_name = prop.go_name()
             type_name = get_type_name(prop.property_type)

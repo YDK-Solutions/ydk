@@ -486,7 +486,7 @@ class SanityYang(unittest.TestCase):
         # READ
         r_1, r_2 = Runner(), Runner()
         r_1.ytypes.built_in_t.number8 = 100
-        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8.get()
+        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
@@ -495,7 +495,7 @@ class SanityYang(unittest.TestCase):
         # UPDATE
         r_1, r_2 = Runner(), Runner()
         r_1.ytypes.built_in_t.number8 = 110
-        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8.get()
+        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 

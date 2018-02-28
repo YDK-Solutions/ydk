@@ -255,8 +255,8 @@ class SanityYang(unittest.TestCase):
     def test_json_decode_1(self):
         self.provider.encoding = EncodingFormat.JSON
         entity = self.codec.decode(self.provider, self._json_runner_payload)
-        self.assertEqual(self._json_runner_payload,
-                         self.codec.encode(self.provider, entity))
+        payload = self.codec.encode(self.provider, entity)
+        self.assertEqual(self._json_runner_payload, payload)
 
     def test_json_encode_decode(self):
         self.provider.encoding = EncodingFormat.JSON
@@ -300,6 +300,7 @@ class SanityYang(unittest.TestCase):
         r_1 = self._get_runner_entity()
         payload = self.codec.encode(self.provider, r_1, subtree=True)
         self.assertEqual(self._xml_runner_payload[:-1], payload)
+
         r_2 = self.codec.decode(self.provider, payload, subtree=True)
         self.assertEqual(r_1, r_2)
 
@@ -311,14 +312,14 @@ class SanityYang(unittest.TestCase):
         <community-set>
           <community-set-name>COMMUNITY-SET1</community-set-name>
           <config>
-            <community-set-name>COMMUNITY-SET1</community-set-name>
             <community-member>ios-regex '^65172:17...$'</community-member>
             <community-member>65172:16001</community-member>
+            <community-set-name>COMMUNITY-SET1</community-set-name>
           </config>
           <state>
-            <community-set-name>COMMUNITY-SET1</community-set-name>
             <community-member>ios-regex '^65172:17...$'</community-member>
             <community-member>65172:16001</community-member>
+            <community-set-name>COMMUNITY-SET1</community-set-name>
           </state>
         </community-set>
       </community-sets>
@@ -343,6 +344,7 @@ class SanityYang(unittest.TestCase):
         routing_policy.defined_sets.bgp_defined_sets.community_sets.community_set.append(com)
         xml_provider = CodecServiceProvider(type='xml')
         payload = self.codec.encode(xml_provider, routing_policy)
+
         self.assertEqual(xml, payload)
         routing_policy_decode = self.codec.decode(xml_provider, payload)
         self.assertEqual(routing_policy, routing_policy_decode)

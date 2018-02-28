@@ -74,7 +74,7 @@ class GetSegmentPathPrinter(object):
 
             predicates += insert_token
             
-            predicates += ('self.%s.get()') % key_prop.name + insert_token
+            predicates += ('str(self.%s)') % key_prop.name + insert_token
 
             predicates += '"'
                 
@@ -83,6 +83,8 @@ class GetSegmentPathPrinter(object):
             predicates += ']"'
 
         path = '%s%s' % (path, predicates)
+
+
         self.ctx.writeln("self._segment_path = lambda: %s" % path)
 
     def _print_get_ydk_segment_path_trailer(self, clazz):

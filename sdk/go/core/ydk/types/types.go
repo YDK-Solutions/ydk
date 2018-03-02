@@ -105,8 +105,6 @@ type Entity interface {
 	GetNamespaceTable() 			map[string]string
 	GetBundleYangModelsLocation() 	string
 
-	GetParentYangName() 			string
-
 	GetFilter() 					yfilter.YFilter
 }
 
@@ -117,10 +115,33 @@ type BitsList struct {
 	Value []map[string]bool
 }
 
+
+/////////////////////////////////////
+// CommonEntityData Utility Functions
+/////////////////////////////////////
+
+// GetYangName returns the given entity's YANG name
+func GetYangName(entity Entity) string {
+	data := entity.GetCommonEntityData()
+	return data.YangName
+}
+
+// GetBundleName returns the name of the bundle that the given entity belongs to
 func GetBundleName(entity Entity) string {
 	data := entity.GetCommonEntityData()
 	return data.BundleName
 }
+
+// GetParentYangName returns the YANG name of the parent of the given entity
+func GetParentYangName(entity Entity) string {
+	data := entity.GetCommonEntityData()
+	return data.ParentYangName
+}
+
+
+/////////////////////////////////////
+// Entity Utility Functions
+/////////////////////////////////////
 
 // HasDataOrFilter returns a bool representing whether the entity or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
@@ -249,6 +270,7 @@ func SetValue(entity Entity, valuePath string, value interface{}) {
 		}
 	}
 }
+
 
 // Decimal64 represents a YANG built-in Decimal64 type
 type Decimal64 struct {

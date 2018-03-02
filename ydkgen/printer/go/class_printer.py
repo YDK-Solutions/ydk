@@ -64,7 +64,6 @@ class ClassPrinter(object):
         self._print_get_namespace_table(clazz)
         self._print_set_parent_function(clazz)
         self._print_get_parent_function(clazz)
-        self._print_get_parent_yang_name_function(clazz)
 
     def _get_class_members(self, clazz, leafs, children):
         for prop in clazz.properties():
@@ -182,12 +181,6 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         rstmt = '%s.parent' % fp.class_alias
         fp.quick_print('GetParent', return_type='types.Entity', return_stmt=rstmt)
-
-    # GetParentYangName
-    def _print_get_parent_yang_name_function(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '"%s"' % clazz.owner.stmt.arg
-        fp.quick_print('GetParentYangName', return_type='string', return_stmt=rstmt)
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

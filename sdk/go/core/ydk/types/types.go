@@ -104,7 +104,6 @@ type Entity interface {
 	GetCapabilitiesTable() 			map[string]string
 	GetNamespaceTable() 			map[string]string
 	GetBundleYangModelsLocation() 	string
-	GetBundleName() 				string
 
 	GetParentYangName() 			string
 
@@ -116,6 +115,11 @@ type Bits map[string]bool
 
 type BitsList struct {
 	Value []map[string]bool
+}
+
+func GetBundleName(entity Entity) string {
+	data := entity.GetCommonEntityData()
+	return data.BundleName
 }
 
 // HasDataOrFilter returns a bool representing whether the entity or any of its children have their data/filter set

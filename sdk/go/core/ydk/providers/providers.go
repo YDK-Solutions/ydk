@@ -206,7 +206,7 @@ func (provider *CodecServiceProvider) Initialize(entity types.Entity) {
 		path.AddCState(&provider.State)
 	}
 
-	bundleName := entity.GetBundleName()
+	bundleName := types.GetBundleName(entity)
 	if len(provider.RootSchemaTable) == 0 {
 		provider.RootSchemaTable = make(map[string]types.RootSchemaNode)
 	}
@@ -231,7 +231,7 @@ func (provider *CodecServiceProvider) GetState() *errors.State {
 
 // GetRootSchemaNode returns root schema node for entity
 func (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity) types.RootSchemaNode {
-	rootSchemaNode, ok := provider.RootSchemaTable[entity.GetBundleName()]
+	rootSchemaNode, ok := provider.RootSchemaTable[types.GetBundleName(entity)]
 	if !ok {
 		panic("Root schema node not found in provider!")
 	}

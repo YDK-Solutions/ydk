@@ -59,7 +59,6 @@ class ClassPrinter(object):
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_get_leafs(clazz, leafs)
-        self._print_bundle_name_function(clazz)
         self._print_yang_models_function(clazz)
         self._print_get_capabilities_table(clazz)
         self._print_get_namespace_table(clazz)
@@ -90,6 +89,7 @@ class ClassPrinter(object):
         # Children - returns map[string]Entity
         # TODO
 
+        fp.ctx.writeln('%s.EntityData.Leafs = make(map[string]interface{})' % fp.class_alias)
         for leaf in leafs:
             fp.ctx.writeln('{0}.EntityData.Leafs["{1}"] = {0}.{2}'.format(
                 fp.class_alias, leaf.stmt.arg, leaf.go_name()))
@@ -145,12 +145,6 @@ class ClassPrinter(object):
                 fp.class_alias, leaf.stmt.arg, leaf.go_name()))
         fp.ctx.writeln('return leafs')
         fp.print_function_trailer()
-
-    # GetBundleName
-    def _print_bundle_name_function(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '"%s"' % self.bundle_name.lower()
-        fp.quick_print('GetBundleName', return_type='string', return_stmt=rstmt)
 
     # GetBundleYangModelsLocation
     def _print_yang_models_function(self, clazz):

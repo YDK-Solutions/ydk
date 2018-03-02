@@ -34,6 +34,7 @@ YANG Development Kit (Generator)
 - [Running Unit Tests](#running-unit-tests)
   - [Python](#python)
   - [C++](#c)
+  - [Go](#go)
 - [Support](#support)
 - [Release Notes](#release-notes)
 
@@ -41,7 +42,7 @@ YANG Development Kit (Generator)
 
 # Overview
 
-**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
+**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python, Go and C++ with planned support for other language bindings in the future.
 
 Other tools and libraries are used to deliver `ydk-gen`'s functionality. In particular:
 
@@ -79,7 +80,6 @@ Centos (Fedora-based):
 ```
    $ sudo yum install epel-release libssh-devel gcc-c++
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.0/libydk-0.7.0-1.x86_64.rpm
-   $ sudo ln –fs /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin:$PATH
 ```
 **To build from source:**
 ```
@@ -149,15 +149,16 @@ Usage: generate.py [options]
 Options:
   --version           show program's version number and exit
   -h, --help          show this help message and exit
-  -p, --python        Generate Python bundle/core. This is currently the default option
-  -c, --cpp           Generate C++ bundle/core
-  --core              Install the python/C++ core
-  --bundle=PROFILE    Take options from a bundle profile file describing YANG
+  -p, --python        Select Python language. This is currently the default option
+  -c, --cpp           Select C++ language
+  -g, --go            Select Go language
+  --core              Generate the core for the selected language
+  --bundle=PROFILE    Generate the bundle for the selected language
   -v, --verbose       Verbose mode
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
-The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
+The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
 
 ## First step: choose your bundle profile
 
@@ -228,7 +229,7 @@ There usually would have been changes on the master branch since the last [relea
 
 First, generate the core and install it:
 
-For C++ or Python, the below step is required:
+For C++, Go or Python, the below step is required:
 ```
 $ ./generate.py --cpp --core
 $ cd gen-api/cpp/ydk/build && make && sudo make install
@@ -240,6 +241,11 @@ $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
 ```
 
+For Go:
+```
+$ ./generate.py --go --core
+$ cp -r gen-api/go/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
+```
 ## Third step: Generate & install your bundle
 Then, generate your bundle using a bundle profile and install it:
 
@@ -258,6 +264,12 @@ ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
 
+For Go:
+```
+$ ./generate.py --go --bundle profiles/bundles/<name-of-profile>.json
+$ cp -r gen-api/go/<name-of-bundle>-bundle/ydk/models/*  $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/models
+```
+
 For C++:
 ```
 $ ./generate.py --cpp --bundle profiles/bundles/<name-of-profile>.json
@@ -266,11 +278,11 @@ $ cd gen-api/cpp/<name-of-bundle>-bundle/build && make && make install
 
 ## Fourth step: Writing your first app
 
-Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and [C++ samples](sdk/cpp/samples). Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html) and [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
+Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and [C++ samples](sdk/cpp/samples). Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html), [Go](http://ydk.cisco.com/go/docs/developer_guide.html) and [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
 
 ## Documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three python bundles and the python core (for C++, use `--cpp` instead of `--python`).
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three python bundles and the python core (for C++, use `--cpp`; for Go, use `--go`).
 
 Note that the below process could take a few hours due to the size of the `cisco_ios_xr` bundle.
 
@@ -308,6 +320,7 @@ When run in this way, we will generate a bundle that only contains tje files spe
 README          - install and usage notes
 gen-api         - generated bundle/core
                     - python (Python SDK)
+                    - go (Go SDK)
                     - cpp (C++ SDK)
 
 generate.py     - script used to generate SDK for yang models
@@ -373,6 +386,9 @@ $ cd ydk-gen/sdk/cpp/tests
 $ mkdir build && cd build
 $ cmake .. && make all test
 ```
+
+## Go
+Please refer [here](https://github.com/CiscoDevNet/ydk-gen/blob/master/sdk/go/core/README.md).
 
 Support
 =======

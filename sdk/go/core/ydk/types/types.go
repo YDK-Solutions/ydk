@@ -96,7 +96,6 @@ type Entity interface {
 	GetChildByName(string, string) 	Entity
 
 	GetChildren() 					map[string]Entity
-	GetLeafs()						map[string]interface{}
 
 	SetParent(Entity)
 	GetParent() 					Entity
@@ -138,6 +137,12 @@ func GetParentYangName(entity Entity) string {
 	return data.ParentYangName
 }
 
+// GetLeafs returns a map of the leafs contained in the given entity
+func GetLeafs(entity Entity) map[string]interface{} {
+	data := entity.GetCommonEntityData()
+	return data.Leafs
+}
+
 
 /////////////////////////////////////
 // Entity Utility Functions
@@ -150,7 +155,7 @@ func HasDataOrFilter(entity Entity) bool {
 	}
 
 	children := entity.GetChildren()
-	leafs := entity.GetLeafs()
+	leafs := GetLeafs(entity)
 
 	// children
 	for _, child := range children {
@@ -181,7 +186,7 @@ func HasDataOrFilter(entity Entity) bool {
 // GetEntityPath returns an EntityPath struct for the given entity
 func GetEntityPath(entity Entity) EntityPath {
 	entityPath := EntityPath{Path: entity.GetSegmentPath()}
-	leafs := entity.GetLeafs()
+	leafs := GetLeafs(entity)
 	v := reflect.ValueOf(entity).Elem()
 
 	// leafs

@@ -58,7 +58,6 @@ class ClassPrinter(object):
         self._print_class_get_segment_path(clazz)
         self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
-        self._print_class_get_leafs(clazz, leafs)
         self._print_yang_models_function(clazz)
         self._print_get_capabilities_table(clazz)
         self._print_get_namespace_table(clazz)
@@ -133,17 +132,6 @@ class ClassPrinter(object):
     def _print_class_get_children(self, clazz, leafs, children):
         fp = ClassGetChildrenPrinter(self.ctx, clazz, leafs, children)
         fp.print_all()
-
-    # GetLeafs
-    def _print_class_get_leafs(self, clazz, leafs):
-        fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetLeafs', return_type='map[string]interface{}')
-        fp.ctx.writeln('leafs := make(map[string]interface{})')
-        for leaf in leafs:
-            fp.ctx.writeln('leafs["{1}"] = {0}.{2}'.format(
-                fp.class_alias, leaf.stmt.arg, leaf.go_name()))
-        fp.ctx.writeln('return leafs')
-        fp.print_function_trailer()
 
     # GetBundleYangModelsLocation
     def _print_yang_models_function(self, clazz):

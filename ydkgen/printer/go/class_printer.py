@@ -51,6 +51,7 @@ class ClassPrinter(object):
         ClassConstructorPrinter(self.ctx, clazz, leafs, self.identity_subclasses).print_all()
 
     def _print_class_method_definitions(self, clazz, leafs, children):
+        self._print_class_get_entity_common_data(clazz, leafs, children)
         self._print_class_get_filter(clazz)
         self._print_class_set_filter(clazz)
         self._print_class_get_go_name(clazz, leafs, children)
@@ -59,7 +60,6 @@ class ClassPrinter(object):
         self._print_class_get_children(clazz, leafs, children)
         self._print_class_get_leafs(clazz, leafs)
         self._print_bundle_name_function(clazz)
-        self._print_yang_name_function(clazz)
         self._print_yang_models_function(clazz)
         self._print_get_capabilities_table(clazz)
         self._print_get_namespace_table(clazz)
@@ -75,6 +75,28 @@ class ClassPrinter(object):
             elif ptype is not None:
                 leafs.append(prop)
 
+    def _print_class_get_entity_common_data(self, clazz, leafs, children):
+        fp = FunctionPrinter(self.ctx, clazz)
+        fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
+
+        fp.ctx.writeln('%s.EntityData.YangName = "%s"' % (fp.class_alias, fp.clazz.stmt.arg))
+        fp.ctx.writeln('%s.EntityData.BundleName = "%s"' % (fp.class_alias, self.bundle_name.lower()))
+        fp.ctx.writeln('%s.EntityData.ParentYangName = "%s"' % (fp.class_alias, clazz.owner.stmt.arg))
+        fp.ctx.bline()
+
+        # GoName - returns string
+        # TODO
+
+        # Children - returns map[string]Entity
+        # TODO
+
+        for leaf in leafs:
+            fp.ctx.writeln('{0}.EntityData.Leafs["{1}"] = {0}.{2}'.format(
+                fp.class_alias, leaf.stmt.arg, leaf.go_name()))
+
+        fp.ctx.writeln('return &(%s.EntityData)' % fp.class_alias)
+        fp.print_function_trailer()
+
     # GetFilter
     def _print_class_get_filter(self, clazz):
         fp = FunctionPrinter(self.ctx, clazz)
@@ -87,7 +109,7 @@ class ClassPrinter(object):
         stmt = '%s.YFilter = yf' % fp.class_alias
         fp.quick_print('SetFilter', args='yf yfilter.YFilter', stmt=stmt)
 
-    # GetFieldNameFromYang
+    # GetGoName
     def _print_class_get_go_name(self, clazz, leafs, children):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetGoName', args='yname string', return_type='string')
@@ -129,12 +151,6 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         rstmt = '"%s"' % self.bundle_name.lower()
         fp.quick_print('GetBundleName', return_type='string', return_stmt=rstmt)
-
-    # GetYangName
-    def _print_yang_name_function(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '"%s"' % fp.clazz.stmt.arg
-        fp.quick_print('GetYangName', return_type='string', return_stmt=rstmt)
 
     # GetBundleYangModelsLocation
     def _print_yang_models_function(self, clazz):

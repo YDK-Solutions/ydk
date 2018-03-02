@@ -76,8 +76,21 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
+type CommonEntityData struct {
+	YangName 		string
+	BundleName 		string
+	YFilter 		yfilter.YFilter
+	Parent 			Entity
+	ParentYangName 	string
+	GoName 			string
+	Children 		map[string]Entity
+	Leafs 			map[string]interface{}
+}
+
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
+	GetCommonEntityData()			*CommonEntityData
+
 	GetGoName(string)				string
 	GetSegmentPath() 				string
 	GetChildByName(string, string) 	Entity
@@ -93,13 +106,12 @@ type Entity interface {
 	GetBundleYangModelsLocation() 	string
 	GetBundleName() 				string
 
-	GetYangName() 					string
 	GetParentYangName() 			string
 
 	GetFilter() 					yfilter.YFilter
 }
 
-// Entity is a basic type that represents containers in YANG
+// Bits is a basic type that represents the YANG bits type
 type Bits map[string]bool
 
 type BitsList struct {

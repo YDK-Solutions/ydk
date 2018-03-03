@@ -40,7 +40,6 @@ class ClassConstructorPrinter(FunctionPrinter):
 
     def print_function_body(self):
         self.ctx.writeln('EntityData types.CommonEntityData')
-        self.ctx.writeln('parent types.Entity')
         self.ctx.writeln('YFilter yfilter.YFilter')
         self._print_inits()
 

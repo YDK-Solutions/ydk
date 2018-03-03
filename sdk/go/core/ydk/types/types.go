@@ -97,9 +97,6 @@ type Entity interface {
 
 	GetChildren() 					map[string]Entity
 
-	SetParent(Entity)
-	GetParent() 					Entity
-
 	GetCapabilitiesTable() 			map[string]string
 	GetNamespaceTable() 			map[string]string
 	GetBundleYangModelsLocation() 	string
@@ -116,7 +113,7 @@ type BitsList struct {
 
 
 /////////////////////////////////////
-// CommonEntityData Utility Functions
+// CommonEntityData Utility Functions -- not really needed
 /////////////////////////////////////
 
 // GetYangName returns the given entity's YANG name
@@ -408,11 +405,11 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 	if ancestor == nil {
 		return ""
 	}
-	p := current_node.GetParent()
+	p := current_node.GetCommonEntityData().Parent
 	parents := EntitySlice{}
 	for p != nil && p != ancestor {
 		//append(parents, p)
-		p = p.GetParent()
+		p = p.GetCommonEntityData().Parent
 	}
 
 	if p == nil {
@@ -455,8 +452,6 @@ func sortValuePaths(v []NameLeafData) []NameLeafData {
 func nameValuesEqual(e1, e2 Entity) bool {
 	valuePath1 := GetEntityPath(e1).ValuePaths
 	valuePath2 := GetEntityPath(e2).ValuePaths
-	// valuePath1 := e1.GetEntityPath(e1.GetParent()).ValuePaths
-	// valuePath2 := e2.GetEntityPath(e2.GetParent()).ValuePaths
 	path1 := sortValuePaths(valuePath1)
 	path2 := sortValuePaths(valuePath2)
 

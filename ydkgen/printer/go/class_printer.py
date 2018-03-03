@@ -61,8 +61,6 @@ class ClassPrinter(object):
         self._print_yang_models_function(clazz)
         self._print_get_capabilities_table(clazz)
         self._print_get_namespace_table(clazz)
-        self._print_set_parent_function(clazz)
-        self._print_get_parent_function(clazz)
 
     def _get_class_members(self, clazz, leafs, children):
         for prop in clazz.properties():
@@ -157,18 +155,6 @@ class ClassPrinter(object):
             'GetNamespaceTable', return_type='map[string]string')
         fp.ctx.write("return %s.GetNamespaces() " % (bundle_name))
         fp.print_function_trailer()
-
-    # SetParent
-    def _print_set_parent_function(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        stmt = '%s.parent = parent' % fp.class_alias
-        fp.quick_print('SetParent', args='parent types.Entity', stmt=stmt)
-
-    # GetParent
-    def _print_get_parent_function(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '%s.parent' % fp.class_alias
-        fp.quick_print('GetParent', return_type='types.Entity', return_stmt=rstmt)
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

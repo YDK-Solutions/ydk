@@ -52,8 +52,6 @@ class ClassPrinter(object):
 
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_entity_common_data(clazz, leafs, children)
-        self._print_class_get_filter(clazz)
-        self._print_class_set_filter(clazz)
         self._print_class_get_go_name(clazz, leafs, children)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_child(clazz, leafs, children)
@@ -74,6 +72,7 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
 
+        fp.ctx.writeln('{0}.EntityData.YFilter = {0}.YFilter'.format(fp.class_alias))
         fp.ctx.writeln('%s.EntityData.YangName = "%s"' % (fp.class_alias, fp.clazz.stmt.arg))
         fp.ctx.writeln('%s.EntityData.BundleName = "%s"' % (fp.class_alias, self.bundle_name.lower()))
         fp.ctx.writeln('%s.EntityData.ParentYangName = "%s"' % (fp.class_alias, clazz.owner.stmt.arg))
@@ -92,18 +91,6 @@ class ClassPrinter(object):
 
         fp.ctx.writeln('return &(%s.EntityData)' % fp.class_alias)
         fp.print_function_trailer()
-
-    # GetFilter
-    def _print_class_get_filter(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '%s.YFilter' % fp.class_alias
-        fp.quick_print('GetFilter', return_type='yfilter.YFilter', return_stmt=rstmt)
-
-    # SetFilter
-    def _print_class_set_filter(self, clazz):
-        fp = FunctionPrinter(self.ctx, clazz)
-        stmt = '%s.YFilter = yf' % fp.class_alias
-        fp.quick_print('SetFilter', args='yf yfilter.YFilter', stmt=stmt)
 
     # GetGoName
     def _print_class_get_go_name(self, clazz, leafs, children):

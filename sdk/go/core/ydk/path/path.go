@@ -632,7 +632,7 @@ func getDataNodeFromEntity(
 	rootDataNode := C.RootSchemaNodeCreate(*getCState(state), rootSchema, path)
 	panicOnCStateError(getCState(state))
 
-	addDataNodeFilterAnnotation(&rootDataNode, entity.GetFilter())
+	addDataNodeFilterAnnotation(&rootDataNode, entity.GetCommonEntityData().YFilter)
 
 	populateNameValues(state, rootDataNode, rootPath)
 	walkChildren(state, entity, rootDataNode)
@@ -674,7 +674,7 @@ func populateDataNode(
 		panic("Datanode could not be created for: " + path.Path)
 	}
 
-	addDataNodeFilterAnnotation(&dataNode, entity.GetFilter())
+	addDataNodeFilterAnnotation(&dataNode, entity.GetCommonEntityData().YFilter)
 
 	populateNameValues(state, dataNode, path)
 	walkChildren(state, entity, dataNode)

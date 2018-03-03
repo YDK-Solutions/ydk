@@ -77,9 +77,12 @@ type EntityPath struct {
 }
 
 type CommonEntityData struct {
+	// static data (internals)
 	YangName 		string
 	BundleName 		string
 	YFilter 		yfilter.YFilter
+
+	// dynamic data (internals)
 	Parent 			Entity
 	ParentYangName 	string
 	GoName 			string
@@ -100,8 +103,6 @@ type Entity interface {
 	GetCapabilitiesTable() 			map[string]string
 	GetNamespaceTable() 			map[string]string
 	GetBundleYangModelsLocation() 	string
-
-	GetFilter() 					yfilter.YFilter
 }
 
 // Bits is a basic type that represents the YANG bits type
@@ -113,7 +114,7 @@ type BitsList struct {
 
 
 /////////////////////////////////////
-// CommonEntityData Utility Functions -- not really needed
+// CommonEntityData Utility Functions -- should these not be utility funcs?
 /////////////////////////////////////
 
 // GetYangName returns the given entity's YANG name
@@ -145,9 +146,10 @@ func GetLeafs(entity Entity) map[string]interface{} {
 // Entity Utility Functions
 /////////////////////////////////////
 
-// HasDataOrFilter returns a bool representing whether the entity or any of its children have their data/filter set
+// HasDataOrFilter returns a bool representing whether the entity
+// or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
-	if (entity.GetFilter() != yfilter.NotSet) {
+	if (entity.GetCommonEntityData().YFilter != yfilter.NotSet) {
 		return true
 	}
 
@@ -156,7 +158,8 @@ func HasDataOrFilter(entity Entity) bool {
 
 	// children
 	for _, child := range children {
-		if (child.GetFilter() != yfilter.NotSet || HasDataOrFilter(child)) {
+		yf := child.GetCommonEntityData().YFilter
+		if (yf != yfilter.NotSet || HasDataOrFilter(child)) {
 			return true
 		}
 	}

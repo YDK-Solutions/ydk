@@ -64,7 +64,8 @@ function install_dependencies {
                             openjdk-8-jre \
                             golang \
                             cmake \
-                            gdebi-core > /dev/null
+                            gdebi-core\
+                            lcov > /dev/null
 
     # gcc-5 and g++5 for modern c++
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y

@@ -112,6 +112,7 @@ std::string ydk::path::replace_xml_escape_sequences(const std::string& xml)
     seqs_table.push_back( std::make_pair( std::string("&gt;"),  std::string(">")) );
     seqs_table.push_back( std::make_pair( std::string("&amp;"), std::string("&")) );
     seqs_table.push_back( std::make_pair( std::string("&quot;"),std::string("""")) );
+    seqs_table.push_back( std::make_pair( std::string("&#13';"), std::string("")) );
 
     std::string reply = xml;
     for (std::pair<std::string,std::string> item : seqs_table)

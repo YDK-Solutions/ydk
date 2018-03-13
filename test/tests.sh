@@ -165,9 +165,10 @@ function install_cpp_core {
     cd $YDKGEN_HOME
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
-    
-    ${CMAKE_BIN} .. && sudo make install
-    make package
+
+    print_msg "Compiling with coverage"
+    ${CMAKE_BIN} -DCOVERAGE=True .. && sudo make install
+    sudo make package || true
     cp libydk*rpm libydk*deb /ydk-gen &> /dev/null
 }
 
@@ -196,6 +197,8 @@ function install_py_core {
     print_msg "Installing py core"
     cd $YDKGEN_HOME
     cd $YDKGEN_HOME/sdk/python/core
+    print_msg "Building python with coverage"
+    export YDK_COVERAGE=
     python setup.py sdist
     pip install dist/ydk*.tar.gz
 
@@ -214,6 +217,7 @@ function run_cpp_bundle_tests {
 
     cpp_sanity_ydktest_gen_install
     cpp_sanity_ydktest_test
+    collect_cpp_coverage
 }
 
 function generate_install_specified_cpp_bundle {
@@ -246,7 +250,8 @@ function cpp_sanity_ydktest_test {
 
     print_msg "Building and running cpp bundle tests"
     mkdir -p $YDKGEN_HOME/sdk/cpp/tests/build && cd sdk/cpp/tests/build
-    run_exec_test ${CMAKE_BIN} ..
+    print_msg "Compiling with coverage"
+    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
     run_exec_test make
     make test
     local status=$?
@@ -284,6 +289,15 @@ function cpp_test_gen {
     run_exec_test sudo make install
 
     # cpp_test_gen_test
+}
+
+function collect_cpp_coverage {
+    print_msg "Collecting coverage for C++"
+    cd ${YDKGEN_HOME}/sdk/cpp/core/build
+    lcov --directory . --capture --output-file coverage.info # capture coverage info
+    lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
+    lcov --list coverage.info #debug info
+    cp coverage.info ${YDKGEN_HOME}
 }
 
 ######################################################################
@@ -326,7 +340,8 @@ function run_go_samples {
 function run_go_sanity_tests {
     print_msg "Running go sanity tests"
     cd $YDKGEN_HOME/sdk/go/core/tests
-    run_exec_test go test
+    run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
+    mv coverage.txt ${YDKGEN_HOME}
     cd -
 }
 

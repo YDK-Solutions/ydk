@@ -377,6 +377,7 @@ class SanityNetconf(unittest.TestCase):
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
+    2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, 1, '', ''"""
             res = re.match(expected_msg, err.message.strip())
@@ -391,6 +392,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
+    2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', '', 1"""
             res = re.match(expected_msg, err.message.strip())
@@ -405,6 +407,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
         except YPYServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
+    2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
 Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', 1, ''"""
             res = re.match(expected_msg, err.message.strip())

@@ -45,16 +45,6 @@ class DataNode;
 
 }
 
-class Entity;
-
-enum class DataStore {
-    candidate,
-    running,
-    startup,
-    url,
-    na
-};
-
 class NetconfService
 {
     public:

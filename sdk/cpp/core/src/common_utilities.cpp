@@ -74,6 +74,7 @@ string replace_xml_escape_sequences(const string& xml)
     seqs_table[string("&gt;")]   = string(">");
     seqs_table[string("&amp;")]  = string("&");
     seqs_table[string("&quot;")] = string("""");
+    seqs_table[string("&#13;")]  = string("");
 
     string reply = xml;
     for (auto item : seqs_table)

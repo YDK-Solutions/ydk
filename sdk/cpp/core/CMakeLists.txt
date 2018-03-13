@@ -84,7 +84,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set (CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
         set (CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
         set (CPACK_RPM_PACKAGE_URL "https://github.com/CiscoDevNet/ydk-cpp")
-        set (CPACK_RPM_PACKAGE_REQUIRES "python-pip, python-devel, libxml2-devel, libxslt-devel, libssh-devel, libcurl-devel, libtool, clang, cmake3, pcre-devel")
+        set (CPACK_RPM_PACKAGE_REQUIRES "python-pip, python-devel, libxml2-devel, libxslt-devel, libssh-devel, libcurl-devel, libtool, cmake3, pcre-devel")
 
         # <name>-<version>-<release>.<architecture>.(src).rpm
         # libydk-0.6.0-0.1.alpha.x86_64.rpm  // RPM
@@ -115,8 +115,13 @@ set(HOME_DIRECTORY $ENV{HOME})
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0")
 
+if(COVERAGE STREQUAL True)
+    set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_BUILD_TYPE debug)
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0")
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL debug)
     option(ENABLE_BUILD_TESTS "Build tests" ON)
@@ -159,6 +164,7 @@ set(libydk_src
     src/value.cpp
     src/value_list.cpp
     src/xml_subtree_codec.cpp
+    src/xml_util.cpp
     src/ydk_operation.cpp
     src/ydk.cpp
     src/ydk_yang.cpp
@@ -213,6 +219,7 @@ set(libydk_install_headers
     src/service_provider.hpp
     src/types.hpp
     src/xml_subtree_codec.hpp
+    src/xml_util.hpp
     src/validation_service.hpp
     src/ydk.h)
 

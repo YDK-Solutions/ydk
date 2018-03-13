@@ -412,10 +412,10 @@ bool NetconfService::validate(NetconfServiceProvider& provider, Entity& source)
     return read_datanode == nullptr;
 }
 
-static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider& provider, const char* yfilter)
+static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider& provider, const char* operation)
 {
     path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
-    auto rpc =  root_schema.create_rpc(yfilter);
+    auto rpc =  root_schema.create_rpc(operation);
     if (rpc == nullptr)
         throw(YError{"Unable to create rpc"});
 
@@ -433,7 +433,7 @@ static void create_input_leaf(path::DataNode & input_datanode, DataStore datasto
         {
             throw(YServiceError{"URL needs to be specified"});
         }
-        os << "/url";
+        os << "/" << datastore_to_string(datastore);
 
         input_datanode.create_datanode(os.str(), url);
     }
@@ -446,58 +446,26 @@ static void create_input_leaf(path::DataNode & input_datanode, DataStore datasto
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string)
 {
     ostringstream os;
-    os << datastore_string;
-
-    switch(datastore)
-    {
-        case DataStore::candidate:
-            os << "/candidate";
-            break;
-
-        case DataStore::running:
-            os << "/running";
-            break;
-
-        case DataStore::startup:
-            os << "/startup";
-            break;
-
-        case DataStore::url:
-            throw(YServiceError{"URL needs to be specified"});
-            break;
-
-        case DataStore::na:
-        default:
-            throw(YServiceError{"DataStore option is invalid"});
-            break;
-    }
-
+    os << datastore_string << "/" << datastore_to_string(datastore);
     input_datanode.create_datanode(os.str());
 }
 
 static string datastore_to_string(DataStore datastore)
 {
-    string datastore_string;
     switch(datastore)
     {
         case DataStore::candidate:
-            datastore_string = "candidate";
-            break;
+            return "candidate";
         case DataStore::running:
-            datastore_string = "running-config";
-            break;
+            return "running";
         case DataStore::startup:
-            datastore_string = "startup-config";
-            break;
+            return "startup";
         case DataStore::url:
-            datastore_string = "URL";
-            break;
+            return "url";
         case DataStore::na:
         default:
-            datastore_string = "NA";
-            break;
+            return "na";
     }
-    return datastore_string;
 }
 
 }

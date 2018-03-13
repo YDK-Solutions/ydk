@@ -20,12 +20,13 @@
 #include "netconf_provider.hpp"
 #include "crud_service.hpp"
 #include "catch.hpp"
+#include "entity_data_node_walker.hpp"
 
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_bgp_types.hpp>
-
 #include <ydk_ydktest/openconfig_platform.hpp>
 #include <ydk_ydktest/openconfig_platform_types.hpp>
+#include "ydk_ydktest/ydktest_sanity.hpp"
 
 #include "config.hpp"
 
@@ -33,6 +34,15 @@ using namespace ydk;
 using namespace ydktest;
 using namespace std;
 
+void print_tree(ydk::path::DataNode* dn, const std::string& indent);
+
+void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root)
+{
+    ydk::path::DataNode& dn = get_data_node_from_entity( *entity, root);
+	ydk::path::Statement s = dn.get_schema_node().get_statement();
+	cout << "\n=====>  Printing DataNode: '" << s.arg << "'" << endl;
+    print_tree( &dn, " ");
+}
 
 void config_bgp(openconfig_bgp::Bgp* bgp)
 {
@@ -300,4 +310,49 @@ TEST_CASE("oc_platform")
     reply = crud.delete_(provider, fil);
     REQUIRE(reply);
 
+}
+
+TEST_CASE( "crud_entity_list_bgp" )
+{
+    ydk::NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
+    ydk::CrudService crud{};
+
+    // Create 'native' configuration
+    ydktest::ydktest_sanity::Native native{};
+    native.hostname = "My Host";
+    native.version = "0.1.0";
+
+    // Set the Global AS
+    openconfig_bgp::Bgp bgp{};
+    bgp.global->config->as = 65001;
+    bgp.global->config->router_id = "1.2.3.4";
+
+    // Create entity list
+    vector<ydk::Entity*> create_list{};
+    create_list.push_back(&native);
+    create_list.push_back(&bgp);
+
+    // Execute CRUD operations
+    bool result = crud.create(provider, create_list);
+    REQUIRE(result == true);
+
+    // Create filter list
+    ydktest::ydktest_sanity::Native native_filter{};
+    openconfig_bgp::Bgp bgp_filter{};
+    vector<ydk::Entity*> filter_list{};
+    filter_list.push_back(&native_filter);
+    filter_list.push_back(&bgp_filter);
+
+    // Read multiple entities
+    auto read_list = crud.read(provider, filter_list);
+    REQUIRE(read_list.size() == 2);
+
+//    for (auto item : read_list) {
+//        print_entity(item, root);
+//    }
+
+    // Delete configuration
+    result = crud.delete_(provider, filter_list);
+    REQUIRE(result == true);
 }

@@ -41,7 +41,8 @@ namespace ydk
 {
 static bool file_exists(const std::string & path)
 {
-    struct stat st={0};
+    struct stat st;
+    memset(&st, 0, sizeof(struct stat));
 
     return stat(path.c_str(), &st) == 0;
 }

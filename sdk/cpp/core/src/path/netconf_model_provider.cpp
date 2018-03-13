@@ -29,7 +29,8 @@
 #include "../types.hpp"
 #include "../ydk_yang.hpp"
 #include "../logger.hpp"
-#include "path_private.hpp"
+#include "../common_utilities.hpp"
+
 
 using namespace std;
 using namespace ydk;

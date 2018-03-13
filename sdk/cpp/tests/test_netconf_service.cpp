@@ -21,7 +21,9 @@
 #include <ydk/netconf_service.hpp>
 #include <ydk_ydktest/ydktest_sanity.hpp>
 #include <ydk_ydktest/openconfig_bgp.hpp>
+#include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/types.hpp>
+
 #include <spdlog/spdlog.h>
 
 #include "config.hpp"
@@ -30,6 +32,9 @@
 using namespace ydk;
 using namespace ydktest;
 using namespace std;
+
+void print_data_node(shared_ptr<ydk::path::DataNode> dn);
+void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root);
 
 // cancel_commit -- issues in netsim
 //TEST_CASE("cancel_commit")
@@ -108,6 +113,41 @@ TEST_CASE("discard_changes")
     REQUIRE(reply);
 }
 
+TEST_CASE("get_edit_copy_config")
+{
+    // session
+    path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfService ns{};
+
+    DataStore target = DataStore::candidate;
+    DataStore source = DataStore::running;
+
+    // Build filter
+    openconfig_interfaces::Interfaces interfaces_filter{};
+    openconfig_bgp::Bgp bgp_filter{};
+    vector<ydk::Entity*> filter_list{};
+    filter_list.push_back(&interfaces_filter);
+    filter_list.push_back(&bgp_filter);
+
+    // Read running config
+    auto get_config_list = ns.get_config(provider, source, filter_list);
+    REQUIRE(get_config_list.size() == 2);
+
+    vector<Entity*> copy_config_list{};
+    for (auto ent : get_config_list) {
+        copy_config_list.push_back(ent.get());
+    }
+
+    // Copy config to candidate
+    auto result = ns.copy_config(provider, target, copy_config_list);
+    REQUIRE(result);
+
+    // Discard changes
+    result = ns.discard_changes(provider);
+    REQUIRE(result);
+}
+
 // edit_config, get_config
 TEST_CASE("edit_config")
 {
@@ -134,6 +174,74 @@ TEST_CASE("edit_config")
 
     reply = ns.discard_changes(provider);
     REQUIRE(reply);
+}
+
+TEST_CASE("edit_multiple_config")
+{
+    // session
+    path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfService ns{};
+    ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
+
+    DataStore target = DataStore::candidate;
+    DataStore source = DataStore::candidate;
+
+    // Create 'native' configuration
+    ydktest::ydktest_sanity::Native native{};
+    native.hostname = "My Host";
+    native.version = "0.1.2";
+
+    // Set the Global AS
+    openconfig_bgp::Bgp bgp{};
+    bgp.global->config->as = 65051;
+    bgp.global->config->router_id = "10.20.30.40";
+
+    // Create entity list
+    vector<ydk::Entity*> edit_list{};
+    edit_list.push_back(&native);
+    edit_list.push_back(&bgp);
+
+    auto reply = ns.edit_config(provider, target, edit_list);
+    REQUIRE(reply);
+
+    // Build filter
+    ydktest::ydktest_sanity::Native native_filter{};
+    openconfig_bgp::Bgp bgp_filter{};
+    vector<ydk::Entity*> filter_list{};
+    filter_list.push_back(&native_filter);
+    filter_list.push_back(&bgp_filter);
+
+    // Read current configuration and print it
+    auto read_list = ns.get_config(provider, source, filter_list);
+    REQUIRE(read_list.size() == 2);
+    for (auto item : read_list) {
+        //print_entity(item, root);
+        string path = item->get_segment_path();
+        if (path.find("bgp") != string::npos) {
+            auto data_ptr = dynamic_cast<openconfig_bgp::Bgp*>(item.get());
+            REQUIRE(data_ptr != nullptr);
+            REQUIRE(data_ptr->global->config->as == bgp.global->config->as);
+            REQUIRE(data_ptr->global->config->router_id == bgp.global->config->router_id);
+        }
+        if (path.find("native") != string::npos) {
+            auto data_ptr = dynamic_cast<ydktest::ydktest_sanity::Native*>(item.get());
+            REQUIRE(data_ptr != nullptr);
+            REQUIRE(data_ptr->hostname == native.hostname);
+            REQUIRE(data_ptr->version == native.version);
+        }
+    }
+
+    // Discard config changes
+    reply = ns.discard_changes(provider);
+    REQUIRE(reply);
+
+    // Read configuration and print it
+//    read_list = ns.get_config(provider, source, get_list);
+//    REQUIRE(read_list.size() == 2);
+//    for (auto item : read_list) {
+//        print_entity(item, root);
+//    }
 }
 
 // get
@@ -194,3 +302,24 @@ TEST_CASE("validate")
     auto reply = ns.validate(provider, source);
     REQUIRE(reply);
 }
+
+// TODO
+//TEST_CASE("read_all_rpc")
+//{
+//    //ydk::path::NetconfSession session{"10.30.110.86", "admin", "admin"};	// XR
+//
+//    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+//    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+//
+//    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };
+//    read_rpc->get_input_node().create_datanode("source/running");
+//
+//    auto read_result = (*read_rpc)(session);
+//    REQUIRE(read_result != nullptr);
+//
+//    // Print config
+//    vector<shared_ptr<ydk::path::DataNode>> data_nodes = read_result->get_children();
+//    for (auto dn : data_nodes) {
+//    	print_data_node(dn);
+//    }
+//}

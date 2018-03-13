@@ -18,6 +18,7 @@
 sanity tests for netconf
 """
 from __future__ import absolute_import
+from __future__ import print_function
 
 import sys
 import unittest
@@ -25,6 +26,8 @@ import logging
 
 from ydk.errors import YPYModelError, YPYError, YPYServiceError
 from ydk.models.ydktest import ydktest_sanity as ysanity
+from ydk.models.ydktest import openconfig_bgp as openconfig
+
 from ydk.providers import NetconfServiceProvider
 from ydk.services  import NetconfService, Datastore
 from ydk.services  import CRUDService
@@ -256,6 +259,48 @@ class SanityNetconf(ParametrizedTestCase):
         xml_encode = codec_service.encode(codec_provider, interfaces)
         # print(xml_encode)
         # enable_logging(logging.ERROR)
+
+    def test_crud_read_mixed(self):
+        #enable_logging(logging.DEBUG)
+        crud = CRUDService()
+
+        # Build configuration of multiple objects
+        native = ysanity.Native()
+        native.hostname = 'NativeHost'
+        native.version = '0.1.0'
+
+        bgp = openconfig.Bgp()
+        bgp.global_.config.as_ = 65001
+        bgp.global_.config.router_id = "1.2.3.4"
+
+        create_list = [native, bgp];
+
+        # Configure device
+        result = crud.create(self.ncc, create_list)
+        self.assertEqual(result, True)
+
+        # Read configuration
+        native_filter = ysanity.Native()
+        bgp_filter = openconfig.Bgp()
+        filter_list = [native_filter, bgp_filter];
+
+        read_list = crud.read(self.ncc, filter_list)
+        self.assertEqual(isinstance(read_list, list), True)
+        self.assertEqual(len(read_list), 2)
+
+        # Print configuration
+#         codec_service = CodecService()
+#         codec_provider = CodecServiceProvider()
+#         codec_provider.encoding = EncodingFormat.XML
+#
+#         for entity in read_list:
+#             xml = codec_service.encode(codec_provider, entity)
+#             print('\n===== Printing entity: %s' %entity.get_segment_path())
+#             print(xml)
+
+        # Delete configuration
+        result = crud.delete(self.ncc, create_list)
+        self.assertEqual(result, True)
 
 def enable_logging(level):
     log = logging.getLogger('ydk')

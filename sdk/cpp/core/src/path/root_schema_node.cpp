@@ -28,6 +28,7 @@
 #include <json.hpp>
 
 #include "../logger.hpp"
+#include "../common_utilities.hpp"
 #include "path_private.hpp"
 
 
@@ -207,10 +208,14 @@ ydk::path::RootSchemaNodeImpl::populate_module_schema(const struct lys_module* m
 void
 ydk::path::RootSchemaNodeImpl::populate_new_schemas_from_payload(const std::string& payload, ydk::EncodingFormat format)
 {
+    YLOG_DEBUG("Populating new schema from payload:\n{}", payload);
     std::vector<const lys_module*> modules;
     if (format == ydk::EncodingFormat::XML)
     {
-        auto namespaces = get_namespaces_from_xml_payload(payload);
+        std::string xml_str = trim(payload);
+        if (xml_str.substr(0, 5) != "<?xml")
+            xml_str = "<data>" + payload + "</data>";
+        auto namespaces = get_namespaces_from_xml_payload(xml_str);
         modules = m_priv_repo->get_new_ly_modules_from_lookup(m_ctx, namespaces, m_name_namespace_lookup);
     }
     else

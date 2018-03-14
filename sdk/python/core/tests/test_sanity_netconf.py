@@ -98,6 +98,8 @@ class SanityNetconf(ParametrizedTestCase):
             op = self.netconf_service.unlock(self.ncc, Datastore.running)
         except Exception as e:
             self.assertIsInstance(e, YPYError)
+            
+        op = self.netconf_service.unlock(self.ncc, Datastore.candidate)
 
     def test_validate(self):
         op = self.netconf_service.validate(self.ncc, source=Datastore.candidate)
@@ -105,7 +107,7 @@ class SanityNetconf(ParametrizedTestCase):
 
         runner = ysanity.Runner()
         runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
+        runner.ydktest_sanity_one.name = 'runner-one-name'
         op = self.netconf_service.validate(self.ncc, source=runner)
         self.assertEqual(True, op)
 
@@ -114,6 +116,7 @@ class SanityNetconf(ParametrizedTestCase):
         pass
 
     def test_commit_discard(self):
+        enable_logging(logging.DEBUG)
         runner = ysanity.Runner()
         runner.two.number = 2
         runner.two.name = 'runner:two:name'
@@ -133,8 +136,9 @@ class SanityNetconf(ParametrizedTestCase):
 
         result = self.netconf_service.get(self.ncc, get_filter)
         self.assertEqual(runner, result)
+        enable_logging(logging.ERROR)
 
-    @unittest.skip('No message id in cancel commit payload')
+    #@unittest.skip('No message id in cancel commit payload')
     def test_confirmed_commit(self):
         runner = ysanity.Runner()
         runner.two.number = 2
@@ -178,6 +182,35 @@ class SanityNetconf(ParametrizedTestCase):
 
         result = self.netconf_service.get_config(self.ncc, Datastore.running, get_filter)
         self.assertEqual(runner, result)
+
+    def test_edit_get_config_list(self):
+        runner = ysanity.Runner()
+        runner.two.number = 2
+        runner.two.name = 'runner-two-name'
+        
+        native = ysanity.Native()
+        native.hostname = 'NewHostName'
+        native.version = '0.1.0a'
+        
+        edit_filter = [runner, native]
+
+        op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, edit_filter)
+        self.assertEqual(True, op)
+
+        get_filter = [ysanity.Runner(), ysanity.Native()]
+        config = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
+        #self.assertEqual(len(config), 2)
+        self.assertEqual(edit_filter, config)
+
+        codec_service = CodecService()
+        codec_provider = CodecServiceProvider()
+        codec_provider.encoding = EncodingFormat.XML
+
+        for entity in config:
+            xml_encode = codec_service.encode(codec_provider, entity)
+            #print(xml_encode)
+
+        op = self.netconf_service.discard_changes(self.ncc)
 
     def test_delete_config(self):
         pass

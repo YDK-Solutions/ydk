@@ -487,7 +487,7 @@ static shared_ptr<path::DataNode> handle_netconf_get_output(const string & reply
         YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply);
         throw(YServiceProviderError{reply});
     }
-    data_start += sizeof("<data>");
+    data_start += sizeof("<data>") - 1;
     auto data_end = reply.find("</data>", data_start);
     if(data_end == string::npos)
     {
@@ -495,7 +495,7 @@ static shared_ptr<path::DataNode> handle_netconf_get_output(const string & reply
         throw(YError{"No end data tag found"});
     }
 
-    string data = reply.substr(data_start, data_end-data_start);	// +sizeof("</data>")
+    string data = reply.substr(data_start, data_end-data_start);
 
     auto datanode = shared_ptr<path::DataNode>(codec_service.decode(root_schema, data, EncodingFormat::XML));
 

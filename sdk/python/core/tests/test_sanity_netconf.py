@@ -66,7 +66,7 @@ class SanityNetconf(ParametrizedTestCase):
     def test_edit_commit_get(self):
         runner = ysanity.Runner()
         runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
+        runner.ydktest_sanity_one.name = 'runner-one-name'
 
         get_filter = ysanity.Runner()
 
@@ -116,10 +116,9 @@ class SanityNetconf(ParametrizedTestCase):
         pass
 
     def test_commit_discard(self):
-        enable_logging(logging.DEBUG)
         runner = ysanity.Runner()
         runner.two.number = 2
-        runner.two.name = 'runner:two:name'
+        runner.two.name = 'runner-two-name'
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
@@ -136,13 +135,12 @@ class SanityNetconf(ParametrizedTestCase):
 
         result = self.netconf_service.get(self.ncc, get_filter)
         self.assertEqual(runner, result)
-        enable_logging(logging.ERROR)
 
     #@unittest.skip('No message id in cancel commit payload')
     def test_confirmed_commit(self):
         runner = ysanity.Runner()
         runner.two.number = 2
-        runner.two.name = 'runner:two:name'
+        runner.two.name = 'runner-two-name'
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
@@ -163,7 +161,7 @@ class SanityNetconf(ParametrizedTestCase):
 
         runner = ysanity.Runner()
         runner.two.number = 2
-        runner.two.name = 'runner:two:name'
+        runner.two.name = 'runner-two-name'
         get_filter = ysanity.Runner()
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
@@ -267,8 +265,6 @@ class SanityNetconf(ParametrizedTestCase):
                           "invalid-input")
 
     def test_sanity_crud_read_interface(self):
-        enable_logging(logging.ERROR)
-
         address = ysanity.Native.Interface.Loopback.Ipv4.Address();
         address.ip = "2.2.2.2"
         address.netmask = "255.255.255.255"
@@ -291,10 +287,8 @@ class SanityNetconf(ParametrizedTestCase):
         codec_provider.encoding = EncodingFormat.XML
         xml_encode = codec_service.encode(codec_provider, interfaces)
         # print(xml_encode)
-        # enable_logging(logging.ERROR)
 
     def test_crud_read_mixed(self):
-        #enable_logging(logging.DEBUG)
         crud = CRUDService()
 
         # Build configuration of multiple objects
@@ -322,14 +316,14 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(len(read_list), 2)
 
         # Print configuration
-#         codec_service = CodecService()
-#         codec_provider = CodecServiceProvider()
-#         codec_provider.encoding = EncodingFormat.XML
-#
-#         for entity in read_list:
-#             xml = codec_service.encode(codec_provider, entity)
-#             print('\n===== Printing entity: %s' %entity.get_segment_path())
-#             print(xml)
+        codec_service = CodecService()
+        codec_provider = CodecServiceProvider()
+        codec_provider.encoding = EncodingFormat.XML
+
+        for entity in read_list:
+            xml = codec_service.encode(codec_provider, entity)
+            #print('\n===== Printing entity: %s' %entity.get_segment_path())
+            #print(xml)
 
         # Delete configuration
         result = crud.delete(self.ncc, create_list)

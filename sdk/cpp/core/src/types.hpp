@@ -374,7 +374,6 @@ enum class DataStore {
     na
 };
 
-std::string to_string(DataStore d);
 }
 
 #endif /* _TYPES_HPP_ */

@@ -34,8 +34,6 @@
 #include "netconf_provider.hpp"
 #include "types.hpp"
 
-using namespace std;
-
 namespace ydk
 {
 
@@ -58,29 +56,29 @@ class NetconfService
         bool commit(NetconfServiceProvider& provider, bool confirmed = false,
             int confirm_timeout = -1, int persist = -1, int persist_id = -1);
 
-        bool copy_config(NetconfServiceProvider& provider, DataStore target, DataStore source, string url = "");
+        bool copy_config(NetconfServiceProvider& provider, DataStore target, DataStore source, std::string url = "");
 
         bool copy_config(NetconfServiceProvider& provider, DataStore target, Entity& source_config);
 
-        bool copy_config(NetconfServiceProvider& provider, DataStore target, vector<Entity*>& source_list);
+        bool copy_config(NetconfServiceProvider& provider, DataStore target, std::vector<Entity*>& source_list);
 
-        bool delete_config(NetconfServiceProvider& provider, DataStore target, string url = "");
+        bool delete_config(NetconfServiceProvider& provider, DataStore target, std::string url = "");
 
         bool discard_changes(NetconfServiceProvider& provider);
 
         bool edit_config(NetconfServiceProvider& provider, DataStore target, Entity& config,
-            string default_operation = "", string test_option = "", string error_option = "");
+            std::string default_operation = "", std::string test_option = "", std::string error_option = "");
 
-        bool edit_config(NetconfServiceProvider& provider, DataStore target, vector<Entity*>& config,
-            string default_operation = "", string test_option = "", string error_option = "");
+        bool edit_config(NetconfServiceProvider& provider, DataStore target, std::vector<Entity*>& config,
+            std::string default_operation = "", std::string test_option = "", std::string error_option = "");
 
-        shared_ptr<Entity> get_config(NetconfServiceProvider& provider, DataStore source, Entity& filter);
+        std::shared_ptr<Entity> get_config(NetconfServiceProvider& provider, DataStore source, Entity& filter);
 
-        vector<shared_ptr<Entity>> get_config(NetconfServiceProvider& provider, DataStore source, vector<Entity*>& filter_list);
+        std::vector<std::shared_ptr<Entity>> get_config(NetconfServiceProvider& provider, DataStore source, std::vector<Entity*>& filter_list);
 
-        shared_ptr<Entity> get(NetconfServiceProvider& provider, Entity& filter);
+        std::shared_ptr<Entity> get(NetconfServiceProvider& provider, Entity& filter);
 
-        vector<shared_ptr<Entity>> get(NetconfServiceProvider& provider, vector<Entity*> & filter_list);
+        std::vector<std::shared_ptr<Entity>> get(NetconfServiceProvider& provider, std::vector<Entity*> & filter_list);
 
         bool kill_session(NetconfServiceProvider& provider, unsigned int session_id);
 
@@ -88,7 +86,7 @@ class NetconfService
 
         bool unlock(NetconfServiceProvider& provider, DataStore target);
 
-        bool validate(NetconfServiceProvider& provider, DataStore source, string url = "");
+        bool validate(NetconfServiceProvider& provider, DataStore source, std::string url = "");
 
         bool validate(NetconfServiceProvider& provider, Entity& source_config);
 };

@@ -479,16 +479,9 @@ TEST_CASE("multiple_encode_decode")
 
     // Encode results
     xml = s.encode(*read_result, ydk::EncodingFormat::XML, true);
-//    cout << endl << "===== XML after encoding multiple entities:" << endl << xml << endl;
 
     auto data_node = s.decode(schema, xml, ydk::EncodingFormat::XML);
     REQUIRE(data_node != nullptr);
-
-    // Print after decoding
-//    vector<shared_ptr<ydk::path::DataNode>> data_nodes = data_node->get_children();
-//    for (auto dn : data_nodes) {
-//    	print_data_node(dn);
-//    }
 }
 
 TEST_CASE("multiple_delete_create_read_rpc")
@@ -544,12 +537,6 @@ TEST_CASE("multiple_delete_create_read_rpc")
 
     auto read_result = (*read_rpc)(session);
     REQUIRE(read_result != nullptr);
-
-    // Print config
-//    vector<shared_ptr<ydk::path::DataNode>> data_nodes = read_result->get_children();
-//    for (auto dn : data_nodes) {
-//    	print_data_node(dn);
-//    }
 }
 
 /* TODO

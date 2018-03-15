@@ -32,21 +32,19 @@
 #include "logger.hpp"
 #include "service_provider.hpp"
 
-using namespace std;
-
 namespace ydk
 {
-    string trim(const string& str);
-    bool replace(string& subject, const string& search, const string& replace);
-    string entity_vector_to_string(vector<Entity*>& v);
+    std::string trim(const std::string& str);
+    bool replace(std::string& subject, const std::string& search, const std::string& replace);
+    std::string entity_vector_to_string(std::vector<Entity*>& v);
 
-    bool has_xml_escape_sequences(const string& xml);
-    string replace_xml_escape_sequences(const string& xml);
+    bool has_xml_escape_sequences(const std::string& xml);
+    std::string replace_xml_escape_sequences(const std::string& xml);
 
-    shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
-    shared_ptr<Entity> read_datanode(Entity & filter, shared_ptr<path::DataNode> read_data_node);
-    string get_data_payload(Entity & entity, const ServiceProvider & provider);
-    string get_xml_subtree_filter_payload(Entity & entity, const ServiceProvider & provider);
+    std::shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
+    std::shared_ptr<Entity> read_datanode(Entity & filter, std::shared_ptr<path::DataNode> read_data_node);
+    std::string get_data_payload(Entity & entity, const ServiceProvider & provider);
+    std::string get_xml_subtree_filter_payload(Entity & entity, const ServiceProvider & provider);
 }
 
 #endif /* YDK_UTILITIES */

@@ -131,7 +131,6 @@ TEST_CASE("get_edit_copy_config")
 
     // Read running config
     auto get_config_list = ns.get_config(provider, source, filter_list);
-    //REQUIRE(get_config_list.size() == 2);
 
     vector<Entity*> copy_config_list{};
     for (auto ent : get_config_list) {
@@ -182,7 +181,6 @@ TEST_CASE("edit_multiple_config")
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
-    //ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
 
     DataStore target = DataStore::candidate;
     DataStore source = DataStore::candidate;
@@ -216,7 +214,6 @@ TEST_CASE("edit_multiple_config")
     auto read_list = ns.get_config(provider, source, filter_list);
     REQUIRE(read_list.size() == 2);
     for (auto item : read_list) {
-        //print_entity(item, root);
         string path = item->get_segment_path();
         if (path.find("bgp") != string::npos) {
             auto data_ptr = dynamic_cast<openconfig_bgp::Bgp*>(item.get());
@@ -235,13 +232,6 @@ TEST_CASE("edit_multiple_config")
     // Discard config changes
     reply = ns.discard_changes(provider);
     REQUIRE(reply);
-
-    // Read configuration and print it
-    //read_list = ns.get_config(provider, source, get_list);
-    //REQUIRE(read_list.size() == 2);
-    //for (auto item : read_list) {
-    //    print_entity(item, root);
-    //}
 }
 
 // get

@@ -412,8 +412,8 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
     auto entity = ydk_rpc.get_input_node().find("filter");
     if(entity.empty()){
     	return string{};
-//        YLOG_ERROR("Failed to get entity node.");
-//        throw(YInvalidArgumentError{"Failed to get entity node"});
+        YLOG_ERROR("Failed to get entity node.");
+        throw(YInvalidArgumentError{"Failed to get entity node"});
     }
 
     auto datanode = entity[0];

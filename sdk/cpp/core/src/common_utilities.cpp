@@ -59,7 +59,8 @@ bool has_xml_escape_sequences(const string& xml)
     if (xml.find("&lt;") != string::npos  ||
         xml.find("&gt;") != string::npos  ||
         xml.find("&amp;") != string::npos ||
-        xml.find("&quot;") != string::npos)
+        xml.find("&quot;")!= string::npos ||
+        xml.find("&#13;") != string::npos)
     {
         return true;
     }
@@ -73,7 +74,7 @@ string replace_xml_escape_sequences(const string& xml)
     seqs_table[string("&lt;")]   = string("<");
     seqs_table[string("&gt;")]   = string(">");
     seqs_table[string("&amp;")]  = string("&");
-    seqs_table[string("&quot;")] = string("""");
+    seqs_table[string("&quot;")] = string("\"");
     seqs_table[string("&#13;")]  = string("");
 
     string reply = xml;

@@ -182,7 +182,7 @@ TEST_CASE("edit_multiple_config")
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     NetconfService ns{};
-    ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
+    //ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
 
     DataStore target = DataStore::candidate;
     DataStore source = DataStore::candidate;

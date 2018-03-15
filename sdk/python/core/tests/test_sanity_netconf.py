@@ -185,7 +185,7 @@ class SanityNetconf(ParametrizedTestCase):
         runner = ysanity.Runner()
         runner.two.number = 2
         runner.two.name = 'runner-two-name'
-        
+
         native = ysanity.Native()
         native.hostname = 'NewHostName'
         native.version = '0.1.0a'
@@ -197,16 +197,15 @@ class SanityNetconf(ParametrizedTestCase):
 
         get_filter = [ysanity.Runner(), ysanity.Native()]
         config = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
-        #self.assertEqual(len(config), 2)
         self.assertEqual(edit_filter, config)
 
-        codec_service = CodecService()
-        codec_provider = CodecServiceProvider()
-        codec_provider.encoding = EncodingFormat.XML
-
-        for entity in config:
-            xml_encode = codec_service.encode(codec_provider, entity)
-            #print(xml_encode)
+#         codec_service = CodecService()
+#         codec_provider = CodecServiceProvider()
+#         codec_provider.encoding = EncodingFormat.XML
+# 
+#         for entity in config:
+#             xml_encode = codec_service.encode(codec_provider, entity)
+#             print(xml_encode)
 
         op = self.netconf_service.discard_changes(self.ncc)
 
@@ -278,15 +277,20 @@ class SanityNetconf(ParametrizedTestCase):
 
         crud = CRUDService()
         result = crud.create(self.ncc, native)
+        self.assertEqual(result, True)
 
         native_read = ysanity.Native()
         interfaces = crud.read(self.ncc, native_read)
 
-        codec_service = CodecService()
-        codec_provider = CodecServiceProvider()
-        codec_provider.encoding = EncodingFormat.XML
-        xml_encode = codec_service.encode(codec_provider, interfaces)
-        # print(xml_encode)
+#         codec_service = CodecService()
+#         codec_provider = CodecServiceProvider()
+#         codec_provider.encoding = EncodingFormat.XML
+#         xml_encode = codec_service.encode(codec_provider, interfaces)
+#         print(xml_encode)
+
+        # Delete configuration
+        result = crud.delete(self.ncc, native)
+        self.assertEqual(result, True)
 
     def test_crud_read_mixed(self):
         crud = CRUDService()
@@ -316,14 +320,14 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(len(read_list), 2)
 
         # Print configuration
-        codec_service = CodecService()
-        codec_provider = CodecServiceProvider()
-        codec_provider.encoding = EncodingFormat.XML
-
-        for entity in read_list:
-            xml = codec_service.encode(codec_provider, entity)
-            #print('\n===== Printing entity: %s' %entity.get_segment_path())
-            #print(xml)
+#         codec_service = CodecService()
+#         codec_provider = CodecServiceProvider()
+#         codec_provider.encoding = EncodingFormat.XML
+# 
+#         for entity in read_list:
+#             xml = codec_service.encode(codec_provider, entity)
+#             print('\n===== Printing entity: %s' %entity.get_segment_path())
+#             print(xml)
 
         # Delete configuration
         result = crud.delete(self.ncc, create_list)

@@ -26,8 +26,8 @@
 #include "xml_subtree_codec.hpp"
 
 using namespace std;
-using namespace ydk;
-
+namespace ydk
+{
 string trim(const string& str)
 {
     const string whitespace = " \t\n\r";
@@ -140,4 +140,5 @@ string get_xml_subtree_filter_payload(Entity & entity, const ServiceProvider & p
     XmlSubtreeCodec xml_subtree_codec{};
     YLOG_DEBUG("Encoding the subtree filter request using XML subtree codec");
     return xml_subtree_codec.encode(entity, provider.get_session().get_root_schema());
+}
 }

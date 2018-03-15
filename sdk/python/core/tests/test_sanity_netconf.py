@@ -55,7 +55,6 @@ class SanityNetconf(ParametrizedTestCase):
         cls.netconf_service = NetconfService()
 
     def setUp(self):
-        from ydk.services import CRUDService
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
@@ -189,7 +188,7 @@ class SanityNetconf(ParametrizedTestCase):
         native = ysanity.Native()
         native.hostname = 'NewHostName'
         native.version = '0.1.0a'
-        
+
         edit_filter = [runner, native]
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, edit_filter)
@@ -202,7 +201,6 @@ class SanityNetconf(ParametrizedTestCase):
 #         codec_service = CodecService()
 #         codec_provider = CodecServiceProvider()
 #         codec_provider.encoding = EncodingFormat.XML
-# 
 #         for entity in config:
 #             xml_encode = codec_service.encode(codec_provider, entity)
 #             print(xml_encode)
@@ -282,11 +280,13 @@ class SanityNetconf(ParametrizedTestCase):
         native_read = ysanity.Native()
         interfaces = crud.read(self.ncc, native_read)
 
-#         codec_service = CodecService()
-#         codec_provider = CodecServiceProvider()
-#         codec_provider.encoding = EncodingFormat.XML
-#         xml_encode = codec_service.encode(codec_provider, interfaces)
-#         print(xml_encode)
+        codec_service = CodecService()
+        codec_provider = CodecServiceProvider()
+        codec_provider.encoding = EncodingFormat.XML
+
+        xml_encode = codec_service.encode(codec_provider, interfaces)
+        print('\n===== Printing entity: %s' %interfaces.get_segment_path())
+        print(xml_encode)
 
         # Delete configuration
         result = crud.delete(self.ncc, native)
@@ -323,7 +323,6 @@ class SanityNetconf(ParametrizedTestCase):
 #         codec_service = CodecService()
 #         codec_provider = CodecServiceProvider()
 #         codec_provider.encoding = EncodingFormat.XML
-# 
 #         for entity in read_list:
 #             xml = codec_service.encode(codec_provider, entity)
 #             print('\n===== Printing entity: %s' %entity.get_segment_path())

@@ -496,3 +496,17 @@ TEST_CASE("TestSessionPathAnyxml")
     a = s.decode(schema, xml, EncodingFormat::XML);
     REQUIRE(a!=nullptr);
 }
+
+TEST_CASE("string_data_with_colon")
+{
+    ydk::path::Repository repo{};
+
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
+    runner.create_datanode("two/name", "runner:two:name");
+
+    ydk::path::Codec s{};
+    auto xml = s.encode(runner, ydk::EncodingFormat::XML, false);
+}

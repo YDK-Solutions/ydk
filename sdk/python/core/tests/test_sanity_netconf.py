@@ -98,7 +98,7 @@ class SanityNetconf(ParametrizedTestCase):
             op = self.netconf_service.unlock(self.ncc, Datastore.running)
         except Exception as e:
             self.assertIsInstance(e, YPYError)
-            
+
         op = self.netconf_service.unlock(self.ncc, Datastore.candidate)
 
     def test_validate(self):

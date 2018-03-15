@@ -315,7 +315,6 @@ TEST_CASE("oc_platform")
 TEST_CASE( "crud_entity_list_bgp" )
 {
     ydk::NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
-    ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
     ydk::CrudService crud{};
 
     // Create 'native' configuration
@@ -349,7 +348,7 @@ TEST_CASE( "crud_entity_list_bgp" )
     REQUIRE(read_list.size() == 2);
 
 //    for (auto item : read_list) {
-//        print_entity(item, root);
+//        print_entity(item, provider.get_session().get_root_schema());
 //    }
 
     // Delete configuration

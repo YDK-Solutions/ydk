@@ -194,7 +194,7 @@ bool NetconfService::discard_changes(NetconfServiceProvider& provider)
 //edit_config
 static bool
 edit_payload(NetconfServiceProvider& provider, DataStore target,
-		std::string payload, std::string default_operation, std::string test_option, std::string error_option)
+		string& payload, string& default_operation, string& test_option, string& error_option)
 {
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, "ietf-netconf:edit-config");
@@ -225,7 +225,7 @@ edit_payload(NetconfServiceProvider& provider, DataStore target,
 }
 
 bool NetconfService::edit_config(NetconfServiceProvider& provider, DataStore target,
-    Entity& config, std::string default_operation, std::string test_option, std::string error_option)
+    Entity& config, string default_operation, string test_option, string error_option)
 {
     YLOG_INFO("Executing 'edit-config' RPC on [{}]", config.get_segment_path());
 
@@ -251,7 +251,7 @@ static vector<shared_ptr<Entity>>
 get_from_list(NetconfServiceProvider& provider, DataStore source, vector<Entity*> & filter_list, const char* path)
 {
     // Get the root schema node
-	shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, path);
+    shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, path);
 
     // Build filter
     string filter_string = "";
@@ -261,7 +261,7 @@ get_from_list(NetconfServiceProvider& provider, DataStore source, vector<Entity*
 
     // Source options: candidate | running | startup
     if (source != DataStore::na)
-	    create_input_leaf(rpc->get_input_node(), source, "source");
+        create_input_leaf(rpc->get_input_node(), source, "source");
     rpc->get_input_node().create_datanode("filter", filter_string);
 
     // Get root data node
@@ -291,14 +291,14 @@ vector<shared_ptr<Entity>>
 NetconfService::get(NetconfServiceProvider& provider, vector<Entity*> & filter_list)
 {
     YLOG_INFO("Executing 'get' RPC on {}", entity_vector_to_string(filter_list));
-	return get_from_list(provider, DataStore::na, filter_list, "ietf-netconf:get");
+    return get_from_list(provider, DataStore::na, filter_list, "ietf-netconf:get");
 }
 
 vector<shared_ptr<Entity>>
 NetconfService::get_config(NetconfServiceProvider& provider, DataStore source, vector<Entity*> & filter_list)
 {
     YLOG_INFO("Executing 'get-config' RPC on {} from {}", entity_vector_to_string(filter_list), datastore_to_string(source));
-	return get_from_list(provider, source, filter_list, "ietf-netconf:get-config");
+    return get_from_list(provider, source, filter_list, "ietf-netconf:get-config");
 }
 
 static shared_ptr<Entity>
@@ -307,7 +307,7 @@ get_entity(NetconfServiceProvider& provider, DataStore source, Entity& filter, c
     // Get the root schema node
     shared_ptr<path::Rpc> rpc = get_rpc_instance(provider, path);
     if (source != DataStore::na) {
-	    create_input_leaf(rpc->get_input_node(), source, "source");
+        create_input_leaf(rpc->get_input_node(), source, "source");
     }
 
     // filter

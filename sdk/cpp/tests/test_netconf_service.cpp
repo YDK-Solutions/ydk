@@ -117,7 +117,6 @@ TEST_CASE("get_edit_copy_config")
 {
     path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
-    ydk::path::RootSchemaNode& root = provider.get_session().get_root_schema();
     NetconfService ns{};
 
     DataStore target = DataStore::candidate;
@@ -136,7 +135,7 @@ TEST_CASE("get_edit_copy_config")
 
     vector<Entity*> copy_config_list{};
     for (auto ent : get_config_list) {
-    	//print_entity(ent, root);
+    	//print_entity(ent, provider.get_session().get_root_schema());
         copy_config_list.push_back(ent.get());
     }
 

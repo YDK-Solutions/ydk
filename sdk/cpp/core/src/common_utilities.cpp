@@ -30,7 +30,7 @@ using namespace ydk;
 
 string trim(const string& str)
 {
-	const string whitespace = " \t\n\r";
+    const string whitespace = " \t\n\r";
     const auto strBegin = str.find_first_not_of(whitespace);
     if (strBegin == string::npos)
         return ""; // no content
@@ -56,10 +56,10 @@ bool replace(string& subject, const string& search, const string& replace)
 
 bool has_xml_escape_sequences(const string& xml)
 {
-	if (xml.find("&lt;") != string::npos  ||
-	    xml.find("&gt;") != string::npos  ||
-		xml.find("&amp;") != string::npos ||
-		xml.find("&quot;") != string::npos)
+    if (xml.find("&lt;") != string::npos  ||
+        xml.find("&gt;") != string::npos  ||
+        xml.find("&amp;") != string::npos ||
+        xml.find("&quot;") != string::npos)
     {
         return true;
     }
@@ -90,17 +90,17 @@ string replace_xml_escape_sequences(const string& xml)
 
 string entity_vector_to_string(vector<Entity*> & entity_list)
 {
-	string buf = "[";
-	bool first = true;
+    string buf = "[";
+    bool first = true;
     for (auto item : entity_list) {
-	    if (first)
-	        first = false;
-	    else
-	        buf += ", ";
-		buf += item->get_segment_path();
-	}
+    if (first)
+        first = false;
+    else
+        buf += ", ";
+        buf += item->get_segment_path();
+    }
     buf += ']';
-	return buf;
+    return buf;
 }
 
 shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
@@ -122,10 +122,13 @@ shared_ptr<Entity> read_datanode(Entity & filter, shared_ptr<path::DataNode> rea
 
 string get_data_payload(Entity & entity, const ServiceProvider & provider)
 {
-	path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_session().get_root_schema());
+    path::DataNode& datanode = get_data_node_from_entity(entity, provider.get_session().get_root_schema());
     const path::DataNode* dn = &datanode;
-    while(dn!= nullptr && dn->get_parent()!=nullptr)
+    while (dn && dn->get_parent())
         dn = dn->get_parent();
+
+    if (dn == nullptr)
+        return string{};
 
     YLOG_DEBUG("Encoding the subtree filter request using path API DataNode");
     path::Codec codec{};

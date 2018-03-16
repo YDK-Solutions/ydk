@@ -33,6 +33,8 @@
 #include "ydk/netconf_provider.hpp"
 #include "ydk_ydktest/ydktest_sanity.hpp"
 
+using namespace std;
+
 const char* expected_bgp_output ="\
 <bgp xmlns=\"http://openconfig.net/yang/bgp\">\
 <global>\
@@ -90,6 +92,7 @@ R"(
     </native>
 )";
 
+
 void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
     ydk::path::Statement s = dn->get_schema_node().get_statement();
@@ -104,6 +107,12 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
             print_tree(c.get(), child_indent);
         std::cout << indent << "</" << s.arg << ">" << std::endl;
     }
+}
+
+void print_data_node(shared_ptr<ydk::path::DataNode> dn)
+{
+	cout << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
+    print_tree(dn.get(), " ");
 }
 
 TEST_CASE( "decode_encode_interfaces" )
@@ -447,6 +456,87 @@ TEST_CASE("oc_routing")
     std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
     create_rpc->get_input_node().create_datanode("entity", xml);
     (*create_rpc)(session);
+}
+
+TEST_CASE("multiple_encode_decode")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
+    auto & native = schema.create_datanode("ydktest-sanity:native", "");
+
+    auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
+    xml += s.encode(native, ydk::EncodingFormat::XML, false);
+
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
+    read_rpc->get_input_node().create_datanode("filter", xml);
+
+    auto read_result = (*read_rpc)(session);
+    REQUIRE(read_result != nullptr);
+
+    // Encode results
+    xml = s.encode(*read_result, ydk::EncodingFormat::XML, true);
+
+    auto data_node = s.decode(schema, xml, ydk::EncodingFormat::XML);
+    REQUIRE(data_node != nullptr);
+}
+
+TEST_CASE("multiple_delete_create_read_rpc")
+{
+    ydk::path::Repository repo{TEST_HOME};
+
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
+    auto & native = schema.create_datanode("ydktest-sanity:native", "");
+
+    auto xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
+    xml += s.encode(native, ydk::EncodingFormat::XML, false);
+
+    // first delete config
+    std::shared_ptr<ydk::path::Rpc> delete_rpc{ schema.create_rpc("ydk:delete") };
+    delete_rpc->get_input_node().create_datanode("entity", xml);
+    auto result = (*delete_rpc)(session);
+    REQUIRE(result == nullptr);
+
+    // Build BGP config
+    auto & as = bgp.create_datanode("global/config/as", "65172");
+    auto & id = bgp.create_datanode("global/config/router-id", "10.20.30.40");
+
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
+
+    xml = s.encode(bgp, ydk::EncodingFormat::XML, false);
+
+    // Build native config
+    auto & version = native.create_datanode("version", "0.1.0");
+    auto & hostname = native.create_datanode("hostname", "MyHost");
+    xml += s.encode(native, ydk::EncodingFormat::XML, false);
+
+    // Create config on device
+    std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
+    create_rpc->get_input_node().create_datanode("entity", xml);
+    result = (*create_rpc)(session);
+    REQUIRE(result == nullptr);
+
+    // Read config from device
+    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
+    auto & native_read = schema.create_datanode("ydktest-sanity:native", "");
+
+    xml = s.encode(bgp_read, ydk::EncodingFormat::XML, false);
+    xml += s.encode(native_read, ydk::EncodingFormat::XML, false);
+
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
+    read_rpc->get_input_node().create_datanode("filter", xml);
+
+    auto read_result = (*read_rpc)(session);
+    REQUIRE(read_result != nullptr);
 }
 
 /* TODO

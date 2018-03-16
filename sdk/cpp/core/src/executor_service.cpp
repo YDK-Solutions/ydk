@@ -36,7 +36,6 @@ namespace ydk{
 static void walk_children(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, std::string path);
 static void create_from_entity_path(std::shared_ptr<Entity> entity, path::DataNode & rpc_input, const std::string & path);
 static void create_from_children(std::map<string, std::shared_ptr<Entity>> & children, path::DataNode & rpc_input);
-shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
 
 ExecutorService::ExecutorService()
 {
@@ -137,14 +136,6 @@ static void create_from_children(std::map<string, std::shared_ptr<Entity>> & chi
             rpc_input.create_datanode(child.first);
         }
     }
-}
-
-shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
-{
-    if(filter.parent == nullptr)
-        return filter.clone_ptr();
-
-    return get_top_entity_from_filter(*(filter.parent));
 }
 
 }

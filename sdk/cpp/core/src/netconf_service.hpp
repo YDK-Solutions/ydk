@@ -43,7 +43,6 @@ class DataNode;
 
 }
 
-
 class NetconfService
 {
     public:
@@ -61,6 +60,8 @@ class NetconfService
 
         bool copy_config(NetconfServiceProvider& provider, DataStore target, Entity& source_config);
 
+        bool copy_config(NetconfServiceProvider& provider, DataStore target, std::vector<Entity*>& source_list);
+
         bool delete_config(NetconfServiceProvider& provider, DataStore target, std::string url = "");
 
         bool discard_changes(NetconfServiceProvider& provider);
@@ -68,9 +69,16 @@ class NetconfService
         bool edit_config(NetconfServiceProvider& provider, DataStore target, Entity& config,
             std::string default_operation = "", std::string test_option = "", std::string error_option = "");
 
+        bool edit_config(NetconfServiceProvider& provider, DataStore target, std::vector<Entity*>& config,
+            std::string default_operation = "", std::string test_option = "", std::string error_option = "");
+
         std::shared_ptr<Entity> get_config(NetconfServiceProvider& provider, DataStore source, Entity& filter);
 
+        std::vector<std::shared_ptr<Entity>> get_config(NetconfServiceProvider& provider, DataStore source, std::vector<Entity*>& filter_list);
+
         std::shared_ptr<Entity> get(NetconfServiceProvider& provider, Entity& filter);
+
+        std::vector<std::shared_ptr<Entity>> get(NetconfServiceProvider& provider, std::vector<Entity*> & filter_list);
 
         bool kill_session(NetconfServiceProvider& provider, unsigned int session_id);
 

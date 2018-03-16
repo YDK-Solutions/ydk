@@ -26,6 +26,7 @@
 #include "../src/path/path_private.hpp"
 #include "config.hpp"
 #include "catch.hpp"
+#include "common_utilities.hpp"
 
 TEST_CASE( "test_segmentalize"  )
 {
@@ -36,7 +37,6 @@ TEST_CASE( "test_segmentalize"  )
     REQUIRE(segments==expected);
 }
 
-
 TEST_CASE( "test_segmentalize_relative_path"  )
 {
     std::string test_string = "interface-configuration[active='act'][interface-name='GigabitEthernet0/0/0/0']";
@@ -44,5 +44,18 @@ TEST_CASE( "test_segmentalize_relative_path"  )
     std::vector<std::string> expected {"interface-configuration[active='act'][interface-name='GigabitEthernet0/0/0/0']"};
 
     REQUIRE(segments == expected);
+}
+
+TEST_CASE( "test_replace_xml_escape_sequences"  )
+{
+    std::string source   = R"(Testing: &lt;tag&gt;; ampersand - &amp;; &quot;quotes&quot;; huawei end-of-line&#13;)";
+    std::string expected = R"(Testing: <tag>; ampersand - &; "quotes"; huawei end-of-line)";
+
+    REQUIRE( ydk::has_xml_escape_sequences(source));
+    REQUIRE( !ydk::has_xml_escape_sequences(expected));
+
+    std::string converted = ydk::replace_xml_escape_sequences(source);
+
+    REQUIRE(converted == expected);
 }
 

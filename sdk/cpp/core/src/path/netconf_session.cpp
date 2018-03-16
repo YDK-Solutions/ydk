@@ -35,7 +35,7 @@
 #include "../ydk_yang.hpp"
 #include "../logger.hpp"
 #include "netconf_model_provider.hpp"
-
+#include "../common_utilities.hpp"
 
 using namespace std;
 
@@ -396,7 +396,6 @@ static string get_annotated_config_payload(path::RootSchemaNode & root_schema,
     }
 
     string config_payload {};
-
     for(auto const & child : datanode->get_children())
     {
         if((child->annotations()).size()==0)
@@ -487,7 +486,7 @@ static shared_ptr<path::DataNode> handle_netconf_get_output(const string & reply
         YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply);
         throw(YServiceProviderError{reply});
     }
-    data_start+= sizeof("<data>") - 1;
+    data_start += sizeof("<data>") - 1;
     auto data_end = reply.find("</data>", data_start);
     if(data_end == string::npos)
     {
@@ -520,8 +519,8 @@ static shared_ptr<path::DataNode> handle_rpc_output(const string & reply, path::
     //need to find the end of the "<rpc-reply start tag
     auto data_start_end = reply.find(">", data_start);
     data_start = data_start_end + 1;
-    data_end -= 1;
-    string data = reply.substr(data_start, data_end-data_start+1);
+
+    string data = reply.substr(data_start, data_end - data_start);
 
     shared_ptr<path::DataNode> datanode = codec_service.decode_rpc_output(
                                                     root_schema,

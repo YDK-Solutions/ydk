@@ -47,9 +47,6 @@ namespace ydk {
 
         std::unordered_set<std::string> segmentalize_module_names(const std::string& value);
 
-        std::string replace_xml_escape_sequences(const std::string& xml);
-        bool has_xml_escape_sequences(const std::string& xml);
-
         class RepositoryPtr : public std::enable_shared_from_this<RepositoryPtr> {
         public:
             explicit RepositoryPtr(ModelCachingOption caching_option);
@@ -294,8 +291,5 @@ namespace ydk {
     }
 
 }
-
-
-
 
 #endif /* YDK_PRIVATE_HPP */

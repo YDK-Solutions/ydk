@@ -19,7 +19,22 @@ from ydk.errors.error_handler import check_argument as _check_argument
 
 
 class CRUDService(_CrudService):
-    """ Python wrapper for CrudService
+    """
+    Python wrapper for CrudService
+
+    Provides API to Create, Read, Update, and Delete configuration on device.
+
+    Args:
+        provider (ydk.ServiceProvider): NetconfServiceProvider.
+        entity_holder (ydk.types.Entity or a list(ydk.types.Entity)): Encoding target(s).
+        pretty (bool, optional): Pretty formatting. Default value is True.
+
+    Returns:
+        Functions read and read-config return, ydk.types.Entity or a list(ydk.types.Entity), depending on provided input.
+        Other functions return boolean value: true - for success; false - failure.
+
+    Raises:
+        Instance of YPYError in case of operation failure fails.
     """
     def __init__(self):
         self._crud = _CrudService()

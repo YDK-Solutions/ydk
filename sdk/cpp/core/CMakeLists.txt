@@ -137,6 +137,7 @@ set(libydk_src
     src/codec_provider.cpp
     src/codec_service.cpp
     src/capabilities_parser.cpp
+    src/common_utilities.cpp
     src/crud_service.cpp
     src/entity.cpp
     src/entity_data_node_walker.cpp
@@ -197,6 +198,7 @@ set(libydk_install_headers
     src/capabilities_parser.hpp
     src/codec_provider.hpp
     src/codec_service.hpp
+    src/common_utilities.hpp
     src/crud_service.hpp
     src/entity_data_node_walker.hpp
     src/entity_lookup.hpp

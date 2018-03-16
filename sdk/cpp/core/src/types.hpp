@@ -370,10 +370,10 @@ enum class DataStore {
     candidate,
     running,
     startup,
-    url
+    url,
+    na
 };
 
-std::string to_string(DataStore d);
 }
 
 #endif /* _TYPES_HPP_ */

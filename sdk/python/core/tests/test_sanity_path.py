@@ -129,6 +129,18 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )
 
+    def test_get_running_config(self):
+        get_config_rpc = self.root_schema.create_rpc("ietf-netconf:get-config")
+        get_config_rpc.get_input_node().create_datanode("source/running")
+
+        response = get_config_rpc(self.nc_session)
+
+        all_nodes = response.get_children()
+        self.assertEqual( len(all_nodes)>=2, True )
+
+        xml = self.codec.encode(response, EncodingFormat.XML, True)
+        self.assertNotEqual( len(xml), 0 )
+
     def test_anyxml(self):
         get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
         get_rpc.get_input_node().create_datanode(

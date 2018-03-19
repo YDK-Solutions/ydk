@@ -397,19 +397,20 @@ func InitCodecServiceProvider(
 	var repoPath *C.char
 	defer C.free(unsafe.Pointer(repoPath))
 
+	data := entity.GetCommonEntityData()
 	if len(repo.Path) > 0 {
 		ydk.YLogDebug(fmt.Sprintf(
 			"CodecServiceProvider using YANG models in %v", repo.Path))
 		repoPath = C.CString(repo.Path)
 	} else {
-		yangPath := entity.GetBundleYangModelsLocation()
+		yangPath := data.BundleYangModelsLocation
 		ydk.YLogDebug(fmt.Sprintf(
 			"CodecServiceProvider using YANG models in %v", yangPath))
 		repoPath = C.CString(yangPath)
 	}
 
-	capabilities := entity.GetCapabilitiesTable()
-	namespaces := entity.GetNamespaceTable()
+	capabilities := data.CapabilitiesTable
+	namespaces := data.NamespaceTable
 	lookupTableKeys := make([]*C.char, 0)
 	lookupTableValues := make([]C.Capability, 0)
 	for name, revision := range capabilities {

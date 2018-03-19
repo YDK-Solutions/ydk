@@ -55,9 +55,6 @@ class ClassPrinter(object):
         self._print_class_get_go_name(clazz, leafs, children)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_children(clazz, leafs, children)
-        self._print_yang_models_function(clazz)
-        self._print_get_capabilities_table(clazz)
-        self._print_get_namespace_table(clazz)
 
     def _get_class_members(self, clazz, leafs, children):
         for prop in clazz.properties():
@@ -76,8 +73,12 @@ class ClassPrinter(object):
         fp.ctx.writeln('%s.YangName = "%s"' % (data_alias, fp.clazz.stmt.arg))
         fp.ctx.writeln('%s.BundleName = "%s"' % (data_alias, self.bundle_name.lower()))
         fp.ctx.writeln('%s.ParentYangName = "%s"' % (data_alias, clazz.owner.stmt.arg))
-        fp.ctx.bline()
 
+        bundle_name = snake_case(self.bundle_name)
+        fp.ctx.writeln('%s.CapabilitiesTable = %s.GetCapabilities()' % (data_alias, bundle_name))
+        fp.ctx.writeln('%s.NamespaceTable = %s.GetNamespaces()' % (data_alias, bundle_name))
+        fp.ctx.writeln('%s.BundleYangModelsLocation = %s.GetModelsPath()' % (data_alias, bundle_name))
+        fp.ctx.bline()
         # GoName - returns string
         # TODO
 
@@ -98,13 +99,11 @@ class ClassPrinter(object):
         #             data_alias, path, fp.class_alias, child.go_name()))
         self.ctx.writeln('%s.Children = %s.GetChildren()' % (data_alias, fp.class_alias))
 
-        # # Leafs
+        # Leafs
         fp.ctx.writeln('%s.Leafs = make(map[string]interface{})' % data_alias)
         for leaf in leafs:
             fp.ctx.writeln('%s.Leafs["%s"] = %s.%s' % (
                 data_alias, leaf.stmt.arg, fp.class_alias, leaf.go_name()))
-        # self.ctx.writeln('%s.Leafs = %s.GetLeafs()' % (data_alias, fp.class_alias))
-
 
         fp.ctx.writeln('return &(%s)' % data_alias)
         fp.print_function_trailer()
@@ -121,7 +120,6 @@ class ClassPrinter(object):
             fp.ctx.writeln('return nil')
             fp.print_function_trailer()
 
-    # GetGoName
     def _print_class_get_go_name(self, clazz, leafs, children):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetGoName', args='yname string', return_type='string')
@@ -132,40 +130,13 @@ class ClassPrinter(object):
         fp.ctx.writeln('return ""')
         fp.print_function_trailer()
 
-    # GetSegmentPath
     def _print_class_get_segment_path(self, clazz):
         fp = GetSegmentPathPrinter(self.ctx, clazz)
         fp.print_all()
 
-    # GetChildren
     def _print_class_get_children(self, clazz, leafs, children):
         fp = ClassGetChildrenPrinter(self.ctx, clazz, leafs, children)
         fp.print_all()
-
-    # GetBundleYangModelsLocation
-    def _print_yang_models_function(self, clazz):
-        bundle_name = snake_case(self.bundle_name)
-        fp = FunctionPrinter(self.ctx, clazz)
-        rstmt = '%s.GetModelsPath()' % bundle_name
-        fp.quick_print('GetBundleYangModelsLocation', return_type='string', return_stmt=rstmt)
-
-    # GetCapabilitiesTable
-    def _print_get_capabilities_table(self, clazz):
-        bundle_name = snake_case(self.bundle_name)
-        fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper(
-            'GetCapabilitiesTable', return_type='map[string]string')
-        fp.ctx.write("return %s.GetCapabilities() " % (bundle_name))
-        fp.print_function_trailer()
-
-    # GetNamespaceTable
-    def _print_get_namespace_table(self, clazz):
-        bundle_name = snake_case(self.bundle_name)
-        fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper(
-            'GetNamespaceTable', return_type='map[string]string')
-        fp.ctx.write("return %s.GetNamespaces() " % (bundle_name))
-        fp.print_function_trailer()
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

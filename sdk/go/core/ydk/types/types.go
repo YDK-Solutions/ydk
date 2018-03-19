@@ -80,31 +80,33 @@ type EntityPath struct {
 // CommonEntityData encapsulate common data within an Entity
 type CommonEntityData struct {
 	// static data (internals)
-	YangName 		string
-	BundleName 		string
-	ParentYangName	string
-	YFilter 		yfilter.YFilter
-	Children 		map[string]Entity
-	Leafs 			map[string]interface{}
+	YangName 					string
+	BundleName 					string
+	ParentYangName				string
+	YFilter 					yfilter.YFilter
+	Children 					map[string]Entity
+	Leafs 						map[string]interface{}
+
+	CapabilitiesTable			map[string]string
+	NamespaceTable				map[string]string
+	BundleYangModelsLocation	string
 
 	// dynamic data (internals)
-	Parent 			Entity
-	GoName 			string
+	Parent 						Entity
+	GoName 						string
 }
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
-	GetCommonEntityData()			*CommonEntityData
+	GetCommonEntityData()	*CommonEntityData
 
-	CreateNewChild(string)			Entity
-	GetGoName(string)				string
-	GetSegmentPath() 				string
+	CreateNewChild(string)	Entity
+	GetGoName(string)		string
+	GetSegmentPath() 		string
 
-	GetChildren() 					map[string]Entity
+	GetChildren() 			map[string]Entity
 
-	GetCapabilitiesTable() 			map[string]string
-	GetNamespaceTable() 			map[string]string
-	GetBundleYangModelsLocation() 	string
+	// GetBundleYangModelsLocation() 	string
 }
 
 // Bits is a basic type that represents the YANG bits type

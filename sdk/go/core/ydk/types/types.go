@@ -25,6 +25,7 @@ import (
 	"sort"
 	"strings"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
+	// "github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/ytype"
@@ -76,27 +77,28 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
+// CommonEntityData encapsulate common data within an Entity
 type CommonEntityData struct {
 	// static data (internals)
 	YangName 		string
 	BundleName 		string
+	ParentYangName	string
 	YFilter 		yfilter.YFilter
+	Children 		map[string]Entity
+	Leafs 			map[string]interface{}
 
 	// dynamic data (internals)
 	Parent 			Entity
-	ParentYangName 	string
 	GoName 			string
-	Children 		map[string]Entity
-	Leafs 			map[string]interface{}
 }
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetCommonEntityData()			*CommonEntityData
 
+	CreateNewChild(string)			Entity
 	GetGoName(string)				string
 	GetSegmentPath() 				string
-	GetChildByName(string, string) 	Entity
 
 	GetChildren() 					map[string]Entity
 
@@ -108,6 +110,7 @@ type Entity interface {
 // Bits is a basic type that represents the YANG bits type
 type Bits map[string]bool
 
+// BitsList represent a list of Bits
 type BitsList struct {
 	Value []map[string]bool
 }
@@ -228,30 +231,40 @@ func GetEntityPath(entity Entity) EntityPath {
 	return entityPath
 }
 
-// todo: need to instantiate child if ok == false
-// GetChildByName takes an Entity and returns the child Entity described by the given childYangName and segmentPath
+// GetChildByName takes an Entity and returns the child Entity described
+// by the given childYangName and segmentPath or nil if there is no match
 func GetChildByName(
 	entity Entity,
 	childYangName string,
 	segmentPath string) Entity {
 
 	children := entity.GetChildren()
+	goName := entity.GetGoName(childYangName)
+	s := reflect.ValueOf(entity).Elem()
+	v := s.FieldByName(goName)
 
-	// child
-	if child, ok := children[childYangName]; ok {
-		return child
+	if v.IsValid() {
+		if v.Kind() == reflect.Slice {
+			_, ok := children[segmentPath]
+			if ok {
+				return children[segmentPath]
+			} else {
+				child := entity.CreateNewChild(childYangName)
+				childValue := reflect.ValueOf(child).Elem()
+				v.Set(reflect.Append(v, childValue))
+				children = entity.GetChildren()
+				return children[child.GetSegmentPath()]
+			}
+		} else {
+			return children[childYangName]
+		}
 	}
-
-	// todo: instantiate the child
-	// need a way to retrieve type from childYangName and/or segmentPath
-	// (ie bake in a map going from string to type in apis)
 	return nil
 }
 
 // SetValue sets the leaf value for given entity, valuePath, and value args
 func SetValue(entity Entity, valuePath string, value interface{}) {
 	goName := entity.GetGoName(valuePath)
-
 	s := reflect.ValueOf(entity).Elem()
 	v := s.FieldByName(goName)
 	if v.IsValid() {

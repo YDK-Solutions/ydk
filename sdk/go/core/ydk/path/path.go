@@ -148,7 +148,7 @@ func ExecuteRPCEntity(
 	rpcInput := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
-	child := rpcEntity.GetChildByName("input", "")
+	child := types.GetChildByName(rpcEntity, "input", "")
 	if (child != nil && types.HasDataOrFilter(child)) {
 		walkRPCChildren(state, child, rpcInput, "")
 	}
@@ -156,7 +156,7 @@ func ExecuteRPCEntity(
 	readDataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
 
-	output := rpcEntity.GetChildByName("output", "")
+	output := types.GetChildByName(rpcEntity, "output", "")
 
 	if (output == nil || readDataNode.Private == nil) {
 		return nil
@@ -736,11 +736,11 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 			var childEntity types.Entity
 			if dataNodeIsList(childDataNode) {
 				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
-				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s'", segmentPath))
-				childEntity = entity.GetChildByName(childName, segmentPath)
+				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s' '%s'", childName, segmentPath))
+				childEntity = types.GetChildByName(entity, childName, segmentPath)
 			} else {
 				ydk.YLogDebug(fmt.Sprintf("Creating child node '%s'", childName))
-				childEntity = entity.GetChildByName(childName, "")
+				childEntity = types.GetChildByName(entity, childName, "")
 			}
 			if childEntity == nil {
 				ydk.YLogError(fmt.Sprintf("Could not create child entity '%s'!", childName))

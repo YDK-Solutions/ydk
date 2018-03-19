@@ -27,7 +27,6 @@ from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_enum_printer import EnumPrinter
 from .class_get_entity_path_printer import GetSegmentPathPrinter
-from .class_get_child_printer import ClassGetChildPrinter
 from .class_get_children_printer import ClassGetChildrenPrinter
 
 
@@ -52,9 +51,9 @@ class ClassPrinter(object):
 
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_entity_common_data(clazz, leafs, children)
+        self._print_class_create_new_child(clazz, children)
         self._print_class_get_go_name(clazz, leafs, children)
         self._print_class_get_segment_path(clazz)
-        self._print_class_get_child(clazz, leafs, children)
         self._print_class_get_children(clazz, leafs, children)
         self._print_yang_models_function(clazz)
         self._print_get_capabilities_table(clazz)
@@ -72,25 +71,55 @@ class ClassPrinter(object):
         fp = FunctionPrinter(self.ctx, clazz)
         fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
 
-        fp.ctx.writeln('{0}.EntityData.YFilter = {0}.YFilter'.format(fp.class_alias))
-        fp.ctx.writeln('%s.EntityData.YangName = "%s"' % (fp.class_alias, fp.clazz.stmt.arg))
-        fp.ctx.writeln('%s.EntityData.BundleName = "%s"' % (fp.class_alias, self.bundle_name.lower()))
-        fp.ctx.writeln('%s.EntityData.ParentYangName = "%s"' % (fp.class_alias, clazz.owner.stmt.arg))
+        data_alias = '%s.EntityData' % fp.class_alias
+        fp.ctx.writeln('%s.YFilter = %s.YFilter' % (data_alias, fp.class_alias))
+        fp.ctx.writeln('%s.YangName = "%s"' % (data_alias, fp.clazz.stmt.arg))
+        fp.ctx.writeln('%s.BundleName = "%s"' % (data_alias, self.bundle_name.lower()))
+        fp.ctx.writeln('%s.ParentYangName = "%s"' % (data_alias, clazz.owner.stmt.arg))
         fp.ctx.bline()
 
         # GoName - returns string
         # TODO
 
         # Children - returns map[string]Entity
-        # TODO
+        # self.ctx.writeln('%s.Children = make(map[string]types.Entity)' % data_alias)
+        # for child in children:
+        #     if child.is_many:
+        #         child_stmt = '%s.%s' % (fp.class_alias, child.go_name())
+        #         fp.ctx.writeln('for i := range %s {' % (child_stmt))
+        #         fp.ctx.lvl_inc()
+        #         child_stmt = '%s[i]' % child_stmt
+        #         fp.ctx.writeln('{0}.Children[{1}.GetSegmentPath()] = &{1}'.format(data_alias, child_stmt))
+        #         fp.ctx.lvl_dec()
+        #         fp.ctx.writeln('}')
+        #     else:
+        #         path = get_qualified_yang_name(child)
+        #         fp.ctx.writeln('%s.Children["%s"] = &%s.%s' % (
+        #             data_alias, path, fp.class_alias, child.go_name()))
+        self.ctx.writeln('%s.Children = %s.GetChildren()' % (data_alias, fp.class_alias))
 
-        fp.ctx.writeln('%s.EntityData.Leafs = make(map[string]interface{})' % fp.class_alias)
+        # # Leafs
+        fp.ctx.writeln('%s.Leafs = make(map[string]interface{})' % data_alias)
         for leaf in leafs:
-            fp.ctx.writeln('{0}.EntityData.Leafs["{1}"] = {0}.{2}'.format(
-                fp.class_alias, leaf.stmt.arg, leaf.go_name()))
+            fp.ctx.writeln('%s.Leafs["%s"] = %s.%s' % (
+                data_alias, leaf.stmt.arg, fp.class_alias, leaf.go_name()))
+        # self.ctx.writeln('%s.Leafs = %s.GetLeafs()' % (data_alias, fp.class_alias))
 
-        fp.ctx.writeln('return &(%s.EntityData)' % fp.class_alias)
+
+        fp.ctx.writeln('return &(%s)' % data_alias)
         fp.print_function_trailer()
+
+    def _print_class_create_new_child(self, clazz, children):
+        fp = FunctionPrinter(self.ctx, clazz)
+        if len(children) == 0:
+            fp.quick_print('CreateNewChild', args='childYangName string', return_type='types.Entity', return_stmt='nil')
+        else:
+            fp.print_function_header_helper('CreateNewChild', args='childYangName string', return_type='types.Entity')
+            for child in children:
+                args = (get_qualified_yang_name(child), child.qualified_go_name())
+                fp.ctx.writeln('if "%s" == childYangName { return &%s{} }' % args)
+            fp.ctx.writeln('return nil')
+            fp.print_function_trailer()
 
     # GetGoName
     def _print_class_get_go_name(self, clazz, leafs, children):
@@ -106,11 +135,6 @@ class ClassPrinter(object):
     # GetSegmentPath
     def _print_class_get_segment_path(self, clazz):
         fp = GetSegmentPathPrinter(self.ctx, clazz)
-        fp.print_all()
-
-    # GetChildByName
-    def _print_class_get_child(self, clazz, leafs, children):
-        fp = ClassGetChildPrinter(self.ctx, clazz, leafs, children)
         fp.print_all()
 
     # GetChildren

@@ -99,8 +99,8 @@ func main() {
 	crud := services.CrudService{}
 
 	bgp := oc_bgp.Bgp{}
-	bgp.Global.SetParent(&bgp)
-	bgp.Global.Config.SetParent(&bgp.Global)
+	bgp.Global.GetCommonEntityData().Parent = &bgp
+	bgp.Global.Config.GetCommonEntityData().Parent = &bgp.Global
 
 	result := crud.Delete(&provider, &bgp.Global.Config)
 

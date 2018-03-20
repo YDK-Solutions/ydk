@@ -51,7 +51,6 @@ class ClassPrinter(object):
 
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_entity_common_data(clazz, leafs, children)
-        self._print_class_create_new_child(clazz, children)
         self._print_class_get_go_name(clazz, leafs, children)
         self._print_class_get_segment_path(clazz)
         self._print_class_get_children(clazz, leafs, children)
@@ -107,18 +106,6 @@ class ClassPrinter(object):
 
         fp.ctx.writeln('return &(%s)' % data_alias)
         fp.print_function_trailer()
-
-    def _print_class_create_new_child(self, clazz, children):
-        fp = FunctionPrinter(self.ctx, clazz)
-        if len(children) == 0:
-            fp.quick_print('CreateNewChild', args='childYangName string', return_type='types.Entity', return_stmt='nil')
-        else:
-            fp.print_function_header_helper('CreateNewChild', args='childYangName string', return_type='types.Entity')
-            for child in children:
-                args = (get_qualified_yang_name(child), child.qualified_go_name())
-                fp.ctx.writeln('if "%s" == childYangName { return &%s{} }' % args)
-            fp.ctx.writeln('return nil')
-            fp.print_function_trailer()
 
     def _print_class_get_go_name(self, clazz, leafs, children):
         fp = FunctionPrinter(self.ctx, clazz)

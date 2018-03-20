@@ -100,13 +100,10 @@ type CommonEntityData struct {
 type Entity interface {
 	GetCommonEntityData()	*CommonEntityData
 
-	CreateNewChild(string)	Entity
 	GetGoName(string)		string
 	GetSegmentPath() 		string
 
 	GetChildren() 			map[string]Entity
-
-	// GetBundleYangModelsLocation() 	string
 }
 
 // Bits is a basic type that represents the YANG bits type
@@ -251,11 +248,16 @@ func GetChildByName(
 			if ok {
 				return children[segmentPath]
 			} else {
-				child := entity.CreateNewChild(childYangName)
-				childValue := reflect.ValueOf(child).Elem()
+				sliceType := v.Type().Elem()
+				childValue := reflect.New(sliceType).Elem()
+
+				method := reflect.New(sliceType).MethodByName("GetSegmentPath")
+				in := make([]reflect.Value, method.Type().NumIn())
+				key := method.Call(in)[0].Interface().(string)
+
 				v.Set(reflect.Append(v, childValue))
 				children = entity.GetChildren()
-				return children[child.GetSegmentPath()]
+				return children[key]
 			}
 		} else {
 			return children[childYangName]

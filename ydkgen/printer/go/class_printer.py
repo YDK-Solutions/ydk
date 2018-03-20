@@ -20,13 +20,12 @@ source_printer.py
  prints Go classes
 
 """
-from ydkgen.api_model import Class, Enum, snake_case
+from ydkgen.api_model import Class, Enum, Package, snake_case
 from ydkgen.common import get_qualified_yang_name, sort_classes_at_same_level
 
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_enum_printer import EnumPrinter
-from .class_get_entity_path_printer import GetSegmentPathPrinter
 from .class_get_children_printer import ClassGetChildrenPrinter
 
 
@@ -52,7 +51,6 @@ class ClassPrinter(object):
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_entity_common_data(clazz, leafs, children)
         self._print_class_get_go_name(clazz, leafs, children)
-        self._print_class_get_segment_path(clazz)
         self._print_class_get_children(clazz, leafs, children)
 
     def _get_class_members(self, clazz, leafs, children):
@@ -65,47 +63,78 @@ class ClassPrinter(object):
 
     def _print_class_get_entity_common_data(self, clazz, leafs, children):
         fp = FunctionPrinter(self.ctx, clazz)
-        fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
-
         data_alias = '%s.EntityData' % fp.class_alias
+        bundle_name = snake_case(self.bundle_name)
+
+        fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
         fp.ctx.writeln('%s.YFilter = %s.YFilter' % (data_alias, fp.class_alias))
         fp.ctx.writeln('%s.YangName = "%s"' % (data_alias, fp.clazz.stmt.arg))
         fp.ctx.writeln('%s.BundleName = "%s"' % (data_alias, self.bundle_name.lower()))
         fp.ctx.writeln('%s.ParentYangName = "%s"' % (data_alias, clazz.owner.stmt.arg))
-
-        bundle_name = snake_case(self.bundle_name)
+        self._print_segment_path(fp, data_alias)
         fp.ctx.writeln('%s.CapabilitiesTable = %s.GetCapabilities()' % (data_alias, bundle_name))
         fp.ctx.writeln('%s.NamespaceTable = %s.GetNamespaces()' % (data_alias, bundle_name))
         fp.ctx.writeln('%s.BundleYangModelsLocation = %s.GetModelsPath()' % (data_alias, bundle_name))
         fp.ctx.bline()
-        # GoName - returns string
-        # TODO
+        self._print_go_name(fp, data_alias)
+        self._print_children(fp, children, data_alias)
+        self._print_leafs(fp, leafs, data_alias)
 
+        fp.ctx.writeln('return &(%s)' % data_alias)
+        fp.print_function_trailer()
+
+    def _print_segment_path(self, fp, data_alias):
+        path = ['"']
+        prefix = ''
+        if fp.clazz.owner is not None:
+            if isinstance(fp.clazz.owner, Package):
+                prefix = '%s:' % fp.clazz.owner.stmt.arg
+            elif fp.clazz.owner.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
+                prefix = '%s:' % fp.clazz.stmt.i_module.arg
+        path.append('%s%s' % (prefix, fp.clazz.stmt.arg))
+
+        key_props = fp.clazz.get_key_props()
+        predicate = '"'
+        for key_prop in key_props:
+            prefix = ''
+            if key_prop.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
+                prefix = '%s:' % (key_prop.stmt.i_module.arg)
+
+            predicate = '''[%s%s='"{0}fmt.Sprintf("%%v", %s.%s){0}"']"'''
+
+            predicate = predicate.format(' + ') % (
+                prefix, key_prop.stmt.arg, fp.class_alias, key_prop.go_name())
+        path.append(predicate)
+
+        fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
+
+    def _print_go_name(self, fp, data_alias):
+        # TODO -- returns string
+        pass
+
+    def _print_children(self, fp, children, data_alias):
         # Children - returns map[string]Entity
-        # self.ctx.writeln('%s.Children = make(map[string]types.Entity)' % data_alias)
+        # fp.ctx.writeln('%s.Children = make(map[string]types.Entity)' % data_alias)
         # for child in children:
         #     if child.is_many:
         #         child_stmt = '%s.%s' % (fp.class_alias, child.go_name())
         #         fp.ctx.writeln('for i := range %s {' % (child_stmt))
         #         fp.ctx.lvl_inc()
         #         child_stmt = '%s[i]' % child_stmt
-        #         fp.ctx.writeln('{0}.Children[{1}.GetSegmentPath()] = &{1}'.format(data_alias, child_stmt))
+        #         fp.ctx.writeln('{0}.Children[{1}.GetCommonEntityData().SegmentPath] = &{1}'.format(data_alias, child_stmt))
         #         fp.ctx.lvl_dec()
         #         fp.ctx.writeln('}')
         #     else:
         #         path = get_qualified_yang_name(child)
         #         fp.ctx.writeln('%s.Children["%s"] = &%s.%s' % (
         #             data_alias, path, fp.class_alias, child.go_name()))
-        self.ctx.writeln('%s.Children = %s.GetChildren()' % (data_alias, fp.class_alias))
+        fp.ctx.writeln('%s.Children = %s.GetChildren()' % (data_alias, fp.class_alias))
 
-        # Leafs
+    def _print_leafs(self, fp, leafs, data_alias):
         fp.ctx.writeln('%s.Leafs = make(map[string]interface{})' % data_alias)
         for leaf in leafs:
             fp.ctx.writeln('%s.Leafs["%s"] = %s.%s' % (
                 data_alias, leaf.stmt.arg, fp.class_alias, leaf.go_name()))
-
-        fp.ctx.writeln('return &(%s)' % data_alias)
-        fp.print_function_trailer()
 
     def _print_class_get_go_name(self, clazz, leafs, children):
         fp = FunctionPrinter(self.ctx, clazz)
@@ -116,10 +145,6 @@ class ClassPrinter(object):
             fp.ctx.writeln('if yname == "%s" { return "%s" }' % (get_qualified_yang_name(child), child.go_name()))
         fp.ctx.writeln('return ""')
         fp.print_function_trailer()
-
-    def _print_class_get_segment_path(self, clazz):
-        fp = GetSegmentPathPrinter(self.ctx, clazz)
-        fp.print_all()
 
     def _print_class_get_children(self, clazz, leafs, children):
         fp = ClassGetChildrenPrinter(self.ctx, clazz, leafs, children)

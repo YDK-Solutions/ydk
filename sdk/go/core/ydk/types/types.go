@@ -86,6 +86,7 @@ type CommonEntityData struct {
 	YFilter 					yfilter.YFilter
 	Children 					map[string]Entity
 	Leafs 						map[string]interface{}
+	SegmentPath					string
 
 	CapabilitiesTable			map[string]string
 	NamespaceTable				map[string]string
@@ -99,10 +100,7 @@ type CommonEntityData struct {
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetCommonEntityData()	*CommonEntityData
-
 	GetGoName(string)		string
-	GetSegmentPath() 		string
-
 	GetChildren() 			map[string]Entity
 }
 
@@ -187,7 +185,7 @@ func HasDataOrFilter(entity Entity) bool {
 
 // GetEntityPath returns an EntityPath struct for the given entity
 func GetEntityPath(entity Entity) EntityPath {
-	entityPath := EntityPath{Path: entity.GetSegmentPath()}
+	entityPath := EntityPath{Path: entity.GetCommonEntityData().SegmentPath}
 	leafs := GetLeafs(entity)
 	v := reflect.ValueOf(entity).Elem()
 
@@ -251,13 +249,13 @@ func GetChildByName(
 				sliceType := v.Type().Elem()
 				childValue := reflect.New(sliceType).Elem()
 
-				method := reflect.New(sliceType).MethodByName("GetSegmentPath")
+				method := reflect.New(sliceType).MethodByName("GetCommonEntityData")
 				in := make([]reflect.Value, method.Type().NumIn())
-				key := method.Call(in)[0].Interface().(string)
+				data := method.Call(in)[0].Elem().Interface().(CommonEntityData)
 
 				v.Set(reflect.Append(v, childValue))
 				children = entity.GetChildren()
-				return children[key]
+				return children[data.SegmentPath]
 			}
 		} else {
 			return children[childYangName]
@@ -410,7 +408,7 @@ func (s EntitySlice) Len() int {
 
 // Less returns whether the Entity at index i is less than the one at index j of the given EntitySlice
 func (s EntitySlice) Less(i, j int) bool {
-	return s[i].GetSegmentPath() < s[j].GetSegmentPath()
+	return s[i].GetCommonEntityData().SegmentPath < s[j].GetCommonEntityData().SegmentPath
 }
 
 // Swap swaps the Entities at indices i and j of the given EntitySlice
@@ -445,12 +443,12 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 		} else {
 			p = p1
 		}
-		path_buffer += p1.GetSegmentPath()
+		path_buffer += p1.GetCommonEntityData().SegmentPath
 	}
 	if p != nil {
 		path_buffer += "/"
 	}
-	path_buffer += current_node.GetSegmentPath()
+	path_buffer += current_node.GetCommonEntityData().SegmentPath
 	return path_buffer
 
 }

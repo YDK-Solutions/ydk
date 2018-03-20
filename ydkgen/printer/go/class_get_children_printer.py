@@ -48,6 +48,6 @@ class ClassGetChildrenPrinter(FunctionPrinter):
         self.ctx.writeln('for i := range %s {' % (child_stmt))
         self.ctx.lvl_inc()
         child_stmt = '%s[i]' % child_stmt
-        self.ctx.writeln('children[{0}.GetSegmentPath()] = &{0}'.format(child_stmt))
+        self.ctx.writeln('children[{0}.GetCommonEntityData().SegmentPath] = &{0}'.format(child_stmt))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')

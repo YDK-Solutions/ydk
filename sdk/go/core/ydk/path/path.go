@@ -136,8 +136,9 @@ func ExecuteRPCEntity(
 	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
 	panicOnCStateError(cstate)
 
+	segmentPath := rpcEntity.GetCommonEntityData().SegmentPath
 	ydkRPC := C.RootSchemaNodeRpc(
-		*cstate, rootSchema, C.CString(rpcEntity.GetSegmentPath()))
+		*cstate, rootSchema, C.CString(segmentPath))
 	panicOnCStateError(cstate)
 
 	if rootSchema == nil {
@@ -192,8 +193,8 @@ func walkRPCChildren(
 			if (children[childName] != nil &&
 				types.HasDataOrFilter(children[childName])) {
 
-				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'",
-					children[childName].GetSegmentPath()))
+				segmentPath := children[childName].GetCommonEntityData().SegmentPath
+				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", segmentPath))
 				walkRPCChildren(state, children[childName], rpcInput, path)
 			}
 		}
@@ -257,8 +258,9 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	}
 
 	topEntity := getTopEntityFromFilter(filter)
+	segmentPath := topEntity.GetCommonEntityData().SegmentPath
 	ydk.YLogDebug(
-		fmt.Sprintf("Reading top entity: '%s'", topEntity.GetSegmentPath()))
+		fmt.Sprintf("Reading top entity: '%s'", segmentPath))
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
 
@@ -648,8 +650,9 @@ func walkChildren(
 
 	for childName := range children {
 
+		segmentPath := children[childName].GetCommonEntityData().SegmentPath
 		ydk.YLogDebug(fmt.Sprintf(
-			"Looking at entity child '%s'", children[childName].GetSegmentPath()))
+			"Looking at entity child '%s'", segmentPath))
 
 		if types.HasDataOrFilter(children[childName]) {
 			populateDataNode(state, children[childName], dataNode)

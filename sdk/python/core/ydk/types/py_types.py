@@ -419,14 +419,14 @@ class EntityCollection():
         Returns list of all entities in the collection.
         If collection is empty, it returns an empty list.
         """
-        return self._entity_map.values()
+        return list(self._entity_map.values())
 
     def get_keys(self):
         """
         Returns list of keys for the collection entities.
         If collection is empty, it returns an empty list.
         """
-        return self._entity_map.keys()
+        return list(self._entity_map.keys())
 
     def __getitem__(self, item):
         """
@@ -436,7 +436,7 @@ class EntityCollection():
         """
         if isinstance(item, int):
             if item < self.len():
-                return self._entity_map.values()[item]
+                return self.get_entities()[item]
             else:
                 return None
         elif isinstance(item, str):

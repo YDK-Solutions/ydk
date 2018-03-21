@@ -205,8 +205,6 @@ function install_py_core {
 #    print_msg "Generating py binaries"
 #    sudo ./generate_python_binary.sh
 
-    run_test sdk/python/core/tests/test_ydk_types.py
-
     cd $YDKGEN_HOME
 }
 
@@ -418,6 +416,7 @@ function py_sanity_ydktest_test {
     cp build/lib*/*.so .
     cd -
 
+    run_test sdk/python/core/tests/test_ydk_types.py
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_netconf_ssh

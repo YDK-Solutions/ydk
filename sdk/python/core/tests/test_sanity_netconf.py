@@ -365,8 +365,8 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(result, True)
 
         # Read configuration
-        filter = Filter([ysanity.Native(), openconfig.Bgp()]);
-        read_config = crud.read(self.ncc, filter)
+        read_filter = Filter([ysanity.Native(), openconfig.Bgp()]);
+        read_config = crud.read(self.ncc, read_filter)
         self.assertEqual(isinstance(read_config, Config), True)
         self.assertEqual(read_config.len(), 2)
 

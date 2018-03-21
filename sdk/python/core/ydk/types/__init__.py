@@ -32,7 +32,7 @@ from ydk.ext.types import YLeaf
 __all__ = [ "YList",
             "Bits",
             "ChildrenMap",
-            "Config"
+            "Config",
             "ModelCachingOption",
             "Decimal64",
             "Empty",
@@ -41,7 +41,7 @@ __all__ = [ "YList",
             "EntityCollection",
             "EntityPath",
             "Enum",
-            "Filter"
+            "Filter",
             "Identity",
             "LeafData",
             "LeafDataList",

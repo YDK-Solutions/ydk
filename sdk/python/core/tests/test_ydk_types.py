@@ -18,7 +18,6 @@ from __future__ import absolute_import
 
 import sys
 import unittest
-import logging
 
 from ydk.errors import YPYInvalidArgumentError
 from ydk.types  import EntityCollection, Filter, Config
@@ -61,13 +60,13 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
-        filter = Filter([runner, native])
+        read_filter = Filter([runner, native])
 
-        self.assertEqual(filter.get_keys(), ['ydktest-sanity:runner', 'ydktest-sanity:native'])
-        entities = filter.get_entities()
+        self.assertEqual(read_filter.get_keys(), ['ydktest-sanity:runner', 'ydktest-sanity:native'])
+        entities = read_filter.get_entities()
         self.assertEqual(format(entities[0]), 'ydk.models.ydktest.ydktest_sanity.Runner')
         self.assertEqual(format(entities[1]), 'ydk.models.ydktest.ydktest_sanity.Native')
-        filter.clear()
+        read_filter.clear()
 
     def test_access_config_by_key(self):
         runner = ysanity.Runner()
@@ -101,12 +100,14 @@ class SanityTest(unittest.TestCase):
         for entity in config:
             print(entity)
 
+        self.assertEqual(config.len(), 2)
         config.clear()
 
     @assert_with_error(test_add_unsupported_pattern, YPYInvalidArgumentError)
     def test_add_unsupported(self):
         anydata = EntityCollection()
         anydata.add('native')
+        self.assertEqual(anydata.is_empty(), True)
 
     def test_init_delete(self):
         runner = ysanity.Runner()

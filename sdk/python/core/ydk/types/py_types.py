@@ -22,6 +22,7 @@
         - Entity
 """
 from collections import OrderedDict
+import logging
 
 from ydk_ import is_set
 from ydk.ext.types import Bits
@@ -34,8 +35,8 @@ from ydk.ext.types import Entity as _Entity
 from ydk.ext.types import LeafDataList
 from ydk.filters import YFilter as _YFilter
 from ydk.errors import YPYModelError as _YPYModelError
+from ydk.errors import YPYInvalidArgumentError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
-
 
 class YList(list):
     """ Represents a list with support for hanging a parent
@@ -358,6 +359,138 @@ class Entity(_Entity):
                         value.parent = self
                 super(Entity, self).__setattr__(name, value)
 
+    def __str__(self):
+        return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
 
 def _name_matches_yang_name(name, yang_name):
     return name == yang_name or yang_name.endswith(':'+name)
+
+class EntityCollection():
+    """ EntityCollection is a wrapper class around standard list of Entity class instances,
+    which allows user-friendly access to collection of entities.
+    """
+    def __init__(self, entities=None):
+        self._entity_map = OrderedDict()
+        if entities is not None:
+            self.add(entities)
+        self.logger = logging.getLogger("ydk.types.EntityCollection")
+
+    def __eq__(self, other):
+        if not isinstance(other, EntityCollection):
+            return False
+        return self._entity_map.__eq__(other._entity_map)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def len(self):
+        return self._entity_map.__len__()
+
+    def is_empty(self):
+        return self._entity_map.__len__() == 0
+
+    def add(self, entities):
+        """
+        Adds new elements to collection. Allowed entries:
+          - instance of Entity class
+          - list of Entity class instances
+        """
+        if entities is None:
+            self._log_error_and_raise_exception("Cannot add None object to the EntityCollection", YPYInvalidArgumentError)
+        elif isinstance(entities, Entity):
+            self._entity_map[entities.get_segment_path()] = entities
+        elif isinstance(entities, list):
+            for entity in entities:
+                if isinstance(entity, Entity):
+                    self._entity_map[entity.get_segment_path()] = entity
+                else:
+                    msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(entity)
+                    self._log_error_and_raise_exception(msg, YPYInvalidArgumentError)
+        else:
+            msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(entities)
+            self._log_error_and_raise_exception(msg, YPYInvalidArgumentError)
+
+    def _log_error_and_raise_exception(self, msg, exception_class):
+        self.logger.error(msg)
+        raise exception_class(msg)
+
+    def get_entities(self):
+        """
+        Returns list of all entities in the collection.
+        If collection is empty, it returns an empty list.
+        """
+        return self._entity_map.values()
+
+    def get_keys(self):
+        """
+        Returns list of keys for the collection entities.
+        If collection is empty, it returns an empty list.
+        """
+        return self._entity_map.keys()
+
+    def __getitem__(self, item):
+        """
+        Returns entity store in the collection.
+        Parameter 'item' could be a class of int (ordered number of entity)
+        or class of string (key (segment path) of the entity.
+        """
+        if isinstance(item, int):
+            if item < self.len():
+                return self._entity_map.values()[item]
+            else:
+                return None
+        elif isinstance(item, str):
+            return self._entity_map[item]
+        else:
+            msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(item)
+            self._log_error_and_raise_exception(msg, YPYInvalidArgumentError)
+            return None
+
+    def clear(self):
+        """Deletes all the members of collection"""
+        self._entity_map.clear()
+
+    def delete(self, item):
+        """
+        Deletes collection item.
+        Parameter 'item' could be
+         - type of int (ordered number of entity)
+         - type of str (key (segment path) of entity)
+         - instance of Entity class
+        Returns entity of deleted instance or None if item is not found.
+        """
+        if isinstance(item, int):
+            entity = self.__getitem__(item)
+            if entity is not None:
+                key = entity.get_segment_path()
+                return self._entity_map.pop(key)
+            else:
+                return None
+        elif isinstance(item, str):
+            if item in self.get_keys():
+                return self._entity_map.pop(item)
+            else:
+                return None
+        elif isinstance(item, Entity):
+            key = item.get_segment_path()
+            if key in self.get_keys():
+                return self._entity_map.pop(key)
+            else:
+                return None
+        else:
+            return None
+
+    def __str__(self):
+        ent_strs = list();
+        for entity in self.get_entities():
+            ent_strs.append(format(entity))
+        return "Entities in {}: {}".format(self.__class__.__name__, ent_strs)
+
+    def __iter__(self):
+        return iter(self.get_entities())
+
+class Filter(EntityCollection):
+    pass
+
+class Config(EntityCollection):
+    pass

@@ -205,6 +205,8 @@ function install_py_core {
 #    print_msg "Generating py binaries"
 #    sudo ./generate_python_binary.sh
 
+    run_test sdk/python/core/tests/test_ydk_types.py
+
     cd $YDKGEN_HOME
 }
 

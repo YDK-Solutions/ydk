@@ -242,7 +242,7 @@ func createFromChildren(
 }
 
 func getTopEntityFromFilter(filter types.Entity) types.Entity {
-	parent := filter.GetCommonEntityData().Parent
+	parent := types.GetParent(filter)
 	if parent == nil {
 		return filter
 	}
@@ -622,10 +622,10 @@ func getDataNodeFromEntity(
 		return nil
 	}
 
-	parent := entity.GetCommonEntityData().Parent
+	parent := types.GetParent(entity)
 	for parent != nil {
 		entity = parent
-		parent = parent.GetCommonEntityData().Parent
+		parent = types.GetParent(entity)
 	}
 
 	rootPath := types.GetEntityPath(entity)
@@ -751,7 +751,7 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 				ydk.YLogError(fmt.Sprintf("Could not create child entity '%s'!", childName))
 				panic("Could not create child entity!")
 			}
-			childEntity.GetCommonEntityData().Parent = entity
+			types.SetParent(childEntity, entity)
 			getEntityFromDataNode(childDataNode, childEntity)
 		}
 	}

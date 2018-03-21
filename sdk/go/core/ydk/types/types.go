@@ -149,6 +149,16 @@ func GetLeafs(entity Entity) map[string]LeafStore {
 	return data.Leafs
 }
 
+// GetParent returns the given entity's parent
+func GetParent(entity Entity) Entity {
+	return entity.GetCommonEntityData().Parent
+}
+
+// SetParent sets the given entity's parent to the given parent entity
+func SetParent(entity, parent Entity) {
+	entity.GetCommonEntityData().Parent = parent
+}
+
 /////////////////////////////////////
 // Entity Utility Functions
 /////////////////////////////////////
@@ -433,11 +443,11 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 	if ancestor == nil {
 		return ""
 	}
-	p := current_node.GetCommonEntityData().Parent
+	p := GetParent(current_node)
 	parents := EntitySlice{}
 	for p != nil && p != ancestor {
 		//append(parents, p)
-		p = p.GetCommonEntityData().Parent
+		p = GetParent(p)
 	}
 
 	if p == nil {

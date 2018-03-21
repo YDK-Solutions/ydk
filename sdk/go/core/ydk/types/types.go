@@ -77,6 +77,16 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
+type ChildStore struct {
+	GoName 	string
+	Value 	Entity
+}
+
+type LeafStore struct {
+	GoName 	string
+	Value 	interface{}
+}
+
 // CommonEntityData encapsulate common data within an Entity
 type CommonEntityData struct {
 	// static data (internals)
@@ -84,8 +94,8 @@ type CommonEntityData struct {
 	BundleName 					string
 	ParentYangName				string
 	YFilter 					yfilter.YFilter
-	Children 					map[string]Entity
-	Leafs 						map[string]interface{}
+	Children 					map[string]ChildStore
+	Leafs 						map[string]LeafStore
 	SegmentPath					string
 
 	CapabilitiesTable			map[string]string
@@ -94,14 +104,12 @@ type CommonEntityData struct {
 
 	// dynamic data (internals)
 	Parent 						Entity
-	GoName 						string
 }
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetCommonEntityData()	*CommonEntityData
-	GetGoName(string)		string
-	GetChildren() 			map[string]Entity
+	GetChildren() 			map[string]ChildStore
 }
 
 // Bits is a basic type that represents the YANG bits type
@@ -136,11 +144,10 @@ func GetParentYangName(entity Entity) string {
 }
 
 // GetLeafs returns a map of the leafs contained in the given entity
-func GetLeafs(entity Entity) map[string]interface{} {
+func GetLeafs(entity Entity) map[string]LeafStore {
 	data := entity.GetCommonEntityData()
 	return data.Leafs
 }
-
 
 /////////////////////////////////////
 // Entity Utility Functions
@@ -158,21 +165,22 @@ func HasDataOrFilter(entity Entity) bool {
 
 	// children
 	for _, child := range children {
-		yf := child.GetCommonEntityData().YFilter
-		if (yf != yfilter.NotSet || HasDataOrFilter(child)) {
-			return true
+		if child.Value != nil {
+			yf := child.Value.GetCommonEntityData().YFilter
+			if (yf != yfilter.NotSet || HasDataOrFilter(child.Value)) {
+				return true
+			}
 		}
 	}
 
 	v := reflect.ValueOf(entity).Elem()
 
 	// checking leafs
-	for name, leaf := range leafs {
-		goName := entity.GetGoName(name)
-		field := v.FieldByName(goName)
+	for _, leaf := range leafs {
+		field := v.FieldByName(leaf.GoName)
 
 		if field.Kind() != reflect.Slice {
-			if leaf != nil { return true }
+			if leaf.Value != nil { return true }
 		} else {
 			for _, l := range field.Interface().([]interface{}) {
 				if l != nil { return true }
@@ -192,19 +200,18 @@ func GetEntityPath(entity Entity) EntityPath {
 	// leafs
 	var leafData LeafData
 	for name, leaf := range leafs {
-		goName := entity.GetGoName(name)
-		field := v.FieldByName(goName)
+		field := v.FieldByName(leaf.GoName)
 
-		if leaf != nil && field.Kind() != reflect.Slice {
-			switch leaf.(type) {
+		if leaf.Value != nil && field.Kind() != reflect.Slice {
+			switch leaf.Value.(type) {
 			case yfilter.YFilter:
 				// yfilter
 				leafData = LeafData{
-					IsSet: true, Filter: leaf.(yfilter.YFilter)}
+					IsSet: true, Filter: leaf.Value.(yfilter.YFilter)}
 			case map[string]bool:
 				// bits
 				var used_bits []string
-				for bit, enabled := range(leaf.(map[string]bool)) {
+				for bit, enabled := range(leaf.Value.(map[string]bool)) {
 					if enabled {
 						used_bits = append(used_bits, bit)
 					}
@@ -213,8 +220,8 @@ func GetEntityPath(entity Entity) EntityPath {
 				leafData = LeafData{IsSet: true, Value: v}
 			default:
 				var v string
-				if reflect.TypeOf(leaf) != reflect.TypeOf(Empty{}) {
-					v = fmt.Sprintf("%v", leafs[name])
+				if reflect.TypeOf(leaf.Value) != reflect.TypeOf(Empty{}) {
+					v = fmt.Sprintf("%v", leafs[name].Value)
 				}
 				leafData = LeafData{
 					IsSet: true, Value: v}
@@ -236,7 +243,8 @@ func GetChildByName(
 	segmentPath string) Entity {
 
 	children := entity.GetChildren()
-	goName := entity.GetGoName(childYangName)
+	goName := children[childYangName].GoName
+
 	s := reflect.ValueOf(entity).Elem()
 	v := s.FieldByName(goName)
 
@@ -244,7 +252,7 @@ func GetChildByName(
 		if v.Kind() == reflect.Slice {
 			_, ok := children[segmentPath]
 			if ok {
-				return children[segmentPath]
+				return children[segmentPath].Value
 			} else {
 				sliceType := v.Type().Elem()
 				childValue := reflect.New(sliceType).Elem()
@@ -255,10 +263,10 @@ func GetChildByName(
 
 				v.Set(reflect.Append(v, childValue))
 				children = entity.GetChildren()
-				return children[data.SegmentPath]
+				return children[data.SegmentPath].Value
 			}
 		} else {
-			return children[childYangName]
+			return children[childYangName].Value
 		}
 	}
 	return nil
@@ -266,7 +274,9 @@ func GetChildByName(
 
 // SetValue sets the leaf value for given entity, valuePath, and value args
 func SetValue(entity Entity, valuePath string, value interface{}) {
-	goName := entity.GetGoName(valuePath)
+	// goName := entity.GetGoName(valuePath)
+	leafs := GetLeafs(entity)
+	goName := leafs[valuePath].GoName
 	s := reflect.ValueOf(entity).Elem()
 	v := s.FieldByName(goName)
 	if v.IsValid() {
@@ -503,23 +513,27 @@ func deepValueEqual(e1, e2 Entity) bool {
 
 	ret := true
 	for k, c1 := range children1 {
-		marker[k] = true
-		if HasDataOrFilter(c1) {
-			c2, ok := children2[k]
-			if ok && deepValueEqual(c1, c2) {
-				ret = ret && nameValuesEqual(c1, c2)
-			} else {
-				ret = false
-				break
+		if c1.Value != nil {
+			marker[k] = true
+			if HasDataOrFilter(c1.Value) {
+				c2, ok := children2[k]
+				if ok && deepValueEqual(c1.Value, c2.Value) {
+					ret = ret && nameValuesEqual(c1.Value, c2.Value)
+				} else {
+					ret = false
+					break
+				}
 			}
 		}
 	}
 
 	for k := range children2 {
-		_, ok := marker[k]
-		if !ok {
-			ret = false
-			break
+		if children2[k].Value != nil{
+			_, ok := marker[k]
+			if !ok {
+				ret = false
+				break
+			}
 		}
 	}
 

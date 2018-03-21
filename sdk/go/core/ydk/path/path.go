@@ -190,12 +190,12 @@ func walkRPCChildren(
 		}
 
 		for childName, _ := range children {
-			if (children[childName] != nil &&
-				types.HasDataOrFilter(children[childName])) {
+			if (children[childName].Value != nil &&
+				types.HasDataOrFilter(children[childName].Value)) {
 
-				segmentPath := children[childName].GetCommonEntityData().SegmentPath
+				segmentPath := children[childName].Value.GetCommonEntityData().SegmentPath
 				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", segmentPath))
-				walkRPCChildren(state, children[childName], rpcInput, path)
+				walkRPCChildren(state, children[childName].Value, rpcInput, path)
 			}
 		}
 
@@ -230,12 +230,12 @@ func createFromEntityPath(
 }
 
 func createFromChildren(
-	state *errors.State, children map[string]types.Entity, rpcInput C.DataNode) {
+	state *errors.State, children map[string]types.ChildStore, rpcInput C.DataNode) {
 
 	for childName, child := range children {
-		if types.HasDataOrFilter(child) {
+		if child.Value != nil && types.HasDataOrFilter(child.Value) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
-				childName, types.GetEntityPath(child).Path))
+				childName, types.GetEntityPath(child.Value).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
 		}
 	}
@@ -649,13 +649,14 @@ func walkChildren(
 	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
 
 	for childName := range children {
+		if children[childName].Value != nil {
+			segmentPath := children[childName].Value.GetCommonEntityData().SegmentPath
+			ydk.YLogDebug(fmt.Sprintf(
+				"Looking at entity child '%s'", segmentPath))
 
-		segmentPath := children[childName].GetCommonEntityData().SegmentPath
-		ydk.YLogDebug(fmt.Sprintf(
-			"Looking at entity child '%s'", segmentPath))
-
-		if types.HasDataOrFilter(children[childName]) {
-			populateDataNode(state, children[childName], dataNode)
+			if types.HasDataOrFilter(children[childName].Value) {
+				populateDataNode(state, children[childName].Value, dataNode)
+			}
 		}
 	}
 	ydk.YLogDebug("")

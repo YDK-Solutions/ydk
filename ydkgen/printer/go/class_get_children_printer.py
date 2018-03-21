@@ -30,17 +30,19 @@ class ClassGetChildrenPrinter(FunctionPrinter):
 
     def print_function_header(self):
         self.print_function_header_helper(
-            'GetChildren', return_type='map[string]types.Entity')
+            'GetChildren', return_type='map[string]types.ChildStore')
 
     def print_function_body(self):
-        self.ctx.writeln('children := make(map[string]types.Entity)')
+        self.ctx.writeln('children := make(map[string]types.ChildStore)')
         for child in self.children:
+            path = get_qualified_yang_name(child)
             if child.is_many:
+                self.ctx.writeln('children["%s"] = types.ChildStore{"%s", nil}' % (
+                    path, child.go_name()))
                 self._print_many(child)
             else:
-                path = get_qualified_yang_name(child)
-                self.ctx.writeln('children["%s"] = &%s.%s' % (
-                    path, self.class_alias, child.go_name()))
+                self.ctx.writeln('children["%s"] = types.ChildStore{"%s", &%s.%s}' % (
+                    path, child.go_name(), self.class_alias, child.go_name()))
         self.ctx.writeln('return children')
 
     def _print_many(self, child):
@@ -48,6 +50,7 @@ class ClassGetChildrenPrinter(FunctionPrinter):
         self.ctx.writeln('for i := range %s {' % (child_stmt))
         self.ctx.lvl_inc()
         child_stmt = '%s[i]' % child_stmt
-        self.ctx.writeln('children[{0}.GetCommonEntityData().SegmentPath] = &{0}'.format(child_stmt))
+        self.ctx.writeln('children[{0}.GetCommonEntityData().SegmentPath] = types.ChildStore{{"{1}", &{0}}}'.format(
+            child_stmt, child.go_name()))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')

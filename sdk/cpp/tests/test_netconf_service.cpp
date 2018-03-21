@@ -293,22 +293,23 @@ TEST_CASE("validate")
     REQUIRE(reply);
 }
 
+// TODO
 // read device configuration (no filter)
-TEST_CASE("read_all_rpc")
-{
-    path::Repository repo{TEST_HOME};
-    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = session.get_root_schema();
-
-    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };
-    read_rpc->get_input_node().create_datanode("source/running");
-
-    auto read_result = (*read_rpc)(session);
-    REQUIRE(read_result != nullptr);
-
-    // Print config
-    vector<shared_ptr<ydk::path::DataNode>> data_nodes = read_result->get_children();
-    for (auto dn : data_nodes) {
-    	print_data_node(dn);
-    }
-}
+//TEST_CASE("read_all_rpc")
+//{
+//    path::Repository repo{TEST_HOME};
+//    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
+//    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+//
+//    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };
+//    read_rpc->get_input_node().create_datanode("source/running");
+//
+//    auto read_result = (*read_rpc)(session);
+//    REQUIRE(read_result != nullptr);
+//
+//    // Print config
+//    vector<shared_ptr<ydk::path::DataNode>> data_nodes = read_result->get_children();
+//    for (auto dn : data_nodes) {
+//    	print_data_node(dn);
+//    }
+//}

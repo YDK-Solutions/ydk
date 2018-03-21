@@ -26,7 +26,6 @@ from ydkgen.common import get_qualified_yang_name, sort_classes_at_same_level
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
 from .class_enum_printer import EnumPrinter
-from .class_get_children_printer import ClassGetChildrenPrinter
 
 
 class ClassPrinter(object):
@@ -50,7 +49,6 @@ class ClassPrinter(object):
 
     def _print_class_method_definitions(self, clazz, leafs, children):
         self._print_class_get_entity_common_data(clazz, leafs, children)
-        self._print_class_get_children(clazz, leafs, children)
 
     def _get_class_members(self, clazz, leafs, children):
         for prop in clazz.properties():
@@ -65,7 +63,7 @@ class ClassPrinter(object):
         data_alias = '%s.EntityData' % fp.class_alias
         bundle_name = snake_case(self.bundle_name)
 
-        fp.print_function_header_helper('GetCommonEntityData', return_type='*types.CommonEntityData')
+        fp.print_function_header_helper('GetEntityData', return_type='*types.CommonEntityData')
         fp.ctx.writeln('%s.YFilter = %s.YFilter' % (data_alias, fp.class_alias))
         fp.ctx.writeln('%s.YangName = "%s"' % (data_alias, fp.clazz.stmt.arg))
         fp.ctx.writeln('%s.BundleName = "%s"' % (data_alias, self.bundle_name.lower()))
@@ -112,32 +110,30 @@ class ClassPrinter(object):
         pass
 
     def _print_children(self, fp, children, data_alias):
-        # Children - returns map[string]Entity
-        # fp.ctx.writeln('%s.Children = make(map[string]types.Entity)' % data_alias)
-        # for child in children:
-        #     if child.is_many:
-        #         child_stmt = '%s.%s' % (fp.class_alias, child.go_name())
-        #         fp.ctx.writeln('for i := range %s {' % (child_stmt))
-        #         fp.ctx.lvl_inc()
-        #         child_stmt = '%s[i]' % child_stmt
-        #         fp.ctx.writeln('{0}.Children[{1}.GetCommonEntityData().SegmentPath] = &{1}'.format(data_alias, child_stmt))
-        #         fp.ctx.lvl_dec()
-        #         fp.ctx.writeln('}')
-        #     else:
-        #         path = get_qualified_yang_name(child)
-        #         fp.ctx.writeln('%s.Children["%s"] = &%s.%s' % (
-        #             data_alias, path, fp.class_alias, child.go_name()))
-        fp.ctx.writeln('%s.Children = %s.GetChildren()' % (data_alias, fp.class_alias))
+        fp.ctx.writeln('%s.Children = make(map[string]types.ChildStore)' % data_alias)
+        for child in children:
+            path = get_qualified_yang_name(child)
+            if child.is_many:
+                fp.ctx.writeln('%s.Children["%s"] = types.ChildStore{"%s", nil}' % (
+                    data_alias, path, child.go_name()))
+
+                child_stmt = '%s.%s' % (fp.class_alias, child.go_name())
+                fp.ctx.writeln('for i := range %s {' % (child_stmt))
+                fp.ctx.lvl_inc()
+                child_stmt = '%s[i]' % child_stmt
+                fp.ctx.writeln('%s.Children[%s.GetEntityData().SegmentPath] = types.ChildStore{"%s", &%s}' %(
+                    data_alias, child_stmt, child.go_name(), child_stmt))
+                fp.ctx.lvl_dec()
+                fp.ctx.writeln('}')
+            else:
+                fp.ctx.writeln('%s.Children["%s"] = types.ChildStore{"%s", &%s.%s}' % (
+                    data_alias, path, child.go_name(), fp.class_alias, child.go_name()))
 
     def _print_leafs(self, fp, leafs, data_alias):
         fp.ctx.writeln('%s.Leafs = make(map[string]types.LeafStore)' % data_alias)
         for leaf in leafs:
             fp.ctx.writeln('%s.Leafs["%s"] = types.LeafStore{"%s", %s.%s}' % (
                 data_alias, leaf.stmt.arg, leaf.go_name(), fp.class_alias, leaf.go_name()))
-
-    def _print_class_get_children(self, clazz, leafs, children):
-        fp = ClassGetChildrenPrinter(self.ctx, clazz, leafs, children)
-        fp.print_all()
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

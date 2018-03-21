@@ -136,7 +136,7 @@ func ExecuteRPCEntity(
 	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
 	panicOnCStateError(cstate)
 
-	segmentPath := rpcEntity.GetCommonEntityData().SegmentPath
+	segmentPath := rpcEntity.GetEntityData().SegmentPath
 	ydkRPC := C.RootSchemaNodeRpc(
 		*cstate, rootSchema, C.CString(segmentPath))
 	panicOnCStateError(cstate)
@@ -170,7 +170,7 @@ func walkRPCChildren(
 
 	ydk.YLogDebug("Walking Rpc Children...")
 	if(rpcEntity != nil) {
-		children := rpcEntity.GetChildren()
+		children := rpcEntity.GetEntityData().Children
 		entityPath := types.GetEntityPath(rpcEntity)
 		ydk.YLogDebug(fmt.Sprintf(
 			"Got %d entity children in '%s'", len(children), entityPath.Path))
@@ -193,7 +193,7 @@ func walkRPCChildren(
 			if (children[childName].Value != nil &&
 				types.HasDataOrFilter(children[childName].Value)) {
 
-				segmentPath := children[childName].Value.GetCommonEntityData().SegmentPath
+				segmentPath := children[childName].Value.GetEntityData().SegmentPath
 				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", segmentPath))
 				walkRPCChildren(state, children[childName].Value, rpcInput, path)
 			}
@@ -258,7 +258,7 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	}
 
 	topEntity := getTopEntityFromFilter(filter)
-	segmentPath := topEntity.GetCommonEntityData().SegmentPath
+	segmentPath := topEntity.GetEntityData().SegmentPath
 	ydk.YLogDebug(
 		fmt.Sprintf("Reading top entity: '%s'", segmentPath))
 
@@ -399,7 +399,7 @@ func InitCodecServiceProvider(
 	var repoPath *C.char
 	defer C.free(unsafe.Pointer(repoPath))
 
-	data := entity.GetCommonEntityData()
+	data := entity.GetEntityData()
 	if len(repo.Path) > 0 {
 		ydk.YLogDebug(fmt.Sprintf(
 			"CodecServiceProvider using YANG models in %v", repo.Path))
@@ -635,7 +635,7 @@ func getDataNodeFromEntity(
 	rootDataNode := C.RootSchemaNodeCreate(*getCState(state), rootSchema, path)
 	panicOnCStateError(getCState(state))
 
-	addDataNodeFilterAnnotation(&rootDataNode, entity.GetCommonEntityData().YFilter)
+	addDataNodeFilterAnnotation(&rootDataNode, entity.GetEntityData().YFilter)
 
 	populateNameValues(state, rootDataNode, rootPath)
 	walkChildren(state, entity, rootDataNode)
@@ -644,13 +644,13 @@ func getDataNodeFromEntity(
 
 func walkChildren(
 	state *errors.State, entity types.Entity, dataNode C.DataNode) {
-	children := entity.GetChildren()
+	children := entity.GetEntityData().Children
 
 	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
 
 	for childName := range children {
 		if children[childName].Value != nil {
-			segmentPath := children[childName].Value.GetCommonEntityData().SegmentPath
+			segmentPath := children[childName].Value.GetEntityData().SegmentPath
 			ydk.YLogDebug(fmt.Sprintf(
 				"Looking at entity child '%s'", segmentPath))
 
@@ -679,7 +679,7 @@ func populateDataNode(
 		panic("Datanode could not be created for: " + path.Path)
 	}
 
-	addDataNodeFilterAnnotation(&dataNode, entity.GetCommonEntityData().YFilter)
+	addDataNodeFilterAnnotation(&dataNode, entity.GetEntityData().YFilter)
 
 	populateNameValues(state, dataNode, path)
 	walkChildren(state, entity, dataNode)

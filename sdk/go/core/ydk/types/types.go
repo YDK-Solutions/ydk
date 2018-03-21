@@ -108,8 +108,7 @@ type CommonEntityData struct {
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
-	GetCommonEntityData()	*CommonEntityData
-	GetChildren() 			map[string]ChildStore
+	GetEntityData()		*CommonEntityData
 }
 
 // Bits is a basic type that represents the YANG bits type
@@ -120,63 +119,34 @@ type BitsList struct {
 	Value []map[string]bool
 }
 
-
-/////////////////////////////////////
-// CommonEntityData Utility Functions -- should these not be utility funcs?
-/////////////////////////////////////
-
-// GetYangName returns the given entity's YANG name
-func GetYangName(entity Entity) string {
-	data := entity.GetCommonEntityData()
-	return data.YangName
-}
-
-// GetBundleName returns the name of the bundle that the given entity belongs to
-func GetBundleName(entity Entity) string {
-	data := entity.GetCommonEntityData()
-	return data.BundleName
-}
-
-// GetParentYangName returns the YANG name of the parent of the given entity
-func GetParentYangName(entity Entity) string {
-	data := entity.GetCommonEntityData()
-	return data.ParentYangName
-}
-
-// GetLeafs returns a map of the leafs contained in the given entity
-func GetLeafs(entity Entity) map[string]LeafStore {
-	data := entity.GetCommonEntityData()
-	return data.Leafs
-}
-
-// GetParent returns the given entity's parent
-func GetParent(entity Entity) Entity {
-	return entity.GetCommonEntityData().Parent
-}
-
-// SetParent sets the given entity's parent to the given parent entity
-func SetParent(entity, parent Entity) {
-	entity.GetCommonEntityData().Parent = parent
-}
-
 /////////////////////////////////////
 // Entity Utility Functions
 /////////////////////////////////////
 
+// GetParent returns the given entity's parent
+func GetParent(entity Entity) Entity {
+	return entity.GetEntityData().Parent
+}
+
+// SetParent sets the given entity's parent to the given parent entity
+func SetParent(entity, parent Entity) {
+	entity.GetEntityData().Parent = parent
+}
+
 // HasDataOrFilter returns a bool representing whether the entity
 // or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
-	if (entity.GetCommonEntityData().YFilter != yfilter.NotSet) {
+	if (entity.GetEntityData().YFilter != yfilter.NotSet) {
 		return true
 	}
 
-	children := entity.GetChildren()
-	leafs := GetLeafs(entity)
+	children := entity.GetEntityData().Children
+	leafs := entity.GetEntityData().Leafs
 
 	// children
 	for _, child := range children {
 		if child.Value != nil {
-			yf := child.Value.GetCommonEntityData().YFilter
+			yf := child.Value.GetEntityData().YFilter
 			if (yf != yfilter.NotSet || HasDataOrFilter(child.Value)) {
 				return true
 			}
@@ -203,8 +173,8 @@ func HasDataOrFilter(entity Entity) bool {
 
 // GetEntityPath returns an EntityPath struct for the given entity
 func GetEntityPath(entity Entity) EntityPath {
-	entityPath := EntityPath{Path: entity.GetCommonEntityData().SegmentPath}
-	leafs := GetLeafs(entity)
+	entityPath := EntityPath{Path: entity.GetEntityData().SegmentPath}
+	leafs := entity.GetEntityData().Leafs
 	v := reflect.ValueOf(entity).Elem()
 
 	// leafs
@@ -252,7 +222,7 @@ func GetChildByName(
 	childYangName string,
 	segmentPath string) Entity {
 
-	children := entity.GetChildren()
+	children := entity.GetEntityData().Children
 	goName := children[childYangName].GoName
 
 	s := reflect.ValueOf(entity).Elem()
@@ -267,12 +237,12 @@ func GetChildByName(
 				sliceType := v.Type().Elem()
 				childValue := reflect.New(sliceType).Elem()
 
-				method := reflect.New(sliceType).MethodByName("GetCommonEntityData")
+				method := reflect.New(sliceType).MethodByName("GetEntityData")
 				in := make([]reflect.Value, method.Type().NumIn())
 				data := method.Call(in)[0].Elem().Interface().(CommonEntityData)
 
 				v.Set(reflect.Append(v, childValue))
-				children = entity.GetChildren()
+				children = entity.GetEntityData().Children
 				return children[data.SegmentPath].Value
 			}
 		} else {
@@ -284,8 +254,7 @@ func GetChildByName(
 
 // SetValue sets the leaf value for given entity, valuePath, and value args
 func SetValue(entity Entity, valuePath string, value interface{}) {
-	// goName := entity.GetGoName(valuePath)
-	leafs := GetLeafs(entity)
+	leafs := entity.GetEntityData().Leafs
 	goName := leafs[valuePath].GoName
 	s := reflect.ValueOf(entity).Elem()
 	v := s.FieldByName(goName)
@@ -428,7 +397,7 @@ func (s EntitySlice) Len() int {
 
 // Less returns whether the Entity at index i is less than the one at index j of the given EntitySlice
 func (s EntitySlice) Less(i, j int) bool {
-	return s[i].GetCommonEntityData().SegmentPath < s[j].GetCommonEntityData().SegmentPath
+	return s[i].GetEntityData().SegmentPath < s[j].GetEntityData().SegmentPath
 }
 
 // Swap swaps the Entities at indices i and j of the given EntitySlice
@@ -463,12 +432,12 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 		} else {
 			p = p1
 		}
-		path_buffer += p1.GetCommonEntityData().SegmentPath
+		path_buffer += p1.GetEntityData().SegmentPath
 	}
 	if p != nil {
 		path_buffer += "/"
 	}
-	path_buffer += current_node.GetCommonEntityData().SegmentPath
+	path_buffer += current_node.GetEntityData().SegmentPath
 	return path_buffer
 
 }
@@ -516,8 +485,8 @@ func deepValueEqual(e1, e2 Entity) bool {
 	if e1 == nil && e2 == nil {
 		return false
 	}
-	children1 := e1.GetChildren()
-	children2 := e2.GetChildren()
+	children1 := e1.GetEntityData().Children
+	children2 := e2.GetEntityData().Children
 
 	marker := make(map[string]bool)
 

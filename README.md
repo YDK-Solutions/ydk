@@ -96,7 +96,7 @@ You can download the latest python package from [here](https://www.python.org/do
 ```
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install python pkg-config libssh xml2 curl pcre cmake
+   $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.0/libydk-0.7.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.7.0-Darwin.pkg -target /
 ```

@@ -25,10 +25,8 @@ import (
 	"sort"
 	"strings"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
-	// "github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
-	"github.com/CiscoDevNet/ydk-go/ydk/types/ytype"
 )
 
 // Empty represents a YANG built-in Empty type
@@ -77,12 +75,14 @@ type EntityPath struct {
 	ValuePaths []NameLeafData
 }
 
-type ChildStore struct {
+// YChild encapsulates the GoName of an entity as well as the entity itself
+type YChild struct {
 	GoName 	string
 	Value 	Entity
 }
 
-type LeafStore struct {
+// YLeaf encapsulates the GoName of a leaf as well as the leaf itself
+type YLeaf struct {
 	GoName 	string
 	Value 	interface{}
 }
@@ -94,8 +94,8 @@ type CommonEntityData struct {
 	BundleName 					string
 	ParentYangName				string
 	YFilter 					yfilter.YFilter
-	Children 					map[string]ChildStore
-	Leafs 						map[string]LeafStore
+	Children 					map[string]YChild
+	Leafs 						map[string]YLeaf
 	SegmentPath					string
 
 	CapabilitiesTable			map[string]string
@@ -122,6 +122,11 @@ type BitsList struct {
 /////////////////////////////////////
 // Entity Utility Functions
 /////////////////////////////////////
+
+// GetSegmentPath returns the given entity's segment path
+func GetSegmentPath(entity Entity) string {
+	return entity.GetEntityData().SegmentPath
+}
 
 // GetParent returns the given entity's parent
 func GetParent(entity Entity) Entity {
@@ -295,46 +300,6 @@ type EnumYLeaf struct {
 // Enum represents a YANG built-in enum type, a base type for all YDK enums.
 type Enum struct {
 	EnumYLeaf
-}
-
-// YLeaf represents a YANG leaf to which data can be assigned.
-type YLeaf struct {
-	name string
-
-	leafType  	ytype.YType
-	bitsValue 	Bits
-
-	Value  	string
-	IsSet  	bool
-	Filter 	yfilter.YFilter
-}
-
-// GetNameLeafdata instantiates and returns NameLeafData type for this leaf
-func (y *YLeaf) GetNameLeafdata() NameLeafData {
-	return NameLeafData{y.name, LeafData{y.Value, y.Filter, y.IsSet}}
-}
-
-// YLeafList represents a YANG leaf-list to which multiple instances of data can be appended
-type YLeafList struct {
-	name   	string
-	values 	[]YLeaf
-
-	Filter    	yfilter.YFilter
-	leafType 	ytype.YType
-}
-
-// GetYLeafs is a getter function for YLeafList values
-func (y *YLeafList) GetYLeafs() []YLeaf {
-	return y.values
-}
-
-// GetNameLeafdata instantiates and returns name NameLeafData for this YLeafList
-func (y *YLeafList) GetNameLeafdata() [](NameLeafData) {
-	result := make([]NameLeafData, len(y.values))
-	for i := 0; i < len(y.values); i++ {
-		result = append(result, NameLeafData{y.values[i].name, LeafData{y.values[i].Value, y.values[i].Filter, y.values[i].IsSet}})
-	}
-	return result
 }
 
 // ServiceProvider

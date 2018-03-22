@@ -230,7 +230,7 @@ func createFromEntityPath(
 }
 
 func createFromChildren(
-	state *errors.State, children map[string]types.ChildStore, rpcInput C.DataNode) {
+	state *errors.State, children map[string]types.YChild, rpcInput C.DataNode) {
 
 	for childName, child := range children {
 		if child.Value != nil && types.HasDataOrFilter(child.Value) {

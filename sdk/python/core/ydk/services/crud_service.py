@@ -17,6 +17,7 @@ from ydk.ext.services import CRUDService as _CrudService
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
 
+from ydk.types import EntityCollection, Config
 
 class CRUDService(_CrudService):
     """
@@ -41,25 +42,43 @@ class CRUDService(_CrudService):
 
     @_check_argument
     def create(self, provider, entity):
+        if isinstance(entity, EntityCollection):
+            entity = entity.get_entities()
         with _handle_error():
             return self._crud.create(provider, entity)
 
     @_check_argument
     def read(self, provider, read_filter):
+        filters = read_filter
+        if isinstance(read_filter, EntityCollection):
+            filters = read_filter.get_entities()
         with _handle_error():
-            return self._crud.read(provider, read_filter)
+            read_entity = self._crud.read(provider, filters)
+        if isinstance(read_filter, EntityCollection):
+            read_entity = Config(read_entity)
+        return read_entity
 
     @_check_argument
     def read_config(self, provider, read_filter):
+        filters = read_filter
+        if isinstance(read_filter, EntityCollection):
+            filters = read_filter.get_entities()
         with _handle_error():
-            return self._crud.read_config(provider, read_filter)
+            read_entity = self._crud.read_config(provider, filters)
+        if isinstance(read_filter, EntityCollection):
+            read_entity = Config(read_entity)
+        return read_entity
 
     @_check_argument
     def update(self, provider, entity):
+        if isinstance(entity, EntityCollection):
+            entity = entity.get_entities()
         with _handle_error():
             return self._crud.update(provider, entity)
 
     @_check_argument
     def delete(self, provider, entity):
+        if isinstance(entity, EntityCollection):
+            entity = entity.get_entities()
         with _handle_error():
             return self._crud.delete(provider, entity)

@@ -294,11 +294,11 @@ TEST_CASE("validate")
 }
 
 // TODO
+// read device configuration (no filter)
 //TEST_CASE("read_all_rpc")
 //{
-//    //ydk::path::NetconfSession session{"10.30.110.86", "admin", "admin"};	// XR
-//
-//    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+//    path::Repository repo{TEST_HOME};
+//    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
 //    ydk::path::RootSchemaNode& schema = session.get_root_schema();
 //
 //    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };

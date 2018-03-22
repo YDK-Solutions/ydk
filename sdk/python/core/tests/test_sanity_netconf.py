@@ -38,6 +38,7 @@ from ydk.ext.types import EncodingFormat
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
+from ydk.types  import EntityCollection, Filter, Config
 
 class SanityNetconf(ParametrizedTestCase):
 
@@ -207,6 +208,26 @@ class SanityNetconf(ParametrizedTestCase):
 
         op = self.netconf_service.discard_changes(self.ncc)
 
+    def test_edit_get_config_collection(self):
+        runner = ysanity.Runner()
+        runner.two.number = 2
+        runner.two.name = 'runner-two-name'
+
+        native = ysanity.Native()
+        native.hostname = 'NewHostName'
+        native.version = '0.1.0a'
+
+        edit_config = Config([runner, native])
+
+        op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, edit_config)
+        self.assertEqual(True, op)
+
+        get_filter = Filter([ysanity.Runner(), ysanity.Native()])
+        config = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
+        self.assertEqual(edit_config, config)
+
+        op = self.netconf_service.discard_changes(self.ncc)
+
     def test_delete_config(self):
         pass
         # startup and candidate cannot be both enabled in ConfD
@@ -285,14 +306,14 @@ class SanityNetconf(ParametrizedTestCase):
         codec_provider.encoding = EncodingFormat.XML
 
         xml_encode = codec_service.encode(codec_provider, interfaces)
-        print('\n===== Printing entity: %s' %interfaces.get_segment_path())
+        print('\n===== Printing entity: {}'.format(interfaces))
         print(xml_encode)
 
         # Delete configuration
         result = crud.delete(self.ncc, native)
         self.assertEqual(result, True)
 
-    def test_crud_read_mixed(self):
+    def test_crud_read_list(self):
         crud = CRUDService()
 
         # Build configuration of multiple objects
@@ -319,14 +340,44 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(isinstance(read_list, list), True)
         self.assertEqual(len(read_list), 2)
 
+        # Delete configuration
+        result = crud.delete(self.ncc, create_list)
+        self.assertEqual(result, True)
+
+    def test_crud_read_collection(self):
+        crud = CRUDService()
+
+        # Build configuration of multiple objects
+        create_list = EntityCollection();
+
+        native = ysanity.Native()
+        native.hostname = 'NativeHost'
+        native.version = '0.1.0'
+        create_list.add(native)
+
+        bgp = openconfig.Bgp()
+        bgp.global_.config.as_ = 65001
+        bgp.global_.config.router_id = "1.2.3.4"
+        create_list.add(bgp)
+
+        # Configure device
+        result = crud.create(self.ncc, create_list)
+        self.assertEqual(result, True)
+
+        # Read configuration
+        read_filter = Filter([ysanity.Native(), openconfig.Bgp()]);
+        read_config = crud.read(self.ncc, read_filter)
+        self.assertEqual(isinstance(read_config, Config), True)
+        self.assertEqual(read_config.len(), 2)
+
         # Print configuration
-#         codec_service = CodecService()
-#         codec_provider = CodecServiceProvider()
-#         codec_provider.encoding = EncodingFormat.XML
-#         for entity in read_list:
-#             xml = codec_service.encode(codec_provider, entity)
-#             print('\n===== Printing entity: %s' %entity.get_segment_path())
-#             print(xml)
+        codec_service = CodecService()
+        codec_provider = CodecServiceProvider()
+        codec_provider.encoding = EncodingFormat.XML
+        for entity in read_config:
+            xml = codec_service.encode(codec_provider, entity)
+            print('\n===== Printing entity: {}'.format(entity))
+            print(xml)
 
         # Delete configuration
         result = crud.delete(self.ncc, create_list)

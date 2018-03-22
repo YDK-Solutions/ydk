@@ -17,6 +17,8 @@ from ydk.ext.services import Datastore, NetconfService as _NetconfService
 from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 
+from ydk.types import EntityCollection, Config
+
 class NetconfService(_NetconfService):
     """ Python wrapper for NetconfService
     """
@@ -64,6 +66,8 @@ class NetconfService(_NetconfService):
             if isinstance(source, Datastore):
                 return self._ns.copy_config(provider, target, source, url)
             elif source_config is not None:
+                if isinstance(source_config, EntityCollection):
+                    source_config = source_config.get_entities()
                 return self._ns.copy_config(provider, target, source_config)
             else:
                 return self._ns.copy_config(provider, target, source)
@@ -89,6 +93,8 @@ class NetconfService(_NetconfService):
             raise _YPYServiceError("provider, target, and config cannot be None")
 
         with _handle_error():
+            if isinstance(config, Config):
+                config = config.get_entities()
             return self._ns.edit_config(provider, target, config,
                 default_operation, test_option, error_option)
 
@@ -96,15 +102,29 @@ class NetconfService(_NetconfService):
         if None in (provider, source, read_filter):
             raise _YPYServiceError("provider, source, and filter cannot be None")
 
+        filters = read_filter
+        if isinstance(read_filter, EntityCollection):
+            filters = read_filter.get_entities()
+
         with _handle_error():
-            return self._ns.get_config(provider, source, read_filter)
+            result = self._ns.get_config(provider, source, filters)
+        if isinstance(read_filter, EntityCollection):
+            result = Config(result)
+        return result
 
     def get(self, provider, read_filter):
         if None in (provider, read_filter):
             raise _YPYServiceError("provider and filter cannot be None")
 
+        filters = read_filter
+        if isinstance(read_filter, EntityCollection):
+            filters = read_filter.get_entities()
+
         with _handle_error():
-            return self._ns.get(provider, read_filter)
+            result = self._ns.get(provider, filters)
+        if isinstance(read_filter, EntityCollection):
+            result = Config(result)
+        return result
 
     def kill_session(self, provider, session_id):
         if None in (provider, session_id):

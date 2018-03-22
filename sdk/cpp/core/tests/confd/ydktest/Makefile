@@ -21,7 +21,7 @@ $(CONFD_DIR)/src/confd/build/include.mk:
 ######################################################################
 # Example specific definitions and rules
 
-CONFD_FLAGS = --addloadpath $(CONFD_DIR)/etc/confd --addloadpath $(CONFD_DIR)/src/confd/yang
+CONFD_FLAGS = --addloadpath $(CONFD_DIR)/etc/confd --addloadpath $(CONFD_DIR)/src/confd/yang --addloadpath $(CONFD_DIR)/src/confd/aaa
 START_FLAGS ?=
 
 
@@ -33,6 +33,8 @@ all:  openconfig-platform.deviation\
 	openconfig-transport-types.fxs ietf-aug-base-1.fxs ietf-aug-base-2.fxs openconfig-terminal-device.fxs  openconfig-if-ethernet.fxs\
 	ydktest-aug-ietf-1.fxs ydktest-aug-ietf-2.fxs ydktest-aug-ietf-4.fxs ydktest-aug-ietf-5.fxs ydktest-sanity-action.fxs\
 		$(CDB_DIR) ssh-keydir
+	@echo "Copying YDK customized aaa_init.xml to $(CDB_DIR)"
+	cp ydk_aaa_init.xml $(CDB_DIR)/aaa_init.xml
 	@echo "Build complete"
 
 openconfig-platform.deviation : cisco-xr-openconfig-platform-deviations.yang \

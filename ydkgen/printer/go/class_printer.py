@@ -88,7 +88,7 @@ class ClassPrinter(object):
                 prefix = '%s:' % fp.clazz.owner.stmt.arg
             elif fp.clazz.owner.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
                 prefix = '%s:' % fp.clazz.stmt.i_module.arg
-        path.append('%s%s' % (prefix, fp.clazz.stmt.arg))
+        path.append('%s%s"' % (prefix, fp.clazz.stmt.arg))
 
         key_props = fp.clazz.get_key_props()
         predicate = '"'
@@ -97,12 +97,11 @@ class ClassPrinter(object):
             if key_prop.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
                 prefix = '%s:' % (key_prop.stmt.i_module.arg)
 
-            predicate = '''[%s%s='"{0}fmt.Sprintf("%%v", %s.%s){0}"']"'''
+            predicate = '''{0}"[%s%s='"{0}fmt.Sprintf("%%v", %s.%s){0}"']"'''
 
             predicate = predicate.format(' + ') % (
                 prefix, key_prop.stmt.arg, fp.class_alias, key_prop.go_name())
-        path.append(predicate)
-
+            path.append(predicate)
         fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
 
     def _print_go_name(self, fp, data_alias):

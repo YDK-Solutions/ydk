@@ -95,6 +95,7 @@ R"(
 
 void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 {
+  try {
     ydk::path::Statement s = dn->get_schema_node().get_statement();
     if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
         auto val = dn->get_value();
@@ -107,6 +108,10 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
             print_tree(c.get(), child_indent);
         std::cout << indent << "</" << s.arg << ">" << std::endl;
     }
+  }
+  catch (ydk::path::YCoreError &ex) {
+	  std::cout << ex.what() << std::endl;
+  }
 }
 
 void print_data_node(shared_ptr<ydk::path::DataNode> dn)

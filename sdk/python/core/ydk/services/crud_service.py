@@ -43,7 +43,7 @@ class CRUDService(_CrudService):
     @_check_argument
     def create(self, provider, entity):
         if isinstance(entity, EntityCollection):
-            entity = entity.get_entities()
+            entity = entity.entities()
         with _handle_error():
             return self._crud.create(provider, entity)
 
@@ -51,7 +51,7 @@ class CRUDService(_CrudService):
     def read(self, provider, read_filter):
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
-            filters = read_filter.get_entities()
+            filters = read_filter.entities()
         with _handle_error():
             read_entity = self._crud.read(provider, filters)
         if isinstance(read_filter, EntityCollection):
@@ -62,7 +62,7 @@ class CRUDService(_CrudService):
     def read_config(self, provider, read_filter):
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
-            filters = read_filter.get_entities()
+            filters = read_filter.entities()
         with _handle_error():
             read_entity = self._crud.read_config(provider, filters)
         if isinstance(read_filter, EntityCollection):
@@ -72,13 +72,13 @@ class CRUDService(_CrudService):
     @_check_argument
     def update(self, provider, entity):
         if isinstance(entity, EntityCollection):
-            entity = entity.get_entities()
+            entity = entity.entities()
         with _handle_error():
             return self._crud.update(provider, entity)
 
     @_check_argument
     def delete(self, provider, entity):
         if isinstance(entity, EntityCollection):
-            entity = entity.get_entities()
+            entity = entity.entities()
         with _handle_error():
             return self._crud.delete(provider, entity)

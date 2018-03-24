@@ -36,48 +36,55 @@ class SanityTest(unittest.TestCase):
 
     def test_entity_collection_empty(self):
         anydata = EntityCollection()
-        self.assertEqual(anydata.is_empty(), True)
-        self.assertEqual(anydata.len(), 0)
+        self.assertEqual(len(anydata), 0)
         self.assertEqual(format(anydata), "Entities in EntityCollection: []")
 
-    def test_config_add(self):
+    def test_config_add_del(self):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
         config = Config()
-        config.add(runner)
-        self.assertEqual(config.is_empty(), False)
-        self.assertEqual(config.len(), 1)
+        config.append(runner)
+        self.assertEqual(len(config), 1)
         self.assertEqual(format(config), "Entities in Config: ['ydk.models.ydktest.ydktest_sanity.Runner']")
 
-        config.add(native)
-        self.assertEqual(config.len(), 2)
+        config.append(native)
+        self.assertEqual(len(config), 2)
+        self.assertEqual(config.has_key(runner.path()), True)
         self.assertEqual(format(config), "Entities in Config: ['ydk.models.ydktest.ydktest_sanity.Runner', 'ydk.models.ydktest.ydktest_sanity.Native']")
 
-        config.clear()
+        del config[native.path()]
+        self.assertEqual(len(config), 1)
+        self.assertEqual(config.has_key(native.path()), False)
+
+        del config[runner]
+        self.assertEqual(len(config), 0)
 
     def test_filter_list(self):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
-        read_filter = Filter([runner, native])
+        read_filter = Filter(runner, native)
 
-        self.assertEqual(read_filter.get_keys(), ['ydktest-sanity:runner', 'ydktest-sanity:native'])
-        entities = read_filter.get_entities()
-        self.assertEqual(format(entities[0]), 'ydk.models.ydktest.ydktest_sanity.Runner')
-        self.assertEqual(format(entities[1]), 'ydk.models.ydktest.ydktest_sanity.Native')
+        self.assertEqual(read_filter.keys(), ['ydktest-sanity:runner', 'ydktest-sanity:native'])
+        all_entities = read_filter.entities()
+        self.assertEqual(format(all_entities[0]), 'ydk.models.ydktest.ydktest_sanity.Runner')
+        self.assertEqual(format(all_entities[1]), 'ydk.models.ydktest.ydktest_sanity.Native')
+
+        self.assertEqual(format(read_filter[runner]), 'ydk.models.ydktest.ydktest_sanity.Runner')
+        self.assertEqual(format(read_filter[runner.path()]), 'ydk.models.ydktest.ydktest_sanity.Runner')
         read_filter.clear()
 
     def test_access_config_by_key(self):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
-        config = Config([runner, native])
-        for key in config.get_keys():
+        config = Config(runner, native)
+        for key in config.keys():
             if key=='ydktest-sanity:runner':
-                self.assertEqual(config[key].get_segment_path(), 'ydktest-sanity:runner')
+                self.assertEqual(config[key].path(), 'ydktest-sanity:runner')
             else:
-                self.assertEqual(config[key].get_segment_path(), 'ydktest-sanity:native')
+                self.assertEqual(config[key].path(), 'ydktest-sanity:native')
         config.clear()
 
     def test_access_config_by_item_no(self):
@@ -85,7 +92,7 @@ class SanityTest(unittest.TestCase):
         native = ysanity.Native()
 
         config = Config([runner, native])
-        for item in range(0, config.len()):
+        for item in range(len(config)):
             if item==0:
                 self.assertEqual(format(config[item]), "ydk.models.ydktest.ydktest_sanity.Runner")
             else:
@@ -96,38 +103,38 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
-        config = Config([runner, native])
+        config = Config(runner, native)
         for entity in config:
             print(entity)
 
-        self.assertEqual(config.len(), 2)
+        self.assertEqual(len(config), 2)
         config.clear()
 
     @assert_with_error(test_add_unsupported_pattern, YPYInvalidArgumentError)
     def test_add_unsupported(self):
         anydata = EntityCollection()
-        anydata.add('native')
-        self.assertEqual(anydata.is_empty(), True)
+        anydata.append('native')
+        self.assertEqual(len(anydata), 0)
 
     def test_init_delete(self):
         runner = ysanity.Runner()
         native = ysanity.Native()
 
         anydata = Config(runner)
-        deleted = anydata.delete(0)
-        self.assertEqual(anydata.is_empty(), True)
+        deleted = anydata.pop(0)
         self.assertEqual(deleted.__class__.__name__, "Runner")
 
-        anydata = Config([runner, native])
-        deleted = anydata.delete('ydktest-sanity:native')
-        self.assertEqual(anydata.len(), 1)
+        anydata = Config()
+        anydata.append([runner, native])
+
+        deleted = anydata.pop('ydktest-sanity:native')
+        self.assertEqual(len(anydata), 1)
         self.assertEqual(deleted.__class__.__name__, "Native")
 
-        deleted = anydata.delete('ydktest-sanity:native')
+        deleted = anydata.pop('ydktest-sanity:native')
         self.assertEqual(deleted, None)
 
-        deleted = anydata.delete(runner)
-        self.assertEqual(anydata.is_empty(), True)
+        deleted = anydata.pop(runner)
         self.assertEqual(deleted.__class__.__name__, "Runner")
 
 if __name__ == '__main__':

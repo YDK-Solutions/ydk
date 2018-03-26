@@ -73,14 +73,14 @@ class ClassPrinter(object):
         fp.ctx.writeln('%s.NamespaceTable = %s.GetNamespaces()' % (data_alias, bundle_name))
         fp.ctx.writeln('%s.BundleYangModelsLocation = %s.GetModelsPath()' % (data_alias, bundle_name))
         fp.ctx.bline()
-        self._print_go_name(fp, data_alias)
         self._print_children(fp, children, data_alias)
         self._print_leafs(fp, leafs, data_alias)
 
         fp.ctx.writeln('return &(%s)' % data_alias)
         fp.print_function_trailer()
 
-    def _print_segment_path(self, fp, data_alias):
+    @staticmethod
+    def _print_segment_path(fp, data_alias):
         path = ['"']
         prefix = ''
         if fp.clazz.owner is not None:
@@ -104,11 +104,8 @@ class ClassPrinter(object):
             path.append(predicate)
         fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
 
-    def _print_go_name(self, fp, data_alias):
-        # TODO -- returns string
-        pass
-
-    def _print_children(self, fp, children, data_alias):
+    @staticmethod
+    def _print_children(fp, children, data_alias):
         fp.ctx.writeln('%s.Children = make(map[string]types.YChild)' % data_alias)
         for child in children:
             path = get_qualified_yang_name(child)
@@ -128,7 +125,8 @@ class ClassPrinter(object):
                 fp.ctx.writeln('%s.Children["%s"] = types.YChild{"%s", &%s.%s}' % (
                     data_alias, path, child.go_name(), fp.class_alias, child.go_name()))
 
-    def _print_leafs(self, fp, leafs, data_alias):
+    @staticmethod
+    def _print_leafs(fp, leafs, data_alias):
         fp.ctx.writeln('%s.Leafs = make(map[string]types.YLeaf)' % data_alias)
         for leaf in leafs:
             fp.ctx.writeln('%s.Leafs["%s"] = types.YLeaf{"%s", %s.%s}' % (

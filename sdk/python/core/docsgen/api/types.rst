@@ -112,11 +112,149 @@ YDK types
 
 .. class:: Entity
 
-    Super class of all classes that represents containers in YANG. YANG lists are represented as :py:class:`YList` of ``Entity`` objects, with support for hanging a parent.
+    Super class of all classes that represent containers in YANG. YANG lists are represented as :py:class:`YList` of **Entity** objects, with support for hanging a parent.
 
     .. py:attribute:: operation
 
-        Optional attribute of the ``Entity`` class which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
+        Optional attribute of the **Entity** class, which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
+
+.. class:: EntityCollection
+
+    Base class to represent collection of unique :py:class:`Entity<ydk.types.Entity>` instances. EntityCollection designed as a wrapper class around ordered dictionary collection of type ``OrderedDict``.
+    It is created specifically to collect Entity class instances. Each Entity instance has unique segment path value, which is used as a key in the dictionary.
+    If 'entity' is and instance of :py:class:`Entity<ydk.types.Entity>` class, the key could be retrieved ad 'entity.get_segment_path()' or simply 'entity.path()'.
+
+    .. py:method:: __init__(*entities):
+
+        Create **EntityCollection** instance:
+
+        :param entities: If not present or ``None``, creates empty collection. Otherwise the instances of :py:class:`Entity<ydk.types.Entity>` class should be listed as parameters.
+        :raises: Exception :py:exc:`YPYInvalidArgumentError<ydk.error.YPYInvalidArgumentError>`, if type of **entities** is different.
+
+    .. py:method:: append(entities):
+
+        Add entity or multiple entities to collection.
+
+        :param entities: Instance of an :py:class:`Entity<ydk.types.Entity>` or Python ``list`` of :py:class:`Entity<ydk.types.Entity>` instances.
+        :raises: Exception :py:exc:`YPYInvalidArgumentError<ydk.error.YPYInvalidArgumentError>`, if type of **entities** is different.
+
+        Example usage for creating **EntityCollection**:
+
+        .. code-block:: python
+
+            >>> from ydk.models.ydktest import ydktest_sanity as ysanity
+            >>> from ydk.types import EntityCollection
+            >>> 
+            >>> runner = ysanity.Runner()
+            >>> native = ysanity.Native()
+            >>> 
+            >>> config = EntityCollection()
+            >>> config.append(runner)
+            >>> config.append(native)
+            >>> # or simply
+            >>> config = EntityCollection(runner, native)
+
+    .. py:method:: __getitem__(item)
+
+        Get single entity instance from collection.
+        
+        :param item: If **item** type is ``int``, the operator returns :py:class:`Entity<ydk.types.Entity>` instance by its sequence number in the collection.
+        
+                     If **item** type is ``str``, the operator returns :py:class:`Entity<ydk.types.Entity>` instance, which has matching key (entity.path()==item).
+                     
+                     If **item** type is ``Entity``, the operator returns :py:class:`Entity<ydk.types.Entity>` instance, which has matching key (entity.path()==item.path()).
+        :return: Instance of :py:class:`Entity<ydk.types.Entity>` or ``None``, if matching instance is not in the collection.
+        :raises: Exception :py:exc:`YPYInvalidArgumentError<ydk.error.YPYInvalidArgumentError>`, if type of **item** is other than ``int`` or ``str`` or ``Entity``.
+
+        Examples for accessing **EntityCollection** members:
+
+        .. code-block:: python
+
+            >>> from ydk.models.ydktest import ydktest_sanity as ysanity
+            >>> from ydk.types import EntityCollection
+            >>> 
+            >>> config = EntityCollection(ysanity.Runner(), ysanity.Native())
+            >>> 
+            >>> runner = config[0]
+            >>> native = config['ydktest-sanity:native']
+            >>> native = config[ysanity.Native()]
+
+    .. py:method:: entities()
+
+        Get collection of all entities as Python ``list`` container. If collection is empty the method returns empty list.
+
+    .. py:method:: keys()
+
+        Get list of keys for the collection entities. If collection is empty, the method returns empty list.
+
+        Examples of accessing the entire **EntityCollection** content:
+
+        .. code-block:: python
+
+            >>> from ydk.models.ydktest import ydktest_sanity as ysanity
+            >>> from ydk.types import EntityCollection
+            >>> 
+            >>> config = EntityCollection(ysanity.Runner(), ysanity.Native())
+            >>> 
+            >>> print(config.entities())
+            ['ydk.models.ydktest.ydktest_sanity.Runner', 'ydk.models.ydktest.ydktest_sanity.Native']
+            >>> print(config.keys())
+            ['ydktest-sanity:runner', 'ydktest-sanity:native']
+
+    .. py:method:: clear()
+
+        Delete all collection members.
+
+    .. py:method:: pop(item)
+
+        Delete single entity instance from collection.
+
+        :param item: If **item** type is ``int``, finds and deletes collection member by its sequence number.
+        
+                     If **item** type is ``str``, finds and deletes collection member, which has **Entity.get_segment_path()==item**.
+                     
+                     If **item** type is ``Entity``, finds and deletes collection member, which has matching key.
+        :return: :py:class:`Entity<ydk.types.Entity>` instance of deleted member of collection, or ``None``, if matching instance is not found in collection.
+        :raises: Exception :py:exc:`YPYInvalidArgumentError<ydk.error.YPYInvalidArgumentError>`, if type of **item** is other than ``int`` or ``str`` or ``Entity``.
+        
+        Examples of deleting items in the collection:
+
+        .. code-block:: python
+
+            >>> from ydk.models.ydktest import ydktest_sanity as ysanity
+            >>> from ydk.types import EntityCollection
+            >>> 
+            >>> config = EntityCollection(ysanity.Runner(), ysanity.Native())
+            >>> 
+            >>> native = config.pop('ydktest-sanity:native')
+            >>> # or
+            >>> del config[ysanity.Runner()]
+            
+    The class also overwrites the following methods of ``OrderedDict`` class:
+    
+    .. py:method:: has_key(key)
+
+    .. py:method:: get(item)
+
+    .. py:method:: __eq__(other)
+    
+    .. py:method:: __ne__(other)
+    
+    .. py:method:: __len__()
+    
+    .. py:method:: __delitem__(item)
+
+    .. py:method:: __iter__():
+
+    .. py:method:: __str__():
+
+.. class:: Config
+
+    Alias of class :py:class:`EntityCollection<ydk.types.EntityCollection>`
+
+.. class:: Filter
+
+    Alias of class :py:class:`EntityCollection<ydk.types.EntityCollection>`
 
 .. class:: YLeaf(leaf_type, name)
 

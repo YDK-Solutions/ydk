@@ -221,3 +221,37 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` i
     # Call the CRUD update on the top-level isis object
     # (assuming you have already instantiated the service and provider)
     result = crud.update(provider, isis)
+
+    
+Applying CRUD to multiple entities
+--------------------------------------
+
+You can apply CRUD operations on multiple entities in one Crud-service call. For example, you want to 'read' BGP and Interfaces configuration together.
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.types import Filter, Config
+    from ydk.models.openconfig import openconfig_bgp, openconfig_interfaces
+
+    # First, create the top-level Bgp and Interface objects
+    int_filter = openconfig_interfaces.Interfaces()
+    bgp_filter = openconfig_bgp.Bgp()
+    
+    # Create read filter
+    read_filter = Filter(int_filter, bgp_filter)
+
+    # Call the CRUD read-config to get configuration of entities
+    result = crud.read_config(provider, read_filter)
+    
+    # Access read results from returned Config collection
+    int_config = result[int_filter]
+    bgp_config = result[bgp_filter]
+    
+    # Or print all configuration in XML format
+    codec_service = CodecService()
+    codec_provider = CodecServiceProvider()
+    codec_provider.encoding = EncodingFormat.XML
+    for entity in result:
+        xml_encode = codec_service.encode(codec_provider, entity)
+        print(xml_encode)

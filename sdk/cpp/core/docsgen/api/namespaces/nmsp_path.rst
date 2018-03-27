@@ -29,15 +29,15 @@ ydk\:\:path
 +------------+------------------------------------------------------------------------+
 | struct     | | :cpp:class:`ValidationService<ValidationService>`                    |
 +------------+------------------------------------------------------------------------+
-| struct     | | :cpp:class:`YCoreError<YCoreError>`                            |
+| struct     | | :cpp:class:`YCoreError<YCoreError>`                                  |
 +------------+------------------------------------------------------------------------+
-| struct     | | :cpp:class:`YDataValidationError<YDataValidationError>`        |
+| struct     | | :cpp:class:`YDataValidationError<YDataValidationError>`              |
 +------------+------------------------------------------------------------------------+
-| struct     | | :cpp:class:`YPathError<YPathError>`                            |
+| struct     | | :cpp:class:`YPathError<YPathError>`                                  |
 +------------+------------------------------------------------------------------------+
-| struct     | | :cpp:class:`YSchemaValidationError<YSchemaValidationError>`    |
+| struct     | | :cpp:class:`YSchemaValidationError<YSchemaValidationError>`          |
 +------------+------------------------------------------------------------------------+
-| struct     | | :cpp:class:`YCodecError<YCodecError>`                          |
+| struct     | | :cpp:class:`YCodecError<YCodecError>`                                |
 +------------+------------------------------------------------------------------------+
 | enumerator | | :cpp:class:`ModelCachingOption<ModelCachingOption>`                  |
 +------------+------------------------------------------------------------------------+

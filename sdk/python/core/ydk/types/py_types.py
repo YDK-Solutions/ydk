@@ -141,7 +141,7 @@ class Entity(_Entity):
         return super(Entity, self).__ne__(other)
 
     def children(self):
-        return get_children()
+        return self.get_children()
 
     def get_children(self):
         children = ChildrenMap()

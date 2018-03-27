@@ -92,7 +92,7 @@ class SanityTest(unittest.TestCase):
         native = ysanity.Native()
 
         config = Config([runner, native])
-        for item in range(len(config)):
+        for item in range(0,len(config)):
             if item==0:
                 self.assertEqual(format(config[item]), "ydk.models.ydktest.ydktest_sanity.Runner")
             else:

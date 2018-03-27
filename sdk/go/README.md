@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-go.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-go)
+[![GoDoc](https://godoc.org/github.com/CiscoDevNet/ydk-go?status.svg)](https://godoc.org/github.com/CiscoDevNet/ydk-go)
+[![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/ydkdev/ydk-go/)
 
 ![ydk-logo-128](https://cloud.githubusercontent.com/assets/16885441/24175899/2010f51e-0e56-11e7-8fb7-30a9f70fbb86.png)
 
@@ -9,6 +11,7 @@
 **Table of Contents**
 
 - [Overview](#overview)
+- [Docker](#docker)
 - [How to Install](#how-to-install)
   - [System Requirements](#system-requirements)
   - [Installing](#installing)
@@ -20,6 +23,15 @@
 ## Overview
 
 The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, plus one or more module bundles that are based on YANG models.  
+
+## Docker
+A [docker image](https://docs.docker.com/engine/reference/run/) is automatically built with the latest ydk-go installed. This be used to run ydk-go without installing anything natively on your machine.
+
+To use the docker image, [install docker](https://docs.docker.com/install/) on your system and run the below command. See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
+
+```
+docker run -it ydkdev/ydk-go
+```
 
 ## How to Install
 
@@ -40,9 +52,16 @@ Centos (Fedora-based) - The following packages must be present in your system be
 
 ```
 $ sudo yum install epel-release
-$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
+$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake libstdc++-static git
+
+# Upgrade gcc to > 5.*
+$ yum install centos-release-scl -y > /dev/null
+$ yum install devtoolset-4-gcc* -y > /dev/null
+$ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+$ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
 $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.0/libydk-0.7.0-1.x86_64.rpm
+
 ```
 
 **Mac**  

@@ -92,7 +92,7 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
         if language == 'go':
             attribute_title = prop.go_name()
         if prop in keys:
-            attribute_title = '%s  <key>' % attribute_title
+            attribute_title = '%s  (key)' % attribute_title
         properties_description.append('.. attribute:: %s\n\n' % (attribute_title))
 
         properties_description.append('\t%s\n' % (
@@ -157,7 +157,7 @@ def get_enum_class_docstring(enumz):
     if enumz.comment is not None:
         enumz_description = enumz.comment
 
-    enumz_description = "%s\n\n\n" % (enumz.name) + enumz_description
+    enumz_description = "%s (Enum Class)\n\n\n" % (enumz.name) + enumz_description
 
     literals_description = []
     for enum_literal in enumz.literals:

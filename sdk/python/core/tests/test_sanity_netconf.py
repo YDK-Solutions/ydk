@@ -348,17 +348,19 @@ class SanityNetconf(ParametrizedTestCase):
         crud = CRUDService()
 
         # Build configuration of multiple objects
-        create_list = EntityCollection();
+        create_list = Config();
 
         native = ysanity.Native()
         native.hostname = 'NativeHost'
         native.version = '0.1.0'
-        create_list.add(native)
+        create_list.append(native)
 
         bgp = openconfig.Bgp()
         bgp.global_.config.as_ = 65001
         bgp.global_.config.router_id = "1.2.3.4"
-        create_list.add(bgp)
+        create_list.append(bgp)
+
+        create_list = Config([native, bgp])
 
         # Configure device
         result = crud.create(self.ncc, create_list)
@@ -368,7 +370,7 @@ class SanityNetconf(ParametrizedTestCase):
         read_filter = Filter([ysanity.Native(), openconfig.Bgp()]);
         read_config = crud.read(self.ncc, read_filter)
         self.assertEqual(isinstance(read_config, Config), True)
-        self.assertEqual(read_config.len(), 2)
+        self.assertEqual(len(read_config), 2)
 
         # Print configuration
         codec_service = CodecService()

@@ -13,7 +13,7 @@ NetconfSession
         int port = 830, \
         const std::string& protocol = "ssh", \
         bool on_demand = true, \
-        bool common_cache = false\
+        bool common_cache = false, \
         int timeout = -1)
 
         Constructs an instance of the ``NetconfSession`` to connect to a server which **has** to support model download
@@ -34,7 +34,7 @@ NetconfSession
         const std::string& password, \
         int port = 830, \
         const std::string& protocol = "ssh", \
-        bool on_demand = true
+        bool on_demand = true, \
         int timeout = -1)
 
         Constructs an instance of the ``NetconfSession`` using the provided :cpp:class:`Repository<Repository>`
@@ -55,7 +55,7 @@ NetconfSession
         const std::string& public_key_path, \
         int port = 830, \
         bool on_demand = true, \
-        bool common_cache = false\
+        bool common_cache = false, \
         int timeout = -1)
 
         Constructs an instance of the ``NetconfSession`` to connect to a server which **has** to support model download
@@ -76,7 +76,7 @@ NetconfSession
         const std::string& private_key_path, \
         const std::string& public_key_path, \
         int port = 830, \
-        bool on_demand = true
+        bool on_demand = true, \
         int timeout = -1)
 
         Constructs an instance of the ``NetconfSession`` using the provided :cpp:class:`Repository<Repository>`

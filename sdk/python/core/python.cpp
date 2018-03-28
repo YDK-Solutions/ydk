@@ -537,7 +537,8 @@ PYBIND11_MODULE(ydk_, ydk)
         .value("candidate", ydk::DataStore::candidate)
         .value("running", ydk::DataStore::running)
         .value("startup", ydk::DataStore::startup)
-        .value("url", ydk::DataStore::url);
+        .value("url", ydk::DataStore::url)
+        .value("na", ydk::DataStore::na);
 
     enum_<ydk::YFilter>(filters, "YFilter")
         .value("merge", ydk::YFilter::merge)

@@ -13,7 +13,7 @@ NetconfServiceProvider
         int port = 830, \
         const std::string& protocol = "ssh", \
         bool on_demand = true, \
-        bool common_cache = false,
+        bool common_cache = false, \
         int timeout = -1)
 
         Constructs an instance of ``NetconfServiceProvider`` connect to a server which **has** to support model download
@@ -34,7 +34,7 @@ NetconfServiceProvider
         std::string password, \
         int port = 830, \
         const std::string& protocol = "ssh", \
-        bool on_demand = true,
+        bool on_demand = true, \
         int timeout = -1)
 
         Constructs an instance of ``NetconfServiceProvider`` using the provided :cpp:class:`repository<path::Repository>`
@@ -73,8 +73,8 @@ NetconfServiceProvider
         std::string private_key_path, \
         std::string public_key_path, \
         int port = 830, \
-        bool on_demand = true,
-        bool common_cache = false,
+        bool on_demand = true, \
+        bool common_cache = false, \
         int timeout = -1)
 
         Constructs an instance of ``NetconfServiceProvider`` using the provided :cpp:class:`repository<path::Repository>`

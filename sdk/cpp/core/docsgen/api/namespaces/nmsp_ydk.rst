@@ -57,17 +57,17 @@ List of all nested namespaces with brief descriptions
 +--------+-----------------------------------------------------------------------------------------+
 | class  | | :cpp:class:`Protocol<Protocol>`                                                       |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YError<YError>`                                                     |
+| struct | | :cpp:class:`YError<YError>`                                                           |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YClientError<YClientError>`                                         |
+| struct | | :cpp:class:`YClientError<YClientError>`                                               |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YIllegalStateError<YIllegalStateError>`                             |
+| struct | | :cpp:class:`YIllegalStateError<YIllegalStateError>`                                   |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>`                       |
+| struct | | :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>`                             |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YModelError<YModelError>`                                           |
+| struct | | :cpp:class:`YModelError<YModelError>`                                                 |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YOperationNotSupportedError<YOperationNotSupportedError>`           |
+| struct | | :cpp:class:`YOperationNotSupportedError<YOperationNotSupportedError>`                 |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YServiceError<YServiceError>`                                       |
+| struct | | :cpp:class:`YServiceError<YServiceError>`                                             |
 +--------+-----------------------------------------------------------------------------------------+

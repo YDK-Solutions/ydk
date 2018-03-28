@@ -67,7 +67,7 @@ class NetconfService(_NetconfService):
                 return self._ns.copy_config(provider, target, source, url)
             elif source_config is not None:
                 if isinstance(source_config, EntityCollection):
-                    source_config = source_config.get_entities()
+                    source_config = source_config.entities()
                 return self._ns.copy_config(provider, target, source_config)
             else:
                 return self._ns.copy_config(provider, target, source)
@@ -94,7 +94,7 @@ class NetconfService(_NetconfService):
 
         with _handle_error():
             if isinstance(config, Config):
-                config = config.get_entities()
+                config = config.entities()
             return self._ns.edit_config(provider, target, config,
                 default_operation, test_option, error_option)
 
@@ -104,7 +104,7 @@ class NetconfService(_NetconfService):
 
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
-            filters = read_filter.get_entities()
+            filters = read_filter.entities()
 
         with _handle_error():
             result = self._ns.get_config(provider, source, filters)
@@ -118,7 +118,7 @@ class NetconfService(_NetconfService):
 
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
-            filters = read_filter.get_entities()
+            filters = read_filter.entities()
 
         with _handle_error():
             result = self._ns.get(provider, filters)

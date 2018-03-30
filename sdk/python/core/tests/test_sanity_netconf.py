@@ -38,7 +38,7 @@ from ydk.ext.types import EncodingFormat
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
-from ydk.types  import EntityCollection, Filter, Config
+from ydk.types  import Filter, Config
 
 class SanityNetconf(ParametrizedTestCase):
 
@@ -54,6 +54,12 @@ class SanityNetconf(ParametrizedTestCase):
             cls.common_cache,
             cls.timeout)
         cls.netconf_service = NetconfService()
+        cls.logger = logging.getLogger("ydk")
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+        handler.setFormatter(formatter)
+        cls.logger.addHandler(handler)
+        cls.logger.setLevel(logging.ERROR)
 
     def setUp(self):
         crud = CRUDService()
@@ -385,13 +391,44 @@ class SanityNetconf(ParametrizedTestCase):
         result = crud.delete(self.ncc, create_list)
         self.assertEqual(result, True)
 
-def enable_logging(level):
-    log = logging.getLogger('ydk')
-    log.setLevel(level)
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-    handler.setFormatter(formatter)
-    log.addHandler(handler)
+    def test_netconf_get_candidate_config(self):
+        self.logger.setLevel(logging.ERROR)
+        ns = NetconfService()
+        config = ns.get_config(self.ncc, Datastore.candidate)
+        self.assertNotEqual(len(config), 0)
+        print("\n==== Retrieved entities:")
+        for entity in config:
+            print(entity.path())
+
+    def test_netconf_get_running_config(self):
+        self.logger.setLevel(logging.ERROR)
+        ns = NetconfService()
+        config = ns.get_config(self.ncc)
+        self.assertNotEqual(len(config), 0)
+        print("\n==== Retrieved entities:")
+        for entity in config:
+            print(entity.path())
+
+    def test_crud_get_all_config(self):
+        self.logger.setLevel(logging.ERROR)
+        crud = CRUDService()
+        config = crud.read_config(self.ncc)
+        self.assertNotEqual(len(config), 0)
+        print("\n==== Retrieved entities:")
+        for entity in config:
+            print(entity.path())
+
+    def test_crud_get_all(self):
+        self.logger.setLevel(logging.ERROR)
+        crud = CRUDService()
+        try:
+            config = crud.read(self.ncc)
+            self.assertNotEqual(len(config), 0)
+            print("\n==== Retrieved entities:")
+            for entity in config:
+                print(entity.path())
+        except YPYModelError as err:
+            self.logger.error("Failed to get device state due to error: {}".format(err.message))
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

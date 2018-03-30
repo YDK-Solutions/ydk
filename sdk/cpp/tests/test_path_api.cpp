@@ -116,8 +116,13 @@ void print_tree(ydk::path::DataNode* dn, const std::string& indent)
 
 void print_data_node(shared_ptr<ydk::path::DataNode> dn)
 {
+  try {
 	cout << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
     print_tree(dn.get(), " ");
+  }
+  catch (ydk::path::YCoreError &ex) {
+	  std::cout << ex.what() << std::endl;
+  }
 }
 
 TEST_CASE( "decode_encode_interfaces" )

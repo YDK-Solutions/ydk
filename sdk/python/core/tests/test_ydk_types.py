@@ -92,11 +92,8 @@ class SanityTest(unittest.TestCase):
         native = ysanity.Native()
 
         config = Config([runner, native])
-        for item in range(0,len(config)):
-            if item==0:
-                self.assertEqual(format(config[item]), "ydk.models.ydktest.ydktest_sanity.Runner")
-            else:
-                self.assertEqual(format(config[item]), "ydk.models.ydktest.ydktest_sanity.Native")
+        self.assertEqual(format(config[0]), "ydk.models.ydktest.ydktest_sanity.Runner")
+        self.assertEqual(format(config[1]), "ydk.models.ydktest.ydktest_sanity.Native")
         config.clear()
 
     def test_access_config_by_iter(self):

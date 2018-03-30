@@ -16,8 +16,9 @@
 from ydk.ext.services import CRUDService as _CrudService
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
-
+from ydk.errors import YPYServiceError
 from ydk.types import EntityCollection, Config
+from ydk.entity_utils import _read_entities
 
 class CRUDService(_CrudService):
     """
@@ -47,8 +48,14 @@ class CRUDService(_CrudService):
         with _handle_error():
             return self._crud.create(provider, entity)
 
-    @_check_argument
-    def read(self, provider, read_filter):
+    def read(self, provider, read_filter=None):
+        if provider is None:
+            raise YPYServiceError("provider cannot be None")
+
+        if read_filter is None:
+            with _handle_error():
+                return _read_entities(provider, get_config=False)
+
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
             filters = read_filter.entities()
@@ -58,8 +65,14 @@ class CRUDService(_CrudService):
             read_entity = Config(read_entity)
         return read_entity
 
-    @_check_argument
-    def read_config(self, provider, read_filter):
+    def read_config(self, provider, read_filter=None):
+        if provider is None:
+            raise YPYServiceError("provider cannot be None")
+
+        if read_filter is None:
+            with _handle_error():
+                return _read_entities(provider)
+
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
             filters = read_filter.entities()

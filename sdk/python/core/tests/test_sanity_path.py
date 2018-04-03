@@ -206,6 +206,25 @@ class SanityTest(unittest.TestCase):
         except Exception as e:
             self.assertEqual(isinstance(e, RuntimeError), True)
 
+    def test_path_codec_list(self):
+        root_shema = self.nc_session.get_root_schema()
+        codec = self.codec
+
+        runner = root_shema.create_datanode("ydktest-sanity:runner")
+        runner.create_datanode("one/number", "2")
+
+        native = root_shema.create_datanode("ydktest-sanity:native")
+        native.create_datanode("version", '0.1.0')
+
+        nodes_encode = [runner, native]
+        xml_encode = self.codec.encode(nodes_encode, EncodingFormat.XML, True)
+
+        root_node = self.codec.decode(root_shema, xml_encode, EncodingFormat.XML)
+        node_decode = root_node.get_children()
+
+        xml_decode = self.codec.encode(node_decode, EncodingFormat.XML, True)
+        self.assertEqual(xml_encode, xml_decode)
+
 def enable_logging(level):
     log = logging.getLogger('ydk')
     log.setLevel(level)

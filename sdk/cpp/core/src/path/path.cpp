@@ -199,12 +199,13 @@ static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchema
     ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
     rd->m_node = lnode;
 
-    struct lyd_node* dnode = lnode;
+    struct lyd_node* first_dnode = lyd_first_sibling(lnode);
+    struct lyd_node* dnode = first_dnode;
     do
     {
         rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd, dnode, nullptr)));
         dnode = dnode->next;
-    } while(dnode && dnode != lnode);
+    } while(dnode && dnode != first_dnode);
 
     return std::shared_ptr<ydk::path::DataNode>(rd);
 }
@@ -232,9 +233,20 @@ ydk::path::Codec::~Codec()
 }
 
 std::string
+ydk::path::Codec::encode(std::vector<ydk::path::DataNode*> & data_nodes, ydk::EncodingFormat format, bool pretty)
+{
+    YLOG_DEBUG("ydk::path::Codec: Encoding list of data nodes to {} formated string", format==ydk::EncodingFormat::JSON ? "JSON" : "XML");
+    std::string ret{};
+    for (auto dn : data_nodes) {
+        ret += encode(*dn, format, pretty);
+    }
+    return ret;
+}
+
+std::string
 ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
 {
-    YLOG_DEBUG("Encoding data node '{}' to {} formated string", dn.get_path(), format==ydk::EncodingFormat::JSON ? "JSON" : "XML");
+    YLOG_DEBUG("ydk::path::Codec: Encoding data node '{}' to {} formated string", dn.get_path(), format==ydk::EncodingFormat::JSON ? "JSON" : "XML");
     std::string ret{};
     if (typeid(dn) == typeid(RootDataImpl)) {
         std::vector<std::shared_ptr<ydk::path::DataNode>> data_nodes = dn.get_children();
@@ -268,7 +280,7 @@ ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat form
 std::shared_ptr<ydk::path::DataNode>
 ydk::path::Codec::decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
-    YLOG_DEBUG("Decoding from {} formatted payload:\n{}", format==ydk::EncodingFormat::JSON ? "JSON" : "XML", buffer);
+    YLOG_DEBUG("ydk::path::Codec: Decoding from {} formatted payload:\n{}", format==ydk::EncodingFormat::JSON ? "JSON" : "XML", buffer);
 
     RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
     rs_impl.populate_new_schemas_from_payload(buffer, format);

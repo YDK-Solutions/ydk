@@ -24,7 +24,7 @@ from ydk.services import CRUDService, Datastore, ExecutorService, CodecService, 
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.types import Empty, EncodingFormat
-from ydk.errors import YPYServiceError, YPYModelError
+from ydk.errors import YPYServiceError
 
 from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase

@@ -408,6 +408,21 @@ class SanityYang(unittest.TestCase):
         entity_list = self.codec.decode(self.provider, xml_encode)
         self.assertEqual(entity_list, [runner, native])
 
+    def test_codec_json(self):
+        runner = ysanity.Runner()
+        runner.two.number = 2
+
+        native = ysanity.Native()
+        native.version = '0.1.0'
+
+        self.provider.encoding = EncodingFormat.JSON
+        json_encode = self.codec.encode(self.provider, [runner, native])
+
+        entity_list = self.codec.decode(self.provider, json_encode)
+        self.assertEqual(entity_list, [runner, native])
+
+        self.provider.encoding = EncodingFormat.XML
+
 if __name__ == '__main__':
     import sys
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityYang)

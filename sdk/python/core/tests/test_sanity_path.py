@@ -208,7 +208,6 @@ class SanityTest(unittest.TestCase):
 
     def test_path_codec_list(self):
         root_shema = self.nc_session.get_root_schema()
-        codec = self.codec
 
         runner = root_shema.create_datanode("ydktest-sanity:runner")
         runner.create_datanode("one/number", "2")

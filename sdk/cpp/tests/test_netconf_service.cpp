@@ -324,7 +324,7 @@ TEST_CASE("ietf_get_rpc")
     try {
         (*read_rpc)(provider.get_session());
     }
-    catch (YModelError ex) {
+    catch (YError& ex) {
         cout << "Exception while executing RPC: " << ex.what() << endl;
     }
 }

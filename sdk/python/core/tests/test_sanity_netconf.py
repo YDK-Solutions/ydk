@@ -427,7 +427,7 @@ class SanityNetconf(ParametrizedTestCase):
             print("\n==== Retrieved entities:")
             for entity in config:
                 print(entity.path())
-        except YPYModelError as err:
+        except YPYError as err:
             self.logger.error("Failed to get device state due to error: {}".format(err.message))
 
 if __name__ == '__main__':

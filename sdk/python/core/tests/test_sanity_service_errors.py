@@ -156,7 +156,7 @@ class SanityCRUD(unittest.TestCase):
         self.crud.delete(self.ncc, runner)
 
     _error_pattern_entity = "'provider' and 'entity' cannot be None"
-    _error_pattern_filter = "'provider' and 'read_filter' cannot be None"
+    _error_pattern_filter = "provider cannot be None"
 
     @assert_with_error(_error_pattern_entity, YPYServiceError)
     def test_crud_create_invalid_1(self):
@@ -189,10 +189,6 @@ class SanityCRUD(unittest.TestCase):
     def test_crud_read_invalid_1(self):
         runner_read = ysanity.Runner()
         self.crud.read(None, runner_read)
-
-    @assert_with_error(_error_pattern_filter, YPYServiceError)
-    def test_crud_read_invalid_2(self):
-        self.crud.read(self.ncc, None)
 
     @assert_with_error(_error_pattern_filter, YPYServiceError)
     def test_crud_read_invalid_3(self):
@@ -423,7 +419,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
             result = self.netconf_service.get_config(self.ncc, None, get_filter)
         except YPYServiceError as err:
-            expected_msg = "provider, source, and filter cannot be None"
+            expected_msg = 'provider and source cannot be None'
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YPYServiceError not raised')

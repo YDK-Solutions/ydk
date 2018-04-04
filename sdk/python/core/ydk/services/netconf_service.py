@@ -18,6 +18,7 @@ from ydk.errors import YPYServiceError as _YPYServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 
 from ydk.types import EntityCollection, Config
+from ydk.entity_utils import _read_entities
 
 class NetconfService(_NetconfService):
     """ Python wrapper for NetconfService
@@ -98,9 +99,13 @@ class NetconfService(_NetconfService):
             return self._ns.edit_config(provider, target, config,
                 default_operation, test_option, error_option)
 
-    def get_config(self, provider, source, read_filter):
-        if None in (provider, source, read_filter):
-            raise _YPYServiceError("provider, source, and filter cannot be None")
+    def get_config(self, provider, source=Datastore.running, read_filter=None):
+        if None in (provider, source):
+            raise _YPYServiceError("provider and source cannot be None")
+
+        if read_filter is None:
+            with _handle_error():
+                return _read_entities(provider, True, source)
 
         filters = read_filter
         if isinstance(read_filter, EntityCollection):
@@ -112,9 +117,13 @@ class NetconfService(_NetconfService):
             result = Config(result)
         return result
 
-    def get(self, provider, read_filter):
-        if None in (provider, read_filter):
-            raise _YPYServiceError("provider and filter cannot be None")
+    def get(self, provider, read_filter=None):
+        if provider is None:
+            raise _YPYServiceError("provider cannot be None")
+
+        if read_filter is None:
+            with _handle_error():
+                return _read_entities(provider, get_config=False)
 
         filters = read_filter
         if isinstance(read_filter, EntityCollection):

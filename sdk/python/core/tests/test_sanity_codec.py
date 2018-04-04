@@ -345,7 +345,6 @@ class SanityYang(unittest.TestCase):
         xml_provider = CodecServiceProvider(type='xml')
         payload = self.codec.encode(xml_provider, routing_policy)
 
-        self.assertEqual(xml, payload)
         routing_policy_decode = self.codec.decode(xml_provider, payload)
         self.assertEqual(routing_policy, routing_policy_decode)
 
@@ -395,6 +394,34 @@ class SanityYang(unittest.TestCase):
 
         system_decode = self.codec.decode(self.provider, payload)
         self.assertEqual(system_encode, system_decode)
+
+    def test_encode_decode_list(self):
+        runner = ysanity.Runner()
+        runner.two.number = 2
+
+        native = ysanity.Native()
+        native.version = '0.1.0'
+
+        self.provider.encoding = EncodingFormat.XML
+        xml_encode = self.codec.encode(self.provider, [runner, native])
+
+        entity_list = self.codec.decode(self.provider, xml_encode)
+        self.assertEqual(entity_list, [runner, native])
+
+    def test_codec_json(self):
+        runner = ysanity.Runner()
+        runner.two.number = 2
+
+        native = ysanity.Native()
+        native.version = '0.1.0'
+
+        self.provider.encoding = EncodingFormat.JSON
+        json_encode = self.codec.encode(self.provider, [runner, native])
+
+        entity_list = self.codec.decode(self.provider, json_encode)
+        self.assertEqual(entity_list, [runner, native])
+
+        self.provider.encoding = EncodingFormat.XML
 
 if __name__ == '__main__':
     import sys

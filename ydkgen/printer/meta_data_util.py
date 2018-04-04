@@ -152,7 +152,7 @@ def get_type_doc(meta_info_data, type_depth, ident):
     return properties_description
 
 
-def get_enum_class_docstring(enumz):
+def get_enum_class_docstring(enumz, language):
     enumz_description = ''
     if enumz.comment is not None:
         enumz_description = enumz.comment
@@ -161,9 +161,12 @@ def get_enum_class_docstring(enumz):
 
     literals_description = []
     for enum_literal in enumz.literals:
-        literals_description.append('.. data:: %s_%s\n' % (
-            enumz.qualified_go_name(),
-            enum_literal.name))
+        if language == 'go':
+            literals_description.append('.. data:: %s_%s\n' % (
+                enumz.qualified_go_name(),
+                enum_literal.name))
+        else:
+            literals_description.append(".. data:: %s = %s\n" % (enum_literal.name, enum_literal.value))
         if enum_literal.comment is not None:
             for line in enum_literal.comment.split("\n"):
                 literals_description.append("\t%s\n\n" % line)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	ysanity_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity_types"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -325,6 +326,19 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
 }
 
+func (suite *SanityTypesTestSuite) TestCascadingTypes() {
+	ctypes := ysanity.CascadingTypes{}
+	ctypes.CompInsttype = ysanity.CompInsttype_unknown
+	ctypes.CompNicinsttype = ysanity.CompInsttype__unknown
+	suite.CRUD.Create(&suite.Provider, &ctypes)
+
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(entityRead, &ctypes), true)
+}
+
 func TestSanityTypesTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(SanityTypesTestSuite))
 }

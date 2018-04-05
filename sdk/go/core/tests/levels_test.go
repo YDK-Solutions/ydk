@@ -267,7 +267,7 @@ func (suite *SanityLevelsTestSuite) TestThreeListPos() {
 }
 
 func (suite *SanityLevelsTestSuite) TestNestedNaming() {
-	n1 := ysanity.Runner_NestedNaming_NestedNaming{}
+	n1 := ysanity.Runner_NestedNaming_NestedNaming_{}
 	n2 := ysanity.Runner_NestedNaming{}
 	n1.NestedNaming.NestedNaming = 1
 	n2.NestedNaming.NestedNaming.NestedNaming = 1

@@ -144,7 +144,7 @@ def isgokeyword(word):
         'case', 'defer', 'go', 'map', 'struct', 'chan',
         'else', 'goto', 'package', 'switch', 'const',
         'fallthrough', 'if', 'range', 'type', 'continue',
-        'for', 'import', 'return', 'var',)
+        'for', 'import', 'return', 'var', 'string',)
 
 def get_sphinx_ref_label(named_element):
     return named_element.fqn().replace('.', '_')

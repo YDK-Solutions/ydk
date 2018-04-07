@@ -529,7 +529,10 @@ PYBIND11_MODULE(ydk_, ydk)
 
     codec
         .def(init<>())
-        .def("encode", &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
+        .def("encode", (std::string (ydk::path::Codec::*)(const ydk::path::DataNode&, ydk::EncodingFormat, bool))
+                &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
+        .def("encode", (std::string (ydk::path::Codec::*)(std::vector<ydk::path::DataNode*>&, ydk::EncodingFormat, bool))
+                &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
         .def("decode", &ydk::path::Codec::decode, arg("root_schema_node"), arg("payload"), arg("encoding"))
         .def("decode_rpc_output", &ydk::path::Codec::decode_rpc_output, arg("root_schema_node"), arg("payload"), arg("rpc_path"), arg("encoding"));
 

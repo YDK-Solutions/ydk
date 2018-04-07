@@ -45,7 +45,7 @@ class EnumPrinter(object):
 
     def _print_enum_docstring(self, enum_class):
         self.ctx.writeln('"""')
-        enumz_docstring = get_enum_class_docstring(enum_class)
+        enumz_docstring = get_enum_class_docstring(enum_class, 'py')
         if len(enumz_docstring):
             for line in enumz_docstring.split('\n'):
                 if line.strip() != '':

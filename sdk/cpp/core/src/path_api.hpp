@@ -292,6 +292,8 @@ public:
     ///
     std::string encode(const DataNode & dn, EncodingFormat format, bool pretty);
 
+    std::string encode(std::vector<ydk::path::DataNode*> & data_nodes, ydk::EncodingFormat format, bool pretty);
+
     ///
     /// @brief decode the buffer to return a DataNode
     ///

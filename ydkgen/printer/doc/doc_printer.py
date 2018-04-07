@@ -142,7 +142,7 @@ class DocPrinter(object):
         self._print_header(enumz)
         # Body
         self.ctx.lvl_inc()
-        docstring = get_enum_class_docstring(enumz)
+        docstring = get_enum_class_docstring(enumz, self.lang)
         self._print_docstring(enumz, docstring)
         self.ctx.lvl_dec()
 

@@ -262,6 +262,7 @@ function cpp_sanity_ydktest_test {
     print_msg "Compiling with coverage"
     run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
     run_exec_test make
+    export CTEST_OUTPUT_ON_FAILURE=1
     make test
     local status=$?
     if [ $status -ne 0 ]; then

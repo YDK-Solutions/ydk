@@ -24,10 +24,11 @@ import ydk.types as ytypes
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, SubTest, ChildIdentity, ChildChildIdentity
+    from ydk.models.ydktest.ydktest_sanity import Runner, CascadingTypes, SubTest, ChildIdentity, ChildChildIdentity
     from ydk.models.ydktest.ydktest_sanity_types import YdktestType
 except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.cascading_types.cascading_types import CascadingTypes
     from ydk.models.ydktest.ydktest_sanity.sub_test.sub_test import SubTest
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity
     from ydk.models.ydktest.ydktest_sanity_types.ydktest_sanity_types import YdktestType
@@ -36,9 +37,9 @@ from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64,  YLeaf, Bits
 from ydk.errors import  YPYModelError, YPYServiceProviderError
 try:
-    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInsttype, CompInsttype_
 except:
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInsttype, CompInsttype_
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -66,6 +67,9 @@ class SanityTest(unittest.TestCase):
     def tearDown(self):
         runner = Runner()
         self.crud.delete(self.ncc, runner)
+
+        ctypes = CascadingTypes()
+        self.crud.delete(self.ncc, ctypes)
 
     def _create_runner(self):
         # runner = Runner()
@@ -493,6 +497,25 @@ class SanityTest(unittest.TestCase):
 
     # def test_binary_invalid(self):
     #     pass
+
+    def test_cascading_types(self):
+        self._cascading_types_helper(CompInsttype.unknown, CompInsttype_.unknown)
+        self._cascading_types_helper(CompInsttype.phys, CompInsttype_.phys)
+        self._cascading_types_helper(CompInsttype.virt, CompInsttype_.virt)
+        self._cascading_types_helper(CompInsttype.hv, CompInsttype_.hv)
+
+    def _cascading_types_helper(self, enum1, enum2):
+        ctypes = CascadingTypes()
+        ctypes.comp_insttype = enum1
+        ctypes.comp_nicinsttype = enum2
+        self.crud.create(self.ncc, ctypes)
+
+        # Read into Runner1
+        ctypesRead = CascadingTypes()
+        ctypesRead = self.crud.read(self.ncc, ctypesRead)
+
+        # Compare runners
+        self.assertEqual(ctypes, ctypesRead)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

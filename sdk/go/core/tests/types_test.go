@@ -327,13 +327,20 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 }
 
 func (suite *SanityTypesTestSuite) TestCascadingTypes() {
+	cascadingTypesHelper(suite, ysanity.CompInsttype_unknown, ysanity.CompInsttype__unknown)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_phys, ysanity.CompInsttype__phys)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_virt, ysanity.CompInsttype__virt)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_hv, ysanity.CompInsttype__hv)
+}
+
+func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInsttype, enum2 ysanity.CompInsttype_){
 	ctypes := ysanity.CascadingTypes{}
-	ctypes.CompInsttype = ysanity.CompInsttype_unknown
-	ctypes.CompNicinsttype = ysanity.CompInsttype__unknown
+	ctypes.CompInsttype = enum1
+	ctypes.CompNicinsttype = enum2
 	suite.CRUD.Create(&suite.Provider, &ctypes)
 
-	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(entityRead, &ctypes), true)
+	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(ctypesRead, &ctypes), true)
 }
 
 func TestSanityTypesTestSuite(t *testing.T) {

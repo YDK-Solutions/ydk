@@ -655,3 +655,51 @@ TEST_CASE("string_leaflist")
     ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
     REQUIRE(r_1->ytypes->built_in_t->enum_llist == r_2->ytypes->built_in_t->enum_llist);
 }
+
+TEST_CASE("test_cascading_types")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // DELETE
+    auto ctypes = make_unique<ydktest_sanity::CascadingTypes>();
+    bool reply = crud.delete_(provider, *ctypes);
+    REQUIRE(reply);
+
+    // CREATE
+    SECTION ( "unknown" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInsttype::unknown;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::unknown;
+    }
+
+    SECTION ( "phys" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInsttype::phys;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::phys;
+    }
+
+    SECTION ( "virt" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInsttype::virt;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::virt;
+    }
+
+    SECTION ( "hv" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInsttype::hv;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::hv;
+    }
+    reply = crud.create(provider, *ctypes);
+    REQUIRE(reply);
+
+    // READ
+    auto filter = make_unique<ydktest_sanity::CascadingTypes>();
+    auto temp = crud.read(provider, *filter);
+    REQUIRE(temp!=nullptr);
+    ydktest_sanity::CascadingTypes * ctypesRead = dynamic_cast<ydktest_sanity::CascadingTypes*>(temp.get());
+    std::cout<<ctypes->comp_insttype<<std::endl;
+    std::cout<<ctypesRead->comp_nicinsttype<<std::endl;
+    REQUIRE(ctypes->comp_insttype == ctypesRead->comp_nicinsttype);
+}

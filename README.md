@@ -61,7 +61,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # Backward compatibility
- Please see [this page](http://ydk.cisco.com/py/docs/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release
+ Please see [this page](http://ydk.cisco.com/py/docs/guides/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release. Note also that [#604](https://github.com/CiscoDevNet/ydk-gen/issues/604) and [#748](https://github.com/CiscoDevNet/ydk-gen/issues/748) introduced backward incompatibility for python. The bundles generated with `0.7.1` or newer ydk-gen will only work with ydk `core` version `0.7.1` or newer. Also error types for python were renamed from `YPYError` to `YError`.
 
 # Docker
 
@@ -82,8 +82,8 @@ Ubuntu (Debian-based):
 **Install prebuilt libydk binary:**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.0/libydk_0.7.0-1_amd64.deb
-   $ sudo gdebi libydk_0.7.0-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.1/libydk_0.7.1-1_amd64.deb
+   $ sudo gdebi libydk_0.7.1-1_amd64.deb
 ```
 **To build from source:**
 ```
@@ -95,7 +95,7 @@ Centos (Fedora-based):
 ```
    $ sudo yum install epel-release
    $ sudo yum install libssh-devel gcc-c++
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.0/libydk-0.7.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.1/libydk-0.7.1-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -125,8 +125,8 @@ You can download the latest python package from [here](https://www.python.org/do
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.0/libydk-0.7.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.7.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.1/libydk-0.7.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.7.1-Darwin.pkg -target /
 ```
 **To build from source:**
 ```
@@ -136,7 +136,7 @@ You can download the latest python package from [here](https://www.python.org/do
 ```
 
 ## Windows
-Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.7.0`` onwards is not supported on Windows.
+Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
 
 # Installation
 ## Setting up your environment
@@ -182,11 +182,13 @@ Options:
   -g, --go            Select Go language
   --core              Generate the core for the selected language
   --bundle=PROFILE    Generate the bundle for the selected language
+  --one-module-per-class
+                      Generate python bundles by creating separate python modules for each class
   -v, --verbose       Verbose mode
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
-The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
+The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
 ## First step: choose your bundle profile
 
@@ -431,4 +433,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.7.0 (alpha). YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.7.1 (alpha). The version of the latest YDK-Gen master branch is 0.7.2-dev. YDK-Gen is licensed under the Apache 2.0 License.

@@ -698,7 +698,7 @@ module ydktest-sanity {
 
   container runner {
 
-    uses nested-naming;
+    // uses nested-naming;
 
     //container at 1,2,3 nested level
     uses one-level;
@@ -756,5 +756,40 @@ module ydktest-sanity {
     uses config-interface-grouping;
 
   } // native
+
+  typedef comp_InstType {
+      type enumeration {
+          enum unknown {
+              value 0;   // Unknown
+          }
+          enum phys {
+              value 1;     // Baremetal Host
+          }
+          enum virt {
+              value 2;     // Virtual Machine
+          }
+          enum hv {
+              value 3;   // Hypervisor Host
+          }
+      }
+      default "unknown";
+  }
+
+  typedef comp_NicInstType {
+      type comp_InstType;
+  }
+
+  container cascading-types {
+
+    leaf comp_InstType {
+      description "this is enum type value";
+      type comp_InstType;
+    }
+
+    leaf comp_NicInstType {
+      description "this is enum type value";
+      type comp_NicInstType;
+    }
+  }
 
 }

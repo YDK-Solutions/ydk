@@ -230,7 +230,8 @@ class NamedElement(Element):
         if hasattr(self, 'goName'):
             return self.goName
 
-        name = camel_case(self.name)
+        suffix = '_' if self.name[-1] == '_' else ''
+        name = '%s%s' % (camel_case(self.name), suffix)
         if self.iskeyword(name):
             name = '_%s' % name
         if name.startswith('_'):

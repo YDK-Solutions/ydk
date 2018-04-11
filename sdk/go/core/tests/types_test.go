@@ -4,6 +4,7 @@ import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	ysanity_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity_types"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -325,7 +326,27 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
 }
 
+func (suite *SanityTypesTestSuite) TestCascadingTypes() {
+	cascadingTypesHelper(suite, ysanity.CompInsttype_unknown, ysanity.CompInsttype__unknown)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_phys, ysanity.CompInsttype__phys)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_virt, ysanity.CompInsttype__virt)
+	cascadingTypesHelper(suite, ysanity.CompInsttype_hv, ysanity.CompInsttype__hv)
+}
+
+func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInsttype, enum2 ysanity.CompInsttype_){
+	ctypes := ysanity.CascadingTypes{}
+	ctypes.CompInsttype = enum1
+	ctypes.CompNicinsttype = enum2
+	suite.CRUD.Create(&suite.Provider, &ctypes)
+
+	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(ctypesRead, &ctypes), true)
+}
+
 func TestSanityTypesTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(SanityTypesTestSuite))
 }
 

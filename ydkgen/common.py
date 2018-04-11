@@ -140,11 +140,23 @@ def iscppkeyword(word):
 
 def isgokeyword(word):
     return word in (
+        # keywords
         'break', 'default', 'func', 'interface', 'select',
         'case', 'defer', 'go', 'map', 'struct', 'chan',
         'else', 'goto', 'package', 'switch', 'const',
         'fallthrough', 'if', 'range', 'type', 'continue',
-        'for', 'import', 'return', 'var',)
+        'for', 'import', 'return', 'var',
+        # types
+        'bool', 'byte', 'complex64', 'complex128', 'error', 'float32', 'float64',
+        'int', 'int8', 'int16', 'int32', 'int64', 'rune', 'string',
+        'uint', 'uint8', 'uint16', 'uint32', 'uint64', 'uintptr',
+        # constants
+        'true', 'false', 'iota',
+        # zero value
+        'nil',
+        # functions
+        'append', 'cap', 'close', 'complex', 'copy', 'delete', 'imag', 'len',
+        'make', 'new', 'panic', 'print', 'println', 'real', 'recover',)
 
 def get_sphinx_ref_label(named_element):
     return named_element.fqn().replace('.', '_')

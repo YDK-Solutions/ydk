@@ -61,7 +61,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # Backward compatibility
- Please see [this page](http://ydk.cisco.com/py/docs/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release
+ Please see [this page](http://ydk.cisco.com/py/docs/guides/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release. Note also that [#604](https://github.com/CiscoDevNet/ydk-gen/issues/604) and [#748](https://github.com/CiscoDevNet/ydk-gen/issues/748) introduced backward incompatibility for python. The bundles generated with `0.7.1` or newer ydk-gen will only work with ydk `core` version `0.7.1` or newer. Also error types for python were renamed from `YPYError` to `YError`.
 
 # Docker
 
@@ -182,11 +182,13 @@ Options:
   -g, --go            Select Go language
   --core              Generate the core for the selected language
   --bundle=PROFILE    Generate the bundle for the selected language
+  --one-module-per-class
+                      Generate python bundles by creating separate python modules for each class
   -v, --verbose       Verbose mode
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
-The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
+The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
 ## First step: choose your bundle profile
 

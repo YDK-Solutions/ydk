@@ -103,12 +103,20 @@ type CommonEntityData struct {
 	BundleYangModelsLocation	string
 
 	// dynamic data (internals)
-	Parent 						Entity
+	Parent 					Entity
+}
+
+func (e *CommonEntityData) GetPath() string {
+    return e.SegmentPath
 }
 
 // Entity is a basic type that represents containers in YANG
 type Entity interface {
 	GetEntityData()		*CommonEntityData
+}
+
+func EntityToString (e Entity) string {
+    return fmt.Sprintf("Type: %s, Path: %v", reflect.TypeOf(e), e.GetEntityData().GetPath())
 }
 
 // Bits is a basic type that represents the YANG bits type
@@ -118,6 +126,189 @@ type Bits map[string]bool
 type BitsList struct {
 	Value []map[string]bool
 }
+
+// EntityCollection definition and methods
+//
+type EntityCollection struct {
+    EcKeys  []string
+    EcMap   map[string]Entity
+}
+
+func (ec EntityCollection) GetEntityData() *CommonEntityData {
+	if ec.Len() > 0 {
+		entity := ec.GetItem(0)
+		return entity.GetEntityData()
+	}
+	return nil
+}
+
+func EntityToCollection (e Entity) *EntityCollection {
+	if e == nil {
+		ec := NewEntityCollection()
+		return &ec
+	}
+	
+	ec, ok := e.(EntityCollection)
+	if ok {
+		return &ec
+	} else {
+		ecp, okp := e.(*EntityCollection)
+		if okp {
+			return ecp
+		}
+	}
+	ec = NewEntityCollection(e)
+	return &ec
+}
+
+func IsEntityCollection (e Entity) bool {
+	if e == nil {
+		return false
+	}
+	
+	_, ok := e.(EntityCollection)
+	if ok {
+		return true
+	} else {
+		_, ok = e.(*EntityCollection)
+		if ok {
+			return true
+		}
+	} 
+	return false
+}
+
+func NewEntityCollection(entities ... Entity) EntityCollection {
+    ec := EntityCollection{}
+    ec.EcMap = make(map[string]Entity)
+    ec.EcKeys  = []string{}
+	if len(entities) > 0 {
+		ec.Append(entities)
+	}
+    return ec
+}
+
+func (ec *EntityCollection) Add(entities ... Entity) {
+	ec.Append(entities)
+}
+
+func (ec *EntityCollection) Append(entities []Entity) {
+    for i:=0; i<len(entities); i++ {
+        entity := entities[i]
+        key := entity.GetEntityData().GetPath()
+        _, exists := ec.EcMap[key]
+        if !exists {
+            ec.EcKeys = append(ec.EcKeys, key)
+        }
+        ec.EcMap[key] = entity
+    }
+}
+
+func (ec *EntityCollection) Len() int {
+    return len(ec.EcMap)
+}
+
+func (ec *EntityCollection) Get(key string) Entity {
+    elem, exists := ec.EcMap[key]
+    if exists {
+        return elem
+    } else {
+        return nil
+    }
+}
+
+func (ec *EntityCollection) GetItem(item int) Entity {
+	if item < len(ec.EcKeys) {
+		key := ec.EcKeys[item]
+		return ec.EcMap[key]
+	}
+	return nil
+}
+
+func (ec *EntityCollection) HasKey(key string) bool {
+    _, exists := ec.EcMap[key]
+    return exists
+}
+
+func (ec *EntityCollection) Pop(key string) Entity {
+    entity, exists := ec.EcMap[key]
+    if !exists {
+        return nil
+    }
+    // remove from keys
+    for i, k := range ec.EcKeys {
+        if k == key {
+            ec.EcKeys = append(ec.EcKeys[:i], ec.EcKeys[i+1:]...)
+            break
+        }
+    }
+    // remove from values
+    delete(ec.EcMap, key)
+    return entity
+}
+
+func (ec *EntityCollection) Clear() {
+    keys := ec.EcKeys
+    for _, key := range keys {
+        delete(ec.EcMap, key)
+    }
+    ec.EcKeys = []string{}
+    ec.EcMap = make(map[string]Entity)
+}
+
+func (ec *EntityCollection) Keys() []string {
+    return ec.EcKeys
+}
+
+func (ec *EntityCollection) Entities() []Entity {
+    entities := make([]Entity, len(ec.EcKeys))
+    i := 0
+    for _, key := range ec.EcKeys {
+        entities[i] = ec.EcMap[key]
+        i++
+    }
+    return entities
+}
+
+func (ec *EntityCollection) String() string {
+    if len(ec.EcMap) == 0 {
+        return "EntityCollection is empty"
+    }
+    entities := ec.Entities()
+    entity_str := make([]string, len(ec.EcMap))
+    i := 0
+    for _, entity := range entities {
+        entity_str[i] = EntityToString(entity)
+        i++
+    }
+    return fmt.Sprintf("EntityCollection [%s]", strings.Join(entity_str, "; "))
+}
+
+// The code below should be included with go 1.9
+//
+//type Config = EntityCollection
+//
+//func NewConfig(entities ... Entity) Config {
+//	ec := Config{}
+//	ec.EcMap = make(map[string]Entity)
+//	ec.EcKeys  = []string{}
+//	if len(entities) > 0 {
+//		ec.Append(entities)
+//	}
+//	return ec
+//}
+//
+//type Filter = EntityCollection
+//
+//func NewFilter(entities ... Entity) Filter {
+//	ec := Filter{}
+//	ec.EcMap = make(map[string]Entity)
+//	ec.EcKeys  = []string{}
+//	if len(entities) > 0 {
+//		ec.Append(entities)
+//	}
+//	return ec
+//}
 
 /////////////////////////////////////
 // Entity Utility Functions
@@ -141,6 +332,9 @@ func SetParent(entity, parent Entity) {
 // HasDataOrFilter returns a bool representing whether the entity
 // or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
+	if entity == nil {
+		return false
+	}
 	if (entity.GetEntityData().YFilter != yfilter.NotSet) {
 		return true
 	}

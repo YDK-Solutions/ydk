@@ -328,3 +328,106 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 func TestSanityTypesTestSuite(t *testing.T) {
 	suite.Run(t, new(SanityTypesTestSuite))
 }
+
+func (suite *SanityTypesTestSuite) Test_EntityCollection() {
+    // Create Data entities and access values
+    runner := ysanity.Runner{}
+    native := ysanity.Native{}
+    runner_path := runner.GetEntityData().GetPath()
+    native_path := native.GetEntityData().GetPath()
+    suite.Equal(types.EntityToString(&runner), "Type: *sanity.Runner, Path: ydktest-sanity:runner")
+    suite.Equal(types.EntityToString(&native), "Type: *sanity.Native, Path: ydktest-sanity:native")
+
+    // Initialization
+    config := types.NewEntityCollection()
+    suite.Equal(config.Len(), 0)
+    suite.Equal(config.String(), "EntityCollection is empty")
+
+    config = types.NewEntityCollection(&runner)
+    suite.Equal(config.Len(), 1)
+
+    config = types.NewEntityCollection(&runner, &native)
+    suite.Equal(config.Len(), 2)
+    suite.Equal(config.String(), "EntityCollection [Type: *sanity.Runner, Path: ydktest-sanity:runner; Type: *sanity.Native, Path: ydktest-sanity:native]")
+
+    // Add
+    config = types.NewEntityCollection()
+    config.Append([]types.Entity{&runner, &native})
+    suite.Equal(config.Len(), 2)
+
+    config.Add(&runner)
+    suite.Equal(config.Len(), 2)
+
+    // Get
+    e := config.Get(runner_path)
+    suite.NotNil(e)
+    suite.IsType(&runner, e)
+    
+    // HasKey
+    suite.Equal(config.HasKey(runner_path), true)
+    suite.Equal(config.HasKey(native_path), true)
+    suite.Equal(config.HasKey("oc_bgp"), false)
+
+    // Get all keys
+    suite.Equal(config.Keys(), []string{runner_path, native_path})
+
+    // Get all entities
+    fmt.Printf("All entities:\n")
+    for _, entity := range config.Entities() {
+        fmt.Printf("%s\n", types.EntityToString(entity))
+    }
+
+    // Delete entity
+    e = config.Pop(runner_path)
+    suite.NotNil(e)
+    suite.IsType(&runner, e)
+    suite.Equal(config.Keys(), []string{native_path})
+
+    fmt.Printf("All entities:\n")
+    for _, key := range config.Keys() {
+        e = config.Get(key)
+        fmt.Printf("%s\n", types.EntityToString(e))
+    }
+    
+    // Add back and test order
+    config.Add(&runner)
+    suite.Equal(config.Keys(), []string{native_path, runner_path})
+
+	// Getting enities by item number
+	for i:=0; i<3; i++ {
+		e = config.GetItem(i)
+		if e != nil {
+			fmt.Printf("%d:  %s\n", i, types.EntityToString(e))
+		} else {
+			fmt.Printf("%d:  nil\n", i)
+		}
+	}
+    // Clear collection
+    config.Clear()
+    suite.Equal(config.Len(), 0)
+    
+    // Testing passing parameters and return values
+    ret1 := test_params("test1", config)
+    col1 := types.EntityToCollection(ret1)
+    suite.Equal(col1.Len(), 0)
+
+    ret2 := test_params("test2", &runner)
+    suite.Equal(types.EntityEqual(ret2, &runner), true)
+
+    config.Add(&runner, &native)
+    ret3 := test_params("test3", config)
+    col3 := types.EntityToCollection(ret3)
+    suite.Equal(col3.Len(), 2)
+}
+
+func test_params(test_name string, entity types.Entity) types.Entity {
+	ec := types.EntityToCollection(entity)
+	if ec == nil {
+		//fmt.Printf("%s: %s\n", test_name, EntityToString(entity))
+		return entity
+	} else {
+		//fmt.Printf("%s: %s\n", test_name, ec.String())
+		return ec
+	}
+}
+

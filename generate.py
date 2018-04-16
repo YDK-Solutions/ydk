@@ -21,6 +21,7 @@ from distutils import dir_util, file_util
 from argparse import ArgumentParser
 
 import fileinput
+import json
 import logging
 import os
 import shutil
@@ -47,10 +48,38 @@ def init_verbose_logger():
     # add the handlers to the logger
     logger.addHandler(ch)
 
+def update_setup_file_version(language, ydk_root):
+    replacer_table = {}     # KEY is file name; VALUE is 2-tuple: substr match, replacement template
+    if language == 'python':
+        replacer_table = {
+            'setup.py': ('VERSION =', "VERSION = '%s-dev'\n"),
+            'CMakeLists.txt': ('project(path VERSION', 'project(path VERSION %s LANGUAGES C CXX)\n')
+        }
+    elif language == 'cpp':
+        replacer_table = {
+            'CMakeLists.txt': ('project(ydk VERSION', 'project(ydk VERSION %s LANGUAGES C CXX)\n')
+        }
+    else:
+        raise Exception('Language {0} has no setup file'.format(language))
 
-def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
-    if is_bundle:
-        return
+    for local_name in replacer_table:
+        keyword = replacer_table[local_name][0]
+        setup_file = os.path.join(ydk_root, 'sdk', language, 'core', local_name)
+        lines = []
+        with open(setup_file, 'r+') as fd:
+            lines = fd.readlines()
+        for line_number in range(len(lines)):
+            line = lines[line_number]
+            if keyword == line[:len(keyword)]:
+                release = get_release(ydk_root)
+                dev_release = '%s%s' % (release[:-1], int(release[-1])+1)
+                l = replacer_table[local_name][1] % dev_release
+                lines[line_number] = l
+        with open(setup_file, 'w+') as fd:
+            fd.writelines(lines)
+
+
+def print_about_page(ydk_root, py_api_doc_gen, release):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
     commit_id = str(repo.head.commit)
@@ -66,7 +95,7 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
 
     # modify about_ydk.rst page
     lines = ''
-    with open(os.path.join(ydk_root, 'sdk', '_docsgen_common', 'about_ydk.rst'), 'r+') as fd:
+    with open(os.path.join(ydk_root, 'sdk/_docsgen_common/about_ydk.rst'), 'r+') as fd:
         lines = fd.read()
     if 'git clone repo-url' in lines:
         lines = lines.replace('repo-url', 'https://{0}.git'.format(url))
@@ -82,46 +111,10 @@ def print_about_page(ydk_root, py_api_doc_gen, release, is_bundle):
         fd.write(lines)
 
 
-def get_release_version(output_directory, language):
-    if language == 'python':
-        return get_py_release_version(output_directory)
-    elif language == 'cpp':
-        return get_cpp_release_version(output_directory)
-    elif language == 'go':
-        return get_go_release_version(output_directory)
-    else:
-        raise Exception('Language {0} not yet supported'.format(language))
-
-
-def get_py_release_version(output_directory):
-    setup_file = os.path.join(output_directory, 'setup.py')
-    with open(setup_file, 'r') as f:
-        for line in f:
-            if ('version=' in line or 'version =' in line or
-                'NMSP_PKG_VERSION' in line and '$VERSION$' not in line or
-                line.startswith('VERSION =')):
-                rv = line[line.find('=')+1:].strip(' \'"\n')
-                release = "release=" + rv
-                version = "version=" + rv
-                break
-    return (release, version)
-
-
-def get_cpp_release_version(output_directory):
-    version_string = ''
-    VERSION = re.compile(r"project\(ydk.* VERSION (?P<version>[\d+\.+]*) LANGUAGES C CXX\)")
-    cmake_file = os.path.join(output_directory, 'CMakeLists.txt')
-    with open(cmake_file) as f:
-        for line in f:
-            major_match = VERSION.match(line)
-            if major_match:
-                version_string = major_match.group('version')
-    release = "release=%s" % version_string
-    version = "version=%s" % version_string
-    return (release, version)
-
-def get_go_release_version(output_directory):
-    return ("release=test", "version=test")
+def get_release(ydk_root):
+    with open(os.path.join(ydk_root, 'sdk', 'version.json')) as f:
+        versions = json.load(f)
+    return versions['core']
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):
@@ -154,13 +147,13 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     py_api_doc_gen = os.path.join(output_directory, 'docsgen')
     py_api_doc = os.path.join(output_directory, 'docs_expanded')
     # if it is package type
-    release = ''
-    version = ''
-    if is_core:
-        release, version = get_release_version(output_directory, language)
+    rv = get_release(ydk_root)
+    release = 'release=%s' % rv
+    version = 'version=%s' % rv
     os.mkdir(py_api_doc)
-    # print about YDK page
-    print_about_page(ydk_root, py_api_doc_gen, release, is_bundle)
+
+    if not is_bundle:
+        print_about_page(ydk_root, py_api_doc_gen, rv)
 
     if is_core:
         copy_docs_from_bundles(output_directory, py_api_doc_gen)
@@ -385,6 +378,9 @@ if __name__ == '__main__':
         language = 'go'
     elif options.python:
         language = 'python'
+
+    if language != 'go' and options.core:
+        update_setup_file_version(language, ydk_root)
 
     try:
         if options.adhoc_bundle_name:

@@ -49,10 +49,12 @@ def init_verbose_logger():
     logger.addHandler(ch)
 
 def update_setup_file_version(language, ydk_root):
+    release, dev = get_release(ydk_root)
+
     replacer_table = {}     # KEY is file name; VALUE is 2-tuple: substr match, replacement template
     if language == 'python':
         replacer_table = {
-            'setup.py': ('VERSION =', "VERSION = '%s-dev'\n"),
+            'setup.py': ('VERSION =', "VERSION = '%s%s'\n" % ('%s', dev)),
             'CMakeLists.txt': ('project(path VERSION', 'project(path VERSION %s LANGUAGES C CXX)\n')
         }
     elif language == 'cpp':
@@ -68,13 +70,10 @@ def update_setup_file_version(language, ydk_root):
         lines = []
         with open(setup_file, 'r+') as fd:
             lines = fd.readlines()
-        for line_number in range(len(lines)):
-            line = lines[line_number]
+        for i, line in enumerate(lines):
             if keyword == line[:len(keyword)]:
-                release = get_release(ydk_root)
-                dev_release = '%s%s' % (release[:-1], int(release[-1])+1)
-                l = replacer_table[local_name][1] % dev_release
-                lines[line_number] = l
+                template = replacer_table[local_name][1]
+                lines[i] = template % release
         with open(setup_file, 'w+') as fd:
             fd.writelines(lines)
 
@@ -114,7 +113,10 @@ def print_about_page(ydk_root, py_api_doc_gen, release):
 def get_release(ydk_root):
     with open(os.path.join(ydk_root, 'sdk', 'version.json')) as f:
         versions = json.load(f)
-    return versions['core']
+    release = versions['core']
+    dev = '-dev' if release[-4:] == '-dev' else ''
+    release = release.replace('-dev', '')
+    return (release, dev)
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):
@@ -147,7 +149,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
     py_api_doc_gen = os.path.join(output_directory, 'docsgen')
     py_api_doc = os.path.join(output_directory, 'docs_expanded')
     # if it is package type
-    rv = get_release(ydk_root)
+    rv, _ = get_release(ydk_root)
     release = 'release=%s' % rv
     version = 'version=%s' % rv
     os.mkdir(py_api_doc)

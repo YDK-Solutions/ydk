@@ -222,9 +222,9 @@ class ClassSetAttrPrinter(object):
     def print_setattr(self, clazz, leafs):
         yleafs = get_leafs(clazz)
         yleaf_lists = get_leaf_lists(clazz)
-        ylists = get_lists(clazz)
+        children = get_child_classes(clazz, self.one_class_per_module)
 
-        if len(yleafs) + len(yleaf_lists) + len(ylists)> 0:
+        if len(yleafs) + len(yleaf_lists) + len(children)> 0:
             self._print_class_setattr_header()
             self._print_class_setattr_body(clazz, leafs)
             self._print_class_setattr_trailer()

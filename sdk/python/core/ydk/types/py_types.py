@@ -121,6 +121,7 @@ class Entity(_Entity):
     """
     def __init__(self):
         super(Entity, self).__init__()
+        self.logger = logging.getLogger("ydk.types.EntityCollection")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
         self._children_yang_names = set()
@@ -343,10 +344,10 @@ class Entity(_Entity):
                             leaf.append(item)
 
             else:
-                if hasattr(value, "parent") and name != "parent":
-                    if hasattr(value, "is_presence_container") and value.is_presence_container:
-                        value.parent = self
-                    elif value.parent is None and value.yang_name in self._child_classes:
+                if isinstance(value, Entity):
+                    if hasattr(value, "parent") and name != "parent" and \
+                        hasattr(value, "is_presence_container") and value.is_presence_container:
+                        self.logger.debug("Assigning parent for '%s' as '%s'"%(value.yang_name, self.yang_name))
                         value.parent = self
                 super(Entity, self).__setattr__(name, value)
 

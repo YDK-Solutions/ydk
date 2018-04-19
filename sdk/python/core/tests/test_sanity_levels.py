@@ -733,9 +733,8 @@ class SanityYang(unittest.TestCase):
         i = runner.Passive.Interfac()
         i.test = "abc"
         p.interfac.append(i)
-        p.xyz = runner.Passive.Testc.Xyz()
-        p.xyz.parent = p
-        p.xyz.xyz = 25
+        p.testc.xyz = runner.Passive.Testc.Xyz()
+        p.testc.xyz.xyz = 25
         runner.passive.append(p)
 
         self.crud.create(self.ncc, runner)

@@ -1,6 +1,6 @@
 .. _ydk-providers:
 
-Serivce Providers
+Service Providers
 =================
 
 .. go:package:: ydk/providers
@@ -47,23 +47,6 @@ Open Daylight
 
 		A Go ``string`` that represents protocol used to connect to the device
 
-	.. attribute:: Private
-
-		An instance of :go:struct:`COpenDaylightServiceProvider<ydk/types/COpenDaylightServiceProvider>`
-
-	.. attribute:: ProvidersHolder
-
-		A slice ([] :ref:`ServiceProvider <types-service-provider>`)
-
-	.. attribute:: State
-
-		An instance of :go:struct:`State<ydk/errors/State>` which represents the error state of this provider
-
-.. function:: (provider *OpenDaylightServiceProvider) GetPrivate()
-
-	:return: private pointer for OpenDaylightServiceProvider
-	:rtype: ``interface{}``
-
 .. function:: (provider *OpenDaylightServiceProvider) Connect()
 
 	Connect to OpenDaylightServiceProvider using Path/Address/Username/Password/Port
@@ -77,11 +60,6 @@ Open Daylight
 
 	:return: Node provider by ID
 	:rtype: :ref:`ServiceProvider <types-service-provider>`
-
-.. function:: (provider *OpenDaylightServiceProvider) GetState()
-
-	:return: error state from OpenDaylightServiceProvider
-	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *OpenDaylightServiceProvider) Disconnect()
 
@@ -119,27 +97,9 @@ Netconf
 
 		A Go ``string`` that represents protocol used to connect to the device
 
-	.. attribute:: Private
-
-		An instance of :go:struct:`CServiceProvider<ydk/types/CServiceProvider>`
-
-	.. attribute:: State
-
-		An instance of :go:struct:`State<ydk/errors/State>`
-
-.. function:: (provider *NetconfServiceProvider) GetPrivate()
-
-	:return: private pointer for NetconfServiceProvider
-	:rtype: ``interface{}``
-
 .. function:: (provider *NetconfServiceProvider) Connect()
 	
 	Connect to NetconfServiceProvider using Repo/Address/Username/Password/Port
-
-.. function:: (provider *NetconfServiceProvider) GetState()
-
-	:return: error state from NetconfServiceProvider
-	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *NetconfServiceProvider) Disconnect()
 
@@ -185,27 +145,9 @@ Restconf
 
 		A Go ``string``. This attribute provides backwards compatibility with older drafts of restconf RFC, this can be "/config" or "/data" (which is the default)
 
-	.. attribute:: Private
-
-		An instance of :go:struct:`CServiceProvider<ydk/types/CServiceProvider>`
-
-	.. attribute:: State
-
-		An instance of :go:struct:`State<ydk/errors/State>`
-
-.. function:: (provider *RestconfServiceProvider) GetPrivate()
-	
-	:return: private pointer for RestconfServiceProvider
-	:rtype: ``interface{}``
-
 .. function:: (provider *RestconfServiceProvider) Connect()
 
 	Connect to RestconfServiceProvider using Path/Address/Username/Password/Port
-
-.. function:: (provider *RestconfServiceProvider) GetState()
-	
-	:return: error state from RestconfServiceProvider
-	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *RestconfServiceProvider) Disconnect
 	
@@ -231,10 +173,6 @@ Codec
 
 		An instance of ``map[string]RootSchemaNode`` (see docs for :go:struct:`RootSchemaNode<ydk/types/RootSchemaNode>`)
 
-	.. attribute:: State
-
-		An instance of :go:struct:`State<ydk/errors/State>`
-
 .. function:: (provider *CodecServiceProvider) Initialize()
 
 	Initialize the CodecServiceProvider
@@ -243,11 +181,6 @@ Codec
 
 	:return: the encoding format for CodecServiceProvider
 	:rtype: :ref:`encoding-format-ydk`
-
-.. function:: (provider *CodecServiceProvider) GetState()
-
-	:return: error state from CodecServiceProvider
-	:rtype: :go:struct:`*State<ydk/errors/State>`
 
 .. function:: (provider *CodecServiceProvider) GetRootSchemaNode(entity types.Entity)
 

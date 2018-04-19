@@ -1,4 +1,4 @@
-Serivces
+Services
 ========
 
 .. go:package:: ydk/services

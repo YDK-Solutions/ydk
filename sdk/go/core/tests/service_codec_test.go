@@ -431,9 +431,30 @@ func (suite *CodecTestSuite) TestTypedefsXMLEncodeDecode() {
 	suite.Equal(types.EntityEqual(&systemEncode, systemDecode), true)
 }
 
+func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
+
+	runnerConfig := ysanity.Runner{}
+	runnerConfig.Two.Number = 2
+	
+	nativeConfig := ysanity.Native{}
+	nativeConfig.Version = "0.1.0"
+	
+	config := types.NewConfig(&runnerConfig, &nativeConfig)
+	
+	suite.Provider.Encoding = encoding.XML	
+	payload := suite.Codec.Encode(&suite.Provider, &config)
+
+	entity := suite.Codec.Decode(&suite.Provider, payload)
+	suite.Equal(types.IsEntityCollection(entity), true)
+
+    // Check results
+	ec := types.EntityToCollection(entity)
+	suite.Equal(ec.Len(), 2)
+	
+	payload2 := suite.Codec.Encode(&suite.Provider, ec)
+	suite.Equal(payload2, payload)
+}
+
 func TestCodecTestSuite(t *testing.T) {
-	if testing.Verbose() {
-		ydk.EnableLogging(ydk.Debug)
-	}
 	suite.Run(t, new(CodecTestSuite))
 }

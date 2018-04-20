@@ -284,31 +284,29 @@ func (ec *EntityCollection) String() string {
     return fmt.Sprintf("EntityCollection [%s]", strings.Join(entity_str, "; "))
 }
 
-// The code below should be included with go 1.9
-//
-//type Config = EntityCollection
-//
-//func NewConfig(entities ... Entity) Config {
-//	ec := Config{}
-//	ec.EcMap = make(map[string]Entity)
-//	ec.EcKeys  = []string{}
-//	if len(entities) > 0 {
-//		ec.Append(entities)
-//	}
-//	return ec
-//}
-//
-//type Filter = EntityCollection
-//
-//func NewFilter(entities ... Entity) Filter {
-//	ec := Filter{}
-//	ec.EcMap = make(map[string]Entity)
-//	ec.EcKeys  = []string{}
-//	if len(entities) > 0 {
-//		ec.Append(entities)
-//	}
-//	return ec
-//}
+type Config = EntityCollection
+
+func NewConfig(entities ... Entity) Config {
+	ec := Config{}
+	ec.EcMap = make(map[string]Entity)
+	ec.EcKeys  = []string{}
+	if len(entities) > 0 {
+		ec.Append(entities)
+	}
+	return ec
+}
+
+type Filter = EntityCollection
+
+func NewFilter(entities ... Entity) Filter {
+	ec := Filter{}
+	ec.EcMap = make(map[string]Entity)
+	ec.EcKeys  = []string{}
+	if len(entities) > 0 {
+		ec.Append(entities)
+	}
+	return ec
+}
 
 /////////////////////////////////////
 // Entity Utility Functions

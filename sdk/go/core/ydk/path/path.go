@@ -85,7 +85,9 @@ func ExecuteRPC(
 			dataValue = getDataPayload(state, value.(types.Entity), rootSchema, provider)
 			defer C.free(unsafe.Pointer(dataValue))
 		}
-		C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+		if !(dataTag == "filter" && len(C.GoString(dataValue)) == 0) {
+			C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+		}
 	}
 
 	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
@@ -100,25 +102,32 @@ func getDataPayload(
 	rootSchema C.RootSchemaNode,
 	provider types.ServiceProvider) *C.char {
 
-	datanode := getDataNodeFromEntity(state, entity, rootSchema)
-
-	if datanode == nil {
-		return nil
-	}
-
-	//for datanode != nil && C.DataNodeGetParent(datanode) != nil {
-	//	datanode = C.DataNodeGetParent(datanode)
-	//}
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
 	cprovider := provider.GetPrivate().(
 		types.CServiceProvider).Private.(C.ServiceProvider)
 	cencoding := C.ServiceProviderGetEncoding(cprovider)
 
-	codec := C.CodecInit()
-	defer C.CodecFree(codec)
-	var data *C.char = C.CodecEncode(*getCState(state), codec, datanode, cencoding, 1)
-	panicOnCStateError(getCState(state))
+	retString := ""
+	config := types.EntityToCollection(entity)
+	for _, ent := range config.Entities() {
+		
+		datanode := getDataNodeFromEntity(state, ent, rootSchema)
+		if datanode == nil {
+			return nil
+		}
 
-	return (data)
+		var data *C.char = C.CodecEncode(*getCState(state), codec, datanode, cencoding, 1)
+		panicOnCStateError(getCState(state))
+		
+		if cencoding == C.JSON {
+			// YG: So far there is no support for multiple JSON encoded entities
+			return data;
+		}
+		retString += C.GoString(data)
+		C.free(unsafe.Pointer(data))
+	}
+	return C.CString(retString)
 }
 
 // ExecuteRPCEntity provides the functionality to execute RPCs with
@@ -253,25 +262,57 @@ func getTopEntityFromFilter(filter types.Entity) types.Entity {
 // ReadDatanode populates entity by reading the top level entity from a given data node.
 // Returns the top entity (types.Entity) from readDataNode.
 func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
-	if readDataNode.Private == nil {
-		return nil
-	}
 
-	topEntity := getTopEntityFromFilter(filter)
-	segmentPath := topEntity.GetEntityData().SegmentPath
-	ydk.YLogDebug(
-		fmt.Sprintf("Reading top entity: '%s'", segmentPath))
+    ec := types.NewEntityCollection()
+
+	if readDataNode.Private == nil {
+		ydk.YLogError("path.ReadDatanode: The readDataNode is nil; returning empty EntityCollection")
+		return ec
+	}
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
 
 	if cchildren.count == C.int(0) {
-		return topEntity
+		return filter;
 	}
-
+	
 	children := (*[1 << 30]C.DataNode)(
 		unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-	getEntityFromDataNode(children[0], topEntity)
-	return topEntity
+	
+	// Need keep order of filters.
+	isFilterEC := types.IsEntityCollection(filter)
+	filter_ec := types.EntityToCollection(filter)
+	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities in the filter: %v", filter_ec.Len()))
+	if filter_ec.Len() > 0 {
+		// Follow filter order
+		// Build map of all children then itterate by filter.
+		childrenMap := make(map[string]C.DataNode)
+		for _, dn := range children {
+			path := C.GoString(C.DataNodeGetPath(dn))[1:]	// Strip '/' in the beginning of the path
+			childrenMap[path] = dn
+		}
+		for _, key := range filter_ec.Keys() {
+			topEntity := filter_ec.Get(key)
+			dn := childrenMap[key]
+			if dn != nil {
+				getEntityFromDataNode(dn, topEntity)
+			}
+			ec.Add(topEntity)
+		}
+	} else {
+		// Itterate over Datanodes
+		for _, dn := range children {
+			entity := DatanodeToEntity(dn)
+			if entity != nil {
+				ec.Add(entity)
+			}
+		}
+	}
+	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities returning: %v, filter is EC: %v", ec.Len(), isFilterEC))
+	if ec.Len() > 1 || isFilterEC {
+		return ec
+	}
+	return ec.GetItem(0)
 }
 
 // ConnectToNetconfProvider connects to NETCONF service provider by creating a
@@ -460,28 +501,35 @@ func CodecServiceEncode(
 	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
 	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
 
-	dataNode := getDataNodeFromEntity(state, entity, realRootSchema)
-
-	if dataNode == nil {
-		return ""
-	}
-
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
+	
+	retString := ""
+	config := types.EntityToCollection(entity)
+	for _, ent := range config.Entities() {
+		
+		dataNode := getDataNodeFromEntity(state, ent, realRootSchema)
+		if dataNode == nil {
+			return ""
+		}
+	
+		var payload *C.char
+		defer C.free(unsafe.Pointer(payload))
 
-	var payload *C.char
-	defer C.free(unsafe.Pointer(payload))
-
-	switch encoding {
-	case encodingFormat.XML:
-		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.XML, 1)
-		panicOnCStateError(getCState(state))
-	case encodingFormat.JSON:
-		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.JSON, 1)
-		panicOnCStateError(getCState(state))
+		switch encoding {
+		case encodingFormat.XML:
+			payload = C.CodecEncode(*getCState(state), codec, dataNode, C.XML, 1)
+			panicOnCStateError(getCState(state))
+			retString += C.GoString(payload)
+		case encodingFormat.JSON:
+			payload = C.CodecEncode(*getCState(state), codec, dataNode, C.JSON, 1)
+			panicOnCStateError(getCState(state))
+			
+			// YG: So far there is no support for multiple entities encoded with JSON format
+			return C.GoString(payload)
+		}
 	}
-
-	return C.GoString(payload)
+	return retString
 }
 
 // CodecServiceDecode decodes XML/JSON payloads passed in to entity.
@@ -507,16 +555,43 @@ func CodecServiceDecode(
 	case encodingFormat.XML:
 		realDataNode = C.CodecDecode(
 			*getCState(state), codec, realRootSchema, realPayload, C.XML)
-		panicOnCStateError(getCState(state))
 	case encodingFormat.JSON:
 		realDataNode = C.CodecDecode(
 			*getCState(state), codec, realRootSchema, realPayload, C.JSON)
-		panicOnCStateError(getCState(state))
 	}
+	panicOnCStateError(getCState(state))
 
 	var dataNode = types.DataNode{Private: realDataNode}
+	cchildren := C.DataNodeGetChildren(dataNode.Private.(C.DataNode))
+	ydk.YLogDebug(fmt.Sprintf("path.CodecServiceDecode: Top entity path: '%s'; Number of children in datanode: '%v'", 
+			topEntity.GetEntityData().SegmentPath, cchildren.count))
+	if cchildren.count == C.int(0) {
+		ydk.YLogDebug("path.CodecServiceDecode: Returning top entity")
+		return topEntity;
+	} else {
+		if cchildren.count == C.int(1) {
+			ydk.YLogDebug("path.CodecServiceDecode: Getting entity from single datanode")
+			return ReadDatanode(topEntity, dataNode)
+		}
+	}
+	// Payload contains multiple containers and or listleafs
+	ydk.YLogDebug("path.CodecServiceDecode: Getting collection of entities")
+	emptyCollection := types.NewFilter();
+	return ReadDatanode(emptyCollection, dataNode)
+}
 
-	return ReadDatanode(topEntity, dataNode)
+func DatanodeToEntity(node C.DataNode) types.Entity {
+
+	nodeName := C.GoString(C.DataNodeGetArgument(node))
+    moduleName := C.GoString(C.DataNodeGetModuleName(node))
+    path := fmt.Sprintf("%s:%s", moduleName, nodeName)
+    ydk.YLogDebug(fmt.Sprintf("Got datanode with path: '%s'", path))
+    
+    topEntity, ok := ydk.GetTopEntity(path)
+    if ok {
+	    getEntityFromDataNode(node, topEntity)
+    }
+    return topEntity
 }
 
 // ConnectToOpenDaylightProvider connects to OpenDaylight device.
@@ -849,4 +924,36 @@ func panicOnCStateError(cstate *C.YDKStatePtr) {
 		C.YDKStateClear(*cstate)
 		panic(err.Error())
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Test Utilities
+//////////////////////////////////////////////////////////////////////////
+func DatanodeToString(dn C.DataNode, indent string) string {
+
+	nodeName := C.GoString(C.DataNodeGetArgument(dn))
+	keyword  := C.GoString(C.DataNodeGetKeyword(dn))
+	var out string
+	if keyword == "leaf" || keyword == "leaf-list" || keyword == "anyxml" {
+		value := C.GoString(C.DataNodeGetValue(dn))
+		out = fmt.Sprintf("%s<%s>%s</%s>\n", indent, nodeName, value, nodeName)
+	} else {
+		out = fmt.Sprintf("%s<%s>\n", indent, nodeName)
+	    child_indent := indent + "  "
+	    cchildren := C.DataNodeGetChildren(dn)
+	    if cchildren.count > C.int(0) {
+			children := (*[1 << 30]C.DataNode)( unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
+			for _, child := range children {
+				out += DatanodeToString(child, child_indent)
+			}
+	    }
+	    out = fmt.Sprintf("%s%s</%s>\n", out, indent, nodeName)
+	}
+	return out
+}
+
+func PrintDataNode(dn C.DataNode) {
+	path := C.GoString(C.DataNodeGetSegmentPath(dn))
+	fmt.Printf("\n=====>  Printing DataNode: '%s'", path)
+	fmt.Printf("%s", DatanodeToString(dn, ""))
 }

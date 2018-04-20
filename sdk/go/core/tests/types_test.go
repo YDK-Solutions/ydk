@@ -344,18 +344,15 @@ func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInsttyp
 }
 
 func TestSanityTypesTestSuite(t *testing.T) {
-	if testing.Verbose() {
-		ydk.EnableLogging(ydk.Debug)
-	}
 	suite.Run(t, new(SanityTypesTestSuite))
 }
 
-func (suite *SanityTypesTestSuite) Test_EntityCollection() {
+func (suite *SanityTypesTestSuite) TestEntityCollection() {
     // Create Data entities and access values
     runner := ysanity.Runner{}
     native := ysanity.Native{}
-    runner_path := runner.GetEntityData().GetPath()
-    native_path := native.GetEntityData().GetPath()
+    runnerPath := runner.GetEntityData().GetPath()
+    nativePath := native.GetEntityData().GetPath()
     suite.Equal(types.EntityToString(&runner), "Type: *sanity.Runner, Path: ydktest-sanity:runner")
     suite.Equal(types.EntityToString(&native), "Type: *sanity.Native, Path: ydktest-sanity:native")
 
@@ -380,47 +377,48 @@ func (suite *SanityTypesTestSuite) Test_EntityCollection() {
     suite.Equal(config.Len(), 2)
 
     // Get
-    e := config.Get(runner_path)
+    e := config.Get(runnerPath)
     suite.NotNil(e)
     suite.IsType(&runner, e)
     
     // HasKey
-    suite.Equal(config.HasKey(runner_path), true)
-    suite.Equal(config.HasKey(native_path), true)
+    suite.Equal(config.HasKey(runnerPath), true)
+    suite.Equal(config.HasKey(nativePath), true)
     suite.Equal(config.HasKey("oc_bgp"), false)
 
     // Get all keys
-    suite.Equal(config.Keys(), []string{runner_path, native_path})
+    suite.Equal(config.Keys(), []string{runnerPath, nativePath})
 
     // Get all entities
-    fmt.Printf("All entities:\n")
+    ydk.YLogDebug("All entities:")
     for _, entity := range config.Entities() {
-        fmt.Printf("%s\n", types.EntityToString(entity))
+    	ydk.YLogDebug(types.EntityToString(entity))
     }
 
     // Delete entity
-    e = config.Pop(runner_path)
+    e = config.Pop(runnerPath)
     suite.NotNil(e)
     suite.IsType(&runner, e)
-    suite.Equal(config.Keys(), []string{native_path})
+    suite.Equal(config.Keys(), []string{nativePath})
 
-    fmt.Printf("All entities:\n")
+    ydk.YLogDebug("All entities after Runner deleted:")
     for _, key := range config.Keys() {
         e = config.Get(key)
-        fmt.Printf("%s\n", types.EntityToString(e))
+        ydk.YLogDebug(fmt.Sprintf("%s", types.EntityToString(e)))
     }
     
     // Add back and test order
     config.Add(&runner)
-    suite.Equal(config.Keys(), []string{native_path, runner_path})
+    suite.Equal(config.Keys(), []string{nativePath, runnerPath})
 
 	// Getting enities by item number
+    ydk.YLogDebug("Getting enities by item number:")
 	for i:=0; i<3; i++ {
 		e = config.GetItem(i)
 		if e != nil {
-			fmt.Printf("%d:  %s\n", i, types.EntityToString(e))
+			ydk.YLogDebug(fmt.Sprintf("%d:  %s", i, types.EntityToString(e)))
 		} else {
-			fmt.Printf("%d:  nil\n", i)
+			ydk.YLogDebug(fmt.Sprintf("%d:  nil\n", i))
 		}
 	}
     // Clear collection
@@ -428,27 +426,34 @@ func (suite *SanityTypesTestSuite) Test_EntityCollection() {
     suite.Equal(config.Len(), 0)
     
     // Testing passing parameters and return values
-    ret1 := test_params("test1", config)
+    ret1 := testParams("test1", config)
     col1 := types.EntityToCollection(ret1)
     suite.Equal(col1.Len(), 0)
 
-    ret2 := test_params("test2", &runner)
+    ret2 := testParams("test2", &runner)
     suite.Equal(types.EntityEqual(ret2, &runner), true)
 
     config.Add(&runner, &native)
-    ret3 := test_params("test3", config)
+    ret3 := testParams("test3", config)
     col3 := types.EntityToCollection(ret3)
     suite.Equal(col3.Len(), 2)
+    
+    // Testing Config and Filter aliases
+    cfg := types.NewConfig()
+	cfg.Add(&runner, &native)
+	suite.Equal(types.IsEntityCollection(cfg), true)
+	filter := types.NewFilter(&native)
+	suite.Equal(types.IsEntityCollection(filter), true)
+	suite.Equal(filter.Len(), 1)
 }
 
-func test_params(test_name string, entity types.Entity) types.Entity {
+func testParams(test_name string, entity types.Entity) types.Entity {
 	ec := types.EntityToCollection(entity)
 	if ec == nil {
 		//fmt.Printf("%s: %s\n", test_name, EntityToString(entity))
 		return entity
-	} else {
-		//fmt.Printf("%s: %s\n", test_name, ec.String())
-		return ec
 	}
+	//fmt.Printf("%s: %s\n", test_name, ec.String())
+	return ec
 }
 

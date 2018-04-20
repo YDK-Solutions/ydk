@@ -335,7 +335,8 @@ TEST_CASE("get_config_openconfig_interfaces_and_bgp")
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
     ydk::path::RootSchemaNode& schema = provider.get_session().get_root_schema();
 
-    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get") };
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };
+    read_rpc->get_input_node().create_datanode("source/running");
 
     // filter
     openconfig_interfaces::Interfaces interfaces_filter{};

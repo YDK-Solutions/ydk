@@ -41,5 +41,3 @@ According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YA
         prefixListEntries.EntityData.Leafs = make(map[string]types.YLeaf)
         return &(prefixListEntries.EntityData)
     }
-
-Since the existence of container ``prefix-list-entries`` itself represents configuration data, YDK does not instantiate an instance of class :go:struct:`Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries<ydk/models/cisco_ios_xr/ipv4_acl_cfg/Ipv4AclAndPrefixList/Prefixes/Prefix/PrefixListEntries>` and assign it to the ``PrefixListEntries`` leaf. The user needs to manually instantiate and assign this object.

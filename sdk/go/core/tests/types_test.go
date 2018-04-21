@@ -447,13 +447,13 @@ func (suite *SanityTypesTestSuite) TestEntityCollection() {
 	suite.Equal(filter.Len(), 1)
 }
 
-func testParams(test_name string, entity types.Entity) types.Entity {
+func testParams(testName string, entity types.Entity) types.Entity {
 	ec := types.EntityToCollection(entity)
 	if ec == nil {
-		//fmt.Printf("%s: %s\n", test_name, EntityToString(entity))
+		ydk.YLogDebug(fmt.Sprintf("%s: %s\n", testName, types.EntityToString(entity)))
 		return entity
 	}
-	//fmt.Printf("%s: %s\n", test_name, ec.String())
+	ydk.YLogDebug(fmt.Sprintf("%s: %s\n", testName, ec.String()))
 	return ec
 }
 

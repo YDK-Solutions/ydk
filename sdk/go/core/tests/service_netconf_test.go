@@ -263,7 +263,7 @@ func (suite *NetconfServiceTestSuite) TestGetOCEntities() {
     // Get results
     getConfigEC := types.EntityToCollection(getConfigEntity)
     for _, entity := range getConfigEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXmlString(entity)))
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
     }
 }
 
@@ -294,7 +294,7 @@ func (suite *NetconfServiceTestSuite) TestGetEditCopyConfigSanity() {
     // Get results
     getConfigEC := types.EntityToCollection(getConfigEntity)
     for _, entity := range getConfigEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXmlString(entity)))
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
     }
 
     // Discard changes
@@ -313,7 +313,7 @@ func (suite *NetconfServiceTestSuite) TestSanityGetRunningConfig() {
     // Get results
     getEC := types.EntityToCollection(getEntity)
     for _, entity := range getEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXmlString(entity)))
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
     }
 }
 
@@ -321,7 +321,7 @@ func TestNetconfServiceTestSuite(t *testing.T) {
 	suite.Run(t, new(NetconfServiceTestSuite))
 }
 
-func GetEntityXmlString(entity types.Entity) string {
+func GetEntityXMLString(entity types.Entity) string {
     codec := services.CodecService{}
 	provider := providers.CodecServiceProvider{}
 	provider.Encoding = encoding.XML

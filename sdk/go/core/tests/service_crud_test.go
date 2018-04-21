@@ -317,7 +317,7 @@ func (suite *CrudTestSuite) TestSanityMultipleEntities() {
     // Get results
     readEC := types.EntityToCollection(readEntity)
     for _, entity := range readEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXmlString(entity)))
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
     }
 
     // Delete configuration
@@ -341,7 +341,7 @@ func (suite *CrudTestSuite) TestSanityReadConfig() {
     // Get results
     readEC := types.EntityToCollection(readEntity)
     for _, entity := range readEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXmlString(entity)))
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
     }
 }
 

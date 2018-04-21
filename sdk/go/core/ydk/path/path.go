@@ -281,9 +281,9 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	
 	// Need keep order of filters.
 	isFilterEC := types.IsEntityCollection(filter)
-	filter_ec := types.EntityToCollection(filter)
-	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities in the filter: %v", filter_ec.Len()))
-	if filter_ec.Len() > 0 {
+	filterEC := types.EntityToCollection(filter)
+	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities in the filter: %v", filterEC.Len()))
+	if filterEC.Len() > 0 {
 		// Follow filter order
 		// Build map of all children then itterate by filter.
 		childrenMap := make(map[string]C.DataNode)
@@ -291,8 +291,8 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 			path := C.GoString(C.DataNodeGetPath(dn))[1:]	// Strip '/' in the beginning of the path
 			childrenMap[path] = dn
 		}
-		for _, key := range filter_ec.Keys() {
-			topEntity := filter_ec.Get(key)
+		for _, key := range filterEC.Keys() {
+			topEntity := filterEC.Get(key)
 			dn := childrenMap[key]
 			if dn != nil {
 				getEntityFromDataNode(dn, topEntity)
@@ -568,11 +568,10 @@ func CodecServiceDecode(
 	if cchildren.count == C.int(0) {
 		ydk.YLogDebug("path.CodecServiceDecode: Returning top entity")
 		return topEntity;
-	} else {
-		if cchildren.count == C.int(1) {
-			ydk.YLogDebug("path.CodecServiceDecode: Getting entity from single datanode")
-			return ReadDatanode(topEntity, dataNode)
-		}
+	}
+	if cchildren.count == C.int(1) {
+		ydk.YLogDebug("path.CodecServiceDecode: Getting entity from single datanode")
+		return ReadDatanode(topEntity, dataNode)
 	}
 	// Payload contains multiple containers and or listleafs
 	ydk.YLogDebug("path.CodecServiceDecode: Getting collection of entities")
@@ -924,36 +923,4 @@ func panicOnCStateError(cstate *C.YDKStatePtr) {
 		C.YDKStateClear(*cstate)
 		panic(err.Error())
 	}
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Test Utilities
-//////////////////////////////////////////////////////////////////////////
-func DatanodeToString(dn C.DataNode, indent string) string {
-
-	nodeName := C.GoString(C.DataNodeGetArgument(dn))
-	keyword  := C.GoString(C.DataNodeGetKeyword(dn))
-	var out string
-	if keyword == "leaf" || keyword == "leaf-list" || keyword == "anyxml" {
-		value := C.GoString(C.DataNodeGetValue(dn))
-		out = fmt.Sprintf("%s<%s>%s</%s>\n", indent, nodeName, value, nodeName)
-	} else {
-		out = fmt.Sprintf("%s<%s>\n", indent, nodeName)
-	    child_indent := indent + "  "
-	    cchildren := C.DataNodeGetChildren(dn)
-	    if cchildren.count > C.int(0) {
-			children := (*[1 << 30]C.DataNode)( unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-			for _, child := range children {
-				out += DatanodeToString(child, child_indent)
-			}
-	    }
-	    out = fmt.Sprintf("%s%s</%s>\n", out, indent, nodeName)
-	}
-	return out
-}
-
-func PrintDataNode(dn C.DataNode) {
-	path := C.GoString(C.DataNodeGetSegmentPath(dn))
-	fmt.Printf("\n=====>  Printing DataNode: '%s'", path)
-	fmt.Printf("%s", DatanodeToString(dn, ""))
 }

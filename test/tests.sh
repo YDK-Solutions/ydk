@@ -131,6 +131,10 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
+    if [ ! -d ${GOROOT} ]; then
+        export GOROOT="/usr/local/go"
+    fi
+
     print_msg "GOPATH is set to: ${GOPATH}"
     print_msg "GOROOT is set to: ${GOROOT}"
 

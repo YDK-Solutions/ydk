@@ -75,6 +75,9 @@ function install_dependencies {
     sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
 
     # install go1.9.2
+    print_msg "Removing pre-installed Golang"
+    sudo apt-get remove golang -y
+    print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
 }

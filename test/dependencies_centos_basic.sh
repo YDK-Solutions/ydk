@@ -49,7 +49,7 @@ function install_dependencies {
      gcc --version
      print_msg "Done installing gcc5"
 
-    # install go1.9.2
+    print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
 }

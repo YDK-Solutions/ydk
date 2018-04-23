@@ -121,6 +121,7 @@ class Entity(_Entity):
     """
     def __init__(self):
         super(Entity, self).__init__()
+        self.logger = logging.getLogger("ydk.types.EntityCollection")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
         self._children_yang_names = set()
@@ -284,6 +285,7 @@ class Entity(_Entity):
             leaf = self._leafs[name]
 
             if isinstance(value, _YFilter):
+                self.logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
                 leaf.yfilter = value
                 if isinstance(leaf, _YLeaf):
                     leaf_name_data.append(leaf.get_name_leafdata())
@@ -304,6 +306,10 @@ class Entity(_Entity):
                 for item in value:
                     l.append(item)
                 leaf_name_data.extend(l.get_name_leafdata())
+        self.logger.debug('Get name leaf data for "%s". Count: %s'%(self.yang_name, len(leaf_name_data)))
+        for l in leaf_name_data:
+            self.logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' % (
+            l[0], l[1].value, l[1].yfilter, l[1].is_set))
         return leaf_name_data
 
     def get_segment_path(self):
@@ -332,6 +338,7 @@ class Entity(_Entity):
                 value = value.name
             if name in leaf_names and name in self.__dict__:
                 # bits ..?
+                prev_value = self.__dict__[name]
                 self.__dict__[name] = value
 
                 leaf = self._leafs[name]
@@ -341,12 +348,22 @@ class Entity(_Entity):
                     elif isinstance(leaf, _YLeafList):
                         for item in value:
                             leaf.append(item)
+                else:
+                    self.logger.debug('Setting "%s" to "%s"' % (value, name))
+                    leaf.yfilter = value
+                    if prev_value is not None:
+                        self.logger.debug('Storing previous value "%s" to "%s"' % (prev_value, name))
+                        if isinstance(leaf, _YLeaf):
+                            leaf.set(prev_value)
+                        elif isinstance(leaf, _YLeafList):
+                            for item in prev_value:
+                                leaf.append(item)
 
             else:
-                if hasattr(value, "parent") and name != "parent":
-                    if hasattr(value, "is_presence_container") and value.is_presence_container:
-                        value.parent = self
-                    elif value.parent is None and value.yang_name in self._child_classes:
+                if isinstance(value, Entity):
+                    if hasattr(value, "parent") and name != "parent" and \
+                        hasattr(value, "is_presence_container") and value.is_presence_container:
+                        self.logger.debug("Assigning parent for '%s' as '%s'"%(value.yang_name, self.yang_name))
                         value.parent = self
                 super(Entity, self).__setattr__(name, value)
 

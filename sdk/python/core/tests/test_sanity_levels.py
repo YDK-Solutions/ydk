@@ -733,15 +733,25 @@ class SanityYang(unittest.TestCase):
         i = runner.Passive.Interfac()
         i.test = "abc"
         p.interfac.append(i)
-        p.xyz = runner.Passive.Testc.Xyz()
-        p.xyz.parent = p
-        p.xyz.xyz = 25
+        p.testc.xyz = runner.Passive.Testc.Xyz()
+        p.testc.xyz.xyz = 25
         runner.passive.append(p)
 
         self.crud.create(self.ncc, runner)
 
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertEqual(runner, runner_read)
+
+    @unittest.skip('TODO. Open issue #738 to be fixed')
+    def test_inner_pres(self):
+        runner = Runner()
+        runner.outer.inner = runner.Outer.Inner()
+        runner.outer.inner.parent = runner.outer
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

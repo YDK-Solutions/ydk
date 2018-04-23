@@ -193,10 +193,11 @@ class DocPrinter(object):
         self._append('=' * len(title))
         self._append('\n')
 
-    def _print_toctree_section(self, elements, title):
+    def _print_toctree_section(self, elements, keyword):
         if len(elements) == 0:
             return
-        if len(title) > 0 and self.lang != 'go':
+        if len(keyword) > 0:
+            title = self._get_toctree_section_title(keyword)
             self._append('**{}**\n'.format(title))
         self._append('.. toctree::')
         self.ctx.lvl_inc()
@@ -205,6 +206,17 @@ class DocPrinter(object):
             self._append('%s <%s>' % (elem.name, get_rst_file_name(elem)))
         self._append('')
         self.ctx.lvl_dec()
+
+    def _get_toctree_section_title(self, base):
+        result = ''
+        if self.lang in ('py', 'cpp'):
+            result = '%s Classes' % base
+        elif self.lang == 'go':
+            result = '%s Structs' % base
+        else:
+            raise Exception('Language {0} not yet supported'.format(self.lang))
+
+        return result
 
     def _print_attribute_list(self, props):
         for prop in props:
@@ -266,11 +278,11 @@ class DocPrinter(object):
                         data_classes.append(elem)
 
             if self.lang != 'py' or isinstance(owner, Package):
-                self._print_toctree_section(data_classes, 'Data Classes')
-            self._print_toctree_section(rpc_classes, 'RPC Classes')
-            self._print_toctree_section(bits_classes, 'Bits Classes')
-            self._print_toctree_section(enum_classes, 'Enum Classes')
-            self._print_toctree_section(idty_classes, 'Identity Classes')
+                self._print_toctree_section(data_classes, 'Data')
+            self._print_toctree_section(rpc_classes, 'RPC')
+            self._print_toctree_section(bits_classes, 'Bits')
+            self._print_toctree_section(enum_classes, 'Enum')
+            self._print_toctree_section(idty_classes, 'Identity')
 
         else:
             self._print_toctree_section(elements, '')

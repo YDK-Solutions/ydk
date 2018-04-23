@@ -440,7 +440,6 @@ class SanityYang(unittest.TestCase):
         i.test = "abc"
         p.interfac.append(i)
         p.testc.xyz = runner.Passive.Testc.Xyz()
-        p.testc.xyz.parent = p
         p.testc.xyz.xyz = 25
         runner.passive.append(p)
 

@@ -76,7 +76,7 @@ function install_dependencies {
 
     # install go1.9.2
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz
-    sudo tar -zxvf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+    sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
 }
 
 ########################## EXECUTION STARTS HERE #############################

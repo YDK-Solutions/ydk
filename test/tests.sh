@@ -131,13 +131,11 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOPATH=""
     export GOROOT="/usr/local/go"
+    export PATH=$GOROOT/bin:$PATH
+
     print_msg "GOPATH is set to: ${GOPATH}"
     print_msg "GOROOT is set to: ${GOROOT}"
-
-    #export PATH=$PATH:$GOPATH/bin
-    export PATH=$PATH:$GOROOT/bin
 
     cd $YDKGEN_HOME
     if [[ -z "${GOPATH// }" ]]; then

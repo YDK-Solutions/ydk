@@ -20,7 +20,7 @@
 # ------------------------------------------------------------------
 
 function usage {
-    printf "\n    Usage: Specify the language to create the SDK and the path to where the github SDK is cloned for: %s -l <[one of python (default)|cpp|go]> -s <PATH-TO-SDK (default: ../ydk-py)>\n\n" "$( basename "${BASH_SOURCE[0]}" )"
+    printf "\n    Usage: Use this script to create YDK repositories (ydk-py, ydk-go etc) hosted on github, generated using ydk-gen. Specify the language to create the SDK and the path to where the github SDK is cloned for\n\n      ./%s -l <[one of python (default)|cpp|go]> -s <PATH-TO-SDK (default: ../ydk-py)>\n\n" "$( basename "${BASH_SOURCE[0]}" )"
 }
 
 function check_gen_api_directories {

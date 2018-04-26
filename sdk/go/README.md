@@ -64,16 +64,6 @@ $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.1/libydk-0.7
 
 ```
 
-Golang
-
-The YDK requires Go version 1.9 or higher. If this is not the case, follow below installation steps. Make sure that environment variables GOROOT and GOPATH are properly set.
-```
-$ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
-$ sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
-$ export GOROOT="/usr/local/go"
-$ export PATH=$GOROOT/bin:$PATH
-```
-
 **Mac**  
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Go:
 ```
@@ -84,7 +74,20 @@ $ xcode-select --install
 $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.1/libydk-0.7.1-Darwin.pkg
 $ sudo installer -pkg libydk-0.7.1-Darwin.pkg -target /
 ```
+
+### Golang
+
 The YDK requires Go version 1.9 or higher. If this is not the case, follow below installation steps. Make sure that environment variables GOROOT and GOPATH are properly set.
+
+**Linux**
+```
+$ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
+$ sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+$ export GOROOT="/usr/local/go"
+$ export PATH=$GOROOT/bin:$PATH
+```
+
+**Mac**  
 ```
 $ export CGO_ENABLED=0
 $ export GOROOT_BOOTSTRAP=$GOROOT

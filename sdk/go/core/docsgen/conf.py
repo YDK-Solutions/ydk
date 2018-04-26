@@ -32,8 +32,6 @@ ydk_root = os.getcwd()
 
 sys.path.append(os.path.abspath(ydk_root+'/sphinxexts'))
 extensions = [ 'godomain' ]
-print(extensions, sys.path)
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

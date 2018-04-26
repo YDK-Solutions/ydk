@@ -268,11 +268,11 @@ These are how YANG types are represented in Go.
 
     An interface type that represents a basic container in YANG
 
-    .. function:: GetEntityData() Entity
+    .. function:: GetEntityData() *CommonEntityData
     
         The :ref:`Entity <types-entity>` interface function
 
-        :return: a reference to :go:struct:`CommonEntityData` representing the data of the entity
+        :return: a pointer to :go:struct:`CommonEntityData` representing entity data
 
 .. function:: GetSegmentPath(entity Entity) string
 
@@ -335,9 +335,9 @@ These are how YANG types are represented in Go.
 
     .. function:: GetEntityData() *CommonEntityData
 
-        Implements Entity interface.
+        Implements :ref:`Entity <types-entity>` interface.
         
-        :return: a reference to :go:struct:`CommonEntityData` representing data of the first entity in the collection; ``nil`` - if collection is empty
+        :return: a reference to :go:struct:`CommonEntityData` representing data for the first entity in the collection; ``nil`` - if collection is empty
 
     .. function:: Add(entities ... Entity)
         

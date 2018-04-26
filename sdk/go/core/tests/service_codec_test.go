@@ -455,6 +455,38 @@ func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
 	suite.Equal(payload2, payload)
 }
 
+func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
+	runner := ysanity.Runner{}
+	ospf := ysanity.Runner_YdktestSanityOne_Ospf{}
+	ospf.Id = 22
+    ospf.PassiveInterface.Interface_ = "xyz"
+	test := ysanity.Runner_YdktestSanityOne_Ospf_Test{}
+    test.Name = "abc"
+    ospf.Test = append(ospf.Test, test)
+    runner.YdktestSanityOne.Ospf = append(runner.YdktestSanityOne.Ospf, ospf)
+    suite.Provider.Encoding = encoding.XML
+    payload := suite.Codec.Encode(&suite.Provider, &runner)
+    fmt.Println(payload)
+    suite.Equal(payload, 
+`<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <one>
+    <ospf xmlns="http://cisco.com/ns/yang/ydktest-sanity-augm">
+      <id>22</id>
+      <passive-interface>
+        <interface>xyz</interface>
+      </passive-interface>
+      <test>
+        <name>abc</name>
+      </test>
+    </ospf>
+  </one>
+</runner>
+`)
+    entity := suite.Codec.Decode(&suite.Provider, payload)
+	runnerDecode := entity.(*ysanity.Runner)
+	suite.Equal(types.EntityEqual(&runner, runnerDecode), true)
+}
+
 func TestCodecTestSuite(t *testing.T) {
 	suite.Run(t, new(CodecTestSuite))
 }

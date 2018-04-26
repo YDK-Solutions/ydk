@@ -351,8 +351,8 @@ func (suite *SanityTypesTestSuite) TestEntityCollection() {
     // Create Data entities and access values
     runner := ysanity.Runner{}
     native := ysanity.Native{}
-    runnerPath := runner.GetEntityData().GetPath()
-    nativePath := native.GetEntityData().GetPath()
+    runnerPath := types.GetSegmentPath(&runner)
+    nativePath := types.GetSegmentPath(&native)
     suite.Equal(types.EntityToString(&runner), "Type: *sanity.Runner, Path: ydktest-sanity:runner")
     suite.Equal(types.EntityToString(&native), "Type: *sanity.Native, Path: ydktest-sanity:native")
 
@@ -377,7 +377,7 @@ func (suite *SanityTypesTestSuite) TestEntityCollection() {
     suite.Equal(config.Len(), 2)
 
     // Get
-    e := config.Get(runnerPath)
+    e, _ := config.Get(runnerPath)
     suite.NotNil(e)
     suite.IsType(&runner, e)
     
@@ -396,15 +396,17 @@ func (suite *SanityTypesTestSuite) TestEntityCollection() {
     }
 
     // Delete entity
-    e = config.Pop(runnerPath)
+    e, _ = config.Pop(runnerPath)
     suite.NotNil(e)
     suite.IsType(&runner, e)
     suite.Equal(config.Keys(), []string{nativePath})
 
     ydk.YLogDebug("All entities after Runner deleted:")
     for _, key := range config.Keys() {
-        e = config.Get(key)
-        ydk.YLogDebug(fmt.Sprintf("%s", types.EntityToString(e)))
+        en, exist := config.Get(key)
+        if exist {
+	        ydk.YLogDebug(fmt.Sprintf("%s", types.EntityToString(en)))
+        }
     }
     
     // Add back and test order

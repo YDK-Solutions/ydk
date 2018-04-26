@@ -158,8 +158,11 @@ func ExecuteRPCEntity(
 	rpcInput := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
+	ydk.YLogDebug(fmt.Sprintf("Calling GetChildByName for Entity: %s: childYangName: %s, segmentPath: %s", types.EntityToString(rpcEntity), "input", ""))
+
 	child := types.GetChildByName(rpcEntity, "input", "")
 	if (child != nil && types.HasDataOrFilter(child)) {
+		ydk.YLogDebug("Calling walkRPCChildren")
 		walkRPCChildren(state, child, rpcInput, "")
 	}
 
@@ -179,7 +182,7 @@ func walkRPCChildren(
 
 	ydk.YLogDebug("Walking Rpc Children...")
 	if(rpcEntity != nil) {
-		children := rpcEntity.GetEntityData().Children
+		children := types.GetYChildrenMap(rpcEntity)
 		entityPath := types.GetEntityPath(rpcEntity)
 		ydk.YLogDebug(fmt.Sprintf(
 			"Got %d entity children in '%s'", len(children), entityPath.Path))
@@ -198,13 +201,13 @@ func walkRPCChildren(
 			ydk.YLogDebug(fmt.Sprintf("Path: %s", path))
 		}
 
-		for childName, _ := range children {
-			if (children[childName].Value != nil &&
-				types.HasDataOrFilter(children[childName].Value)) {
+		for _, child := range children {
+			if (child.Value != nil &&
+				types.HasDataOrFilter(child.Value)) {
 
-				segmentPath := children[childName].Value.GetEntityData().SegmentPath
+				segmentPath := child.Value.GetEntityData().SegmentPath
 				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", segmentPath))
-				walkRPCChildren(state, children[childName].Value, rpcInput, path)
+				walkRPCChildren(state, child.Value, rpcInput, path)
 			}
 		}
 
@@ -275,10 +278,10 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 	if cchildren.count == C.int(0) {
 		return filter;
 	}
-	
+
 	children := (*[1 << 30]C.DataNode)(
 		unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-	
+
 	// Need keep order of filters.
 	isFilterEC := types.IsEntityCollection(filter)
 	filterEC := types.EntityToCollection(filter)
@@ -292,7 +295,7 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 			childrenMap[path] = dn
 		}
 		for _, key := range filterEC.Keys() {
-			topEntity := filterEC.Get(key)
+			topEntity, _ := filterEC.Get(key)
 			dn := childrenMap[key]
 			if dn != nil {
 				getEntityFromDataNode(dn, topEntity)
@@ -718,18 +721,18 @@ func getDataNodeFromEntity(
 
 func walkChildren(
 	state *errors.State, entity types.Entity, dataNode C.DataNode) {
-	children := entity.GetEntityData().Children
+	children := types.GetYChildren(entity.GetEntityData())
 
 	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
 
-	for childName := range children {
-		if children[childName].Value != nil {
-			segmentPath := children[childName].Value.GetEntityData().SegmentPath
+	for _, child := range children {
+		if child.Value != nil {
+			segmentPath := child.Value.GetEntityData().SegmentPath
 			ydk.YLogDebug(fmt.Sprintf(
 				"Looking at entity child '%s'", segmentPath))
 
-			if types.HasDataOrFilter(children[childName].Value) {
-				populateDataNode(state, children[childName].Value, dataNode)
+			if types.HasDataOrFilter(child.Value) {
+				populateDataNode(state, child.Value, dataNode)
 			}
 		}
 	}

@@ -300,7 +300,7 @@ function cpp_test_gen {
 function collect_cpp_coverage {
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/core/build
-    lcov --directory . --capture --output-file coverage.info # capture coverage info
+    lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
     lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
     lcov --list coverage.info #debug info
     print_msg "Moving cpp coverage to ${YDKGEN_HOME}"
@@ -382,9 +382,9 @@ function py_sanity_ydktest {
 function py_sanity_doc_gen {
    print_msg "Generating docs"
    sudo rm -rf gen-api/cpp/ydk
-   run_test generate.py --core --cpp --generate-doc > /dev/null
-   run_test generate.py --core --go --generate-doc > /dev/null
-   run_test generate.py --core --python --generate-doc > /dev/null
+   run_test generate.py --core --cpp --generate-doc &> /dev/null
+   run_test generate.py --core --go --generate-doc &> /dev/null
+   run_test generate.py --core --python --generate-doc &> /dev/null
 }
 
 function py_sanity_ydktest_gen {

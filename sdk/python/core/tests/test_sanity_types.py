@@ -28,9 +28,10 @@ try:
     from ydk.models.ydktest.ydktest_sanity_types import YdktestType
 except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.native.native import Native
     from ydk.models.ydktest.ydktest_sanity.cascading_types.cascading_types import CascadingTypes
     from ydk.models.ydktest.ydktest_sanity.sub_test.sub_test import SubTest
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity, Native
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity
     from ydk.models.ydktest.ydktest_sanity_types.ydktest_sanity_types import YdktestType
 
 from ydk.models.ydktest import ydktest_types as y_types

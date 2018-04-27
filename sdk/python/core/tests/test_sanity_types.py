@@ -24,22 +24,22 @@ import ydk.types as ytypes
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, CascadingTypes, SubTest, ChildIdentity, ChildChildIdentity
+    from ydk.models.ydktest.ydktest_sanity import Runner, CascadingTypes, SubTest, ChildIdentity, ChildChildIdentity, Native
     from ydk.models.ydktest.ydktest_sanity_types import YdktestType
 except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.ydktest_sanity.cascading_types.cascading_types import CascadingTypes
     from ydk.models.ydktest.ydktest_sanity.sub_test.sub_test import SubTest
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity, Native
     from ydk.models.ydktest.ydktest_sanity_types.ydktest_sanity_types import YdktestType
 
 from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64,  YLeaf, Bits
 from ydk.errors import  YModelError, YServiceProviderError
 try:
-    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInsttype, CompInsttype_
+    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInstType, CompInstType_
 except:
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInsttype, CompInsttype_
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInstType, CompInstType_
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -499,10 +499,10 @@ class SanityTest(unittest.TestCase):
     #     pass
 
     def test_cascading_types(self):
-        self._cascading_types_helper(CompInsttype.unknown, CompInsttype_.unknown)
-        self._cascading_types_helper(CompInsttype.phys, CompInsttype_.phys)
-        self._cascading_types_helper(CompInsttype.virt, CompInsttype_.virt)
-        self._cascading_types_helper(CompInsttype.hv, CompInsttype_.hv)
+        self._cascading_types_helper(CompInstType.unknown, CompInstType_.unknown)
+        self._cascading_types_helper(CompInstType.phys, CompInstType_.phys)
+        self._cascading_types_helper(CompInstType.virt, CompInstType_.virt)
+        self._cascading_types_helper(CompInstType.hv, CompInstType_.hv)
 
     def _cascading_types_helper(self, enum1, enum2):
         ctypes = CascadingTypes()
@@ -516,6 +516,17 @@ class SanityTest(unittest.TestCase):
 
         # Compare runners
         self.assertEqual(ctypes, ctypesRead)
+
+    def test_capital_letters(self):
+        native = Native()
+        gigabit_eth = Native.Interface.GigabitEthernet()
+        gigabit_eth.name = "test"
+        native.interface.gigabitethernet.append(gigabit_eth)
+
+        self.crud.create(self.ncc, native)
+        read_entity = self.crud.read(self.ncc, Native())
+
+        self.assertEqual(read_entity, native)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

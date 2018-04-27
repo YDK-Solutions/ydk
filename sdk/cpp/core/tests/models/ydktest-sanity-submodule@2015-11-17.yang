@@ -139,7 +139,7 @@ submodule ydktest-sanity-submodule {
         "Configure Interfaces";
  
       // interface GigabitEthernet
-      list Gigabitethernet {
+      list GigabitEthernet {
         description
           "GigabitEthernet IEEE 802.3z";
         key "name";

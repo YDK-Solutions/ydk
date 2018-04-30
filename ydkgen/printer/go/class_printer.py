@@ -110,7 +110,7 @@ class ClassPrinter(object):
         for child in children:
             path = get_qualified_yang_name(child)
             if child.is_many:
-                fp.ctx.writeln('%s.Children.Append["%s"] = types.YChild{"%s", nil}' % (
+                fp.ctx.writeln('%s.Children.Append("%s", types.YChild{"%s", nil})' % (
                     data_alias, path, child.property_type.go_name()))
 
                 child_stmt = '%s.%s' % (fp.class_alias, child.property_type.go_name())

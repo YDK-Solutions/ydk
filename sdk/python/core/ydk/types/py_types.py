@@ -38,6 +38,22 @@ from ydk.errors import YModelError as _YModelError
 from ydk.errors import YInvalidArgumentError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
 
+def _build_key_list(entity):
+    key_list = []
+    if hasattr(entity, 'ylist_key_names'):
+        for key in entity.ylist_key_names:
+            if hasattr(entity, key):
+                key_list.append(entity.__dict__[key])
+    return key_list
+
+def _keys_to_str(key_list):
+    key_str = ''
+    for key in key_list:
+        if key_str.__len__() > 0:
+            key_str += ','
+        key_str += format(key)
+    return key_str
+
 class YList(list):
     """ Represents a list with support for hanging a parent
 
@@ -50,8 +66,8 @@ class YList(list):
         statement takes one argument, which is an identifier, followed by a
         block of substatements that holds detailed list information.
 
-        A list entry is uniquely identified by the values of the list's keys,
-        if defined.
+        A list entry is uniquely identified by the values of the list's keys, if defined.
+        The keys then could be used to get entities from the YList.
     """
     def __init__(self, parent):
         super(YList, self).__init__()
@@ -72,6 +88,35 @@ class YList(list):
        for item in items:
            self.append(item)
 
+    def insert(self, index, elem):
+        super(YList, self).insert(index, elem)
+        elem.parent = self.parent
+
+    def get(self, keys):
+        if isinstance(keys, list):
+            key_cmp = _keys_to_str(keys)
+        else:
+            key_cmp = format(keys)
+        elems = []
+        for elem in self:
+            key = _keys_to_str(_build_key_list(elem))
+            if key == key_cmp:
+                elems.append(elem)
+        if elems.__len__() == 0:
+            return None
+        elif elems.__len__() == 1:
+            return elems[0]
+        return elems
+
+    def keys(self):
+        key_list = []
+        for elem in self:
+            key = _build_key_list(elem)
+            if key.__len__() > 1:
+                key_list.append(key)
+            elif key.__len__() == 1:
+                key_list.append(key[0])
+        return key_list
 
 class YLeafList(_YLeafList):
     """ Wrapper class for YLeafList, add __repr__ and get list slice

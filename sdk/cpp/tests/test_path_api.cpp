@@ -141,7 +141,7 @@ TEST_CASE( "decode_encode_interfaces" )
 
 TEST_CASE( "rpc_escape" )
 {
-    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022, "ssh", false};
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022, "ssh"};
     ydk::path::RootSchemaNode& root = session.get_root_schema();
     ydk::path::Codec s{};
 

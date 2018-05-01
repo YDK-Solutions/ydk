@@ -459,7 +459,7 @@ func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
 	runner := ysanity.Runner{}
 	ospf := ysanity.Runner_YdktestSanityOne_Ospf{}
 	ospf.Id = 22
-    ospf.PassiveInterface.Interface_ = "xyz"
+    ospf.PassiveInterface.Interface = "xyz"
 	test := ysanity.Runner_YdktestSanityOne_Ospf_Test{}
     test.Name = "abc"
     ospf.Test = append(ospf.Test, test)

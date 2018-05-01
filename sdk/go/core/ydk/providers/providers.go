@@ -130,6 +130,15 @@ func (provider *NetconfServiceProvider) GetPrivate() interface{} {
 	return provider.Private
 }
 
+// GetState returns error state from NetconfServiceProvider
+func (provider *NetconfServiceProvider) GetState() *errors.State {
+	return &provider.State
+}
+
+func (provider *NetconfServiceProvider) GetCapabilities() []string {
+	return path.GetCapabilitesFromNetconfProvider(provider.Private)
+}
+
 // Connect to NetconfServiceProvider using Repo/Address/Username/Password/Port
 func (provider *NetconfServiceProvider) Connect() {
 	if len(provider.Protocol) == 0 {
@@ -145,11 +154,6 @@ func (provider *NetconfServiceProvider) Connect() {
 		provider.Protocol,
 		provider.OnDemand,
 		provider.CommonCache)
-}
-
-// GetState returns error state from NetconfServiceProvider
-func (provider *NetconfServiceProvider) GetState() *errors.State {
-	return &provider.State
 }
 
 // Disconnect from NetconfServiceProvider

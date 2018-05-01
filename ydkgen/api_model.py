@@ -225,19 +225,20 @@ class NamedElement(Element):
         return pkg.bundle_name + '::' + '::'.join(reversed(names))
 
     def go_name(self):
-        if self.stmt is None:
+        stmt = self.stmt
+        if stmt is None:
             raise Exception('element is not yet defined')
         if hasattr(self, 'goName'):
             return self.goName
 
-        suffix = '_' if self.name[-1] == '_' else ''
-        name = '%s%s' % (camel_case(self.name), suffix)
+        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+        name = camel_case(name)
         if self.iskeyword(name):
-            name = '_%s' % name
-        if name.startswith('_'):
-            self.name = '%s%s' % ('Y', name)
-        self.goName = name
+            name = '%s%s' % ('Y', name)
+        # suffix = '_' if self.name[-1] == '_' else ''
+        # name = '%s%s' % (name, suffix)
 
+        self.goName = name
         return self.goName
 
     def qualified_go_name(self):
@@ -771,6 +772,26 @@ class Enum(DataType):
         else:
             return self.owner.get_package()
 
+    def go_name(self):
+        stmt = self.stmt
+        if stmt is None:
+            raise Exception('element is not yet defined')
+        if hasattr(self, 'goName'):
+            return self.goName
+
+        while stmt.parent is not None and not stmt.keyword in ('leaf', 'leaf-list', 'typedef'):
+            stmt = stmt.parent
+
+        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+        name = camel_case(name)
+        if self.iskeyword(name):
+            name = '%s%s' % ('Y', name)
+        suffix = '_' if self.name[-1] == '_' else ''
+
+        name = '%s%s' % (name, suffix)
+        self.goName = name
+        return self.goName
+
     @property
     def stmt(self):
         return self._stmt
@@ -913,12 +934,15 @@ def get_property_name(element, iskeyword):
 
 # capitalized input will not affected
 def camel_case(input_text):
-    def _title(s):
-        if len(s) > 0  and s.startswith(s[0].upper()):
+    def _capitalize(s):
+        if len(s) == 0 or s.startswith(s[0].upper()):
             return s
-        return s.title()
-    result = ''.join([_title(word) for word in input_text.split('-')])
-    result = ''.join([_title(word) for word in result.split('_')])
+        ret = s[0].upper()
+        if len(s) > 1:
+            ret = '%s%s' % (ret, s[1:])
+        return ret
+    result = ''.join([_capitalize(word) for word in input_text.split('-')])
+    result = ''.join([_capitalize(word) for word in result.split('_')])
     if input_text.startswith('_'):
         result = '_'+result;
     return result

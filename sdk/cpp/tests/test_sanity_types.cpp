@@ -670,26 +670,26 @@ TEST_CASE("test_cascading_types")
     // CREATE
     SECTION ( "unknown" )
     {
-        ctypes->comp_insttype = ydktest_sanity::CompInsttype::unknown;
-        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::unknown;
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::unknown;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::unknown;
     }
 
     SECTION ( "phys" )
     {
-        ctypes->comp_insttype = ydktest_sanity::CompInsttype::phys;
-        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::phys;
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::phys;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::phys;
     }
 
     SECTION ( "virt" )
     {
-        ctypes->comp_insttype = ydktest_sanity::CompInsttype::virt;
-        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::virt;
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::virt;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::virt;
     }
 
     SECTION ( "hv" )
     {
-        ctypes->comp_insttype = ydktest_sanity::CompInsttype::hv;
-        ctypes->comp_nicinsttype = ydktest_sanity::CompInsttype_::hv;
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::hv;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::hv;
     }
     reply = crud.create(provider, *ctypes);
     REQUIRE(reply);
@@ -702,4 +702,30 @@ TEST_CASE("test_cascading_types")
     std::cout<<ctypes->comp_insttype<<std::endl;
     std::cout<<ctypesRead->comp_nicinsttype<<std::endl;
     REQUIRE(ctypes->comp_insttype == ctypesRead->comp_nicinsttype);
+}
+
+TEST_CASE("test_capital_letters")
+{
+    NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    auto native = make_unique<ydktest_sanity::Native>();
+    bool reply = crud.delete_(provider, *native);
+    REQUIRE(reply);
+
+    // CREATE
+    auto gigabit_eth = make_shared<ydktest_sanity::Native::Interface::GigabitEthernet>();
+    gigabit_eth->parent = native->interface.get();
+    gigabit_eth->name = "test";
+
+    native->interface->gigabitethernet.push_back(gigabit_eth);
+    reply = crud.create(provider, *native);
+    REQUIRE(reply);
+
+    // READ
+    auto filter = make_unique<ydktest_sanity::Native>();
+    auto read_entity_wrapper = crud.read(provider, *filter);
+    REQUIRE(read_entity_wrapper != nullptr);
+    ydktest_sanity::Native *read_entity = dynamic_cast<ydktest_sanity::Native*>(read_entity_wrapper.get());
+    REQUIRE(*native == *read_entity);
 }

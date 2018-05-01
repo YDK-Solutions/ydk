@@ -111,19 +111,19 @@ class ClassPrinter(object):
             path = get_qualified_yang_name(child)
             if child.is_many:
                 fp.ctx.writeln('%s.Children.Append("%s", types.YChild{"%s", nil})' % (
-                    data_alias, path, child.go_name()))
+                    data_alias, path, child.property_type.go_name()))
 
-                child_stmt = '%s.%s' % (fp.class_alias, child.go_name())
+                child_stmt = '%s.%s' % (fp.class_alias, child.property_type.go_name())
                 fp.ctx.writeln('for i := range %s {' % (child_stmt))
                 fp.ctx.lvl_inc()
                 child_stmt = '%s[i]' % child_stmt
                 fp.ctx.writeln('%s.Children.Append(types.GetSegmentPath(&%s), types.YChild{"%s", &%s})' %(
-                    data_alias, child_stmt, child.go_name(), child_stmt))
+                    data_alias, child_stmt, child.property_type.go_name(), child_stmt))
                 fp.ctx.lvl_dec()
                 fp.ctx.writeln('}')
             else:
                 fp.ctx.writeln('%s.Children.Append("%s", types.YChild{"%s", &%s.%s})' % (
-                    data_alias, path, child.go_name(), fp.class_alias, child.go_name()))
+                    data_alias, path, child.property_type.go_name(), fp.class_alias, child.property_type.go_name()))
 
     @staticmethod
     def _print_leafs(fp, leafs, data_alias):

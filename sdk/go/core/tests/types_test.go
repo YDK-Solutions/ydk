@@ -327,20 +327,30 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 }
 
 func (suite *SanityTypesTestSuite) TestCascadingTypes() {
-	cascadingTypesHelper(suite, ysanity.CompInsttype_unknown, ysanity.CompInsttype__unknown)
-	cascadingTypesHelper(suite, ysanity.CompInsttype_phys, ysanity.CompInsttype__phys)
-	cascadingTypesHelper(suite, ysanity.CompInsttype_virt, ysanity.CompInsttype__virt)
-	cascadingTypesHelper(suite, ysanity.CompInsttype_hv, ysanity.CompInsttype__hv)
+	cascadingTypesHelper(suite, ysanity.CompInstType_unknown, ysanity.CompInstType__unknown)
+	cascadingTypesHelper(suite, ysanity.CompInstType_phys, ysanity.CompInstType__phys)
+	cascadingTypesHelper(suite, ysanity.CompInstType_virt, ysanity.CompInstType__virt)
+	cascadingTypesHelper(suite, ysanity.CompInstType_hv, ysanity.CompInstType__hv)
 }
 
-func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInsttype, enum2 ysanity.CompInsttype_){
+func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInstType, enum2 ysanity.CompInstType_){
 	ctypes := ysanity.CascadingTypes{}
-	ctypes.CompInsttype = enum1
-	ctypes.CompNicinsttype = enum2
+	ctypes.CompInstType = enum1
+	ctypes.CompNicInstType = enum2
 	suite.CRUD.Create(&suite.Provider, &ctypes)
 
 	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(ctypesRead, &ctypes), true)
+}
+
+func (suite *SanityTypesTestSuite) TestCapitalLetters() {
+	native := ysanity.Native{}
+	native.Interface.GigabitEthernet = make([]ysanity.Native_Interface_GigabitEthernet, 1)
+	native.Interface.GigabitEthernet[0].Name = "test"
+	suite.CRUD.Create(&suite.Provider, &native)
+
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Native{})
+	suite.Equal(types.EntityEqual(entityRead, &native), true)
 }
 
 func TestSanityTypesTestSuite(t *testing.T) {

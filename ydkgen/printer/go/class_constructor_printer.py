@@ -100,7 +100,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             self.ctx.bline()
 
             self.ctx.writeln('%s %s' % (
-                prop.go_name(), prop.property_type.qualified_go_name()))
+                prop.property_type.go_name(), prop.property_type.qualified_go_name()))
 
     def _print_child_inits_many(self, prop):
         if (prop.is_many and isinstance(prop.property_type, Class)
@@ -112,7 +112,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             self.ctx.bline()
 
             self.ctx.writeln('%s []%s' % (
-                prop.go_name(), prop.property_type.qualified_go_name()))
+                prop.property_type.go_name(), prop.property_type.qualified_go_name()))
 
     def _get_formatted_comment(self, comments):
         comments = ' '.join(comments)

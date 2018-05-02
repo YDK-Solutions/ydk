@@ -135,6 +135,7 @@ func (provider *NetconfServiceProvider) GetState() *errors.State {
 	return &provider.State
 }
 
+// GetCapabilities returns the capabilities supported by NetconfServiceProvider
 func (provider *NetconfServiceProvider) GetCapabilities() []string {
 	return path.GetCapabilitesFromNetconfProvider(provider.Private)
 }

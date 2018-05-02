@@ -374,6 +374,8 @@ func DisconnectFromNetconfProvider(provider types.CServiceProvider) {
 	C.NetconfServiceProviderFree(realProvider)
 }
 
+// GetCapabilitesFromNetconfProvider gets the capabilities supported by the provider.
+// Returns the list of capabilities.
 func GetCapabilitesFromNetconfProvider(provider types.CServiceProvider) []string {
 	realProvider := provider.Private.(C.ServiceProvider)
 	size := C.NetconfServiceProviderGetNumCapabilities(realProvider)

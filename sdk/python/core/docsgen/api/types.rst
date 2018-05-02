@@ -301,21 +301,30 @@ YDK types
 
     Concrete class that represents a YANG ``list``, with pointer to its parent.
 
-    :param parent: (:py:class:`Entity<ydk.types.Entity>`) Parent YDK ``Entity`` object.
+    :param parent: Parent :py:class:`Entity<ydk.types.Entity>` object.
 
     .. py:method:: append(self, item):
 
-        Append YDK ``Entity`` object to current list.
+        Append single :py:class:`Entity<ydk.types.Entity>` object to current list.
 
-        :param item: YDK ``Entity`` object to be appended.
-        :type param: :py:class:`Entity<ydk.types.Entity>`
+        :param item: :py:class:`Entity<ydk.types.Entity>` object to be appended.
 
     .. py:method:: extend(self, items):
 
-        Append list of YDK ``Entity`` object to current list.
+        Append multiple instances of :py:class:`Entity<ydk.types.Entity>` class to current list.
 
-        :param items: List of YDK ``Entity`` object to be appended.
-        :type param: list of :py:class:`Entity<ydk.types.Entity>`
+        :param items: List of :py:class:`Entity<ydk.types.Entity>` objects to be appended.
+
+    .. py:method:: get(self, key):
+
+        Access list elements by their key(s), if it is defined in the Yang model.
+
+        :param key: Key value for single key or key list for multiple keys as defined in the Yang model of the list.
+        :return: List element having matching key value - :py:class:`Entity<ydk.types.Entity>` object, or None if element is not found. If multiple elements have matching key, the function returns list of Entity objects.  
+
+    .. py:method:: keys(self):
+    
+        :return: List of keys for all elements in the list.
 
 .. class:: YType
 

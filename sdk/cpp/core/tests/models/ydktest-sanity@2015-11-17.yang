@@ -656,6 +656,21 @@ module ydktest-sanity {
     }
   }
 
+  grouping two-key-list {
+    list two-key-list {
+        key "first second";
+        leaf first {
+            type string;
+        }
+        leaf second {
+            type uint32;
+        }
+        leaf property {
+            type string;
+        }
+    }
+  }
+
   grouping identity-list {
     list identity-list {
         key "name";
@@ -756,6 +771,8 @@ module ydktest-sanity {
     uses three-level-w-list;
 
     uses three-level-w-list-at-two;
+
+    uses two-key-list;
 
     uses identity-list;
 

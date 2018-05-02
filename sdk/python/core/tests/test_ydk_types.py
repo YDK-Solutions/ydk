@@ -134,6 +134,56 @@ class SanityTest(unittest.TestCase):
         deleted = anydata.pop(runner)
         self.assertEqual(deleted.__class__.__name__, "Runner")
 
+    def test_ylist_runner_two_key_list(self):
+        runner = ysanity.Runner()
+        l_1, l_2 = ysanity.Runner.TwoKeyList(), ysanity.Runner.TwoKeyList()
+        l_1.first, l_2.first = 'f1', 'f2'
+        l_1.second, l_2.second = 11, 22
+        runner.two_key_list.extend([l_1, l_2])
+
+        ldata_list = runner.two_key_list
+        ldata_keys = ldata_list.keys()
+        self.assertEqual(ldata_keys, [['f1', 11], ['f2', 22]])
+
+        for lkey in ldata_keys:
+            ldata = ldata_list.get(lkey)
+            self.assertNotEqual(ldata, None)
+
+        self.assertEqual(ldata_list.get(['f1', 11]), l_1)
+        self.assertEqual(ldata_list.get(['f2', 22]), l_2)
+
+    def test_ylist_runner_one_key_list(self):
+        one_list = ysanity.Runner.OneList()
+        l_1, l_2 = ysanity.Runner.OneList.Ldata(), ysanity.Runner.OneList.Ldata()
+        l_1.number, l_2.number = 1, 2
+        one_list.ldata.extend([l_1, l_2])
+
+        ldata_list = one_list.ldata
+        ldata_keys = ldata_list.keys()
+        self.assertEqual(ldata_keys, [1, 2])
+
+        for lkey in ldata_keys:
+            ldata = ldata_list.get(lkey)
+            self.assertNotEqual(ldata, None)
+
+        self.assertEqual(ldata_list.get(1), l_1)
+        self.assertEqual(ldata_list.get(2), l_2)
+
+    def test_ylist_runner_no_key_list(self):
+        runner = ysanity.Runner()
+        t1 = ysanity.Runner().NoKeyList()
+        t1.test = 't1'
+        t2 = ysanity.Runner().NoKeyList()
+        t2.test = 't2'
+        t3 = ysanity.Runner().NoKeyList()
+        t3.test = 't3'
+        runner.no_key_list.extend([t1, t2, t3])
+        self.assertEqual(runner.no_key_list.keys(), [])
+        count = ''
+        for elem in runner.no_key_list:
+            count += elem.test
+        self.assertEqual(count, 't1t2t3')
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     testloader = unittest.TestLoader()

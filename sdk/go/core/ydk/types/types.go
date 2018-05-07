@@ -408,6 +408,17 @@ func HasDataOrFilter(entity Entity) bool {
 	if entity == nil {
 		return false
 	}
+
+	isPresence, isSet := IsPresenceContainer(entity), false
+	if isPresence {
+		v := reflect.ValueOf(entity).Elem()
+		field := v.FieldByName("YPresence")
+		isSet = field.Interface().(bool)
+	}
+	if isSet {
+		return true
+	}
+
 	entityData := entity.GetEntityData()
 	if (entityData.YFilter != yfilter.NotSet) {
 		return true
@@ -424,10 +435,9 @@ func HasDataOrFilter(entity Entity) bool {
 		}
 	}
 
-	v := reflect.ValueOf(entity).Elem()
-
 	// checking leafs
 	leafs := GetYLeafs(entityData)
+	v := reflect.ValueOf(entity).Elem()
 	for _, leaf := range leafs {
 		field := v.FieldByName(leaf.GoName)
 
@@ -562,6 +572,18 @@ func SetValue(entity Entity, valuePath string, value interface{}) {
 	}
 }
 
+// IsPresenceContainer returns if the given entity is a presence container
+func IsPresenceContainer(entity Entity) bool {
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	return field.IsValid()
+}
+
+func SetPresenceFlag(entity Entity) {
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	field.Set(reflect.ValueOf(true))
+}
 
 // Decimal64 represents a YANG built-in Decimal64 type
 type Decimal64 struct {

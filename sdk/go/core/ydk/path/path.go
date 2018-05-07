@@ -841,6 +841,9 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 				ydk.YLogError(fmt.Sprintf("Could not create child entity '%s'!", childName))
 				panic("Could not create child entity!")
 			}
+			if types.IsPresenceContainer(childEntity){
+				types.SetPresenceFlag(childEntity)
+			}
 			types.SetParent(childEntity, entity)
 			getEntityFromDataNode(childDataNode, childEntity)
 		}

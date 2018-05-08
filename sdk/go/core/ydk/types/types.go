@@ -405,24 +405,11 @@ func SetParent(entity, parent Entity) {
 // HasDataOrFilter returns a bool representing whether the entity
 // or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
-	if entity == nil {
-		return false
-	}
-
-	isPresence, isSet := IsPresenceContainer(entity), false
-	if isPresence {
-		v := reflect.ValueOf(entity).Elem()
-		field := v.FieldByName("YPresence")
-		isSet = field.Interface().(bool)
-	}
-	if isSet {
-		return true
-	}
+	if entity == nil { return false }
+	if GetPresenceFlag(entity) { return true }
 
 	entityData := entity.GetEntityData()
-	if (entityData.YFilter != yfilter.NotSet) {
-		return true
-	}
+	if (entityData.YFilter != yfilter.NotSet) { return true }
 
 	// children
 	children := GetYChildren(entityData)
@@ -579,7 +566,18 @@ func IsPresenceContainer(entity Entity) bool {
 	return field.IsValid()
 }
 
+// GetPresenceFlag returns whether the presence flag of the given entity
+// is set or not if it is a presence container
+func GetPresenceFlag(entity Entity) bool {
+	if !IsPresenceContainer(entity) { return false }
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	return field.Interface().(bool)
+}
+
+// SetPresenceFlag sets the presence flag of the given entity if it is a presence container
 func SetPresenceFlag(entity Entity) {
+	if !IsPresenceContainer(entity) { return }
 	v := reflect.ValueOf(entity).Elem()
 	field := v.FieldByName("YPresence")
 	field.Set(reflect.ValueOf(true))

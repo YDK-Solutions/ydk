@@ -405,13 +405,11 @@ func SetParent(entity, parent Entity) {
 // HasDataOrFilter returns a bool representing whether the entity
 // or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
-	if entity == nil {
-		return false
-	}
+	if entity == nil { return false }
+	if GetPresenceFlag(entity) { return true }
+
 	entityData := entity.GetEntityData()
-	if (entityData.YFilter != yfilter.NotSet) {
-		return true
-	}
+	if (entityData.YFilter != yfilter.NotSet) { return true }
 
 	// children
 	children := GetYChildren(entityData)
@@ -424,10 +422,9 @@ func HasDataOrFilter(entity Entity) bool {
 		}
 	}
 
-	v := reflect.ValueOf(entity).Elem()
-
 	// checking leafs
 	leafs := GetYLeafs(entityData)
+	v := reflect.ValueOf(entity).Elem()
 	for _, leaf := range leafs {
 		field := v.FieldByName(leaf.GoName)
 
@@ -562,6 +559,29 @@ func SetValue(entity Entity, valuePath string, value interface{}) {
 	}
 }
 
+// IsPresenceContainer returns if the given entity is a presence container
+func IsPresenceContainer(entity Entity) bool {
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	return field.IsValid()
+}
+
+// GetPresenceFlag returns whether the presence flag of the given entity
+// is set or not if it is a presence container
+func GetPresenceFlag(entity Entity) bool {
+	if !IsPresenceContainer(entity) { return false }
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	return field.Interface().(bool)
+}
+
+// SetPresenceFlag sets the presence flag of the given entity if it is a presence container
+func SetPresenceFlag(entity Entity) {
+	if !IsPresenceContainer(entity) { return }
+	v := reflect.ValueOf(entity).Elem()
+	field := v.FieldByName("YPresence")
+	field.Set(reflect.ValueOf(true))
+}
 
 // Decimal64 represents a YANG built-in Decimal64 type
 type Decimal64 struct {

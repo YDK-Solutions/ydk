@@ -353,8 +353,34 @@ func (suite *SanityTypesTestSuite) TestCapitalLetters() {
 	suite.Equal(types.EntityEqual(entityRead, &native), true)
 }
 
-func TestSanityTypesTestSuite(t *testing.T) {
-	suite.Run(t, new(SanityTypesTestSuite))
+func (suite *SanityTypesTestSuite) TestPresence() {
+	var runner ysanity.Runner
+	var runnerRead ysanity.Runner
+	var readEntity types.Entity
+
+	// Setting Presence
+	runner = ysanity.Runner{}
+	types.SetPresenceFlag(&runner.Outer.Inner)
+	suite.Equal(true, runner.Outer.Inner.YPresence)
+
+	suite.CRUD.Create(&suite.Provider, &runner)
+	readEntity = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	runnerRead = *readEntity.(*ysanity.Runner)
+	suite.Equal(true, types.EntityEqual(&runnerRead, &runner))
+	suite.Equal(runner.Outer.Inner.YPresence, runnerRead.Outer.Inner.YPresence)
+
+	// CRUD Delete
+	suite.CRUD.Delete(&suite.Provider, &ysanity.Runner{})
+
+	// Setting Data
+	runner = ysanity.Runner{}
+	runner.Runner2.SomeLeaf = "test"
+
+	suite.CRUD.Create(&suite.Provider, &runner)
+	readEntity = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	runnerRead = *readEntity.(*ysanity.Runner)
+	suite.Equal(true, types.EntityEqual(&runnerRead, &runner))
+	suite.Equal(runner.Outer.Inner.YPresence, runnerRead.Outer.Inner.YPresence)
 }
 
 func (suite *SanityTypesTestSuite) TestEntityCollection() {
@@ -469,3 +495,9 @@ func testParams(testName string, entity types.Entity) types.Entity {
 	return ec
 }
 
+func TestSanityTypesTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
+	suite.Run(t, new(SanityTypesTestSuite))
+}

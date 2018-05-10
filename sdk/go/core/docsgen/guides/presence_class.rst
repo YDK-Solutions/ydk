@@ -3,7 +3,7 @@
 What are presence types?
 ==========================
 
-According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YANG supports two styles of containers. One is for organizing hierarchy. Another type (called 'presence container') is for representing configuration data. For instance the existence of presence container ``ssh`` indicates the capability to log in to the device using ssh. Let us consider a presence node ``prefix-list-entries`` in `Cisco-IOS-XR-ipv4-acl-cfg.yang<https://github.com/YangModels/yang/blob/96883adbf612605f02271523d7eaa731ded46b61/vendor/cisco/xr/621/Cisco-IOS-XR-ipv4-acl-cfg.yang#L105>`_. This node is generated as a `YDK struct <https://github.com/CiscoDevNet/ydk-go/blob/a636555e554800cec197cfc0f4e51d345798cfe3/ydk/models/cisco_ios_xr/ipv4_acl_cfg/ipv4_acl_cfg.go#L901>`_ shown below:
+According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YANG supports two styles of containers. One is for organizing hierarchy. Another type (called 'presence container') is for representing configuration data. For instance the existence of presence container ``ssh`` indicates the capability to log in to the device using ssh. Let us consider a presence node ``prefix-list-entries`` in `Cisco-IOS-XR-ipv4-acl-cfg.yang<https://github.com/YangModels/yang/blob/master/vendor/cisco/xr/621/Cisco-IOS-XR-ipv4-acl-cfg.yang#L105>`. This node is generated as a `YDK struct <https://github.com/CiscoDevNet/ydk-go/blob/master/ydk/models/cisco_ios_xr/ipv4_acl_cfg/ipv4_acl_cfg.go#L901>`_ shown below:
 
 .. code-block:: c
     :linenos:

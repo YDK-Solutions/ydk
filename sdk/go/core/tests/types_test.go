@@ -272,12 +272,12 @@ func (suite *SanityTypesTestSuite) TestIdentityRef() {
 
 func (suite *SanityTypesTestSuite) TestListMaxElements() {
 	runner := ysanity.Runner{}
-	elems := make([]ysanity.Runner_OneList_Ldata, 0)
+	elems := make([]*ysanity.Runner_OneList_Ldata, 0)
 	for i := 0; i < 10; i++ {
 		l := ysanity.Runner_OneList_Ldata{}
 		l.Number = i
 		l.Name = strconv.Itoa(i)
-		elems = append(elems, l)
+		elems = append(elems, &l)
 	}
 	runner.OneList.Ldata = elems
 	// The payload errMsg is hardcoded with message-id of certain value.
@@ -345,8 +345,9 @@ func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInstTyp
 
 func (suite *SanityTypesTestSuite) TestCapitalLetters() {
 	native := ysanity.Native{}
-	native.Interface.GigabitEthernet = make([]ysanity.Native_Interface_GigabitEthernet, 1)
-	native.Interface.GigabitEthernet[0].Name = "test"
+	native.Interface = ysanity.Native_Interface{}
+	ge := ysanity.Native_Interface_GigabitEthernet{Name: "test"}
+	native.Interface.GigabitEthernet = append(native.Interface.GigabitEthernet, &ge)
 	suite.CRUD.Create(&suite.Provider, &native)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Native{})
@@ -457,6 +458,38 @@ func (suite *SanityTypesTestSuite) TestEntityCollection() {
 	filter := types.NewFilter(&native)
 	suite.Equal(types.IsEntityCollection(filter), true)
 	suite.Equal(filter.Len(), 1)
+}
+
+func (suite *SanityTypesTestSuite) TestListTwoKeys() {
+	runner := ysanity.Runner{}
+	l1 := ysanity.Runner_TwoKeyList{First: "f1", Second: 11}
+	l2 := ysanity.Runner_TwoKeyList{First: "f2", Second: 22}
+	runner.TwoKeyList = []*ysanity.Runner_TwoKeyList {&l1, &l2}
+
+	ldataKeys := types.GetListKeys(runner.TwoKeyList)
+	suite.Equal(fmt.Sprintf("%v", ldataKeys), "[[f1 11] [f2 22]]")
+
+	for _, lkey := range ldataKeys {
+		ldata := types.GetFromList(runner.TwoKeyList, lkey);
+		suite.NotNil(ldata)
+	}
+	suite.Equal(types.EntityEqual(types.GetFromList(runner.TwoKeyList, "f1", 11), &l1), true)
+	suite.Equal(types.EntityEqual(types.GetFromList(runner.TwoKeyList, "f2", 22), &l2), true)
+}
+
+func (suite *SanityTypesTestSuite) TestListNoKeys() {
+	runner := ysanity.Runner{}
+	t1 := ysanity.Runner_NoKeyList{Test: "t1"}
+	t2 := ysanity.Runner_NoKeyList{Test: "t2"}
+	t3 := ysanity.Runner_NoKeyList{Test: "t3"}
+	runner.NoKeyList = []*ysanity.Runner_NoKeyList {&t1, &t2, &t3}
+
+	suite.Equal(len(types.GetListKeys(runner.NoKeyList)), 0)
+	var count string
+	for _, elem := range runner.NoKeyList {
+		count = count + elem.Test.(string)
+	}
+	suite.Equal(count, "t1t2t3")
 }
 
 func testParams(testName string, entity types.Entity) types.Entity {

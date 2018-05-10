@@ -111,7 +111,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             self.ctx.writelns(comments)
             self.ctx.bline()
 
-            self.ctx.writeln('%s []%s' % (
+            self.ctx.writeln('%s []*%s' % (
                 prop.property_type.go_name(), prop.property_type.qualified_go_name()))
 
     def _get_formatted_comment(self, comments):

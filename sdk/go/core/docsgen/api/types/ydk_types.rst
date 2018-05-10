@@ -344,6 +344,26 @@ These are how YANG types are represented in Go.
     :param valuePath: The :go:struct:`YLeaf` `name` value
     :param value: Instance of value interface
 
+.. function:: IsPresenceContainer(entity Entity) bool
+
+    returns if the given :ref:`Entity <types-entity>` is a presence container
+
+    :param entity: An instance of :ref:`Entity <types-entity>`
+    :return: A Go boolean representing whether the :ref:`Entity <types-entity>` is a presence container or not
+
+.. function:: GetPresenceFlag(entity Entity) bool
+
+    returns whether the presence flag of the given :ref:`Entity <types-entity>`
+
+    :param entity: An instance of :ref:`Entity <types-entity>`
+    :return: A Go boolean representing whether the :ref:`Entity <types-entity>` is the presence flag has been set or not
+
+.. function:: SetPresenceFlag(entity Entity)
+
+    sets the presence flag of the given :ref:`Entity <types-entity>` if it is a presence container
+
+    :param entity: An instance of :ref:`Entity <types-entity>`
+
 .. function:: EntityToString(entity Entity) string
 
     Utility function to get string representation of the entity.

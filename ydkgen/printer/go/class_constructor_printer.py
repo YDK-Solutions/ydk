@@ -41,6 +41,8 @@ class ClassConstructorPrinter(FunctionPrinter):
     def print_function_body(self):
         self.ctx.writeln('EntityData types.CommonEntityData')
         self.ctx.writeln('YFilter yfilter.YFilter')
+        if self.clazz.stmt.search_one('presence') is not None:
+            self.ctx.writeln('YPresence bool')
         self._print_inits()
 
     def _print_docstring(self):

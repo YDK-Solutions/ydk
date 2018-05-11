@@ -34,14 +34,13 @@ We can try to configure a dynamic subscription with the below app.
         telemetry := openconfig_telemetry.TelemetrySystem{}
         telemetry.Subscriptions = openconfig_telemetry.TelemetrySystem_Subscriptions
         telemetry.Subscriptions.Dynamic = openconfig_telemetry.TelemetrySystem_Subscriptions_Dynamic{}
-        telemetry.Subscriptions.Dynamic.Subscription = make([]openconfig_telemetry.Subscriptions.Dynamic.Subscription, 0)
         
         s := openconfig_telemetry.Subscriptions.Dynamic.Subscription{}
         s.SubscriptionId = 123
         s.State = openconfig_telemetry.Subscriptions.Dynamic.Subscription.State{}
         s.State.SubscriptionId = 123
 
-        telemetry.Subscriptions.Dynamic.Subscription = append(telemetry.Subscriptions.Dynamic.Subscription, s)
+        telemetry.Subscriptions.Dynamic.Subscription = append(telemetry.Subscriptions.Dynamic.Subscription, &s)
 
         // Call the CRUD create on the top-level telemetry object
         // (assuming you have already instantiated the service and provider)

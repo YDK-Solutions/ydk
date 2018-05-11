@@ -75,7 +75,9 @@ class ClassPrinter(object):
         fp.ctx.bline()
         self._print_children(fp, children, data_alias)
         self._print_leafs(fp, leafs, data_alias)
+        self._print_list_keys(clazz, data_alias)
 
+        fp.ctx.bline()
         fp.ctx.writeln('return &(%s)' % data_alias)
         fp.print_function_trailer()
 
@@ -117,7 +119,7 @@ class ClassPrinter(object):
                 fp.ctx.writeln('for i := range %s {' % (child_stmt))
                 fp.ctx.lvl_inc()
                 child_stmt = '%s[i]' % child_stmt
-                fp.ctx.writeln('%s.Children.Append(types.GetSegmentPath(&%s), types.YChild{"%s", &%s})' %(
+                fp.ctx.writeln('%s.Children.Append(types.GetSegmentPath(%s), types.YChild{"%s", %s})' %(
                     data_alias, child_stmt, child.property_type.go_name(), child_stmt))
                 fp.ctx.lvl_dec()
                 fp.ctx.writeln('}')
@@ -131,6 +133,15 @@ class ClassPrinter(object):
         for leaf in leafs:
             fp.ctx.writeln('%s.Leafs.Append("%s", types.YLeaf{"%s", %s.%s})' % (
                 data_alias, leaf.stmt.arg, leaf.go_name(), fp.class_alias, leaf.go_name()))
+
+    def _print_list_keys(self, clazz, data_alias):
+        keys = ''
+        for prop in clazz.get_key_props():
+            if keys.__len__() > 0:
+                keys += ', '
+            keys += '"' + prop.go_name() + '"'
+        self.ctx.bline()
+        self.ctx.writeln("%s.YListKeys = []string {%s}" % (data_alias, keys))
 
     def _print_child_classes(self, parent):
         unsorted_classes = [nested_class for nested_class in parent.owned_elements if isinstance(nested_class, Class)]

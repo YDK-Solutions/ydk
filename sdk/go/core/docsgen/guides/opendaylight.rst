@@ -83,11 +83,9 @@ After establishing the connection, let's instantiate the entities and set some d
         // BGP instance
         bgp.Instance = xr_bgp.Bgp_Instance{}
         bgp.Instance.InstanceName = "test"
-        bgp.Instance.InstanceAs = make([]xr_bgp.Bgp_Instance_InstanceAs, 0)
 
         instanceAs := xr_bgp.Bgp_Instance_InstanceAs{}
         instanceAs.As = 65001
-        instanceAs.FourByteAs = make([]xr_bgp.Bgp_Instance_InstanceAs_FourByteAs, 0)
         
         fourByteAs := xr_bgp.Bgp_Instance_As_FourByteAs{}
         fourByteAs.As = 65001
@@ -97,17 +95,16 @@ After establishing the connection, let's instantiate the entities and set some d
         fourByteAs.DefaultVrf = xr_bgp.Bgp_Instance_InstanceAs_FourByteAs_DefaultVrf{}
         fourByteAs.DefaultVrf.Global = xr_bgp.Bgp_Instance_InstanceAs_FourByteAs_DefaultVrf_Global{}
         fourByteAs.DefaultVrf.Global.GlobalAfs = xr_bgp.Bgp_Instance_InstanceAs_FourByteAs_DefaultVrf_Global_GlobalAfs{}
-        fourByteAs.DefaultVrf.Global.GlobalAfs.GlobalAf = make([]xr_bgp.Bgp_Instance_InstanceAs_FourByteAs_DefaultVrf_Global_GlobalAfs_GlobalAf, 0)
 
         globalAf := xr_bgp.Bgp_Instance_InstanceAs_FourByteAs_DefaultVrf_Global_GlobalAfs_GlobalAf{}
         globalAf.AfName = xr_bgp_types.BgpAddressFamily_ipv4_unicast
         globalAf.Enable = types.Empty{}
 
-        fourByteAs.DefaultVrf.Global.GlobalAfs.GlobalAf = append(fourByteAs.DefaultVrf.Global.GlobalAfs.GlobalAf, globalAf)
+        fourByteAs.DefaultVrf.Global.GlobalAfs.GlobalAf = append(fourByteAs.DefaultVrf.Global.GlobalAfs.GlobalAf, &globalAf)
 
         // add the instance to the parent bgp object
-        instanceAs.FourByteAs = append(instanceAs.FourByteAs, fourByteAs)
-        bgp.Instance.InstanceAs = append(bgp.Instance.InstanceAs, instanceAs)
+        instanceAs.FourByteAs = append(instanceAs.FourByteAs, &fourByteAs)
+        bgp.Instance.InstanceAs = append(bgp.Instance.InstanceAs, &instanceAs)
 
 
 Invoking the CRUD Service

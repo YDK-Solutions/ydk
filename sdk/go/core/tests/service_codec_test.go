@@ -216,13 +216,13 @@ func config(bgp *ysanity_bgp.Bgp) {
 	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
 	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
 	ipv6Afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6Afisafi)
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, &ipv6Afisafi)
 
 	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
 	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.IPV4UNICAST{}
 	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV4UNICAST{}
 	ipv4Afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4Afisafi)
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, &ipv4Afisafi)
 }
 
 func configRunner(runner *ysanity.Runner) {
@@ -243,8 +243,8 @@ func configRunner(runner *ysanity.Runner) {
 	elem12.Number = 212
 	elem12.Name = "runner:twolist:ldata:21:subl1:212"
 
-	elem1.Subl1 = append(elem1.Subl1, elem11)
-	elem1.Subl1 = append(elem1.Subl1, elem12)
+	elem1.Subl1 = append(elem1.Subl1, &elem11)
+	elem1.Subl1 = append(elem1.Subl1, &elem12)
 
 	elem21 := ysanity.Runner_TwoList_Ldata_Subl1{}
 	elem22 := ysanity.Runner_TwoList_Ldata_Subl1{}
@@ -254,11 +254,11 @@ func configRunner(runner *ysanity.Runner) {
 	elem22.Number = 222
 	elem22.Name = "runner:twolist:ldata:22:subl1:222"
 
-	elem2.Subl1 = append(elem2.Subl1, elem21)
-	elem2.Subl1 = append(elem2.Subl1, elem22)
+	elem2.Subl1 = append(elem2.Subl1, &elem21)
+	elem2.Subl1 = append(elem2.Subl1, &elem22)
 
-	runner.TwoList.Ldata = append(runner.TwoList.Ldata, elem1)
-	runner.TwoList.Ldata = append(runner.TwoList.Ldata, elem2)
+	runner.TwoList.Ldata = append(runner.TwoList.Ldata, &elem1)
+	runner.TwoList.Ldata = append(runner.TwoList.Ldata, &elem2)
 }
 
 func (suite *CodecTestSuite) TestXMLEncode() {
@@ -435,12 +435,12 @@ func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
 
 	runnerConfig := ysanity.Runner{}
 	runnerConfig.Two.Number = 2
-	
+
 	nativeConfig := ysanity.Native{}
 	nativeConfig.Version = "0.1.0"
-	
+
 	config := types.NewConfig(&runnerConfig, &nativeConfig)
-	
+
 	suite.Provider.Encoding = encoding.XML	
 	payload := suite.Codec.Encode(&suite.Provider, &config)
 
@@ -450,7 +450,7 @@ func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
     // Check results
 	ec := types.EntityToCollection(entity)
 	suite.Equal(ec.Len(), 2)
-	
+
 	payload2 := suite.Codec.Encode(&suite.Provider, ec)
 	suite.Equal(payload2, payload)
 }
@@ -462,8 +462,8 @@ func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
     ospf.PassiveInterface.Interface = "xyz"
 	test := ysanity.Runner_YdktestSanityOne_Ospf_Test{}
     test.Name = "abc"
-    ospf.Test = append(ospf.Test, test)
-    runner.YdktestSanityOne.Ospf = append(runner.YdktestSanityOne.Ospf, ospf)
+    ospf.Test = append(ospf.Test, &test)
+    runner.YdktestSanityOne.Ospf = append(runner.YdktestSanityOne.Ospf, &ospf)
     suite.Provider.Encoding = encoding.XML
     payload := suite.Codec.Encode(&suite.Provider, &runner)
     fmt.Println(payload)
@@ -487,6 +487,39 @@ func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
 	suite.Equal(types.EntityEqual(&runner, runnerDecode), true)
 }
 
+func (suite *CodecTestSuite) TestOneKeyList() {
+	runner := ysanity.Runner{}
+	configRunner(&runner)
+
+	// Get first level list element
+	ldata := types.GetFromList(runner.TwoList.Ldata, 22)
+	suite.NotNil(ldata)
+	suite.Equal(types.EntityToString(ldata), "Type: *sanity.Runner_TwoList_Ldata, Path: ldata[number='22']")
+
+	// Try non-existant key
+	ldataNE := types.GetFromList(runner.TwoList.Ldata, 222)
+	suite.Nil(ldataNE)
+
+	// Get second level list element
+	sublist := ldata.(*ysanity.Runner_TwoList_Ldata).Subl1
+	sublData:= types.GetFromList(sublist, 221)
+	suite.NotNil(sublData)
+	suite.Equal(types.EntityToString(sublData), "Type: *sanity.Runner_TwoList_Ldata_Subl1, Path: subl1[number='221']")
+
+	// Iterate over key list
+	sublistKeys := types.GetListKeys(sublist)
+	suite.Equal(len(sublistKeys), 2)
+	suite.Equal(fmt.Sprintf("%v", sublistKeys), "[221 222]")
+	for _, key := range sublistKeys {
+		entity := types.GetFromList(sublist, key)
+		suite.NotNil(entity)
+		ydk.YLogDebug(fmt.Sprintf("For key: %v, Found Entity: %v", key, types.EntityToString(entity)))
+	}
+}
+
 func TestCodecTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(CodecTestSuite))
 }

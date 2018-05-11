@@ -28,25 +28,24 @@ To parse a JSON string representing yang data into a YDK go object and then to a
     // Declare the JSON configuration
     const (
         ifJSON = `{
-    "Cisco-IOS-XR-ifmgr-cfg:interface-configurations": {
-        "interface-configuration": [
-        {
-            "active": "act",
-            "interface-name": "Loopback0",
-            "description": "PRIMARY ROUTER LOOPBACK",
-            "Cisco-IOS-XR-ipv4-io-cfg:ipv4-network": {
-                "addresses": {
-                    "primary": {
-                        "address": "172.16.255.1",
-                        "netmask": "255.255.255.255"
+            "Cisco-IOS-XR-ifmgr-cfg:interface-configurations": {
+                "interface-configuration": [
+                {
+                    "active": "act",
+                    "interface-name": "Loopback0",
+                    "description": "PRIMARY ROUTER LOOPBACK",
+                    "Cisco-IOS-XR-ipv4-io-cfg:ipv4-network": {
+                        "addresses": {
+                            "primary": {
+                                "address": "172.16.255.1",
+                                "netmask": "255.255.255.255"
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-}
-`
-)
+        }`
+    )
 
     // execute main program.
     func main() {
@@ -95,12 +94,8 @@ To convert a YDK python object into a JSON string, the below approach can be use
         jsonProvider := providers.CodecServiceProvider{}
         jsonProvider.Encoding = encoding.JSON
 
-        // Instantiate the interface configuration struct to configure the IPv4 loopback
-        interfaceConfigs := ifmgr_cfg.InterfaceConfigurations{}
-
-        // Instantiate the InterfaceConfiguration slice instance
-        intefaceConfigs.InterfaceConfiguration = make([]ifmgr_cfg.InterfaceConfigurations_InterfaceConfiguration, 1)
-        interfaceConfig := &intefaceConfigs.InterfaceConfiguration[0]
+        // Instantiate the InterfaceConfiguration instance
+        interfaceConfig := ifmgr_cfg.InterfaceConfigurations_InterfaceConfiguration{}
         interfaceConfig.Active = "Act"
         interfaceConfig.InterfaceName = "Loopback0"
         interfaceConfig.Description = "PRIMARY ROUTER LOOPBACK"
@@ -109,6 +104,10 @@ To convert a YDK python object into a JSON string, the below approach can be use
         interfaceConfig.Ipv4Network.Addresses.Primary.Address = "172.16.255.1"
         interfaceConfig.Ipv4Network.Addresses.Primary.Netmask = "255.255.255.255"
 
+        // Instantiate the interface configuration structure
+        interfaceConfigs := ifmgr_cfg.InterfaceConfigurations{}
+        intefaceConfigs.InterfaceConfiguration = append(intefaceConfigs.InterfaceConfiguration, &interfaceConfig)
+        
         // Invoke the encode method to encode the YDK go object to a JSON payload
         jsonPayload := codec.Encode(&jsonProvider, &interfaceConfigs)
         fmt.Println(jsonPayload)

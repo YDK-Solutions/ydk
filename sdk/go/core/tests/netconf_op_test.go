@@ -66,8 +66,8 @@ func (suite *NETCONFOperationsTestSuite) TestCreate() {
 	e2.Name = "bar"
 	e2.YFilter = yfilter.Create
 
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &e1)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &e2)
 
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
 	// create duplicate value raises error
@@ -102,8 +102,8 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	e2.Number = 2
 	e2.Name = "bar"
 	e2.YFilter = yfilter.Create
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e1)
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, e2)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &e1)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &e2)
 	suite.CRUD.Update(&suite.Provider, &runnerCreate)
 	ydk.YLogDebug("TestDelete finished Create")
 
@@ -111,7 +111,7 @@ func (suite *NETCONFOperationsTestSuite) TestDelete() {
 	eU1 := ysanity.Runner_OneList_Ldata{}
 	eU1.Number = 1
 	eU1.YFilter = yfilter.Delete
-	runnerUpdate.OneList.Ldata = append(runnerUpdate.OneList.Ldata, eU1)
+	runnerUpdate.OneList.Ldata = append(runnerUpdate.OneList.Ldata, &eU1)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 	ydk.YLogDebug("TestDelete finished Update")
 

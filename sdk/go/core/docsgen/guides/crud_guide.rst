@@ -26,7 +26,6 @@ Also, the field ``NonStateful`` is set to ``nil`` by default. Therefore it needs
     func main() {
         // Create the top-level container and instantiate slice
         snmp := snmp_agent_cfg.Snmp_Correlator_Rules{}
-        snmp.Rule = make([]snmp_agent_cfg.Snmp_Correlator_Rules_Rule, 0)
 
         // Create the Rule
         rule := snmp_agent_cfg.Snmp_Correlator_Rules_Rule{}
@@ -37,7 +36,7 @@ Also, the field ``NonStateful`` is set to ``nil`` by default. Therefore it needs
         rule.NonStateful.Timeout = 3s
 
         // Append
-        snmp.Rule = append(snmp.Rule, rule)
+        snmp.Rule = append(snmp.Rule, &rule)
 
         // Call the CRUD create on the top-level object
         // (assuming you have already instantiated the service and provider)
@@ -124,47 +123,80 @@ For example, to read the instances of a deeply nested ``slice`` called :go:struc
     func main() {
         // First create the top-level Rib objects
         rib := ip_rib_ipv4_oper.Rib{}
-        rib.Vrfs = ip_rib_ipv4_oper.Rib_Vrf{}
-        rib.Vrfs.Vrf = make([]ip_rib_ipv4_oper.Rib_Vrfs_Vrf, 0)
 
         // Then create the list instance Vrf
         vrf := ip_rib_ipv4_oper.Rib_Vrfs_Vrf{}
         vrf.VrfName = "default"
 
         // Then create the child list element Af and the rest of the nested list instances
-        vrf.Afs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs{}
-        vrf.Afs.Af = make([]ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af, 0)
         af := ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af{}
         af.AfName = "IPv4"
 
-        af.Safs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs{}
-        af.Safs.Saf = make([]ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf, 0)
         saf := ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf{}
         saf.SafName = "Unicast"
 
-        saf.IpRibRouteTableNames = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames{}
-        saf.IpRibRouteTableNames.IpRibRouteTableName = make([]ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames.IpRibRouteTableName, 0)
         tableName := ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames.IpRibRouteTableName{}
         tableName.RouteTableName = "default"
 
         // Create the final list instance Route
-        tableName.Routes = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames_IpRibRouteTableName_Routes{}
-        tableName.Routes.Route = make([]ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames_IpRibRouteTableName_Routes_Route, 0)
         route := ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames_IpRibRouteTableName_Routes_Route{}
         route.YFilter = yfilter.Read // set the yfilter attribute for route to yfilter.Read
 
         // Append each of the list instances to their respective parents
-        tableName.Routes.Route = append(table_name.Routes.Route, route)
-        saf.IpRibRouteTableNames.IpRibRouteTableName = append(saf.IpRibRouteTableNames.IpRibRouteTableName, tableName)
-        af.Safs.Saf = append(af.Safs.Saf, saf)
-        vrf.Afs.Af = append(vrf.Afs.Af, af)
-        rib.Vrfs.Vrf = append(rib.Vrfs.Vrf, vrf)
+        tableName.Routes = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames_IpRibRouteTableName_Routes{}
+        tableName.Routes.Route = append(table_name.Routes.Route, &route)
+        
+        saf.IpRibRouteTableNames = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames{}
+        saf.IpRibRouteTableNames.IpRibRouteTableName = append(saf.IpRibRouteTableNames.IpRibRouteTableName, &tableName)
+        
+        af.Safs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs{}
+        af.Safs.Saf = append(af.Safs.Saf, &saf)
+        
+        vrf.Afs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs{}
+        vrf.Afs.Af = append(vrf.Afs.Af, &af)
+        
+        rib.Vrfs = ip_rib_ipv4_oper.Rib_Vrf{}
+        rib.Vrfs.Vrf = append(rib.Vrfs.Vrf, &vrf)
 
         // Call the CRUD read on the top-level rib object
         // (assuming you have already instantiated the service and provider)
         ribOper := crud.Read(&provider, &rib)
     }
 
+
+Accessing list elements
+-----------------------
+
+Lets continue previous example to demonstrate, how user can access `rib.Vrfs.Vrf` directly and by key identifier, which is `vrf.VrfName`.
+
+.. code-block:: c
+    :linenos:
+
+        // Directly iterate over the slice
+        for _, eVrf := range rib.Vrfs.Vrf {
+              eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
+              fmt.Printf("Key: %v, VRF name: %v\n", key, eVrf.VrfName)
+        }
+        
+        // Access specific VRF configuration directly when VRF name is known
+        iVrf := types.GetFromList(rib.Vrfs.Vrf, "default")
+        if iVrf != nil {
+                eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
+                fmt.Printf("VRF name: %v\n", eVrf.VrfName)
+        }
+
+        // Get all VRF names present in BGP configuration
+        allVrfNames := types.GetListKeys(rib.Vrfs.Vrf)
+        
+        // Iterate over the VRF names
+        for _, name := range allVrfNames {
+                iVrf := types.GetFromList(rib.Vrfs.Vrf, name)
+                if iVrf != nil {
+                        eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
+                        fmt.Printf("VRF name: %v\n", eVrf.VrfName)
+                }
+        }
+        
 
 Reading a leaf
 --------------
@@ -186,18 +218,16 @@ For example, to read a ``YLeaf`` called ``Running`` in the :go:struct:`Instance 
         // First create the top-level Isis object
         isis = clns_isis_cfg.Isis{}
 
-        // Create the list instance
-        isis.Instances = clns_isis_cfg.Isis.Instances{}
-        isis.Instances.Instance = make([]clns_isis_cfg.Isis.Instances.Instance, 0)
-
+        // Create ISIS instance
         ins := clns_isis_cfg.Isis.Instances.Instance{}
         ins.InstanceName = "default"
 
         // Set the leaf called 'running'
         ins.Running = types.Empty{}
 
-        // Append the instance to the parent
-        isis.Instances.Instance = append(isis.Instances.Instance, ins)
+        // Create the list and append the instance
+        isis.Instances = clns_isis_cfg.Isis.Instances{}
+        isis.Instances.Instance = append(isis.Instances.Instance, &ins)
 
         // Call the CRUD read on the top-level isis object
         // (assuming you have already instantiated the service and provider)
@@ -223,18 +253,16 @@ For example, to delete a Go ``slice`` called :go:struct:`Instance <ydk/models/ci
         // First create the top-level Isis object
         isis = clns_isis_cfg.Isis{}
 
-        // Create the list instance
-        isis.Instances = clns_isis_cfg.Isis.Instances{}
-        isis.Instances.Instance = make([]clns_isis_cfg.Isis.Instances.Instance, 0)
-
+        // Create the ISIS instance
         ins := clns_isis_cfg.Isis.Instances.Instance{}
         ins.InstanceName = "xyz"
 
         // Set the YFilter attribute of the leaf called 'ins' to yfilter.Delete
         ins.YFilter = yfilter.Delete
 
-        // Append the instance to the parent
-        isis.Instances.Instance = append(isis.Instances.Instance, ins)
+        // Create the list and append the instance
+        isis.Instances = clns_isis_cfg.Isis.Instances{}
+        isis.Instances.Instance = append(isis.Instances.Instance, &ins)
 
         // Call the CRUD read on the top-level isis object
         // (assuming you have already instantiated the service and provider)
@@ -262,15 +290,14 @@ For example, to delete a ``YLeaf`` called ``Running`` in the :go:struct:`Instanc
         // First create the top-level Isis object
         isis = clns_isis_cfg.Isis{}
 
-        // Create the list instance
-        isis.Instances = clns_isis_cfg.Isis.Instances{}
-        isis.Instances.Instance = make([]clns_isis_cfg.Isis.Instances.Instance, 0)
-
+        // Create the ISIS instance
         ins := clns_isis_cfg.Isis.Instances.Instance{}
         ins.InstanceName = "default"
 
-        // Not setting the Running leaf, Append the instance to the parent
-        isis.Instances.Instance = append(isis.Instances.Instance, ins)
+        // Not setting the Running leaf
+        // Create list and Append the instance
+        isis.Instances = clns_isis_cfg.Isis.Instances{}
+        isis.Instances.Instance = append(isis.Instances.Instance, &ins)
 
         // Call the CRUD read on the top-level isis object
         // (assuming you have already instantiated the service and provider)

@@ -42,9 +42,9 @@ func getInitEntity() filterread.A {
 	l3.Number = 3
 	l3.Value = "l3.Value"
 
-	a.Lst = append(a.Lst, l1)
-	a.Lst = append(a.Lst, l2)
-	a.Lst = append(a.Lst, l3)
+	a.Lst = append(a.Lst, &l1)
+	a.Lst = append(a.Lst, &l2)
+	a.Lst = append(a.Lst, &l3)
 
 	return a
 }
@@ -166,16 +166,16 @@ func (suite *FilterReadTestSuite) Test7() {
 	item2 := filterread.A_Lst{}
 	item1.Number = 1
 	item2.Number = 2
-	a.Lst = append(a.Lst, item1)
-	a.Lst = append(a.Lst, item2)
+	a.Lst = append(a.Lst, &item1)
+	a.Lst = append(a.Lst, &item2)
 
 	entity := suite.CRUD.Read(&suite.Provider, &a)
 
 	initEntity := filterread.A{}
 	item1.Value = "l1.Value"
 	item2.Value = "l2.Value"
-	initEntity.Lst = append(initEntity.Lst, item1)
-	initEntity.Lst = append(initEntity.Lst, item2)
+	initEntity.Lst = append(initEntity.Lst, &item1)
+	initEntity.Lst = append(initEntity.Lst, &item2)
 
 	suite.Equal(types.EntityEqual(entity, &initEntity), true)
 }

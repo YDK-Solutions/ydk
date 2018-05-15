@@ -469,7 +469,7 @@ TEST_CASE("test_ylist")
 
     auto ep = ylist_1[0];
     REQUIRE(ep != nullptr);
-    auto test_entity = (TestEntity*)ep.get();
+    auto test_entity = dynamic_cast<TestEntity*> (ep.get());
     REQUIRE(test_entity->name == test1->name);
 
     ep = ylist_1["test2"];

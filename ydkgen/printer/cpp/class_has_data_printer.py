@@ -31,7 +31,7 @@ class ClassHasDataPrinter(object):
         self.ctx.writeln('if (is_presence_container) return true;')
         for child in children:
             if child.is_many:
-                self._print_class_has_many(child, 'for (std::size_t index=0; index<%s.size(); index++)', 'if(%s[index]->has_data())' % child.name)
+                self._print_class_has_many(child, 'for (std::size_t index=0; index<%s.len(); index++)', 'if(%s[index]->has_data())' % child.name)
         for leaf in leafs:
             if leaf.is_many:
                 self._print_class_has_many(leaf, 'for (auto const & leaf : %s.getYLeafs())', 'if(leaf.is_set)')
@@ -46,7 +46,7 @@ class ClassHasDataPrinter(object):
         self._print_function_header(clazz, 'has_operation')
         for child in children:
             if child.is_many:
-                self._print_class_has_many(child, 'for (std::size_t index=0; index<%s.size(); index++)', 'if(%s[index]->has_operation())' % child.name)
+                self._print_class_has_many(child, 'for (std::size_t index=0; index<%s.len(); index++)', 'if(%s[index]->has_operation())' % child.name)
         for leaf in leafs:
             if leaf.is_many:
                 self._print_class_has_many(leaf, 'for (auto const & leaf : %s.getYLeafs())', 'if(is_set(leaf.yfilter))')

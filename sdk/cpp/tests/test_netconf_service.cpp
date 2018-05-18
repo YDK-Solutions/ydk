@@ -328,3 +328,30 @@ TEST_CASE("ietf_get_rpc")
         cout << "Exception while executing RPC: " << ex.what() << endl;
     }
 }
+
+TEST_CASE("get_openconfig_interfaces_and_bgp")
+{
+    NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& schema = provider.get_session().get_root_schema();
+
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ietf-netconf:get-config") };
+    read_rpc->get_input_node().create_datanode("source/running");
+
+    // Build filter
+    openconfig_interfaces::Interfaces interfaces_filter{};
+    openconfig_bgp::Bgp bgp_filter{};
+
+    std::string filter_string = get_xml_subtree_filter_payload(bgp_filter, provider);
+    filter_string += "\n" + get_xml_subtree_filter_payload(interfaces_filter, provider);
+
+    read_rpc->get_input_node().create_datanode("filter", filter_string);
+
+    auto read_result = (*read_rpc)(provider.get_session());
+    REQUIRE(read_result != nullptr);
+
+    // Print config
+    auto data_nodes = read_result->get_children();
+    for (auto dn : data_nodes) {
+        print_data_node(dn);
+    }
+}

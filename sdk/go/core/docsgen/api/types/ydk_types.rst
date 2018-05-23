@@ -188,9 +188,9 @@ These are how YANG types are represented in Go.
     
     If Go structure `YangList` implements interface :ref:`Entity <types-entity>`, meaning implements `func (e *YangList) GetEntityData() *CommonEntityData {}`, then the list of entities should be implemented as `[]*YangList`. \
     according to the YANG model the list may have one or more keys, which uniquely identify list element, or may have no keys. The slices can be created and list elements can be accessed using standard Go functions and methods. \
-    The YDK provides some additional functions, which allow user access list elements by key(s).
+    The YDK provides package `ylist` containing functions, which allow user access list elements by key or keys.
     
-    .. function:: GetFromList(slice interface{}, keys ... interface{}) Entity
+    .. function:: Get(slice interface{}, keys ... interface{}) Entity
     
        Get list element (entity) by key or keys, if list element has more than one key
        
@@ -199,7 +199,7 @@ These are how YANG types are represented in Go.
        :return: Element of the list, which has matching key(s) value(s).
        :rtype: :ref:`Entity <types-entity>`
     
-    .. function:: GetListKeys(slice interface{}) []interface{} Entity
+    .. function:: Keys(slice interface{}) []interface{} Entity
     
        Get keys for all list elements
        

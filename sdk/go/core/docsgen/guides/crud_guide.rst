@@ -179,18 +179,18 @@ Lets continue previous example to demonstrate, how user can access `rib.Vrfs.Vrf
         }
         
         // Access specific VRF configuration directly when VRF name is known
-        iVrf := types.GetFromList(rib.Vrfs.Vrf, "default")
+        iVrf := ylist.Get(rib.Vrfs.Vrf, "default")
         if iVrf != nil {
                 eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
                 fmt.Printf("VRF name: %v\n", eVrf.VrfName)
         }
 
         // Get all VRF names present in BGP configuration
-        allVrfNames := types.GetListKeys(rib.Vrfs.Vrf)
+        allVrfNames := ylist.Keys(rib.Vrfs.Vrf)
         
         // Iterate over the VRF names
         for _, name := range allVrfNames {
-                iVrf := types.GetFromList(rib.Vrfs.Vrf, name)
+                iVrf := ylist.Get(rib.Vrfs.Vrf, name)
                 if iVrf != nil {
                         eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
                         fmt.Printf("VRF name: %v\n", eVrf.VrfName)

@@ -492,7 +492,7 @@ ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, co
         if (!p) {
             YLOG_WARN("Unable to parse module '{}'. This model cannot be used with YDK", module);
             return p;
-        }
+       }
     }
     else {
         const struct lys_node *last = nullptr;

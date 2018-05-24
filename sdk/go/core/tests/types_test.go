@@ -8,6 +8,7 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	"github.com/stretchr/testify/suite"
 	"strconv"
 	"testing"
@@ -492,15 +493,15 @@ func (suite *SanityTypesTestSuite) TestListTwoKeys() {
 	l2 := ysanity.Runner_TwoKeyList{First: "f2", Second: 22}
 	runner.TwoKeyList = []*ysanity.Runner_TwoKeyList {&l1, &l2}
 
-	ldataKeys := types.GetListKeys(runner.TwoKeyList)
+	ldataKeys := ylist.Keys(runner.TwoKeyList)
 	suite.Equal(fmt.Sprintf("%v", ldataKeys), "[[f1 11] [f2 22]]")
 
 	for _, lkey := range ldataKeys {
-		ldata := types.GetFromList(runner.TwoKeyList, lkey);
+		ldata := ylist.Get(runner.TwoKeyList, lkey);
 		suite.NotNil(ldata)
 	}
-	suite.Equal(types.EntityEqual(types.GetFromList(runner.TwoKeyList, "f1", 11), &l1), true)
-	suite.Equal(types.EntityEqual(types.GetFromList(runner.TwoKeyList, "f2", 22), &l2), true)
+	suite.Equal(types.EntityEqual(ylist.Get(runner.TwoKeyList, "f1", 11), &l1), true)
+	suite.Equal(types.EntityEqual(ylist.Get(runner.TwoKeyList, "f2", 22), &l2), true)
 }
 
 func (suite *SanityTypesTestSuite) TestListNoKeys() {
@@ -510,7 +511,7 @@ func (suite *SanityTypesTestSuite) TestListNoKeys() {
 	t3 := ysanity.Runner_NoKeyList{Test: "t3"}
 	runner.NoKeyList = []*ysanity.Runner_NoKeyList {&t1, &t2, &t3}
 
-	suite.Equal(len(types.GetListKeys(runner.NoKeyList)), 0)
+	suite.Equal(len(ylist.Keys(runner.NoKeyList)), 0)
 	var count string
 	for _, elem := range runner.NoKeyList {
 		count = count + elem.Test.(string)

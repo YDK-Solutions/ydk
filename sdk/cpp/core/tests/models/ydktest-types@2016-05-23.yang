@@ -66,6 +66,11 @@ module ydktest-types {
       description "Identityref type";
   }
 
+  feature crypto {
+    description
+      "crypto feature";
+  }
+
   grouping tt {
       container xyz {
         presence true;

@@ -13,6 +13,7 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -492,26 +493,26 @@ func (suite *CodecTestSuite) TestOneKeyList() {
 	configRunner(&runner)
 
 	// Get first level list element
-	ldata := types.GetFromList(runner.TwoList.Ldata, 22)
+	ldata := ylist.Get(runner.TwoList.Ldata, 22)
 	suite.NotNil(ldata)
 	suite.Equal(types.EntityToString(ldata), "Type: *sanity.Runner_TwoList_Ldata, Path: ldata[number='22']")
 
 	// Try non-existant key
-	ldataNE := types.GetFromList(runner.TwoList.Ldata, 222)
+	ldataNE := ylist.Get(runner.TwoList.Ldata, 222)
 	suite.Nil(ldataNE)
 
 	// Get second level list element
 	sublist := ldata.(*ysanity.Runner_TwoList_Ldata).Subl1
-	sublData:= types.GetFromList(sublist, 221)
+	sublData:= ylist.Get(sublist, 221)
 	suite.NotNil(sublData)
 	suite.Equal(types.EntityToString(sublData), "Type: *sanity.Runner_TwoList_Ldata_Subl1, Path: subl1[number='221']")
 
 	// Iterate over key list
-	sublistKeys := types.GetListKeys(sublist)
+	sublistKeys := ylist.Keys(sublist)
 	suite.Equal(len(sublistKeys), 2)
 	suite.Equal(fmt.Sprintf("%v", sublistKeys), "[221 222]")
 	for _, key := range sublistKeys {
-		entity := types.GetFromList(sublist, key)
+		entity := ylist.Get(sublist, key)
 		suite.NotNil(entity)
 		ydk.YLogDebug(fmt.Sprintf("For key: %v, Found Entity: %v", key, types.EntityToString(entity)))
 	}

@@ -177,12 +177,7 @@ static LYD_FORMAT get_ly_format(ydk::EncodingFormat format)
     LYD_FORMAT scheme = LYD_XML;
     if (format == ydk::EncodingFormat::JSON)
     {
-        ydk::YLOG_DEBUG("Performing decode operation on JSON");
         scheme = LYD_JSON;
-    }
-    else
-    {
-        ydk::YLOG_DEBUG("Performing decode operation on XML");
     }
     return scheme;
 }

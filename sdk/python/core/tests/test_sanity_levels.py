@@ -750,6 +750,39 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertEqual(runner, runner_read)
 
+    def embedded_single_quote_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab\'c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
+    def embedded_double_quote_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab&quot;c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
+    def embedded_slash_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab/c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

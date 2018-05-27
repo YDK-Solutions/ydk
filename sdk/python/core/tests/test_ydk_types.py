@@ -160,14 +160,19 @@ class SanityTest(unittest.TestCase):
 
         ldata_list = one_list.ldata
         ldata_keys = ldata_list.keys()
-        self.assertEqual(ldata_keys, [1, 2])
+        self.assertEqual(ldata_keys, ['1', '2'])
 
         for lkey in ldata_keys:
             ldata = ldata_list[lkey]
             self.assertNotEqual(ldata, None)
 
-        self.assertEqual(ldata_list[1], l_1)
-        self.assertEqual(ldata_list[2], l_2)
+        # Access by item number
+        self.assertEqual(ldata_list[0], l_1)
+        self.assertEqual(ldata_list[1], l_2)
+
+        # Access by key string value
+        self.assertEqual(ldata_list['1'], l_1)
+        self.assertEqual(ldata_list['2'], l_2)
 
     def test_ylist_runner_no_key_list(self):
         runner = ysanity.Runner()

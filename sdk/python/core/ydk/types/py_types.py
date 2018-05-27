@@ -524,31 +524,32 @@ class YList(EntityCollection):
                     if attr is None:
                         key_list = []
                         break
-                    else:
-                        key_list.append(attr)
+                    key_list.append(attr)
         if len(key_list) == 0:
             key = format(self.counter)
             self.counter += 1
         elif len(key_list) == 1:
             key = key_list[0]
+            if not isinstance(key, str):
+                key = format(key)
         else:
             key = tuple(key_list)
         return key
 
     def _flush_cache(self):
         for _ in range(len(self._cache_dict)):
-            old_key, entity = self._cache_dict.popitem(False)
+            _, entity = self._cache_dict.popitem(False)
             self._entity_map[self._key(entity)] = entity
 
-    def append(self, entity):
-        entity.parent = self.parent
-        if entity is None:
+    def append(self, entities):
+        entities.parent = self.parent
+        if entities is None:
             self._log_error_and_raise_exception("Cannot add None object to the YList", YInvalidArgumentError)
-        elif isinstance(entity, Entity):
-            key = self._key(entity)
-            self._cache_dict[key] = entity
+        elif isinstance(entities, Entity):
+            key = self._key(entities)
+            self._cache_dict[key] = entities
         else:
-            msg = "Argument %s is not supported by YList class; data ignored"%type(entity)
+            msg = "Argument %s is not supported by YList class; data ignored"%type(entities)
             self._log_error_and_raise_exception(msg, YInvalidArgumentError)
 
     def extend(self, entity_list):
@@ -574,10 +575,12 @@ class YList(EntityCollection):
 
     def __getitem__(self, item):
         entity = None
-        if self.has_key(item):
-            entity = self._entity_map[item]
-        elif isinstance(item, int) and 0 <= item < len(self):
+        if isinstance(item, int) and 0 <= item < len(self):
             entity = self.entities()[item]
+        elif self.has_key(item):
+            entity = self._entity_map[item]
+        elif not isinstance(item, str):
+            entity = self._entity_map[format(item)]
         return entity
 
     def __len__(self):

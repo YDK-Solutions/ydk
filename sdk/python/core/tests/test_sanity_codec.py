@@ -183,20 +183,20 @@ class SanityYang(unittest.TestCase):
 
         ldata_list = r_1.two_list.ldata
         ldata_keys = ldata_list.keys()
-        self.assertEqual(ldata_keys, [21, 22])
+        self.assertEqual(ldata_keys, ['21', '22'])
 
         for lkey in ldata_keys:
-            ldata = ldata_list.get(lkey)
+            ldata = ldata_list[lkey]
             self.assertNotEqual(ldata, None)
 
-        ldata_21 = ldata_list.get(21)
+        ldata_21 = ldata_list['21']
         self.assertEqual(ldata_21.number, 21)
         self.assertEqual(ldata_21.name, 'runner:twolist:ldata[21]:name')
 
         subl_21 = ldata_21.subl1
         subl_21_keys = subl_21.keys()
-        self.assertEqual(subl_21_keys, [211, 212])
-        subl_21_212 = subl_21.get(212)
+        self.assertEqual(subl_21_keys, ['211', '212'])
+        subl_21_212 = subl_21['212']
         self.assertEqual(subl_21_212.name, 'runner:twolist:ldata[21]:subl1[212]:name')
 
     def test_xml_encode_2(self):

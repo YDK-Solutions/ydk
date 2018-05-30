@@ -92,7 +92,7 @@ func configIsis(isis *isisCfg.Isis) {
 
 	//		segment routing
 	prefixSID := &interfaceAf.InterfaceAfData.PrefixSid
-	prefixSID.Type = isisCfg.Isissid1_absolute
+	prefixSID.Type_ = isisCfg.Isissid1_absolute
 	prefixSID.Value = 16061
 	prefixSID.Php = isisCfg.IsisphpFlag_enable
 	prefixSID.ExplicitNull = isisCfg.IsisexplicitNullFlag_disable
@@ -126,7 +126,7 @@ func main() {
 	flag.Parse()
 
 	if *vPtr {
-		ydk.EnableLogging(ydk.Debug)
+		ydk.EnableLogging(ydk.Info)
 	}
 
 	// create codec provider

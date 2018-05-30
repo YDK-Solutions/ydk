@@ -4,9 +4,11 @@ import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	ysanity_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity_types"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	"github.com/stretchr/testify/suite"
 	"strconv"
 	"testing"
@@ -271,12 +273,12 @@ func (suite *SanityTypesTestSuite) TestIdentityRef() {
 
 func (suite *SanityTypesTestSuite) TestListMaxElements() {
 	runner := ysanity.Runner{}
-	elems := make([]ysanity.Runner_OneList_Ldata, 0)
+	elems := make([]*ysanity.Runner_OneList_Ldata, 0)
 	for i := 0; i < 10; i++ {
 		l := ysanity.Runner_OneList_Ldata{}
 		l.Number = i
 		l.Name = strconv.Itoa(i)
-		elems = append(elems, l)
+		elems = append(elems, &l)
 	}
 	runner.OneList.Ldata = elems
 	// The payload errMsg is hardcoded with message-id of certain value.
@@ -302,7 +304,7 @@ func (suite *SanityTypesTestSuite) TestListMaxElements() {
 `
 	funcDidPanic, panicValue := didPanic(func() { suite.CRUD.Create(&suite.Provider, &runner) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp("YServiceProviderError:", panicValue)
 	suite.Regexp(errMsg, panicValue)
 }
 
@@ -325,6 +327,211 @@ func (suite *SanityTypesTestSuite) TestIdentityFromOtherModule() {
 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
 }
 
+func (suite *SanityTypesTestSuite) TestCascadingTypes() {
+	cascadingTypesHelper(suite, ysanity.CompInstType_unknown, ysanity.CompInstType__unknown)
+	cascadingTypesHelper(suite, ysanity.CompInstType_phys, ysanity.CompInstType__phys)
+	cascadingTypesHelper(suite, ysanity.CompInstType_virt, ysanity.CompInstType__virt)
+	cascadingTypesHelper(suite, ysanity.CompInstType_hv, ysanity.CompInstType__hv)
+}
+
+func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInstType, enum2 ysanity.CompInstType_){
+	ctypes := ysanity.CascadingTypes{}
+	ctypes.CompInstType = enum1
+	ctypes.CompNicInstType = enum2
+	suite.CRUD.Create(&suite.Provider, &ctypes)
+
+	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(ctypesRead, &ctypes), true)
+}
+
+func (suite *SanityTypesTestSuite) TestCapitalLetters() {
+	native := ysanity.Native{}
+	native.Interface = ysanity.Native_Interface{}
+	ge := ysanity.Native_Interface_GigabitEthernet{Name: "test"}
+	native.Interface.GigabitEthernet = append(native.Interface.GigabitEthernet, &ge)
+	suite.CRUD.Create(&suite.Provider, &native)
+
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Native{})
+	suite.Equal(types.EntityEqual(entityRead, &native), true)
+}
+
+func (suite *SanityTypesTestSuite) TestPresence() {
+	var runner ysanity.Runner
+	var runnerRead ysanity.Runner
+	var readEntity types.Entity
+
+	// Setting Presence
+	runner = ysanity.Runner{}
+	types.SetPresenceFlag(&runner.Outer.Inner)
+	suite.Equal(true, runner.Outer.Inner.YPresence)
+
+	suite.CRUD.Create(&suite.Provider, &runner)
+	readEntity = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	runnerRead = *readEntity.(*ysanity.Runner)
+	suite.Equal(true, types.EntityEqual(&runnerRead, &runner))
+	suite.Equal(runner.Outer.Inner.YPresence, runnerRead.Outer.Inner.YPresence)
+
+	// CRUD Delete
+	suite.CRUD.Delete(&suite.Provider, &ysanity.Runner{})
+
+	// Setting Data
+	runner = ysanity.Runner{}
+	runner.Runner2.SomeLeaf = "test"
+
+	suite.CRUD.Create(&suite.Provider, &runner)
+	readEntity = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	runnerRead = *readEntity.(*ysanity.Runner)
+	suite.Equal(true, types.EntityEqual(&runnerRead, &runner))
+	suite.Equal(runner.Outer.Inner.YPresence, runnerRead.Outer.Inner.YPresence)
+}
+
+func (suite *SanityTypesTestSuite) TestEntityCollection() {
+    // Create Data entities and access values
+    runner := ysanity.Runner{}
+    native := ysanity.Native{}
+    runnerPath := types.GetSegmentPath(&runner)
+    nativePath := types.GetSegmentPath(&native)
+    suite.Equal(types.EntityToString(&runner), "Type: *sanity.Runner, Path: ydktest-sanity:runner")
+    suite.Equal(types.EntityToString(&native), "Type: *sanity.Native, Path: ydktest-sanity:native")
+
+    // Initialization
+    config := types.NewEntityCollection()
+    suite.Equal(config.Len(), 0)
+    suite.Equal(config.String(), "EntityCollection is empty")
+
+    config = types.NewEntityCollection(&runner)
+    suite.Equal(config.Len(), 1)
+
+    config = types.NewEntityCollection(&runner, &native)
+    suite.Equal(config.Len(), 2)
+    suite.Equal(config.String(), "EntityCollection [Type: *sanity.Runner, Path: ydktest-sanity:runner; Type: *sanity.Native, Path: ydktest-sanity:native]")
+
+    // Add
+    config = types.NewEntityCollection()
+    config.Append([]types.Entity{&runner, &native})
+    suite.Equal(config.Len(), 2)
+
+    config.Add(&runner)
+    suite.Equal(config.Len(), 2)
+
+    // Get
+    e, _ := config.Get(runnerPath)
+    suite.NotNil(e)
+    suite.IsType(&runner, e)
+    
+    // HasKey
+    suite.Equal(config.HasKey(runnerPath), true)
+    suite.Equal(config.HasKey(nativePath), true)
+    suite.Equal(config.HasKey("oc_bgp"), false)
+
+    // Get all keys
+    suite.Equal(config.Keys(), []string{runnerPath, nativePath})
+
+    // Get all entities
+    ydk.YLogDebug("All entities:")
+    for _, entity := range config.Entities() {
+    	ydk.YLogDebug(types.EntityToString(entity))
+    }
+
+    // Delete entity
+    e, _ = config.Pop(runnerPath)
+    suite.NotNil(e)
+    suite.IsType(&runner, e)
+    suite.Equal(config.Keys(), []string{nativePath})
+
+    ydk.YLogDebug("All entities after Runner deleted:")
+    for _, key := range config.Keys() {
+        en, exist := config.Get(key)
+        if exist {
+	        ydk.YLogDebug(fmt.Sprintf("%s", types.EntityToString(en)))
+        }
+    }
+    
+    // Add back and test order
+    config.Add(&runner)
+    suite.Equal(config.Keys(), []string{nativePath, runnerPath})
+
+	// Getting enities by item number
+    ydk.YLogDebug("Getting enities by item number:")
+	for i:=0; i<3; i++ {
+		e = config.GetItem(i)
+		if e != nil {
+			ydk.YLogDebug(fmt.Sprintf("%d:  %s", i, types.EntityToString(e)))
+		} else {
+			ydk.YLogDebug(fmt.Sprintf("%d:  nil\n", i))
+		}
+	}
+    // Clear collection
+    config.Clear()
+    suite.Equal(config.Len(), 0)
+    
+    // Testing passing parameters and return values
+    ret1 := testParams("test1", config)
+    col1 := types.EntityToCollection(ret1)
+    suite.Equal(col1.Len(), 0)
+
+    ret2 := testParams("test2", &runner)
+    suite.Equal(types.EntityEqual(ret2, &runner), true)
+
+    config.Add(&runner, &native)
+    ret3 := testParams("test3", config)
+    col3 := types.EntityToCollection(ret3)
+    suite.Equal(col3.Len(), 2)
+    
+    // Testing Config and Filter aliases
+    cfg := types.NewConfig()
+	cfg.Add(&runner, &native)
+	suite.Equal(types.IsEntityCollection(cfg), true)
+	filter := types.NewFilter(&native)
+	suite.Equal(types.IsEntityCollection(filter), true)
+	suite.Equal(filter.Len(), 1)
+}
+
+func (suite *SanityTypesTestSuite) TestListTwoKeys() {
+	runner := ysanity.Runner{}
+	l1 := ysanity.Runner_TwoKeyList{First: "f1", Second: 11}
+	l2 := ysanity.Runner_TwoKeyList{First: "f2", Second: 22}
+	runner.TwoKeyList = []*ysanity.Runner_TwoKeyList {&l1, &l2}
+
+	ldataKeys := ylist.Keys(runner.TwoKeyList)
+	suite.Equal(fmt.Sprintf("%v", ldataKeys), "[[f1 11] [f2 22]]")
+
+	for _, lkey := range ldataKeys {
+		ldata := ylist.Get(runner.TwoKeyList, lkey);
+		suite.NotNil(ldata)
+	}
+	suite.Equal(types.EntityEqual(ylist.Get(runner.TwoKeyList, "f1", 11), &l1), true)
+	suite.Equal(types.EntityEqual(ylist.Get(runner.TwoKeyList, "f2", 22), &l2), true)
+}
+
+func (suite *SanityTypesTestSuite) TestListNoKeys() {
+	runner := ysanity.Runner{}
+	t1 := ysanity.Runner_NoKeyList{Test: "t1"}
+	t2 := ysanity.Runner_NoKeyList{Test: "t2"}
+	t3 := ysanity.Runner_NoKeyList{Test: "t3"}
+	runner.NoKeyList = []*ysanity.Runner_NoKeyList {&t1, &t2, &t3}
+
+	suite.Equal(len(ylist.Keys(runner.NoKeyList)), 0)
+	var count string
+	for _, elem := range runner.NoKeyList {
+		count = count + elem.Test.(string)
+	}
+	suite.Equal(count, "t1t2t3")
+}
+
+func testParams(testName string, entity types.Entity) types.Entity {
+	ec := types.EntityToCollection(entity)
+	if ec == nil {
+		ydk.YLogDebug(fmt.Sprintf("%s: %s\n", testName, types.EntityToString(entity)))
+		return entity
+	}
+	ydk.YLogDebug(fmt.Sprintf("%s: %s\n", testName, ec.String()))
+	return ec
+}
+
 func TestSanityTypesTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(SanityTypesTestSuite))
 }

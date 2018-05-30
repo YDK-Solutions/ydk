@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
 project(ydk_@BRIEF_NAME@ VERSION @VERSION@ LANGUAGES C CXX)
 
@@ -83,7 +83,7 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set (CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
         set (CPACK_RPM_PACKAGE_VENDOR ${CPACK_PACKAGE_VENDOR})
         set (CPACK_RPM_PACKAGE_URL "https://github.com/CiscoDevNet/ydk-cpp")
-        set (CPACK_RPM_PACKAGE_REQUIRES "epel-release, python-pip, python-devel, libxml2-devel, libxslt-devel, libssh-devel, libcurl-devel, libtool, clang, cmake3, pcre-devel")
+        set (CPACK_RPM_PACKAGE_REQUIRES "python-pip, python-devel, libxml2-devel, libxslt-devel, libssh-devel, libcurl-devel, libtool, clang, cmake3, pcre-devel")
 
         # <name>-<version>-<release>.<architecture>.(src).rpm
         # libydk-0.6.0-0.1.alpha.x86_64.rpm  // RPM

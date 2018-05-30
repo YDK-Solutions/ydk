@@ -18,6 +18,7 @@ from __future__ import absolute_import
 
 import sys
 import unittest
+import logging
 
 from ydk.path.sessions import NetconfSession
 from ydk.path import Codec
@@ -48,11 +49,11 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(runner, EncodingFormat.XML, True)
         create_rpc = self.root_schema.create_rpc("ydk:delete")
         create_rpc.get_input_node().create_datanode("entity", xml)
-        # RuntimeError: YCPPCoreError: YCPPCodecError:Schema node not found.. Path: input/config if invoked
-        # create_rpc(self.nc_session)
+        # RuntimeError: YCoreError: YCodecError:Schema node not found.. Path: input/config if invoked
+        create_rpc(self.nc_session)
 
     def tearDown(self):
-        # RuntimeError: YCPPCoreError: YCPPCodecError:Schema node not found.. Path: input/config if invoked
+        # RuntimeError: YCoreError: YCodecError:Schema node not found.. Path: input/config if invoked
         self._delete_runner()
 
     def test_leafs(self):
@@ -128,7 +129,109 @@ class SanityTest(unittest.TestCase):
         xml = self.codec.encode(res, EncodingFormat.XML, False)
         self.assertNotEqual( len(xml), 0 )
 
+    def test_get_running_config(self):
+        get_config_rpc = self.root_schema.create_rpc("ietf-netconf:get-config")
+        get_config_rpc.get_input_node().create_datanode("source/running")
 
+        response = get_config_rpc(self.nc_session)
+
+        all_nodes = response.get_children()
+        self.assertEqual( len(all_nodes)>=2, True )
+
+        xml = self.codec.encode(response, EncodingFormat.XML, True)
+        self.assertNotEqual( len(xml), 0 )
+
+    def test_anyxml(self):
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?><bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
+
+        get_rpc = self.root_schema.create_rpc('ietf-netconf:get')
+        get_rpc.get_input_node().create_datanode(
+            'filter',
+            '''<?xml version="1.0"?>
+            <bgp xmlns="http://openconfig.net/yang/bgp"/>''')
+        datanode = get_rpc(self.nc_session)
+        self.assertIsNotNone(datanode)
+
+    def test_create_gre_tunnel_on_demand(self):
+        enable_logging(logging.ERROR)
+
+        from ydk.models.ydktest import ydktest_sanity as ysanity
+        from ydk.providers import NetconfServiceProvider
+        from ydk.services  import CRUDService
+
+        provider = NetconfServiceProvider(
+            "127.0.0.1",
+            "admin",
+            "admin",
+            12022)
+
+        native = ysanity.Native()
+
+        tunnel = native.interface.Tunnel()
+        tunnel.name = 521
+        tunnel.description = "test tunnel"
+        
+        # Configure protocol-over-protocol tunneling
+        tunnel.tunnel.source = "1.2.3.4"
+        tunnel.tunnel.destination = "4.3.2.1"
+        tunnel.tunnel.bandwidth.receive = 100000
+        tunnel.tunnel.bandwidth.transmit = 100000
+        
+        native.interface.tunnel.append(tunnel)
+        
+        crud_service = CRUDService();
+        crud_service.create(provider, native)
+
+    def test_anyxml_action(self):
+        expected='''<data xmlns="http://cisco.com/ns/yang/ydktest-action">
+  <action-node>
+    <test>xyz</test>
+  </action-node>
+</data>
+'''
+        native = self.root_schema.create_datanode("ydktest-sanity-action:data", "")
+        a = native.create_action("action-node")
+        a.create_datanode("test", "xyz")
+
+        xml = self.codec.encode(native, EncodingFormat.XML, True)
+        self.assertEqual(xml, expected)
+
+        try:
+            native(self.nc_session)
+        except Exception as e:
+            self.assertEqual(isinstance(e, RuntimeError), True)
+
+    def test_path_codec_list(self):
+        root_shema = self.nc_session.get_root_schema()
+
+        runner = root_shema.create_datanode("ydktest-sanity:runner")
+        runner.create_datanode("one/number", "2")
+
+        native = root_shema.create_datanode("ydktest-sanity:native")
+        native.create_datanode("version", '0.1.0')
+
+        nodes_encode = [runner, native]
+        xml_encode = self.codec.encode(nodes_encode, EncodingFormat.XML, True)
+
+        root_node = self.codec.decode(root_shema, xml_encode, EncodingFormat.XML)
+        node_decode = root_node.get_children()
+
+        xml_decode = self.codec.encode(node_decode, EncodingFormat.XML, True)
+        self.assertEqual(xml_encode, xml_decode)
+
+def enable_logging(level):
+    log = logging.getLogger('ydk')
+    log.setLevel(level)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
+        
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()
 

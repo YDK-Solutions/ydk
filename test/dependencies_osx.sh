@@ -35,8 +35,7 @@ function install_dependencies {
                  pcre \
                  wget \
                  xml2 \
-                 lcov \
-                 pybind11 > /dev/null
+                 lcov  > /dev/null
     brew install libssh
     brew link libssh
     brew rm -f --ignore-dependencies python python3
@@ -48,7 +47,7 @@ function install_dependencies {
 function install_confd {
     print_msg "install_confd"
 
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip
+    wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.darwin.x86_64.zip
     ./confd-basic-6.2.darwin.x86_64.installer.bin ../confd
 }
@@ -89,7 +88,8 @@ function install_grpc {
 
 install_dependencies
 install_confd
-install_fpm
+
+#install_fpm
 install_protobuf
 install_grpc
 

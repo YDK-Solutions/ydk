@@ -110,7 +110,7 @@ func (suite *ExecutorServiceTestSuite) TestLockUnlockFail() {
 	funcDidPanic, panicValue := didPanic(func() { 
 		suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &lockRpc, nil) })
 	suite.Equal(funcDidPanic, true)
-	suite.Regexp("YGOServiceProviderError:", panicValue)
+	suite.Regexp("YServiceProviderError:", panicValue)
 	suite.Regexp("<error-tag>lock-denied</error-tag>", panicValue)
 }
 
@@ -380,8 +380,5 @@ func (suite *ExecutorServiceTestSuite) TestKillSession() {
 }
 
 func TestExecutorServiceTestSuite(t *testing.T) {
-	if testing.Verbose() {
-		ydk.EnableLogging(ydk.Debug)
-	}
 	suite.Run(t, new(ExecutorServiceTestSuite))
 }

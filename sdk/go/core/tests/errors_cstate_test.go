@@ -58,7 +58,7 @@ func (suite *CStateErrorsTestSuite) TestRepositoryWrongPath() {
 		Password: "admin",
 		Port:     12022}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YGOInvalidArgumentError: path %s is not a valid directory", repo.Path)
+	errMsg := fmt.Sprintf("YInvalidArgumentError: path %s is not a valid directory", repo.Path)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -69,7 +69,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongPort() {
 		Password: "admin",
 		Port:     12000}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YGOClientError: Could not connect to %s", provider.Address)
+	errMsg := fmt.Sprintf("YClientError: Could not connect to %s", provider.Address)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -80,7 +80,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongCredentials() {
 		Password: "admin",
 		Port:     12022}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YGOClientError: Could not connect to %s", provider.Address)
+	errMsg := fmt.Sprintf("YClientError: Could not connect to %s", provider.Address)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -92,7 +92,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongProtocol() {
 		Port:     12022,
 		Protocol: "/dev/null"}
 	defer provider.Disconnect()
-	errMsg := "YGOOperationNotSupportedError: Protocol is not supported!"
+	errMsg := "YOperationNotSupportedError: Protocol is not supported!"
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -106,7 +106,7 @@ func (suite *CStateErrorsTestSuite) TestOpenDaylightNotSupportedProtocol() {
 		EncodingFormat: encoding.XML,
 		Protocol:       protocol.Netconf}
 	defer odlProvider.Disconnect()
-	errMsg := "YGOServiceProviderError: Netconf protocol currently not supported"
+	errMsg := "YServiceProviderError: Netconf protocol currently not supported"
 	assert.PanicsWithValue(suite.T(), errMsg, func() { odlProvider.Connect() })
 }
 
@@ -126,7 +126,7 @@ func (suite *CStateErrorsTestSuite) TestOpenDaylightInvalidNodeID() {
 	ydk.YLogDebug(fmt.Sprintf("nodeIDS: %v", nodeIDs))
 
 	nodeID := "xe"
-	errMsg := fmt.Sprintf("YGOServiceProviderError: Invalid node id %v", nodeID)
+	errMsg := fmt.Sprintf("YServiceProviderError: Invalid node id %v", nodeID)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { odlProvider.GetNodeProvider(nodeID) })
 }
 
@@ -138,7 +138,7 @@ func (suite *CStateErrorsTestSuite) TestCodecInvalidEncode() {
 	bgp.Global.Config.As = 65172
 	bgp.Global.Config.RouterId = ""
 
-	errMsg := `YGOModelError: Value "" does not satisfy the constraint ` +
+	errMsg := `YModelError: Value "" does not satisfy the constraint ` +
 		`"(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}` +
 		`([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" (range, length, or pattern). ` +
 		`Path: /openconfig-bgp:bgp/global/config/router-id`
@@ -156,7 +156,7 @@ func (suite *CStateErrorsTestSuite) TestCodecInvalidDecode2() {
 	provider := providers.CodecServiceProvider{}
 	provider.Encoding = encoding.XML
 
-	errMsg := `YGOModelError: Value "wrong router id" does not satisfy the constraint ` +
+	errMsg := `YModelError: Value "wrong router id" does not satisfy the constraint ` +
 		`"(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}` +
 		`([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" (range, length, or pattern). ` +
 		`Path: /openconfig-bgp:bgp/global/config/router-id`
@@ -166,6 +166,8 @@ func (suite *CStateErrorsTestSuite) TestCodecInvalidDecode2() {
 func TestCStateErrorsTestSuite(t *testing.T) {
 	if testing.Verbose() {
 		ydk.EnableLogging(ydk.Debug)
+	} else {
+		ydk.EnableLogging(ydk.Error)
 	}
 	suite.Run(t, new(CStateErrorsTestSuite))
 }

@@ -6,6 +6,10 @@ YDK Filters
 .. go:package:: ydk/yfilter
     :synopsis: YDK Go Filters
 
+.. code-block:: sh
+
+   import "github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+
 Filters represent edit operation for YDK objects as specified in
 `NETCONF RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_,
 defaults to ``not_set``, and  ``read`` operation providing functionality
@@ -13,7 +17,7 @@ to read a singal leaf.
 Operations as defined under netconf edit-config operation attribute in
 `RFC 6241 <https://tools.ietf.org/html/rfc6241#section-7.2>`_ and for
 filtering read operations by leaf to be used with various :go:struct:`Services<ydk/services>` and 
-:go:struct:`entities<ydk/types/Entity>`.
+:ref:`Entity <types-entity>`.
 
 .. _y-filter:
 
@@ -50,7 +54,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
         containing this attribute is added to the configuration if
         and only if the configuration data does not already exist in
         the configuration datastore. If the configuration data
-        exists, an error (:go:struct:`YGOServiceProviderError<ydk/types/YGOServiceProviderError>`) will be thrown
+        exists, an error (:go:struct:`YServiceProviderError<ydk/errors/YServiceProviderError>`) will be thrown
         with XML error message.
 
     .. attribute:: Remove
@@ -71,7 +75,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
         containing this attribute is deleted from the configuration
         if and only if the configuration data currently exists in
         the configuration datastore. If the configuration data does
-        not exist, an :go:struct:`YGOServiceProviderError<ydk/types/YGOServiceProviderError>` will be
+        not exist, an :go:struct:`YServiceProviderError<ydk/errors/YServiceProviderError>` will be
         thrown with XML error message.
 
     .. attribute:: Replace

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
 project(ydk_bundle_test)
 set(YDK_UNITTEST_TARGET_NAME "ydk_bundle_test")
@@ -7,30 +7,31 @@ enable_testing()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
+        main.cpp
         test_c_api.cpp
-        test_core_netconf.cpp
+        test_crud.cpp
+        test_errors.cpp
+        test_executor_service.cpp
+        test_netconf_operations.cpp
+        test_netconf_provider.cpp
+        test_netconf_service.cpp
         test_netconf_ssh_client.cpp
         test_netconf_tcp_client.cpp
-        test_restconf_client.cpp
-        testsanitynctest.cpp
-        test_crud.cpp
         test_core_gnmi.cpp
         test_gnmi_provider.cpp
         test_gnmi_service.cpp
         test_on_demand_loading.cpp
-        test_sanity_levels.cpp
-        test_sanity_types.cpp
-        testsanityvalidationtest.cpp
-        test_netconf_provider.cpp
+        test_opendaylight.cpp
+        test_path_api.cpp
+        test_restconf_client.cpp
         test_restconf_provider.cpp
         test_sanity_codec.cpp
-        test_netconf_operations.cpp
-        test_executor_service.cpp
-        test_netconf_service.cpp
-        test_errors.cpp
-        test_opendaylight.cpp
+        test_sanity_levels.cpp
+        test_sanity_types.cpp
         test_xml_subtree.cpp
-        main.cpp)
+        testsanitynctest.cpp
+        testsanityvalidationtest.cpp
+        )
 
 find_library(xml2_location xml2)
 find_library(curl_location curl)
@@ -48,7 +49,12 @@ find_package(GRPC REQUIRED)
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0")
+if(COVERAGE STREQUAL True)
+    set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0 -fprofile-arcs -ftest-coverage")
+    set(CMAKE_BUILD_TYPE debug)
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG   "-g3 -O0")
+endif()
 
 
 # set default build type if not specified by user

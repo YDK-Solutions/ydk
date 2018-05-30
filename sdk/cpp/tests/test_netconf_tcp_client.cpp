@@ -28,7 +28,7 @@ using namespace std;
 #define NC_VERB_VERBOSE 2
 
 // NOTE: The ./ ensures this test has to be explicitly run by name
-TEST_CASE("./tcp_xr")
+TEST_CASE("tcp_xr")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -62,7 +62,7 @@ TEST_CASE("./tcp_xr")
 }
 
 
-TEST_CASE("./tcp_create")
+TEST_CASE("tcp_create")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -74,7 +74,7 @@ TEST_CASE("./tcp_create")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("./tcp_edit_get_config")
+TEST_CASE("tcp_edit_get_config")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -154,7 +154,7 @@ TEST_CASE("./tcp_edit_get_config")
     REQUIRE(NULL != strstr(reply.c_str(), "<ok/>"));
 }
 
-TEST_CASE("./tcp_validate")
+TEST_CASE("tcp_validate")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -175,7 +175,7 @@ TEST_CASE("./tcp_validate")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("./tcp_lock_unlock")
+TEST_CASE("tcp_lock_unlock")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -269,7 +269,7 @@ TEST_CASE("./tcp_rpc_error")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("./tcp_device_not_connected_execute")
+TEST_CASE("tcp_device_not_connected_execute")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     try
@@ -285,14 +285,14 @@ TEST_CASE("./tcp_device_not_connected_execute")
                  "</rpc>");
         REQUIRE(s== "");
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not execute payload. Not connected to 127.0.0.1");
+        REQUIRE(e.err_msg=="YClientError: Could not execute payload. Not connected to 127.0.0.1");
     }
 
 }
 
-TEST_CASE("./tcp_rpc_invalid")
+TEST_CASE("tcp_rpc_invalid")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int ok = 0;
@@ -310,9 +310,9 @@ TEST_CASE("./tcp_rpc_invalid")
              "</rpc>");
         REQUIRE(NULL != strstr(reply.c_str(), ""));
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: could not build payload");
+        REQUIRE(e.err_msg=="YClientError: could not build payload");
     }
 
     REQUIRE(result == ok);
@@ -334,16 +334,16 @@ TEST_CASE("./tcp_rpc_invalid")
 //          );
 //         REQUIRE(reply== "");
 //     }
-//     catch (YCPPError & e)
+//     catch (YError & e)
 //     {
-//         REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+//         REQUIRE(e.err_msg=="YClientError: Could not build payload");
 //     }
 
 
 //     REQUIRE(result == OK);
 // }
 
-TEST_CASE("./tcp_correct_xml_wrong_rpc")
+TEST_CASE("tcp_correct_xml_wrong_rpc")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -359,7 +359,7 @@ TEST_CASE("./tcp_correct_xml_wrong_rpc")
     REQUIRE(result == OK);
 }
 
-TEST_CASE("./tcp_empty_rpc")
+TEST_CASE("tcp_empty_rpc")
 {
     NetconfTCPClient client{"admin", "admin", "127.0.0.1", 12307};
     int OK = 0;
@@ -372,15 +372,15 @@ TEST_CASE("./tcp_empty_rpc")
         string reply = client.execute_payload("");
         REQUIRE(reply== "");
     }
-    catch (YCPPError & e)
+    catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YCPPClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YClientError: Could not build payload");
     }
     REQUIRE(result == OK);
 }
 
 // Timeout error
-TEST_CASE("./tcp_multiple_clients")
+TEST_CASE("tcp_multiple_clients")
 {
     NetconfTCPClient client1{"admin", "admin", "127.0.0.1", 12307};
     NetconfTCPClient client2{"admin", "admin", "127.0.0.1", 12307};

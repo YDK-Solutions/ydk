@@ -25,9 +25,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <fstream>
-#include <unordered_set>
 
 #include "path_private.hpp"
 #include "../ydk_yang.hpp"
@@ -41,7 +41,8 @@ namespace ydk
 {
 static bool file_exists(const std::string & path)
 {
-    struct stat st = {0};
+    struct stat st;
+    memset(&st, 0, sizeof(struct stat));
 
     return stat(path.c_str(), &st) == 0;
 }
@@ -69,7 +70,7 @@ static void create_if_does_not_exist(const std::string & path)
         if(mkdir(path.c_str(), 0700) != 0)
         {
             YLOG_ERROR("Could not create repository: {}", path);
-            throw(YCPPIllegalStateError{"Could not create repository: "+path});
+            throw(YIllegalStateError{"Could not create repository: "+path});
         }
     }
 }
@@ -94,7 +95,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
                     || error_message.str().find("does not satisfy the constraint")!= std::string::npos)
             {
                 YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
-                throw(YCPPModelError{});
+                throw(YModelError{});
             }
             YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
             break;
@@ -110,7 +111,7 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
 }
 
 ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option)
-  : using_temp_directory(true), caching_option(caching_option)
+  : using_temp_directory(true), caching_option(caching_option), server_caps()
 {
     path = get_models_download_path();
     ly_set_log_clb(libyang_log_callback, 1);
@@ -118,13 +119,13 @@ ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option
 
 
 ydk::path::RepositoryPtr::RepositoryPtr(const std::string& search_dir, path::ModelCachingOption caching_option)
-  : path{search_dir}, using_temp_directory(false), caching_option(caching_option)
+  : path{search_dir}, using_temp_directory(false), caching_option(caching_option), server_caps()
 {
 
     if (!file_exists(path))
     {
         YLOG_ERROR("Path {} is not a valid directory.", search_dir);
-        throw(YCPPInvalidArgumentError{"path "+search_dir+" is not a valid directory"});
+        throw(YInvalidArgumentError{"path "+search_dir+" is not a valid directory"});
     }
 
     ly_set_log_clb(libyang_log_callback, 1);
@@ -167,7 +168,7 @@ namespace ydk {
             enlarged_data = static_cast<char*>(std::malloc((len + 2) * sizeof *enlarged_data));
             if (!enlarged_data) {
                 YLOG_ERROR("Could not download model: {}", model_name);
-                throw(std::bad_alloc{});
+                throw(YIllegalStateError{"Could not download model: " + model_name});
             }
             memcpy(enlarged_data, data, len);
             enlarged_data[len] = enlarged_data[len + 1] = '\0';
@@ -192,13 +193,14 @@ namespace ydk {
                 yang_file_path += '/';
                 yang_file_path += (submod_name?submod_name:module_name);
                 yang_file_path_no_revision += yang_file_path;
-                if(module_rev){
-                    yang_file_path += "@";
-                    yang_file_path += module_rev;
-                }
-                else if(sub_rev){
+
+                if(submod_name && sub_rev){
                     yang_file_path += "@";
                     yang_file_path += sub_rev;
+                }
+                else if(module_name && module_rev){
+                    yang_file_path += "@";
+                    yang_file_path += module_rev;
                 }
                 yang_file_path += ".yang";
                 YLOG_DEBUG("Opening file {}", yang_file_path);
@@ -222,7 +224,7 @@ namespace ydk {
                         return get_enlarged_data(model_data, yang_file_path);
                     } else {
                         YLOG_ERROR("Cannot open file {}", yang_file_path);
-                        throw(YCPPIllegalStateError("Cannot open file"));
+                        throw(YIllegalStateError("Cannot open file " + yang_file_path));
                     }
 
                 }
@@ -244,13 +246,13 @@ namespace ydk {
                         return get_enlarged_data(model_data, yang_file_path);
                     } else {
                         YLOG_DEBUG("Cannot find model with module_name: {} module_rev: {}", module_name, (module_rev !=nullptr ? module_rev : ""));
-//                        throw(YCPPIllegalStateError{"Cannot find model"});
+//                        throw(YIllegalStateError{"Cannot find model"});
                         return {};
                     }
                 }
             }
             YLOG_DEBUG("Cannot find model with module_name: {}", module_name);
-//            throw(YCPPIllegalStateError{"Cannot find model"});
+//            throw(YIllegalStateError{"Cannot find model"});
             return {};
         }
     }
@@ -279,17 +281,17 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
         YLOG_INFO("Path where models are to be downloaded: {}", path);
     }
     YLOG_DEBUG("Creating libyang context in path: {}", path);
-    struct ly_ctx* ctx = ly_ctx_new(path.c_str());
+    struct ly_ctx* ctx = ly_ctx_new(path.c_str(), LY_CTX_ALLIMPLEMENTED);
 
     if(!ctx) {
         YLOG_ERROR("Could not create repository in: {}", path);
-        throw(std::bad_alloc{});
+        throw(YIllegalStateError{"Could not create repository in: " + path});
     }
 
     //set module callback (only if there is a model provider)
     if(!model_providers.empty())
     {
-        ly_ctx_set_module_clb(ctx, get_module_callback, this);
+        ly_ctx_set_module_imp_clb(ctx, get_module_callback, this);
     }
 
     return ctx;
@@ -299,12 +301,11 @@ std::shared_ptr<ydk::path::RootSchemaNode>
 ydk::path::RepositoryPtr::create_root_schema(const std::unordered_map<std::string, path::Capability>& lookup_table,
                                              const std::vector<path::Capability>& caps_to_load)
 {
-    ly_verb(LY_LLSILENT); //turn off libyang logging at the beginning
+    ly_verb(LY_LLVRB); // enable libyang logging
     ly_ctx* ctx = create_ly_context();
 
     load_module_from_capabilities(ctx, caps_to_load);
 
-    ly_verb(LY_LLVRB); // enable libyang logging after model download has completed
     RootSchemaNodeImpl* rs = new RootSchemaNodeImpl{ctx, shared_from_this(), lookup_table};
     return std::shared_ptr<RootSchemaNode>(rs);
 }
@@ -427,13 +428,19 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name)
 {
     bool new_module = true;
-    return load_module(ctx, module_name, "", {}, new_module);
+    std::string revision = "";
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, bool& new_module)
 {
-    return load_module(ctx, module_name, "", {}, new_module);
+    std::string revision = "";
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
 }
 
 const lys_module*
@@ -453,33 +460,82 @@ const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision)
 {
     bool new_module = true;
-    return load_module(ctx, module_name, revision, {}, new_module);
+    ydk::path::Capability mod_cap = ydk::path::Capability{module_name, revision};
+    get_module_capabilities(mod_cap);
+    return load_module(ctx, mod_cap, new_module);
+}
+
+void
+ydk::path::RepositoryPtr::collect_features_from_imported_modules(const lys_module* module, std::set<std::pair<lys_module*, std::string>>& features)
+{
+    for (int i=0; i<module->imp_size; i++) {
+        const lys_module* imp_module = module->imp[i].module;
+        ydk::path::Capability mod_cap = ydk::path::Capability{imp_module->name, ""};
+        get_module_capabilities(mod_cap);
+        for (auto f : mod_cap.features) {
+            features.insert(make_pair((lys_module*)imp_module, f));
+        }
+        collect_features_from_imported_modules(imp_module, features);
+    }
 }
 
 const lys_module*
 ydk::path::RepositoryPtr::load_module(ly_ctx* ctx, const std::string& module, const std::string& revision, const std::vector<std::string>& features, bool& new_module)
 {
 
-    YLOG_DEBUG("Module '{}' Revision '{}'", module.c_str(), revision.c_str());
+    YLOG_DEBUG("Loading Module '{}' Revision '{}'", module.c_str(), revision.c_str());
 
-    auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? 0 : revision.c_str());
-
-    if(!p)
-    {
-        p = ly_ctx_load_module(ctx, module.c_str(), revision.empty() ? 0 : revision.c_str());
-    } else {
-        YLOG_DEBUG("Cache hit Module '{}' Revision '{}'", module, revision);
-        new_module = false;
-    }
+    auto p = ly_ctx_get_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str(), 1);
 
     if (!p) {
-        YLOG_WARN("Unable to parse module: '{}'. This model cannot be used with YDK", module);
+        p = ly_ctx_load_module(ctx, module.c_str(), revision.empty() ? NULL : revision.c_str());
+        if (!p) {
+            YLOG_WARN("Unable to parse module '{}'. This model cannot be used with YDK", module);
+            return p;
+       }
+    }
+    else {
+        const struct lys_node *last = nullptr;
+        auto q = lys_getnext(last, nullptr, p, 0);
+        if (q && q->priv) {
+            YLOG_DEBUG("The module '{}' schema has already been populated in YDK repository", module);
+            new_module = false;
+        }
+        else {
+            YLOG_DEBUG("The module '{}' schema present in Libyang repository, but not in YDK; consider populate", module);
+        }
     }
 
-    for (auto f : features)
-        lys_features_enable(p, f.c_str());
+    // Collect all module features
+    std::set<std::pair<lys_module*, std::string>> all_features{};
+    for (auto f : features) {
+        all_features.insert(make_pair((lys_module*)p, f));
+    }
+    collect_features_from_imported_modules(p, all_features);
 
+    for (auto elem : all_features) {
+        if (lys_features_enable((const lys_module*)elem.first, elem.second.c_str())) {
+            YLOG_DEBUG("Failed to enable feature '{}' in '{}'", elem.second, elem.first->name);
+        }
+        else {
+            YLOG_DEBUG("Enabled feature '{}' in '{}'", elem.second, elem.first->name);
+        }
+    }
     return p;
+}
+
+void
+ydk::path::RepositoryPtr::get_module_capabilities(ydk::path::Capability & mod_cap)
+{
+    for (auto & cap: server_caps) {
+        if (cap.module == mod_cap.module &&
+            (mod_cap.revision == "" || cap.revision == mod_cap.revision))
+        {
+            mod_cap.features = cap.features;
+            mod_cap.deviations = cap.deviations;
+            break;
+        }
+    }
 }
 
 ///
@@ -567,5 +623,9 @@ std::vector<ydk::path::ModelProvider*> ydk::path::Repository::get_model_provider
     return m_priv_repo->get_model_providers();
 }
 
+void
+ydk::path::Repository::set_server_capabilities(std::vector<path::Capability> & serv_caps) {
+	m_priv_repo->server_caps = serv_caps;
+}
 ////////////////////////////////////////////////////////////////////////
 

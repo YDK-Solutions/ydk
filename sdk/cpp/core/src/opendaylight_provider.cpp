@@ -15,13 +15,11 @@
 ------------------------------------------------------------------*/
 
 #include "logger.hpp"
-#include "netconf_provider.hpp"
 #include "opendaylight_parser.hpp"
 #include "opendaylight_provider.hpp"
 #include "path_api.hpp"
 #include "restconf_client.hpp"
 #include "restconf_provider.hpp"
-#include "service_provider.hpp"
 
 
 using namespace std;
@@ -40,7 +38,7 @@ OpenDaylightServiceProvider::OpenDaylightServiceProvider(path::Repository & repo
     if(protocol != Protocol::restconf)
     {
         YLOG_ERROR("Netconf protocol currently not supported");
-        throw(YCPPServiceProviderError{"Netconf protocol currently not supported"});
+        throw(YServiceProviderError{"Netconf protocol currently not supported"});
     }
 
     RestconfClient client{address, username, password, port, get_encoding_string(encoding)};
@@ -63,7 +61,7 @@ unique_ptr<ydk::ServiceProvider> OpenDaylightServiceProvider::create_provider_fo
     if(odl_nodes.find(node_id) == odl_nodes.end())
     {
         YLOG_ERROR("Invalid node id {}", node_id);
-        throw(YCPPServiceProviderError{"Invalid node id " + node_id});
+        throw(YServiceProviderError{"Invalid node id " + node_id});
     }
     YLOG_DEBUG("Creating and returning provider for {}", node_id);
     vector<string> node_capabilities{};

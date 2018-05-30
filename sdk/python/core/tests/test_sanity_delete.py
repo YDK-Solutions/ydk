@@ -23,7 +23,7 @@ import unittest
 
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
-from ydk.errors import YPYError
+from ydk.errors import YError
 from ydk.filters import YFilter
 from ydk.models.ydktest import ydktest_sanity as ysanity
 
@@ -101,16 +101,14 @@ class SanityYang(unittest.TestCase):
         runner_create.two.name = 'two'
         self.crud.create(self.ncc, runner_create)
 
-        runner_read_filter = ysanity.Runner()
-        runner_read = self.crud.read(self.ncc, runner_read_filter)
-
         # use DELETE object to remove leaf one
-        runner_update = runner_read
-        runner_update.ydktest_sanity_one.name.yfilter = YFilter.delete
+        runner_update = ysanity.Runner()
+        runner_update.ydktest_sanity_one.name = ''
+        runner_update.ydktest_sanity_one.name = YFilter.delete
         self.crud.update(self.ncc, runner_update)
 
         # manually create remaining runner with leaf two
-        runner_read = self.crud.read(self.ncc, runner_read_filter)
+        runner_read = self.crud.read(self.ncc, ysanity.Runner())
         runner_compare = ysanity.Runner()
         runner_compare.two.name = 'two'
 
@@ -128,7 +126,7 @@ class SanityYang(unittest.TestCase):
         runner_update.ytypes.built_in_t.llstring.append('0')
         runner_update.ytypes.built_in_t.llstring.append('3')
         # set yfilter
-        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
+        runner_update.ytypes.built_in_t.llstring = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -136,10 +134,11 @@ class SanityYang(unittest.TestCase):
         runner_compare = runner_create
         runner_compare.ydktest_sanity_one.name = 'one'
 
-        runner_compare.ytypes.built_in_t.llstring.clear()
+        runner_compare.ytypes.built_in_t.llstring = []
         runner_compare.ytypes.built_in_t.llstring.extend(['1', '2', '4'])
 
         self.assertEqual(runner_compare, runner_read)
+        self.assertEqual(runner_compare.ytypes.built_in_t.llstring, runner_read.ytypes.built_in_t.llstring)
 
     def test_delete_on_leaflist(self):
         runner_create = ysanity.Runner()
@@ -150,7 +149,7 @@ class SanityYang(unittest.TestCase):
 
         runner_update = ysanity.Runner()
         runner_update.ytypes.built_in_t.llstring.append('3')
-        runner_update.ytypes.built_in_t.llstring.yfilter = YFilter.delete
+        runner_update.ytypes.built_in_t.llstring = YFilter.delete
 
         self.crud.update(self.ncc, runner_update)
         runner_read = self.read_from_empty_filter()
@@ -160,12 +159,13 @@ class SanityYang(unittest.TestCase):
         runner_compare.ytypes.built_in_t.llstring.extend(['0', '1', '2', '4'])
 
         self.assertEqual(runner_compare, runner_read)
+        self.assertEqual(runner_compare.ytypes.built_in_t.llstring, runner_read.ytypes.built_in_t.llstring)
 
     def test_delete_on_list_with_identitykey(self):
         runner = ysanity.Runner()
         a1 = ysanity.Runner.OneList.IdentityList()
         a1.config.id = ysanity.ChildIdentity()
-        a1.id_ref =  a1.config.id.get()
+        a1.id_ref =  a1.config.id.to_string()
         runner.one_list.identity_list.append(a1)
         self.crud.create(self.ncc, runner)
 
@@ -174,7 +174,7 @@ class SanityYang(unittest.TestCase):
         runner_update = ysanity.Runner()
         k = ysanity.Runner.OneList.IdentityList()
         k.config.id = ysanity.ChildIdentity()
-        k.id_ref = k.config.id.get()
+        k.id_ref = k.config.id.to_string()
         k.yfilter = YFilter.delete
         runner_update.one_list.identity_list.append(k)
 

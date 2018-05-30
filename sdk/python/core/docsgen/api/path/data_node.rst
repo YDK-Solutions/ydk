@@ -26,7 +26,7 @@ DataNode
         This method adds the annotation to this Datanode.
 
         :param annotation: (:py:class:`Annotation<ydk.path.Annotation>`) Annotation to be added.
-        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
 
     .. py:method:: annotations()
 
@@ -49,8 +49,27 @@ DataNode
         :param path: (``str``) The XPath expression identifying the node.
         :param value: (``str``) The value to be set.
 
-        :raises RuntimeError: With ``YCPPPathError`` prefix in case the path is invalie.
-        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
+        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+
+    .. py:method:: create_action(path)
+
+        Create a DataNode representing a YANG 1.1 action corresponding to the path and set its value, if provided.
+
+        :param path: (``str``) The XPath expression identifying the node.
+
+        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
+        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+
+    .. py:method:: __call__(service_provider)
+
+        Execute/Invoke the DataNode containing a YANG 1.1 action through the given service provider.
+
+        :param service_provider: (:py:class:`ServiceProvider`) The Service provider.
+        :return: :py:class:`DataNode` instance if succeed.
+        :rtype: None or :py:class:`DataNode`
+
+        :raises RuntimeError: With ``YError`` prefix in case the path is invalid or DataNode contains no action nodes.
 
     .. py:method:: find(path)
 
@@ -102,4 +121,4 @@ DataNode
             * This method does not validate the value being set.
 
         :param value: (``str``) The value to set. This should be the string representation of the YANG type.
-        :raises RuntimeError: With ``YCPPInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).
+        :raises RuntimeError: With ``YInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).

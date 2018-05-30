@@ -59,13 +59,13 @@ func configBgp(bgp *ysanity_bgp.Bgp) {
 	ipv6Afisafi.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
 	ipv6Afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
 	ipv6Afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv6Afisafi)
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, &ipv6Afisafi)
 
 	ipv4Afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
 	ipv4Afisafi.AfiSafiName = &ysanity_bgp_types.IPV4UNICAST{}
 	ipv4Afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV4UNICAST{}
 	ipv4Afisafi.Config.Enabled = true
-	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, ipv4Afisafi)
+	bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, &ipv4Afisafi)
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
@@ -76,7 +76,7 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLEncoding() {
 	payload := suite.Codec.Encode(&suite.Provider, &bgp)
 
 	ydk.YLogDebug(fmt.Sprintf(
-		"In TestGenCodeXMLEncoding, payload = %v", payload))
+		"In TestGenCodeXMLEncoding, payload:\n%v", payload))
 }
 
 func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
@@ -84,7 +84,7 @@ func (suite *GenCodeTestSuite) TestGenCodeXMLDecoding() {
 	bgpDecoded := entity.(*ysanity_bgp.Bgp)
 
 	p := suite.Codec.Encode(&suite.Provider, bgpDecoded)
-	ydk.YLogDebug(fmt.Sprintf("In TestGenCodeXMlDecoding, payload = %v", p))
+	ydk.YLogDebug(fmt.Sprintf("In TestGenCodeXMlDecoding, payload:\n%v", p))
 }
 
 func TestGenCodeTestSuite(t *testing.T) {

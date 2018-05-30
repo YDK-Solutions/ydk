@@ -70,20 +70,20 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
     if(path.empty())
     {
         YLOG_ERROR("Path is empty");
-        throw(YCPPInvalidArgumentError{"Path is empty"});
+        throw(YInvalidArgumentError{"Path is empty"});
     }
 
     //path should not start with /
     if(path.at(0) == '/')
     {
         YLOG_ERROR("Path '{}' should not start with /", path);
-        throw(YCPPInvalidArgumentError{"Path should not start with /"});
+        throw(YInvalidArgumentError{"Path should not start with /"});
     }
     std::vector<std::string> segments = segmentalize(path);
     if(segments.size()<=0)
     {
         YLOG_ERROR("Could not segmentalize path");
-        throw(YCPPInvalidArgumentError{"Could not segmentalize path"});
+        throw(YInvalidArgumentError{"Could not segmentalize path"});
     }
 
     std::string start_seg = m_path + segments[0];
@@ -94,7 +94,7 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
     if( dnode == nullptr)
     {
         YLOG_ERROR("Path '{}' is invalid", path);
-        throw(YCPPInvalidArgumentError{"Path is invalid: " + path});
+        throw(YInvalidArgumentError{"Path is invalid: " + path});
     }
 
     DataNodeImpl* dn = nullptr;
@@ -122,11 +122,6 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
     }
 
     DataNode* rdn = dn;
-    // created data node is the last child
-    while(!rdn->get_children().empty())
-    {
-        rdn = rdn->get_children()[0].get();
-    }
 
     //at this stage we have dn so for the remaining segments use dn as the parent
     if(segments.size() > 1)
@@ -154,7 +149,7 @@ ydk::path::RootDataImpl::set_value(const std::string& value)
 {
     if(!value.empty()) {
         YLOG_ERROR("Invalid value being assigned to root");
-        throw(YCPPInvalidArgumentError{"Invalid value being assigned to root."});
+        throw(YInvalidArgumentError{"Invalid value being assigned to root."});
     }
 }
 
@@ -212,7 +207,7 @@ ydk::path::RootDataImpl::find(const std::string& path)
     }
 
     auto s = get_schema_node().get_statement();
-    if(s.keyword == "rpc")
+    if(s.keyword == "rpc" || s.keyword == "action")
     {
         schema_path+="input/";
     }
@@ -220,7 +215,7 @@ ydk::path::RootDataImpl::find(const std::string& path)
     schema_path+=path;
 
     YLOG_DEBUG("Looking for schema nodes path in root: '{}'", schema_path);
-    const struct lys_node* found_snode = ly_ctx_get_node(m_node->schema->module->ctx, nullptr, schema_path.c_str());
+    const struct lys_node* found_snode = ly_ctx_get_node(m_node->schema->module->ctx, nullptr, schema_path.c_str(), 1);
 
     if(found_snode)
     {

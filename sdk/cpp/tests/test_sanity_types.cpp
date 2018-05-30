@@ -14,8 +14,9 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 
-#include <string.h>
 #include <iostream>
+#include <sstream>
+#include <string.h>
 
 #include "ydk/netconf_provider.hpp"
 #include "ydk/crud_service.hpp"
@@ -654,4 +655,132 @@ TEST_CASE("string_leaflist")
     REQUIRE(r_read!=nullptr);
     ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
     REQUIRE(r_1->ytypes->built_in_t->enum_llist == r_2->ytypes->built_in_t->enum_llist);
+}
+
+TEST_CASE("test_cascading_types")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // DELETE
+    auto ctypes = make_unique<ydktest_sanity::CascadingTypes>();
+    bool reply = crud.delete_(provider, *ctypes);
+    REQUIRE(reply);
+
+    // CREATE
+    SECTION ( "unknown" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::unknown;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::unknown;
+    }
+
+    SECTION ( "phys" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::phys;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::phys;
+    }
+
+    SECTION ( "virt" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::virt;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::virt;
+    }
+
+    SECTION ( "hv" )
+    {
+        ctypes->comp_insttype = ydktest_sanity::CompInstType::hv;
+        ctypes->comp_nicinsttype = ydktest_sanity::CompInstType_::hv;
+    }
+    reply = crud.create(provider, *ctypes);
+    REQUIRE(reply);
+
+    // READ
+    auto filter = make_unique<ydktest_sanity::CascadingTypes>();
+    auto temp = crud.read(provider, *filter);
+    REQUIRE(temp!=nullptr);
+    ydktest_sanity::CascadingTypes * ctypesRead = dynamic_cast<ydktest_sanity::CascadingTypes*>(temp.get());
+    std::cout<<ctypes->comp_insttype<<std::endl;
+    std::cout<<ctypesRead->comp_nicinsttype<<std::endl;
+    REQUIRE(ctypes->comp_insttype == ctypesRead->comp_nicinsttype);
+}
+
+TEST_CASE("test_capital_letters")
+{
+    NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    auto native = make_unique<ydktest_sanity::Native>();
+    bool reply = crud.delete_(provider, *native);
+    REQUIRE(reply);
+
+    // CREATE
+    auto gigabit_eth = make_shared<ydktest_sanity::Native::Interface::GigabitEthernet>();
+    gigabit_eth->parent = native->interface.get();
+    gigabit_eth->name = "test";
+
+    native->interface->gigabitethernet.append(gigabit_eth);
+    reply = crud.create(provider, *native);
+    REQUIRE(reply);
+
+    // READ
+    auto filter = make_unique<ydktest_sanity::Native>();
+    auto read_entity_wrapper = crud.read(provider, *filter);
+    REQUIRE(read_entity_wrapper != nullptr);
+    ydktest_sanity::Native *read_entity = dynamic_cast<ydktest_sanity::Native*>(read_entity_wrapper.get());
+    REQUIRE(*native == *read_entity);
+}
+
+static string vector_to_string(vector<string> & string_vector)
+{
+    ostringstream buf;
+    for (auto item : string_vector) {
+        if (buf.str().length() > 0)
+            buf << ", ";
+        buf << "\"" << item << "\"";
+    }
+    return buf.str();
+}
+
+TEST_CASE("test_ylist_two_keys") {
+	auto runner = make_shared<ydktest_sanity::Runner>();
+	auto l1 = make_shared<ydktest_sanity::Runner::TwoKeyList> (); l1->first = "f1"; l1->second = 11;
+	auto l2 = make_shared<ydktest_sanity::Runner::TwoKeyList> (); l2->first = "f2"; l2->second = 22;
+	runner->two_key_list.extend({l1, l2});
+
+	auto ldataKeys = runner->two_key_list.keys();
+	REQUIRE(vector_to_string(ldataKeys) == R"("f1,11", "f2,22")");
+
+	string count{};
+	for (auto lkey : ldataKeys) {
+		auto ent = runner->two_key_list[lkey];
+		REQUIRE(ent != nullptr);
+		auto ldata = dynamic_cast<ydktest_sanity::Runner::TwoKeyList*> (ent.get());
+		count += ldata->first;
+	}
+	REQUIRE(count == "f1f2");
+
+	auto ent = runner->two_key_list["f2,22"];
+	REQUIRE(ent != nullptr);
+	auto ldata = dynamic_cast<ydktest_sanity::Runner::TwoKeyList*> (ent.get());
+    count = ldata->first;
+	REQUIRE("f2" == count);
+}
+
+TEST_CASE("test_ylist_no_keys") {
+	auto runner = make_shared<ydktest_sanity::Runner>();
+	auto t1 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t1->test = "t1";
+	auto t2 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t2->test = "t2";
+	auto t3 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t3->test = "t3";
+	runner->no_key_list.extend({t1, t2, t3});
+
+	auto testKeys = runner->no_key_list.keys();
+	REQUIRE(vector_to_string(testKeys) == R"("0", "1", "2")");
+
+	string count{};
+	for (auto ent : runner->no_key_list.entities()) {
+		auto elem = dynamic_cast<ydktest_sanity::Runner::NoKeyList*> (ent.get());
+		count += elem->test;
+	}
+	REQUIRE(count == "t1t2t3");
 }

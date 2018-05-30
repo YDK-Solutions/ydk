@@ -48,6 +48,7 @@ namespace ydk {
 class gNMIClient;
 class NetconfClient;
 class RestconfClient;
+class CapabilitiesParser;
 
 namespace path {
 
@@ -269,8 +270,8 @@ public:
     ///
     /// @param[in] dn The root of DataNode tree to validate.
     /// @param[in] option The context for validation.
-    /// @throws YCPPValidationError if validation errors were detected.
-    /// @throws YCPPInvalidArgumentError if the arguments are invalid.
+    /// @throws YValidationError if validation errors were detected.
+    /// @throws YInvalidArgumentError if the arguments are invalid.
     ///
     void validate(const DataNode & dn, ydk::ValidationService::Option option);
 };
@@ -293,9 +294,11 @@ public:
     /// @param[in] format to encode to.
     /// @param[in] pretty if true the output is indented for human consumption.
     /// @return The encoded string.
-    //  @throws YCPPInvalidArgumentError if the arguments are invalid.
+    //  @throws YInvalidArgumentError if the arguments are invalid.
     ///
     std::string encode(const DataNode & dn, EncodingFormat format, bool pretty);
+
+    std::string encode(std::vector<ydk::path::DataNode*> & data_nodes, ydk::EncodingFormat format, bool pretty);
 
     ///
     /// @brief decode the buffer to return a DataNode
@@ -304,22 +307,22 @@ public:
     /// @param[in] buffer The string representation of the DataNode.
     /// @param[in] format .Note ::TREE is not supported.
     /// @return The DataNode instantiated or nullptr in case of error.
-    /// @throws YCPPInvalidArgumentError if the arguments are invalid.
+    /// @throws YInvalidArgumentError if the arguments are invalid.
     ///
     std::shared_ptr<DataNode> decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
     std::shared_ptr<DataNode> decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format);
 };
 
 ///
-/// @brief Base class for YCPP Errors
+/// @brief Base class for Y Errors
 ///
 /// The subclasses give a specialized view of the error that has occurred.
 ///
-struct YCPPCoreError : public ydk::YCPPError
+struct YCoreError : public ydk::YError
 {
-    YCPPCoreError();
+    YCoreError();
 
-    YCPPCoreError(const std::string& msg);
+    YCoreError(const std::string& msg);
 
 };
 
@@ -328,7 +331,7 @@ struct YCPPCoreError : public ydk::YCPPError
 /// @brief Error that encapsualtes the validation errors
 ///        on a data tree
 ///
-struct YCPPDataValidationError : public YCPPCoreError
+struct YDataValidationError : public YCoreError
 {
     /// Data Validation Error Enum
     enum class Error {
@@ -365,7 +368,7 @@ struct YCPPDataValidationError : public YCPPCoreError
 
     };
 
-    YCPPDataValidationError();
+    YDataValidationError();
 
     /// List of pair<DataNode, ValidationError>. The Validation Error is specific to
     /// this node
@@ -373,7 +376,7 @@ struct YCPPDataValidationError : public YCPPCoreError
 
 };
 
-struct YCPPPathError : public YCPPCoreError
+struct YPathError : public YCoreError
 {
     enum class Error {
         SUCCESS,  /// no error
@@ -397,11 +400,11 @@ struct YCPPPathError : public YCPPCoreError
 
     Error err;
 
-    YCPPPathError(YCPPPathError::Error error_code);
+    YPathError(YPathError::Error error_code);
 
 };
 
-struct YCPPCodecError : public YCPPCoreError
+struct YCodecError : public YCoreError
 {
     enum class Error {
         SUCCESS,  /// no error
@@ -416,7 +419,7 @@ struct YCPPCodecError : public YCPPCoreError
 
     Error err;
 
-    YCPPCodecError(YCPPCodecError::Error merror);
+    YCodecError(YCodecError::Error merror);
 };
 
 ///
@@ -512,8 +515,8 @@ public:
     /// the given path expression. See @see howtopath
     /// @param path The path expression.
     /// @return vector of SchemaNode  that satisfies the criterion.
-    /// @throws YCPPPathError if the path expression in invalid, See error code for details.
-    /// @throws YCPPInvalidArgumentError if the argument is invalid.
+    /// @throws YPathError if the path expression in invalid, See error code for details.
+    /// @throws YInvalidArgumentError if the argument is invalid.
     ///
     virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
@@ -583,8 +586,8 @@ public:
     /// the given path expression. See @see howtopath
     /// @param path The path expression.
     /// @return vector of SchemaNode  that satisfies the criterion.
-    /// @throws YCPPPathError if the path expression in invalid, See error code for details.
-    /// @throws YCPPInvalidArgumentError if the argument is invalid.
+    /// @throws YPathError if the path expression in invalid, See error code for details.
+    /// @throws YInvalidArgumentError if the argument is invalid.
     ///
     virtual std::vector<SchemaNode*> find(const std::string& path) = 0;
 
@@ -627,8 +630,8 @@ public:
     /// of the schema tree
     /// @param[in] value The string representation of the value to set.
     /// @return Pointer to DataNode created.
-    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
-    /// @throws YCPPPathError In case the path is invalid.
+    /// @throws YInvalidArgumentError In case the argument is invalid.
+    /// @throws YPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
 
@@ -646,8 +649,8 @@ public:
     ///
     /// @param[in] path The XPath expression identifying the node.
     /// @return DataNode created or nullptr
-    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
-    /// @throws YCPPPathError In case the path is invalid.
+    /// @throws YInvalidArgumentError In case the argument is invalid.
+    /// @throws YPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path)  = 0;
 
@@ -674,8 +677,8 @@ public:
     /// The path expression should point to a SchemaNode that represents the Rpc
     /// @param[in] path The path to the rpc schema node
     /// @return rpc or nullptr
-    /// @throws YCPPInvalidArgumentError if the argument is invalid.
-    /// @throws YCPPPathError if the path is invalid
+    /// @throws YInvalidArgumentError if the argument is invalid.
+    /// @throws YPathError if the path is invalid
     ///
     virtual std::shared_ptr<Rpc> create_rpc(const std::string& path) = 0;
 };
@@ -726,10 +729,12 @@ public:
     /// @param[in] path The XPath expression identifying the node.
     /// @param[in] value The string representation of the value to set.
     /// @return Pointer to DataNode created.
-    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
-    /// @throws YCPPPathError In case the path is invalid.
+    /// @throws YInvalidArgumentError In case the argument is invalid.
+    /// @throws YPathError In case the path is invalid.
     ///
    virtual DataNode& create_datanode(const std::string& path);
+
+   virtual DataNode& create_action(const std::string& path) = 0;
 
     ///
     /// @brief create a DataNode corresponding to the path and set its value
@@ -745,10 +750,22 @@ public:
     ///
     /// @param[in] path The XPath expression identifying the node.
     /// @return Pointer to DataNode created.
-    /// @throws YCPPInvalidArgumentError In case the argument is invalid.
-    /// @throws YCPPPathError In case the path is invalid.
+    /// @throws YInvalidArgumentError In case the argument is invalid.
+    /// @throws YPathError In case the path is invalid.
     ///
     virtual DataNode& create_datanode(const std::string& path, const std::string& value) = 0;
+
+    ///
+    /// @brief execute/invoke the action through the given session.
+    ///
+    /// @param[in] session The Session
+    /// @areturn pointer to the DataNode or nullptr if none exists
+    ///
+    virtual std::shared_ptr<DataNode> operator()(const Session& session) = 0;
+
+    virtual bool has_action_node() const = 0;
+
+    virtual std::string get_action_node_path() const = 0;
 
     ///
     /// @brief set the value of this DataNode.
@@ -759,7 +776,7 @@ public:
     /// Note this method does not validate the value being set. To validate please see the ValidationService.
     ///
     /// @param[in] value The value to set. This should be the string representation of the YANG type.
-    /// @throws YCPPInvalidArgumentError if the DataNode's value cannot be set (for example it represents
+    /// @throws YInvalidArgumentError if the DataNode's value cannot be set (for example it represents
     /// a container)
     virtual void set_value(const std::string& value) = 0;
 
@@ -812,7 +829,7 @@ public:
     /// This method adds the annotation to this datanode
     ///
     /// @param[in] an The annotation to add to this DataNode
-    /// @throws YCPPInvalidArgumentError In case the argument is invalid
+    /// @throws YInvalidArgumentError In case the argument is invalid
     ///
     virtual void add_annotation(const Annotation& an) = 0;
 
@@ -874,6 +891,8 @@ struct Capability {
     std::vector<std::string> deviations;
 };
 
+std::ostream& operator<< (std::ostream& stream, const Capability& value);
+
 ///
 /// @brief interface for module provider.
 ///
@@ -927,7 +946,7 @@ public:
     ///
     /// Constructor
     /// @param[in] search_dir The path in the filesystem where yang files can be found.
-    /// @throws YCPPInvalidArgumentError if the search_dir is not a valid directory in the
+    /// @throws YInvalidArgumentError if the search_dir is not a valid directory in the
     /// filesystem
     Repository(const std::string& search_dir, ModelCachingOption caching_option = ModelCachingOption::PER_DEVICE);
 
@@ -975,6 +994,7 @@ public:
     ///
     std::vector<ModelProvider*> get_model_providers() const;
 
+    void set_server_capabilities(std::vector<path::Capability> & serv_caps);
 
     std::string path;
  private:
@@ -1009,6 +1029,17 @@ public:
     /// @return The pointer to the DataNode representing the output.
     ///
     virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const = 0 ;
+
+    ///
+    /// @brief invoke the Action
+    ///
+    /// invokes or executes the action defined inside the given DataNode and Returns a DataNode pointer
+    /// if the action has an output modelled in YANG.
+    ///
+    /// @param[in] pointer to the Rpc node
+    /// @return The pointer to the DataNode representing the output.
+    ///
+    virtual std::shared_ptr<DataNode> invoke(DataNode& rpc) const = 0 ;
 };
 
 class NetconfSession : public Session {
@@ -1050,27 +1081,18 @@ public:
                    bool common_cache = false,
                    int timeout = -1);
 
-    // NetconfSession(
-    //     const std::string& address,
-    //     const std::string& username,
-    //     Repository& repo = "",
-    //     const std::string& private_key_path = "",
-    //     const std::string& public_key_path = "",
-    //     int port = 830,
-    //     bool on_demand = true,
-    //     bool common_cache = false,
-    //     int timeout = -1);
+    ~NetconfSession();
 
-    virtual ~NetconfSession();
-
-    virtual RootSchemaNode& get_root_schema() const;
-    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    RootSchemaNode& get_root_schema() const;
+    std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
     std::vector<std::string> get_capabilities() const;
 
 private:
-    std::shared_ptr<DataNode> handle_edit(
+    std::vector<std::string> get_yang_1_1_capabilities() const;
+    std::shared_ptr<DataNode> handle_crud_edit(
         Rpc& rpc, Annotation ann) const;
-    std::shared_ptr<DataNode> handle_read(Rpc& rpc) const;
+    std::shared_ptr<DataNode> handle_crud_read(Rpc& rpc) const;
     std::shared_ptr<DataNode> handle_netconf_operation(Rpc& ydk_rpc) const;
     void initialize_client_with_key(const std::string& address,
                                     const std::string& username,
@@ -1087,8 +1109,8 @@ private:
     void initialize_repo(Repository& repo, bool on_demand);
     std::string execute_payload(const std::string & payload) const;
 private:
-    std::unique_ptr<NetconfClient> client;
-    std::unique_ptr<ModelProvider> model_provider;
+    std::shared_ptr<NetconfClient> client;
+    std::shared_ptr<ModelProvider> model_provider;
     std::shared_ptr<RootSchemaNode> root_schema;
     std::vector<std::string> server_capabilities;
 };
@@ -1096,6 +1118,7 @@ private:
 
 class RestconfSession : public Session {
 public:
+    RestconfSession();
     RestconfSession(Repository & repo,
                     const std::string & address,
                     const std::string & username,
@@ -1112,15 +1135,16 @@ public:
                     const std::string & config_url_root,
                     const std::string & state_url_root);
 
-    virtual ~RestconfSession();
+    ~RestconfSession();
 
-    virtual RootSchemaNode& get_root_schema() const;
-    virtual std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    RootSchemaNode& get_root_schema() const;
+    std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
 
 private:
     void initialize(Repository & repo);
-    std::shared_ptr<DataNode> handle_edit(Rpc& rpc, const std::string & yfilter) const;
-    std::shared_ptr<DataNode> handle_read(Rpc& rpc) const;
+    std::shared_ptr<DataNode> handle_crud_edit(Rpc& rpc, const std::string & yfilter) const;
+    std::shared_ptr<DataNode> handle_crud_read(Rpc& rpc) const;
 private:
         std::shared_ptr<RestconfClient> client;
         std::shared_ptr<RootSchemaNode> root_schema;
@@ -1177,7 +1201,7 @@ private:
 
 ///
 ///
-/// @brief An instance of the YANG schmea rpc node
+/// @brief An instance of the YANG schema rpc node
 ///
 /// Instances of this class represent a YANG rpc and are modelled as Callables.
 /// The input data node tree is used to populate the input parameters to the rpc

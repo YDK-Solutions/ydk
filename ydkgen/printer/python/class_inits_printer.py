@@ -22,7 +22,7 @@ class_inits_printer.py
 """
 from pyang.types import PathTypeSpec
 from ydkgen.api_model import Bits, Class, Package, DataType, Enum, snake_case
-from ydkgen.common import get_module_name, has_list_ancestor, is_top_level_class, get_qualified_yang_name
+from ydkgen.common import get_module_name, has_list_ancestor, is_top_level_class, get_qualified_yang_name, get_unclashed_name
 from .class_get_entity_path_printer import GetAbsolutePathPrinter, GetSegmentPathPrinter
 
 
@@ -50,25 +50,14 @@ def get_lists(clazz):
     return lists
 
 
-def get_child_container_classes(clazz, one_class_per_module):
+def get_child_classes(clazz, one_class_per_module):
     m = []
     for prop in clazz.properties():
-        if prop.stmt.keyword == 'container':
+        if prop.stmt.keyword in ('list', 'container'):
             if one_class_per_module:
-                m.append('"%s" : ("%s", %s.%s)'%(get_qualified_yang_name(prop.property_type), prop.name, clazz.name, prop.property_type.name))
+                m.append('("%s", ("%s", %s.%s))' % (get_qualified_yang_name(prop.property_type), prop.name, clazz.name, prop.property_type.name))
             else:
-                m.append('"%s" : ("%s", %s)'%(get_qualified_yang_name(prop.property_type), prop.name, prop.property_type.qn()))
-    return '%s' % (', '.join(m))
-
-
-def get_child_list_classes(clazz, one_class_per_module):
-    m = []
-    for prop in clazz.properties():
-        if prop.stmt.keyword == 'list':
-            if one_class_per_module:
-                m.append('"%s" : ("%s", %s.%s)' % (get_qualified_yang_name(prop.property_type), prop.name, clazz.name, prop.property_type.name))
-            else:
-                m.append('"%s" : ("%s", %s)' % (get_qualified_yang_name(prop.property_type), prop.name, prop.property_type.qn()))
+                m.append('("%s", ("%s", %s))' % (get_qualified_yang_name(prop.property_type), prop.name, prop.property_type.qn()))
     return '%s' % (', '.join(m))
 
 
@@ -108,8 +97,9 @@ class ClassInitsPrinter(object):
             self.ctx.writeln('self.yang_parent_name = "%s"' % clazz.owner.stmt.arg)
             self.ctx.writeln('self.is_top_level_class = %s' % ('True' if is_top_level_class(clazz) else 'False'))
             self.ctx.writeln('self.has_list_ancestor = %s' % ('True' if has_list_ancestor(clazz) else 'False'))
-            self.ctx.writeln('self._child_container_classes = {%s}' % (get_child_container_classes(clazz, self.one_class_per_module)))
-            self.ctx.writeln('self._child_list_classes = {%s}' % (get_child_list_classes(clazz, self.one_class_per_module)))
+            self.ctx.writeln(
+                'self.ylist_key_names = [%s]' % (','.join(["'%s'" % key.name for key in clazz.get_key_props()])))
+            self.ctx.writeln('self._child_classes = OrderedDict([%s])' % (get_child_classes(clazz, self.one_class_per_module)))
             if clazz.stmt.search_one('presence') is not None:
                 self.ctx.writeln('self.is_presence_container = True')
             self._print_init_leafs_and_leaflists(clazz, leafs)
@@ -119,31 +109,45 @@ class ClassInitsPrinter(object):
             self._print_class_absolute_path(clazz, leafs)
 
     def _print_init_leafs_and_leaflists(self, clazz, leafs):
-        yleafs = get_leafs(clazz)
-        yleaf_lists = get_leaf_lists(clazz)
+        if len(leafs) == 0:
+            self.ctx.writeln('self._leafs = OrderedDict()')
+            return
+
+        self.ctx.writeln('self._leafs = OrderedDict([')
+        self.ctx.lvl_inc()
+        declarations = []
 
         for prop in leafs:
-            leaf_type = None
-            if prop in yleafs:
-                leaf_type = 'YLeaf'
-            elif prop in yleaf_lists:
-                leaf_type = 'YLeafList'
+            leaf_name = prop.name
+            ytype = self._get_type_name(prop.property_type)
 
-            self.ctx.bline()
+            leaf_type = 'YLeaf'
+            declaration_stmt =      'self.%s = None' % leaf_name
+            if prop.is_many:
+                leaf_type = 'YLeafList'
+                declaration_stmt =  'self.%s = []' % leaf_name
+            elif isinstance(prop.property_type, Bits):
+                declaration_stmt =  'self.%s = Bits()' % leaf_name
+
+            yname = prop.stmt.arg
             if all((prop.stmt.top.arg != clazz.stmt.top.arg,
                     hasattr(prop.stmt.top, 'i_aug_targets') and
                     clazz.stmt.top in prop.stmt.top.i_aug_targets)):
-                name = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
-            else:
-                name = prop.stmt.arg
+                yname = ':'.join([prop.stmt.top.arg, prop.stmt.arg])
 
-            self.ctx.writeln('self.%s = %s(YType.%s, "%s")'
-                % (prop.name, leaf_type, self._get_type_name(prop.property_type), name))
+            self.ctx.writeln("('%s', %s(YType.%s, '%s'))," % (leaf_name, leaf_type, ytype, yname))
+            declarations.append(declaration_stmt)
+
+        self.ctx.lvl_dec()
+        self.ctx.writeln('])')
+
+        for line in declarations:
+            self.ctx.writeln(line)
 
     def _print_children_imports(self, clazz, children):
         for child in children:
-            self.ctx.writeln('from .%s import %s' % (snake_case(child.property_type.stmt.arg), snake_case(child.property_type.stmt.arg)))
-            self.ctx.writeln('self.__class__.%s = %s.%s' % (child.property_type.name, snake_case(child.property_type.stmt.arg), child.property_type.name))
+            self.ctx.writeln('from .%s import %s' % (get_unclashed_name(child.property_type, child.property_type.iskeyword), get_unclashed_name(child.property_type, child.property_type.iskeyword)))
+            self.ctx.writeln('self.__class__.%s = %s.%s' % (child.property_type.name, get_unclashed_name(child.property_type, child.property_type.iskeyword), child.property_type.name))
         self.ctx.bline()
 
     def _print_init_children(self, children):
@@ -152,14 +156,13 @@ class ClassInitsPrinter(object):
                 self.ctx.bline()
                 if (child.stmt.search_one('presence') is None):
                     if self.one_class_per_module:
-                        self.ctx.writeln('self.%s = %s.%s()' % (child.name, snake_case(child.property_type.stmt.arg), child.property_type.name))
+                        self.ctx.writeln('self.%s = %s.%s()' % (child.name, get_unclashed_name(child.property_type, child.property_type.iskeyword), child.property_type.name))
                     else:
                         self.ctx.writeln('self.%s = %s()' % (child.name, child.property_type.qn()))
                     self.ctx.writeln('self.%s.parent = self' % child.name)
                 else:
                     self.ctx.writeln('self.%s = None' % (child.name))
-                self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, child.stmt.arg))
-                self.ctx.writeln('self._children_yang_names.add("%s")' % (child.stmt.arg))
+                self.ctx.writeln('self._children_name_map["%s"] = "%s"' % (child.name, get_qualified_yang_name(child)))
 
     def _print_init_lists(self, clazz):
         if clazz.is_identity() and len(clazz.extends) == 0:
@@ -219,9 +222,9 @@ class ClassSetAttrPrinter(object):
     def print_setattr(self, clazz, leafs):
         yleafs = get_leafs(clazz)
         yleaf_lists = get_leaf_lists(clazz)
-        ylists = get_lists(clazz)
+        children = get_child_classes(clazz, self.one_class_per_module)
 
-        if len(yleafs) + len(yleaf_lists) + len(ylists)> 0:
+        if len(yleafs) + len(yleaf_lists) + len(children)> 0:
             self._print_class_setattr_header()
             self._print_class_setattr_body(clazz, leafs)
             self._print_class_setattr_trailer()

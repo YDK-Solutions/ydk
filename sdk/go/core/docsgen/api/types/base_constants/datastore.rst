@@ -1,10 +1,14 @@
-.. _datastore-ydk:
-
 DataStore
 ---------
 
 .. go:package:: ydk/types/datastore
     :synopsis: DataStore
+
+.. code-block:: sh
+
+   import "github.com/CiscoDevNet/ydk-go/ydk/types/datastore"
+
+.. _datastore-ydk:
 
 .. attribute:: DataStore
 

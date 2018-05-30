@@ -8,6 +8,16 @@ Overview
 
 The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, plus one or more module bundles that are based on YANG models.
 
+Docker
+======
+
+A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed. This be used to run ydk-py without installing anything natively on your machine.
+
+To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command. See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
+
+  docker run -it ydkdev/ydk-py
+
+
 System Requirements
 ===================
 Please follow the below instructions to install the system requirements before installing YDK-Py:
@@ -60,12 +70,46 @@ Ubuntu (Debian-based)
 
 Centos (Fedora-based)
 
+**Note:** Currently, only Centos7/RHEL7 are known to work.
+
 .. code-block:: sh
 
    $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-alpha/libydk-0.8.0-1.x86_64.rpm
 
+   # Upgrade compiler to gcc 5.*
+   $ yum install centos-release-scl -y > /dev/null
+   $ yum install devtoolset-4-gcc* -y > /dev/null
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+
 Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
+
+To install the core and bundles on Centos, please follow the below steps.
+
+``Python2.7``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.4``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.6``::
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xe
 
 macOS
 -----
@@ -77,7 +121,7 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install pkg-config libssh libxml2 curl pcre cmake
+   $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/libydk-0.8.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 

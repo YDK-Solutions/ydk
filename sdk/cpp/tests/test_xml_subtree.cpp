@@ -98,7 +98,7 @@ REQUIRE(result);
 auto ld = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
 ld->name="xyz";
 ld->number.yfilter = YFilter::delete_;
-r_1->one_list->ldata.push_back(ld);
+r_1->one_list->ldata.append(ld);
 
 auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
@@ -150,9 +150,9 @@ stmt->actions->bgp_actions->config->set_local_pref = 1233;
 stmt->parent = pd->statements.get();
 
 auto rp = make_shared<openconfig_routing_policy::RoutingPolicy>();
-pd->statements->statement.push_back(stmt);
+pd->statements->statement.append(stmt);
 
-rp->policy_definitions->policy_definition.push_back(pd);
+rp->policy_definitions->policy_definition.append(pd);
 
 auto s = codec.encode(*rp, session.get_root_schema());
 REQUIRE(s==R"(<routing-policy xmlns="http://openconfig.net/yang/routing-policy">
@@ -198,7 +198,7 @@ afi_safi->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
 afi_safi->config->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
 afi_safi->config->enabled = true;
 afi_safi->parent = bgp->global->afi_safis.get();
-bgp->global->afi_safis->afi_safi.push_back(move(afi_safi));
+bgp->global->afi_safis->afi_safi.append(move(afi_safi));
 
 auto s = codec.encode(*bgp, session.get_root_schema());
 REQUIRE(s==R"(<bgp xmlns="http://openconfig.net/yang/bgp">
@@ -311,4 +311,27 @@ v->global->yfilter = YFilter::read;
 auto r = crud.read_config(provider, *v);
 REQUIRE(r!=nullptr);
 REQUIRE(*r==*g);
+}
+
+TEST_CASE("test_no_key_list")
+{
+std::string payload=R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <no-key-list>
+    <test>abc</test>
+  </no-key-list>
+  <no-key-list>
+    <test>xyz</test>
+  </no-key-list>
+</runner>)";
+
+ydk::path::Repository repo{TEST_HOME};
+ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+
+CodecService c{};
+CodecServiceProvider cp{EncodingFormat::XML};
+XmlSubtreeCodec xml_codec{};
+
+auto no_key = xml_codec.decode(payload, make_shared<ydktest_sanity::Runner>());
+auto no_key_payload = xml_codec.encode(*no_key, session.get_root_schema());
+REQUIRE(payload==no_key_payload);
 }

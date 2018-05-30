@@ -113,16 +113,16 @@ func (suite *FiltersTestSuite) TestReadOnListWithKey() {
 	l2 := ysanity.Runner_OneList_Ldata{}
 	l1.Number = 1
 	l2.Number = 2
-	r1.OneList.Ldata = append(r1.OneList.Ldata, l1)
-	r1.OneList.Ldata = append(r1.OneList.Ldata, l2)
+	r1.OneList.Ldata = append(r1.OneList.Ldata, &l1)
+	r1.OneList.Ldata = append(r1.OneList.Ldata, &l2)
 	suite.CRUD.Create(&suite.Provider, &r1)
 
 	r2 := ysanity.Runner{}
-	r2.OneList.Ldata = append(r2.OneList.Ldata, l1)
+	r2.OneList.Ldata = append(r2.OneList.Ldata, &l1)
 	entity := suite.CRUD.Read(&suite.Provider, &r2)
 
 	cmpEntity := ysanity.Runner{}
-	cmpEntity.OneList.Ldata = append(cmpEntity.OneList.Ldata, l1)
+	cmpEntity.OneList.Ldata = append(cmpEntity.OneList.Ldata, &l1)
 
 	suite.Equal(types.EntityEqual(entity, &cmpEntity), true)
 }
@@ -185,7 +185,7 @@ func (suite *FiltersTestSuite) TestDecoder() {
 	l := ysanity.Runner_OneList_Ldata{}
 	l.Number = 1
 	l.Name = "l.Name"
-	r1.OneList.Ldata = append(r1.OneList.Ldata, l)
+	r1.OneList.Ldata = append(r1.OneList.Ldata, &l)
 	suite.CRUD.Create(&suite.Provider, &r1)
 
 	r2 := ysanity.Runner{}

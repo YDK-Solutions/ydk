@@ -2,27 +2,27 @@ Codec Service
 =============
 
 
-.. py:class:: ydk.services.CodecService()
+YDK CodecService class provides API for encoding and decoding of payload strings in XML or JSON format to/from instances of :py:class:`Entity<ydk.types.Entity>`, which represent containers in the device supported YANG models.
 
-    Supports encoding and decoding Python model API objects of type :py:class:`Entity<ydk.types.Entity>`.
+.. py:class:: ydk.services.CodecService()
 
     .. py:method:: encode(provider, entity, pretty=True, subtree=False)
 
-        Encodes :py:class:`Entity<ydk.types.Entity>` in ``entity`` and returns the payload.
+        Encodes :py:class:`Entity<ydk.types.Entity>` into payload string in XML or JSON format.
 
-        :param provider: (:py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>`) Provider instance.
-        :param entity: (:py:class:`Entity<ydk.types.Entity>` or dict of ``str`` and :py:class:`Entity<ydk.types.Entity>`) Either a single entity or a dictionary of entities.
-        :param pretty: (:py:class:`EncodingFormat<ydk.types.EncodingFormat>`)Formats the payload in a readable way with idnentation
-        :param subtree: (``bool``) Can be used to encode XML subtree filters to use with netconf ``get``/``get-config`` operations
-        :return: Either a single ``str`` for a single encoded payload or a dictionary of ``str``
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if error has occurred.
+        :param provider: :py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>` - Codec Provider instance.
+        :param entity: :py:class:`Entity<ydk.types.Entity>` instance or collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``.
+        :param pretty: ``bool`` flag, which specifies if resulting string must be in human readable way with indentation.
+        :param subtree: ``bool`` flag, which directs to encode entity to XML subtree.
+        :return: Type of returned object corresponds to the type of **entity**: single payload ``str``, or ``list`` of ``str``, or a ``dictionary`` of ``str``.
+        :raises: :py:exc:`YError<ydk.errors.YError>`, if error has occurred.
 
     .. py:method:: decode(provider, payload, subtree=False)
 
-        Decodes payload in ``payload`` and returns :py:class:`Entity<ydk.types.Entity>`.
+        Decodes **payload** string in XML or JSON format to instances of :py:class:`Entity<ydk.types.Entity>` class.
 
-        :param provider: (:py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>`) Provider instance.
-        :param payload: (``str`` or dict of ``str`` and ``str``) Either a single encoded payload or a dictionary of payloads.
-        :param subtree: (``bool``) Can be used to decode XML subtree filters to use with netconf ``get``/``get-config`` operations
-        :return: Either a single decoded instance of :py:class:`Entity<ydk.types.Entity>` or a dictionary of decoded :py:class:`Entity<ydk.types.Entity>`
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if error has occurred.
+        :param provider: :py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>` - Codec Provider instance.
+        :param payload: ``str`` or collection of ``str`` Either a single encoded payload or a collection of payloads encapsulated to ``list`` or ``dict``.
+        :param subtree: ``bool`` flag, which directs to encode entity to XML subtree.
+        :return: Type of returned object corresponds to the type of **payload**. It is either an instance of :py:class:`Entity<ydk.types.Entity>`, or a collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``.
+        :raises: :py:exc:`YError<ydk.errors.YError>`, if error has occurred.

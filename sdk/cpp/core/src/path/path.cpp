@@ -25,30 +25,16 @@
 #include <pcre.h>
 #include <fstream>
 #include <sstream>
+#include <typeinfo>
 
 #include "../logger.hpp"
 #include "path_private.hpp"
+#include "../common_utilities.hpp"
 
 #define SLASH_CHAR "##SLASH##"
 
-////////////////////////////////////////////////////////////////////
-/// Function segmentalize()
-////////////////////////////////////////////////////////////////////
 namespace ydk
 {
-static bool replace(std::string& subject, const std::string& search, const std::string& replace)
-{
-    size_t pos = 0;
-    int replace_count = 0;
-    while ((pos = subject.find(search, pos)) != std::string::npos)
-    {
-         subject.replace(pos, search.length(), replace);
-         pos += replace.length();
-         replace_count+=1;
-    }
-    return replace_count>0;
-}
-
 static void escape_slashes(std::string& data)
 {
     pcre *re = NULL;
@@ -165,11 +151,9 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
             break;
         case ydk::ValidationService::Option::GET_CONFIG:
             option_str="GET-CONFIG";
-            ly_option = LYD_OPT_GETCONFIG;
+            ly_option = LYD_OPT_GETCONFIG | LYD_OPT_NOAUTODEL;
             break;
-
     }
-    ly_option = ly_option | LYD_OPT_NOAUTODEL;
 
     YLOG_INFO("Validation called on {} with option {}", dn.get_path(), option_str);
 
@@ -179,13 +163,58 @@ ydk::path::ValidationService::validate(const ydk::path::DataNode & dn, ydk::Vali
     int rc = lyd_validate(&lynode,ly_option, NULL);
     if(rc) {
         YLOG_ERROR("Data validation failed: {}. Path: {}", ly_errmsg(), ly_errpath());
-        throw(ydk::YCPPModelError{""});
+        throw(ydk::YModelError{""});
     }
 
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Utility functions
+//////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////
+static LYD_FORMAT get_ly_format(ydk::EncodingFormat format)
+{
+    LYD_FORMAT scheme = LYD_XML;
+    if (format == ydk::EncodingFormat::JSON)
+    {
+        scheme = LYD_JSON;
+    }
+    return scheme;
+}
+
+static ydk::path::RootSchemaNodeImpl & get_root_schema_impl(ydk::path::RootSchemaNode & root_schema)
+{
+    ydk::path::RootSchemaNodeImpl & rs_impl = dynamic_cast<ydk::path::RootSchemaNodeImpl &>(root_schema);
+    return rs_impl;
+}
+
+static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchemaNodeImpl & rs_impl, struct lyd_node *lnode)
+{
+    ydk::YLOG_DEBUG("Performing decode operation");
+    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+    rd->m_node = lnode;
+
+    struct lyd_node* first_dnode = lyd_first_sibling(lnode);
+    struct lyd_node* dnode = first_dnode;
+    do
+    {
+        rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd, dnode, nullptr)));
+        dnode = dnode->next;
+    } while(dnode && dnode != first_dnode);
+
+    return std::shared_ptr<ydk::path::DataNode>(rd);
+}
+
+static const struct lyd_node* create_lyd_node_for_rpc(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
+{
+    const struct lyd_node* rpc = lyd_new_path(NULL, rs_impl.m_ctx, rpc_path.c_str(), NULL, LYD_ANYDATA_SXML, 0);
+    if( rpc == nullptr || ly_errno )
+    {
+        ydk::YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
+        throw(ydk::path::YCodecError{ydk::path::YCodecError::Error::XML_INVAL});
+    }
+    return rpc;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // class ydk::Codec
@@ -199,130 +228,88 @@ ydk::path::Codec::~Codec()
 }
 
 std::string
+ydk::path::Codec::encode(std::vector<ydk::path::DataNode*> & data_nodes, ydk::EncodingFormat format, bool pretty)
+{
+    YLOG_DEBUG("ydk::path::Codec: Encoding list of data nodes to {} formated string", format==ydk::EncodingFormat::JSON ? "JSON" : "XML");
+    std::string ret{};
+    for (auto dn : data_nodes) {
+        ret += encode(*dn, format, pretty);
+    }
+    return ret;
+}
+
+std::string
 ydk::path::Codec::encode(const ydk::path::DataNode& dn, ydk::EncodingFormat format, bool pretty)
 {
+    YLOG_DEBUG("ydk::path::Codec: Encoding data node '{}' to {} formated string", dn.get_path(), format==ydk::EncodingFormat::JSON ? "JSON" : "XML");
     std::string ret{};
-
-
-    LYD_FORMAT scheme = LYD_XML;
-
-
-    if(format == ydk::EncodingFormat::JSON)
-    {
-    	YLOG_DEBUG("Performing encode operation to JSON");
-        scheme = LYD_JSON;
-    }
-    else
-    {
-    	YLOG_DEBUG("Performing encode operation to XML");
-    }
-
-    struct lyd_node* m_node = nullptr;
-
-    const DataNodeImpl& impl = dynamic_cast<const DataNodeImpl &>(dn);
-    m_node = impl.m_node;
-
-    if(m_node == nullptr){
-        throw(YCPPInvalidArgumentError{"No data in data node"});
-    }
-    char* buffer;
-
-    if(!lyd_print_mem(&buffer, m_node,scheme, (pretty ? LYP_FORMAT : 0)|LYP_WD_ALL|LYP_KEEPEMPTYCONT)) {
-        if(!buffer)
-        {
-            std::ostringstream os;
-            os << "Could not encode datanode: "<< m_node->schema->name;
-            YLOG_ERROR(os.str().c_str());
-            throw(YCPPCoreError{os.str()});
+    if (typeid(dn) == typeid(RootDataImpl)) {
+        std::vector<std::shared_ptr<ydk::path::DataNode>> data_nodes = dn.get_children();
+        for (auto dn : data_nodes) {
+            ret += encode(*dn, format, pretty);
         }
-        ret = buffer;
-        std::free(buffer);
     }
-
+    else {
+        LYD_FORMAT scheme = get_ly_format(format);
+        const ydk::path::DataNodeImpl& impl = dynamic_cast<const ydk::path::DataNodeImpl &>(dn);
+        struct lyd_node* m_node = impl.m_node;
+        if (m_node == nullptr) {
+            throw(ydk::YInvalidArgumentError{"No data in data node"});
+        }
+        char* buffer;
+        if(!lyd_print_mem(&buffer, m_node, scheme, (pretty ? LYP_FORMAT : 0)|LYP_WD_ALL|LYP_KEEPEMPTYCONT)) {
+            if(!buffer)
+            {
+                std::ostringstream os;
+                os << "Could not encode datanode: "<< m_node->schema->name;
+                ydk::YLOG_ERROR(os.str().c_str());
+                throw(ydk::path::YCoreError{os.str()});
+            }
+            ret = buffer;
+            std::free(buffer);
+        }
+    }
     return ret;
-
-}
-
-static LYD_FORMAT get_ly_format(ydk::EncodingFormat format)
-{
-    LYD_FORMAT scheme = LYD_XML;
-    if (format == ydk::EncodingFormat::JSON)
-    {
-        ydk::YLOG_DEBUG("Performing decode operation on JSON");
-        scheme = LYD_JSON;
-    }
-    else
-    {
-        ydk::YLOG_DEBUG("Performing decode operation on XML");
-    }
-    return scheme;
-}
-
-static ydk::path::RootSchemaNodeImpl & get_root_schema_impl(ydk::path::RootSchemaNode & root_schema)
-{
-    ydk::path::RootSchemaNodeImpl & rs_impl = dynamic_cast<ydk::path::RootSchemaNodeImpl &>(root_schema);
-    return rs_impl;
-}
-
-static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchemaNodeImpl & rs_impl, struct lyd_node *root)
-{
-    ydk::YLOG_DEBUG("Performing decode operation");
-    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
-    rd->m_node = root;
-
-    struct lyd_node* dnode = rd->m_node;
-    do
-    {
-        rd->child_map.insert(std::make_pair(rd->m_node, std::make_shared<ydk::path::DataNodeImpl>(rd, rd->m_node, nullptr)));
-        dnode = dnode->next;
-    } while(dnode && dnode != nullptr && dnode != root);
-
-    return std::shared_ptr<ydk::path::DataNode>(rd);
 }
 
 std::shared_ptr<ydk::path::DataNode>
 ydk::path::Codec::decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format)
 {
+    YLOG_DEBUG("ydk::path::Codec: Decoding from {} formatted payload:\n{}", format==ydk::EncodingFormat::JSON ? "JSON" : "XML", buffer);
+
     RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
     rs_impl.populate_new_schemas_from_payload(buffer, format);
+
     struct lyd_node *root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(),
                 get_ly_format(format), LYD_OPT_TRUSTED |  LYD_OPT_GET);
 
     if( root == nullptr || ly_errno )
     {
         YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
-        throw(YCPPCodecError{YCPPCodecError::Error::XML_INVAL});
+        throw(YCodecError{YCodecError::Error::XML_INVAL});
     }
     return perform_decode(rs_impl, root);
-}
-
-static const struct lyd_node* create_ly_rpc_node(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
-{
-    const struct lyd_node* rpc = lyd_new_path(NULL, rs_impl.m_ctx, rpc_path.c_str(), NULL, LYD_ANYDATA_SXML, 0);
-    if( rpc == nullptr || ly_errno )
-    {
-        ydk::YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
-        throw(ydk::path::YCPPCodecError{ydk::path::YCPPCodecError::Error::XML_INVAL});
-    }
-    return rpc;
 }
 
 std::shared_ptr<ydk::path::DataNode>
 ydk::path::Codec::decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer,
             const std::string & rpc_path, EncodingFormat format)
 {
+    YLOG_DEBUG( "Decoding output for RPC '{}'. Output is: {}", rpc_path, buffer);
+
     RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
     rs_impl.populate_new_schemas_from_payload(buffer, format);
-    const struct lyd_node* rpc = create_ly_rpc_node(rs_impl, rpc_path);
+    const struct lyd_node* rpc = create_lyd_node_for_rpc(rs_impl, rpc_path);
 
     struct lyd_node* root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(),
                 get_ly_format(format), LYD_OPT_TRUSTED |  LYD_OPT_RPCREPLY, rpc, NULL);
     if( root == nullptr || ly_errno )
     {
         YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
-        throw(YCPPCodecError{YCPPCodecError::Error::XML_INVAL});
+        throw(YCodecError{YCodecError::Error::XML_INVAL});
     }
 
     return perform_decode(rs_impl, root);
 }
+
 #undef SLASH_CHAR

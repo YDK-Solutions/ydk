@@ -65,16 +65,16 @@ ydk::path::SchemaNodeImpl::populate_augmented_schema_node(vector<lys_node*>& anc
         }
     }
     else {
-        while(node) {
-            auto p = node;
-            while(p && (p->nodetype == LYS_USES)) {
+        const struct lys_node *last = nullptr;
+        while (auto p = lys_getnext(last, node->parent, nullptr, 0)) {
+        	last = p;
+            while (p->nodetype == LYS_USES) {
                 p = p->child;
             }
             if (p) {
                 YLOG_DEBUG("Populating new schema node '{}'", string(p->name));
                 m_children.emplace_back(make_unique<SchemaNodeImpl>(this, const_cast<struct lys_node*>(p)));
             }
-            node = node->next;
         }
     }
 }
@@ -126,20 +126,20 @@ ydk::path::SchemaNodeImpl::find(const string& path)
     if(path.empty())
     {
         YLOG_ERROR("Path is empty");
-        throw(YCPPInvalidArgumentError{"path is empty"});
+        throw(YInvalidArgumentError{"path is empty"});
     }
 
     //has to be a relative path
     if(path.at(0) == '/')
     {
         YLOG_ERROR("Path must be a relative path");
-        throw(YCPPInvalidArgumentError{"path must be a relative path"});
+        throw(YInvalidArgumentError{"path must be a relative path"});
     }
 
     vector<SchemaNode*> ret;
     struct ly_ctx* ctx = m_node->module->ctx;
 
-    const struct lys_node* found_node = ly_ctx_get_node(ctx, m_node, path.c_str());
+    const struct lys_node* found_node = ly_ctx_get_node(ctx, m_node, path.c_str(), 0);
 
     if (found_node)
     {
@@ -261,6 +261,9 @@ ydk::path::SchemaNodeImpl::get_statement() const
     case LYS_ACTION:
         s.keyword = "action";
         break;
+    case LYS_EXT:
+        s.keyword = "extension";
+        break;
     case LYS_ANYDATA:
     case LYS_UNKNOWN:
         break;
@@ -284,7 +287,7 @@ ydk::path::SchemaNodeImpl::get_keys() const
         //sanity check
         if(m_node->nodetype != LYS_LIST) {
             YLOG_ERROR("Mismatch in schema");
-            throw(YCPPIllegalStateError{"Mismatch in schema"});
+            throw(YIllegalStateError{"Mismatch in schema"});
         }
         struct lys_node_list *slist = (struct lys_node_list *)m_node;
         for(uint8_t i=0; i < slist->keys_size; ++i) {

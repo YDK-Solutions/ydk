@@ -24,9 +24,12 @@ import unittest
 
 from ydk.types import Empty
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.oc_pattern import OcA
 except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.oc_pattern.oc_a.oc_a import OcA
 
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
@@ -486,7 +489,7 @@ class SanityYang(unittest.TestCase):
         # READ
         r_1, r_2 = Runner(), Runner()
         r_1.ytypes.built_in_t.number8 = 100
-        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8.get()
+        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
@@ -495,7 +498,7 @@ class SanityYang(unittest.TestCase):
         # UPDATE
         r_1, r_2 = Runner(), Runner()
         r_1.ytypes.built_in_t.number8 = 110
-        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8.get()
+        r_1.ytypes.built_in_t.leaf_ref = r_1.ytypes.built_in_t.number8
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
@@ -508,7 +511,6 @@ class SanityYang(unittest.TestCase):
 
         self.assertEqual(r_2, None)
 
-    @unittest.skip('Libyang Error')
     def test_leafref_pos(self):
         # CREATE
         r_1, r_2 = Runner(), Runner()
@@ -541,12 +543,12 @@ class SanityYang(unittest.TestCase):
         e_2.subc.subc_subl1.extend([e_21, e_22])
         r_1.inbtw_list.ldata.extend([e_1, e_2])
 
-        r_1.leaf_ref.ref_one_name = r_1.ydktest_sanity_one.name.get()
-        r_1.leaf_ref.ref_two_sub1_number = r_1.two.sub1.number.get()
-        r_1.leaf_ref.ref_three_sub1_sub2_number = r_1.three.sub1.sub2.number.get()
-        r_1.leaf_ref.ref_inbtw = e_21.name.get()
-        r_1.leaf_ref.ydktest_sanity_one.name = 'runner:leaf-ref:one:name'
-        r_1.leaf_ref.ydktest_sanity_one.two.self_ref_one_name = r_1.leaf_ref.ref_one_name.get()
+        r_1.leaf_ref.ref_one_name = r_1.ydktest_sanity_one.name
+        r_1.leaf_ref.ref_two_sub1_number = r_1.two.sub1.number
+        r_1.leaf_ref.ref_three_sub1_sub2_number = r_1.three.sub1.sub2.number
+        r_1.leaf_ref.ref_inbtw = e_21.name
+        r_1.leaf_ref.one.name = 'runner:leaf-ref:one:name'
+        r_1.leaf_ref.one.two.self_ref_one_name = r_1.leaf_ref.ref_one_name
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
@@ -583,12 +585,12 @@ class SanityYang(unittest.TestCase):
         e_2.subc.subc_subl1.extend([e_21, e_22])
         r_1.inbtw_list.ldata.extend([e_1, e_2])
 
-        r_1.leaf_ref.ref_one_name = r_1.ydktest_sanity_one.name.get()
-        r_1.leaf_ref.ref_two_sub1_number = r_1.two.sub1.number.get()
-        r_1.leaf_ref.ref_three_sub1_sub2_number = r_1.three.sub1.sub2.number.get()
-        r_1.leaf_ref.ref_inbtw = e_21.name.get()
-        r_1.leaf_ref.ydktest_sanity_one.name = 'runner/leaf-ref/one/name'
-        r_1.leaf_ref.ydktest_sanity_one.two.self_ref_one_name = r_1.leaf_ref.ref_one_name.get()
+        r_1.leaf_ref.ref_one_name = r_1.ydktest_sanity_one.name
+        r_1.leaf_ref.ref_two_sub1_number = r_1.two.sub1.number
+        r_1.leaf_ref.ref_three_sub1_sub2_number = r_1.three.sub1.sub2.number
+        r_1.leaf_ref.ref_inbtw = e_21.name
+        r_1.leaf_ref.one.name = 'runner/leaf-ref/one/name'
+        r_1.leaf_ref.one.two.self_ref_one_name = r_1.leaf_ref.ref_one_name
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, r_2)
 
@@ -675,6 +677,112 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, Runner())
 
         self.assertEqual(runner, runner_read)
+
+    def test_iden_list(self):
+        runner = Runner()
+        e_1 = Runner.IdentityList()
+        e_1.name = ChildIdentity()
+        runner.identity_list.append(e_1)
+
+        e_1 = Runner.EnumList()
+        e_1.name = YdkEnumTest.none
+        runner.identity_list.append(e_1)
+
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+
+        self.assertEqual(runner, runner_read)
+
+    @unittest.skip('Fails on travis. Passes locally')
+    def test_oc_pattern(self):
+        # Create OcA
+        oc = OcA()
+        oc.a = 'xyz'
+        oc.b.b = 'xyz'
+        self.crud.create(self.ncc, oc)
+
+        # Read into Runner1
+        oc1 = self.crud.read(self.ncc, OcA())
+
+        # Compare runners
+        self.assertEqual(oc, oc1)
+
+        # Delete
+        oc = OcA()
+        oc.a = 'xyz'
+        self.crud.delete(self.ncc, oc)
+
+    def test_mtu(self):
+        runner = Runner()
+        mt = runner.Mtus.Mtu()
+        mt.owner = "test"
+        mt.mtu = 12
+        runner.mtus.mtu.append(mt)
+
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+
+        self.assertEqual(runner, runner_read)
+
+    def test_passive(self):
+        runner = Runner()
+        p = runner.Passive()
+        p.name = "xyz"
+        i = runner.Passive.Interfac()
+        i.test = "abc"
+        p.interfac.append(i)
+        p.testc.xyz = runner.Passive.Testc.Xyz()
+        p.testc.xyz.xyz = 25
+        runner.passive.append(p)
+
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
+    def test_inner_pres(self):
+        runner = Runner()
+        runner.outer.inner = runner.Outer.Inner()
+        self.crud.create(self.ncc, runner)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(runner, runner_read)
+
+    @unittest.skip('Skip due to known issue')
+    def test_embedded_single_quote_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab\'c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, r)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(r, runner_read)
+
+    def test_embedded_double_quote_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab&quot;c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, r)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(r, runner_read)
+
+    def test_embedded_slash_list_key(self):
+        r = Runner()
+        t = Runner.TwoKeyList()
+        t.first = "ab/c"
+        t.second = 1233
+        r.two_key_list.append(t)
+        self.crud.create(self.ncc, r)
+
+        runner_read = self.crud.read(self.ncc, Runner())
+        self.assertEqual(r, runner_read)
 
 
 if __name__ == '__main__':

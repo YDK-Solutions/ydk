@@ -22,9 +22,9 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-from ydk.errors import YPYError, YPYServiceError
+from ydk.errors import YError, YServiceError
 from ydk.models.ydktest import ydktest_sanity as ysanity
-from ydk.models.ydktest import ietf_netconf
+from ydk.models.ydktest import ietf_netconf, openconfig_bgp
 from ydk.providers import NetconfServiceProvider, CodecServiceProvider
 from ydk.services import ExecutorService, CodecService
 from ydk.types import Empty, EncodingFormat
@@ -64,10 +64,11 @@ class SanityTest(unittest.TestCase):
         try:
             rpc = ietf_netconf.CloseSession()
             self.es.execute_rpc(self.ncc, rpc)
-        except YPYError:
+        except YError:
             pass
         del self.ncc
 
+    @unittest.skip('Issues in confd')
     def test_close_session_rpc(self):
         rpc = ietf_netconf.CloseSession()
 
@@ -139,7 +140,7 @@ class SanityTest(unittest.TestCase):
         self.assertIsNotNone(reply)
         self.assertEqual(reply, runner)
 
-    @unittest.skip('YCPPServiceProviderError')
+    @unittest.skip('YServiceProviderError')
     def test_kill_session(self):
         rpc = ietf_netconf.KillSession()
         rpc.input.session_id = 3
@@ -169,7 +170,7 @@ class SanityTest(unittest.TestCase):
         try:
             reply = self.es.execute_rpc(self.ncc, unlock_rpc)
         except Exception as e:
-            self.assertIsInstance(e, YPYError)
+            self.assertIsInstance(e, YError)
 
     def test_validate_rpc_1(self):
         rpc = ietf_netconf.Validate()
@@ -194,15 +195,13 @@ class SanityTest(unittest.TestCase):
         try:
             self.es.execute_rpc(self.ncc, runner)
         except Exception as e:
-            self.assertIsInstance(e, YPYError)
-            # self.assertEqual(e.code, YPYErrorCode.INVALID_RPC)
+            self.assertIsInstance(e, YError)
+            # self.assertEqual(e.code, YErrorCode.INVALID_RPC)
 
-    @unittest.skip('TODO: get-schema rpc is not yet supported on netsim')
     def test_execute_get_schema(self):
-        get_schema_rpc = ietf_netconf_monitoring.GetSchema()
-        get_schema_rpc.input.identifier = 'ietf-netconf-monitoring'
-        get_schema_rpc.input.format = ietf_netconf_monitoring.Yang_Identity()
-        self.executor.execute_rpc(self.ncc, get_schema_rpc)
+        get_rpc = ietf_netconf.Get()
+        get_rpc.input.filter = '<bgp xmlns="http://openconfig.net/yang/bgp"/>'
+        self.es.execute_rpc(self.ncc, get_rpc, openconfig_bgp.Bgp())
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

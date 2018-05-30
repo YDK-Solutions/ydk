@@ -94,7 +94,6 @@ NetconfSSHClient::NetconfSSHClient(
     nc_session_transport(NC_TRANSPORT_SSH);
 
     nc_set_keypair_path(private_key_path.c_str(), public_key_path.c_str());
-    // password_lookup.insert(make_pair(make_pair(username, hostname), password));
     session=NULL;
 }
 
@@ -110,7 +109,7 @@ int NetconfSSHClient::connect()
 std::string NetconfSSHClient::get_hostname_port()
 {
     ostringstream os;
-    os<<hostname<<":"<<port;
+    os<<hostname<<"_"<<port;
     return os.str();
 }
 
@@ -139,7 +138,7 @@ string NetconfSSHClient::execute_payload(const string & payload)
     const nc_msgid msgid = nc_session_send_rpc(session, rpc);
     if (msgid == NULL) {
         YLOG_ERROR("Could not send payload {}", payload );
-        throw(YCPPClientError{"Could not send payload"});
+        throw(YClientError{"Could not send payload"});
     }
 
     YLOG_DEBUG("Netconf SSH Client: receiving rpc");
@@ -165,7 +164,7 @@ nc_rpc* NetconfSSHClient::build_rpc_request(const string & payload)
     if (rpc == NULL)
     {
         YLOG_ERROR("Could not build rpc payload: {}", payload );
-        throw(YCPPClientError{"Could not build payload"});
+        throw(YClientError{"Could not build payload"});
     }
     return rpc;
 }
@@ -182,10 +181,10 @@ string NetconfSSHClient::process_rpc_reply(int msg_type, const nc_rpc* reply)
         default:
         case NC_MSG_WOULDBLOCK:
             YLOG_ERROR("Connection timed out");
-            throw(YCPPClientError{"Connection timed out"});
+            throw(YClientError{"Connection timed out"});
         case NC_MSG_UNKNOWN:
             YLOG_ERROR("RPC error occurred");
-            throw(YCPPClientError{"RPC error occured"});
+            throw(YClientError{"RPC error occured"});
     }
     return {};
 }
@@ -258,7 +257,7 @@ void NetconfSSHClient::perform_session_check(const string & message)
     if (session == NULL)
     {
         YLOG_ERROR(message.c_str());
-        throw(YCPPClientError{message});
+        throw(YClientError{message});
     }
 }
 

@@ -24,21 +24,23 @@ import ydk.types as ytypes
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, SubTest, ChildIdentity, ChildChildIdentity
+    from ydk.models.ydktest.ydktest_sanity import Runner, CascadingTypes, SubTest, ChildIdentity, ChildChildIdentity, Native
     from ydk.models.ydktest.ydktest_sanity_types import YdktestType
 except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.native.native import Native
+    from ydk.models.ydktest.ydktest_sanity.cascading_types.cascading_types import CascadingTypes
     from ydk.models.ydktest.ydktest_sanity.sub_test.sub_test import SubTest
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, ChildChildIdentity
     from ydk.models.ydktest.ydktest_sanity_types.ydktest_sanity_types import YdktestType
 
 from ydk.models.ydktest import ydktest_types as y_types
 from ydk.types import Empty, Decimal64,  YLeaf, Bits
-from ydk.errors import  YPYModelError, YPYServiceProviderError
+from ydk.errors import  YModelError, YServiceProviderError
 try:
-    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+    from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInstType, CompInstType_
 except:
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInstType, CompInstType_
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
@@ -66,6 +68,9 @@ class SanityTest(unittest.TestCase):
     def tearDown(self):
         runner = Runner()
         self.crud.delete(self.ncc, runner)
+
+        ctypes = CascadingTypes()
+        self.crud.delete(self.ncc, ctypes)
 
     def _create_runner(self):
         # runner = Runner()
@@ -426,7 +431,7 @@ class SanityTest(unittest.TestCase):
     @unittest.skip('No unique check')
     def test_leaflist_unique(self):
         runner = Runner()
-        with self.assertRaises(YPYModelError):
+        with self.assertRaises(YModelError):
             for i in range(3):
                 runner.ytypes.built_in_t.llstring.append(0)
 
@@ -440,7 +445,7 @@ class SanityTest(unittest.TestCase):
             l.name = str(i)
             elems.append(l)
         runner.one_list.ldata.extend(elems)
-        with self.assertRaises(YPYServiceProviderError):
+        with self.assertRaises(YServiceProviderError):
             self.crud.create(self.ncc, runner)
 
     def test_submodule(self):
@@ -467,11 +472,62 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         self.assertEqual(runner, runner1)
 
+    def test_boolean_update_read(self):
+        runner = Runner()
+        runner.ytypes.built_in_t.bool_value = True
+        self.crud.create(self.ncc, runner)
+
+        # Read into Runner1
+        runner1 = Runner()
+        runner1 = self.crud.read(self.ncc, runner1)
+
+        # Compare runners
+        self.assertEqual(runner, runner1)
+
+        # Update the leaf and run update
+        runner1.ytypes.built_in_t.bool_value = True
+        self.crud.create(self.ncc, runner1)
+
+        # Read into Runner2
+        runner2 = self.crud.read(self.ncc, Runner())
+        # Compare runners
+        self.assertEqual(runner2, runner1)
+
     # def test_binary(self):
     #     pass
 
     # def test_binary_invalid(self):
     #     pass
+
+    def test_cascading_types(self):
+        self._cascading_types_helper(CompInstType.unknown, CompInstType_.unknown)
+        self._cascading_types_helper(CompInstType.phys, CompInstType_.phys)
+        self._cascading_types_helper(CompInstType.virt, CompInstType_.virt)
+        self._cascading_types_helper(CompInstType.hv, CompInstType_.hv)
+
+    def _cascading_types_helper(self, enum1, enum2):
+        ctypes = CascadingTypes()
+        ctypes.comp_insttype = enum1
+        ctypes.comp_nicinsttype = enum2
+        self.crud.create(self.ncc, ctypes)
+
+        # Read into Runner1
+        ctypesRead = CascadingTypes()
+        ctypesRead = self.crud.read(self.ncc, ctypesRead)
+
+        # Compare runners
+        self.assertEqual(ctypes, ctypesRead)
+
+    def test_capital_letters(self):
+        native = Native()
+        gigabit_eth = Native.Interface.GigabitEthernet()
+        gigabit_eth.name = "test"
+        native.interface.gigabitethernet.append(gigabit_eth)
+
+        self.crud.create(self.ncc, native)
+        read_entity = self.crud.read(self.ncc, Native())
+
+        self.assertEqual(read_entity, native)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

@@ -5,10 +5,10 @@ How do I use the Path API?
 
 .. contents:: Table of Contents
 
-The :ref:`Path API<path-api-guide>` (part of the `YDK core <https://github.com/CiscoDevNet/ydk-py/tree/master/core>`_) is a generic API which can be used to create and access YANG data nodes without having to use the model bundle APIs (for example, `openconfig <https://github.com/CiscoDevNet/ydk-py/tree/master/openconfig>`_). Apps can be written using xpath-like path expressions as illustrated below.
+The :ref:`Path API<path-api-guide>` (part of the `YDK core <https://github.com/CiscoDevNet/ydk-py/tree/master/core>`_) is a generic API which can be used to create and access YANG data nodes without having to use the model bundle APIs (for example, `openconfig <https://github.com/CiscoDevNet/ydk-py/tree/master/openconfig>`_). The ``ydk`` python package is sufficient to use the Path API. Apps can be written using xpath-like path expressions as illustrated below.
 
-Creating a configuration
-------------------------
+How do I create a basic configuration?
+--------------------------------------
 
 An example for using Path API to create a ``bgp`` configuration using the ``openconfig-bgp`` model in conjunction with the standard `edit-config RPC <https://github.com/YangModels/yang/blob/4b12d5017eb94a0760746d72c6fd93cb02943d45/standard/ietf/RFC/ietf-netconf%402011-06-01.yang#L416>`_ is shown below:
 
@@ -63,8 +63,8 @@ An example for using Path API to create a ``bgp`` configuration using the ``open
     edit_rpc(session)
 
 
-Calling a non-standard RPC using path API
------------------------------------------
+How do I work with different RPCs?
+----------------------------------
 
 To invoke the `get-schema RPC <https://github.com/YangModels/yang/blob/4b12d5017eb94a0760746d72c6fd93cb02943d45/standard/ietf/RFC/ietf-netconf-monitoring%402010-10-04.yang#L512>`_ to download the ``Cisco-IOS-XR-aaa-lib-cfg.yang`` yang model from a netconf server using the path API, the below approach can be used.
 
@@ -98,8 +98,57 @@ To invoke the `get-schema RPC <https://github.com/YangModels/yang/blob/4b12d5017
     # Print the XML
     print(output_xml)
 
-Path syntax
------------
+
+How do I work with YANG 1.1 actions?
+------------------------------------
+
+Path API can be used to work with a ``action`` as defined in the YANG 1.1 standard in `RFC 7950 <https://tools.ietf.org/html/rfc7950>`_.
+
+Consider the below snippet from an example ``action-config.yang`` model compliant with the YANG 1.1 standard.
+
+.. code-block:: yang
+
+    container data {
+      action action-node {
+        input {
+            leaf ip-test {
+                type string;
+            }
+         }
+         output {
+            leaf op-test {
+                type string;
+            }
+         }
+      }
+    }
+
+The below script can be used to work with the above model
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.path import NetconfSession
+    from ydk.path import Codec
+    from ydk.types import EncodingFormat
+
+    # Create a NetconfSession instance to connect to the device which supports the YANG 1.1 action-config model
+    session = NetconfSession('10.0.0.1', 'admin', 'admin')
+
+    # Get the root schema node
+    root_schema = session.get_root_schema()
+
+    # Create and populate the action data
+    data = self.root_schema.create_datanode("action-config:data", "")
+    action = action.create_action("action-node")
+    action.create_datanode("ip-test", "xyz")
+
+    # Invoke the data object containing the action on the session
+    data(session)
+
+
+What is the Path syntax?
+------------------------
 
 Full XPath notation is supported for find operations on :py:class:`DataNode<DataNode>`\(s\). This XPath conforms to the YANG specification \(`RFC 6020 section 6.4 <https://tools.ietf.org/html/rfc6020#section-6.4>`_\). Some useful examples:
 
@@ -121,7 +170,7 @@ Full XPath notation is supported for find operations on :py:class:`DataNode<Data
 
     /module-name:container/container2/augment-module:aug-cont/aug-leaf
 
-A very small subset of this full XPath is recognized by :py:meth:`DataNode::create<DataNode.create>`. Basically, only a relative or absolute path can be specified to identify a new data node. However, lists must be identified by all their keys and created with all of them, so for those cases predicates are allowed. Predicates must be ordered the way the keys are ordered and all the keys must be specified. Every predicate includes a single key with its value. Optionally, leaves and leaf-lists can have predicates specifying their value in the path itself. All these paths are valid XPath expressions. Example: (Relative to Root Data or :py:class:`RootSchemaNode`)
+A very small subset of this full XPath is recognized by :py:meth:`DataNode::create<ydk.path.DataNode.create>`. Basically, only a relative or absolute path can be specified to identify a new data node. However, lists must be identified by all their keys and created with all of them, so for those cases predicates are allowed. Predicates must be ordered the way the keys are ordered and all the keys must be specified. Every predicate includes a single key with its value. Optionally, leaves and leaf-lists can have predicates specifying their value in the path itself. All these paths are valid XPath expressions. Example: (Relative to Root Data or :py:class:`ydk.path.RootSchemaNode`)
 
 .. code-block:: bash
 

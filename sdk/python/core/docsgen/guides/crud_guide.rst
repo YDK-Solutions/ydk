@@ -85,7 +85,7 @@ Now, let us replace the above configuration with a new configuration for the :py
     result = crud.update(provider, bgp)
 
 
-Reading a list
+Creating and reading a list
 --------------
 
 For example, to read the instances of a deeply nested :py:class:`YList<ydk.types.YList>` called :py:class:`Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route<ydk.models.cisco_ios_xr.Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route>`  in the ``Cisco_IOS_XR_ip_rib_ipv4_oper`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
@@ -128,6 +128,42 @@ For example, to read the instances of a deeply nested :py:class:`YList<ydk.types
     # (assuming you have already instantiated the service and provider)
     rib_oper = crud.read(provider, rib)
 
+    vrf_list = rib_oper.vrfs.vrf
+    vrf_default = vrf_list["default"]  # or  vrf_default = vrf_list.get("default")
+
+Read all VRF configuration:
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.models.cisco_ios_xr import Cisco_IOS_XR_ip_rib_ipv4_oper
+    from ydk.filters import YFilter
+
+    # First create the top-level Rib() object
+    rib = Cisco_IOS_XR_ip_rib_ipv4_oper.Rib()
+
+    # Call the CRUD read on the top-level rib object
+    # (assuming you have already instantiated the service and provider)
+    rib_oper = crud.read(provider, rib)
+
+    # Access all VRFs in the list
+    for vrf in rib_oper.vrfs.vrf:
+        print(vrf.vrf_name)
+
+    # Get list of VRF names
+    all_vrf_names = rib_oper.vrfs.vrf.keys()
+
+    # Iterate over VRF names
+    for vrf_name in all_vrf_names:
+        vrf = rib_oper.vrfs.vrf[vrf_name]
+        for af in vrf.afs.af:
+            print("VRF: %s, AF: %s", vrf_name, af)
+
+    # Access specific VRF, when name is known
+    vrf = rib_oper.vrfs.vrf["default"]
+    if vrf is not None:
+        for af in vrf.afs.af:
+            print("VRF: %s, AF: %s", "default", af)
 
 Reading a leaf
 --------------
@@ -150,7 +186,7 @@ For example, to read a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` in 
     ins.instance_name = 'default'
 
     # Set the yfilter attribute of the leaf called 'running' to YFilter.read
-    ins.running.yfilter = YFilter.read
+    ins.running = YFilter.read
 
     # Append the instance to the parent
     isis.instances.instance.append(ins)
@@ -195,7 +231,28 @@ For example, to delete a :py:class:`YList<ydk.types.YList>` called :py:class:`In
 Deleting a leaf
 ---------------
 
-For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` in the :py:class:`Instance<ydk.models.cisco_ios_xr.Cisco_IOS_XR_clns_isis_cfg.Isis>` class in the ``Cisco_IOS_XR_clns_isis_cfg`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
+For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``timer`` of type ``int`` in the :py:class:`Cdp<ydk.models.cisco_ios_xr.Cisco_IOS_XR_cdp_cfg.Cdp>` class in the ``Cisco_IOS_XR_cdp_cfg`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
+
+.. code-block:: python
+    :linenos:
+
+
+    from ydk.models.cisco_ios_xr import Cisco_IOS_XR_cdp_cfg
+    from ydk.filters import YFilter
+
+    # First create the top-level Cdp() object
+    cdp = Cisco_IOS_XR_cdp_cfg.Cdp()
+
+    # Set a dummy value to the leaf
+    cdp.timer = 5
+    # Assign YFilter.delete to the 'timer' leaf
+    cdp.timer = YFilter.delete
+
+    # Call the CRUD update on the top-level cdp object
+    # (assuming you have already instantiated the service and provider)
+    result = crud.update(provider, cdp)
+
+For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` of type ``Empty`` in the :py:class:`Instance<ydk.models.cisco_ios_xr.Cisco_IOS_XR_clns_isis_cfg.Isis>` class in the ``Cisco_IOS_XR_clns_isis_cfg`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
 
 .. code-block:: python
     :linenos:
@@ -212,9 +269,8 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` i
     ins = Cisco_IOS_XR_clns_isis_cfg.Isis.Instances.Instance()
     ins.instance_name = 'default'
 
-    # Set the yfilter attribute of the leaf called 'running' to YFilter.delete
-    ins.running = Empty()
-    ins.running.yfilter = YFilter.delete
+    # Assign YFilter.delete to the 'running' leaf
+    ins.running = YFilter.delete
 
     # Append the instance to the parent
     isis.instances.instance.append(ins)
@@ -222,3 +278,37 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` i
     # Call the CRUD update on the top-level isis object
     # (assuming you have already instantiated the service and provider)
     result = crud.update(provider, isis)
+
+    
+Applying CRUD to multiple entities
+--------------------------------------
+
+You can apply CRUD operations on multiple entities in one Crud-service call. For example, you want to 'read' BGP and Interfaces configuration together.
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.types import Filter, Config
+    from ydk.models.openconfig import openconfig_bgp, openconfig_interfaces
+
+    # First, create the top-level Bgp and Interface objects
+    int_filter = openconfig_interfaces.Interfaces()
+    bgp_filter = openconfig_bgp.Bgp()
+    
+    # Create read filter
+    read_filter = Filter(int_filter, bgp_filter)
+
+    # Call the CRUD read-config to get configuration of entities
+    result = crud.read_config(provider, read_filter)
+    
+    # Access read results from returned Config collection
+    int_config = result[int_filter]
+    bgp_config = result[bgp_filter]
+    
+    # Or print all configuration in XML format
+    codec_service = CodecService()
+    codec_provider = CodecServiceProvider()
+    codec_provider.encoding = EncodingFormat.XML
+    for entity in result:
+        xml_encode = codec_service.encode(codec_provider, entity)
+        print(xml_encode)

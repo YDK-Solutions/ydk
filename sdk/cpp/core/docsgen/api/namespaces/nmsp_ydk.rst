@@ -57,17 +57,17 @@ List of all nested namespaces with brief descriptions
 +--------+-----------------------------------------------------------------------------------------+
 | class  | | :cpp:class:`Protocol<Protocol>`                                                       |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPError<YCPPError>`                                                     |
+| struct | | :cpp:class:`YError<YError>`                                                           |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPClientError<YCPPClientError>`                                         |
+| struct | | :cpp:class:`YClientError<YClientError>`                                               |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPIllegalStateError<YCPPIllegalStateError>`                             |
+| struct | | :cpp:class:`YIllegalStateError<YIllegalStateError>`                                   |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>`                       |
+| struct | | :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>`                             |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPModelError<YCPPModelError>`                                           |
+| struct | | :cpp:class:`YModelError<YModelError>`                                                 |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPOperationNotSupportedError<YCPPOperationNotSupportedError>`           |
+| struct | | :cpp:class:`YOperationNotSupportedError<YOperationNotSupportedError>`                 |
 +--------+-----------------------------------------------------------------------------------------+
-| struct | | :cpp:class:`YCPPServiceError<YCPPServiceError>`                                       |
+| struct | | :cpp:class:`YServiceError<YServiceError>`                                             |
 +--------+-----------------------------------------------------------------------------------------+

@@ -3,7 +3,8 @@ package test
 import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
-	// "github.com/CiscoDevNet/ydk-go/ydk/models/ietf/interfaces"
+	"github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/ietf_netconf_acm"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -38,17 +39,17 @@ func getNestedObject() ysanity.Runner {
 	ee11 := getEE(11)
 	ee12 := getEE(12)
 
-	e1.Subc.SubcSubl1 = append(e1.Subc.SubcSubl1, ee11)
-	e1.Subc.SubcSubl1 = append(e1.Subc.SubcSubl1, ee12)
+	e1.Subc.SubcSubl1 = append(e1.Subc.SubcSubl1, &ee11)
+	e1.Subc.SubcSubl1 = append(e1.Subc.SubcSubl1, &ee12)
 
 	ee21 := getEE(21)
 	ee22 := getEE(22)
 
-	e2.Subc.SubcSubl1 = append(e2.Subc.SubcSubl1, ee21)
-	e2.Subc.SubcSubl1 = append(e2.Subc.SubcSubl1, ee22)
+	e2.Subc.SubcSubl1 = append(e2.Subc.SubcSubl1, &ee21)
+	e2.Subc.SubcSubl1 = append(e2.Subc.SubcSubl1, &ee22)
 
-	runner.InbtwList.Ldata = append(runner.InbtwList.Ldata, e1)
-	runner.InbtwList.Ldata = append(runner.InbtwList.Ldata, e2)
+	runner.InbtwList.Ldata = append(runner.InbtwList.Ldata, &e1)
+	runner.InbtwList.Ldata = append(runner.InbtwList.Ldata, &e2)
 
 	return runner
 }
@@ -184,7 +185,7 @@ func (suite *CrudTestSuite) TestDeleteOnListWithIdentitykey() {
 	il.Config.Id = ysanity.ChildIdentity{}
 	il.IdRef = ysanity.ChildIdentity{}
 
-	runner.OneList.IdentityList = append(runner.OneList.IdentityList, il)
+	runner.OneList.IdentityList = append(runner.OneList.IdentityList, &il)
 	suite.CRUD.Create(&suite.Provider, &runner)
 
 	runnerUpdate := ysanity.Runner{}
@@ -192,7 +193,7 @@ func (suite *CrudTestSuite) TestDeleteOnListWithIdentitykey() {
 	k.Config.Id = ysanity.ChildIdentity{}
 	k.IdRef = ysanity.ChildIdentity{}
 	k.YFilter = yfilter.Delete
-	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, k)
+	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, &k)
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -267,9 +268,9 @@ func (suite *CrudTestSuite) TestDeleteOnListElements() {
 	baz.Number = 3
 	baz.Name = "baz"
 
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, foo)
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, bar)
-	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, baz)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &foo)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &bar)
+	runnerCreate.OneList.Ldata = append(runnerCreate.OneList.Ldata, &baz)
 
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
@@ -286,6 +287,62 @@ func (suite *CrudTestSuite) TestDeleteOnListElements() {
 	runnerCmp.OneList.Ldata = runnerCmp.OneList.Ldata[:1]
 
 	suite.Equal(types.EntityEqual(entity, &runnerCmp), true)
+}
+
+func (suite *CrudTestSuite) TestSanityMultipleEntities() {
+	// Build configuration collection
+	runner := ysanity.Runner{}
+	runner.Two.Number = 2
+	runner.Two.Name = "runner-two-name"
+	
+	native := ysanity.Native{}
+	native.Version = "0.1.0"
+	native.Hostname = "MyHost"
+	
+	configEC := types.NewConfig(&runner, &native)
+
+    // Create configuration
+	result := suite.CRUD.Create(&suite.Provider, configEC)
+	suite.Equal(result, true)
+	
+    // Build filter
+	runnerFilter := ysanity.Runner{}
+	nativeFilter := ysanity.Native{}
+    filterEC := types.NewFilter(&runnerFilter, &nativeFilter)
+
+    // Read running config
+    readEntity := suite.CRUD.Read(&suite.Provider, filterEC);
+    suite.Equal( types.IsEntityCollection(readEntity), true)
+
+    // Get results
+    readEC := types.EntityToCollection(readEntity)
+    for _, entity := range readEC.Entities() {
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
+    }
+
+    // Delete configuration
+    result = suite.CRUD.Delete(&suite.Provider, configEC);
+    suite.Equal(result, true)
+}
+
+func (suite *CrudTestSuite) TestSanityReadConfig() {
+
+	// Import ietf_netconf_acm package in order to register otherwise missing entity 
+	nacm := ietf_netconf_acm.Nacm{}
+	
+    // Build empty filter
+    filterEC := types.NewFilter(&nacm)
+    filterEC.Clear()
+
+    // Read running config
+    readEntity := suite.CRUD.ReadConfig(&suite.Provider, filterEC);
+    suite.Equal( types.IsEntityCollection(readEntity), true)
+
+    // Get results
+    readEC := types.EntityToCollection(readEntity)
+    for _, entity := range readEC.Entities() {
+    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
+    }
 }
 
 // TODO: Delete list using YFilter

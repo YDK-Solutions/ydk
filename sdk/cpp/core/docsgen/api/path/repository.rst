@@ -20,7 +20,7 @@ Repository
 
         :param caching_option: Model caching option.
 
-        :raises: :cpp:class:`YCPPIllegalStateError<YCPPIllegalStateError>` If the model downloads directory could not be created.
+        :raises: :cpp:class:`YIllegalStateError<YIllegalStateError>` If the model downloads directory could not be created.
 
     .. cpp:function:: Repository(const std::string& search_dir, ModelCachingOption caching_option = ModelCachingOption::PER_DEVICE)
 
@@ -29,7 +29,7 @@ Repository
         :param search_dir: The path in the filesystem where yang files can be found.
         :param caching_option: Model caching option.
 
-        :raises: :cpp:class:`YCPPIllegalStateError<YCPPIllegalStateError>` If the model downloads directory could not be created.
+        :raises: :cpp:class:`YIllegalStateError<YIllegalStateError>` If the model downloads directory could not be created.
 
     .. cpp:function:: std::shared_ptr<RootSchemaNode> create_root_schema(const std::vector<Capability>& capabilities)
 

@@ -1,11 +1,45 @@
-.. _presence-class:
+.. _presence-type:
 
-Presence Classes
-==================
-According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YANG supports two styles of containers. One for organizing hierarchy, another for representing configuration data. For instance the existence of presence container ``ssh`` indicates the capability to log in to the device using ssh. Let's consider a presence node ``match-community-set`` in `openconfig-bgp-policy.yang <https://github.com/YangModels/yang/blob/96883adbf612605f02271523d7eaa731ded46b61/vendor/cisco/xr/621/openconfig-bgp-policy.yang#L126>`_. This node is generated as YDK class shown below:
+What are presence types?
+==========================
 
-.. code-block:: go
+According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YANG supports two styles of containers. One is for organizing hierarchy. Another type (called 'presence container') is for representing configuration data. For instance the existence of presence container `ssh` indicates the capability to log in to the device using SSH. Let us consider a presence node `prefix-list-entries` in `Cisco-IOS-XR-ipv4-acl-cfg.yang <https://github.com/YangModels/yang/blob/master/vendor/cisco/xr/621/Cisco-IOS-XR-ipv4-acl-cfg.yang#L105>`_. This node is generated as a `YDK struct <https://github.com/CiscoDevNet/ydk-go/blob/master/ydk/models/cisco_ios_xr/ipv4_acl_cfg/ipv4_acl_cfg.go#L901>`_ shown below:
 
-    todo
+.. code-block:: c
+    :linenos:
 
-Since the existence of container ``match-community-set`` itself represents configuration data, YDK does not instantiate an instance of struct :go:struct:`MatchCommunitySet<ydk/models/openconfig/openconfig_routing_policy/RoutingPolicy/PolicyDefinitions/PolicyDefinition/Statements/Statement/Conditions/BgpConditions/MatchCommunitySet>` and assign it to ``self.match_community_set``. The user need to manually assign it.
+    // Ipv4AclAndPrefixList_Prefixes_Prefix
+    // Name of a prefix list
+    type Ipv4AclAndPrefixList_Prefixes_Prefix struct {
+        EntityData types.CommonEntityData
+        YFilter yfilter.YFilter
+
+        // This attribute is a key. Prefix list name - max 32 characters. The type is
+        // string.
+        PrefixListName interface{}
+
+        // Sequence of entries forming a prefix list.
+        PrefixListEntries Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries
+    }
+
+    // Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries
+    // Sequence of entries forming a prefix list
+    // This type is a presence type.
+    type Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries struct {
+        EntityData types.CommonEntityData
+        YFilter yfilter.YFilter
+        YPresence bool
+
+        // A prefix list entry; either a description (remark) or a prefix to match
+        // against. The type is slice of
+        // Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries_PrefixListEntry.
+        PrefixListEntry []Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries_PrefixListEntry
+}
+
+Since the existence of container `prefix-list-entries` itself represents configuration data, YDK does not instantiate an instance of :go:struct:`Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries<ydk/models/cisco_ios_xr/ipv4_acl_cfg/Ipv4AclAndPrefixList/Prefixes/Prefix/PrefixListEntries>` with the YPresence attribute. The user needs manually instantiate and assign this object as follows:
+
+.. code-block:: c
+    :linenos:
+    
+    pref := Ipv4AclAndPrefixList_Prefixes_Prefix{}
+    pref.PrefixListEntries.YPresence = true

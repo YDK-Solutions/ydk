@@ -33,7 +33,7 @@ using namespace ydk;
 
 std::string AUGMENTED_XML_PAYLOAD = R"(<cpython xmlns="http://cisco.com/ns/yang/ietf-aug-base-1">
   <doc>
-    <aug-5-identityref xmlns="http://cisco.com/ns/yang/yaug-five">aug-identity</aug-5-identityref>
+    <aug-5-identityref xmlns:yaug-five="http://cisco.com/ns/yang/yaug-five">yaug-five:derived-aug-identity</aug-5-identityref>
     <disutils>
       <four-aug-list xmlns="http://cisco.com/ns/yang/yaug-four">
         <enabled>true</enabled>
@@ -85,7 +85,7 @@ std::string AUGMENTED_JSON_PAYLOAD = R"({
       "ydktest-aug-ietf-2:ydktest-aug-2": {
         "aug-two": "aug two"
       },
-      "aug-5-identityref": "ydktest-aug-ietf-5:aug-identity"
+      "ydktest-aug-ietf-5:aug-5-identityref": "ydktest-aug-ietf-5:derived-aug-identity"
     },
     "lib": {
       "ydktest-aug-ietf-4:ydktest-aug-4": {
@@ -136,4 +136,27 @@ TEST_CASE("on_demand_provider_loading_xml")
     CodecService codec_service{};
     auto cpython = std::make_shared<ydktest::ietf_aug_base_1::Cpython>();
     codec_service.decode(codec_provider, AUGMENTED_XML_PAYLOAD, cpython);
+}
+
+TEST_CASE( "native_tunnel_create" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto & native = schema.create_datanode("ydktest-sanity:native");
+
+    auto & tunnelInt = native.create_datanode("interface/Tunnel[name='521']");
+
+    auto & tunnel = tunnelInt.create_datanode("ydktest-sanity-augm:tunnel");
+
+    auto & source = tunnel.create_datanode("source", "Lo222");
+
+    auto & destination = tunnel.create_datanode("destination", "2.3.4.5");
+
+    ydk::path::Codec s{};
+
+    auto xml = s.encode(native, ydk::EncodingFormat::XML, false);
+
+    std::cout << xml << std::endl;
 }

@@ -1,11 +1,14 @@
 .. _howto-path:
 
-Using the Path API
-==================
+.. _path-api-guide:
 
-.. package:: ydk.path
+How do I use the Path API?
+==========================
 
 .. contents:: Table of Contents
+
+The :ref:`Path API<path-api-guide>` (part of the `YDK core <https://github.com/CiscoDevNet/ydk-py/tree/master/core>`_) is a generic API which can be used to create and access YANG data nodes without having to use the model bundle APIs (for example, `openconfig <https://github.com/CiscoDevNet/ydk-py/tree/master/openconfig>`_). Applications can be written using xpath-like path expressions as illustrated below.
+
 
 Path Syntax
 -----------
@@ -49,13 +52,3 @@ Almost the same XPath is accepted by :go:struct:`SchemaNode<SchemaNode>` methods
 .. note::
 
     In all cases the node's prefix is specified as the name of the appropriate YANG schema. Any node can be prefixed by the module name. However, if the prefix is omitted, the module name is inherited from the previous (parent) node. It means, that the first node in the path is always supposed to have a prefix.
-
-Example
--------
-
-Example for using Path API is shown below(assuming you have openconfig-bgp avaiable in device capability):
-
-.. code-block:: go
-    :linenos:
-
-    todo

@@ -24,7 +24,7 @@ from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.models.ydktest import ydktest_sanity_types as ysanity_types
 from ydk.providers import NetconfServiceProvider
 from ydk.types import Empty, Decimal64
-from ydk.errors import YPYError, YPYModelError, YPYServiceError
+from ydk.errors import YError, YModelError, YServiceError
 from ydk.models.ydktest.ydktest_sanity import YdkEnumIntTest
 
 from test_utils import assert_with_error
@@ -44,8 +44,8 @@ test_int16_invalid_pattern =  """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    .*
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.Enum.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , {}"""
@@ -53,18 +53,7 @@ test_int32_invalid_patern = """set\(\): incompatible function arguments. The fol
     1. \(self: ydk_.types.YLeaf, value: int\) -> None
     2. \(self: ydk_.types.YLeaf, value: int\) -> None
     3. \(self: ydk_.types.YLeaf, value: int\) -> None
-    4. \(self: ydk_.types.YLeaf, value: int\) -> None
-    5. \(self: ydk_.types.YLeaf, value: int\) -> None
-    6. \(self: ydk_.types.YLeaf, value: int\) -> None
-    7. \(self: ydk_.types.YLeaf, value: float\) -> None
-    8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
-    9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
-    10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
-    13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
-
-Invoked with: , \[\]"""
+    .*"""
 test_int64_invalid_pattern = """Invalid value "9223372036854775808" in "number64" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/number64"""
 test_uint8_invalid_pattern = """Invalid value "-1" in "u_number8" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/u_number8"""
 test_uint16_invalid_pattern = """Invalid value "not an uint" in "u_number16" element. Path: /ydktest-sanity:runner/ytypes/built-in-t/u_number16"""
@@ -81,8 +70,8 @@ test_string_invalid_pattern = """set\(\): incompatible function arguments. The f
     8. \(self: ydk_.types.YLeaf, value: ydk_.types.Empty\) -> None
     9. \(self: ydk_.types.YLeaf, value: ydk_.types.Identity\) -> None
     10. \(self: ydk_.types.YLeaf, value: ydk_.types.Bits\) -> None
-    11. \(self: ydk_.types.YLeaf, value: (unicode|str)\) -> None
-    12. \(self: ydk_.types.YLeaf, value: ydk_.types.YLeaf\) -> None
+    .*
+    12. \(self: ydk_.types.YLeaf, value: ydk_.types.Enum.YLeaf\) -> None
     13. \(self: ydk_.types.YLeaf, value: ydk_.types.Decimal64\) -> None
 
 Invoked with: , \['name_str'\]"""
@@ -126,85 +115,85 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         self.crud.delete(self.ncc, runner)
 
-    @assert_with_error(test_int8_invalid_pattern, YPYModelError)
+    @assert_with_error(test_int8_invalid_pattern, YModelError)
     def test_int8_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number8 = 8.5
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_int16_invalid_pattern, YPYModelError)
+    @assert_with_error(test_int16_invalid_pattern, YModelError)
     def test_int16_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number16 = {}
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_int32_invalid_patern, YPYModelError)
+    @assert_with_error(test_int32_invalid_patern, YModelError)
     def test_int32_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number32 = []
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_int64_invalid_pattern, YPYModelError)
+    @assert_with_error(test_int64_invalid_pattern, YModelError)
     def test_int64_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number64 = 9223372036854775808
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_uint8_invalid_pattern, YPYModelError)
+    @assert_with_error(test_uint8_invalid_pattern, YModelError)
     def test_uint8_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.u_number8 = -1
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_uint16_invalid_pattern, YPYModelError)
+    @assert_with_error(test_uint16_invalid_pattern, YModelError)
     def test_uint16_invalid(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number16 = 'not an uint'
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_uint32_invalid_pattern, YPYModelError)
+    @assert_with_error(test_uint32_invalid_pattern, YModelError)
     def test_uint32_invalid(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number32 = 4294967296
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_uint64_invalid_pattern, YPYModelError)
+    @assert_with_error(test_uint64_invalid_pattern, YModelError)
     def test_uint64_invalid(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.u_number64 = 18446744073709551616
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_string_invalid_pattern, YPYModelError)
+    @assert_with_error(test_string_invalid_pattern, YModelError)
     def test_string_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.name = ['name_str']
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_empty_invalid_pattern, YPYModelError)
+    @assert_with_error(test_empty_invalid_pattern, YModelError)
     def test_empty_invalid(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.emptee = '0'
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_boolean_invalid_pattern, YPYModelError)
+    @assert_with_error(test_boolean_invalid_pattern, YModelError)
     def test_boolean_invalid(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.bool_value = ''
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_enum_invalid_pattern, YPYModelError)
+    @assert_with_error(test_enum_invalid_pattern, YModelError)
     def test_enum_invalid(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.enum_value = 'not an enum'
         self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_yleaflist_assignment_pattern, YPYModelError)
+    @assert_with_error(test_yleaflist_assignment_pattern, YModelError)
     def test_yleaflist_assignment(self):
             runner = ysanity.Runner()
             runner.ytypes.built_in_t.llstring = ['invalid', 'leaf-list', 'assignment']
             self.crud.create(self.ncc, runner)
 
-    @assert_with_error(test_ylist_assignment_pattern, YPYModelError)
+    @assert_with_error(test_ylist_assignment_pattern, YModelError)
     def test_ylist_assignment(self):
         runner = ysanity.Runner()
         elems, n = [], 10

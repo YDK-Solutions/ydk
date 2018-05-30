@@ -24,7 +24,7 @@ package path
 
 // #cgo CXXFLAGS: -g -std=c++11
 // #cgo darwin LDFLAGS:  -fprofile-arcs -ftest-coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -ldl
+// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -lm -ldl
 // #include <ydk/ydk.h>
 // #include <stdlib.h>
 import "C"
@@ -32,6 +32,7 @@ import "C"
 import (
 	"fmt"
 	"github.com/CiscoDevNet/ydk-go/ydk"
+	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	encodingFormat "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/protocol"
@@ -84,7 +85,9 @@ func ExecuteRPC(
 			dataValue = getDataPayload(state, value.(types.Entity), rootSchema, provider)
 			defer C.free(unsafe.Pointer(dataValue))
 		}
-		C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+		if !(dataTag == "filter" && len(C.GoString(dataValue)) == 0) {
+			C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
+		}
 	}
 
 	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
@@ -94,30 +97,37 @@ func ExecuteRPC(
 }
 
 func getDataPayload(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema C.RootSchemaNode,
 	provider types.ServiceProvider) *C.char {
 
-	datanode := getDataNodeFromEntity(state, entity, rootSchema)
-
-	if datanode == nil {
-		return nil
-	}
-
-	//for datanode != nil && C.DataNodeGetParent(datanode) != nil {
-	//	datanode = C.DataNodeGetParent(datanode)
-	//}
+	codec := C.CodecInit()
+	defer C.CodecFree(codec)
 	cprovider := provider.GetPrivate().(
 		types.CServiceProvider).Private.(C.ServiceProvider)
 	cencoding := C.ServiceProviderGetEncoding(cprovider)
 
-	codec := C.CodecInit()
-	defer C.CodecFree(codec)
-	var data *C.char = C.CodecEncode(*getCState(state), codec, datanode, cencoding, 1)
-	panicOnCStateError(getCState(state))
+	retString := ""
+	config := types.EntityToCollection(entity)
+	for _, ent := range config.Entities() {
+		
+		datanode := getDataNodeFromEntity(state, ent, rootSchema)
+		if datanode == nil {
+			return nil
+		}
 
-	return (data)
+		var data *C.char = C.CodecEncode(*getCState(state), codec, datanode, cencoding, 1)
+		panicOnCStateError(getCState(state))
+		
+		if cencoding == C.JSON {
+			// YG: So far there is no support for multiple JSON encoded entities
+			return data;
+		}
+		retString += C.GoString(data)
+		C.free(unsafe.Pointer(data))
+	}
+	return C.CString(retString)
 }
 
 // ExecuteRPCEntity provides the functionality to execute RPCs with
@@ -135,8 +145,9 @@ func ExecuteRPCEntity(
 	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
 	panicOnCStateError(cstate)
 
+	segmentPath := rpcEntity.GetEntityData().SegmentPath
 	ydkRPC := C.RootSchemaNodeRpc(
-		*cstate, rootSchema, C.CString(rpcEntity.GetSegmentPath()))
+		*cstate, rootSchema, C.CString(segmentPath))
 	panicOnCStateError(cstate)
 
 	if rootSchema == nil {
@@ -147,15 +158,18 @@ func ExecuteRPCEntity(
 	rpcInput := C.RpcInput(*cstate, ydkRPC)
 	panicOnCStateError(cstate)
 
-	child := rpcEntity.GetChildByName("input", "")
+	ydk.YLogDebug(fmt.Sprintf("Calling GetChildByName for Entity: %s: childYangName: %s, segmentPath: %s", types.EntityToString(rpcEntity), "input", ""))
+
+	child := types.GetChildByName(rpcEntity, "input", "")
 	if (child != nil && types.HasDataOrFilter(child)) {
+		ydk.YLogDebug("Calling walkRPCChildren")
 		walkRPCChildren(state, child, rpcInput, "")
 	}
 
 	readDataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	panicOnCStateError(cstate)
 
-	output := rpcEntity.GetChildByName("output", "")
+	output := types.GetChildByName(rpcEntity, "output", "")
 
 	if (output == nil || readDataNode.Private == nil) {
 		return nil
@@ -164,11 +178,11 @@ func ExecuteRPCEntity(
 }
 
 func walkRPCChildren(
-	state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	state *errors.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 
 	ydk.YLogDebug("Walking Rpc Children...")
 	if(rpcEntity != nil) {
-		children := rpcEntity.GetChildren()
+		children := types.GetYChildrenMap(rpcEntity)
 		entityPath := types.GetEntityPath(rpcEntity)
 		ydk.YLogDebug(fmt.Sprintf(
 			"Got %d entity children in '%s'", len(children), entityPath.Path))
@@ -187,13 +201,13 @@ func walkRPCChildren(
 			ydk.YLogDebug(fmt.Sprintf("Path: %s", path))
 		}
 
-		for childName, _ := range children {
-			if (children[childName] != nil &&
-				types.HasDataOrFilter(children[childName])) {
+		for _, child := range children {
+			if (child.Value != nil &&
+				types.HasDataOrFilter(child.Value)) {
 
-				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'",
-					children[childName].GetSegmentPath()))
-				walkRPCChildren(state, children[childName], rpcInput, path)
+				segmentPath := child.Value.GetEntityData().SegmentPath
+				ydk.YLogDebug(fmt.Sprintf("Looking at entity child '%s'", segmentPath))
+				walkRPCChildren(state, child.Value, rpcInput, path)
 			}
 		}
 
@@ -207,7 +221,7 @@ func walkRPCChildren(
 }
 
 func createFromEntityPath(
-	state *types.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
+	state *errors.State, rpcEntity types.Entity, rpcInput C.DataNode, path string) {
 
 	entityPath := types.GetEntityPath(rpcEntity)
 	for _, nameValue := range entityPath.ValuePaths {
@@ -228,68 +242,108 @@ func createFromEntityPath(
 }
 
 func createFromChildren(
-	state *types.State, children map[string]types.Entity, rpcInput C.DataNode) {
+	state *errors.State, children map[string]types.YChild, rpcInput C.DataNode) {
 
 	for childName, child := range children {
-		if types.HasDataOrFilter(child) {
+		if child.Value != nil && types.HasDataOrFilter(child.Value) {
 			ydk.YLogDebug(fmt.Sprintf("Creating child '%s' : %s",
-				childName, types.GetEntityPath(child).Path))
+				childName, types.GetEntityPath(child.Value).Path))
 			C.DataNodeCreate(*getCState(state), rpcInput, C.CString(childName), C.CString(""))
 		}
 	}
 }
 
 func getTopEntityFromFilter(filter types.Entity) types.Entity {
-	if filter.GetParent() == nil {
+	parent := types.GetParent(filter)
+	if parent == nil {
 		return filter
 	}
 
-	return getTopEntityFromFilter(filter.GetParent())
+	return getTopEntityFromFilter(parent)
 }
 
 // ReadDatanode populates entity by reading the top level entity from a given data node.
 // Returns the top entity (types.Entity) from readDataNode.
 func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
-	if readDataNode.Private == nil {
-		return nil
-	}
 
-	topEntity := getTopEntityFromFilter(filter)
-	ydk.YLogDebug(
-		fmt.Sprintf("Reading top entity: '%s'", topEntity.GetSegmentPath()))
+    ec := types.NewEntityCollection()
+
+	if readDataNode.Private == nil {
+		ydk.YLogError("path.ReadDatanode: The readDataNode is nil; returning empty EntityCollection")
+		return ec
+	}
 
 	cchildren := C.DataNodeGetChildren(readDataNode.Private.(C.DataNode))
 
 	if cchildren.count == C.int(0) {
-		return topEntity
+		return filter;
 	}
 
 	children := (*[1 << 30]C.DataNode)(
 		unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-	getEntityFromDataNode(children[0], topEntity)
-	return topEntity
+
+	// Need keep order of filters.
+	isFilterEC := types.IsEntityCollection(filter)
+	filterEC := types.EntityToCollection(filter)
+	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities in the filter: %v", filterEC.Len()))
+	if filterEC.Len() > 0 {
+		// Follow filter order
+		// Build map of all children then itterate by filter.
+		childrenMap := make(map[string]C.DataNode)
+		for _, dn := range children {
+			path := C.GoString(C.DataNodeGetPath(dn))[1:]	// Strip '/' in the beginning of the path
+			childrenMap[path] = dn
+		}
+		for _, key := range filterEC.Keys() {
+			topEntity, _ := filterEC.Get(key)
+			dn := childrenMap[key]
+			if dn != nil {
+				getEntityFromDataNode(dn, topEntity)
+			}
+			ec.Add(topEntity)
+		}
+	} else {
+		// Itterate over Datanodes
+		for _, dn := range children {
+			entity := DatanodeToEntity(dn)
+			if entity != nil {
+				ec.Add(entity)
+			}
+		}
+	}
+	ydk.YLogDebug(fmt.Sprintf("path.ReadDatanode: Number of entities returning: %v, filter is EC: %v", ec.Len(), isFilterEC))
+	if ec.Len() > 1 || isFilterEC {
+		return ec
+	}
+	return ec.GetItem(0)
 }
 
 // ConnectToNetconfProvider connects to NETCONF service provider by creating a
 // connection to the provider using given address, username, password, and port.
 // Returns the connected service provider (types.CServiceProvider).
 func ConnectToNetconfProvider(
-	state *types.State,
+	state *errors.State,
 	repo types.Repository,
-	Address, Username, Password string,
+	address, username, password string,
 	port int,
-	Protocol string) types.CServiceProvider {
+	protocol string,
+	onDemand, commonCache bool) types.CServiceProvider {
 
-	var address *C.char = C.CString(Address)
-	defer C.free(unsafe.Pointer(address))
-	var username *C.char = C.CString(Username)
-	defer C.free(unsafe.Pointer(username))
-	var password *C.char = C.CString(Password)
-	defer C.free(unsafe.Pointer(password))
+	var caddress *C.char = C.CString(address)
+	defer C.free(unsafe.Pointer(caddress))
+	var cusername *C.char = C.CString(username)
+	defer C.free(unsafe.Pointer(cusername))
+	var cpassword *C.char = C.CString(password)
+	defer C.free(unsafe.Pointer(cpassword))
 	var cport C.int = C.int(port)
 
-	var cprotocol *C.char = C.CString(Protocol)
+	var cprotocol *C.char = C.CString(protocol)
 	defer C.free(unsafe.Pointer(cprotocol))
+
+	var cOnDemand C.boolean = 1
+	if onDemand { cOnDemand = 0 }
+	var cCommonCache C.boolean = 0
+	if commonCache { cCommonCache = 1 }
 
 	AddCState(state)
 	cstate := getCState(state)
@@ -300,12 +354,12 @@ func ConnectToNetconfProvider(
 		var path *C.char = C.CString(repo.Path)
 		repo := C.RepositoryInitWithPath(*cstate, path)
 		panicOnCStateError(cstate)
-		p = C.NetconfServiceProviderInitWithRepo(
-			*cstate, repo, address, username, password, cport, cprotocol)
+		p = C.NetconfServiceProviderInitWithOnDemandRepo(
+			*cstate, repo, caddress, cusername, cpassword, cport, cprotocol, cOnDemand)
 		panicOnCStateError(cstate)
 	} else {
-		p = C.NetconfServiceProviderInit(
-			*cstate, address, username, password, cport, cprotocol)
+		p = C.NetconfServiceProviderInitWithOnDemand(
+			*cstate, caddress, cusername, cpassword, cport, cprotocol, cOnDemand, cCommonCache)
 		panicOnCStateError(cstate)
 	}
 
@@ -320,8 +374,21 @@ func DisconnectFromNetconfProvider(provider types.CServiceProvider) {
 	C.NetconfServiceProviderFree(realProvider)
 }
 
+// GetCapabilitesFromNetconfProvider gets the capabilities supported by the provider.
+// Returns the list of capabilities.
+func GetCapabilitesFromNetconfProvider(provider types.CServiceProvider) []string {
+	realProvider := provider.Private.(C.ServiceProvider)
+	size := C.NetconfServiceProviderGetNumCapabilities(realProvider)
+	capabilities := make([]string, size)
+	for i := range capabilities {
+		ccapability := C.NetconfServiceProviderGetCapabilityByIndex(realProvider, C.int(i))
+		capabilities[i] = C.GoString(ccapability)
+	}
+	return capabilities
+}
+
 // CleanUpErrorState cleans up memory for CState.
-func CleanUpErrorState(state *types.State) {
+func CleanUpErrorState(state *errors.State) {
 	realState := getCState(state)
 	C.YDKStateFree(*realState)
 }
@@ -331,7 +398,7 @@ func CleanUpErrorState(state *types.State) {
 // and port.
 // Returns the connected service provider (types.CServiceProvider).
 func ConnectToRestconfProvider(
-	state *types.State,
+	state *errors.State,
 	Path, Address, Username, Password string,
 	port int, encoding encodingFormat.EncodingFormat,
 	stateURLRoot, configURLRoot string) types.CServiceProvider {
@@ -382,34 +449,44 @@ func DisconnectFromRestconfProvider(provider types.CServiceProvider) {
 // InitCodecServiceProvider initializes CodecServiceProvider.
 // Returns root schema node (types.RootSchemaNode) parsed from repository.
 func InitCodecServiceProvider(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	repo types.Repository) types.RootSchemaNode {
-
-	caps := entity.GetAugmentCapabilitiesFunction()()
 
 	var repoPath *C.char
 	defer C.free(unsafe.Pointer(repoPath))
 
+	data := entity.GetEntityData()
 	if len(repo.Path) > 0 {
 		ydk.YLogDebug(fmt.Sprintf(
 			"CodecServiceProvider using YANG models in %v", repo.Path))
 		repoPath = C.CString(repo.Path)
 	} else {
-		yangPath := entity.GetBundleYangModelsLocation()
+		yangPath := data.BundleYangModelsLocation
 		ydk.YLogDebug(fmt.Sprintf(
 			"CodecServiceProvider using YANG models in %v", yangPath))
 		repoPath = C.CString(yangPath)
 	}
 
-	realCaps := make([]C.Capability, 0)
-	var realCap C.Capability
-	for mod, rev := range caps {
-		realCap = C.CapabilityCreate(
-			*getCState(state), C.CString(mod), C.CString(rev))
-		panicOnCStateError(getCState(state))
-		defer C.CapabilityFree(realCap)
-		realCaps = append(realCaps, realCap)
+	capabilities := data.CapabilitiesTable
+	namespaces := data.NamespaceTable
+	lookupTableKeys := make([]*C.char, 0)
+	lookupTableValues := make([]C.Capability, 0)
+	for name, revision := range capabilities {
+		var cname *C.char = C.CString(name)
+		lookupTableKeys = append(lookupTableKeys, cname)
+
+		capability := C.CapabilityCreate(
+			*getCState(state), C.CString(name), C.CString(revision))
+		defer C.CapabilityFree(capability)
+		lookupTableValues = append(lookupTableValues, capability)
+
+		namespace, ok := namespaces[name]
+		if ok {
+			var cnamespace *C.char = C.CString(namespace)
+			lookupTableKeys = append(lookupTableKeys, cnamespace)
+			lookupTableValues = append(lookupTableValues, capability)
+		}
 	}
 
 	realRepo := C.RepositoryInitWithPath(*getCState(state), repoPath)
@@ -417,7 +494,11 @@ func InitCodecServiceProvider(
 
 	repo.Private = realRepo
 	rootSchemaWrapper := C.RepositoryCreateRootSchemaWrapper(
-		*getCState(state), realRepo, &realCaps[0], C.int(len(realCaps)))
+		*getCState(state),
+		realRepo,
+		&lookupTableKeys[0],
+		&lookupTableValues[0],
+		C.int(len(lookupTableKeys)))
 	panicOnCStateError(getCState(state))
 
 	rootSchemaNode := types.RootSchemaNode{Private: rootSchemaWrapper}
@@ -428,7 +509,7 @@ func InitCodecServiceProvider(
 // encoding format passed in.
 // Returns the resulting payload (string).
 func CodecServiceEncode(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema types.RootSchemaNode,
 	encoding encodingFormat.EncodingFormat) string {
@@ -436,34 +517,41 @@ func CodecServiceEncode(
 	rootSchemaWrapper := rootSchema.Private.(C.RootSchemaWrapper)
 	realRootSchema := C.RootSchemaWrapperUnwrap(rootSchemaWrapper)
 
-	dataNode := getDataNodeFromEntity(state, entity, realRootSchema)
-
-	if dataNode == nil {
-		return ""
-	}
-
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
+	
+	retString := ""
+	config := types.EntityToCollection(entity)
+	for _, ent := range config.Entities() {
+		
+		dataNode := getDataNodeFromEntity(state, ent, realRootSchema)
+		if dataNode == nil {
+			return ""
+		}
+	
+		var payload *C.char
+		defer C.free(unsafe.Pointer(payload))
 
-	var payload *C.char
-	defer C.free(unsafe.Pointer(payload))
-
-	switch encoding {
-	case encodingFormat.XML:
-		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.XML, 1)
-		panicOnCStateError(getCState(state))
-	case encodingFormat.JSON:
-		payload = C.CodecEncode(*getCState(state), codec, dataNode, C.JSON, 1)
-		panicOnCStateError(getCState(state))
+		switch encoding {
+		case encodingFormat.XML:
+			payload = C.CodecEncode(*getCState(state), codec, dataNode, C.XML, 1)
+			panicOnCStateError(getCState(state))
+			retString += C.GoString(payload)
+		case encodingFormat.JSON:
+			payload = C.CodecEncode(*getCState(state), codec, dataNode, C.JSON, 1)
+			panicOnCStateError(getCState(state))
+			
+			// YG: So far there is no support for multiple entities encoded with JSON format
+			return C.GoString(payload)
+		}
 	}
-
-	return C.GoString(payload)
+	return retString
 }
 
 // CodecServiceDecode decodes XML/JSON payloads passed in to entity.
 // Returns the top level entity (types.Entity) from resulting data node.
 func CodecServiceDecode(
-	state *types.State,
+	state *errors.State,
 	rootSchema types.RootSchemaNode,
 	payload string,
 	encoding encodingFormat.EncodingFormat,
@@ -483,22 +571,48 @@ func CodecServiceDecode(
 	case encodingFormat.XML:
 		realDataNode = C.CodecDecode(
 			*getCState(state), codec, realRootSchema, realPayload, C.XML)
-		panicOnCStateError(getCState(state))
 	case encodingFormat.JSON:
 		realDataNode = C.CodecDecode(
 			*getCState(state), codec, realRootSchema, realPayload, C.JSON)
-		panicOnCStateError(getCState(state))
 	}
+	panicOnCStateError(getCState(state))
 
 	var dataNode = types.DataNode{Private: realDataNode}
+	cchildren := C.DataNodeGetChildren(dataNode.Private.(C.DataNode))
+	ydk.YLogDebug(fmt.Sprintf("path.CodecServiceDecode: Top entity path: '%s'; Number of children in datanode: '%v'", 
+			topEntity.GetEntityData().SegmentPath, cchildren.count))
+	if cchildren.count == C.int(0) {
+		ydk.YLogDebug("path.CodecServiceDecode: Returning top entity")
+		return topEntity;
+	}
+	if cchildren.count == C.int(1) {
+		ydk.YLogDebug("path.CodecServiceDecode: Getting entity from single datanode")
+		return ReadDatanode(topEntity, dataNode)
+	}
+	// Payload contains multiple containers and or listleafs
+	ydk.YLogDebug("path.CodecServiceDecode: Getting collection of entities")
+	emptyCollection := types.NewFilter();
+	return ReadDatanode(emptyCollection, dataNode)
+}
 
-	return ReadDatanode(topEntity, dataNode)
+func DatanodeToEntity(node C.DataNode) types.Entity {
+
+	nodeName := C.GoString(C.DataNodeGetArgument(node))
+    moduleName := C.GoString(C.DataNodeGetModuleName(node))
+    path := fmt.Sprintf("%s:%s", moduleName, nodeName)
+    ydk.YLogDebug(fmt.Sprintf("Got datanode with path: '%s'", path))
+    
+    topEntity, ok := ydk.GetTopEntity(path)
+    if ok {
+	    getEntityFromDataNode(node, topEntity)
+    }
+    return topEntity
 }
 
 // ConnectToOpenDaylightProvider connects to OpenDaylight device.
 // Returns the connected service provider (types.COpenDaylightServiceProvier).
 func ConnectToOpenDaylightProvider(
-	state *types.State,
+	state *errors.State,
 	Path, Address, Username, Password string,
 	port int,
 	encoding encodingFormat.EncodingFormat,
@@ -546,7 +660,7 @@ func DisconnectFromOpenDaylightProvider(
 // given the opendaylight service provider.
 // Returns node ids available ([]string).
 func OpenDaylightServiceProviderGetNodeIDs(
-	state *types.State, provider types.COpenDaylightServiceProvider) []string {
+	state *errors.State, provider types.COpenDaylightServiceProvider) []string {
 
 	cprovider := provider.Private.(C.OpenDaylightServiceProvider)
 	var ids []string
@@ -570,7 +684,7 @@ func OpenDaylightServiceProviderGetNodeIDs(
 // node provider given the opendaylight service provider and node id.
 // Returns service provider (types.CServiceProvider) based on given node id.
 func OpenDaylightServiceProviderGetNodeProvider(
-	state *types.State,
+	state *errors.State,
 	provider types.COpenDaylightServiceProvider,
 	nodeID string) types.CServiceProvider {
 
@@ -590,15 +704,18 @@ func OpenDaylightServiceProviderGetNodeProvider(
 // DataNode from Entity
 //////////////////////////////////////////////////////////////////////////
 func getDataNodeFromEntity(
-	state *types.State,
+	state *errors.State,
 	entity types.Entity,
 	rootSchema C.RootSchemaNode) C.DataNode {
 
 	if entity == nil {
 		return nil
 	}
-	for parent := entity.GetParent(); parent != nil; parent = parent.GetParent() {
+
+	parent := types.GetParent(entity)
+	for parent != nil {
 		entity = parent
+		parent = types.GetParent(entity)
 	}
 
 	rootPath := types.GetEntityPath(entity)
@@ -608,7 +725,7 @@ func getDataNodeFromEntity(
 	rootDataNode := C.RootSchemaNodeCreate(*getCState(state), rootSchema, path)
 	panicOnCStateError(getCState(state))
 
-	addDataNodeFilterAnnotation(&rootDataNode, entity.GetFilter())
+	addDataNodeFilterAnnotation(&rootDataNode, entity.GetEntityData().YFilter)
 
 	populateNameValues(state, rootDataNode, rootPath)
 	walkChildren(state, entity, rootDataNode)
@@ -616,25 +733,27 @@ func getDataNodeFromEntity(
 }
 
 func walkChildren(
-	state *types.State, entity types.Entity, dataNode C.DataNode) {
-	children := entity.GetChildren()
+	state *errors.State, entity types.Entity, dataNode C.DataNode) {
+	children := types.GetYChildren(entity.GetEntityData())
 
 	ydk.YLogDebug(fmt.Sprintf("Got %d entity children", len(children)))
 
-	for childName := range children {
+	for _, child := range children {
+		if child.Value != nil {
+			segmentPath := child.Value.GetEntityData().SegmentPath
+			ydk.YLogDebug(fmt.Sprintf(
+				"Looking at entity child '%s'", segmentPath))
 
-		ydk.YLogDebug(fmt.Sprintf(
-			"Looking at entity child '%s'", children[childName].GetSegmentPath()))
-
-		if types.HasDataOrFilter(children[childName]) {
-			populateDataNode(state, children[childName], dataNode)
+			if types.HasDataOrFilter(child.Value) {
+				populateDataNode(state, child.Value, dataNode)
+			}
 		}
 	}
 	ydk.YLogDebug("")
 }
 
 func populateDataNode(
-	state *types.State, entity types.Entity, parentDataNode C.DataNode) {
+	state *errors.State, entity types.Entity, parentDataNode C.DataNode) {
 
 	path := types.GetEntityPath(entity)
 	p := C.CString(path.Path)
@@ -650,14 +769,14 @@ func populateDataNode(
 		panic("Datanode could not be created for: " + path.Path)
 	}
 
-	addDataNodeFilterAnnotation(&dataNode, entity.GetFilter())
+	addDataNodeFilterAnnotation(&dataNode, entity.GetEntityData().YFilter)
 
 	populateNameValues(state, dataNode, path)
 	walkChildren(state, entity, dataNode)
 }
 
 func populateNameValues(
-	state *types.State, dataNode C.DataNode, path types.EntityPath) {
+	state *errors.State, dataNode C.DataNode, path types.EntityPath) {
 
 	for _, nameValue := range path.ValuePaths {
 		var result C.DataNode
@@ -712,17 +831,18 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 			var childEntity types.Entity
 			if dataNodeIsList(childDataNode) {
 				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
-				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s'", segmentPath))
-				childEntity = entity.GetChildByName(childName, segmentPath)
+				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s' '%s'", childName, segmentPath))
+				childEntity = types.GetChildByName(entity, childName, segmentPath)
 			} else {
 				ydk.YLogDebug(fmt.Sprintf("Creating child node '%s'", childName))
-				childEntity = entity.GetChildByName(childName, "")
+				childEntity = types.GetChildByName(entity, childName, "")
 			}
 			if childEntity == nil {
 				ydk.YLogError(fmt.Sprintf("Could not create child entity '%s'!", childName))
 				panic("Could not create child entity!")
 			}
-			childEntity.SetParent(entity)
+			types.SetPresenceFlag(childEntity)
+			types.SetParent(childEntity, entity)
 			getEntityFromDataNode(childDataNode, childEntity)
 		}
 	}
@@ -749,10 +869,10 @@ func addDataNodeFilterAnnotation(dataNode *C.DataNode, yf yfilter.YFilter) {
 // Error Handling
 //////////////////////////////////////////////////////////////////////////
 
-// AddCState creates and adds cstate to *types.State.
-func AddCState(state *types.State) {
+// AddCState creates and adds cstate to *errors.State.
+func AddCState(state *errors.State) {
 	cstate := C.YDKStateCreate()
-	state.Private = types.CState{Private: cstate}
+	state.Private = errors.CState{Private: cstate}
 }
 
 func checkState(cstate *C.YDKStatePtr) error {
@@ -771,25 +891,25 @@ func checkState(cstate *C.YDKStatePtr) error {
 
 	switch cerrorType {
 	case C.YDK_CLIENT_ERROR:
-		return &types.YGOClientError{Msg: errMsg}
+		return &errors.YClientError{Msg: errMsg}
 	case C.YDK_SERVICE_PROVIDER_ERROR:
-		return &types.YGOServiceProviderError{Msg: errMsg}
+		return &errors.YServiceProviderError{Msg: errMsg}
 	case C.YDK_SERVICE_ERROR:
-		return &types.YGOServiceError{Msg: errMsg}
+		return &errors.YServiceError{Msg: errMsg}
 	case C.YDK_ILLEGAL_STATE_ERROR:
-		return &types.YGOIllegalStateError{Msg: errMsg}
+		return &errors.YIllegalStateError{Msg: errMsg}
 	case C.YDK_INVALID_ARGUMENT_ERROR:
-		return &types.YGOInvalidArgumentError{Msg: errMsg}
+		return &errors.YInvalidArgumentError{Msg: errMsg}
 	case C.YDK_OPERATION_NOTSUPPORTED_ERROR:
-		return &types.YGOOperationNotSupportedError{Msg: errMsg}
+		return &errors.YOperationNotSupportedError{Msg: errMsg}
 	case C.YDK_MODEL_ERROR:
-		return &types.YGOModelError{Msg: errMsg}
+		return &errors.YModelError{Msg: errMsg}
 	case C.YDK_CORE_ERROR:
-		return &types.YGOCoreError{Msg: errMsg}
+		return &errors.YCoreError{Msg: errMsg}
 	case C.YDK_CODEC_ERROR:
-		return &types.YGOCodecError{Msg: errMsg}
+		return &errors.YCodecError{Msg: errMsg}
 	default:
-		return &types.YGOError{Msg: errMsg}
+		return &errors.YError{Msg: errMsg}
 	}
 }
 
@@ -801,8 +921,8 @@ func getCProtocol(proto protocol.Protocol) C.Protocol {
 	}
 }
 
-func getCState(state *types.State) *C.YDKStatePtr {
-	statePtr := state.Private.(types.CState).Private.(C.YDKStatePtr)
+func getCState(state *errors.State) *C.YDKStatePtr {
+	statePtr := state.Private.(errors.CState).Private.(C.YDKStatePtr)
 	return &statePtr
 }
 

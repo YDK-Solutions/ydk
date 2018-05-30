@@ -70,14 +70,14 @@ After establishing the connection, we instantiate the entities and set some data
  :linenos:
 
  // Create BGP object
- auto bgp = make_unique<openconfig_bgp::Bgp>();
+ auto bgp = make_shared<openconfig_bgp::Bgp>();
 
  // Set the Global AS
  bgp->global->config->as = 65001;
  bgp->global->config->router_id = "1.2.3.4";
 
  // Create a neighbor
- auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+ auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
  neighbor->neighbor_address = "6.7.8.9";
  neighbor->config->neighbor_address = "6.7.8.9";
  neighbor->config->peer_as = 65001;
@@ -88,7 +88,7 @@ After establishing the connection, we instantiate the entities and set some data
  neighbor->parent = bgp->neighbors.get();
 
  // Add the neighbor config to the BGP neighbors list
- bgp->neighbors->neighbor.push_back(move(neighbor));
+ bgp->neighbors->neighbor.append(neighbor);
 
 
 Invoking the CRUD Service
@@ -108,12 +108,12 @@ Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudSer
  {
    crud_service.create(provider, *bgp);
  }
- catch(YCPPError & e)
+ catch(YError & e)
  {
    cerr << "Error details: " << e.what() << endl;
  }
 
-Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YCPPError<ydk::YCPPError>`
+Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YError<ydk::YError>`
 
 Logging
 ----------------------

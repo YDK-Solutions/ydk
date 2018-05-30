@@ -40,9 +40,11 @@ class ModulePrinter(FilePrinter):
     def print_header(self, package):
         self._print_module_description(package)
 
+        self.ctx.writeln("from collections import OrderedDict")
+        self.ctx.bline()
         self.ctx.writeln("from ydk.types import Entity, EntityPath, Identity, Enum, YType, YLeaf, YLeafList, YList, LeafDataList, Bits, Empty, Decimal64")
         self.ctx.writeln("from ydk.filters import YFilter")
-        self.ctx.writeln("from ydk.errors import YPYError, YPYModelError")
+        self.ctx.writeln("from ydk.errors import YError, YModelError")
         self.ctx.writeln("from ydk.errors.error_handler import handle_type_error as _handle_type_error")
         self.ctx.bline()
         self.ctx.bline()

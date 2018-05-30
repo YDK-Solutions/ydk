@@ -108,7 +108,7 @@ class GoBindingsPrinter(LanguageBindingsPrinter):
         def _walk_n_print(named_element, p):
             self.print_file(get_go_doc_file_name(p, named_element),
                             emit_go_doc,
-                            _EmitArgs(self.ypy_ctx, named_element, self.identity_subclasses))
+                            _EmitArgs(self.ypy_ctx, named_element, (self.identity_subclasses, self.bundle_name)))
 
             for owned_element in named_element.owned_elements:
                 if isinstance(owned_element, (Class, Enum)):
@@ -128,10 +128,12 @@ def get_go_doc_file_name(path, named_element):
     return '%s/%s.rst' % (path, get_rst_file_name(named_element))
 
 def emit_table_of_contents(ctx, packages, extra_args):
-    DocPrinter(ctx, 'go').print_table_of_contents(packages, extra_args[0], extra_args[1])
+    bundle_name, bundle_version = extra_args
+    DocPrinter(ctx, 'go', bundle_name, bundle_version).print_table_of_contents(packages)
 
-def emit_go_doc(ctx, named_element, identity_subclasses):
-    DocPrinter(ctx, 'go').print_module_documentation(named_element, identity_subclasses)
+def emit_go_doc(ctx, named_element, extra_args):
+    identity_subclasses, bundle_name = extra_args
+    DocPrinter(ctx, 'go', bundle_name).print_module_documentation(named_element, identity_subclasses)
 
 def copy_tree(src, dst):
     names = os.listdir(src)

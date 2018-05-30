@@ -30,8 +30,8 @@ SchemaNode
 
         :param path: The path expression.
         :return: Vector of :cpp:class:`SchemaNode<SchemaNode>` that satisfies the criterion.
-        :raises: :cpp:class:`YCPPPathError<YCPPPathError>` if the path expression in invalid, see error code for details.
-        :raises: :cpp:class:`YCPPInvalidArgumentError<YCPPInvalidArgumentError>` if the argument is invalid.
+        :raises: :cpp:class:`YPathError<YPathError>` if the path expression in invalid, see error code for details.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>` if the argument is invalid.
 
     .. cpp:function:: virtual const SchemaNode* get_parent() const noexcept
 

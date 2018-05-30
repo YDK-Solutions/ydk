@@ -186,7 +186,8 @@ def emit_cpp_doc(ctx, named_element, identity_subclasses):
 
 
 def emit_table_of_contents(ctx, packages, extra_args):
-    DocPrinter(ctx, 'cpp').print_table_of_contents(packages, extra_args[0], extra_args[1])
+    bundle_name, bundle_version = extra_args
+    DocPrinter(ctx, 'cpp', bundle_name, bundle_version).print_table_of_contents(packages)
 
 
 def emit_test_cases(ctx, package, identity_subclasses):

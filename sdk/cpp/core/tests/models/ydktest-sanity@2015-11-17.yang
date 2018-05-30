@@ -37,7 +37,6 @@ module ydktest-sanity {
      This module contains definitions
      for the following management objects:
 
-
      Copyright (c) 2013-2014 by Cisco Systems, Inc.
      All rights reserved.";
 
@@ -247,12 +246,12 @@ module ydktest-sanity {
         }
 
         leaf u_number8 {
-          description " 8 bit uinteger value type";
+          description " 8 bit uinteger value type, must be >=0 & <= 255";
           type uint8;
         }
 
         leaf u_number16 {
-          description "16 bit uinteger value type";
+          description "16 bit uinteger value type, must be >=0 & <= 65025";
           type uint16;
         }
 
@@ -657,6 +656,49 @@ module ydktest-sanity {
     }
   }
 
+  grouping two-key-list {
+    list two-key-list {
+        key "first second";
+        leaf first {
+            type string;
+        }
+        leaf second {
+            type uint32;
+        }
+        leaf property {
+            type string;
+        }
+    }
+  }
+
+  grouping identity-list {
+    list identity-list {
+        key "name";
+        leaf name {
+            type identityref {
+                base base-identity;
+           }
+        }
+    }
+  }
+
+  grouping enum-list {
+    list enum-list {
+        key "name";
+        leaf name {
+            type Ydk-Enum-test;
+        }
+    }
+  }
+
+  grouping inner-pres {
+    container outer {
+        container inner {
+            presence true;
+        }
+    }
+  }
+
   grouping one-read-only {
     description "testing for couple of leaves";
     container one-read-only {
@@ -677,9 +719,43 @@ module ydktest-sanity {
     }
   }
 
+  grouping mtus {
+      container mtus {
+        list mtu {
+            key "owner";
+
+            leaf owner {
+                type string;
+            }
+
+            leaf mtu {
+                type int32;
+                mandatory true;
+            }
+        }
+    }
+  }
+
+  grouping passive {
+    list passive {
+        key "name";
+        leaf name {
+            type string;
+        }
+        list interfac {
+            key "test";
+
+            leaf test {
+                type string;
+            }
+        }
+    }
+  }
+
+
   container runner {
 
-    uses nested-naming;
+    // uses nested-naming;
 
     //container at 1,2,3 nested level
     uses one-level;
@@ -696,11 +772,23 @@ module ydktest-sanity {
 
     uses three-level-w-list-at-two;
 
+    uses two-key-list;
+
+    uses identity-list;
+
+    uses enum-list;
+
     uses leaf-ref-g;
 
     uses not-supported;
 
     uses one-read-only;
+
+    uses mtus;
+
+    uses passive;
+
+    uses inner-pres;
 
     container runner-2 {
 
@@ -709,5 +797,64 @@ module ydktest-sanity {
           type string;
        }
     }
+
+    list no-key-list {
+        config false;
+        leaf test {
+            type string;
+        }
+    }
   }
+  
+  container native {
+
+    leaf version {
+      description "Version";
+      type string;
+    }
+
+    leaf hostname {
+      description "Set system's network name";
+      type string;
+    }
+
+    uses config-interface-grouping;
+
+  } // native
+
+  typedef comp_InstType {
+      type enumeration {
+          enum unknown {
+              value 0;   // Unknown
+          }
+          enum phys {
+              value 1;     // Baremetal Host
+          }
+          enum virt {
+              value 2;     // Virtual Machine
+          }
+          enum hv {
+              value 3;   // Hypervisor Host
+          }
+      }
+      default "unknown";
+  }
+
+  typedef comp_NicInstType {
+      type comp_InstType;
+  }
+
+  container cascading-types {
+
+    leaf comp_InstType {
+      description "this is enum type value";
+      type comp_InstType;
+    }
+
+    leaf comp_NicInstType {
+      description "this is enum type value";
+      type comp_NicInstType;
+    }
+  }
+
 }

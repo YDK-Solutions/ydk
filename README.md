@@ -1,6 +1,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6e111527081b48e1b2252c3562e08a3b)](https://www.codacy.com/app/ydk/ydk-gen?utm_source=github.com&utm_medium=referral&utm_content=CiscoDevNet/ydk-gen&utm_campaign=badger)
 [![License](https://cloud.githubusercontent.com/assets/17089095/19458582/dd626d2c-9481-11e6-8019-8227c5c66a06.png)](https://github.com/CiscoDevNet/ydk-gen/blob/master/LICENSE) [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-gen.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-gen)
 [![codecov](https://codecov.io/gh/CiscoDevNet/ydk-gen/branch/master/graph/badge.svg)](https://codecov.io/gh/CiscoDevNet/ydk-gen)
+[![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/ydkdev/ydk-gen/)
 
 ![ydk-logo-128](https://cloud.githubusercontent.com/assets/16885441/24175899/2010f51e-0e56-11e7-8fb7-30a9f70fbb86.png)
 
@@ -12,6 +13,8 @@ YANG Development Kit (Generator)
 **Table of Contents**
 
 - [Overview](#overview)
+- [Backward compatibility](#backward-compatibility)
+- [Docker](#docker)
 - [System requirements](#system-requirements)
   - [Linux](#linux)
   - [macOS](#macos)
@@ -21,7 +24,7 @@ YANG Development Kit (Generator)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Usage](#usage)
   - [First step: choose your bundle profile](#first-step-choose-your-bundle-profile)
-    - [Details](#Details)
+    - [Details](#details)
   - [Second step: Generate & install the core](#second-step-generate--install-the-core)
   - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
@@ -34,6 +37,7 @@ YANG Development Kit (Generator)
 - [Running Unit Tests](#running-unit-tests)
   - [Python](#python)
   - [C++](#c)
+  - [Go](#go)
 - [Support](#support)
 - [Release Notes](#release-notes)
 
@@ -41,12 +45,15 @@ YANG Development Kit (Generator)
 
 # Overview
 
-**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python and C++ with planned support for other language bindings in the future.
+**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python, Go and C++ with planned support for other language bindings in the future.
 
 Other tools and libraries are used to deliver `ydk-gen`'s functionality. In particular:
 
 * YANG model analysis and code generation is implemented using APIs from the [pyang](https://github.com/mbj4668/pyang) library
 * Documentation is generated using [Sphinx](http://www.sphinx-doc.org/en/stable/)
+* Run time yang model analysis is done using [libyang](https://github.com/CESNET/libyang)
+* C++ to python bindings are created using [pybind11](https://github.com/pybind/pybind11)
+* C++ uses [catch](https://github.com/catchorg/Catch2) and [spdlog](https://github.com/gabime/spdlog) for tests and logging respectively
 
 Of course, many other libraries are used as an integral part of ydk-gen and it's dependencies, too many to mention!
 
@@ -54,8 +61,17 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # Backward compatibility
- Please see [this page](http://ydk.cisco.com/py/docs/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release
+ Please see [this page](http://ydk.cisco.com/py/docs/guides/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release. Note also that [#604](https://github.com/CiscoDevNet/ydk-gen/issues/604) and [#748](https://github.com/CiscoDevNet/ydk-gen/issues/748) introduced backward incompatibility for python. The bundles generated with `0.7.1` or newer ydk-gen will only work with ydk `core` version `0.7.1` or newer. Also error types for python were renamed from `YPYError` to `YError`.
 
+# Docker
+
+A [docker image](https://docs.docker.com/engine/reference/run/) is automatically built with the latest ydk-gen installed. This be used to run ydk-gen without installing anything natively on your machine.
+
+To use the docker image, [install docker](https://docs.docker.com/install/) on your system and run the below command. See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
+
+```
+docker run -it ydkdev/ydk-gen
+```
 
 # System requirements
 Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate--install-the-core) after installing the below requirements:
@@ -66,8 +82,8 @@ Ubuntu (Debian-based):
 **Install prebuilt libydk binary:**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.6.2/libydk_0.6.2-1_amd64.deb
-   $ sudo gdebi libydk_0.6.2-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.1/libydk_0.7.1-1_amd64.deb
+   $ sudo gdebi libydk_0.7.1-1_amd64.deb
 ```
 **To build from source:**
 ```
@@ -77,15 +93,26 @@ Centos (Fedora-based):
 
 **Install prebuilt libydk binary:**
 ```
-   $ sudo yum install epel-release libssh-devel gcc-c++
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.2/libydk-0.6.2-1.x86_64.rpm
-   $ sudo ln –fs /usr/bin/cmake3 /usr/bin/cmake && export PATH=/usr/bin:$PATH
+   $ sudo yum install epel-release
+   $ sudo yum install libssh-devel gcc-c++
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.1/libydk-0.7.1-1.x86_64.rpm
+
+   # Upgrade compiler to gcc 5.*
+   $ yum install centos-release-scl -y > /dev/null
+   $ yum install devtoolset-4-gcc* -y > /dev/null
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 **To build from source:**
 ```
-$ sudo yum install epel-release
-$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 clang libcurl-devel
-$ sudo ln –fs $(which cmake3) /usr/bin/cmake && export PATH=/usr/bin:$PATH
+   $ sudo yum install epel-release
+   $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 clang libcurl-devel rpm-build redhat-lsb
+
+   # Upgrade compiler to gcc 5.*
+   $ yum install centos-release-scl -y > /dev/null
+   $ yum install devtoolset-4-gcc* -y > /dev/null
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
 ## macOS
@@ -97,9 +124,9 @@ You can download the latest python package from [here](https://www.python.org/do
 ```
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install python pkg-config libssh xml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.6.2/libydk-0.6.2-Darwin.pkg
-   $ sudo installer -pkg libydk-0.6.2-Darwin.pkg -target /
+   $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.1/libydk-0.7.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.7.1-Darwin.pkg -target /
 ```
 **To build from source:**
 ```
@@ -109,7 +136,7 @@ You can download the latest python package from [here](https://www.python.org/do
 ```
 
 ## Windows
-Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.2`` onwards is not supported on Windows.
+Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
 
 # Installation
 ## Setting up your environment
@@ -149,15 +176,19 @@ Usage: generate.py [options]
 Options:
   --version           show program's version number and exit
   -h, --help          show this help message and exit
-  -p, --python        Generate Python bundle/core. This is currently the default option
-  -c, --cpp           Generate C++ bundle/core
-  --core              Install the python/C++ core
-  --bundle=PROFILE    Take options from a bundle profile file describing YANG
+  -p, --python        Select Python language. This is currently the default option
+  -l, --libydk        Generate the libydk core package (required for using YDK Python, Go, C++)
+  -c, --cpp           Select C++ language
+  -g, --go            Select Go language
+  --core              Generate the core for the selected language
+  --bundle=PROFILE    Generate the bundle for the selected language
+  --one-module-per-class
+                      Generate python bundles by creating separate python modules for each class
   -v, --verbose       Verbose mode
   --generate-doc      Generation documentation
   --output-directory  The output-directory . If not specified the output can be found under `ydk-gen/gen-api/python`
 ```
-The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
+The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
 ## First step: choose your bundle profile
 
@@ -228,10 +259,17 @@ There usually would have been changes on the master branch since the last [relea
 
 First, generate the core and install it:
 
-For C++ or Python, the below step is required:
+First generate and install ``libydk`` (**required for C++, Go or Python**):
 ```
-$ ./generate.py --cpp --core
-$ cd gen-api/cpp/ydk/build && make && sudo make install
+$ ./generate.py --libydk
+$ cd gen-api/cpp/ydk/build
+$ make
+
+# To create the libydk binary package to use for later installation, run the below command
+$ make package
+
+# To install the compiled libydk code, run the below command after the above
+$ [sudo] make install
 ```
 
 For python:
@@ -240,6 +278,11 @@ $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
 ```
 
+For Go:
+```
+$ ./generate.py --go --core
+$ cp -r gen-api/go/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
+```
 ## Third step: Generate & install your bundle
 Then, generate your bundle using a bundle profile and install it:
 
@@ -258,6 +301,12 @@ ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
 
+For Go:
+```
+$ ./generate.py --go --bundle profiles/bundles/<name-of-profile>.json
+$ cp -r gen-api/go/<name-of-bundle>-bundle/ydk/models/*  $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/models
+```
+
 For C++:
 ```
 $ ./generate.py --cpp --bundle profiles/bundles/<name-of-profile>.json
@@ -266,11 +315,11 @@ $ cd gen-api/cpp/<name-of-bundle>-bundle/build && make && make install
 
 ## Fourth step: Writing your first app
 
-Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and [C++ samples](sdk/cpp/samples). Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html) and [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
+Now, you can start creating apps based on the models in your bundle. Assuming you generated a python bundle, the models will be available for importing in your app under `ydk.models.<name-of-your-bundle>`. For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and [C++ samples](sdk/cpp/samples). Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html), [Go](http://ydk.cisco.com/go/docs/developer_guide.html) and [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
 
 ## Documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three python bundles and the python core (for C++, use `--cpp` instead of `--python`).
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. For example, the below sequence of commands will generate the documentation for the three python bundles and the python core (for C++, use `--cpp`; for Go, use `--go`).
 
 Note that the below process could take a few hours due to the size of the `cisco_ios_xr` bundle.
 
@@ -280,6 +329,19 @@ Note that the below process could take a few hours due to the size of the `cisco
 ./generate.py --python --bundle profiles/bundles/cisco_ios_xr_6_1_1.json
 ./generate.py --python --core --generate-doc
 ```
+
+If you have previously generated documentation, using the `--cached-output-dir --output-directory <dir>` option can be used to reduce document generation time. Taking python as an example:
+
+```
+mkdir gen-api/cache
+mv gen-api/python gen-api/cache
+
+./generate.py --python --bundle profiles/bundles/ietf_0_1_5.json
+./generate.py --python --bundle profiles/bundles/openconfig_0_1_5.json
+./generate.py --python --bundle profiles/bundles/cisco_ios_xr_6_3_2.json
+./generate.py --python --core --generate-doc --output-directory gen-api --cached-output-dir -v
+```
+
 Pre-generated documentation for [ydk-py](http://ydk.cisco.com/py/docs/) and [ydk-cpp](http://ydk.cisco.com/cpp/docs/) are available.
 
 # Generating an "Adhoc" YDK-Py Bundle
@@ -308,6 +370,7 @@ When run in this way, we will generate a bundle that only contains tje files spe
 README          - install and usage notes
 gen-api         - generated bundle/core
                     - python (Python SDK)
+                    - go (Go SDK)
                     - cpp (C++ SDK)
 
 generate.py     - script used to generate SDK for yang models
@@ -374,10 +437,13 @@ $ mkdir build && cd build
 $ cmake .. && make all test
 ```
 
+## Go
+Please refer [here](https://github.com/CiscoDevNet/ydk-gen/blob/master/sdk/go/core/README.md).
+
 Support
 =======
 Join the [YDK community](https://communities.cisco.com/community/developer/ydk) to connect with other users and with the makers of YDK.
 
 Release Notes
 ===============
-The current YDK release version is 0.6.2 (alpha). YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.7.1 (alpha). The version of the latest YDK-Gen master branch is 0.7.2-dev. YDK-Gen is licensed under the Apache 2.0 License.

@@ -29,8 +29,9 @@
 #include <functional>
 #include <cstring>
 #include <cassert>
+#include <set>
 #include <unordered_set>
-#include <unordered_map>
+#include <map>
 
 #include "libyang/libyang.h"
 #include "libyang/tree_schema.h"
@@ -69,6 +70,7 @@ namespace ydk {
 
         public:
             std::string path;
+            std::vector<path::Capability> server_caps;
 
         private:
             ly_ctx* create_ly_context();
@@ -81,6 +83,10 @@ namespace ydk {
             const lys_module* load_module(ly_ctx* ctx, ydk::path::Capability& capability, bool& new_module);
             const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision);
             const lys_module* load_module(ly_ctx* ctx, const std::string& module_name, const std::string& revision, const std::vector<std::string>& features, bool& new_module);
+
+            void get_module_capabilities(ydk::path::Capability& capability);
+            void collect_features_from_imported_modules(const lys_module* module,
+                                                        std::set<std::pair<lys_module*, std::string>>& features);
 
          private:
             std::vector<ModelProvider*> model_providers;
@@ -185,6 +191,14 @@ namespace ydk {
 
             virtual DataNode& create_datanode(const std::string& path, const std::string& value);
 
+            DataNode& create_action(const std::string& path);
+
+            std::shared_ptr<DataNode> operator()(const Session& session);
+
+            bool has_action_node() const;
+
+            std::string get_action_node_path() const;
+
             void set_value(const std::string& value);
 
             virtual std::string get_value() const;
@@ -288,8 +302,5 @@ namespace ydk {
     }
 
 }
-
-
-
 
 #endif /* YDK_PRIVATE_HPP */

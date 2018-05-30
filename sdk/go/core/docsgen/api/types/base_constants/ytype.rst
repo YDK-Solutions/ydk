@@ -1,12 +1,15 @@
-.. _protocol-ydk:
-
 YTypes
 ------
 
 .. go:package:: ydk/types/ytype
     :synopsis: YType
 
-.. y-type:
+.. code-block:: sh
+
+   import "github.com/CiscoDevNet/ydk-go/ydk/types/ytype"
+
+.. _y-type:
+
 .. attribute:: YType
 
     Represents YANG data type with underlying type ``int``
@@ -53,4 +56,4 @@ YTypes
 
     .. attribute:: Str
 
-        Represents YANG ``string type by a value of 10
+        Represents YANG ``string`` type by a value of 10

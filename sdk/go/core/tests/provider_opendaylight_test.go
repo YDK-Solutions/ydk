@@ -71,7 +71,7 @@ func (suite *OpenDaylightProviderTestSuite) TestCreateODL() {
 	neighbor.Config.PeerAs = 65001
 	neighbor.Config.LocalAs = 65001
 	neighbor.Config.PeerGroup = "IBGP"
-	bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, neighbor)
+	bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, &neighbor)
 
 	peerGroup := oc_bgp.Bgp_PeerGroups_PeerGroup{}
 	peerGroup.PeerGroupName = "IBGP"
@@ -79,7 +79,7 @@ func (suite *OpenDaylightProviderTestSuite) TestCreateODL() {
 	peerGroup.Config.Description = "test description"
 	peerGroup.Config.PeerAs = 65001
 	peerGroup.Config.LocalAs = 65001
-	bgp.PeerGroups.PeerGroup = append(bgp.PeerGroups.PeerGroup, peerGroup)
+	bgp.PeerGroups.PeerGroup = append(bgp.PeerGroups.PeerGroup, &peerGroup)
 
 	provider := suite.Provider.GetNodeProvider("xr")
 	result := suite.CRUD.Create(provider, &bgp)

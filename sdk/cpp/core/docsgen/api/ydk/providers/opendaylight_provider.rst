@@ -30,7 +30,7 @@ OpenDaylightServiceProvider
         Returns the :cpp:class:`ServiceProvider<ydk::ServiceProvider>` instance corresponding to the device being controlled by the OpenDaylight instance, indicated by "node_id".
 
         :param node_id: The name of the device being controlled by the OpenDaylight instance.
-        :return: Reference to the :cpp:class:`ServiceProvider<ydk::ServiceProvider>` or raises :cpp:class:`YCPPServiceProviderError<YCPPServiceProviderError>` if one could not be found.
+        :return: Reference to the :cpp:class:`ServiceProvider<ydk::ServiceProvider>` or raises :cpp:class:`YServiceProviderError<YServiceProviderError>` if one could not be found.
 
     .. cpp:function:: const std::vector<std::string> & get_node_ids()
 

@@ -7,7 +7,7 @@
     "description": "YDK Test Profile",
     "models": {
     "dir": [
-        "/yang/ocni"
+        "/sdk/cpp/core/tests/models"
         ]
     }
 }

@@ -70,10 +70,11 @@ class ModulePrinter(FilePrinter):
             self.enum_printer.print_enum(elem)
         elif isinstance(elem, Bits):
             pass
-        elif elem.is_identity():
-            self.identity_printer.print_identity(elem)
-        else:
-            self.class_printer.print_output(elem)
+        elif isinstance(elem, Class):
+            if elem.is_identity():
+                self.identity_printer.print_identity(elem)
+            else:
+                self.class_printer.print_output(elem)
 
     def _print_imports(self, package):
         self.ctx.writeln('import (')

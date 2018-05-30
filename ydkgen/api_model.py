@@ -224,25 +224,30 @@ class NamedElement(Element):
             element = element.owner
         return pkg.bundle_name + '::' + '::'.join(reversed(names))
 
-    def go_name(self, case = 'UpperCamel'):
-        if self.stmt is None:
+    def go_name(self):
+        stmt = self.stmt
+        if stmt is None:
             raise Exception('element is not yet defined')
+        if hasattr(self, 'goName'):
+            return self.goName
 
-        name = self.name
-        if isinstance(self, Property):
-            name = camel_case(self.name)
-        if case == 'UpperCamel':
-            return name
-        elif case == 'lowerCamel':
-            return '%s%s' % (name[0].lower(), name[1:])
-        else:
-            supported = 'Currently Supporting: UpperCamel, lowerCamel'
-            raise Exception('{0} case is not supported\n{1}'.format(case, supported))
+        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+        name = camel_case(name)
+        if self.iskeyword(name):
+            name = '%s%s' % ('Y', name)
+        # suffix = '_' if self.name[-1] == '_' else ''
+        # name = '%s%s' % (name, suffix)
+
+        self.goName = name
+        return self.goName
 
     def qualified_go_name(self):
         ''' get the Go qualified name (sans package name) '''
         if self.stmt.keyword == 'identity':
             return self.go_name()
+
+        if hasattr(self, 'qualifiedGoName'):
+            return self.qualifiedGoName
 
         names = []
         element = self
@@ -251,7 +256,8 @@ class NamedElement(Element):
                 element = element.owner
             names.append(element.go_name())
             element = element.owner
-        return '_'.join(reversed(names))
+        self.qualifiedGoName = '_'.join(reversed(names))
+        return self.qualifiedGoName
 
 
 class Package(NamedElement):
@@ -528,8 +534,8 @@ class Class(NamedElement):
         name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
         name = camel_case(name)
 
-        if self.iskeyword(name) or self.iskeyword(name.lower()):
-            name = '%s_' % name
+        if self.iskeyword(name):
+            name = '_%s' % name
         self.name = name
 
         if self.name.startswith('_'):
@@ -686,12 +692,7 @@ class Property(NamedElement):
         self.featuring_classifiers = []
         self.read_only = False
         self.is_many = False
-        # self.property_type = None
-        self.default_value = None
-        self.visibility = '+'
         self.id = False
-        self.ordered = False
-        self.unique = False
         self._property_type = None
         self.max_elements = None
         self.min_elements = None
@@ -712,6 +713,7 @@ class Property(NamedElement):
         self._stmt = stmt
         #name = snake_case(stmt.arg)
         name = snake_case(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+
         if self.iskeyword(name) or self.iskeyword(name.lower()):
             name = '%s_' % name
         self.name = name
@@ -769,6 +771,26 @@ class Enum(DataType):
             return self.owner
         else:
             return self.owner.get_package()
+
+    def go_name(self):
+        stmt = self.stmt
+        if stmt is None:
+            raise Exception('element is not yet defined')
+        if hasattr(self, 'goName'):
+            return self.goName
+
+        while stmt.parent is not None and not stmt.keyword in ('leaf', 'leaf-list', 'typedef'):
+            stmt = stmt.parent
+
+        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+        name = camel_case(name)
+        if self.iskeyword(name):
+            name = '%s%s' % ('Y', name)
+        suffix = '_' if self.name[-1] == '_' else ''
+
+        name = '%s%s' % (name, suffix)
+        self.goName = name
+        return self.goName
 
     @property
     def stmt(self):
@@ -901,14 +923,26 @@ def snake_case(input_text):
     s = s.replace('.', '_')
     return s.lower()
 
+
+def get_property_name(element, iskeyword):
+    name = snake_case(element.stmt.unclashed_arg if hasattr(element.stmt, 'unclashed_arg') else element.stmt.arg)
+    if iskeyword(name) or iskeyword(name.lower()) or (
+            element.owner is not None and element.stmt.arg.lower() == element.owner.stmt.arg.lower()):
+        name = '%s_' % name
+    return name
+
+
 # capitalized input will not affected
 def camel_case(input_text):
-    def _title(s):
-        if len(s) > 0  and s.startswith(s[0].upper()):
+    def _capitalize(s):
+        if len(s) == 0 or s.startswith(s[0].upper()):
             return s
-        return s.title()
-    result = ''.join([_title(word) for word in input_text.split('-')])
-    result = ''.join([_title(word) for word in result.split('_')])
+        ret = s[0].upper()
+        if len(s) > 1:
+            ret = '%s%s' % (ret, s[1:])
+        return ret
+    result = ''.join([_capitalize(word) for word in input_text.split('-')])
+    result = ''.join([_capitalize(word) for word in result.split('_')])
     if input_text.startswith('_'):
         result = '_'+result;
     return result

@@ -31,6 +31,7 @@ import (
 	"fmt"
 	"strconv"
 	"github.com/CiscoDevNet/ydk-go/ydk"
+	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/datastore"
@@ -111,7 +112,11 @@ func (c *CodecService) Decode(
 
 	// 1. parse payload, get topEntity
 	nmsp := getEntityLookupKey(provider, payload)
-	topEntity := ydk.GetTopEntity(nmsp)
+	topEntity, _ := ydk.GetTopEntity(nmsp)
+	if topEntity == nil {
+		err := errors.YModelError{Msg: fmt.Sprintf("Failed to find top entity for lookup key '%s'", nmsp)}
+		panic(err.Error())
+	}
 	// 2. initialize repository, fetch rootSchema
 	provider.Initialize(topEntity)
 	rootSchema := provider.GetRootSchemaNode(topEntity)
@@ -211,18 +216,18 @@ func (ns *NetconfService) CopyConfig(
 
 	// target/source options: candidate | running | startup | url
 	if (target == datastore.NotSet) {
-		err := types.YGOError{Msg: "You must select target"}
+		err := errors.YError{Msg: "You must select target"}
 		panic(err.Error())
 	}
 
 	if ((target == datastore.URL ||
 		sourceDS == datastore.URL) && len(url) == 0){
-		err := types.YGOError{Msg: "url must be specified"}
+		err := errors.YError{Msg: "url must be specified"}
 		panic(err.Error())
 	}
 	if ((sourceDS != datastore.NotSet && sourceEntity != nil) ||
 		sourceDS == datastore.NotSet && sourceEntity == nil) {
-		err := types.YGOError{
+		err := errors.YError{
 			Msg: "sourceDS OR sourceEntity must be valid, not neither nor both"}
 		panic(err.Error())
 	}
@@ -261,7 +266,7 @@ func (ns *NetconfService) DeleteConfig(
 
 		errMsg := "target: %v can only be Startup (url is ignored)"
 		errMsg += " or Url (url must be specified)"
-		err := types.YGOError{Msg: fmt.Sprintf(errMsg, dsStr)}
+		err := errors.YError{Msg: fmt.Sprintf(errMsg, dsStr)}
 		panic(err.Error())
 	}
 
@@ -301,7 +306,7 @@ func (ns *NetconfService) EditConfig(
 	if (target == datastore.URL || target == datastore.Startup){
 		errMsg := fmt.Sprintf(
 			"target: %v can only be Candidate or Running", dsStr)
-		err := types.YGOError{Msg: errMsg}
+		err := errors.YError{Msg: errMsg}
 		panic(err.Error())
 	}
 
@@ -341,7 +346,7 @@ func (ns *NetconfService) GetConfig(
 	if (source == datastore.URL){
 		errMsg := fmt.Sprintf(
 			"source: %v can only be Candidate, Running, or Startup", dsStr)
-		err := types.YGOError{Msg: errMsg}
+		err := errors.YError{Msg: errMsg}
 		panic(err.Error())
 	}
 
@@ -391,7 +396,7 @@ func (ns *NetconfService) Lock(
 	dataValue := ""
 
 	if (target == datastore.URL){
-		err := types.YGOError{Msg: "url must be specified"}
+		err := errors.YError{Msg: "url must be specified"}
 		panic(err.Error())
 	}
 
@@ -412,7 +417,7 @@ func (ns *NetconfService) Unlock(
 	dataValue := ""
 
 	if (target == datastore.URL){
-		err := types.YGOError{Msg: "url must be specified"}
+		err := errors.YError{Msg: "url must be specified"}
 		panic(err.Error())
 	}
 
@@ -438,13 +443,13 @@ func (ns *NetconfService) Validate(
 
 	if ((sourceDS != datastore.NotSet && sourceEntity != nil) ||
 		sourceDS == datastore.NotSet && sourceEntity == nil) {
-		err := types.YGOError{
+		err := errors.YError{
 			Msg: "sourceDS OR sourceEntity must be valid, not neither nor both"}
 		panic(err.Error())
 	}
 	// sourceDS options: candidate | running | startup | url
 	if (sourceDS == datastore.URL && len(url) == 0){
-		err := types.YGOError{Msg: "url must be specified"}
+		err := errors.YError{Msg: "url must be specified"}
 		panic(err.Error())
 	}
 	data := map[string]interface{} {}

@@ -85,7 +85,7 @@ Now, let us replace the above configuration with a new configuration for the :py
     result = crud.update(provider, bgp)
 
 
-Reading a list
+Creating and reading a list
 --------------
 
 For example, to read the instances of a deeply nested :py:class:`YList<ydk.types.YList>` called :py:class:`Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route<ydk.models.cisco_ios_xr.Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route>`  in the ``Cisco_IOS_XR_ip_rib_ipv4_oper`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
@@ -128,6 +128,42 @@ For example, to read the instances of a deeply nested :py:class:`YList<ydk.types
     # (assuming you have already instantiated the service and provider)
     rib_oper = crud.read(provider, rib)
 
+    vrf_list = rib_oper.vrfs.vrf
+    vrf_default = vrf_list["default"]  # or  vrf_default = vrf_list.get("default")
+
+Read all VRF configuration:
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.models.cisco_ios_xr import Cisco_IOS_XR_ip_rib_ipv4_oper
+    from ydk.filters import YFilter
+
+    # First create the top-level Rib() object
+    rib = Cisco_IOS_XR_ip_rib_ipv4_oper.Rib()
+
+    # Call the CRUD read on the top-level rib object
+    # (assuming you have already instantiated the service and provider)
+    rib_oper = crud.read(provider, rib)
+
+    # Access all VRFs in the list
+    for vrf in rib_oper.vrfs.vrf:
+        print(vrf.vrf_name)
+
+    # Get list of VRF names
+    all_vrf_names = rib_oper.vrfs.vrf.keys()
+
+    # Iterate over VRF names
+    for vrf_name in all_vrf_names:
+        vrf = rib_oper.vrfs.vrf[vrf_name]
+        for af in vrf.afs.af:
+            print("VRF: %s, AF: %s", vrf_name, af)
+
+    # Access specific VRF, when name is known
+    vrf = rib_oper.vrfs.vrf["default"]
+    if vrf is not None:
+        for af in vrf.afs.af:
+            print("VRF: %s, AF: %s", "default", af)
 
 Reading a leaf
 --------------

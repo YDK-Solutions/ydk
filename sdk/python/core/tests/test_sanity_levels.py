@@ -750,38 +750,39 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertEqual(runner, runner_read)
 
-    def embedded_single_quote_list_key(self):
+    @unittest.skip('Skip due to known issue')
+    def test_embedded_single_quote_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
         t.first = "ab\'c"
         t.second = 1233
         r.two_key_list.append(t)
-        self.crud.create(self.ncc, runner)
+        self.crud.create(self.ncc, r)
 
         runner_read = self.crud.read(self.ncc, Runner())
-        self.assertEqual(runner, runner_read)
+        self.assertEqual(r, runner_read)
 
-    def embedded_double_quote_list_key(self):
+    def test_embedded_double_quote_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
         t.first = "ab&quot;c"
         t.second = 1233
         r.two_key_list.append(t)
-        self.crud.create(self.ncc, runner)
+        self.crud.create(self.ncc, r)
 
         runner_read = self.crud.read(self.ncc, Runner())
-        self.assertEqual(runner, runner_read)
+        self.assertEqual(r, runner_read)
 
-    def embedded_slash_list_key(self):
+    def test_embedded_slash_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
         t.first = "ab/c"
         t.second = 1233
         r.two_key_list.append(t)
-        self.crud.create(self.ncc, runner)
+        self.crud.create(self.ncc, r)
 
         runner_read = self.crud.read(self.ncc, Runner())
-        self.assertEqual(runner, runner_read)
+        self.assertEqual(r, runner_read)
 
 
 if __name__ == '__main__':

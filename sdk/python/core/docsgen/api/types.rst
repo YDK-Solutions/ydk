@@ -299,9 +299,9 @@ YDK types
 
 .. class:: YList(parent)
 
-    Concrete class that represents a YANG ``list``, with pointer to its parent.
+    Concrete class that represents a YANG ``list``, with pointer to its `parent`. The class extends :py:class:`EntityCollection<ydk.types.EntityCollection>` and implements OrderedDict functionality.
 
-    :param parent: Parent :py:class:`Entity<ydk.types.Entity>` object.
+    :param parent: :py:class:`Entity<ydk.types.Entity>` object, which hosts the YList.
 
     .. py:method:: append(self, item):
 
@@ -315,7 +315,7 @@ YDK types
 
         :param items: List of :py:class:`Entity<ydk.types.Entity>` objects to be appended.
 
-    .. py:method:: get(self, key):
+    .. py:method:: get(self, key) and __getitem__(self, key), which implements operator `[]`
 
         Access list elements by their key(s), if it is defined in the Yang model.
 
@@ -406,7 +406,7 @@ Examples of instantiating and using objects of Entity type are shown below(assum
     afi_safi = bgp.Global_.AfiSafis.AfiSafi()
     bgp.global_.afi_safis.afi_safi.append(afi_safi)
 
-Examples of assigning values to leafs are shown below:
+Examples of assigning values to leafs:
 
 .. code-block:: python
     :linenos:
@@ -427,7 +427,7 @@ Examples of assigning values to leafs are shown below:
     node.bits_type['first-option'] = True                                   # bits, node is a dummy container
     node.bits_type['second-option'] = False
 
-Examples of appending values to leaf-lists are shown below:
+Examples of appending values to leaf-lists:
 
 .. code-block:: python
     :linenos:

@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from .py_types import Entity, EntityCollection, Config, Filter, YList, YLeafList
+from .py_types import Entity, EntityCollection, Config, Filter, YList, YLeafList, _add_key_token
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
 from ydk.ext.types import ModelCachingOption
@@ -47,4 +47,6 @@ __all__ = [ "YList",
             "LeafDataList",
             "YLeaf",
             "YLeafList",
-            "YType" ]
+            "YType",
+            "_add_key_token",
+            ]

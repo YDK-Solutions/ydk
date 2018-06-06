@@ -45,7 +45,7 @@ class GetSegmentPathPrinter(object):
         self._print_get_ydk_segment_path_body(clazz)
 
     def _print_get_ydk_segment_path_body(self, clazz):
-        path='"'
+        path="'"
         if clazz.owner is not None:
             if isinstance(clazz.owner, Package):
                 path+= clazz.owner.stmt.arg + ':'
@@ -53,37 +53,20 @@ class GetSegmentPathPrinter(object):
                 path+=clazz.stmt.i_module.arg + ':'
 
         path+= clazz.stmt.arg
-        path+='"'
-        predicates = ''
+        path+="'"
         insert_token = ' + '
 
         key_props = clazz.get_key_props()
         for key_prop in key_props:
-            predicates += insert_token
             
-            predicates += '"['
+            key_name = ''
             if key_prop.stmt.i_module.arg != clazz.stmt.i_module.arg:
-                predicates += key_prop.stmt.i_module.arg
-                predicates += ':'
+                key_name += key_prop.stmt.i_module.arg
+                key_name += ':'
+            key_name += key_prop.stmt.arg
             
-            predicates += key_prop.stmt.arg + '='
-            
-            predicates += "'"
-                
-            predicates +='"'
-
-            predicates += insert_token
-            
-            predicates += ('str(self.%s)') % key_prop.name + insert_token
-
-            predicates += '"'
-                
-            predicates += "'"
-                
-            predicates += ']"'
-
-        path = '%s%s' % (path, predicates)
-
+            path += insert_token
+            path += "_add_key_token(self.%s, '%s')" % (key_prop.name, key_name)
 
         self.ctx.writeln("self._segment_path = lambda: %s" % path)
 

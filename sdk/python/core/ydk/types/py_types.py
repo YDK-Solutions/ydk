@@ -585,3 +585,11 @@ class YList(EntityCollection):
 
     def __len__(self):
         return self._entity_map.__len__() + self._cache_dict.__len__()
+
+def _add_key_token(attr, attr_name):
+    attr_str = format(attr)
+    if "'" in attr_str:
+        token = '[{}="{}"]'.format(attr_name, attr_str)
+    else:
+        token = "[{}='{}']".format(attr_name, attr_str)
+    return token

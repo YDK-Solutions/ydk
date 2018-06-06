@@ -764,7 +764,7 @@ class SanityYang(unittest.TestCase):
     def test_embedded_double_quote_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
-        t.first = "ab&quot;c"
+        t.first = 'ab"c'
         t.second = 1233
         r.two_key_list.append(t)
         self.crud.create(self.ncc, r)

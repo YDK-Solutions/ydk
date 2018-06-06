@@ -200,6 +200,7 @@ class GetSegmentPathPrinter(object):
 
 
     def _print_get_ydk_segment_path_body(self, clazz):
+        self.ctx.writeln('std::ostringstream path_buffer;')
         path='"'
         if clazz.owner is not None:
             if isinstance(clazz.owner, Package):
@@ -207,28 +208,17 @@ class GetSegmentPathPrinter(object):
             elif clazz.owner.stmt.i_module.arg != clazz.stmt.i_module.arg:
                 path+=clazz.stmt.i_module.arg + ':'
 
-        path+= clazz.stmt.arg
-        path+='"'
-        predicates = ''
-        insert_token = ' <<'
+        path+= clazz.stmt.arg + '";'
+        self.ctx.writeln('path_buffer << %s' % (path))
+
         key_props = clazz.get_key_props()
         for key_prop in key_props:
-            predicates += insert_token
-            predicates += '"['
+            predicate = ''
             if key_prop.stmt.i_module.arg != clazz.stmt.i_module.arg:
-                predicates += key_prop.stmt.i_module.arg
-                predicates += ':'
-            predicates += key_prop.stmt.arg + '='
-            predicates+= "'"
-            predicates+='"'
-            predicates += insert_token
-            predicates += ('%s') % key_prop.name + insert_token
-            predicates += '"'
-            predicates += "'"
-            predicates += ']"'
-
-        self.ctx.writeln('std::ostringstream path_buffer;')
-        self.ctx.writeln('path_buffer << %s%s;' % (path, predicates))
+                predicate += key_prop.stmt.i_module.arg
+                predicate += ':'
+            predicate += key_prop.stmt.arg
+            self.ctx.writeln('ADD_KEY_TOKEN(%s, "%s");' % (key_prop.name, predicate))
         self.ctx.writeln('return path_buffer.str();')
 
     def _print_get_ydk_segment_path_trailer(self, clazz):

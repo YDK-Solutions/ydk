@@ -400,6 +400,21 @@ func (suite *SanityLevelsTestSuite) TestOcPattern() {
 	suite.CRUD.Delete(&suite.Provider, &ocADel)
 }
 
+func (suite *SanityLevelsTestSuite) TestEmbeddedQuotes() {
+	runner := ysanity.Runner{}
+	l1 := ysanity.Runner_TwoKeyList{First: "ab'cd",  Second: 11}
+	l2 := ysanity.Runner_TwoKeyList{First: "ab\"cd", Second: 22}
+	runner.TwoKeyList = []*ysanity.Runner_TwoKeyList {&l1, &l2}
+
+	suite.CRUD.Create(&suite.Provider, &runner)
+
+	runnerFilter := ysanity.Runner{}
+	runnerRead := suite.CRUD.Read(&suite.Provider, &runnerFilter)
+	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+
+	suite.CRUD.Delete(&suite.Provider, &runner)
+}
+
 func TestSanityLevelsTestSuite(t *testing.T) {
 	if testing.Verbose() {
 		ydk.EnableLogging(ydk.Debug)

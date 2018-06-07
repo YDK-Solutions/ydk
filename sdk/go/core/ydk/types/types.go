@@ -790,3 +790,14 @@ func EntityEqual(x, y Entity) bool {
 	}
 	return deepValueEqual(x, y)
 }
+
+func AddKeyToken(attr interface{}, attrName string) string {
+    attrStr := fmt.Sprintf("%v", attr)
+    var token string
+    if strings.Index(attrStr, "'") >= 0 {
+        token = fmt.Sprintf("[%s=\"%s\"]", attrName, attrStr)
+    } else {
+        token = fmt.Sprintf("[%s='%s']", attrName, attrStr)
+    }
+    return token
+}

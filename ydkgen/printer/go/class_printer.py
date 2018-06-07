@@ -95,15 +95,14 @@ class ClassPrinter(object):
         key_props = fp.clazz.get_key_props()
         predicate = '"'
         for key_prop in key_props:
-            prefix = ''
+            key_name = ''
             if key_prop.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
-                prefix = '%s:' % (key_prop.stmt.i_module.arg)
+                key_name += key_prop.stmt.i_module.arg
+                key_name += ':'
+            key_name += key_prop.stmt.arg
 
-            predicate = '''{0}"[%s%s='"{0}fmt.Sprintf("%%v", %s.%s){0}"']"'''
+            path.append(" + types.AddKeyToken(%s.%s, \"%s\")" % (fp.class_alias, key_prop.go_name(), key_name))
 
-            predicate = predicate.format(' + ') % (
-                prefix, key_prop.stmt.arg, fp.class_alias, key_prop.go_name())
-            path.append(predicate)
         fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
 
     @staticmethod

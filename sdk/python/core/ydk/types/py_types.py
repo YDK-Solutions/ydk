@@ -281,7 +281,21 @@ class Entity(_Entity):
         return leaf_name_data
 
     def get_segment_path(self):
-        return self._segment_path()
+        path = self._segment_path()
+        if ("[" in path) and hasattr(self, 'ylist_key_names') and len(self.ylist_key_names) > 0:
+            path = path.split('[')[0]
+            for attr_name in self.ylist_key_names:
+                leaf = self._leafs[attr_name]
+                if leaf is not None:
+                    attr_str = format(self.__dict__[attr_name])
+                    if "'" in attr_str:
+                        path += '[{}="{}"]'.format(leaf.name, attr_str)
+                    else:
+                        path += "[{}='{}']".format(leaf.name, attr_str)
+                else:
+                    # should never get here
+                    return self._segment_path()
+        return path
 
     def path(self):
         return self.get_segment_path()

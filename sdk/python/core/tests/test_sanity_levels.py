@@ -750,11 +750,10 @@ class SanityYang(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertEqual(runner, runner_read)
 
-    @unittest.skip('Skip due to known issue')
     def test_embedded_single_quote_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
-        t.first = "ab\'c"
+        t.first = "ab'c"
         t.second = 1233
         r.two_key_list.append(t)
         self.crud.create(self.ncc, r)
@@ -765,7 +764,7 @@ class SanityYang(unittest.TestCase):
     def test_embedded_double_quote_list_key(self):
         r = Runner()
         t = Runner.TwoKeyList()
-        t.first = "ab&quot;c"
+        t.first = 'ab"c'
         t.second = 1233
         r.two_key_list.append(t)
         self.crud.create(self.ncc, r)

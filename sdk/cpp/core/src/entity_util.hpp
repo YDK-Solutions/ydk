@@ -55,4 +55,14 @@ void parse_entity_to_prefix_and_paths(Entity& entity, std::pair<std::string, std
 
 }
 
+#define ADD_KEY_TOKEN(attr, attr_name) {\
+    std::ostringstream attr_buffer;\
+    attr_buffer << attr; std::string attr_str = attr_buffer.str();\
+    if (attr_str.find("\'") != std::string::npos) {\
+        path_buffer << "[" << attr_name << "=\"" << attr_str << "\"]";\
+    } else {\
+        path_buffer << "[" << attr_name << "='" << attr_str << "']";\
+	}\
+}
+
 #endif /* ENTITY_UTIL_HPP */

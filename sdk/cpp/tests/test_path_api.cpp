@@ -603,3 +603,41 @@ TEST_CASE("oc_optic")
     (*create_rpc)(session);
 }
 */
+TEST_CASE("test_embedded_single_quote_path") {
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
+    runner.create_datanode("two-key-list[first=\"ab'c\"][second='123']", "");
+
+    auto xml = s.encode(runner, ydk::EncodingFormat::XML, true);
+    string first = R"(<first>ab'c</first>)";
+    REQUIRE(xml.find(first) != string::npos);
+}
+
+TEST_CASE("test_embedded_double_quote_path") {
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
+    runner.create_datanode("two-key-list[first='ab\"c'][second='123']", "");
+
+    auto xml = s.encode(runner, ydk::EncodingFormat::XML, true);
+    string first = R"(<first>ab&quot;c</first>)";
+    REQUIRE(xml.find(first) != string::npos);
+}
+
+TEST_CASE("test_embedded_slash_path") {
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+    ydk::path::Codec s{};
+
+    auto & runner = schema.create_datanode("ydktest-sanity:runner", "");
+    runner.create_datanode("two-key-list[first='ab/c'][second='123']", "");
+
+    auto xml = s.encode(runner, ydk::EncodingFormat::XML, true);
+    string first = R"(<first>ab/c</first>)";
+    REQUIRE(xml.find(first) != string::npos);
+}

@@ -48,6 +48,37 @@ using grpc::Status;
 
 using json = nlohmann::json;
 
+std::string cap_array[] =
+    {"ietf-aug-base-1?module=ietf-aug-base-1&revision=2016-07-01",
+     "ietf-aug-base-2?module=ietf-aug-base-2&revision=2016-07-01",
+     "main?module=main&revision=2015-11-17",
+     "main-aug1?module=main-aug1&revision=2015-11-17",
+     "oc-pattern?module=oc-pattern&revision=2015-11-17",
+     "yaug-five?module=ydktest-aug-ietf-5&revision=2017-07-26",
+     "yaug-four?module=ydktest-aug-ietf-4&revision=2016-06-27",
+     "yaug-one?module=ydktest-aug-ietf-1&revision=2016-06-17",
+     "yaug-two?module=ydktest-aug-ietf-2&revision=2016-06-22",
+     "ydk-filter?module=ydktest-filterread&revision=2015-11-17",
+     "ydktest-sanity?module=ydktest-sanity&revision=2015-11-17&features=ipv6-privacy-autoconf,ipv4-non-contiguous-netmasks",
+     "ydktest-sanity-augm?module=ydktest-sanity-augm&revision=2015-11-17",
+     "ydktest-sanity-types?module=ydktest-sanity-types&revision=2016-04-11",
+     "ydktest-types?module=ydktest-types&revision=2016-05-23&features=crypto",
+     "bgp?module=openconfig-bgp&revision=2016-06-21",
+     "bgp-policy?module=openconfig-bgp-policy&revision=2016-06-21",
+     "bgp-types?module=openconfig-bgp-types&revision=2016-06-21",
+     "interfaces?module=openconfig-interfaces&revision=2016-05-26",
+     "interfaces/ethernet?module=openconfig-if-ethernet&revision=2016-05-26",
+     "openconfig-ext?module=openconfig-extensions&revision=2015-10-09",
+     "openconfig-types?module=openconfig-types&revision=2016-05-31",
+     "platform?module=openconfig-platform&revision=2016-06-06&deviations=cisco-xr-openconfig-platform-deviations",
+     "platform-types?module=openconfig-platform-types&revision=2016-06-06",
+     "platform/transceiver?module=openconfig-platform-transceiver&revision=2016-05-24",
+     "policy-types?module=openconfig-policy-types&revision=2016-05-12",
+     "routing-policy?module=openconfig-routing-policy&revision=2016-05-12",
+     "terminal-device?module=openconfig-terminal-device&revision=2016-06-17",
+     "transport-types?module=openconfig-transport-types&revision=2016-06-17"
+    };
+
 // Logic and data behind the server's behavior.
 class gNMIImpl final : public gNMI::Service 
 {    
@@ -59,53 +90,50 @@ class gNMIImpl final : public gNMI::Service
     {
         response->set_gnmi_version("0.2.2");
 
-        // read cap file and populate model data
-        std::ifstream capfile("/usr/local/share/ydk/0.0.0.0:50051/capabilities.txt");
-
         ::gnmi::ModelData* modeldata;
         ::gnmi::Encoding encoding;
 
         std::string cap;
         std::vector<std::string> capabilities;
-        std::string org_name;
-        std::string module_name;
-        std::string revision_number;
-        std::string name_delim = "?module=";
+        std::string org_name{};
+        std::string module_name{};
+        std::string revision_number{};
+        std::string features{};
+        std::string module_delim = "?module=";
         std::string rev_delim = "&revision=";
 
-        while (std::getline(capfile, cap)) 
+        for (auto cap : cap_array)
         {
             capabilities.push_back(cap);
-            if((cap.find(name_delim)==std::string::npos) && (cap.find(rev_delim)==std::string::npos)) 
-            {
-                org_name = cap.substr(0,cap.find(name_delim));
-            } 
-            else 
-            {
-                org_name = cap.substr(0,cap.find(name_delim));
-                cap.erase(0,cap.find(name_delim) + name_delim.length());
-                module_name = cap.substr(0, cap.find(rev_delim));
-                revision_number = cap.substr(cap.find(rev_delim) + rev_delim.length());
+            modeldata = response->add_supported_models();
+
+            auto module_pos = cap.find(module_delim);
+            if (module_pos != std::string::npos) {
+                org_name = cap.substr(0, module_pos);
+                cap.erase(0, module_pos + module_delim.length());
+                modeldata->set_organization(org_name);
+            }
+            auto rev_pos = cap.find(rev_delim);
+            if (rev_pos != std::string::npos) {
+                module_name = cap.substr(0, rev_pos);
+                modeldata->set_name(module_name);
+                revision_number = cap.substr(rev_pos + rev_delim.length());
+                modeldata->set_version(revision_number);
             }
 
-            modeldata = response->add_supported_models();
-            modeldata->set_name(module_name);
-            std::cout << "Organization: " << modeldata->organization() << std::endl;
             if(!(modeldata->organization()).empty())
             {
-                std::cout << "Organization: " << modeldata->organization() << std::endl;
+                std::cout << "Prefix: " << modeldata->organization() << std::endl;
             }
             if(!module_name.empty()) 
             { 
-                modeldata->set_organization(org_name);
                 std::cout << "Module: " << modeldata->name() << std::endl;
             }
             if(!revision_number.empty()) 
             {
-                modeldata->set_version(revision_number);
                 std::cout << "Revision: " << modeldata->version() << std::endl;
-                std::cout << "          -----------             \n" << std::endl;
             }
+            std::cout << std::endl;
         }
         response->add_supported_encodings(::gnmi::Encoding::JSON);
         return Status::OK;
@@ -134,8 +162,12 @@ class gNMIImpl final : public gNMI::Service
         std::string path_element;
         std::vector<std::string> path_container;
         int element_size;
-        int is_bgp = 0;
+        bool is_bgp = false;
+        bool is_int = false;
         json json_payload;
+
+        std::cout << "===========Get Request Received===========" << std::endl;
+        std::cout << request->DebugString() << std::endl;
 
         notification = response->add_notification();
         std::time_t timestamp_val = std::time(nullptr);
@@ -159,7 +191,10 @@ class gNMIImpl final : public gNMI::Service
             path->add_element(request->path(j).element(i));
             path_container.push_back(path_element);
             if(path_element == "openconfig-bgp:bgp") {
-                is_bgp = 1;
+                is_bgp = true;
+            }
+            else if(path_element == "openconfig-interfaces:interfaces") {
+                is_int = true;
             }
             path_element.clear();
           }
@@ -167,9 +202,12 @@ class gNMIImpl final : public gNMI::Service
 
         update->set_allocated_path(path);
 
-        if (set_counter == 1 && delete_counter == 0 && is_bgp == 1){
+        if (set_counter == 1 && delete_counter == 0 && (is_bgp || is_int)) {
             std::cout << "DEBUG: Update Value Set by Create Request\n";
-            response_payload = "{\"global\": {\"config\": {\"as\":65172} }, \"neighbors\": {\"neighbor\": [{\"neighbor-address\":\"172.16.255.2\", \"config\": {\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
+            if (is_bgp)
+                response_payload = "{\"global\": {\"config\": {\"as\":65172} }, \"neighbors\": {\"neighbor\": [{\"neighbor-address\":\"172.16.255.2\", \"config\": {\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
+            else if (is_int)
+            	response_payload = "{\"interface\":[{\"name\":\"Loopback10\"}]}";
             json_payload = json::parse(response_payload);
             get_value(path_container, json_payload);
             value->set_json_ietf_val(response_payload);
@@ -183,9 +221,6 @@ class gNMIImpl final : public gNMI::Service
             response_payload = "{\"value\":\"null\"}";
         }
 
-
-        std::cout << "===========Get Request Received===========" << std::endl;
-        std::cout << request->DebugString() << std::endl;
         std::cout << "===========Get Response Sent===========" << std::endl;
         std::cout << response->DebugString() << std::endl;
         return Status::OK;
@@ -266,7 +301,7 @@ class gNMIImpl final : public gNMI::Service
 void RunServer() 
 {
     std::string server_address("0.0.0.0:50051");
-    bool is_secure = true;
+    bool is_secure = false;
 
     gNMIImpl service;
     ServerBuilder builder; 

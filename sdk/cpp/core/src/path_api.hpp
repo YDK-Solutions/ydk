@@ -1176,10 +1176,15 @@ public:
                    const std::string& password,
                    int port = 57400);
 
+    gNMISession(Repository & repo,
+                   const std::string& address,
+                   int port = 57400);
+
     ~gNMISession();
 
     RootSchemaNode& get_root_schema() const;
     std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
+    std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
     std::vector<std::string> get_capabilities() const;
     EncodingFormat get_encoding() const;
     std::string execute_payload(const std::string & payload, const std::string & operation, bool is_config) const;
@@ -1197,6 +1202,7 @@ private:
     std::unique_ptr<gNMIClient> client;
     std::shared_ptr<RootSchemaNode> root_schema;
     std::vector<std::string> server_capabilities;
+    bool is_secure;
 };
 
 ///

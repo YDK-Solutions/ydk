@@ -31,7 +31,7 @@ ExternalProject_Add(
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     DOWNLOAD_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     DOWNLOAD_NAME "gnmi.proto"
-    DOWNLOAD_COMMAND curl https://raw.githubusercontent.com/shgandhi/reference/master/rpc/gnmi/gnmi.proto > gnmi.proto
+    DOWNLOAD_COMMAND curl https://raw.githubusercontent.com/openconfig/gnmi/8a14ac0e9ed67e08988f9913243d89f398454824/proto/gnmi/gnmi.proto > gnmi.proto
     CONFIGURE_COMMAND ""
     SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"
     BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi"

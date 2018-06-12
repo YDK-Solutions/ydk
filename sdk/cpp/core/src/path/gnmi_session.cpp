@@ -44,10 +44,10 @@ namespace path
 {
 static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_schema, string operation);
 
-static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name);
-static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc);
+//static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name);
+//static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc);
+//static string get_read_rpc_name(bool config);
 
-static string get_read_rpc_name(bool config);
 static shared_ptr<path::DataNode> handle_edit_reply(const string & reply);
 
 static bool is_config(path::Rpc & rpc);
@@ -59,15 +59,15 @@ const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 
 // Secure
 // Create a default SSL ChannelCredentials object
-gNMISession::SecureChannelArguments input_args = get_channel_credentials();
 gNMISession::gNMISession(const std::string& address,
                    const std::string& username,
                    const std::string& password,
                    int port)
 {
-    path::Repository repo;
+    is_secure = true;
+	path::Repository repo;
     initialize(repo, address, username, password, port);
-    YLOG_DEBUG("Connected to {} using Secure Channel", address, username, password, port);
+    YLOG_DEBUG("gNMISession: Connected to {} using Secure Channel", address, username, password, port);
 }
 
 gNMISession::gNMISession(Repository & repo,
@@ -76,9 +76,18 @@ gNMISession::gNMISession(Repository & repo,
                    const std::string& password,
                    int port)
 {
-
+    is_secure = true;
     initialize(repo, address, username, password, port);
-    YLOG_DEBUG("Connected to {} using Secure Channel", address, username, password, port);
+    YLOG_DEBUG("gNMISession: Connected to {} using Secure Channel", address, username, password, port);
+}
+
+gNMISession::gNMISession(Repository & repo,
+                   const std::string& address,
+                   int port)
+{
+    is_secure = false;
+    initialize(repo, address, "", "", port);
+    YLOG_DEBUG("gNMISession: Connected to {} using Insecure Channel", address);
 }
 
 gNMISession::~gNMISession() = default;
@@ -90,8 +99,14 @@ void gNMISession::initialize(path::Repository & repo, const std::string& address
     std::ostringstream address_buffer{};
     address_buffer << address << ":" << port;
 
-    client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
-    client->connect();
+    if (is_secure) {
+        gNMISession::SecureChannelArguments input_args = get_channel_credentials();
+        client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
+        client->connect();
+    }
+    else {
+    	client = make_unique<gNMIClient>(grpc::CreateChannel(address_buffer.str(), grpc::InsecureChannelCredentials()));
+    }
     server_capabilities = client->get_capabilities();
     std::vector<std::string> empty_caps;
 
@@ -99,8 +114,8 @@ void gNMISession::initialize(path::Repository & repo, const std::string& address
 
     if(root_schema.get() == nullptr)
     {
-        YLOG_ERROR("Root schema cannot be obtained");
-        throw(YCPPIllegalStateError{"Root schema cannot be obtained"});
+        YLOG_ERROR("gNMISession::initialize: Root schema cannot be obtained");
+        throw(YIllegalStateError{"Root schema cannot be obtained"});
     }
 }
 
@@ -112,13 +127,15 @@ gNMISession::SecureChannelArguments get_channel_credentials()
 
     server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
 
-    YLOG_DEBUG("In gnmi_session server cert: {}", server_cert);
+    YLOG_DEBUG("gNMISession::get_channel_credentials: Server certificate:\n{}", server_cert);
 
     grpc::SslCredentialsOptions ssl_opts;
     auto args = std::make_shared<grpc::ChannelArguments>();
     gNMISession::SecureChannelArguments input_args;
     ssl_opts.pem_root_certs = server_cert;
-    args->SetSslTargetNameOverride("ems.cisco.com");
+
+    args->SetSslTargetNameOverride("2001:420:1101:1::b");
+    //args->SetSslTargetNameOverride("ems.cisco.com");
 
     // TODO: Authenticate client at server
     /* string client_key, client_cert;
@@ -180,10 +197,16 @@ shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
     }
     else
     {
-        YLOG_ERROR("RPC is not supported");
-        throw(YCPPOperationNotSupportedError{"RPC is not supported!"});
+        YLOG_ERROR("gNMISession::invoke: RPC is not supported");
+        throw(YOperationNotSupportedError{"RPC is not supported!"});
     }
     return datanode;
+}
+
+shared_ptr<path::DataNode> gNMISession::invoke(path::DataNode& datanode) const
+{
+    throw(YOperationNotSupportedError{"gNMISession::invoke: action datanode is not supported!"});
+    return nullptr;
 }
 
 shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const
@@ -197,8 +220,8 @@ static shared_ptr<path::DataNode> handle_edit_reply(const string & reply)
 {
     if(reply.find("Success") == string::npos)
     {
-        YLOG_ERROR("No ok in reply received from device");
-        throw(YCPPServiceProviderError{reply});
+        YLOG_ERROR("No OK in reply received from device");
+        throw(YServiceProviderError{reply});
     }
 
     // No error no output for edit-config
@@ -238,14 +261,14 @@ shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::Ro
     if(data_start == string::npos)
     {
         YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply.c_str());
-        throw(YCPPServiceProviderError{reply});
+        throw(YServiceProviderError{reply});
     }
     data_start+= sizeof("\"data\":") - 1;
     auto data_end = reply.find_last_of("}");
     if(data_end == string::npos)
     {
         YLOG_ERROR( "No end data tag found in reply sent by device {}", reply.c_str());
-        throw(YCPPError{"No end data tag found"});
+        throw(YError{"No end data tag found"});
     }
 
     string data = reply.substr(data_start, data_end-data_start + 1);
@@ -254,7 +277,7 @@ shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::Ro
     if(!datanode)
     {
         YLOG_ERROR( "Codec service failed to decode datanode");
-        throw(YCPPError{"Problems deserializing output"});
+        throw(YError{"Problems deserializing output"});
     }
     return datanode;
 }
@@ -271,7 +294,7 @@ static string get_config_payload(path::RootSchemaNode & root_schema,
     auto entity = rpc.get_input_node().find("entity");
     if(entity.empty()){
         YLOG_ERROR("Failed to get entity node");
-        throw(YCPPInvalidArgumentError{"Failed to get entity node"});
+        throw(YInvalidArgumentError{"Failed to get entity node"});
     }
 
     path::DataNode* entity_node = entity[0].get();
@@ -282,7 +305,7 @@ static string get_config_payload(path::RootSchemaNode & root_schema,
 
     if(!datanode){
         YLOG_ERROR("Failed to decode entity node");
-        throw(YCPPInvalidArgumentError{"Failed to decode entity node"});
+        throw(YInvalidArgumentError{"Failed to decode entity node"});
     }
 
     string config_payload {};
@@ -309,7 +332,7 @@ static string get_filter_payload(path::Rpc & ydk_rpc)
     if(entity.empty())
     {
         YLOG_ERROR("Failed to get entity node.");
-        throw(YCPPInvalidArgumentError{"Failed to get entity node"});
+        throw(YInvalidArgumentError{"Failed to get entity node"});
     }
 
     auto datanode = entity[0];
@@ -334,7 +357,7 @@ static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_sc
     if(c.empty())
     {
         YLOG_ERROR("'{}' rpc schema not found!", operation);
-        throw(YCPPIllegalStateError{"CRUD read rpc schema not found!"});
+        throw(YIllegalStateError{"CRUD read rpc schema not found!"});
     }
     return c[0];
 }

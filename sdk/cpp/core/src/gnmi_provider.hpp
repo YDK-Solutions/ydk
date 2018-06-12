@@ -45,14 +45,18 @@ namespace ydk
                    const std::string& username,
                    const std::string& password,
                    int port = 57400);
-        virtual ~gNMIServiceProvider();
+        gNMIServiceProvider(path::Repository & repo,
+        		   const std::string& address,
+                   int port = 57400);
+        ~gNMIServiceProvider();
 
-        virtual EncodingFormat get_encoding() const;
-        virtual const path::Session& get_session() const;
+        EncodingFormat get_encoding() const;
+        const path::Session& get_session() const;
         std::vector<std::string> get_capabilities() const;
 
     private:
         const path::gNMISession session;
+        bool is_secure;
     };
 }
 #endif 

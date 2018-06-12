@@ -29,6 +29,8 @@
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/filters.hpp>
+#include <ydk/codec_provider.hpp>
+#include <ydk/codec_service.hpp>
 
 using namespace std;
 using namespace ydk;
@@ -37,6 +39,8 @@ using namespace path;
 using namespace std;
 using namespace ydk;
 using namespace ydktest;
+
+void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root);
 
 void config_bgp(openconfig_bgp::Bgp bgp)
 {
@@ -48,7 +52,7 @@ void config_bgp(openconfig_bgp::Bgp bgp)
     neighbor->config->peer_as = 65172;
     
     neighbor->parent = bgp.neighbors.get();
-    bgp.neighbors->neighbor.push_back(move(neighbor));
+    bgp.neighbors->neighbor.append(move(neighbor));
 }
 
 void read_sub(const string & s)
@@ -59,10 +63,10 @@ void read_sub(const string & s)
 TEST_CASE("gnmi_service_subscribe")
 {
     // session
-    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
-    string address = "127.0.0.1:50051";
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
+    gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
     openconfig_interfaces::Interfaces filter = {};
@@ -71,7 +75,7 @@ TEST_CASE("gnmi_service_subscribe")
 //    i->name = "Loopback0";
 //    i->config->name = "Loopback0";
 //    i->config->description = "test";
-    filter.interface.push_back(i);
+    filter.interface.append(i);
 
     // Get Request 
     gs.subscribe(provider, filter, "ONCE", 10, "ON_CHANGE", 100000, read_sub);
@@ -81,58 +85,67 @@ TEST_CASE("gnmi_service_subscribe")
 TEST_CASE("gnmi_service_create")
 {
     // session
-    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
-    string address = "127.0.0.1:50051";
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
+    gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
+    CodecServiceProvider codec_provider{EncodingFormat::JSON};
+    CodecService codec_service{};
 
-    openconfig_interfaces::Interfaces filter = {};
     auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    i->name = "Loopback0";
-    i->config->name = "Loopback0";
-    filter.interface.push_back(i);
+    i->name = "Loopback10";
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(i);
 
     // Get Request 
-    auto get_reply = gs.set(provider, filter, "gnmi_create");
+    auto get_reply = gs.set(provider, ifcs, "gnmi_create");
     REQUIRE(get_reply);
 
+    openconfig_interfaces::Interfaces filter{};
+    auto int_filter = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    int_filter->name = "*";
+    int_filter->yfilter = YFilter::read;
+    filter.interface.append(int_filter);
+
+    auto get_after_create_reply = gs.get(provider, filter, false);
+    REQUIRE(get_after_create_reply != nullptr);
+    print_entity(get_after_create_reply, provider.get_session().get_root_schema());
 }
 
 TEST_CASE("gnmi_service_get")
 {
 	// session
-    path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
-    string address = "pavarotti:57400";
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, "pavarotti", "admin", "admin"};
+    gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
-//    openconfig_bgp::Bgp filter = {};
-    openconfig_interfaces::Interfaces filter = {};
     // Set Create Request
     openconfig_bgp::Bgp bgp = {};
-//    config_bgp(bgp);
-    bgp.global->config->yfilter = YFilter::read;
-//    auto create_reply = gs.set(provider, bgp, "gnmi_create");
-//    REQUIRE(create_reply);
+    config_bgp(bgp);
+    auto create_reply = gs.set(provider, bgp, "gnmi_create");
+    REQUIRE(create_reply);
+
 
     // Get Request
+    openconfig_bgp::Bgp filter = {};
+    filter.global->config->yfilter = YFilter::read;
+    auto get_after_create_reply = gs.get(provider, filter, true);
+    REQUIRE(get_after_create_reply);
 
-//    auto get_after_create_reply = gs.get(provider, bgp, true);
-
-//    REQUIRE(get_after_create_reply);
-    CrudService crud{};
-    auto r = crud.read_config(provider, bgp);
+//    CrudService crud{};
+//    auto r = crud.read_config(provider, bgp);
 }
 
 TEST_CASE("gnmi_service_delete")
 {
 	// session
     path::Repository repo{TEST_HOME};
-    string address = "127.0.0.1:50051";
+    string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 50051};
+    gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
     openconfig_bgp::Bgp filter = {};

@@ -35,9 +35,6 @@ namespace ydk
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // gNMI path utils
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-static void parse_entity_children(map<string, shared_ptr<Entity>> & children, vector<PathElem> & path_container);
-static void parse_entity(Entity& entity, vector<PathElem> & path_container);
-
 PathKey::PathKey(const std::string & name, const std::string & value)
         : name(name), value(value)
 {
@@ -48,7 +45,7 @@ PathElem::PathElem(const std::string & path, std::vector<PathKey> keys)
 {
 }
 
-static void parse_entity(Entity& entity, vector<PathElem> & path_container)
+static void parse_entity(Entity & entity, vector<PathElem> & path_container)
 {
     EntityPath path = get_entity_path(entity, entity.parent);
     auto s = entity.get_segment_path();
@@ -69,14 +66,15 @@ static void parse_entity(Entity& entity, vector<PathElem> & path_container)
             }
          }
     }
-
+    p = s.find(":");
+    if (p != std::string::npos) {
+    	path_container.push_back({s.substr(0, p), std::vector<PathKey>{}});
+    	s = s.substr(p+1);
+    }
     path_container.push_back({s, keys});
-    auto c = entity.get_children();
-    parse_entity_children(c, path_container);
-}
 
-static void parse_entity_children(map<string, shared_ptr<Entity>> & children, vector<PathElem> & path_container)
-{
+    //parse_entity_children(entity, path_container);
+    auto children = entity.get_children();
     YLOG_DEBUG("Children count: {}", children.size());
     for(auto const& child : children)
     {
@@ -95,17 +93,16 @@ void parse_entity_to_prefix_and_paths(Entity& entity, pair<string, string> & pre
 {
     EntityPath root_path = get_entity_path(entity, nullptr);
     auto s = root_path.path;
-    YLOG_DEBUG("Got root path: {}", s);
+    YLOG_DEBUG("Got entity root path: {}", s);
     auto p = s.find(":");
     if(p != std::string::npos)
     {
         auto mod = s.substr(0, p);
         auto con = s.substr(p+1);
         prefix = make_pair(mod, con);
-        YLOG_DEBUG("Got prefix: {}, {}", prefix.first, prefix.second);
+        YLOG_DEBUG("Got entity prefix: {}, {}", prefix.first, prefix.second);
     }
-    auto c = entity.get_children();
-    parse_entity_children(c, path_container);
+    parse_entity(entity, path_container);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

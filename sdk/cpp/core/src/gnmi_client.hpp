@@ -66,6 +66,7 @@ public:
     } PathPrefixValueFlags;
 
     gNMIClient(std::shared_ptr<Channel> channel, const std::string & username, const std::string & password);
+    gNMIClient(std::shared_ptr<Channel> channel);
     ~gNMIClient();
 
     int connect();
@@ -103,6 +104,7 @@ private:
     std::unique_ptr<gNMI::Stub> stub_;
     std::string username;
     std::string password;
+    bool is_secure;
 };
 }
 

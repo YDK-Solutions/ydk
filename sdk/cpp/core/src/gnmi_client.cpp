@@ -50,7 +50,6 @@ gNMIClient::PathPrefixValueFlags flag;
 
 
 static bool check_capabilities_status(Status status);
-static json parse_set_request_payload(const string & payload);
 static json parse_gnmi_set_request_payload(const string & payload);
 static string check_if_path_has_value(string element);
 static string format_notification_response(string prefix_to_prepend, const std::string& path_to_prepend, const std::string& value);
@@ -73,7 +72,8 @@ static std::shared_ptr<Channel> connect_to_server()
     ssl_opts.pem_root_certs = server_cert;
     ssl_opts.pem_private_key = server_key;
 
-    args.SetSslTargetNameOverride("ems.cisco.com");
+    args.SetSslTargetNameOverride("2001:420:1101:1::b");
+    //args.SetSslTargetNameOverride("ems.cisco.com");
 
     YLOG_DEBUG("In gnmi_connect server cert: {}", server_cert);
 
@@ -86,7 +86,7 @@ static bool check_capabilities_status(Status status)
     if (!(status.ok()))
     {
       YLOG_ERROR("Capabilities RPC Failed.");
-      throw(YCPPError{"Capabilities RPC Failed"});
+      throw(YError{"Capabilities RPC Failed"});
       return false;
     }
     return true;
@@ -289,7 +289,7 @@ static void populate_get_request(gnmi::GetRequest & request, std::pair<std::stri
             auto key = path_elem->mutable_key();
             (*key)[k.name] = k.value;
         }
-        YLOG_DEBUG("Key size {}", path_elem->key_size());
+        //YLOG_DEBUG("Key size {}", path_elem->key_size());
     }
     if(only_config)
         request.set_type(gnmi::GetRequest::CONFIG);
@@ -303,7 +303,12 @@ static void populate_get_request(gnmi::GetRequest & request, std::pair<std::stri
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 gNMIClient::gNMIClient(shared_ptr<Channel> channel, const std::string & username, const  std::string & password)
- : stub_(gNMI::NewStub(channel)), username(username), password(password)
+ : stub_(gNMI::NewStub(channel)), username(username), password(password), is_secure(true)
+{
+}
+
+gNMIClient::gNMIClient(shared_ptr<Channel> channel)
+ : stub_(gNMI::NewStub(channel)), username(""), password(""), is_secure(false)
 {
 }
 
@@ -314,8 +319,9 @@ gNMIClient::~gNMIClient()
 int gNMIClient::connect()
 {
     // Authenticate Server at Client
-    connect_to_server();
-
+	if (is_secure) {
+        connect_to_server();
+	}
     return EXIT_SUCCESS;
 }
 
@@ -324,7 +330,7 @@ bool gNMIClient::has_gnmi_version(gnmi::CapabilityResponse* response)
     if (!(response->gnmi_version().size() > 0)) 
     {
         YLOG_ERROR("Capabilities Received Without gNMI Version");
-        throw(YCPPError{"Capabilities Received Without gNMI Version"});
+        throw(YError{"Capabilities Received Without gNMI Version"});
         return false;
     }
     return true; 
@@ -412,10 +418,10 @@ vector<string> gNMIClient::get_capabilities()
 
 void gNMIClient::populate_set_request(gnmi::SetRequest & request, const std::string& payload, const std::string& operation)
 {
-    YLOG_DEBUG("Payload {}\n Operation {}", payload, operation);
-    json config_payload;
+    YLOG_DEBUG("Payload: {}\n Operation: {}", payload, operation);
+    json config_payload = parse_gnmi_set_request_payload(payload);
 //    if ((operation == "gnmi_create")||(operation == "gnmi_delete")){
-        config_payload = parse_gnmi_set_request_payload(payload);
+//        config_payload = parse_gnmi_set_request_payload(payload);
 //    } else {
 //        config_payload = parse_set_request_payload(payload);
 //    }
@@ -470,16 +476,19 @@ string gNMIClient::get_path_from_update(gnmi::Update update)
     {
         gnmi::Path path = update.path();
         int element_size = path.element_size();
-
-        for(int l = 0; l < element_size - 1; ++l)
-        {
-            path_element_to_add = check_if_path_has_value(path.element(l));
-            path_to_prepend.append("\"" + path_element_to_add + "\":{");
+        if (element_size > 0) {
+            for(int l = 0; l < element_size - 1; ++l)
+            {
+                path_element_to_add = check_if_path_has_value(path.element(l));
+                path_to_prepend.append("\"" + path_element_to_add + "\":{");
+            }
+            path_element_to_add = check_if_path_has_value(path.element(element_size - 1));
+            path_to_prepend.append("\"" + path_element_to_add + "\":");
         }
-        path_element_to_add = check_if_path_has_value(path.element(element_size - 1));
-        path_to_prepend.append("\"" + path_element_to_add + "\":");
-    } else
+    }
+    else {
         path_to_prepend.clear();
+    }
     return path_to_prepend;
 }
 
@@ -575,7 +584,7 @@ string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* r
     if (!(status.ok())) 
     {
         YLOG_ERROR("Get RPC Status Not OK:\n{}", status.error_message());
-        throw(YCPPError{status.error_message()});
+        throw(YError{status.error_message()});
     }
     else 
     {
@@ -596,7 +605,7 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
     if (!(status.ok())) 
     {
         YLOG_ERROR("Set RPC Status not OK");
-        throw(YCPPError{status.error_message()});
+        throw(YError{status.error_message()});
     } 
 
     YLOG_DEBUG("Set RPC OK");

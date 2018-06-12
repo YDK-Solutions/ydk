@@ -71,7 +71,7 @@ bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const strin
     if(operation != "gnmi_create" && operation != "gnmi_delete")
     {
         YLOG_ERROR("{} operation not supported", operation );
-        throw(YCPPServiceProviderError{operation + " operation not supported"});
+        throw(YServiceProviderError{operation + " operation not supported"});
     }
     YLOG_INFO("Executing set RPC with {} operation", operation);
     string data_payload = get_data_payload(provider, filter);
@@ -94,13 +94,13 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
     if(list_mode != "ONCE" && list_mode != "STREAM" && list_mode != "POLL")
     {
         YLOG_ERROR("{} list mode not supported", mode);
-        throw(YCPPServiceProviderError{list_mode + " list mode not supported"});
+        throw(YServiceProviderError{list_mode + " list mode not supported"});
     }
 
     if(mode != "ON_CHANGE" && mode != "SAMPLE" && mode!= "TARGET_DEFINED")
     {
         YLOG_ERROR("{} mode not supported", mode);
-        throw(YCPPServiceProviderError{mode + " mode not supported"});
+        throw(YServiceProviderError{mode + " mode not supported"});
     }
 
     YLOG_INFO("Executing subscribe RPC in {} list mode", list_mode);

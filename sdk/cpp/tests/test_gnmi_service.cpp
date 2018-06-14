@@ -82,6 +82,27 @@ TEST_CASE("gnmi_service_subscribe")
 
 }
 
+TEST_CASE("gnmi_service_create2")
+{
+    // session
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port};
+    gNMIService gs{};
+    CodecServiceProvider codec_provider{EncodingFormat::JSON};
+    CodecService codec_service{};
+
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+    auto payload = codec_service.encode(codec_provider, ifcs);
+
+    auto ifcs_d = codec_service.decode(codec_provider, payload, make_shared<openconfig_interfaces::Interfaces>());
+    REQUIRE(ifcs == *ifcs_d);
+}
+
 TEST_CASE("gnmi_service_create")
 {
     // session
@@ -103,10 +124,10 @@ TEST_CASE("gnmi_service_create")
     REQUIRE(get_reply);
 
     openconfig_interfaces::Interfaces filter{};
-    auto int_filter = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    int_filter->name = "*";
-    int_filter->yfilter = YFilter::read;
-    filter.interface.append(int_filter);
+//    auto int_filter = make_shared<openconfig_interfaces::Interfaces::Interface>();
+//    int_filter->name = "*";
+//    int_filter->yfilter = YFilter::read;
+//    filter.interface.append(int_filter);
 
     auto get_after_create_reply = gs.get(provider, filter, false);
     REQUIRE(get_after_create_reply != nullptr);

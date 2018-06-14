@@ -158,7 +158,6 @@ class gNMIImpl final : public gNMI::Service
         ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
         ::gnmi::Path* path = new ::gnmi::Path;
         ::gnmi::Path prefix;
-        std::string prefix_element;
         std::string path_element;
         std::vector<std::string> path_container;
         int element_size;
@@ -174,32 +173,28 @@ class gNMIImpl final : public gNMI::Service
         notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
         notification->mutable_prefix()->CopyFrom(request->prefix());
 
-        update = notification->add_update();
-
-        for(int i = 0; i < notification->prefix().element_size(); ++i) 
-        {
-          prefix_element.append("\"");
-          prefix_element.append(notification->prefix().element(i));
-          prefix_element.append("\"");
+        std::string origin = request->prefix().origin();
+        if(origin == "openconfig-bgp") {
+            is_bgp = true;
+        }
+        else if(origin == "openconfig-interfaces") {
+            is_int = true;
         }
 
         for(int j = 0; j < request->path_size(); ++j) 
         {
-          for(int i = 0; i < request->path(j).element_size(); ++i) 
+          auto req_path = request->path(j);
+          for(int i = 0; i < req_path.elem_size(); ++i)
           {
-            path_element.append(request->path(j).element(i));
-            path->add_element(request->path(j).element(i));
+        	auto path_elem = req_path.elem(i);
+            path_element.append(path_elem.name());
+            path->add_element(path_elem.name());
             path_container.push_back(path_element);
-            if(path_element == "openconfig-bgp:bgp") {
-                is_bgp = true;
-            }
-            else if(path_element == "openconfig-interfaces:interfaces") {
-                is_int = true;
-            }
             path_element.clear();
           }
         }
 
+        update = notification->add_update();
         update->set_allocated_path(path);
 
         if (set_counter == 1 && delete_counter == 0 && (is_bgp || is_int)) {

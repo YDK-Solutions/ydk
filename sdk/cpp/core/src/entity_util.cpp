@@ -45,6 +45,8 @@ PathElem::PathElem(const std::string & path, std::vector<PathKey> keys)
 {
 }
 
+static void parse_entity_children(map<string, shared_ptr<Entity>> & children, vector<PathElem> & path_container);
+
 static void parse_entity(Entity & entity, vector<PathElem> & path_container)
 {
     EntityPath path = get_entity_path(entity, entity.parent);
@@ -66,15 +68,14 @@ static void parse_entity(Entity & entity, vector<PathElem> & path_container)
             }
          }
     }
-    p = s.find(":");
-    if (p != std::string::npos) {
-    	path_container.push_back({s.substr(0, p), std::vector<PathKey>{}});
-    	s = s.substr(p+1);
-    }
-    path_container.push_back({s, keys});
 
-    //parse_entity_children(entity, path_container);
-    auto children = entity.get_children();
+    path_container.push_back({s, keys});
+    auto c = entity.get_children();
+    parse_entity_children(c, path_container);
+}
+
+static void parse_entity_children(map<string, shared_ptr<Entity>> & children, vector<PathElem> & path_container)
+{
     YLOG_DEBUG("Children count: {}", children.size());
     for(auto const& child : children)
     {
@@ -102,7 +103,8 @@ void parse_entity_to_prefix_and_paths(Entity& entity, pair<string, string> & pre
         prefix = make_pair(mod, con);
         YLOG_DEBUG("Got entity prefix: {}, {}", prefix.first, prefix.second);
     }
-    parse_entity(entity, path_container);
+    auto c = entity.get_children();
+    parse_entity_children(c, path_container);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 #include "logger.hpp"
 #include "gnmi_provider.hpp"
 #include "gnmi_service.hpp"
+#include "common_utilities.hpp"
 
 using namespace std;
 
@@ -37,9 +38,18 @@ using grpc::SslCredentialsOptions;
 
 namespace ydk {
 
-static string get_data_payload(gNMIServiceProvider& provider, Entity & entity);
-static shared_ptr<Entity> read_datanode(Entity & filter, shared_ptr<path::DataNode> read_data_node);
-static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter);
+static string get_data_payload(gNMIServiceProvider& provider, Entity & entity)
+{
+    path::Codec codec_service{};
+    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
+    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
+
+    string payload{"\"filter\":"};
+    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
+    YLOG_DEBUG("===========Generating Target Payload============");
+    YLOG_DEBUG("{}", payload.c_str());
+    return payload;
+}
 
 gNMIService::gNMIService()
 {
@@ -111,33 +121,4 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
     client.execute_subscribe_operation(prefix_pair, path_container, list_mode, qos, sample_interval, mode, func);
 }
 
-static string get_data_payload(gNMIServiceProvider& provider, Entity & entity)
-{
-    path::Codec codec_service{};
-    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
-    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
-
-    string payload{"\"filter\":"};
-    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
-    YLOG_DEBUG("===========Generating Target Payload============");
-    YLOG_DEBUG("{}", payload.c_str());
-    return payload;
-}
-
-static shared_ptr<Entity> read_datanode(Entity & filter, shared_ptr<path::DataNode> read_data_node)
-{
-    if (read_data_node == nullptr)
-        return {};
-    shared_ptr<Entity> top_entity = get_top_entity_from_filter(filter);
-    get_entity_from_data_node(read_data_node->get_children()[0].get(), top_entity);
-    return top_entity;
-}
-
-static shared_ptr<Entity> get_top_entity_from_filter(Entity & filter)
-{
-    if(filter.parent == nullptr)
-        return filter.clone_ptr();
-
-    return get_top_entity_from_filter(*(filter.parent));
-}
 }

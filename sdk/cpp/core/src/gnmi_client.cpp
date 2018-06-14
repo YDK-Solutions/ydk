@@ -104,8 +104,8 @@ static void parse_data_payload_to_paths(const string & payload_filter, vector<st
     }
 }
 
-static void parse_get_request_payload(const string & payload, vector<string> & path_container)
-{
+//static void parse_get_request_payload(const string & payload, vector<string> & path_container)
+//{
 //    auto payload_to_parse = json::parse("{" + payload + "}");
 //    string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "null");
 //    if (payload_filter == "null") {
@@ -117,8 +117,8 @@ static void parse_get_request_payload(const string & payload, vector<string> & p
 //            payload_filter = filter;
 //        }
 //    }
-    parse_data_payload_to_paths(payload, path_container);
-}
+//    parse_data_payload_to_paths(payload, path_container);
+//}
 
 static json parse_set_request_payload(const string & payload)
 {
@@ -257,13 +257,17 @@ static string format_notification_response(string prefix_to_prepend, const std::
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
     else
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + value + "}");
+    size_t pos = 0;
+    while ((pos = path_to_prepend.find ("{", ++pos)) != string::npos) {
+    	reply_to_parse.append("}");
+    }
     return reply_to_parse;
 }
 
 static void populate_get_request(gnmi::GetRequest & request, const std::string& payload, bool is_config)
 {
     vector<string> path_container;
-    parse_get_request_payload(payload, path_container);
+    parse_data_payload_to_paths(payload, path_container);
 
     gnmi::Path* path = request.add_path();
     for(size_t i = 0; i < path_container.size(); ++i)
@@ -442,15 +446,44 @@ void gNMIClient::populate_set_request(gnmi::SetRequest & request, const std::str
 string gNMIClient::get_prefix_from_notification(gnmi::Notification notification)
 {
     gnmi::Path prefix = notification.prefix();
-    string element;
     string prefix_to_prepend;
 
-    int element_size = prefix.element_size();
-    for(int j = 0; j < element_size; ++j)
-    {
-        element.append("\"" + prefix.element(j) + "\" ");
-        prefix_to_prepend.append(prefix.element(j));
-        prefix_to_prepend.append(":");
+    string origin = prefix.origin();
+    if (origin.length() > 0) {
+    	prefix_to_prepend = "\"";
+    	prefix_to_prepend.append(origin);
+    }
+
+    if (prefix.element_size() > 0) {
+        for (int i = 0; i < prefix.element_size(); i++)
+        {
+            if (prefix.element(i) != origin) {
+            	if (origin.length() > 0)
+            		prefix_to_prepend.append(":");
+            	else
+            		prefix_to_prepend = "\"";
+                prefix_to_prepend.append(prefix.element(i));
+                break;
+            }
+        }
+        if (prefix_to_prepend.length() > 0)
+            prefix_to_prepend.append("\":");
+    }
+    else if (prefix.elem_size() > 0) {
+        for (int i = 0; i < prefix.elem_size(); i++)
+        {
+      	    auto path_elem = prefix.elem(i);
+            if (path_elem.name() != origin) {
+            	if (origin.length() > 0)
+            		prefix_to_prepend.append(":");
+            	else
+            		prefix_to_prepend = "\"";
+                prefix_to_prepend.append(path_elem.name());
+                break;
+            }
+        }
+        if (prefix_to_prepend.length() > 0)
+            prefix_to_prepend.append("\":");
     }
     return prefix_to_prepend;
 }
@@ -518,8 +551,12 @@ string gNMIClient::parse_get_response(gnmi::GetResponse* response)
     {
         notification = response->notification(i);
 
-        if(notification.has_prefix()) prefix_to_prepend = get_prefix_from_notification(notification);
-        else prefix_to_prepend.clear();
+        if (notification.has_prefix()) {
+            prefix_to_prepend = get_prefix_from_notification(notification);
+        }
+        else {
+            prefix_to_prepend.clear();
+        }
 
         if(notification.update_size() != 0) {
             for(int k = 0; k < notification.update_size(); ++k)

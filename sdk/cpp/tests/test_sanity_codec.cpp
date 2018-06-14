@@ -534,11 +534,6 @@ TEST_CASE("passive_codec")
 
 TEST_CASE("json_encode_decode")
 {
-    // session
-    path::Repository repo{TEST_HOME};
-    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
-    ydk::path::RootSchemaNode& schema = session.get_root_schema();
-
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 

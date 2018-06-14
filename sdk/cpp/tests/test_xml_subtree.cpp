@@ -147,7 +147,6 @@ pd->name = "xyz";
 
 auto stmt = make_shared<openconfig_routing_policy::RoutingPolicy::PolicyDefinitions::PolicyDefinition::Statements::Statement>();
 stmt->actions->bgp_actions->config->set_local_pref = 1233;
-stmt->parent = pd->statements.get();
 
 auto rp = make_shared<openconfig_routing_policy::RoutingPolicy>();
 pd->statements->statement.append(stmt);
@@ -193,12 +192,11 @@ auto bgp = make_unique<openconfig_bgp::Bgp>();
 bgp->global->config->as = 65172;
 bgp->global->config->router_id = "1.2.3.4";
 
-auto afi_safi = make_unique<openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
+auto afi_safi = make_shared<openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
 afi_safi->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
 afi_safi->config->afi_safi_name = openconfig_bgp_types::L3VPNIPV4UNICAST();
 afi_safi->config->enabled = true;
-afi_safi->parent = bgp->global->afi_safis.get();
-bgp->global->afi_safis->afi_safi.append(move(afi_safi));
+bgp->global->afi_safis->afi_safi.append(afi_safi);
 
 auto s = codec.encode(*bgp, session.get_root_schema());
 REQUIRE(s==R"(<bgp xmlns="http://openconfig.net/yang/bgp">

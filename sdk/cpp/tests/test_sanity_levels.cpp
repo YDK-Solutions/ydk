@@ -256,18 +256,15 @@ TEST_CASE("onelist")
     REQUIRE(reply);
 
     auto r_2 = make_unique<ydktest_sanity::Runner>();
-    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-    auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_2 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->name = "foo";
     e_2->number = 2;
     e_2->name = "bar";
 
-    e_1->parent = r_1->one_list.get();
-    r_1->one_list->ldata.append(move(e_1));
-
-    e_2->parent = r_1->one_list.get();
-    r_1->one_list->ldata.append(move(e_2));
+    r_1->one_list->ldata.append(e_1);
+    r_1->one_list->ldata.append(e_2);
 
     reply = crud.create(provider, *(r_1->one_list));
     REQUIRE(reply);
@@ -288,11 +285,10 @@ TEST_CASE("test_onelist_neg_update_key_nonexist")
 
     //CREATE
     auto r_2 = make_unique<ydktest_sanity::Runner>();
-    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-    e_1->parent = r_1->one_list.get();
+    auto e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->name = "foo";
-    r_1->one_list->ldata.append(move(e_1));
+    r_1->one_list->ldata.append(e_1);
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
 
@@ -330,16 +326,12 @@ TEST_CASE("test_twolist_pos")
 
     l_1->number = 21;
     l_1->name = "21name";
-    l_1->parent = r_1->two_list.get();
     l_2->number = 22;
     l_2->name = "22name";
-    l_2->parent = r_1->two_list.get();
     s_1->number = 221;
     s_1->name = "221name";
-    s_1->parent = l_1.get();
     s_2->number = 222;
     s_2->name = "222name";
-    s_2->parent = l_2.get();
 
     l_1->subl1.extend({s_1, s_2});
     r_1->two_list->ldata.extend({l_1, l_2});
@@ -388,21 +380,15 @@ TEST_CASE("test_threelist_pos")
 
     l_1->number = 21;
     l_1->name = "21name";
-    l_1->parent = r_1->three_list.get();
     l_2->number = 22;
     l_2->name = "22name";
-    l_2->parent = r_1->three_list.get();
     s_1->number = 221;
     s_1->name = "221name";
-    s_1->parent = l_1.get();
     s_2->number = 222;
     s_2->name = "222name";
-    s_2->parent = l_2.get();
     ss_1->number = 2221;
-    ss_1->parent = s_1.get();
     ss_1->name = "2221name";
     ss_2->number = 2222;
-    ss_2->parent = s_2.get();
     ss_2->name = "2222name";
 
     s_1->sub_subl1.append(ss_1);
@@ -457,16 +443,12 @@ TEST_CASE("test_InbtwList_pos")
 
     l_1->number = 21;
     l_1->name = "21name";
-    l_1->parent = r_1->inbtw_list.get();
     l_2->number = 22;
     l_2->name = "22name";
-    l_2->parent = r_1->inbtw_list.get();
     s_1->number = 221;
     s_1->name = "221name";
-    s_1->parent = l_1->subc.get();
     s_2->number = 222;
     s_2->name = "222name";
-    s_2->parent = l_2->subc.get();
 
     l_1->subc->subc_subl1.append(s_1);
     l_2->subc->subc_subl1.append(s_2);
@@ -541,8 +523,6 @@ TEST_CASE("test_leafref_pos")
     r_1->three->sub1->sub2->number = 311;
     auto e_1  = make_shared<ydktest_sanity::Runner::InbtwList::Ldata>();
     auto e_2  = make_shared<ydktest_sanity::Runner::InbtwList::Ldata>();
-    e_1->parent = r_1->inbtw_list.get();
-    e_2->parent = r_1->inbtw_list.get();
     e_1->number = 11;
     e_2->number = 21;
     e_1->name = "11name";
@@ -557,8 +537,6 @@ TEST_CASE("test_leafref_pos")
     e_12->number = 112;
     e_11->name = "111name";
     e_12->name = "112name";
-    e_11->parent = e_1->subc.get();
-    e_12->parent = e_1->subc.get();
     e_1->subc->subc_subl1.extend({e_11, e_12});
     auto e_21 = make_shared<ydktest_sanity::Runner::InbtwList::Ldata::Subc::SubcSubl1>();
     auto e_22 = make_shared<ydktest_sanity::Runner::InbtwList::Ldata::Subc::SubcSubl1>();
@@ -566,8 +544,6 @@ TEST_CASE("test_leafref_pos")
     e_22->number = 122;
     e_21->name = "121name";
     e_22->name = "122name";
-    e_21->parent = e_2->subc.get();
-    e_22->parent = e_2->subc.get();
     e_2->subc->subc_subl1.extend({e_21, e_22});
     r_1->inbtw_list->ldata.extend({e_1, e_2});
 
@@ -644,10 +620,8 @@ TEST_CASE("aug_onelist_pos")
     auto e_2 = make_shared<ydktest_sanity::Runner::OneList::OneAugList::Ldata>();
     e_1->number = 1;
     e_1->name = "1name";
-    e_1->parent = r_1->one_list->one_aug_list.get();
     e_2->number = 2;
     e_2->name = "2name";
-    e_2->parent = r_1->one_list->one_aug_list.get();
     r_1->one_list->one_aug_list->ldata.extend({e_1, e_2});
     r_1->one_list->one_aug_list->enabled = true;
     reply = crud.create(provider, *r_1);
@@ -754,7 +728,6 @@ TEST_CASE("mtus")
     auto mt = make_shared<ydktest_sanity::Runner::Mtus::Mtu>();
     mt->owner = "test";
     mt->mtu = 12;
-    mt->parent = r_1->mtus.get();
     r_1->mtus->mtu.append(mt);
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
@@ -785,7 +758,6 @@ TEST_CASE("passive")
     passive->name = "abc";
     auto i = make_shared<ydktest_sanity::Runner::Passive::Interfac>();
     i->test = "xyz";
-    i->parent = passive.get();
     passive->interfac.append(i);
     passive->testc->xyz = make_shared<ydktest_sanity::Runner::Passive::Testc::Xyz>();
     passive->testc->xyz->parent = passive.get();

@@ -716,7 +716,6 @@ TEST_CASE("test_capital_letters")
 
     // CREATE
     auto gigabit_eth = make_shared<ydktest_sanity::Native::Interface::GigabitEthernet>();
-    gigabit_eth->parent = native->interface.get();
     gigabit_eth->name = "test";
 
     native->interface->gigabitethernet.append(gigabit_eth);
@@ -775,7 +774,7 @@ TEST_CASE("test_ylist_no_keys") {
 	runner->no_key_list.extend({t1, t2, t3});
 
 	auto testKeys = runner->no_key_list.keys();
-	REQUIRE(vector_to_string(testKeys) == R"("0", "1", "2")");
+	REQUIRE(vector_to_string(testKeys) == R"("1000000", "1000001", "1000002")");
 
 	string count{};
 	for (auto ent : runner->no_key_list.entities()) {

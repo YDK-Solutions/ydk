@@ -126,7 +126,7 @@ class ClassConstructorPrinter(object):
                         if key_str.__len__() > 0:
                             key_str += ', '
                         key_str += '"%s"' % key.name
-                    init_stmts.append('%s{%s}' % (child.name,  key_str))
+                    init_stmts.append('%s(this, {%s})' % (child.name,  key_str))
             else:
                 if (child.stmt.search_one('presence') is None):
                     init_stmts.append('%s(std::make_shared<%s>())' % (child.name, child.property_type.qualified_cpp_name()))

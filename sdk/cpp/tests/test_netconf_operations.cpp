@@ -103,20 +103,18 @@ TEST_CASE("test_create")
     REQUIRE(reply);
 
     //CREATE
-    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-    auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_2 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->name = "foo";
     e_2->number = 2;
     e_2->name = "bar";
 
-    e_1->parent = r_1->one_list.get();
     e_1->yfilter = YFilter::create;
-    r_1->one_list->ldata.append(move(e_1));
+    r_1->one_list->ldata.append(e_1);
 
-    e_2->parent = r_1->one_list.get();
     e_2->yfilter = YFilter::create;
-    r_1->one_list->ldata.append(move(e_2));
+    r_1->one_list->ldata.append(e_2);
 
     reply = crud.update(provider, *r_1);
     REQUIRE(reply);
@@ -137,44 +135,38 @@ TEST_CASE("test_delete")
     REQUIRE(reply);
 
     //CREATE
-    auto e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-    auto e_2 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
+    auto e_2 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->name = "foo";
     e_2->number = 2;
     e_2->name = "bar";
 
-    e_1->parent = r_1->one_list.get();
     e_1->yfilter = YFilter::create;
-    r_1->one_list->ldata.append(move(e_1));
+    r_1->one_list->ldata.append(e_1);
 
-    e_2->parent = r_1->one_list.get();
     e_2->yfilter = YFilter::create;
-    r_1->one_list->ldata.append(move(e_2));
+    r_1->one_list->ldata.append(e_2);
 
     reply = crud.update(provider, *r_1);
     REQUIRE(reply);
 
     //DELETE
     r_1 = make_unique<ydktest_sanity::Runner>();
-    e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-
-    e_1->parent = r_1->one_list.get();
+    e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->yfilter = YFilter::delete_;
-    r_1->one_list->ldata.append(move(e_1));
+    r_1->one_list->ldata.append(e_1);
 
     reply = crud.update(provider, *r_1);
     REQUIRE(reply);
 
     //DELETE AGAIN WITH ERROR
     r_1 = make_unique<ydktest_sanity::Runner>();
-    e_1 = make_unique<ydktest_sanity::Runner::OneList::Ldata>();
-
-    e_1->parent = r_1->one_list.get();
+    e_1 = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
     e_1->number = 1;
     e_1->yfilter = YFilter::delete_;
-    r_1->one_list->ldata.append(move(e_1));
+    r_1->one_list->ldata.append(e_1);
     CHECK_THROWS_AS(crud.update(provider, *r_1), YServiceProviderError);
 }
 

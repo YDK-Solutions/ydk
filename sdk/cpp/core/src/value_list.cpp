@@ -271,7 +271,8 @@ std::vector<std::pair<std::string, LeafData> > YLeafList::get_name_leafdata() co
 
 using namespace std;
 
-YList::YList(initializer_list<string> key_names)
+YList::YList(Entity* parent_entity, initializer_list<string> key_names)
+	: parent(parent_entity),counter(1000000)
 {
     ylist_key_names = vector<string>{};
     entity_map = map<string,shared_ptr<Entity>>{};
@@ -306,8 +307,8 @@ YList::build_key(shared_ptr<Entity> ep)
     }
     key = value_buffer.str();
     if (key.length() == 0) {
-        // No key list or no matching key
-        value_buffer << key_vector.size();
+        // No key list or no matching key, use internal counter
+        value_buffer << counter++;
         key = value_buffer.str();
     }
     return key;
@@ -316,6 +317,8 @@ YList::build_key(shared_ptr<Entity> ep)
 void
 YList::append(shared_ptr<Entity> ep)
 {
+    ep->parent = parent;
+
 	string key = build_key(ep);
     if (!entity_map[key]) {
         key_vector.push_back(key);

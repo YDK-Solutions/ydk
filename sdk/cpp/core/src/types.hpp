@@ -354,7 +354,7 @@ class YLeafList {
 class YList
 {
   public:
-    YList(std::initializer_list<std::string> key_names);
+    YList(Entity* parent_entity, std::initializer_list<std::string> key_names);
     virtual ~YList();
 
     std::shared_ptr<Entity> operator [] (const std::string& key) const;
@@ -362,6 +362,7 @@ class YList
     std::vector<std::shared_ptr<Entity>> entities() const;
     std::vector<std::string> keys() const;
     std::size_t len() const;
+
     void append(std::shared_ptr<Entity> ep);
     void extend(std::initializer_list<std::shared_ptr<Entity>> ep_list);
     std::string build_key(std::shared_ptr<Entity> ep);
@@ -370,6 +371,8 @@ class YList
     std::vector<std::string> ylist_key_names;
     std::map<std::string,std::shared_ptr<Entity>> entity_map;
     std::vector<std::string> key_vector;
+    Entity* parent;
+    int counter;
 };
 
 std::ostream& operator<< (std::ostream& stream, const YLeaf& value);

@@ -437,9 +437,11 @@ static string vector_to_string(vector<string> & string_vector)
 
 TEST_CASE("test_ylist")
 {
-    YList ylist_0 = YList{};
-    YList ylist_1 = YList{"name"};
-    YList ylist_2 = YList{"first", "second"};
+    TestEntity* list_holder = new TestEntity();
+
+    YList ylist_0 = YList(list_holder, {});
+    YList ylist_1 = YList(list_holder, {"name"});
+    YList ylist_2 = YList(list_holder, {"first", "second"});
 
     auto test1 = std::make_shared<TestEntity>();
     test1->name = "test1";
@@ -459,7 +461,7 @@ TEST_CASE("test_ylist")
     REQUIRE(ylist_0.len() == 2);
 
     auto keys = ylist_0.keys();
-    REQUIRE(vector_to_string(keys) == R"("0", "1")");
+    REQUIRE(vector_to_string(keys) == R"("1000000", "1000001")");
 
     ylist_1.extend({test1, test2});
     REQUIRE(ylist_1.len() == 2);
@@ -477,3 +479,24 @@ TEST_CASE("test_ylist")
     test_entity = dynamic_cast<TestEntity*> (ep.get());
     REQUIRE(test_entity->name == test2->name);
 }
+
+//TODO Test for issue #800 to be resolved
+//TEST_CASE("test_ylist_race")
+//{
+//	TestEntity* list_holder = new TestEntity();
+//
+//    YList ylist = YList(list_holder, {"name"});
+//
+//    // Append test1 to the YList before key value is defined
+//    auto test1 = std::make_shared<TestEntity>();
+//    ylist.append(test1);
+//
+//    ylist[0]->name = "test1";
+//    ylist[0]->enabled = true;
+//
+//    auto keys = ylist.keys();
+//    REQUIRE(vector_to_string(keys) == R"("test1")");
+//
+//    auto ep = ylist["test1"];
+//    REQUIRE(ep != nullptr);
+//}

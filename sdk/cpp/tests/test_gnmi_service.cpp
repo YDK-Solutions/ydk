@@ -71,36 +71,12 @@ TEST_CASE("gnmi_service_subscribe")
 
     openconfig_interfaces::Interfaces filter = {};
     auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    i->yfilter = YFilter::read;
-//    i->name = "Loopback0";
-//    i->config->name = "Loopback0";
-//    i->config->description = "test";
+    i->name = "*";
     filter.interface.append(i);
 
     // Get Request 
     gs.subscribe(provider, filter, "ONCE", 10, "ON_CHANGE", 100000, read_sub);
 
-}
-
-TEST_CASE("gnmi_service_create2")
-{
-    // session
-    path::Repository repo{TEST_HOME};
-    string address = "127.0.0.1"; int port = 50051;
-
-    gNMIServiceProvider provider{repo, address, port};
-    gNMIService gs{};
-    CodecServiceProvider codec_provider{EncodingFormat::JSON};
-    CodecService codec_service{};
-
-    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
-    auto payload = codec_service.encode(codec_provider, ifcs);
-
-    auto ifcs_d = codec_service.decode(codec_provider, payload, make_shared<openconfig_interfaces::Interfaces>());
-    REQUIRE(ifcs == *ifcs_d);
 }
 
 TEST_CASE("gnmi_service_create")
@@ -118,17 +94,20 @@ TEST_CASE("gnmi_service_create")
     i->name = "Loopback10";
     openconfig_interfaces::Interfaces ifcs{};
     ifcs.interface.append(i);
+    ifcs.yfilter = YFilter::replace;
 
-    // Get Request 
-    auto get_reply = gs.set(provider, ifcs, "gnmi_create");
+    // Set-replace Request
+    auto get_reply = gs.set(provider, ifcs);
+    REQUIRE(get_reply);
+
+    // Set interface description
+    i->config->name = "Loopback10";
+    i->config->description = "Test";
+    ifcs.yfilter = YFilter::update;
+    get_reply = gs.set(provider, ifcs);
     REQUIRE(get_reply);
 
     openconfig_interfaces::Interfaces filter{};
-//    auto int_filter = make_shared<openconfig_interfaces::Interfaces::Interface>();
-//    int_filter->name = "*";
-//    int_filter->yfilter = YFilter::read;
-//    filter.interface.append(int_filter);
-
     auto get_after_create_reply = gs.get(provider, filter, false);
     REQUIRE(get_after_create_reply != nullptr);
     print_entity(get_after_create_reply, provider.get_session().get_root_schema());
@@ -139,25 +118,26 @@ TEST_CASE("gnmi_service_get")
 	// session
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
-
     gNMIServiceProvider provider{repo, address, port};
+
+//    string address = "10.30.110.86"; int port = 57400;
+//    gNMIServiceProvider provider{repo, address, "admin", "admin", port};
+
     gNMIService gs{};
 
     // Set Create Request
     openconfig_bgp::Bgp bgp = {};
     config_bgp(bgp);
-    auto create_reply = gs.set(provider, bgp, "gnmi_create");
+    bgp.yfilter = YFilter::replace;
+    auto create_reply = gs.set(provider, bgp);
     REQUIRE(create_reply);
-
 
     // Get Request
     openconfig_bgp::Bgp filter = {};
-    filter.global->config->yfilter = YFilter::read;
+
     auto get_after_create_reply = gs.get(provider, filter, true);
     REQUIRE(get_after_create_reply);
-
-//    CrudService crud{};
-//    auto r = crud.read_config(provider, bgp);
+    print_entity(get_after_create_reply, provider.get_session().get_root_schema());
 }
 
 TEST_CASE("gnmi_service_delete")
@@ -173,7 +153,8 @@ TEST_CASE("gnmi_service_delete")
     openconfig_bgp::Bgp bgp = {};
 
     // Set Delete Request
-    auto delete_reply = gs.set(provider, bgp, "gnmi_delete");
+    bgp.yfilter = YFilter::delete_;
+    auto delete_reply = gs.set(provider, bgp);
     REQUIRE(delete_reply);
 
     // Get Request

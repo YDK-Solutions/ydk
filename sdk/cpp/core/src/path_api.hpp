@@ -1188,6 +1188,8 @@ public:
     std::vector<std::string> get_capabilities() const;
     EncodingFormat get_encoding() const;
     std::string execute_payload(const std::string & payload, const std::string & operation, bool is_config) const;
+    std::string execute_set_payload(const std::pair<std::string, std::string> prefix_pair,
+                                    const std::string & payload, const std::string & operation) const;
     std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
     gNMIClient & get_client() const;
 

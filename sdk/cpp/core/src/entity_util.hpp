@@ -52,7 +52,7 @@ bool is_set(const YFilter & yfilter);
 const EntityPath get_entity_path(const Entity & entity, Entity* ancestor);
 
 void parse_entity_to_prefix_and_paths(Entity& entity, std::pair<std::string, std::string> & prefix, std::vector<PathElem> & path_container);
-
+void parse_entity_prefix(Entity& entity, std::pair<std::string, std::string> & prefix);
 }
 
 #define ADD_KEY_TOKEN(attr, attr_name) {\

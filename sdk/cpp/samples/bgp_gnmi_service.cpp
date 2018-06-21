@@ -84,13 +84,15 @@ int main(int argc, char* argv[])
 	    // Set Create Request
 	    openconfig::openconfig_bgp::Bgp bgp = {};
 	    config_bgp(bgp);
-	    gs.set(provider, bgp, "gnmi_create");
+	    bgp.yfilter = YFilter::replace;
+	    gs.set(provider, bgp);
 
 	    // Get Request
 	    gs.get(provider, filter);
 
 	    // Set Delete Request
-	    gs.set(provider, bgp, "gnmi_delete");
+	    bgp.yfilter = YFilter::delete_;
+	    gs.set(provider, bgp);
 
 	    // Get Request
 	    gs.get(provider, filter);
@@ -104,13 +106,15 @@ int main(int argc, char* argv[])
 	    // Set Create Request
 	    openconfig::openconfig_bgp::Bgp bgp = {};
 	    config_bgp(bgp);
-	    gs.set(provider, bgp, "gnmi_create");
+	    bgp.yfilter = YFilter::replace;
+	    gs.set(provider, bgp);
 
 	    // Get Request
 	    gs.get(provider, filter);
 
 	    // Set Delete Request
-	    gs.set(provider, bgp, "gnmi_delete");
+	    bgp.yfilter = YFilter::delete_;
+	    gs.set(provider, bgp);
 
 	    // Get Request
 	    gs.get(provider, filter);

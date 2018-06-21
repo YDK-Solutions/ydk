@@ -37,7 +37,7 @@ public:
     gNMIService();
     ~gNMIService();
     std::shared_ptr<Entity> get(gNMIServiceProvider& provider, Entity& filter, bool only_config) const;
-    bool set(gNMIServiceProvider& provider, Entity& filter, const std::string & operation) const;
+    bool set(gNMIServiceProvider& provider, Entity& filter) const;
 
     void subscribe(gNMIServiceProvider& provider, Entity& filter, const std::string & list_mode, long long qos,
                     const std::string & mode, int sample_interval, std::function<void(const std::string &)> func) const;

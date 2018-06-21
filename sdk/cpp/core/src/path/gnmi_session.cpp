@@ -238,6 +238,16 @@ shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, const st
     return handle_read_reply(execute_payload(filter_value, operation, config), *root_schema);
 }
 
+string gNMISession::execute_set_payload(const pair<string, string> prefix_pair,
+		const string & payload, const string & operation) const
+{
+    string reply = client->execute_set_wrapper(prefix_pair, payload, operation);
+    YLOG_DEBUG("=============Reply payload received from device=============");
+    YLOG_DEBUG("{}", reply.c_str());
+    YLOG_DEBUG("\n");
+    return reply;
+}
+
 string gNMISession::execute_payload(const string & payload, const string & operation, bool is_config) const
 {
     string reply = client->execute_wrapper(payload, operation, is_config);

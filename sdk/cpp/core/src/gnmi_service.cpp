@@ -42,12 +42,12 @@ static string get_data_payload(gNMIServiceProvider& provider, Entity & entity)
 {
     path::Codec codec_service{};
     path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
+    entity.yfilter = YFilter::not_set;
     path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
 
-    string payload{"\"filter\":"};
-    payload+=codec_service.encode(datanode, EncodingFormat::JSON, false);
+    string payload = codec_service.encode(datanode, EncodingFormat::JSON, false);
     YLOG_DEBUG("===========Generating Target Payload============");
-    YLOG_DEBUG("{}", payload.c_str());
+    YLOG_DEBUG("{}", payload);
     return payload;
 }
 
@@ -69,27 +69,37 @@ shared_ptr<Entity> gNMIService::get(gNMIServiceProvider& provider, Entity& filte
 
     path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
 
-    auto & client = (dynamic_cast<const path::gNMISession&>(provider.get_session())).get_client();
+    auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
+    auto & client = gnmi_session.get_client();
     string reply = client.execute_get_operation(prefix_pair, path_container, only_config);
-    auto output = (dynamic_cast<const path::gNMISession&>(provider.get_session())).handle_read_reply(reply, root_schema);
-    return read_datanode(filter, output);
+
+    auto output = gnmi_session.handle_read_reply(reply, root_schema);
+    return read_datanode(filter, output->get_children()[0]);
 }
 
 //set
-bool gNMIService::set(gNMIServiceProvider& provider, Entity& filter, const string & operation) const
+bool gNMIService::set(gNMIServiceProvider& provider, Entity& entity) const
 {
-    if(operation != "gnmi_create" && operation != "gnmi_delete")
+	string operation = to_string(entity.yfilter);
+	if (operation != "replace" && operation != "update" && operation != "delete")
     {
-        YLOG_ERROR("{} operation not supported", operation );
+        YLOG_ERROR("gNMIService::set: {} operation not supported", operation );
         throw(YServiceProviderError{operation + " operation not supported"});
     }
-    YLOG_INFO("Executing set RPC with {} operation", operation);
-    string data_payload = get_data_payload(provider, filter);
+    YLOG_INFO("Executing set RPC operation '{}' on entity '{}'", operation, entity.get_segment_path());
 
-    string reply = (dynamic_cast<const path::gNMISession&>(provider.get_session())).execute_payload(data_payload, operation, true);
-    if(!reply.empty())
-        return true;
-    return false;
+    std::pair<std::string, std::string> prefix_pair;
+    parse_entity_prefix(entity, prefix_pair);
+    string data_payload = get_data_payload(provider, entity);
+    auto pos = data_payload.find("{", 4);
+    if (pos != string::npos) {
+        data_payload = data_payload.substr(pos, data_payload.length()-pos-1);
+    }
+
+    auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
+    string reply = gnmi_session.execute_set_payload(prefix_pair, data_payload, operation);
+
+    return (!reply.empty());
 }
 
 //subscribe
@@ -103,21 +113,23 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 {
     if(list_mode != "ONCE" && list_mode != "STREAM" && list_mode != "POLL")
     {
-        YLOG_ERROR("{} list mode not supported", mode);
-        throw(YServiceProviderError{list_mode + " list mode not supported"});
+        YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
+        throw(YServiceProviderError{list_mode + " list mode is not supported"});
     }
 
-    if(mode != "ON_CHANGE" && mode != "SAMPLE" && mode!= "TARGET_DEFINED")
+    if (mode != "ON_CHANGE" && mode != "SAMPLE" && mode!= "TARGET_DEFINED")
     {
-        YLOG_ERROR("{} mode not supported", mode);
-        throw(YServiceProviderError{mode + " mode not supported"});
+        YLOG_ERROR("gNMIService::subscribe: mode '{}' is not supported", mode);
+        throw(YServiceProviderError{mode + " mode is not supported"});
     }
 
-    YLOG_INFO("Executing subscribe RPC in {} list mode", list_mode);
+    YLOG_INFO("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", list_mode);
     std::pair<std::string, std::string> prefix_pair;
     std::vector<PathElem> path_container;
     parse_entity_to_prefix_and_paths(filter, prefix_pair, path_container);
-    auto & client = (dynamic_cast<const path::gNMISession&>(provider.get_session())).get_client();
+
+    auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
+    auto & client = gnmi_session.get_client();
     client.execute_subscribe_operation(prefix_pair, path_container, list_mode, qos, sample_interval, mode, func);
 }
 

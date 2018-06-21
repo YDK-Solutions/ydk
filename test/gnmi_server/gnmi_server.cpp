@@ -152,12 +152,8 @@ class gNMIImpl final : public gNMI::Service
 
     Status Get(ServerContext* context, const GetRequest* request, GetResponse* response) override 
     {
-        ::gnmi::Notification* notification;
         std::string response_payload;
-        ::gnmi::Update* update;
         ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
-        ::gnmi::Path* path = new ::gnmi::Path;
-        ::gnmi::Path prefix;
         std::string path_element;
         std::vector<std::string> path_container;
         int element_size;
@@ -168,52 +164,60 @@ class gNMIImpl final : public gNMI::Service
         std::cout << "===========Get Request Received===========" << std::endl;
         std::cout << request->DebugString() << std::endl;
 
-        notification = response->add_notification();
+        auto notification = response->add_notification();
         std::time_t timestamp_val = std::time(nullptr);
         notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
-        notification->mutable_prefix()->CopyFrom(request->prefix());
-
         std::string origin = request->prefix().origin();
-        if(origin == "openconfig-bgp") {
-            is_bgp = true;
+        if (origin.length() > 0) {
+            notification->mutable_prefix()->CopyFrom(request->prefix());
+            if (origin == "openconfig-bgp") {
+                is_bgp = true;
+            }
+            else if (origin == "openconfig-interfaces") {
+                is_int = true;
+            }
         }
-        else if(origin == "openconfig-interfaces") {
-            is_int = true;
-        }
-
         for(int j = 0; j < request->path_size(); ++j) 
         {
-          auto req_path = request->path(j);
-          for(int i = 0; i < req_path.elem_size(); ++i)
-          {
-        	auto path_elem = req_path.elem(i);
-            path_element.append(path_elem.name());
-            path->add_element(path_elem.name());
-            path_container.push_back(path_element);
-            path_element.clear();
-          }
-        }
+            ::gnmi::Path* response_path = new ::gnmi::Path;
 
-        update = notification->add_update();
-        update->set_allocated_path(path);
+            auto req_path = request->path(j);
+            origin = req_path.origin();
+            if (origin.length() > 0) {
+                response_path->set_origin(origin);
+                if (origin == "openconfig-bgp") {
+                    is_bgp = true;
+                }
+                else if (origin == "openconfig-interfaces") {
+                    is_int = true;
+                }
+            }
+            for(int i = 0; i < req_path.elem_size(); ++i)
+            {
+                gnmi::PathElem* path_elem = response_path->add_elem();
+                path_elem->CopyFrom(req_path.elem(i));
+            }
+            auto update = notification->add_update();
+            update->set_allocated_path(response_path);
 
-        if (set_counter == 1 && delete_counter == 0 && (is_bgp || is_int)) {
-            std::cout << "DEBUG: Update Value Set by Create Request\n";
-            if (is_bgp)
-                response_payload = "{\"global\": {\"config\": {\"as\":65172} }, \"neighbors\": {\"neighbor\": [{\"neighbor-address\":\"172.16.255.2\", \"config\": {\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
-            else if (is_int)
-            	response_payload = "{\"interface\":[{\"name\":\"Loopback10\"}]}";
-            json_payload = json::parse(response_payload);
-            get_value(path_container, json_payload);
-            value->set_json_ietf_val(response_payload);
-            update->set_allocated_val(value);
-        } 
-        else if (delete_counter == 1) {
-            std::cout << "DEBUG: Update Value Deleted by Delete Request\n";
-            response_payload = "{\"value\":\"null\"}";
-        }
-        else {
-            response_payload = "{\"value\":\"null\"}";
+            if (set_counter == 1 && delete_counter == 0 && (is_bgp || is_int)) {
+                std::cout << "DEBUG: Update Value Set by Create Request\n";
+                if (is_bgp)
+                    response_payload = "{\"global\": {\"config\": {\"as\":65172} }, \"neighbors\": {\"neighbor\": [{\"neighbor-address\":\"172.16.255.2\", \"config\": {\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
+                else if (is_int)
+                    response_payload = "{\"interface\":[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]}";
+                json_payload = json::parse(response_payload);
+                get_value(path_container, json_payload);
+                value->set_json_ietf_val(response_payload);
+                update->set_allocated_val(value);
+            }
+            else if (delete_counter == 1) {
+                std::cout << "DEBUG: Update Value Deleted by Delete Request\n";
+                response_payload = "{\"value\":\"null\"}";
+            }
+            else {
+                response_payload = "{\"value\":\"null\"}";
+            }
         }
 
         std::cout << "===========Get Response Sent===========" << std::endl;
@@ -225,13 +229,15 @@ class gNMIImpl final : public gNMI::Service
     {
         ::grpc::Status status;
         ::gnmi::Update update;
-        ::gnmi::Update replace;
         ::gnmi::UpdateResult* update_response;
         ::gnmi::Path* path = new ::gnmi::Path;
         ::gnmi::UpdateResult_Operation operation;
         
-        update_response = response->add_response();
+        update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_DELETE);
+        std::cout << "===========Set Request Received===========" << std::endl;
+        std::cout << request->DebugString() << std::endl;
 
+        update_response = response->add_response();
         std::time_t timestamp_val = std::time(nullptr);
         update_response->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
 
@@ -240,29 +246,45 @@ class gNMIImpl final : public gNMI::Service
             delete_counter = 1;
             for(int i = 0; i < request->delete__size(); ++i)
             {
-                ::gnmi::Path delete_path = request->delete_(i); 
-                delete_path.add_element(delete_path.element(i));
+                ::gnmi::Path* response_path = new ::gnmi::Path;
+
+                ::gnmi::Path delete_path = request->delete_(i);
+                std::string origin = delete_path.origin();
+                if (origin.length() > 0) {
+                    response_path->set_origin(origin);
+                }
+                for(int j = 0; j < delete_path.elem_size(); ++j)
+                {
+                    gnmi::PathElem* path_elem = response_path->add_elem();
+                    path_elem->CopyFrom(delete_path.elem(j));
+                }
+                update_response->set_allocated_path(response_path);
             }
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_DELETE);
-            std::cout << "===========Set Request Received===========" << std::endl;
-            std::cout << request->DebugString() << std::endl;
             std::cout << "===========Set Response Sent===========" << std::endl;
             std::cout << response->DebugString() << std::endl;
             return Status::OK;
         } 
-        else if (request->replace_size() >= 1) {
+        else if (request->replace_size() > 0) {
+            set_counter = 1;
+            delete_counter = 0;
             for(int i = 0; i < request->replace_size(); ++i)
             {
-                replace = request->replace(i); 
-                for(int j = 0; j < replace.path().element_size(); ++j) 
-                {
-                    path->add_element(replace.path().element(j));
+                ::gnmi::Path* response_path = new ::gnmi::Path;
+
+                auto replace_path = request->replace(i).path();
+                std::string origin = replace_path.origin();
+                if (origin.length() > 0) {
+                    response_path->set_origin(origin);
                 }
+                for(int j = 0; j < replace_path.elem_size(); ++j)
+                {
+                    gnmi::PathElem* path_elem = response_path->add_elem();
+                    path_elem->CopyFrom(replace_path.elem(j));
+                }
+                update_response->set_allocated_path(response_path);
             }
-            update_response->set_allocated_path(path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
-            std::cout << "===========Set Request Received===========" << std::endl;
-            std::cout << request->DebugString() << std::endl;
             std::cout << "===========Set Response Sent===========" << std::endl;
             std::cout << response->DebugString() << std::endl;
             return Status::OK;
@@ -272,16 +294,21 @@ class gNMIImpl final : public gNMI::Service
             delete_counter = 0;
             for(int i = 0; i < request->update_size(); ++i)
             {
-                update = request->update(i); 
-                for(int j = 0; j < update.path().element_size(); ++j) 
-                {
-                    path->add_element(update.path().element(j));
+                ::gnmi::Path* response_path = new ::gnmi::Path;
+
+                auto update_path = request->update(i).path();
+                std::string origin = update_path.origin();
+                if (origin.length() > 0) {
+                    response_path->set_origin(origin);
                 }
+                for(int j = 0; j < update_path.elem_size(); ++j)
+                {
+                    gnmi::PathElem* path_elem = response_path->add_elem();
+                    path_elem->CopyFrom(update_path.elem(j));
+                }
+                update_response->set_allocated_path(response_path);
             }
-            update_response->set_allocated_path(path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_UPDATE);
-            std::cout << "===========Set Request Received===========" << std::endl;
-            std::cout << request->DebugString() << std::endl;
             std::cout << "===========Set Response Sent===========" << std::endl;
             std::cout << response->DebugString() << std::endl;
             return Status::OK;

@@ -19,24 +19,22 @@
 #include <iostream>
 #include "config.hpp"
 #include "catch.hpp"
+
 using namespace ydk;
 using namespace std;
 
-
-
 TEST_CASE("GNMICreateP")
 {
-	ydk::path::Repository repo{};
-	gNMIServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 50051};
+	ydk::path::Repository repo{TEST_HOME};
+	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
 
 	CHECK_NOTHROW(provider.get_encoding());
 }
 
-
 TEST_CASE("GNMICreateNoRepoP")
 {
-
-	gNMIServiceProvider provider{ "127.0.0.1", "admin", "admin", 50051};
+	ydk::path::Repository repo{};
+	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
 
 	CHECK_NOTHROW(provider.get_encoding());
 }

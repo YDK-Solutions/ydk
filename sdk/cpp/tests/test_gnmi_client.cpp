@@ -24,15 +24,16 @@
 using namespace ydk;
 using namespace std;
 
-string address = "127.0.0.1:50051";
+//string address = "127.0.0.1:50051";
+string address = "10.30.110.86:57400";
 
-TEST_CASE("gnmi_xr")
+TEST_CASE("gnmi_xr")	// Not running
 {
     gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()), "admin", "admin");
 
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
 
     std::cout << "result: " << result << std::endl;
     REQUIRE(result == ok);
@@ -43,7 +44,7 @@ TEST_CASE("gnmi_xr")
     // start timer
     gettimeofday(&t1, NULL);
 
-    string reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"openconfig-bgp:bgp\":{}}"}})", "read");
+    string reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"openconfig-bgp:bgp\":{}}"}})", "read", true);
     
     // stop timer
     gettimeofday(&t2, NULL);
@@ -62,45 +63,45 @@ TEST_CASE("gnmi_create")
 
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
     REQUIRE(result == ok);
 }
 
-TEST_CASE("gnmi_edit_get_config")
+TEST_CASE("gnmi_edit_get_config")	// Not working
 {
     gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
 
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
     REQUIRE(result == ok);
 
     string reply = client.execute_wrapper(
-     R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}"}})", "create");
+     R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}"}})", "create", true);
     REQUIRE(NULL != strstr(reply.c_str(), "Success"));
 
-    reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"openconfig-bgp:bgp\":{}}"}})", "read");
+    reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"openconfig-bgp:bgp\":{}}"}})", "read", true);
     
     REQUIRE(NULL != strstr(reply.c_str(), R"({"as":65172})"));
 
-    reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{}}"}})", "delete");
+    reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{}}"}})", "delete", true);
     REQUIRE(NULL != strstr(reply.c_str(), "Success"));
 
     REQUIRE(result == ok);
 }
 
 
-TEST_CASE("gnmi_device_not_connected_execute")
+TEST_CASE("gnmi_device_not_connected_execute")	// Not working
 {
     gNMIClient client(grpc::CreateChannel("", grpc::InsecureChannelCredentials()));
 
     try
     {
-        string s = client.execute_wrapper( R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172,\"router-id\":\"1.2.3.4\"}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"6.7.8.9\",\"config\":{\"local-as\":65001,\"neighbor-address\":\"6.7.8.9\",\"peer-as\":65001,\"peer-group\":\"IBGP\"}}]},\"peer-groups\":{\"peer-group\":[{\"peer-group-name\":\"IBGP\",\"config\":{\"description\":\"test description\",\"local-as\":65001,\"peer-as\":65001,\"peer-group-name\":\"IBGP\"}}]}}}"}})", "create");
+        string s = client.execute_wrapper( R"("rpc":{"ietf-netconf:edit-config":{"target":{"running":[null]},"error-option":"rollback-on-error","config":"{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172,\"router-id\":\"1.2.3.4\"}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"6.7.8.9\",\"config\":{\"local-as\":65001,\"neighbor-address\":\"6.7.8.9\",\"peer-as\":65001,\"peer-group\":\"IBGP\"}}]},\"peer-groups\":{\"peer-group\":[{\"peer-group-name\":\"IBGP\",\"config\":{\"description\":\"test description\",\"local-as\":65001,\"peer-as\":65001,\"peer-group-name\":\"IBGP\"}}]}}}"}})", "create", true);
         std::cout << "s: " << s << std::endl;
         REQUIRE(s == "");
     }
-    catch(YCPPError & e)
+    catch(YError & e)
     {
         REQUIRE(e.err_msg=="Connect Failed");
     }
@@ -114,7 +115,7 @@ TEST_CASE("RpcInvalid")
     : stub_(gNMI::NewStub(channel)){}
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
     REQUIRE(result == ok);
 
     try
@@ -145,12 +146,12 @@ TEST_CASE("RpcInvalid")
 
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
     REQUIRE(result == ok);
 
     try
     {
-        string reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"testing}"}})", "read");
+        string reply = client.execute_wrapper(R"("rpc":{"ietf-netconf:get-config":{"source":{"running":[null]},"filter":"{\"testing}"}})", "read", true);
         std::cout << "reply: " << reply << std::endl;
         //REQUIRE(NULL != strstr(reply.c_str(), "parse error"));
     }
@@ -170,7 +171,7 @@ TEST_CASE("RpcInvalid")
 //    std::unique_ptr<gNMIClient> client;;
 //    int ok = 0;
 //
-//    int result = client.connect(address);
+//    int result = client.connect();
 //    REQUIRE(result == ok);
 //
 //    try
@@ -200,7 +201,7 @@ TEST_CASE("EmptyRpc")
 
     int ok = 0;
 
-    int result = client.connect(address);
+    int result = client.connect();
     REQUIRE(result == ok);
 
     try
@@ -235,10 +236,9 @@ TEST_CASE("gnmi_multiple_clients")
     gNMIClient client14(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
     gNMIClient client15(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
 
-    int result = client1.connect(address) && client2.connect(address) && client3.connect(address) && client4.connect(address) && client5.connect(address)
-         && client6.connect(address) && client7.connect(address) && client8.connect(address) && client9.connect(address) && client10.connect(address)
-         && client11.connect(address) && client12.connect(address) && client13.connect(address) && client14.connect(address) && client15.connect(address);
+    int result = client1.connect() && client2.connect() && client3.connect() && client4.connect() && client5.connect()
+         && client6.connect() && client7.connect() && client8.connect() && client9.connect() && client10.connect()
+         && client11.connect() && client12.connect() && client13.connect() && client14.connect() && client15.connect();
     REQUIRE(result == 0);
-
 }
 

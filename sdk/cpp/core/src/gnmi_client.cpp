@@ -50,10 +50,7 @@ gNMIClient::PathPrefixValueFlags flag;
 
 
 static bool check_capabilities_status(Status status);
-static json parse_gnmi_set_request_payload(const string & payload);
-static string check_if_path_has_value(string element);
 static string format_notification_response(string prefix_to_prepend, const std::string& path_to_prepend, const std::string& value);
-static void allocate_set_request_path(const string & operation, gnmi::SetRequest & request, vector<string> root_path, json config_payload);
 
 static std::shared_ptr<Channel> connect_to_server()
 {
@@ -120,49 +117,49 @@ static void parse_data_payload_to_paths(const string & payload_filter, vector<st
 //    parse_data_payload_to_paths(payload, path_container);
 //}
 
-static json parse_set_request_payload(const string & payload)
-{
-    auto payload_to_parse = json::parse("{" + payload + "}");
-    json config_payload = json::parse(payload_to_parse.value("/rpc/ietf-netconf:edit-config/config"_json_pointer, "Empty Config"));
-    YLOG_DEBUG("JSON Payload: {}", config_payload.dump());
-    return config_payload;
-}
+//static json parse_set_request_payload(const string & payload)
+//{
+//    auto payload_to_parse = json::parse("{" + payload + "}");
+//    json config_payload = json::parse(payload_to_parse.value("/rpc/ietf-netconf:edit-config/config"_json_pointer, "Empty Config"));
+//    YLOG_DEBUG("JSON Payload: {}", config_payload.dump());
+//    return config_payload;
+//}
 
 static json parse_gnmi_set_request_payload(const string & payload)
 {
-    auto payload_to_parse = json::parse("{" + payload + "}");
+    auto payload_to_parse = (payload.find("{") == 0) ? json::parse(payload) : json::parse("{" + payload + "}");
     YLOG_DEBUG("JSON Payload: {}", payload_to_parse.dump());
-//    json default_payload = json::parse("{\"value\":\"null\"}");
-//    json config_payload = payload_to_parse.value("/filter"_json_pointer, default_payload);
     return payload_to_parse;
 }
 
 static void allocate_set_request_path(const string & operation, gnmi::SetRequest & request, vector<string> root_path, json config_payload)
 {
-    gnmi::Path* path = new gnmi::Path;
-    gnmi::Update* update;
     gnmi::TypedValue* value = new gnmi::TypedValue;
 
-    if((operation == "delete")||(operation == "gnmi_delete"))
+    if (operation == "delete")
     {
         gnmi::Path* delete_path = request.add_delete_();
-        for(size_t i = 0; i < root_path.size(); ++i)
+        delete_path->set_origin(root_path[0]);
+        for(size_t i = 1; i < root_path.size(); ++i)
         {
-            delete_path->add_element(root_path[i]);
+            gnmi::PathElem* path_elem = delete_path->add_elem();
+            path_elem->set_name(root_path[i]);
         }
-    } else if ((operation == "create")||(operation == "gnmi_create"))
+    }
+    else if (operation == "replace" || operation == "update")
     {
-        update = request.add_update();
-        for(size_t i = 0; i < root_path.size(); ++i)
+        gnmi::Update* update = (operation == "update") ? request.add_update() : request.add_replace();
+        gnmi::Path*   update_path = new gnmi::Path;
+        update_path->set_origin(root_path[0]);
+        for(size_t i = 1; i < root_path.size(); ++i)
         {
-            path->add_element(root_path[i]);
+            gnmi::PathElem* path_elem = update_path->add_elem();
+            path_elem->set_name(root_path[i]);
         }
-        update->set_allocated_path(path);
-        for (auto& config_value : config_payload)
-        {
-            value->set_json_ietf_val(config_value.dump());
-            update->set_allocated_val(value);
-        }
+        update->set_allocated_path(update_path);
+
+        value->set_json_ietf_val(config_payload.dump());
+        update->set_allocated_val(value);
     }
 }
 
@@ -255,8 +252,13 @@ static string format_notification_response(string prefix_to_prepend, const std::
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
     else if ((flag.prefix_has_value) && (flag.path_has_value))
         reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
-    else
-        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + value + "}");
+    else {
+        string val = (value == "") ? "{\"null\"}" : value;
+        if (prefix_to_prepend.length()==0 && path_to_prepend.length()==0 && val.find("{")==0)
+            reply_to_parse.append("\"data\":" + val);
+        else
+            reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + val + "}");
+    }
     size_t pos = 0;
     while ((pos = path_to_prepend.find ("{", ++pos)) != string::npos) {
     	reply_to_parse.append("}");
@@ -264,7 +266,7 @@ static string format_notification_response(string prefix_to_prepend, const std::
     return reply_to_parse;
 }
 
-static void populate_get_request(gnmi::GetRequest & request, const std::string& payload, bool is_config)
+static void populate_get_request(gnmi::GetRequest & request, const string& payload, bool is_config)
 {
     vector<string> path_container;
     parse_data_payload_to_paths(payload, path_container);
@@ -279,11 +281,20 @@ static void populate_get_request(gnmi::GetRequest & request, const std::string& 
     request.set_encoding(gnmi::Encoding::JSON_IETF);
 }
 
-static void populate_get_request(gnmi::GetRequest & request, std::pair<std::string, std::string> & prefix,
+static void populate_get_request(gnmi::GetRequest & request, pair<string, string> & prefix,
                                     std::vector<PathElem> & path_container, bool only_config)
 {
-    request.set_allocated_prefix(get_prefix(prefix));
     auto path = request.add_path();
+
+    // Add prefix to the path
+    if (prefix.first.length() > 0) {
+        path->set_origin(prefix.first);
+        if (prefix.second.length() > 0) {
+            auto path_elem = path->add_elem();
+            path_elem->set_name(prefix.second);
+        }
+    }
+	// Populate the rest of the path
     for(size_t i = 0; i < path_container.size(); ++i)
     {
         auto path_elem = path->add_elem();
@@ -293,7 +304,6 @@ static void populate_get_request(gnmi::GetRequest & request, std::pair<std::stri
             auto key = path_elem->mutable_key();
             (*key)[k.name] = k.value;
         }
-        //YLOG_DEBUG("Key size {}", path_elem->key_size());
     }
     if(only_config)
         request.set_type(gnmi::GetRequest::CONFIG);
@@ -420,15 +430,13 @@ vector<string> gNMIClient::get_capabilities()
     return capabilities;
 }
 
-void gNMIClient::populate_set_request(gnmi::SetRequest & request, const std::string& payload, const std::string& operation)
+static void
+populate_set_request(gnmi::SetRequest & request, const std::string& payload, const std::string& operation)
 {
-    YLOG_DEBUG("Payload: {}\n Operation: {}", payload, operation);
+    YLOG_DEBUG("gNMIClient::populate_set_request: Operation: {}, Payload:\n{}", operation, payload);
+
     json config_payload = parse_gnmi_set_request_payload(payload);
-//    if ((operation == "gnmi_create")||(operation == "gnmi_delete")){
-//        config_payload = parse_gnmi_set_request_payload(payload);
-//    } else {
-//        config_payload = parse_set_request_payload(payload);
-//    }
+
     string path_elem;
     vector<string> root_path;
     istringstream payload_config_value(config_payload.dump());
@@ -437,10 +445,28 @@ void gNMIClient::populate_set_request(gnmi::SetRequest & request, const std::str
         if(path_elem.find("{")==string::npos && path_elem.find("}")==string::npos)
         {
             root_path.push_back(path_elem);
+            auto pos = payload.find(":", path_elem.length());
+            if (pos != string::npos) {
+                config_payload = parse_gnmi_set_request_payload(payload.substr(pos+1, payload.length()-pos-1));
+            }
             break;
         }
     }
-    allocate_set_request_path(operation, request, root_path, payload);
+    allocate_set_request_path(operation, request, root_path, config_payload);
+}
+
+static void
+populate_set_request(gnmi::SetRequest & request,
+		const pair<string, string> & prefix, const std::string& payload, const std::string& operation)
+{
+    YLOG_DEBUG("gNMIClient::populate_set_request: Operation: {}, Payload:\n{}", operation, payload);
+
+    json config_payload = parse_gnmi_set_request_payload(payload);
+
+    vector<string> root_path;
+    root_path.push_back(prefix.first);
+    root_path.push_back(prefix.second);
+    allocate_set_request_path(operation, request, root_path, config_payload);
 }
 
 string gNMIClient::get_prefix_from_notification(gnmi::Notification notification)
@@ -488,17 +514,17 @@ string gNMIClient::get_prefix_from_notification(gnmi::Notification notification)
     return prefix_to_prepend;
 }
 
-static string check_if_path_has_value(string element)
-{
-    if(element.find("[")==string::npos)
-    {
-        flag.path_has_value = false;
-        return element;
-    } else {
-        flag.path_has_value = true;
-        return element.substr(0,element.find("["));
-    }
-}
+//static string check_if_path_has_key_values(gnmi::PathElem & element)
+//{
+//	if (element.key_size() > 0) {
+//	    // TODO? Convert PathElem with keys to JSON string
+//        flag.path_has_value = false;
+//        return element.name();
+//    } else {
+//        flag.path_has_value = true;
+//        return element.name();
+//    }
+//}
 
 string gNMIClient::get_path_from_update(gnmi::Update update)
 {
@@ -508,15 +534,24 @@ string gNMIClient::get_path_from_update(gnmi::Update update)
     if(update.has_path())
     {
         gnmi::Path path = update.path();
-        int element_size = path.element_size();
-        if (element_size > 0) {
-            for(int l = 0; l < element_size - 1; ++l)
-            {
-                path_element_to_add = check_if_path_has_value(path.element(l));
-                path_to_prepend.append("\"" + path_element_to_add + "\":{");
+        int elem_size = path.elem_size();
+        if (elem_size > 0) {
+            string origin = path.origin();
+            if (origin.length() > 0) {
+                path_to_prepend.append("\"" + origin + ":");
             }
-            path_element_to_add = check_if_path_has_value(path.element(element_size - 1));
-            path_to_prepend.append("\"" + path_element_to_add + "\":");
+            int l;
+            for (l = 0; l < elem_size - 1; l++)
+            {
+                path_element_to_add = path.elem(l).name();	//check_if_path_has_key_values(path.elem(l));
+                if (l>0 || path_to_prepend.length()==0)
+                    path_to_prepend.append("\"");
+                path_to_prepend.append(path_element_to_add + "\":{");
+            }
+            path_element_to_add = path.elem(l).name();	//check_if_path_has_key_values(path.elem(elem_size-1));
+            if (elem_size>1 || path_to_prepend.length()==0)
+                path_to_prepend.append("\"");
+            path_to_prepend.append(path_element_to_add + "\":");
         }
     }
     else {
@@ -583,7 +618,21 @@ string gNMIClient::parse_set_response(gnmi::SetResponse* response)
     return reply_to_parse;
 }
 
-string gNMIClient::execute_wrapper(const string & payload, const std::string& operation, bool is_config)
+string
+gNMIClient::execute_set_wrapper(const pair<string, string> & prefix, const string & payload, const string& operation)
+{
+    gnmi::SetRequest request;
+    gnmi::SetResponse response;
+
+    populate_set_request(request, prefix, payload, operation);
+    YLOG_INFO("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
+    string reply = execute_set_payload(request, &response);
+    YLOG_INFO("Set Operation {} Succeeded", operation);
+    return reply;
+}
+
+string
+gNMIClient::execute_wrapper(const string & payload, const std::string& operation, bool is_config)
 {
     if (operation == "read")
     {
@@ -596,7 +645,7 @@ string gNMIClient::execute_wrapper(const string & payload, const std::string& op
         YLOG_INFO("Get Operation {} Succeeded", operation);
         return reply;
     }
-    else if ((operation == "create")||(operation == "update")||(operation == "delete")||(operation == "gnmi_create")||(operation == "gnmi_delete"))
+    else if (operation == "replace" || operation == "update" || operation == "delete")
     {   
         gnmi::SetRequest request;
         gnmi::SetResponse response;
@@ -649,8 +698,8 @@ string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* r
     return parse_set_response(response);
 }
 
-string gNMIClient::execute_get_operation(std::pair<std::string, std::string> & prefix,
-                                    std::vector<PathElem> & path_container, bool only_config)
+string
+gNMIClient::execute_get_operation(pair<string, string> & prefix, vector<PathElem> & path_container, bool only_config)
 {
     gnmi::GetRequest request;
     gnmi::GetResponse response;

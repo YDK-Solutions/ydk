@@ -71,6 +71,8 @@ public:
 
     int connect();
     std::string execute_wrapper(const std::string & payload, const std::string& operation, bool is_config);
+    std::string execute_set_wrapper(const std::pair<std::string, std::string> & prefix,
+                                    const std::string & payload, const std::string& operation);
     std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
     std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
 
@@ -98,8 +100,6 @@ private:
     std::string parse_get_response(::gnmi::GetResponse* response);
     std::string parse_set_response(::gnmi::SetResponse* response);
     std::string parse_subscribe_response(::gnmi::SubscribeResponse* response);
-
-    void populate_set_request(::gnmi::SetRequest & request, const std::string& payload, const std::string& operation);
 
     std::unique_ptr<gNMI::Stub> stub_;
     std::string username;

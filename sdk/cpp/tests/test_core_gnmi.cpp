@@ -26,32 +26,32 @@
 
 #include "catch.hpp"
 #include "config.hpp"
-#include "path_api.hpp"
+#include "gnmi_path_api.hpp"
 
-const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
-const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
+//const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
+//const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
 
-void gnmi_print_tree(ydk::path::DataNode* dn, const std::string& indent)
-{
-    ydk::path::Statement s = dn->get_schema_node().get_statement();
-    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
-        auto val = dn->get_value();
-        std::cout << indent << "{\"" << s.arg << "\":" << val << "}" << std::endl;
-    } else {
-        std::string child_indent{indent};
-        child_indent+="  ";
-        std::cout << indent << "{\"" << s.arg << "\":" << std::endl;
-        for(auto c : dn->get_children())
-	    gnmi_print_tree(c.get(), child_indent);
-        std::cout << indent << "}" << std::endl;
-    }
-}
+//void gnmi_print_tree(ydk::path::DataNode* dn, const std::string& indent)
+//{
+//    ydk::path::Statement s = dn->get_schema_node().get_statement();
+//    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
+//        auto val = dn->get_value();
+//        std::cout << indent << "{\"" << s.arg << "\":" << val << "}" << std::endl;
+//    } else {
+//        std::string child_indent{indent};
+//        child_indent+="  ";
+//        std::cout << indent << "{\"" << s.arg << "\":" << std::endl;
+//        for(auto c : dn->get_children())
+//	    gnmi_print_tree(c.get(), child_indent);
+//        std::cout << indent << "}" << std::endl;
+//    }
+//}
 
 TEST_CASE("gnmi_test_json_payload"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
@@ -108,7 +108,8 @@ TEST_CASE("gnmi_test_json_payload"  )
     std::cout<< rpc_json<<std::endl;
 }
 
-
+/* NOT READY FOR THIS TEST!!
+ *
 TEST_CASE("gnmi_bgp_create")
 {
     ydk::path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
@@ -164,12 +165,12 @@ TEST_CASE("gnmi_bgp_create")
 //    update_rpc->get_input_node().create_datanode("entity", json);
 //    (*update_rpc)(session);
 }
-
+*/
 TEST_CASE("gnmi_core_validate")
 {
     ydk::path::Repository repo{};
 
-    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     auto & runner = schema.create_datanode("ietf-netconf:validate", "");
@@ -184,37 +185,63 @@ TEST_CASE("gnmi_core_validate")
     std::cout << json << std::endl;
 }
 
-TEST_CASE("gnmi_bgp_xr_openconfig"  )
+TEST_CASE("gnmi_caps")
 {
     ydk::path::Repository repo{TEST_HOME};
-
-    ydk::path::gNMISession session{repo,"127.0.0.1", "admin", "admin", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
-    ydk::path::Codec s{};
+    std::shared_ptr<ydk::path::Rpc> cap_rpc { schema.create_rpc("ydk:gnmi-caps") };
+    auto caps = (*cap_rpc)(session);
 
-    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
-    
-    //call create
+    ydk::path::Codec codec{};
+    auto json = codec.encode(*caps, ydk::EncodingFormat::JSON, true);
+    //std::cout << "Server capabilities:" << std::endl << json << std::endl;
+}
+
+TEST_CASE("gnmi_bgp_xr_openconfig")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    // Configure BGP
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp");
     auto & as = bgp.create_datanode("global/config/as", "65172");
-    //bgp/neighbors/neighbor
-    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']");
     auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
     auto & peer_as = neighbor.create_datanode("config/peer-as","65172");    
 
-    std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-    REQUIRE( !json.empty() );
-    create_rpc->get_input_node().create_datanode("entity", json);
-    auto res = (*create_rpc)(session);
+    // Configure interface
+    auto & ifc = schema.create_datanode("openconfig-interfaces:interfaces");
+    auto & lo10_config = ifc.create_datanode("interface[name='Loopback10']");
+
+    // Add data-nodes to RPC
+    ydk::path::Codec s{};
+    auto bgp_json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
+    auto int_json = s.encode(ifc, ydk::EncodingFormat::JSON, false);
+
+    std::shared_ptr<ydk::path::Rpc> set_rpc { schema.create_rpc("ydk:gnmi-set") };
+    set_rpc->get_input_node().create_datanode("replace[alias='bgp']/entity", bgp_json);
+    set_rpc->get_input_node().create_datanode("replace[alias='int']/entity", int_json);
+
+    auto res = (*set_rpc)(session);
 
 	//call read
-    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:read") };
     auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
-    json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
-    REQUIRE( !json.empty() );
-    read_rpc->get_input_node().create_datanode("filter", json);
-    read_rpc->get_input_node().create_datanode("only-config");
+    auto json_bgp = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
+    REQUIRE( !json_bgp.empty() );
+
+    auto & int_read = schema.create_datanode("openconfig-interfaces:interfaces", "");
+    auto json_int = s.encode(int_read, ydk::EncodingFormat::JSON, false);
+    REQUIRE( !json_int.empty() );
+
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:gnmi-get") };
+    read_rpc->get_input_node().create_datanode("type", "CONFIG");
+
+    read_rpc->get_input_node().create_datanode("request[alias='bgp']/entity", json_bgp);
+    read_rpc->get_input_node().create_datanode("request[alias='int']/entity", json_int);
+
     auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);

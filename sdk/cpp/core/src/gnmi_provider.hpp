@@ -22,6 +22,7 @@
 
 #include "gnmi_client.hpp"
 #include "path_api.hpp"
+#include "gnmi_path_api.hpp"
 #include "service_provider.hpp"
 
 namespace ydk 

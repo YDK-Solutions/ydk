@@ -38,14 +38,8 @@
 #include "types.hpp"
 #include "validation_service.hpp"
 
-namespace grpc {
-class ChannelCredentials;
-class ChannelArguments;
-}
-
 namespace ydk {
 
-class gNMIClient;
 class NetconfClient;
 class RestconfClient;
 class CapabilitiesParser;
@@ -310,6 +304,7 @@ public:
     /// @throws YInvalidArgumentError if the arguments are invalid.
     ///
     std::shared_ptr<DataNode> decode(RootSchemaNode & root_schema, const std::string& buffer, EncodingFormat format);
+    std::shared_ptr<DataNode> decode_json_output(RootSchemaNode & root_schema, const std::vector<std::string> & buffer_list);
     std::shared_ptr<DataNode> decode_rpc_output(RootSchemaNode & root_schema, const std::string& buffer, const std:: string & rpc_path, EncodingFormat format);
 };
 
@@ -1157,56 +1152,6 @@ private:
 };
 
 
-class gNMISession : public Session {
-public:
-    typedef struct SecureChannelArguments
-    {
-        std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-        std::shared_ptr<grpc::ChannelArguments> args;
-    } SecureChannelArguments;
-
-    gNMISession(Repository & repo,
-                   const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
-
-    gNMISession(const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
-
-    gNMISession(Repository & repo,
-                   const std::string& address,
-                   int port = 57400);
-
-    ~gNMISession();
-
-    RootSchemaNode& get_root_schema() const;
-    std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
-    std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
-    std::vector<std::string> get_capabilities() const;
-    EncodingFormat get_encoding() const;
-    std::string execute_payload(const std::string & payload, const std::string & operation, bool is_config) const;
-    std::string execute_set_payload(const std::pair<std::string, std::string> prefix_pair,
-                                    const std::string & payload, const std::string & operation) const;
-    std::shared_ptr<path::DataNode> handle_read_reply(std::string reply, path::RootSchemaNode & root_schema) const;
-    gNMIClient & get_client() const;
-
-private:
-    void initialize(Repository& repo, const std::string& address, const std::string& username, const std::string& password, int port);
-    std::shared_ptr<path::DataNode> handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const;
-    std::shared_ptr<path::DataNode> handle_read(path::Rpc& rpc, const std::string & operation) const;
-    void print_root_paths(ydk::path::RootSchemaNode& rsn) const;
-    void print_paths(ydk::path::SchemaNode& sn) const;
-
-private:
-    std::unique_ptr<gNMIClient> client;
-    std::shared_ptr<RootSchemaNode> root_schema;
-    std::vector<std::string> server_capabilities;
-    bool is_secure;
-};
-
 ///
 ///
 /// @brief An instance of the YANG schema rpc node
@@ -1246,12 +1191,10 @@ public:
     ///
     /// @return pointer to the SchemaNode associated with this rpc.
     virtual SchemaNode& get_schema_node() const = 0;
-
-
 };
 
-}
+}	// namespace path
 
-}
+}	// namespace ydk
 
 #endif /* YDK_CORE_HPP */

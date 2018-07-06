@@ -48,94 +48,79 @@ using grpc::Status;
 
 using json = nlohmann::json;
 
-std::string cap_array[] =
-    {"ietf-aug-base-1?module=ietf-aug-base-1&revision=2016-07-01",
-     "ietf-aug-base-2?module=ietf-aug-base-2&revision=2016-07-01",
-     "main?module=main&revision=2015-11-17",
-     "main-aug1?module=main-aug1&revision=2015-11-17",
-     "oc-pattern?module=oc-pattern&revision=2015-11-17",
-     "yaug-five?module=ydktest-aug-ietf-5&revision=2017-07-26",
-     "yaug-four?module=ydktest-aug-ietf-4&revision=2016-06-27",
-     "yaug-one?module=ydktest-aug-ietf-1&revision=2016-06-17",
-     "yaug-two?module=ydktest-aug-ietf-2&revision=2016-06-22",
-     "ydk-filter?module=ydktest-filterread&revision=2015-11-17",
-     "ydktest-sanity?module=ydktest-sanity&revision=2015-11-17&features=ipv6-privacy-autoconf,ipv4-non-contiguous-netmasks",
-     "ydktest-sanity-augm?module=ydktest-sanity-augm&revision=2015-11-17",
-     "ydktest-sanity-types?module=ydktest-sanity-types&revision=2016-04-11",
-     "ydktest-types?module=ydktest-types&revision=2016-05-23&features=crypto",
-     "bgp?module=openconfig-bgp&revision=2016-06-21",
-     "bgp-policy?module=openconfig-bgp-policy&revision=2016-06-21",
-     "bgp-types?module=openconfig-bgp-types&revision=2016-06-21",
-     "interfaces?module=openconfig-interfaces&revision=2016-05-26",
-     "interfaces/ethernet?module=openconfig-if-ethernet&revision=2016-05-26",
-     "openconfig-ext?module=openconfig-extensions&revision=2015-10-09",
-     "openconfig-types?module=openconfig-types&revision=2016-05-31",
-     "platform?module=openconfig-platform&revision=2016-06-06&deviations=cisco-xr-openconfig-platform-deviations",
-     "platform-types?module=openconfig-platform-types&revision=2016-06-06",
-     "platform/transceiver?module=openconfig-platform-transceiver&revision=2016-05-24",
-     "policy-types?module=openconfig-policy-types&revision=2016-05-12",
-     "routing-policy?module=openconfig-routing-policy&revision=2016-05-12",
-     "terminal-device?module=openconfig-terminal-device&revision=2016-06-17",
-     "transport-types?module=openconfig-transport-types&revision=2016-06-17"
+static std::string cap_array[] =
+    {"IETF NETMOD Working Group?module=ietf-aug-base-1&revision=2016-07-01",
+     "IETF NETMOD Working Group?module=ietf-aug-base-2&revision=2016-07-01",
+     "YDK?module=oc-pattern&revision=2015-11-17",
+     "YDK?module=main&revision=2015-11-17",
+     "YDK?module=main-aug1&revision=2015-11-17",
+     "YDK?module=ydktest-aug-ietf-5&revision=2017-07-26",
+     "YDK?module=ydktest-aug-ietf-4&revision=2016-06-27",
+     "YDK?module=ydktest-aug-ietf-1&revision=2016-06-17",
+     "YDK?module=ydktest-aug-ietf-2&revision=2016-06-22",
+     "YDK?module=ydktest-filterread&revision=2015-11-17",
+     "YDK?module=ydktest-sanity&revision=2015-11-17",		//&features=ipv6-privacy-autoconf,ipv4-non-contiguous-netmasks",
+     "YDK?module=ydktest-sanity-augm&revision=2015-11-17",
+     "YDK?module=ydktest-sanity-types&revision=2016-04-11",
+     "YDK?module=ydktest-types&revision=2016-05-23",		//&features=crypto",
+     "OpenConfig working group?module=openconfig-bgp&revision=2016-06-21",
+     "OpenConfig working group?module=openconfig-bgp-policy&revision=2016-06-21",
+     "OpenConfig working group?module=openconfig-bgp-types&revision=2016-06-21",
+     "OpenConfig working group?module=openconfig-interfaces&revision=2016-05-26",
+     "OpenConfig working group?module=openconfig-if-ethernet&revision=2016-05-26",
+     "OpenConfig working group?module=openconfig-extensions&revision=2015-10-09",
+     "OpenConfig working group?module=openconfig-types&revision=2016-05-31",
+     "OpenConfig working group?module=openconfig-platform&revision=2016-06-06",		//&deviations=cisco-xr-openconfig-platform-deviations",
+     "OpenConfig working group?module=openconfig-platform-types&revision=2016-06-06",
+     "OpenConfig working group?module=openconfig-platform-transceiver&revision=2016-05-24",
+     "OpenConfig working group?module=openconfig-policy-types&revision=2016-05-12",
+     "OpenConfig working group?module=openconfig-routing-policy&revision=2016-05-12",
+     "OpenConfig working group?module=openconfig-terminal-device&revision=2016-06-17",
+     "OpenConfig working group?module=openconfig-transport-types&revision=2016-06-17"
     };
+
+static std::string bgp_payload =
+		"{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
+static std::string int_payload =
+		"{\"interface\":[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]}";
+static std::string null_payload =
+		"{\"value\":\"null\"}";
 
 // Logic and data behind the server's behavior.
 class gNMIImpl final : public gNMI::Service 
 {    
-    int set_counter = 0;
-    int delete_counter = 0;
     bool is_secure = true;
+    bool int_set = false;
+    bool bgp_set = false;
 
     Status Capabilities(ServerContext* context, const CapabilityRequest* request, CapabilityResponse* response) override 
     {
-        response->set_gnmi_version("0.2.2");
-
-        ::gnmi::ModelData* modeldata;
-        ::gnmi::Encoding encoding;
-
-        std::string cap;
-        std::vector<std::string> capabilities;
-        std::string org_name{};
-        std::string module_name{};
-        std::string revision_number{};
-        std::string features{};
         std::string module_delim = "?module=";
         std::string rev_delim = "&revision=";
 
         for (auto cap : cap_array)
         {
-            capabilities.push_back(cap);
-            modeldata = response->add_supported_models();
+            ::gnmi::ModelData* modeldata = response->add_supported_models();
 
             auto module_pos = cap.find(module_delim);
-            if (module_pos != std::string::npos) {
-                org_name = cap.substr(0, module_pos);
-                cap.erase(0, module_pos + module_delim.length());
-                modeldata->set_organization(org_name);
-            }
             auto rev_pos = cap.find(rev_delim);
-            if (rev_pos != std::string::npos) {
-                module_name = cap.substr(0, rev_pos);
+            if (module_pos != std::string::npos && rev_pos != std::string::npos) {
+                std::string org_name = cap.substr(0, module_pos);
+                modeldata->set_organization(org_name);
+
+                std::string module_name = cap.substr(module_pos+module_delim.length(), rev_pos-module_pos-module_delim.length());
                 modeldata->set_name(module_name);
-                revision_number = cap.substr(rev_pos + rev_delim.length());
+
+                std::string revision_number = cap.substr(rev_pos + rev_delim.length());
                 modeldata->set_version(revision_number);
             }
-
-            if(!(modeldata->organization()).empty())
-            {
-                std::cout << "Prefix: " << modeldata->organization() << std::endl;
-            }
-            if(!module_name.empty()) 
-            { 
-                std::cout << "Module: " << modeldata->name() << std::endl;
-            }
-            if(!revision_number.empty()) 
-            {
-                std::cout << "Revision: " << modeldata->version() << std::endl;
-            }
-            std::cout << std::endl;
         }
+
         response->add_supported_encodings(::gnmi::Encoding::JSON);
+        response->add_supported_encodings(::gnmi::Encoding::JSON_IETF);
+
+        response->set_gnmi_version("0.4.0");
+
         return Status::OK;
     }
 
@@ -152,47 +137,30 @@ class gNMIImpl final : public gNMI::Service
 
     Status Get(ServerContext* context, const GetRequest* request, GetResponse* response) override 
     {
-        std::string response_payload;
-        ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
-        std::string path_element;
-        std::vector<std::string> path_container;
-        int element_size;
-        bool is_bgp = false;
-        bool is_int = false;
-        json json_payload;
-
         std::cout << "===========Get Request Received===========" << std::endl;
         std::cout << request->DebugString() << std::endl;
 
-        auto notification = response->add_notification();
-        std::time_t timestamp_val = std::time(nullptr);
-        notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
-        std::string origin = request->prefix().origin();
-        if (origin.length() > 0) {
-            notification->mutable_prefix()->CopyFrom(request->prefix());
-            if (origin == "openconfig-bgp") {
-                is_bgp = true;
-            }
-            else if (origin == "openconfig-interfaces") {
-                is_int = true;
-            }
-        }
         for(int j = 0; j < request->path_size(); ++j) 
         {
+            std::string response_payload{};
             ::gnmi::Path* response_path = new ::gnmi::Path;
+            auto notification = response->add_notification();
+            std::time_t timestamp_val = std::time(nullptr);
+            notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
 
             auto req_path = request->path(j);
-            origin = req_path.origin();
+            std::string origin = req_path.origin();
             if (origin.length() > 0) {
                 response_path->set_origin(origin);
-                if (origin == "openconfig-bgp") {
-                    is_bgp = true;
+                if (origin == "openconfig-bgp" && bgp_set) {
+                    response_payload = bgp_payload;
                 }
-                else if (origin == "openconfig-interfaces") {
-                    is_int = true;
+                else if (origin == "openconfig-interfaces" && int_set) {
+                    response_payload = int_payload;
                 }
+                else response_payload = null_payload;
             }
-            for(int i = 0; i < req_path.elem_size(); ++i)
+            for (int i = 0; i < req_path.elem_size(); ++i)
             {
                 gnmi::PathElem* path_elem = response_path->add_elem();
                 path_elem->CopyFrom(req_path.elem(i));
@@ -200,24 +168,13 @@ class gNMIImpl final : public gNMI::Service
             auto update = notification->add_update();
             update->set_allocated_path(response_path);
 
-            if (set_counter == 1 && delete_counter == 0 && (is_bgp || is_int)) {
-                std::cout << "DEBUG: Update Value Set by Create Request\n";
-                if (is_bgp)
-                    response_payload = "{\"global\": {\"config\": {\"as\":65172} }, \"neighbors\": {\"neighbor\": [{\"neighbor-address\":\"172.16.255.2\", \"config\": {\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
-                else if (is_int)
-                    response_payload = "{\"interface\":[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]}";
-                json_payload = json::parse(response_payload);
-                get_value(path_container, json_payload);
-                value->set_json_ietf_val(response_payload);
-                update->set_allocated_val(value);
-            }
-            else if (delete_counter == 1) {
-                std::cout << "DEBUG: Update Value Deleted by Delete Request\n";
-                response_payload = "{\"value\":\"null\"}";
-            }
-            else {
-                response_payload = "{\"value\":\"null\"}";
-            }
+            ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+
+            std::vector<std::string> path_container;
+            json json_payload = json::parse(response_payload);
+            get_value(path_container, json_payload);
+            value->set_json_ietf_val(response_payload);
+            update->set_allocated_val(value);
         }
 
         std::cout << "===========Get Response Sent===========" << std::endl;
@@ -227,96 +184,91 @@ class gNMIImpl final : public gNMI::Service
 
     Status Set(ServerContext* context, const SetRequest* request, SetResponse* response) override 
     {
-        ::grpc::Status status;
-        ::gnmi::Update update;
-        ::gnmi::UpdateResult* update_response;
-        ::gnmi::Path* path = new ::gnmi::Path;
-        ::gnmi::UpdateResult_Operation operation;
-        
-        update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_DELETE);
         std::cout << "===========Set Request Received===========" << std::endl;
         std::cout << request->DebugString() << std::endl;
 
-        update_response = response->add_response();
         std::time_t timestamp_val = std::time(nullptr);
-        update_response->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
+        response->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
 
-        if (request->delete__size() >= 1)
+        for (int i = 0; i < request->delete__size(); ++i)
         {
-            delete_counter = 1;
-            for(int i = 0; i < request->delete__size(); ++i)
-            {
-                ::gnmi::Path* response_path = new ::gnmi::Path;
+            ::gnmi::UpdateResult* update_response = response->add_response();
 
-                ::gnmi::Path delete_path = request->delete_(i);
-                std::string origin = delete_path.origin();
-                if (origin.length() > 0) {
-                    response_path->set_origin(origin);
+            ::gnmi::Path* response_path = new ::gnmi::Path();
+            ::gnmi::Path delete_path = request->delete_(i);
+            std::string origin = delete_path.origin();
+            if (origin.length() > 0) {
+                response_path->set_origin(origin);
+                if (origin == "openconfig-bgp" && bgp_set) {
+                    bgp_set = false;
                 }
-                for(int j = 0; j < delete_path.elem_size(); ++j)
-                {
-                    gnmi::PathElem* path_elem = response_path->add_elem();
-                    path_elem->CopyFrom(delete_path.elem(j));
+                else if (origin == "openconfig-interfaces" && int_set) {
+                    int_set = false;
                 }
-                update_response->set_allocated_path(response_path);
             }
+            for(int j = 0; j < delete_path.elem_size(); ++j)
+            {
+                gnmi::PathElem* path_elem = response_path->add_elem();
+                path_elem->CopyFrom(delete_path.elem(j));
+            }
+            update_response->set_allocated_path(response_path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_DELETE);
-            std::cout << "===========Set Response Sent===========" << std::endl;
-            std::cout << response->DebugString() << std::endl;
-            return Status::OK;
         } 
-        else if (request->replace_size() > 0) {
-            set_counter = 1;
-            delete_counter = 0;
-            for(int i = 0; i < request->replace_size(); ++i)
-            {
-                ::gnmi::Path* response_path = new ::gnmi::Path;
 
-                auto replace_path = request->replace(i).path();
-                std::string origin = replace_path.origin();
-                if (origin.length() > 0) {
-                    response_path->set_origin(origin);
+        for (int i = 0; i < request->replace_size(); ++i)
+        {
+            ::gnmi::UpdateResult* update_response = response->add_response();
+
+            ::gnmi::Path* response_path = new ::gnmi::Path;
+            ::gnmi::Update request_update= request->replace(i);
+            auto replace_path = request_update.path();
+            std::string origin = replace_path.origin();
+            if (origin.length() > 0) {
+                response_path->set_origin(origin);
+                if (origin == "openconfig-bgp") {
+                    bgp_set = true;
                 }
-                for(int j = 0; j < replace_path.elem_size(); ++j)
-                {
-                    gnmi::PathElem* path_elem = response_path->add_elem();
-                    path_elem->CopyFrom(replace_path.elem(j));
+                else if (origin == "openconfig-interfaces") {
+                    int_set = true;
                 }
-                update_response->set_allocated_path(response_path);
             }
+            for(int j = 0; j < replace_path.elem_size(); ++j)
+            {
+                gnmi::PathElem* path_elem = response_path->add_elem();
+                path_elem->CopyFrom(replace_path.elem(j));
+            }
+            update_response->set_allocated_path(response_path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
-            std::cout << "===========Set Response Sent===========" << std::endl;
-            std::cout << response->DebugString() << std::endl;
-            return Status::OK;
-        } 
-        else if (request->update_size() >= 1) {
-            set_counter = 1;
-            delete_counter = 0;
-            for(int i = 0; i < request->update_size(); ++i)
-            {
-                ::gnmi::Path* response_path = new ::gnmi::Path;
-
-                auto update_path = request->update(i).path();
-                std::string origin = update_path.origin();
-                if (origin.length() > 0) {
-                    response_path->set_origin(origin);
-                }
-                for(int j = 0; j < update_path.elem_size(); ++j)
-                {
-                    gnmi::PathElem* path_elem = response_path->add_elem();
-                    path_elem->CopyFrom(update_path.elem(j));
-                }
-                update_response->set_allocated_path(response_path);
-            }
-            update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_UPDATE);
-            std::cout << "===========Set Response Sent===========" << std::endl;
-            std::cout << response->DebugString() << std::endl;
-            return Status::OK;
-        } else {
-            update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_INVALID); 
-            std::cout << status.error_message() << std::endl;
-            return Status::CANCELLED;
         }
+
+        for (int i = 0; i < request->update_size(); ++i)
+        {
+            ::gnmi::UpdateResult* update_response = response->add_response();
+
+            ::gnmi::Path* response_path = new ::gnmi::Path;
+            ::gnmi::Update request_update= request->replace(i);
+            auto replace_path = request_update.path();
+            std::string origin = replace_path.origin();
+            if (origin.length() > 0) {
+                response_path->set_origin(origin);
+                if (origin == "openconfig-bgp") {
+                    bgp_set = true;
+                }
+                else if (origin == "openconfig-interfaces") {
+                    int_set = true;
+                }
+            }
+            for(int j = 0; j < replace_path.elem_size(); ++j)
+            {
+                gnmi::PathElem* path_elem = response_path->add_elem();
+                path_elem->CopyFrom(replace_path.elem(j));
+            }
+            update_response->set_allocated_path(response_path);
+            update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
+        }
+        std::cout << "===========Set Response Sent===========" << std::endl;
+        std::cout << response->DebugString() << std::endl;
+        return Status::OK;
     } 
 };
 

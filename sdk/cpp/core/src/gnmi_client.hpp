@@ -56,6 +56,26 @@ namespace ydk
 
 class Entity;
 
+struct gNMIRequest {
+	std::string alias;
+	std::string payload;
+	gnmi::Path* path;
+	std::string type;
+	std::string operation;
+};
+
+struct gNMIModelData {
+	std::string name;
+	std::string organization;
+	std::string version;
+};
+
+struct gNMICapabilityResponse {
+    std::string gnmi_version;
+    std::vector<gNMIModelData>  supported_models;
+    std::vector<std::string> supported_encodings;
+};
+
 class gNMIClient
 {
 public:
@@ -70,14 +90,11 @@ public:
     ~gNMIClient();
 
     int connect();
-    std::string execute_wrapper(const std::string & payload, const std::string& operation, bool is_config);
-    std::string execute_set_wrapper(const std::pair<std::string, std::string> & prefix,
-                                    const std::string & payload, const std::string& operation);
-    std::string execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
-    std::string execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
 
-    std::string execute_get_operation(std::pair<std::string, std::string> & prefix,
-                                    std::vector<PathElem> & path_container, bool only_config);
+    std::vector<std::string> execute_get_operation(const std::vector<gNMIRequest> get_request_list, const std::string& operation);
+
+    bool execute_set_operation(const std::vector<gNMIRequest> get_request_list);
+
     void execute_subscribe_operation(std::pair<std::string, std::string> & prefix,
                                     std::vector<PathElem> & path_container,
                                     const std::string & list_mode,
@@ -85,22 +102,19 @@ public:
                                     int sample_interval,
                                     const std::string & mode,
                                     std::function<void(const std::string &)> func);
+
     std::vector<std::string> get_capabilities();
+    gNMICapabilityResponse execute_get_capabilities();
 
 private:
-    std::string get_path_from_update(::gnmi::Update update);
-    std::string get_prefix_from_notification(::gnmi::Notification notification);
-    std::string get_value_from_update(::gnmi::Update update);
 
-    bool has_gnmi_version(::gnmi::CapabilityResponse* response);
     void parse_capabilities_modeldata(::gnmi::CapabilityResponse* response);
-    void parse_capabilities_encodings(::gnmi::CapabilityResponse* response);
     void parse_capabilities(::gnmi::CapabilityResponse* response);
 
-    std::string parse_get_response(::gnmi::GetResponse* response);
-    std::string parse_set_response(::gnmi::SetResponse* response);
-    std::string parse_subscribe_response(::gnmi::SubscribeResponse* response);
+    std::vector<std::string> execute_get_payload(const ::gnmi::GetRequest& request, ::gnmi::GetResponse* response);
+    bool execute_set_payload(const ::gnmi::SetRequest& request, ::gnmi::SetResponse* response);
 
+    std::vector<std::string> capabilities;
     std::unique_ptr<gNMI::Stub> stub_;
     std::string username;
     std::string password;

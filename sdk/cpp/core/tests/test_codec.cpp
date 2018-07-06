@@ -30,6 +30,8 @@
 #include "mock_data.hpp"
 #include <iostream>
 
+#include "../src/path/path_private.hpp"
+
 using namespace ydk;
 using namespace std;
 
@@ -119,6 +121,48 @@ TEST_CASE( "test_submodule_feature" )
     auto xml_rt = s.encode(*real_dn, ydk::EncodingFormat::XML, true);
     REQUIRE(xml == xml_rt);
 }
+
+TEST_CASE( "decode_multiple_json" )
+{
+    std::string searchdir{TEST_HOME};
+    mock::MockSession sp{searchdir, test_openconfig};
+    auto & schema = sp.get_root_schema();
+
+    std::string json_int_payload = R"({
+  "openconfig-interfaces:interfaces": {
+    "interface": [
+      {
+        "name": "Loopback10",
+        "config": {
+          "name": "Loopback10"
+        }
+      }
+    ]
+  }
+}
+)";
+    std::string json_bgp_payload = R"({
+  "openconfig-bgp:bgp": {
+    "global": {
+      "config": {
+        "as": 65172
+      }
+    }
+  }
+}
+)";
+    std::vector<std::string> payload_list = {json_int_payload, json_bgp_payload};
+
+    ydk::path::Codec s{};
+
+    auto rdn = s.decode_json_output(schema, payload_list);
+    REQUIRE(rdn != nullptr);
+
+    auto dn = dynamic_cast<ydk::path::DataNode*> (rdn.get());
+    auto json_str = s.encode(*dn, EncodingFormat::JSON, true);
+    REQUIRE(json_str == json_int_payload + json_bgp_payload);
+}
+
 /*
 TEST_CASE( "test_codec_ok" )
 {

@@ -27,8 +27,10 @@
 #include "../gnmi_provider.hpp"
 #include "../ietf_parser.hpp"
 #include "../logger.hpp"
-#include "../path_api.hpp"
+#include "../gnmi_path_api.hpp"
 #include "../ydk_yang.hpp"
+#include "path_private.hpp"
+#include "gnmi_util.hpp"
 
 using grpc::Channel;
 using grpc::ChannelArguments;
@@ -44,15 +46,6 @@ namespace path
 {
 static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_schema, string operation);
 
-//static shared_ptr<path::Rpc> create_rpc_instance(path::RootSchemaNode & root_schema, string rpc_name);
-//static path::DataNode& create_rpc_input(path::Rpc & gnmi_rpc);
-//static string get_read_rpc_name(bool config);
-
-static shared_ptr<path::DataNode> handle_edit_reply(const string & reply);
-
-static bool is_config(path::Rpc & rpc);
-static string get_filter_payload(path::Rpc & ydk_rpc);
-static string get_config_payload(path::RootSchemaNode & root_schema, path::Rpc & rpc);
 static gNMISession::SecureChannelArguments get_channel_credentials();
 
 const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
@@ -166,41 +159,48 @@ path::RootSchemaNode& gNMISession::get_root_schema() const
     return *root_schema;
 }
 
-shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
+void gNMISession::invoke(path::Rpc& rpc, std::function<void(const vector<string> &)> func) const
 {
-    path::SchemaNode* create_schema = get_schema_for_operation(*root_schema, "ydk:create");
-    path::SchemaNode* read_schema = get_schema_for_operation(*root_schema, "ydk:read");
-    path::SchemaNode* update_schema = get_schema_for_operation(*root_schema, "ydk:update");
-    path::SchemaNode* delete_schema = get_schema_for_operation(*root_schema, "ydk:delete");
+    path::SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
     path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
-    shared_ptr<path::DataNode> datanode = nullptr;
-
-    if(rpc_schema == create_schema || rpc_schema == delete_schema || rpc_schema == update_schema)
-    {
-        if (rpc_schema == create_schema)
-        {
-            return handle_edit(rpc, "create");
-        }
-        else if (rpc_schema == delete_schema)
-        {
-            return handle_edit(rpc, "delete");
-        }
-        else
-        {
-            return handle_edit(rpc, "update");
-        }
+    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
+    if(rpc_schema == gnmi_sub) {
+        // TODO
+        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
     }
-    else if(rpc_schema == read_schema)
-    {
-        return handle_read(rpc, "read");
-    }
-    else
-    {
-        YLOG_ERROR("gNMISession::invoke: RPC is not supported");
+    else {
+        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
         throw(YOperationNotSupportedError{"RPC is not supported!"});
     }
-    return datanode;
+}
+
+shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
+{
+    path::SchemaNode* gnmi_get = get_schema_for_operation(*root_schema, "ydk:gnmi-get");
+    path::SchemaNode* gnmi_set = get_schema_for_operation(*root_schema, "ydk:gnmi-set");
+    path::SchemaNode* gnmi_cap = get_schema_for_operation(*root_schema, "ydk:gnmi-caps");
+
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    if(rpc_schema == gnmi_set)
+    {
+        handle_set(rpc);
+        return nullptr;
+    }
+    else if(rpc_schema == gnmi_get)
+    {
+        return handle_get(rpc);
+    }
+    else if(rpc_schema == gnmi_cap)
+    {
+        return handle_get_capabilities();
+    }
+    else {
+        auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
+        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
+        throw(YOperationNotSupportedError{"RPC is not supported!"});
+    }
+    return nullptr;
 }
 
 shared_ptr<path::DataNode> gNMISession::invoke(path::DataNode& datanode) const
@@ -209,156 +209,181 @@ shared_ptr<path::DataNode> gNMISession::invoke(path::DataNode& datanode) const
     return nullptr;
 }
 
-shared_ptr<path::DataNode> gNMISession::handle_edit(path::Rpc& ydk_rpc, const std::string & operation) const
+static void populate_path_from_payload(gnmi::Path* path, const string & payload, RootSchemaNode & root_schema)
 {
-    string config_payload = get_config_payload(*root_schema, ydk_rpc);
-
-    return handle_edit_reply(execute_payload(config_payload, operation, false));
+    Codec s{};
+    auto root_dn = s.decode(root_schema, payload, EncodingFormat::JSON);
+    if(!root_dn || root_dn->get_children().empty()) {
+        YLOG_ERROR( "Codec service failed to decode datanode from JSON payload");
+        throw(YError{"Problems deserializing JSON payload"});
+    }
+    auto child = (root_dn->get_children())[0].get();
+    parse_datanode_to_path(child, path);
 }
 
-static shared_ptr<path::DataNode> handle_edit_reply(const string & reply)
+static gNMIRequest build_set_request(path::RootSchemaNode & root_schema, DataNode* request, const string & operation)
 {
-    if(reply.find("Success") == string::npos)
-    {
-        YLOG_ERROR("No OK in reply received from device");
-        throw(YServiceProviderError{reply});
+    gNMIRequest one_request{};
+    one_request.type = "set";
+    one_request.operation = operation;
+    auto entity = request->find("entity");
+    if (entity.empty()) {
+        YLOG_ERROR("Failed to get 'entity' node from set RPC");
+        throw(YInvalidArgumentError{"Failed to get 'entity' node from set RPC"});
     }
+    path::DataNode* entity_node = entity[0].get();
+    one_request.payload = entity_node->get_value();
 
-    // No error no output for edit-config
-    return nullptr;
+    one_request.path = new gnmi::Path();
+    if (operation == "delete") {
+        populate_path_from_payload(one_request.path, one_request.payload, root_schema);
+    }
+    else {
+        auto pos = one_request.payload.find("{", 4);
+        if (pos != string::npos) {
+            string prefix = one_request.payload.substr(2, pos-4);
+            parse_prefix_to_path(prefix, one_request.path);
+            one_request.payload = one_request.payload.substr(pos, one_request.payload.length()-pos-1);
+        }
+    }
+    return one_request;
 }
 
-
-shared_ptr<path::DataNode> gNMISession::handle_read(path::Rpc& ydk_rpc, const std::string & operation) const
+bool gNMISession::handle_set(path::Rpc& ydk_rpc) const
 {
-    bool config = is_config(ydk_rpc);
+	vector<gNMIRequest> setRequest{};
 
-    string filter_value = get_filter_payload(ydk_rpc);
+    //path::SchemaNode* rpc_schema = &(ydk_rpc.get_schema_node());
+    //auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
 
-    return handle_read_reply(execute_payload(filter_value, operation, config), *root_schema);
+    auto delete_list = ydk_rpc.get_input_node().find("delete");
+    if (!delete_list.empty()) {
+        for (auto request : delete_list) {
+            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "delete");
+            setRequest.push_back(one_request);
+        }
+    }
+
+    auto replace_list = ydk_rpc.get_input_node().find("replace");
+    if (!replace_list.empty()) {
+        for (auto request : replace_list) {
+            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "replace");
+            setRequest.push_back(one_request);
+        }
+    }
+
+    auto update_list = ydk_rpc.get_input_node().find("update");
+    if (!update_list.empty()) {
+        for (auto request : update_list) {
+            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "update");
+            setRequest.push_back(one_request);
+        }
+    }
+
+    return client->execute_set_operation(setRequest);
 }
 
-string gNMISession::execute_set_payload(const pair<string, string> prefix_pair,
-		const string & payload, const string & operation) const
+shared_ptr<path::DataNode>
+gNMISession::handle_get(path::Rpc& rpc) const
 {
-    string reply = client->execute_set_wrapper(prefix_pair, payload, operation);
-    YLOG_DEBUG("=============Reply payload received from device=============");
-    YLOG_DEBUG("{}", reply.c_str());
-    YLOG_DEBUG("\n");
-    return reply;
+	vector<gNMIRequest> getRequest{};
+
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
+    auto request_list = rpc.get_input_node().find("request");
+    if (request_list.empty()) {
+        YLOG_ERROR("Failed to get 'request' node from '{}' RPC", rpc_name);
+        throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
+    }
+
+    string operation = "CONFIG";
+    auto type = rpc.get_input_node().find("type");
+    if (!type.empty()) {
+        path::DataNode* type_node = type[0].get();
+        operation = type_node->get_value();
+    }
+
+    for (auto request : request_list) {
+        gNMIRequest one_request{};
+        one_request.type = "get";
+        one_request.operation = operation;
+
+        auto alias = request.get()->find("alias");
+        if (!alias.empty()) {
+            path::DataNode* alias_node = alias[0].get();
+            one_request.alias = alias_node->get_value();
+        }
+
+        auto entity = request.get()->find("entity");
+        if (entity.empty()) {
+            YLOG_ERROR("Failed to get 'entity' node from '{}' RPC", rpc_name);
+            throw(YInvalidArgumentError{"Failed to get 'entity' node from RPC"});
+        }
+        path::DataNode* entity_node = entity[0].get();
+        one_request.payload = entity_node->get_value();
+
+        one_request.path = new gnmi::Path();
+        populate_path_from_payload(one_request.path, one_request.payload, get_root_schema());
+
+        getRequest.push_back(one_request);
+    }
+
+    vector<string> reply = client->execute_get_operation(getRequest, operation);
+    YLOG_DEBUG("============= Reply payload received from device =============");
+    for (auto response : reply) {
+        YLOG_DEBUG("\n{}", response);
+    }
+
+    return handle_get_reply(reply);
 }
 
-string gNMISession::execute_payload(const string & payload, const string & operation, bool is_config) const
+shared_ptr<path::DataNode>
+gNMISession::handle_get_reply(vector<string> reply_val) const
 {
-    string reply = client->execute_wrapper(payload, operation, is_config);
-    YLOG_DEBUG("=============Reply payload received from device=============");
-    YLOG_DEBUG("{}", reply.c_str());
-    YLOG_DEBUG("\n");
-    return reply;
+    path::Codec codec{};
+
+    shared_ptr<path::DataNode> root_dn = codec.decode_json_output(get_root_schema(), reply_val);
+    if (!root_dn) {
+        YLOG_ERROR( "Codec service failed to decode JSON values from GetResponse");
+        throw(YError{"Problems deserializing JSON output"});
+    }
+    return root_dn;
 }
 
-shared_ptr<path::DataNode> gNMISession::handle_read_reply(string reply, path::RootSchemaNode & root_schema) const
+shared_ptr<path::DataNode>
+gNMISession::handle_get_capabilities() const
 {
-    path::Codec codec_service{};
-    auto empty_data = reply.find("data");
-    if(empty_data == string::npos)
-    {
-        YLOG_INFO("Found empty data tag");
-        return nullptr;
-    }
+	gNMICapabilityResponse reply = client->execute_get_capabilities();
 
-    auto data_start = reply.find("\"data\":");
-    if(data_start == string::npos)
-    {
-        YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply.c_str());
-        throw(YServiceProviderError{reply});
-    }
-    data_start+= sizeof("\"data\":") - 1;
-    auto data_end = reply.find_last_of("}");
-    if(data_end == string::npos)
-    {
-        YLOG_ERROR( "No end data tag found in reply sent by device {}", reply.c_str());
-        throw(YError{"No end data tag found"});
-    }
+	RootSchemaNodeImpl & rs_impl = dynamic_cast<ydk::path::RootSchemaNodeImpl &> (*root_schema);
 
-    string data = reply.substr(data_start, data_end-data_start + 1);
+    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
 
-    auto datanode = shared_ptr<path::DataNode>(codec_service.decode(root_schema, data, EncodingFormat::JSON));
-    if(!datanode)
-    {
-        YLOG_ERROR( "Codec service failed to decode datanode");
-        throw(YError{"Problems deserializing output"});
-    }
-    return datanode;
+	auto & output_dn = rd->create_datanode("ydk:gnmi-capabilities", "");
+
+	for (auto model : reply.supported_models) {
+		ostringstream so, sv;
+	    so << "supported-models[name='" << model.name << "']/organization";
+	    output_dn.create_datanode(so.str(), model.organization);
+
+	    sv << "supported-models[name='" << model.name << "']/version";
+	    output_dn.create_datanode(sv.str(), model.version);
+	}
+
+	for (auto e : reply.supported_encodings) {
+		ostringstream s;
+		s << "supported-encodings[.='" << e << "']";
+		output_dn.create_datanode(s.str());
+	}
+
+	output_dn.create_datanode("gnmi-version", reply.gnmi_version);
+
+    return shared_ptr<path::DataNode> (rd);
 }
 
 gNMIClient & gNMISession::get_client() const
 {
     return *client;
-}
-
-static string get_config_payload(path::RootSchemaNode & root_schema,
-    path::Rpc & rpc)
-{
-    path::Codec codec_service{};
-    auto entity = rpc.get_input_node().find("entity");
-    if(entity.empty()){
-        YLOG_ERROR("Failed to get entity node");
-        throw(YInvalidArgumentError{"Failed to get entity node"});
-    }
-
-    path::DataNode* entity_node = entity[0].get();
-    string entity_value = entity_node->get_value();
-
-    //deserialize the entity_value
-    auto datanode = codec_service.decode(root_schema, entity_value, EncodingFormat::JSON);
-
-    if(!datanode){
-        YLOG_ERROR("Failed to decode entity node");
-        throw(YInvalidArgumentError{"Failed to decode entity node"});
-    }
-
-    string config_payload {};
-
-    for(auto const & child : datanode->get_children())
-    {
-        config_payload += codec_service.encode(*child, EncodingFormat::JSON, false);
-    }
-    return config_payload;
-}
-
-static bool is_config(path::Rpc & rpc)
-{
-    if(!rpc.get_input_node().find("only-config").empty())
-    {
-        return true;
-    }
-    return false;
-}
-
-static string get_filter_payload(path::Rpc & ydk_rpc)
-{
-    auto entity = ydk_rpc.get_input_node().find("filter");
-    if(entity.empty())
-    {
-        YLOG_ERROR("Failed to get entity node.");
-        throw(YInvalidArgumentError{"Failed to get entity node"});
-    }
-
-    auto datanode = entity[0];
-    return datanode->get_value();
-}
-
-static string get_gnmi_payload(path::DataNode & input, string data_tag, string data_value)
-{
-    path::Codec codec_service{};
-    input.create_datanode(data_tag, data_value);
-    string payload{"\"rpc\":"};
-    payload+=codec_service.encode(input, EncodingFormat::JSON, false);
-    YLOG_DEBUG("===========Generating Target Payload============");
-    YLOG_DEBUG("{}", payload.c_str());
-    YLOG_DEBUG("\n");
-    return payload;
 }
 
 static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, string operation)
@@ -371,5 +396,5 @@ static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_sc
     }
     return c[0];
 }
-}
-}
+}    // namespace path
+}  // namespace ydk

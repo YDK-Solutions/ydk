@@ -24,12 +24,10 @@
 #include <thread>
 #include <google/protobuf/text_format.h>
 
-#include "entity_util.hpp"
 #include "errors.hpp"
 #include "json.hpp"
 #include "logger.hpp"
-#include "types.hpp"
-
+#include "gnmi_util.hpp"
 #include "gnmi_client.hpp"
 
 using namespace std;
@@ -45,12 +43,18 @@ namespace ydk
 // Utility functions
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-vector<string> capabilities;
 gNMIClient::PathPrefixValueFlags flag;
 
-
-static bool check_capabilities_status(Status status);
-static string format_notification_response(string prefix_to_prepend, const std::string& path_to_prepend, const std::string& value);
+static void check_status(grpc::Status status, string message)
+{
+    if (!status.ok()) {
+        ostringstream s;
+        s << message << ":\n" << status.error_message();
+        string er_msg = s.str();
+        YLOG_ERROR(er_msg.c_str());
+        throw(YServiceProviderError{er_msg});
+    }
+}
 
 static std::shared_ptr<Channel> connect_to_server()
 {
@@ -76,91 +80,6 @@ static std::shared_ptr<Channel> connect_to_server()
 
     auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
     return grpc::CreateCustomChannel("", channel_creds, args);
-}
-
-static bool check_capabilities_status(Status status)
-{
-    if (!(status.ok()))
-    {
-      YLOG_ERROR("Capabilities RPC Failed.");
-      throw(YError{"Capabilities RPC Failed"});
-      return false;
-    }
-    return true;
-}
-
-static void parse_data_payload_to_paths(const string & payload_filter, vector<string> & path_container)
-{
-    string path_elem;
-    istringstream payload_filter_value(payload_filter);
-    while(getline(payload_filter_value, path_elem, '"'))
-    {
-        if(path_elem.find("{")==string::npos && path_elem.find("}")==string::npos
-             && path_elem.find(",")==string::npos  && path_elem != ":")
-            path_container.push_back(path_elem);
-    }
-}
-
-//static void parse_get_request_payload(const string & payload, vector<string> & path_container)
-//{
-//    auto payload_to_parse = json::parse("{" + payload + "}");
-//    string payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get-config/filter"_json_pointer, "null");
-//    if (payload_filter == "null") {
-//        payload_filter = payload_to_parse.value("/rpc/ietf-netconf:get/filter"_json_pointer, "null");
-//        if(payload_filter == "null") {
-//            string delim = ":{\"";
-//            int filter_len = payload.find_last_of("\"") - (payload.find(delim) + delim.length());
-//            auto filter = payload.substr(payload.find(delim) + delim.length(), filter_len);
-//            payload_filter = filter;
-//        }
-//    }
-//    parse_data_payload_to_paths(payload, path_container);
-//}
-
-//static json parse_set_request_payload(const string & payload)
-//{
-//    auto payload_to_parse = json::parse("{" + payload + "}");
-//    json config_payload = json::parse(payload_to_parse.value("/rpc/ietf-netconf:edit-config/config"_json_pointer, "Empty Config"));
-//    YLOG_DEBUG("JSON Payload: {}", config_payload.dump());
-//    return config_payload;
-//}
-
-static json parse_gnmi_set_request_payload(const string & payload)
-{
-    auto payload_to_parse = (payload.find("{") == 0) ? json::parse(payload) : json::parse("{" + payload + "}");
-    YLOG_DEBUG("JSON Payload: {}", payload_to_parse.dump());
-    return payload_to_parse;
-}
-
-static void allocate_set_request_path(const string & operation, gnmi::SetRequest & request, vector<string> root_path, json config_payload)
-{
-    gnmi::TypedValue* value = new gnmi::TypedValue;
-
-    if (operation == "delete")
-    {
-        gnmi::Path* delete_path = request.add_delete_();
-        delete_path->set_origin(root_path[0]);
-        for(size_t i = 1; i < root_path.size(); ++i)
-        {
-            gnmi::PathElem* path_elem = delete_path->add_elem();
-            path_elem->set_name(root_path[i]);
-        }
-    }
-    else if (operation == "replace" || operation == "update")
-    {
-        gnmi::Update* update = (operation == "update") ? request.add_update() : request.add_replace();
-        gnmi::Path*   update_path = new gnmi::Path;
-        update_path->set_origin(root_path[0]);
-        for(size_t i = 1; i < root_path.size(); ++i)
-        {
-            gnmi::PathElem* path_elem = update_path->add_elem();
-            path_elem->set_name(root_path[i]);
-        }
-        update->set_allocated_path(update_path);
-
-        value->set_json_ietf_val(config_payload.dump());
-        update->set_allocated_val(value);
-    }
 }
 
 static gnmi::SubscriptionList_Mode get_sublist_mode(const string & list_mode)
@@ -241,75 +160,29 @@ static void populate_subscribe_request(gnmi::SubscribeRequest & request,
     request.set_allocated_subscribe(sl);
 }
 
-static string format_notification_response(string prefix_to_prepend, const std::string& path_to_prepend, const std::string& value)
+static string format_notification_response(const std::string& path_to_prepend, const std::string& value)
 {
-    string reply_to_parse;
+    string reply_val;
 
     // TODO: Update again when payload format from the server(IOS XR) is made consistent with different request paths
     if (flag.path_has_value)
-        reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + "[" + value + "]" + "}}");
-    else if (flag.prefix_has_value)
-        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
-    else if ((flag.prefix_has_value) && (flag.path_has_value))
-        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
+        reply_val = "{" + path_to_prepend + "{[" + value + "]}}";
+//    else if (flag.prefix_has_value)
+//        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
+//    else if ((flag.prefix_has_value) && (flag.path_has_value))
+//        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
     else {
-        string val = (value == "") ? "{\"null\"}" : value;
-        if (prefix_to_prepend.length()==0 && path_to_prepend.length()==0 && val.find("{")==0)
-            reply_to_parse.append("\"data\":" + val);
+        string val = (value == "{\"value\":\"null\"}") ? "{}" : value;
+        if (path_to_prepend.length()==0 && val.find("{")==0)
+            reply_val = val;
         else
-            reply_to_parse.append("\"data\":{" + prefix_to_prepend + path_to_prepend + val + "}");
+            reply_val = "{" + path_to_prepend + val + "}";
     }
     size_t pos = 0;
     while ((pos = path_to_prepend.find ("{", ++pos)) != string::npos) {
-    	reply_to_parse.append("}");
+        reply_val.append("}");
     }
-    return reply_to_parse;
-}
-
-static void populate_get_request(gnmi::GetRequest & request, const string& payload, bool is_config)
-{
-    vector<string> path_container;
-    parse_data_payload_to_paths(payload, path_container);
-
-    gnmi::Path* path = request.add_path();
-    for(size_t i = 0; i < path_container.size(); ++i)
-        path->add_element(path_container[i]);
-    if(is_config)
-        request.set_type(gnmi::GetRequest::CONFIG);
-    else
-        request.set_type(gnmi::GetRequest::STATE);
-    request.set_encoding(gnmi::Encoding::JSON_IETF);
-}
-
-static void populate_get_request(gnmi::GetRequest & request, pair<string, string> & prefix,
-                                    std::vector<PathElem> & path_container, bool only_config)
-{
-    auto path = request.add_path();
-
-    // Add prefix to the path
-    if (prefix.first.length() > 0) {
-        path->set_origin(prefix.first);
-        if (prefix.second.length() > 0) {
-            auto path_elem = path->add_elem();
-            path_elem->set_name(prefix.second);
-        }
-    }
-	// Populate the rest of the path
-    for(size_t i = 0; i < path_container.size(); ++i)
-    {
-        auto path_elem = path->add_elem();
-        path_elem->set_name(path_container[i].path);
-        for(auto k : path_container[i].keys)
-        {
-            auto key = path_elem->mutable_key();
-            (*key)[k.name] = k.value;
-        }
-    }
-    if(only_config)
-        request.set_type(gnmi::GetRequest::CONFIG);
-    else
-        request.set_type(gnmi::GetRequest::STATE);
-    request.set_encoding(gnmi::Encoding::JSON_IETF);
+    return reply_val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,7 +212,7 @@ int gNMIClient::connect()
     return EXIT_SUCCESS;
 }
 
-bool gNMIClient::has_gnmi_version(gnmi::CapabilityResponse* response) 
+static bool has_gnmi_version(gnmi::CapabilityResponse* response)
 {
     if (!(response->gnmi_version().size() > 0)) 
     {
@@ -347,7 +220,7 @@ bool gNMIClient::has_gnmi_version(gnmi::CapabilityResponse* response)
         throw(YError{"Capabilities Received Without gNMI Version"});
         return false;
     }
-    return true; 
+    return true;
 }
 
 void gNMIClient::parse_capabilities_modeldata(gnmi::CapabilityResponse* response)
@@ -382,7 +255,7 @@ void gNMIClient::parse_capabilities_modeldata(gnmi::CapabilityResponse* response
     }
 }
 
-void gNMIClient::parse_capabilities_encodings(gnmi::CapabilityResponse* response)
+static void parse_capabilities_encodings(gnmi::CapabilityResponse* response)
 {
     gnmi::Encoding encoding;
     string encoding_value;
@@ -420,8 +293,7 @@ vector<string> gNMIClient::get_capabilities()
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
     grpc::Status status = stub_->Capabilities(&context, request, &response);
-
-    check_capabilities_status(status);
+    check_status(status, "CapabilityRequest failed with error");
 
     if(has_gnmi_version(&response))
     {
@@ -430,103 +302,40 @@ vector<string> gNMIClient::get_capabilities()
     return capabilities;
 }
 
-static void
-populate_set_request(gnmi::SetRequest & request, const std::string& payload, const std::string& operation)
+gNMICapabilityResponse gNMIClient::execute_get_capabilities()
 {
-    YLOG_DEBUG("gNMIClient::populate_set_request: Operation: {}, Payload:\n{}", operation, payload);
+    gNMICapabilityResponse reply{};
 
-    json config_payload = parse_gnmi_set_request_payload(payload);
+    CapabilityRequest request;
+    CapabilityResponse response;
+    grpc::ClientContext context;
+    context.AddMetadata("username", username);
+    context.AddMetadata("password", password);
+    grpc::Status status = stub_->Capabilities(&context, request, &response);
+    check_status(status, "CapabilityRequest failed with error");
 
-    string path_elem;
-    vector<string> root_path;
-    istringstream payload_config_value(config_payload.dump());
-    while(getline(payload_config_value, path_elem, '"'))
+    reply.gnmi_version = response.gnmi_version();
+    for (size_t i = 0, n = response.supported_models_size(); i < n; i++)
     {
-        if(path_elem.find("{")==string::npos && path_elem.find("}")==string::npos)
-        {
-            root_path.push_back(path_elem);
-            auto pos = payload.find(":", path_elem.length());
-            if (pos != string::npos) {
-                config_payload = parse_gnmi_set_request_payload(payload.substr(pos+1, payload.length()-pos-1));
-            }
-            break;
-        }
+        auto model = response.supported_models(i);
+
+        gNMIModelData model_data{};
+        model_data.name = model.name();
+        model_data.organization = model.organization();
+        model_data.version = model.version();
+
+        reply.supported_models.push_back(model_data);
     }
-    allocate_set_request_path(operation, request, root_path, config_payload);
+    for (int i = 0, n = response.supported_encodings_size(); i < n; i++)
+    {
+        gnmi::Encoding encoding = response.supported_encodings(i);
+        string encoding_value = gnmi::Encoding_Name(encoding);
+        reply.supported_encodings.push_back(encoding_value);
+    }
+    return reply;
 }
 
-static void
-populate_set_request(gnmi::SetRequest & request,
-		const pair<string, string> & prefix, const std::string& payload, const std::string& operation)
-{
-    YLOG_DEBUG("gNMIClient::populate_set_request: Operation: {}, Payload:\n{}", operation, payload);
-
-    json config_payload = parse_gnmi_set_request_payload(payload);
-
-    vector<string> root_path;
-    root_path.push_back(prefix.first);
-    root_path.push_back(prefix.second);
-    allocate_set_request_path(operation, request, root_path, config_payload);
-}
-
-string gNMIClient::get_prefix_from_notification(gnmi::Notification notification)
-{
-    gnmi::Path prefix = notification.prefix();
-    string prefix_to_prepend;
-
-    string origin = prefix.origin();
-    if (origin.length() > 0) {
-    	prefix_to_prepend = "\"";
-    	prefix_to_prepend.append(origin);
-    }
-
-    if (prefix.element_size() > 0) {
-        for (int i = 0; i < prefix.element_size(); i++)
-        {
-            if (prefix.element(i) != origin) {
-            	if (origin.length() > 0)
-            		prefix_to_prepend.append(":");
-            	else
-            		prefix_to_prepend = "\"";
-                prefix_to_prepend.append(prefix.element(i));
-                break;
-            }
-        }
-        if (prefix_to_prepend.length() > 0)
-            prefix_to_prepend.append("\":");
-    }
-    else if (prefix.elem_size() > 0) {
-        for (int i = 0; i < prefix.elem_size(); i++)
-        {
-      	    auto path_elem = prefix.elem(i);
-            if (path_elem.name() != origin) {
-            	if (origin.length() > 0)
-            		prefix_to_prepend.append(":");
-            	else
-            		prefix_to_prepend = "\"";
-                prefix_to_prepend.append(path_elem.name());
-                break;
-            }
-        }
-        if (prefix_to_prepend.length() > 0)
-            prefix_to_prepend.append("\":");
-    }
-    return prefix_to_prepend;
-}
-
-//static string check_if_path_has_key_values(gnmi::PathElem & element)
-//{
-//	if (element.key_size() > 0) {
-//	    // TODO? Convert PathElem with keys to JSON string
-//        flag.path_has_value = false;
-//        return element.name();
-//    } else {
-//        flag.path_has_value = true;
-//        return element.name();
-//    }
-//}
-
-string gNMIClient::get_path_from_update(gnmi::Update update)
+static string get_path_from_update(gnmi::Update update)
 {
     string path_to_prepend;
     string path_element_to_add;
@@ -560,7 +369,7 @@ string gNMIClient::get_path_from_update(gnmi::Update update)
     return path_to_prepend;
 }
 
-string gNMIClient::get_value_from_update(gnmi::Update update)
+static string get_value_from_update(gnmi::Update update)
 {
     gnmi::TypedValue value;
     string value_for_payload;
@@ -571,144 +380,132 @@ string gNMIClient::get_value_from_update(gnmi::Update update)
     return value_for_payload;
 }
 
-string gNMIClient::parse_get_response(gnmi::GetResponse* response)
+static vector<string> parse_get_response(gnmi::GetResponse* response)
 {
-    gnmi::Notification notification;
-    gnmi::Update update;
-    string value;
-    string reply_to_parse;
-    string prefix_to_prepend;
-    string path_to_prepend;
+    vector<string> response_list{};
 
-    int notification_size = response->notification_size();
-
-    for(int i = 0; i < notification_size; ++i)
+    for(int i = 0; i < response->notification_size(); ++i)
     {
-        notification = response->notification(i);
-
-        if (notification.has_prefix()) {
-            prefix_to_prepend = get_prefix_from_notification(notification);
-        }
-        else {
-            prefix_to_prepend.clear();
-        }
-
+        gnmi::Notification notification = response->notification(i);
+        string path_to_prepend;
+        string reply_to_parse;
+        string value;
         if(notification.update_size() != 0) {
             for(int k = 0; k < notification.update_size(); ++k)
             {
-                update = notification.update(k);
+                gnmi::Update update = notification.update(k);
                 path_to_prepend = get_path_from_update(update);
                 value.append(get_value_from_update(update));
-                reply_to_parse = format_notification_response(prefix_to_prepend, path_to_prepend, value);
+                reply_to_parse = format_notification_response(path_to_prepend, value);
+            }
+        }
+        response_list.push_back(reply_to_parse);
+    }
+    return response_list;
+}
+
+vector<string>
+gNMIClient::execute_get_operation(const std::vector<gNMIRequest> get_request_list, const std::string& operation)
+{
+    gnmi::GetRequest gnmi_get_request;
+    gnmi::GetResponse gnmi_get_response;
+
+    for (auto ydk_request : get_request_list) {
+        // Populate gnmi::GetRequest
+        gnmi::Path* path = gnmi_get_request.add_path();
+        if (ydk_request.path != nullptr)
+            path->CopyFrom(*ydk_request.path);
+    }
+
+    if (operation == "ALL")
+        gnmi_get_request.set_type(gnmi::GetRequest::ALL);
+    else if (operation == "OPERATIONAL")
+        gnmi_get_request.set_type(gnmi::GetRequest::OPERATIONAL);
+    else if (operation == "STATE")
+        gnmi_get_request.set_type(gnmi::GetRequest::STATE);
+    else
+        gnmi_get_request.set_type(gnmi::GetRequest::CONFIG);
+    gnmi_get_request.set_encoding(gnmi::Encoding::JSON_IETF);
+
+    YLOG_INFO("\n=============== Get Request Sent ================\n{}\n", gnmi_get_request.DebugString());
+    auto reply = execute_get_payload(gnmi_get_request, &gnmi_get_response);
+    YLOG_INFO("Get Operation Succeeded");
+    return reply;
+}
+
+bool
+gNMIClient::execute_set_operation(const std::vector<ydk::gNMIRequest> set_request_list)
+{
+    gnmi::SetRequest gnmi_set_request;
+    gnmi::SetResponse gnmi_set_response;
+
+    // Populate gnmi::SetRequest
+    // delete
+    for (auto request : set_request_list) {
+        if (request.operation == "delete") {
+            gnmi::Path* path = gnmi_set_request.add_delete_();
+            if (request.path != nullptr)
+                path->CopyFrom(*request.path);
+        }
+    }
+    // replace
+    for (auto request : set_request_list) {
+        if (request.operation == "replace") {
+            ::gnmi::Update* update = gnmi_set_request.add_replace();
+            if (request.path != nullptr) {
+                update->set_allocated_path(request.path);
+                if (!request.payload.empty()) {
+                    ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+                    value->set_json_ietf_val(request.payload);
+                    update->set_allocated_val(value);
+                }
             }
         }
     }
-    return reply_to_parse;
-}
-
-string gNMIClient::parse_set_response(gnmi::SetResponse* response)
-{
-    gnmi::UpdateResult update_response;
-    string reply_to_parse;
-    for(int i = 0; i < response->response_size(); ++i)
-    {
-        update_response = response->response(i);
-        reply_to_parse.append(UpdateResult_Operation_Name(update_response.op()) + " Success");
+    // update
+    for (auto request : set_request_list) {
+        if (request.operation == "update") {
+            ::gnmi::Update* update = gnmi_set_request.add_update();
+            if (request.path != nullptr) {
+                update->set_allocated_path(request.path);
+                if (!request.payload.empty()) {
+                    ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+                    value->set_json_ietf_val(request.payload);
+                    update->set_allocated_val(value);
+                }
+            }
+        }
     }
-    return reply_to_parse;
-}
 
-string
-gNMIClient::execute_set_wrapper(const pair<string, string> & prefix, const string & payload, const string& operation)
-{
-    gnmi::SetRequest request;
-    gnmi::SetResponse response;
-
-    populate_set_request(request, prefix, payload, operation);
-    YLOG_INFO("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
-    string reply = execute_set_payload(request, &response);
-    YLOG_INFO("Set Operation {} Succeeded", operation);
+    YLOG_INFO("\n=============== Set Request Sent ================\n{}\n", gnmi_set_request.DebugString());
+    auto reply = execute_set_payload(gnmi_set_request, &gnmi_set_response);
+    YLOG_INFO("Set Operation Succeeded");
     return reply;
 }
 
-string
-gNMIClient::execute_wrapper(const string & payload, const std::string& operation, bool is_config)
-{
-    if (operation == "read")
-    {
-        gnmi::GetRequest request;
-        gnmi::GetResponse response;
-
-        populate_get_request(request, payload, is_config);
-        YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
-        string reply = execute_get_payload(request, &response);
-        YLOG_INFO("Get Operation {} Succeeded", operation);
-        return reply;
-    }
-    else if (operation == "replace" || operation == "update" || operation == "delete")
-    {   
-        gnmi::SetRequest request;
-        gnmi::SetResponse response;
-
-        populate_set_request(request, payload, operation);
-        YLOG_INFO("\n===============Set Request Sent================\n{}\n", request.DebugString().c_str());
-        string reply = execute_set_payload(request, &response);
-        YLOG_INFO("Set Operation {} Succeeded", operation);
-        return reply;
-    }
-    return "";
-}
-
-string gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* response)
+vector<string>
+gNMIClient::execute_get_payload(const GetRequest& request, GetResponse* response)
 {
     grpc::ClientContext context;
-    grpc::Status status;
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
-    status = stub_->Get(&context, request, response);
-    YLOG_INFO("\n=============Get Response Received=============\n{}\n", response->DebugString().c_str());
-    if (!(status.ok())) 
-    {
-        YLOG_ERROR("Get RPC Status Not OK:\n{}", status.error_message());
-        throw(YError{status.error_message()});
-    }
-    else 
-    {
-        YLOG_DEBUG("Get RPC OK");
-        string reply = parse_get_response(response);
-        return reply;
-    }
+    grpc::Status status = stub_->Get(&context, request, response);
+    check_status(status, "GetRequest failed with error");
+    YLOG_INFO("\n============= Get Response Received =============\n{}\n", response->DebugString().c_str());
+    YLOG_DEBUG("Get RPC succeeded");
+    return parse_get_response(response);
 }
 
-string gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response)
+bool
+gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response)
 {
     grpc::ClientContext context;
-    grpc::Status status;
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
-    status = stub_->Set(&context, request, response);
-    YLOG_INFO("\n=============Set Response Received=============\n{}\n", response->DebugString().c_str());
-    if (!(status.ok())) 
-    {
-        YLOG_ERROR("Set RPC Status not OK");
-        throw(YError{status.error_message()});
-    } 
-
-    YLOG_DEBUG("Set RPC OK");
-    return parse_set_response(response);
-}
-
-string
-gNMIClient::execute_get_operation(pair<string, string> & prefix, vector<PathElem> & path_container, bool only_config)
-{
-    gnmi::GetRequest request;
-    gnmi::GetResponse response;
-
-    populate_get_request(request, prefix, path_container, only_config);
-    YLOG_INFO("\n===============Get Request Sent================\n{}\n", request.DebugString().c_str());
-    string reply = execute_get_payload(request, &response);
-    YLOG_INFO("Get Operation Succeeded ");
-    return reply;
+    grpc::Status status = stub_->Set(&context, request, response);
+    check_status(status, "SetRequest failed with error");
+    YLOG_INFO("\n============= Set Response Received =============\n{}\n", response->DebugString().c_str());
+    return true;
 }
 
 void gNMIClient::execute_subscribe_operation(std::pair<std::string, std::string> & prefix,
@@ -728,17 +525,16 @@ void gNMIClient::execute_subscribe_operation(std::pair<std::string, std::string>
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
 
-    YLOG_INFO("\n===============Subscribing================");
     auto a = stub_->Subscribe(&context);
     std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer = move(a);
 
-    YLOG_INFO("\n===============Sending SubscribeRequest================\n{}\n", request->DebugString().c_str());
+    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", request->DebugString().c_str());
     client_reader_writer->Write(*request);
 //    client_reader_writer->WritesDone();
     YLOG_DEBUG("Done sending request");
 
     YLOG_INFO("Subscribe Operation Succeeded");
-    YLOG_DEBUG("\n=============Receiving Subscribe Response=============");
+    YLOG_DEBUG("\n============= Receiving Subscribe Response =============");
     YLOG_INFO("Invoking callback function to receive the subscription data");
 
     if(list_mode == "POLL")
@@ -754,7 +550,7 @@ void gNMIClient::execute_subscribe_operation(std::pair<std::string, std::string>
                     gnmi::SubscribeRequest req;
                     gnmi::Poll* p = new gnmi::Poll;
                     req.set_allocated_poll(p);
-                    YLOG_INFO("\n===============Sending SubscribeRequest================\n{}\n", req.DebugString().c_str());
+                    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", req.DebugString().c_str());
                     client_reader_writer->Write(req);
                 }
             }

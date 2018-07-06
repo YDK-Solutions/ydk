@@ -36,11 +36,19 @@ class gNMIService
 public:
     gNMIService();
     ~gNMIService();
-    std::shared_ptr<Entity> get(gNMIServiceProvider& provider, Entity& filter, bool only_config) const;
-    bool set(gNMIServiceProvider& provider, Entity& filter) const;
+
+    std::shared_ptr<Entity> get(gNMIServiceProvider & provider,
+                                Entity& filter, const std::string & operation) const;
+    std::vector<std::shared_ptr<Entity>> get(gNMIServiceProvider & provider,
+                                std::vector<Entity*> & filter_list, const std::string & operation);
+
+    bool set(gNMIServiceProvider & provider, Entity& entity) const;
+    bool set(gNMIServiceProvider & provider, std::vector<Entity*> & entity_list) const;
 
     void subscribe(gNMIServiceProvider& provider, Entity& filter, const std::string & list_mode, long long qos,
                     const std::string & mode, int sample_interval, std::function<void(const std::string &)> func) const;
+
+    std::string capabilities(gNMIServiceProvider & provider);
 };
 
 }

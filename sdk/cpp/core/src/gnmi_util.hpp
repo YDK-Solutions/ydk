@@ -20,31 +20,41 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#ifndef ENTITY_UTIL_HPP
-#define ENTITY_UTIL_HPP
+#ifndef GNMI_UTIL_HPP
+#define GNMI_UTIL_HPP
 
-#include <sstream>
-#include "types.hpp"
+#include "entity_util.hpp"
+#include "path/path_private.hpp"
+
+#include "gnmi.pb.h"
 
 namespace ydk
 {
 
-std::string get_relative_entity_path(const Entity* current_node, const Entity* ancestor, const std::string & path);
+struct PathKey
+{
+    std::string name;
+    std::string value;
 
-bool is_set(const YFilter & yfilter);
+    PathKey(const std::string & name, const std::string & value);
+};
 
-const EntityPath get_entity_path(const Entity & entity, Entity* ancestor);
+struct PathElem
+{
+    std::string path;
+    std::vector<PathKey> keys;
+    PathElem(const std::string & path, std::vector<PathKey> keys);
+};
+
+void parse_entity_to_prefix_and_paths(Entity& entity, std::pair<std::string, std::string> & prefix, std::vector<PathElem> & path_container);
+void parse_entity_prefix(Entity& entity, std::pair<std::string, std::string> & prefix);
+
+void parse_entity_to_path(Entity& entity, gnmi::Path* path);
+void parse_entity_prefix(Entity& entity, gnmi::Path* path);
+
+void parse_datanode_to_path(path::DataNode* dn, gnmi::Path* path);
+
+void parse_prefix_to_path(const std::string& prefix, gnmi::Path* path);
 
 }
-
-#define ADD_KEY_TOKEN(attr, attr_name) {\
-    std::ostringstream attr_buffer;\
-    attr_buffer << attr; std::string attr_str = attr_buffer.str();\
-    if (attr_str.find("\'") != std::string::npos) {\
-        path_buffer << "[" << attr_name << "=\"" << attr_str << "\"]";\
-    } else {\
-        path_buffer << "[" << attr_name << "='" << attr_str << "']";\
-	}\
-}
-
-#endif /* ENTITY_UTIL_HPP */
+#endif /* GNMI_UTIL_HPP */

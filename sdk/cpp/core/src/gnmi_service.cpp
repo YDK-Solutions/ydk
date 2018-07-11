@@ -202,33 +202,77 @@ bool gNMIService::set(gNMIServiceProvider& provider, vector<Entity*> & entity_li
 
 //subscribe
 void gNMIService::subscribe(gNMIServiceProvider& provider,
-                            Entity& filter,
-                            const std::string & list_mode,
-                            long long qos,
-                            const std::string & mode,
-                            int sample_interval,
+                            gNMIService::Subscription* subscription,
+                            uint32 qos, const std::string & mode,
                             std::function<void(const std::string &)> func) const
 {
-    if(list_mode != "ONCE" && list_mode != "STREAM" && list_mode != "POLL")
+    YLOG_INFO("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", mode);
+
+    if(mode != "ONCE" && mode != "STREAM" && mode != "POLL")
     {
         YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
-        throw(YServiceProviderError{list_mode + " list mode is not supported"});
+        throw(YServiceProviderError{mode + " list mode is not supported"});
     }
 
-    if (mode != "ON_CHANGE" && mode != "SAMPLE" && mode!= "TARGET_DEFINED")
+    auto list_mode = subscription->subscription_mode;
+    if (list_mode != "ON_CHANGE" && list_mode != "SAMPLE" && list_mode!= "TARGET_DEFINED")
     {
-        YLOG_ERROR("gNMIService::subscribe: mode '{}' is not supported", mode);
-        throw(YServiceProviderError{mode + " mode is not supported"});
+        YLOG_ERROR("gNMIService::subscribe: mode '{}' is not supported", list_mode);
+        throw(YServiceProviderError{list_mode + " mode is not supported"});
     }
 
-    YLOG_INFO("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", list_mode);
-    std::pair<std::string, std::string> prefix_pair;
-    std::vector<PathElem> path_container;
-    parse_entity_to_prefix_and_paths(filter, prefix_pair, path_container);
+    gNMISubscription sub{};
+    sub.path = new gnmi::Path;
+    parse_entity_to_path(*subscription->entity, sub.path);
+    sub.subscription_mode = list_mode;
+    sub.sample_interval = subscription->sample_interval;
+    sub.suppress_redundant = subscription->suppress_redundant;
+    sub.heartbeat_interval = subscription->heartbeat_interval;
+
+    vector<gNMISubscription> sub_list{};
+    sub_list.push_back(sub);
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
     auto & client = gnmi_session.get_client();
-    client.execute_subscribe_operation(prefix_pair, path_container, list_mode, qos, sample_interval, mode, func);
+    client.execute_subscribe_operation(sub_list, qos, mode, func);
+}
+
+void gNMIService::subscribe(gNMIServiceProvider& provider,
+                            vector<gNMIService::Subscription*> & subscription_list,
+                            uint32 qos, const std::string & mode,
+                            std::function<void(const std::string &)> func) const
+{
+    YLOG_INFO("gNMIService::subscribe: Executing subscribe request in '{}' list mode", mode);
+
+    if (mode != "ONCE" && mode != "STREAM" && mode != "POLL")
+    {
+        YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
+        throw(YServiceProviderError{mode + " list mode is not supported"});
+    }
+
+
+    vector<gNMISubscription> sub_list{};
+    for (auto subscription : subscription_list) {
+        auto list_mode = subscription->subscription_mode;
+        if (list_mode != "ON_CHANGE" && list_mode != "SAMPLE" && list_mode!= "TARGET_DEFINED")
+        {
+            YLOG_ERROR("gNMIService::subscribe: mode '{}' is not supported", list_mode);
+            throw(YServiceProviderError{list_mode + " mode is not supported"});
+        }
+        gNMISubscription sub{};
+        sub.path = new gnmi::Path;
+        parse_entity_to_path(*subscription->entity, sub.path);
+        sub.subscription_mode = list_mode;
+        sub.sample_interval = subscription->sample_interval;
+        sub.suppress_redundant = subscription->suppress_redundant;
+        sub.heartbeat_interval = subscription->heartbeat_interval;
+
+        sub_list.push_back(sub);
+    }
+
+    auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
+    auto & client = gnmi_session.get_client();
+    client.execute_subscribe_operation(sub_list, qos, mode, func);
 }
 
 std::string

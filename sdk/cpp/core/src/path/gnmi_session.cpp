@@ -159,15 +159,14 @@ path::RootSchemaNode& gNMISession::get_root_schema() const
     return *root_schema;
 }
 
-void gNMISession::invoke(path::Rpc& rpc, std::function<void(const vector<string> &)> func) const
+void gNMISession::invoke(path::Rpc& rpc, std::function<void(const std::string &)> func) const
 {
     path::SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
     path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
-    if(rpc_schema == gnmi_sub) {
-        // TODO
-        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
+    if (rpc_schema == gnmi_sub) {
+        handle_subscribe(rpc, func);
     }
     else {
         YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
@@ -379,6 +378,83 @@ gNMISession::handle_get_capabilities() const
 	output_dn.create_datanode("gnmi-version", reply.gnmi_version);
 
     return shared_ptr<path::DataNode> (rd);
+}
+
+void
+gNMISession::handle_subscribe(path::Rpc& rpc, std::function<void(const std::string &)> func) const
+{
+    vector<gNMISubscription> sub_list{};
+    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
+    auto subscription = rpc.get_input_node().find("subscription");
+    if (subscription.empty()) {
+        YLOG_ERROR("Failed to get 'subscription' node from '{}' RPC", rpc_name);
+        throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
+    }
+    uint32 qos = 0;
+    auto qos_dn = subscription[0]->find("qos");
+    if (!qos_dn.empty()) {
+        path::DataNode* qos_node = qos_dn[0].get();
+        qos = strtoul(qos_node->get_value().c_str(), NULL, 0);
+    }
+    string mode = "ONCE";
+    auto mode_dn = subscription[0]->find("mode");
+    if (!mode_dn.empty()) {
+        path::DataNode* mode_node = mode_dn[0].get();
+        mode = mode_node->get_value();
+    }
+
+    auto subscription_list = subscription[0]->find("subscription-list");
+    if (subscription_list.empty()) {
+        YLOG_ERROR("Failed to get 'subscription-list' node from '{}' RPC", rpc_name);
+        throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
+    }
+
+    for (auto one_subscription : subscription_list) {
+        gNMISubscription sub{};
+
+        auto entity_vector = one_subscription->find("entity");
+        if (entity_vector.empty()) {
+            YLOG_ERROR("Failed to get 'entity' node from subscribe RPC");
+            throw(YInvalidArgumentError{"Failed to get 'entity' node from subscribe RPC"});
+        }
+        path::DataNode* entity_node = entity_vector[0].get();
+        sub.path = new gnmi::Path();
+        populate_path_from_payload(sub.path, entity_node->get_value(), *root_schema);
+
+        sub.subscription_mode = "ON_CHANGE";
+        auto list_mode_dn = one_subscription->find("subscription-mode");
+        if (!list_mode_dn.empty()) {
+            path::DataNode* list_mode_node = list_mode_dn[0].get();
+            sub.subscription_mode = list_mode_node->get_value();
+        }
+
+        sub.sample_interval = 60000000;
+        auto interval_dn = one_subscription->find("sample-interval");
+        if (!interval_dn.empty()) {
+            path::DataNode* interval_node = interval_dn[0].get();
+            sub.sample_interval = strtoull(interval_node->get_value().c_str(), NULL, 0);
+        }
+
+        sub.suppress_redundant = true;
+        auto suppress_dn = one_subscription->find("suppress-redundant");
+        if (!suppress_dn.empty()) {
+            path::DataNode* suppress_node = suppress_dn[0].get();
+            if (suppress_node->get_value() == "false")
+            sub.suppress_redundant = false;
+        }
+
+        sub.heartbeat_interval = sub.sample_interval * 10;
+        auto heartbeat_dn = one_subscription->find("heartbeat-interval");
+        if (!heartbeat_dn.empty()) {
+            path::DataNode* heartbeat_node = heartbeat_dn[0].get();
+            sub.heartbeat_interval = strtoull(heartbeat_node->get_value().c_str(), NULL, 0);
+        }
+
+        sub_list.push_back(sub);
+    }
+
+    client->execute_subscribe_operation(sub_list, qos, mode, func);
 }
 
 gNMIClient & gNMISession::get_client() const

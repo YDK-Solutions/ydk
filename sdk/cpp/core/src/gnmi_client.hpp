@@ -36,6 +36,8 @@
 #include "gnmi.grpc.pb.h"
 #include "gnmi.pb.h"
 
+#include "types.hpp"
+
 using namespace gnmi;
 
 using gnmi::gNMI;
@@ -76,6 +78,14 @@ struct gNMICapabilityResponse {
     std::vector<std::string> supported_encodings;
 };
 
+struct gNMISubscription {
+    gnmi::Path* path;
+    std::string subscription_mode;
+    uint64 sample_interval;
+    bool suppress_redundant;
+    uint64 heartbeat_interval;
+};
+
 class gNMIClient
 {
 public:
@@ -95,13 +105,9 @@ public:
 
     bool execute_set_operation(const std::vector<gNMIRequest> get_request_list);
 
-    void execute_subscribe_operation(std::pair<std::string, std::string> & prefix,
-                                    std::vector<PathElem> & path_container,
-                                    const std::string & list_mode,
-                                    long long qos,
-                                    int sample_interval,
-                                    const std::string & mode,
-                                    std::function<void(const std::string &)> func);
+    void execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
+                                     uint32 qos, const std::string & mode,
+                                     std::function<void(const std::string &)> func);
 
     std::vector<std::string> get_capabilities();
     gNMICapabilityResponse execute_get_capabilities();

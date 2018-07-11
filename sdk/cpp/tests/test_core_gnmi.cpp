@@ -166,26 +166,51 @@ TEST_CASE("gnmi_bgp_create")
 //    (*update_rpc)(session);
 }
 */
-TEST_CASE("gnmi_core_validate")
-{
-    ydk::path::Repository repo{};
 
+void read_sub(const std::string & s);
+
+TEST_CASE("gnmi_rpc_subscribe")
+{
+    ydk::path::Repository repo{TEST_HOME};
     ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
-    auto & runner = schema.create_datanode("ietf-netconf:validate", "");
+    ydk::path::Codec codec{};
 
-    auto & ysanity = runner.create_datanode("source/candidate", "");
+    std::shared_ptr<ydk::path::Rpc> rpc { schema.create_rpc("ydk:gnmi-subscribe") };
+    auto & subscription = rpc->get_input_node().create_datanode("subscription", "");
+    subscription.create_datanode("mode", "ONCE");
+    subscription.create_datanode("qos", "10");
 
-    ydk::path::Codec s{};
-    auto json = s.encode(runner, ydk::EncodingFormat::JSON, false);
+    auto & ifs = schema.create_datanode("openconfig-interfaces:interfaces", "");
+    ifs.create_datanode("interface[name='*']/state");
+    auto int_json = codec.encode(ifs, ydk::EncodingFormat::JSON, false);
 
-    CHECK( !json.empty());
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
+    bgp.create_datanode("neighbors/neighbor[neighbor-address='0.0.0.0']/state");
+    auto bgp_json = codec.encode(bgp, ydk::EncodingFormat::JSON, false);
 
-    std::cout << json << std::endl;
+    auto & int_subscription = subscription.create_datanode("subscription-list[alias='int']", "");
+    int_subscription.create_datanode("entity", int_json);
+    int_subscription.create_datanode("subscription-mode", "ON_CHANGE");
+    int_subscription.create_datanode("sample-interval", "10000000");
+    int_subscription.create_datanode("suppress-redundant", "true");
+    int_subscription.create_datanode("heartbeat-interval", "1000000000");
+
+    auto & bgp_subscription = subscription.create_datanode("subscription-list[alias='bgp']", "");
+    bgp_subscription.create_datanode("entity", bgp_json);
+    // bgp_subscription.create_datanode("subscription-mode", "ON_CHANGE");	// can be skipped as default
+    bgp_subscription.create_datanode("sample-interval", "20000000");
+    // bgp_subscription.create_datanode("suppress-redundant", "true");  	// can be skipped as default
+    // bgp_subscription.create_datanode("heartbeat-interval", "2000000000");// can be skipped as it is calculated from sample-interval
+
+    // auto json = codec.encode(rpc->get_input_node(), ydk::EncodingFormat::JSON, true);
+    // std::cout << "Built RPC:" << std::endl << json << std::endl;
+
+    session.invoke(*rpc, read_sub);
 }
 
-TEST_CASE("gnmi_caps")
+TEST_CASE("gnmi_rpc_caps")
 {
     ydk::path::Repository repo{TEST_HOME};
     ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
@@ -199,7 +224,7 @@ TEST_CASE("gnmi_caps")
     //std::cout << "Server capabilities:" << std::endl << json << std::endl;
 }
 
-TEST_CASE("gnmi_bgp_xr_openconfig")
+TEST_CASE("gnmi_rpc_set_get_bgp")
 {
     ydk::path::Repository repo{TEST_HOME};
     ydk::path::gNMISession session{repo, "127.0.0.1", 50051};

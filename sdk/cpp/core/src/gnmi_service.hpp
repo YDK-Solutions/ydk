@@ -33,7 +33,15 @@ class gNMIServiceProvider;
 
 class gNMIService
 {
-public:
+  public:
+    struct Subscription {
+        Entity* entity;
+        std::string subscription_mode;
+        uint64 sample_interval;
+        bool suppress_redundant;
+        uint64 heartbeat_interval;
+    };
+
     gNMIService();
     ~gNMIService();
 
@@ -45,8 +53,14 @@ public:
     bool set(gNMIServiceProvider & provider, Entity& entity) const;
     bool set(gNMIServiceProvider & provider, std::vector<Entity*> & entity_list) const;
 
-    void subscribe(gNMIServiceProvider& provider, Entity& filter, const std::string & list_mode, long long qos,
-                    const std::string & mode, int sample_interval, std::function<void(const std::string &)> func) const;
+    void subscribe(gNMIServiceProvider& provider,
+                   Subscription* sub,
+                   uint32 qos, const std::string & mode,
+                   std::function<void(const std::string &)> func) const;
+    void subscribe(gNMIServiceProvider& provider,
+                   std::vector<Subscription*> & sub_list,
+                   uint32 qos, const std::string & mode,
+                   std::function<void(const std::string &)> func) const;
 
     std::string capabilities(gNMIServiceProvider & provider);
 };

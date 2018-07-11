@@ -46,13 +46,13 @@ void config_bgp(openconfig_bgp::Bgp bgp)
 {
     bgp.global->config->as = 65172;
     
-    auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     neighbor->neighbor_address = "172.16.255.2";
     neighbor->config->neighbor_address = "172.16.255.2";
     neighbor->config->peer_as = 65172;
     
     neighbor->parent = bgp.neighbors.get();
-    bgp.neighbors->neighbor.append(move(neighbor));
+    bgp.neighbors->neighbor.append(neighbor);
 }
 
 void read_sub(const string & s)
@@ -87,9 +87,57 @@ TEST_CASE("gnmi_service_subscribe")
     i->name = "*";
     filter.interface.append(i);
 
-    // Get Request 
-    gs.subscribe(provider, filter, "ONCE", 10, "ON_CHANGE", 100000, read_sub);
+    // Build subscription
+    gNMIService::Subscription subscription{};
+    subscription.entity = &filter;
+    subscription.subscription_mode = "ON_CHANGE";
+    subscription.sample_interval = 10000000;
+    subscription.suppress_redundant = true;
+    subscription.heartbeat_interval = 1000000000;
 
+    gs.subscribe(provider, &subscription, 10, "ONCE", read_sub);
+}
+
+TEST_CASE("gnmi_service_subscribe_multiples")
+{
+    // session
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port};
+    gNMIService gs{};
+
+    openconfig_interfaces::Interfaces ifcs = {};
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "*";
+    ifcs.interface.append(ifc);
+
+    openconfig_bgp::Bgp bgp = {};
+    auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    neighbor->neighbor_address = "*";
+    bgp.neighbors->neighbor.append(neighbor);
+
+    // Build subscriptions
+    gNMIService::Subscription ifc_subscription{};
+    ifc_subscription.entity = &ifcs;
+    ifc_subscription.subscription_mode = "ON_CHANGE";
+    ifc_subscription.sample_interval = 10000000;
+    ifc_subscription.suppress_redundant = true;
+    ifc_subscription.heartbeat_interval = 1000000000;
+
+    gNMIService::Subscription bgp_subscription{};
+    bgp_subscription.entity = &bgp;
+    bgp_subscription.subscription_mode = "TARGET_DEFINED";
+    bgp_subscription.sample_interval = 20000000;
+    bgp_subscription.suppress_redundant = true;
+    bgp_subscription.heartbeat_interval = 2000000000;
+
+    vector<gNMIService::Subscription*> subscription_list{};
+    subscription_list.push_back(&ifc_subscription);
+    subscription_list.push_back(&bgp_subscription);
+
+    // Get Request
+    gs.subscribe(provider, subscription_list, 10, "ONCE", read_sub);
 }
 
 TEST_CASE("gnmi_service_create")

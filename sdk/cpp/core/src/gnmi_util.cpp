@@ -222,10 +222,21 @@ void parse_prefix_to_path(const string& prefix, gnmi::Path* path)
     }
 }
 
+static path::DataNode* get_last_datanode(path::DataNode* dn)
+{
+    auto children = dn->get_children();
+    if (!children.empty()) {
+        // Select last child
+        return get_last_datanode(children[children.size()-1].get());
+    }
+    return dn;
+}
+
 void parse_datanode_to_path(path::DataNode* dn, gnmi::Path* path)
 {
-	string root_path = dn->get_path();
-    std::vector<std::string> segments = path::segmentalize(root_path);
+    path::DataNode* last_datanode = get_last_datanode(dn);
+    string full_path = last_datanode->get_path();
+    std::vector<std::string> segments = path::segmentalize(full_path);
 
     // Add origin and first container to the path
     auto s = segments[1];

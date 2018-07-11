@@ -952,87 +952,70 @@ container ydk {
                      for updates for data sent from the target to the client.";
 
         input {
-          container request {
-            choice type {
-              case subscription {
-                list subscription-list {
-                  key "alias";
-                  uses gnmi-entity-grouping;
+          container subscription {
+            list subscription-list {
+              key "alias";
+              uses gnmi-entity-grouping;
 
-                  leaf subscription-mode {
-                    description "The mode of each subscription determines triggers for updates for data sent from the target to the client.";
-                    type enumeration {
-                        enum TARGET_DEFINED {
-                            value 0;
-                        }
-                        enum ON_CHANGE {
-                            value 1;
-                        }
-                        enum SAMPLE {
-                            value 2;
-                        }
-                    }
-                    default ON_CHANGE;
+              leaf subscription-mode {
+                  description "The mode of each subscription determines triggers for updates for data sent from the target to the client.";
+                  type enumeration {
+                      enum TARGET_DEFINED {
+                          value 0;
+                      }
+                      enum ON_CHANGE {
+                          value 1;
+                      }
+                      enum SAMPLE {
+                          value 2;
+                      }
                   }
-
-                  leaf sample-interval {
-                      description "Time interval in ns between samples in STREAM mode";
-                      type uint64;
-                      default 60000000;
-                  }
-
-                  leaf suppress-redundant {
-                      description "Indicates whether values that not changed should be sent in a STREAM subscription.";
-                      type boolean;
-                      default true;
-                  }
-
-                  leaf heartbeat-interval {
-                      description "Specifies the maximum allowable silent period in nanoseconds when
-                                   suppress_redundant is in use. The target should send a value at least once
-                                   in the period specified.";
-                      type uint64;
-                      default 3600000000;
-                  }
-                }
-
-                leaf mode {
-                    description "The mode of each subscription determines triggers for updates for data sent from the target to the client.";
-                    type enumeration {
-                        enum ONCE {
-                            value 0;
-                        }
-                        enum POLL {
-                            value 1;
-                        }
-                        enum STREAM {
-                            value 2;
-                        }
-                    }
-                    default ONCE;
-                }
-
-                leaf qos {
-                    description "DSCP marking to be used.";
-                    type uint32;
-                    default 0;
-                }
-
+                  default ON_CHANGE;
               }
-              case poll {
-                  leaf poll-request {
-                      description "Poll message sent to target to retrieve previously set subscription.";
-                      type empty;
-                  }
+
+              leaf sample-interval {
+                  description "Time interval in ns between samples in STREAM mode";
+                  type uint64;
+                  default 60000000;
               }
+
+              leaf suppress-redundant {
+                  description "Indicates whether values that not changed should be sent in a STREAM subscription.";
+                  type boolean;
+                  default true;
+              }
+
+              leaf heartbeat-interval {
+                  description "Specifies the maximum allowable silent period in nanoseconds when
+                               suppress_redundant is in use. The target should send a value at least once
+                               in the period specified.";
+                  type uint64;
+                  default 3600000000;
+              }
+            }
+
+            leaf mode {
+                description "The mode of each subscription determines triggers for updates for data sent from the target to the client.";
+                type enumeration {
+                    enum ONCE {
+                        value 0;
+                    }
+                    enum POLL {
+                        value 1;
+                    }
+                    enum STREAM {
+                        value 2;
+                    }
+                }
+                default ONCE;
+            }
+
+            leaf qos {
+                description "DSCP marking to be used.";
+                type uint32;
+                default 0;
             }
           }
-        }
-
-        output {
-            anyxml data {
-                description "Data that is read";
-            }
         }
     }
 

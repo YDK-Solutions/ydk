@@ -95,69 +95,26 @@ static gnmi::SubscriptionList_Mode get_sublist_mode(const string & list_mode)
     return gnmi::SubscriptionList_Mode_ONCE;
 }
 
-static gnmi::Path* get_prefix(pair<string, string> & prefix_pair)
+static void populate_subscribe_request(gnmi::SubscriptionList* sl, gNMISubscription subscription)
 {
-    gnmi::Path* prefix = new gnmi::Path;
-    prefix->set_origin(prefix_pair.first);
-    auto prefix_elem = prefix->add_elem();
-    prefix_elem->set_name(prefix_pair.second);
-    return prefix;
-}
-
-static gnmi::Path* get_gnmi_path(std::vector<PathElem> & path_container)
-{
-    gnmi::Path* path = new gnmi::Path;
-    for(size_t i = 0; i < path_container.size(); ++i)
-    {
-        auto path_elem = path->add_elem();
-        path_elem->set_name(path_container[i].path);
-        for(auto k : path_container[i].keys)
-        {
-            auto key = path_elem->mutable_key();
-            (*key)[k.name] = k.value;
-        }
-        YLOG_DEBUG("Key size {}", path_elem->key_size());
-    }
-    return path;
-}
-
-static void populate_subscribe_request(gnmi::SubscribeRequest & request,
-                                    std::pair<std::string, std::string> & prefix_pair,
-                                    std::vector<PathElem> & path_container,
-                                    const std::string & list_mode,
-                                    long long qos,
-                                    int sample_interval,
-                                    const std::string & mode)
-{
-    gnmi::SubscriptionList* sl = new gnmi::SubscriptionList;
-
-    sl->set_mode(get_sublist_mode(list_mode));
-    sl->set_allocated_prefix(get_prefix(prefix_pair));
-    sl->set_encoding(gnmi::Encoding::PROTO);
-
-    gnmi::QOSMarking* qosmarking = new gnmi::QOSMarking;
-    qosmarking->set_marking(qos);
-    sl->set_allocated_qos(qosmarking);
-
     gnmi::Subscription* sub = sl->add_subscription();
+    if (subscription.path)
+        sub->set_allocated_path(subscription.path);
+    sub->set_sample_interval(subscription.sample_interval);
+    sub->set_suppress_redundant(subscription.suppress_redundant);
+    sub->set_heartbeat_interval(subscription.heartbeat_interval);
 
-    sub->set_allocated_path(get_gnmi_path(path_container));
-    sub->set_sample_interval(sample_interval);
-
-    if(mode == "SAMPLE")
+    if(subscription.subscription_mode == "SAMPLE")
     {
         sub->set_mode(gnmi::SubscriptionMode::SAMPLE);
     }
-    else if(mode == "ON_CHANGE")
+    else if(subscription.subscription_mode == "ON_CHANGE")
     {
         sub->set_mode(gnmi::SubscriptionMode::ON_CHANGE);
     }
-    else
-    {
+    else {
         sub->set_mode(gnmi::SubscriptionMode::TARGET_DEFINED);
     }
-
-    request.set_allocated_subscribe(sl);
 }
 
 static string format_notification_response(const std::string& path_to_prepend, const std::string& value)
@@ -508,19 +465,30 @@ gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response
     return true;
 }
 
-void gNMIClient::execute_subscribe_operation(std::pair<std::string, std::string> & prefix,
-                                    std::vector<PathElem> & path_container,
-                                    const std::string & list_mode,
-                                    long long qos,
-                                    int sample_interval,
-                                    const std::string & mode,
-                                    std::function<void(const std::string &)> func)
+void
+gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
+		                                uint32 qos, const std::string & list_mode,
+                                        std::function<void(const std::string &)> func)
 {
     grpc::ClientContext context;
     gnmi::SubscribeResponse response;
+
     auto request = make_shared<gnmi::SubscribeRequest>();
 
-    populate_subscribe_request(*request, prefix, path_container, list_mode, qos, sample_interval, mode);
+    gnmi::SubscriptionList* sl = new gnmi::SubscriptionList;
+    sl->set_mode(get_sublist_mode(list_mode));
+    sl->set_encoding(gnmi::Encoding::JSON_IETF);
+
+    gnmi::QOSMarking* qosmarking = new gnmi::QOSMarking;
+    qosmarking->set_marking(qos);
+    sl->set_allocated_qos(qosmarking);
+
+    for (auto subscription : subscription_list) {
+        populate_subscribe_request(sl, subscription);
+    }
+    request->set_allocated_subscribe(sl);
+
+    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", request->DebugString().c_str());
 
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
@@ -528,9 +496,8 @@ void gNMIClient::execute_subscribe_operation(std::pair<std::string, std::string>
     auto a = stub_->Subscribe(&context);
     std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer = move(a);
 
-    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", request->DebugString().c_str());
     client_reader_writer->Write(*request);
-//    client_reader_writer->WritesDone();
+
     YLOG_DEBUG("Done sending request");
 
     YLOG_INFO("Subscribe Operation Succeeded");

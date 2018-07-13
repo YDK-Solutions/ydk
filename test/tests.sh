@@ -320,6 +320,51 @@ function collect_cpp_coverage {
     cp coverage.info ${YDKGEN_HOME}
 }
 
+function init_gnmi_server {
+    print_msg "Starting YDK gNMI server"
+    mkdir -p $YDKGEN_HOME/test/gnmi_server/build && cd $YDKGEN_HOME/test/gnmi_server/build
+    cmake .. && make
+    ./gnmi_server &
+    local status=$?
+    if [ $status -ne 0 ]; then
+        print_msg "Could not start gNMI server"
+        exit $status
+    fi
+    cd -
+}
+
+function stop_gnmi_server {
+    print_msg "Stopping gNMI server"
+    pkill -f gnmi_server
+}
+
+function build_gnmi_core_library {
+    print_msg "Building core gnmi library"
+    cd $YDKGEN_HOME/sdk/cpp/gnmi
+    mkdir -p build
+    cd build
+    cmake .. && make
+    sudo make install
+    cd $YDKGEN_HOME
+}
+
+function build_and_run_tests {
+    print_msg "Building gnmi tests"
+    cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
+    mkdir -p build
+    cd build
+    cmake .. && make
+
+    init_gnmi_server
+    ./ydk_gnmi_test
+    stop_gnmi_server
+}
+
+function run_cpp_gnmi_tests {
+    build_gnmi_core_library
+    build_and_run_tests
+}
+
 ######################################################################
 # Go ydktest bundle install and test functions
 ######################################################################
@@ -734,6 +779,8 @@ init_tcp_server
 ######################################
 install_test_cpp_core
 run_cpp_bundle_tests
+run_cpp_gnmi_tests
+
 exit
 
 init_go_env

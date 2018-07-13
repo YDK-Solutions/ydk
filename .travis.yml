@@ -4,12 +4,12 @@ language: python
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      group: edge
+#    - os: linux
+#      dist: trusty
+#      group: edge
 #    - os: osx
 #      osx_image: xcode7.3
-      language: generic
+#      language: generic
 #      go: 1.9
     - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7
     - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial PYTHON_VERSION=2.7

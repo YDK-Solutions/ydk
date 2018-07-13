@@ -29,6 +29,7 @@ gen-api/
 *.idea
 scripts
 sdk/cpp/core/tests/confd/ydktest/cli-history
+sdk/cpp/gnmi/tests/main.cpp
 sdk/python/core/ydk/models/ydktest
 test/gnmi_client
 yang/nxos*

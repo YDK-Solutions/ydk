@@ -54,9 +54,41 @@ function install_fpm {
     gem install --no-ri --no-rdoc fpm
 }
 
+function install_protobuf {
+    print_msg "Installing protobuf and protoc"
+
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip > /dev/null
+    unzip protobuf-cpp-3.3.0.zip
+    cd protobuf-3.3.0
+    ./configure > /dev/null
+    make > /dev/null
+    make check > /dev/null
+    sudo make install
+    sudo ldconfig
+    cd -
+}
+
+function install_grpc {
+    print_msg "Installing grpc"
+
+    git clone -b 1.4.5 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make > /dev/null
+    sudo make install
+    curr_dir="$(pwd)"
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$curr_dir/grpc/libs/opt:$curr_dir/protobuf-3.3.0/src/.libs:/usr/local/lib64
+    cd -
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 ./test/dependencies_centos_basic.sh
+
 install_confd
 install_openssl
 #install_fpm
+
+install_protobuf
+install_grpc

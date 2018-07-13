@@ -43,12 +43,12 @@ function install_fpm {
 function install_protobuf {
     print_msg "Installing protobuf and protoc"
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip > /dev/null
     unzip protobuf-cpp-3.3.0.zip
     cd protobuf-3.3.0
     ./configure
-    make
-    make check
+    make > /dev/null
+    make check > /dev/null
     sudo make install
     sudo ldconfig
     cd -
@@ -61,7 +61,7 @@ function install_grpc {
     cd grpc
     git submodule update --init
     sudo ldconfig
-    make
+    make > /dev/null
     sudo make install
     cd -
 }
@@ -69,8 +69,10 @@ function install_grpc {
 ########################## EXECUTION STARTS HERE #############################
 
 ./test/dependencies_ubuntu_basic.sh
+
 install_confd
 
 #install_fpm
+
 install_protobuf
 install_grpc

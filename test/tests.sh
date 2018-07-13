@@ -323,7 +323,7 @@ function collect_cpp_coverage {
 function init_gnmi_server {
     print_msg "Starting YDK gNMI server"
     mkdir -p $YDKGEN_HOME/test/gnmi_server/build && cd $YDKGEN_HOME/test/gnmi_server/build
-    cmake .. && make
+    ${CMAKE_BIN} .. && make
     ./gnmi_server &
     local status=$?
     if [ $status -ne 0 ]; then
@@ -343,7 +343,7 @@ function build_gnmi_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    cmake .. && make
+    ${CMAKE_BIN} .. && make
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -353,7 +353,7 @@ function build_and_run_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    cmake .. && make
+    ${CMAKE_BIN} .. && make
 
     init_gnmi_server
     ./ydk_gnmi_test

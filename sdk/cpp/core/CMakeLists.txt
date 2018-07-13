@@ -93,7 +93,6 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 include(CPack)
-include(FindProtobuf)
 
 # include custom Modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
@@ -345,8 +344,6 @@ set(yang_objs
     yang_types.c.o
 )
 
-set(protobuf_MODULE_COMPATIBLE TRUE)
-
 # Find dependent libraries
 find_library(curl_location curl)
 find_library(ssh_threads_location ssh_threads)
@@ -443,7 +440,6 @@ include_directories(
     ${LIBXML2_INCLUDE_DIR}
     ${libnetconf_headers_location}
     ${libnetconf_location}/headers
-    ${Protobuf_INCLUDE_DIR}
     ${libyang_headers_location}
     ${libyang_location}/headers
     ${PROJECT_SOURCE_DIR}/src
@@ -463,9 +459,7 @@ target_link_libraries(ydk
     ${pthread_location}
     libnetconf
     libyang
-    ${GRPC_GRPC++_LIBRARY}
     -rdynamic
-    ${PROTOBUF_LIBRARY}
     ${dl_location}
 )
 

@@ -733,6 +733,8 @@ init_tcp_server
 # Install/test core
 ######################################
 install_test_cpp_core
+run_cpp_bundle_tests
+exit
 
 init_go_env
 install_go_core
@@ -742,7 +744,7 @@ install_py_core
 ######################################
 # Install/test bundles
 ######################################
-run_cpp_bundle_tests
+
 run_go_bundle_tests
 run_python_bundle_tests
 # test_gen_tests

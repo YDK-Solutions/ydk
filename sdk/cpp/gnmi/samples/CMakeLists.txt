@@ -6,21 +6,7 @@ project(samples)
 set(SAMPLE_DESCRIPTION "BGP sample application using YANG Development Kit Library, the library for YDK API.")
 
 
-set(samples     bgp_create
-                bgp_update 
-                bgp_read
-                bgp_delete
-                bgp_routing_policy_create
-                isis_xr_create
-                isis_xr_delete
-                isis_xr_read
-                bgp_xr_create
-                bgp_xr_delete
-                bgp_xr_read
-                bgp_xr_opendaylight
-                bgp_restconf
-                xe_native_read # uncomment this line if you want to build this XE native sample which takes a while
-                )
+set(samples     bgp_gnmi_create)
 
 # set default build type if not specified by user
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -41,6 +27,8 @@ find_library(pcre_location pcre)
 find_library(xslt_location xslt)
 find_library(pthread_location pthread)
 find_library(dl_location dl)
+find_package(Protobuf REQUIRED)
+find_package(GRPC REQUIRED)
 
 include_directories(SYSTEM)
 
@@ -65,7 +53,9 @@ foreach(sample IN LISTS samples)
             ${xslt_location}
             ${pthread_location}
             ${dl_location}
- 	        -rdynamic
+            ${GRPC_GRPC++_LIBRARY}
+	        -rdynamic
+            ${PROTOBUF_LIBRARY}
             )
 
     set_property(TARGET ${sample} PROPERTY CXX_STANDARD 11)

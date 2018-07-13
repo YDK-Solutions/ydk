@@ -21,16 +21,18 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include "config.hpp"
-#include "catch.hpp"
 #include <ydk/gnmi_provider.hpp>
-#include <ydk/crud_service.hpp>
 #include <ydk/gnmi_service.hpp>
+#include <ydk/codec_provider.hpp>
+#include <ydk/codec_service.hpp>
+#include <ydk/entity_data_node_walker.hpp>
+
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/filters.hpp>
-#include <ydk/codec_provider.hpp>
-#include <ydk/codec_service.hpp>
+
+#include "../../core/src/catch.hpp"
+#include "../../core/tests/config.hpp"
 
 using namespace std;
 using namespace ydk;
@@ -40,7 +42,45 @@ using namespace std;
 using namespace ydk;
 using namespace ydktest;
 
-void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root);
+void print_tree(ydk::path::DataNode* dn, const std::string& indent)
+{
+  try {
+    ydk::path::Statement s = dn->get_schema_node().get_statement();
+    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
+        auto val = dn->get_value();
+        std::cout << indent << "<" << s.arg << ">" << val << "</" << s.arg << ">" << std::endl;
+    } else {
+        std::string child_indent{indent};
+        child_indent+="  ";
+        std::cout << indent << "<" << s.arg << ">" << std::endl;
+        for(auto c : dn->get_children())
+            print_tree(c.get(), child_indent);
+        std::cout << indent << "</" << s.arg << ">" << std::endl;
+    }
+  }
+  catch (ydk::path::YCoreError &ex) {
+	  std::cout << ex.what() << std::endl;
+  }
+}
+
+void print_data_node(shared_ptr<ydk::path::DataNode> dn)
+{
+  try {
+	cout << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
+    print_tree(dn.get(), " ");
+  }
+  catch (ydk::path::YCoreError &ex) {
+	  std::cout << ex.what() << std::endl;
+  }
+}
+
+void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root)
+{
+    ydk::path::DataNode& dn = get_data_node_from_entity( *entity, root);
+	ydk::path::Statement s = dn.get_schema_node().get_statement();
+	cout << "\n=====>  Printing DataNode: '" << s.arg << "'" << endl;
+    print_tree( &dn, " ");
+}
 
 void config_bgp(openconfig_bgp::Bgp bgp)
 {

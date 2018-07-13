@@ -24,9 +24,11 @@
 #include <algorithm>
 #include <vector>
 
+#include <ydk/errors.hpp>
+#include <ydk/logger.hpp>
+#include <ydk/entity_util.hpp>
+
 #include "gnmi_util.hpp"
-#include "errors.hpp"
-#include "logger.hpp"
 
 using namespace std;
 
@@ -222,7 +224,11 @@ void parse_prefix_to_path(const string& prefix, gnmi::Path* path)
     }
 }
 
-static path::DataNode* get_last_datanode(path::DataNode* dn)
+namespace path {
+
+vector<string> segmentalize(const string& path);
+
+static path::DataNode* get_last_datanode(DataNode* dn)
 {
     auto children = dn->get_children();
     if (!children.empty()) {
@@ -232,7 +238,7 @@ static path::DataNode* get_last_datanode(path::DataNode* dn)
     return dn;
 }
 
-void parse_datanode_to_path(path::DataNode* dn, gnmi::Path* path)
+void parse_datanode_to_path(DataNode* dn, gnmi::Path* path)
 {
     path::DataNode* last_datanode = get_last_datanode(dn);
     string full_path = last_datanode->get_path();
@@ -248,4 +254,6 @@ void parse_datanode_to_path(path::DataNode* dn, gnmi::Path* path)
     }
 }
 
-}
+}    // namespace path
+
+}  // namespace ydk

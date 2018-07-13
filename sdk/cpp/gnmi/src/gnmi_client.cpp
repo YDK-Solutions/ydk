@@ -24,9 +24,10 @@
 #include <thread>
 #include <google/protobuf/text_format.h>
 
-#include "errors.hpp"
-#include "json.hpp"
-#include "logger.hpp"
+#include <ydk/errors.hpp>
+#include <ydk/json.hpp>
+#include <ydk/logger.hpp>
+
 #include "gnmi_util.hpp"
 #include "gnmi_client.hpp"
 

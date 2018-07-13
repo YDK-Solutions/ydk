@@ -14,16 +14,18 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 #include <string.h>
+#include <iostream>
+
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/errors.hpp>
-#include <iostream>
-#include "config.hpp"
-#include "catch.hpp"
+
+#include "../../core/src/catch.hpp"
+#include "../../core/tests/config.hpp"
 
 using namespace ydk;
 using namespace std;
 
-TEST_CASE("GNMICreateP")
+TEST_CASE("GNMICreateWithRepo")
 {
 	ydk::path::Repository repo{TEST_HOME};
 	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
@@ -31,7 +33,7 @@ TEST_CASE("GNMICreateP")
 	CHECK_NOTHROW(provider.get_encoding());
 }
 
-TEST_CASE("GNMICreateNoRepoP")
+TEST_CASE("GNMICreateNoRepo")
 {
 	ydk::path::Repository repo{};
 	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};

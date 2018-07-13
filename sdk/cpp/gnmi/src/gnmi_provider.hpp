@@ -18,12 +18,11 @@
 #define _GNMI_PROVIDER_H_
 
 #include <fstream>
-#include <libyang/libyang.h>
+
+#include <ydk/service_provider.hpp>
 
 #include "gnmi_client.hpp"
-#include "path_api.hpp"
 #include "gnmi_path_api.hpp"
-#include "service_provider.hpp"
 
 namespace ydk 
 {
@@ -31,7 +30,7 @@ namespace ydk
 
     class gNMIServiceProvider : public ServiceProvider 
     {
-    public:
+      public:
         typedef struct SecureChannelArguments
         {
             std::shared_ptr<grpc::ChannelCredentials> channel_creds;
@@ -55,7 +54,7 @@ namespace ydk
         const path::Session& get_session() const;
         std::vector<std::string> get_capabilities() const;
 
-    private:
+      private:
         const path::gNMISession session;
         bool is_secure;
     };

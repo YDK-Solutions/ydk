@@ -24,8 +24,7 @@
 #ifndef GNMI_SERVICE_HPP
 #define GNMI_SERVICE_HPP
 
-#include "path_api.hpp"
-#include "types.hpp"
+#include "gnmi_path_api.hpp"
 
 namespace ydk
 {

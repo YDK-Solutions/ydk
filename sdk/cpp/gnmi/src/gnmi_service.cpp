@@ -20,14 +20,15 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
-#include "codec_service.hpp"
-#include "entity_data_node_walker.hpp"
-#include "gnmi_util.hpp"
-#include "errors.hpp"
-#include "logger.hpp"
+
+#include <ydk/entity_data_node_walker.hpp>
+#include <ydk/common_utilities.hpp>
+#include <ydk/errors.hpp>
+#include <ydk/logger.hpp>
+
 #include "gnmi_provider.hpp"
 #include "gnmi_service.hpp"
-#include "common_utilities.hpp"
+#include "gnmi_util.hpp"
 
 using namespace std;
 

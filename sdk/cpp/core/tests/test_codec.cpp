@@ -25,11 +25,13 @@
 //
 //////////////////////////////////////////////////////////////////
 
-#include "../src/types.hpp"
-#include "catch.hpp"
-#include "mock_data.hpp"
 #include <iostream>
 
+#include "catch.hpp"
+#include "config.hpp"
+#include "mock_data.hpp"
+
+#include "../src/types.hpp"
 #include "../src/path/path_private.hpp"
 
 using namespace ydk;

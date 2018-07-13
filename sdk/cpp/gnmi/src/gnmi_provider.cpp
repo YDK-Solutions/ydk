@@ -26,20 +26,24 @@
 #include <memory>
 #include <libyang/libyang.h>
 
-#include "entity_data_node_walker.hpp"
-#include "errors.hpp"
-#include "ietf_parser.hpp"
+#include <ydk/errors.hpp>
+#include <ydk/entity_data_node_walker.hpp>
+#include <ydk/ietf_parser.hpp>
+#include <ydk/types.hpp>
+#include <ydk/logger.hpp>
+
 #include "gnmi_client.hpp"
 #include "gnmi_provider.hpp"
-#include "types.hpp"
-#include "ydk_yang.hpp"
-#include "logger.hpp"
 
 using namespace std;
-using namespace ydk;
 
 namespace ydk
 {
+
+    ServiceProvider::~ServiceProvider()
+    {
+    }
+
     gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
                    const std::string& address,
                    const std::string& username,

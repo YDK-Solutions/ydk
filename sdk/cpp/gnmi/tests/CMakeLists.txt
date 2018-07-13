@@ -1,34 +1,16 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
 project(ydk_bundle_test)
-set(YDK_UNITTEST_TARGET_NAME "ydk_bundle_test")
+set(YDK_UNITTEST_TARGET_NAME "ydk_gnmi_test")
 
 enable_testing()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
-        main.cpp
-        test_c_api.cpp
-        test_crud.cpp
-        test_errors.cpp
-        test_executor_service.cpp
-        test_netconf_operations.cpp
-        test_netconf_provider.cpp
-        test_netconf_service.cpp
-        test_netconf_ssh_client.cpp
-        test_netconf_tcp_client.cpp
-        test_on_demand_loading.cpp
-        test_opendaylight.cpp
-        test_path_api.cpp
-        test_restconf_client.cpp
-        test_restconf_provider.cpp
-        test_sanity_codec.cpp
-        test_sanity_levels.cpp
-        test_sanity_types.cpp
-        test_xml_subtree.cpp
-        testsanitynctest.cpp
-        testsanityvalidationtest.cpp
-        )
+        test_core_gnmi.cpp
+        test_gnmi_provider.cpp
+        test_gnmi_service.cpp
+        main.cpp)
 
 find_library(xml2_location xml2)
 find_library(curl_location curl)
@@ -39,8 +21,8 @@ find_library(xslt_location xslt)
 find_library(pthread_location pthread)
 find_library(dl_location dl)
 find_library(ydk_location ydk)
+find_library(ydk_gnmi_location ydk_gnmi)
 find_library(ydk_ydktest_location ydk_ydktest)
-find_library(ydk_ydktest_new_location ydk_ydktest_new)
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
 
@@ -68,6 +50,7 @@ set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
     ${ydk_location}
+    ${ydk_gnmi_location}
     ${ydk_ydktest_location}
     ${ydk_ydktest_new_location}
     ${xml2_location}

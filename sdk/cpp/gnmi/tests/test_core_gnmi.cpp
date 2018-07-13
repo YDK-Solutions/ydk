@@ -24,28 +24,85 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#include "catch.hpp"
-#include "config.hpp"
-#include "gnmi_path_api.hpp"
+#include <ydk/gnmi_path_api.hpp>
+#include <ydk/gnmi_util.hpp>
 
-//const char* gnmi_expected_bgp_output ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
-//const char* gnmi_expected_bgp_read ="{\"openconfig-bgp:bgp\":{\"global\":{\"config\":{\"as\":65172}},\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}}";
+#include "../../core/src/path/path_private.hpp"
+#include "../../core/src/catch.hpp"
+#include "../../core/tests/config.hpp"
+#include "../../core/tests/mock_data.hpp"
 
-//void gnmi_print_tree(ydk::path::DataNode* dn, const std::string& indent)
-//{
-//    ydk::path::Statement s = dn->get_schema_node().get_statement();
-//    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
-//        auto val = dn->get_value();
-//        std::cout << indent << "{\"" << s.arg << "\":" << val << "}" << std::endl;
-//    } else {
-//        std::string child_indent{indent};
-//        child_indent+="  ";
-//        std::cout << indent << "{\"" << s.arg << "\":" << std::endl;
-//        for(auto c : dn->get_children())
-//	    gnmi_print_tree(c.get(), child_indent);
-//        std::cout << indent << "}" << std::endl;
-//    }
-//}
+TEST_CASE( "test_gnmi_datanode_to_path" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    mock::MockSession sp{TEST_HOME, test_openconfig};
+    auto & schema = sp.get_root_schema();
+
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp");
+    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']");
+    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::path::parse_datanode_to_path(&peer_as, path);
+
+    std::string expected = R"(origin: "openconfig-bgp"
+elem {
+  name: "bgp"
+}
+elem {
+  name: "neighbors"
+}
+elem {
+  name: "neighbor"
+  key {
+    key: "neighbor-address"
+    value: "172.16.255.2"
+  }
+}
+elem {
+  name: "config"
+}
+elem {
+  name: "peer-as"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
+
+TEST_CASE( "test_gnmi_datanode_to_path_2" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    mock::MockSession sp{TEST_HOME, test_openconfig};
+    auto & schema = sp.get_root_schema();
+
+    auto & runner = schema.create_datanode("ydktest-sanity:runner");
+    auto & two_pr  = runner.create_datanode("two-key-list[first='GigabitEthernet0/0/0/0'][second='222']");
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::path::parse_datanode_to_path(&two_pr, path);
+
+    std::string expected = R"(origin: "ydktest-sanity"
+elem {
+  name: "runner"
+}
+elem {
+  name: "two-key-list"
+  key {
+    key: "first"
+    value: "GigabitEthernet0/0/0/0"
+  }
+  key {
+    key: "second"
+    value: "222"
+  }
+}
+elem {
+  name: "second"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
 
 TEST_CASE("gnmi_test_json_payload"  )
 {

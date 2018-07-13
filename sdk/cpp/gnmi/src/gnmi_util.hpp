@@ -23,8 +23,7 @@
 #ifndef GNMI_UTIL_HPP
 #define GNMI_UTIL_HPP
 
-#include "entity_util.hpp"
-#include "path/path_private.hpp"
+#include <ydk/path_api.hpp>
 
 #include "gnmi.pb.h"
 
@@ -52,9 +51,11 @@ void parse_entity_prefix(Entity& entity, std::pair<std::string, std::string> & p
 void parse_entity_to_path(Entity& entity, gnmi::Path* path);
 void parse_entity_prefix(Entity& entity, gnmi::Path* path);
 
-void parse_datanode_to_path(path::DataNode* dn, gnmi::Path* path);
-
 void parse_prefix_to_path(const std::string& prefix, gnmi::Path* path);
+
+namespace path {
+    void parse_datanode_to_path(DataNode* dn, gnmi::Path* path);
+}
 
 }
 #endif /* GNMI_UTIL_HPP */

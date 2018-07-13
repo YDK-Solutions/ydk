@@ -36,7 +36,7 @@
 #include "gnmi.grpc.pb.h"
 #include "gnmi.pb.h"
 
-#include "types.hpp"
+#include <ydk/types.hpp>
 
 using namespace gnmi;
 

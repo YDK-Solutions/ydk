@@ -28,7 +28,7 @@
 #ifndef YDK_GNMI_CORE_HPP
 #define YDK_GNMI_CORE_HPP
 
-#include "path_api.hpp"
+#include <ydk/path_api.hpp>
 
 namespace grpc {
     class ChannelCredentials;

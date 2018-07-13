@@ -24,12 +24,13 @@
 #include <fstream>
 #include <libyang/libyang.h>
 
-#include "../gnmi_provider.hpp"
-#include "../ietf_parser.hpp"
-#include "../logger.hpp"
-#include "../gnmi_path_api.hpp"
-#include "../ydk_yang.hpp"
-#include "path_private.hpp"
+#include <ydk/ietf_parser.hpp>
+#include <ydk/logger.hpp>
+
+#include "../../core/src/path/path_private.hpp"
+
+#include "gnmi_provider.hpp"
+#include "gnmi_path_api.hpp"
 #include "gnmi_util.hpp"
 
 using grpc::Channel;
@@ -44,7 +45,7 @@ namespace ydk
 {
 namespace path
 {
-static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode& root_schema, string operation);
+static SchemaNode* get_schema_for_operation(RootSchemaNode& root_schema, string operation);
 
 static gNMISession::SecureChannelArguments get_channel_credentials();
 
@@ -58,7 +59,7 @@ gNMISession::gNMISession(const std::string& address,
                    int port)
 {
     is_secure = true;
-	path::Repository repo;
+	Repository repo;
     initialize(repo, address, username, password, port);
     YLOG_DEBUG("gNMISession: Connected to {} using Secure Channel", address, username, password, port);
 }
@@ -85,7 +86,7 @@ gNMISession::gNMISession(Repository & repo,
 
 gNMISession::~gNMISession() = default;
 
-void gNMISession::initialize(path::Repository & repo, const std::string& address, const std::string& username, const std::string& password, int port)
+void gNMISession::initialize(Repository & repo, const std::string& address, const std::string& username, const std::string& password, int port)
 {
     IetfCapabilitiesParser capabilities_parser{};
 
@@ -154,16 +155,16 @@ std::vector<std::string> gNMISession::get_capabilities() const
     return server_capabilities;
 }
 
-path::RootSchemaNode& gNMISession::get_root_schema() const
+RootSchemaNode& gNMISession::get_root_schema() const
 {
     return *root_schema;
 }
 
-void gNMISession::invoke(path::Rpc& rpc, std::function<void(const std::string &)> func) const
+void gNMISession::invoke(Rpc& rpc, std::function<void(const std::string &)> func) const
 {
-    path::SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
+    SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
-    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     if (rpc_schema == gnmi_sub) {
         handle_subscribe(rpc, func);
@@ -174,13 +175,13 @@ void gNMISession::invoke(path::Rpc& rpc, std::function<void(const std::string &)
     }
 }
 
-shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
+shared_ptr<DataNode> gNMISession::invoke(Rpc& rpc) const
 {
-    path::SchemaNode* gnmi_get = get_schema_for_operation(*root_schema, "ydk:gnmi-get");
-    path::SchemaNode* gnmi_set = get_schema_for_operation(*root_schema, "ydk:gnmi-set");
-    path::SchemaNode* gnmi_cap = get_schema_for_operation(*root_schema, "ydk:gnmi-caps");
+    SchemaNode* gnmi_get = get_schema_for_operation(*root_schema, "ydk:gnmi-get");
+    SchemaNode* gnmi_set = get_schema_for_operation(*root_schema, "ydk:gnmi-set");
+    SchemaNode* gnmi_cap = get_schema_for_operation(*root_schema, "ydk:gnmi-caps");
 
-    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    SchemaNode* rpc_schema = &(rpc.get_schema_node());
     if(rpc_schema == gnmi_set)
     {
         handle_set(rpc);
@@ -202,7 +203,7 @@ shared_ptr<path::DataNode> gNMISession::invoke(path::Rpc& rpc) const
     return nullptr;
 }
 
-shared_ptr<path::DataNode> gNMISession::invoke(path::DataNode& datanode) const
+shared_ptr<DataNode> gNMISession::invoke(DataNode& datanode) const
 {
     throw(YOperationNotSupportedError{"gNMISession::invoke: action datanode is not supported!"});
     return nullptr;
@@ -220,7 +221,7 @@ static void populate_path_from_payload(gnmi::Path* path, const string & payload,
     parse_datanode_to_path(child, path);
 }
 
-static gNMIRequest build_set_request(path::RootSchemaNode & root_schema, DataNode* request, const string & operation)
+static gNMIRequest build_set_request(RootSchemaNode & root_schema, DataNode* request, const string & operation)
 {
     gNMIRequest one_request{};
     one_request.type = "set";
@@ -230,7 +231,7 @@ static gNMIRequest build_set_request(path::RootSchemaNode & root_schema, DataNod
         YLOG_ERROR("Failed to get 'entity' node from set RPC");
         throw(YInvalidArgumentError{"Failed to get 'entity' node from set RPC"});
     }
-    path::DataNode* entity_node = entity[0].get();
+    DataNode* entity_node = entity[0].get();
     one_request.payload = entity_node->get_value();
 
     one_request.path = new gnmi::Path();
@@ -248,12 +249,9 @@ static gNMIRequest build_set_request(path::RootSchemaNode & root_schema, DataNod
     return one_request;
 }
 
-bool gNMISession::handle_set(path::Rpc& ydk_rpc) const
+bool gNMISession::handle_set(Rpc& ydk_rpc) const
 {
 	vector<gNMIRequest> setRequest{};
-
-    //path::SchemaNode* rpc_schema = &(ydk_rpc.get_schema_node());
-    //auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
 
     auto delete_list = ydk_rpc.get_input_node().find("delete");
     if (!delete_list.empty()) {
@@ -282,12 +280,12 @@ bool gNMISession::handle_set(path::Rpc& ydk_rpc) const
     return client->execute_set_operation(setRequest);
 }
 
-shared_ptr<path::DataNode>
-gNMISession::handle_get(path::Rpc& rpc) const
+shared_ptr<DataNode>
+gNMISession::handle_get(Rpc& rpc) const
 {
 	vector<gNMIRequest> getRequest{};
 
-    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     auto request_list = rpc.get_input_node().find("request");
     if (request_list.empty()) {
@@ -298,7 +296,7 @@ gNMISession::handle_get(path::Rpc& rpc) const
     string operation = "CONFIG";
     auto type = rpc.get_input_node().find("type");
     if (!type.empty()) {
-        path::DataNode* type_node = type[0].get();
+        DataNode* type_node = type[0].get();
         operation = type_node->get_value();
     }
 
@@ -309,7 +307,7 @@ gNMISession::handle_get(path::Rpc& rpc) const
 
         auto alias = request.get()->find("alias");
         if (!alias.empty()) {
-            path::DataNode* alias_node = alias[0].get();
+            DataNode* alias_node = alias[0].get();
             one_request.alias = alias_node->get_value();
         }
 
@@ -318,7 +316,7 @@ gNMISession::handle_get(path::Rpc& rpc) const
             YLOG_ERROR("Failed to get 'entity' node from '{}' RPC", rpc_name);
             throw(YInvalidArgumentError{"Failed to get 'entity' node from RPC"});
         }
-        path::DataNode* entity_node = entity[0].get();
+        DataNode* entity_node = entity[0].get();
         one_request.payload = entity_node->get_value();
 
         one_request.path = new gnmi::Path();
@@ -336,12 +334,12 @@ gNMISession::handle_get(path::Rpc& rpc) const
     return handle_get_reply(reply);
 }
 
-shared_ptr<path::DataNode>
+shared_ptr<DataNode>
 gNMISession::handle_get_reply(vector<string> reply_val) const
 {
-    path::Codec codec{};
+    Codec codec{};
 
-    shared_ptr<path::DataNode> root_dn = codec.decode_json_output(get_root_schema(), reply_val);
+    shared_ptr<DataNode> root_dn = codec.decode_json_output(get_root_schema(), reply_val);
     if (!root_dn) {
         YLOG_ERROR( "Codec service failed to decode JSON values from GetResponse");
         throw(YError{"Problems deserializing JSON output"});
@@ -349,14 +347,14 @@ gNMISession::handle_get_reply(vector<string> reply_val) const
     return root_dn;
 }
 
-shared_ptr<path::DataNode>
+shared_ptr<DataNode>
 gNMISession::handle_get_capabilities() const
 {
 	gNMICapabilityResponse reply = client->execute_get_capabilities();
 
-	RootSchemaNodeImpl & rs_impl = dynamic_cast<ydk::path::RootSchemaNodeImpl &> (*root_schema);
+	RootSchemaNodeImpl & rs_impl = dynamic_cast<RootSchemaNodeImpl &> (*root_schema);
 
-    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+    RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
 
 	auto & output_dn = rd->create_datanode("ydk:gnmi-capabilities", "");
 
@@ -377,14 +375,14 @@ gNMISession::handle_get_capabilities() const
 
 	output_dn.create_datanode("gnmi-version", reply.gnmi_version);
 
-    return shared_ptr<path::DataNode> (rd);
+    return shared_ptr<DataNode> (rd);
 }
 
 void
-gNMISession::handle_subscribe(path::Rpc& rpc, std::function<void(const std::string &)> func) const
+gNMISession::handle_subscribe(Rpc& rpc, std::function<void(const std::string &)> func) const
 {
     vector<gNMISubscription> sub_list{};
-    path::SchemaNode* rpc_schema = &(rpc.get_schema_node());
+    SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     auto subscription = rpc.get_input_node().find("subscription");
     if (subscription.empty()) {
@@ -394,13 +392,13 @@ gNMISession::handle_subscribe(path::Rpc& rpc, std::function<void(const std::stri
     uint32 qos = 0;
     auto qos_dn = subscription[0]->find("qos");
     if (!qos_dn.empty()) {
-        path::DataNode* qos_node = qos_dn[0].get();
+        DataNode* qos_node = qos_dn[0].get();
         qos = strtoul(qos_node->get_value().c_str(), NULL, 0);
     }
     string mode = "ONCE";
     auto mode_dn = subscription[0]->find("mode");
     if (!mode_dn.empty()) {
-        path::DataNode* mode_node = mode_dn[0].get();
+        DataNode* mode_node = mode_dn[0].get();
         mode = mode_node->get_value();
     }
 
@@ -418,28 +416,28 @@ gNMISession::handle_subscribe(path::Rpc& rpc, std::function<void(const std::stri
             YLOG_ERROR("Failed to get 'entity' node from subscribe RPC");
             throw(YInvalidArgumentError{"Failed to get 'entity' node from subscribe RPC"});
         }
-        path::DataNode* entity_node = entity_vector[0].get();
+        DataNode* entity_node = entity_vector[0].get();
         sub.path = new gnmi::Path();
         populate_path_from_payload(sub.path, entity_node->get_value(), *root_schema);
 
         sub.subscription_mode = "ON_CHANGE";
         auto list_mode_dn = one_subscription->find("subscription-mode");
         if (!list_mode_dn.empty()) {
-            path::DataNode* list_mode_node = list_mode_dn[0].get();
+            DataNode* list_mode_node = list_mode_dn[0].get();
             sub.subscription_mode = list_mode_node->get_value();
         }
 
         sub.sample_interval = 60000000;
         auto interval_dn = one_subscription->find("sample-interval");
         if (!interval_dn.empty()) {
-            path::DataNode* interval_node = interval_dn[0].get();
+            DataNode* interval_node = interval_dn[0].get();
             sub.sample_interval = strtoull(interval_node->get_value().c_str(), NULL, 0);
         }
 
         sub.suppress_redundant = true;
         auto suppress_dn = one_subscription->find("suppress-redundant");
         if (!suppress_dn.empty()) {
-            path::DataNode* suppress_node = suppress_dn[0].get();
+            DataNode* suppress_node = suppress_dn[0].get();
             if (suppress_node->get_value() == "false")
             sub.suppress_redundant = false;
         }
@@ -447,7 +445,7 @@ gNMISession::handle_subscribe(path::Rpc& rpc, std::function<void(const std::stri
         sub.heartbeat_interval = sub.sample_interval * 10;
         auto heartbeat_dn = one_subscription->find("heartbeat-interval");
         if (!heartbeat_dn.empty()) {
-            path::DataNode* heartbeat_node = heartbeat_dn[0].get();
+            DataNode* heartbeat_node = heartbeat_dn[0].get();
             sub.heartbeat_interval = strtoull(heartbeat_node->get_value().c_str(), NULL, 0);
         }
 
@@ -462,7 +460,7 @@ gNMIClient & gNMISession::get_client() const
     return *client;
 }
 
-static path::SchemaNode* get_schema_for_operation(path::RootSchemaNode & root_schema, string operation)
+static SchemaNode* get_schema_for_operation(RootSchemaNode & root_schema, string operation)
 {
     auto c = root_schema.find(operation);
     if(c.empty())

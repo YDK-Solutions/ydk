@@ -30,3 +30,5 @@ gen-api/
 scripts
 sdk/cpp/core/tests/confd/ydktest/cli-history
 sdk/python/core/ydk/models/ydktest
+test/gnmi*
+yang/nxos*

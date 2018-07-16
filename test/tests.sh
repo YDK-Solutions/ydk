@@ -343,7 +343,7 @@ function build_gnmi_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    ${CMAKE_BIN} .. && make
+    ${CMAKE_BIN} -DCOVERAGE=True .. && make
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -353,7 +353,7 @@ function build_and_run_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    ${CMAKE_BIN} .. && make
+    ${CMAKE_BIN} -DCOVERAGE=True .. && make
 
     init_gnmi_server
     ./ydk_gnmi_test

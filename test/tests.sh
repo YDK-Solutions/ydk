@@ -361,6 +361,14 @@ function build_and_run_tests {
 }
 
 function run_cpp_gnmi_tests {
+    if [[ $(uname) == "Linux" ]] ; then
+        os_info=$(cat /etc/*-release)
+        if [[ ${os_info} == *"fedora"* ]]; then
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
+            print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
+        fi
+    fi
+
     build_gnmi_core_library
     build_and_run_tests
 }

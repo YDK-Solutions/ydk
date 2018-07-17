@@ -53,10 +53,6 @@ function install_grpc {
     sudo make install
     sudo ldconfig
     cd -
-
-    curr_dir="$(pwd)"
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$curr_dir/grpc/libs/opt:$curr_dir/protobuf-3.5.0/src/.libs:/usr/local/lib64
-
 }
 
 ########################## EXECUTION STARTS HERE #############################

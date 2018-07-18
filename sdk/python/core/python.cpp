@@ -28,8 +28,6 @@
 #include <ydk/entity_util.hpp>
 #include <ydk/executor_service.hpp>
 #include <ydk/filters.hpp>
-#include <ydk/gnmi_provider.hpp>
-#include <ydk/gnmi_service.hpp>
 #include <ydk/logging_callback.hpp>
 #include <ydk/netconf_provider.hpp>
 #include <ydk/netconf_service.hpp>
@@ -462,21 +460,6 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::RestconfSession::*)(ydk::path::Rpc& rpc) const) &ydk::path::RestconfSession::invoke, return_value_policy::reference)
         .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::RestconfSession::*)(ydk::path::DataNode& rpc) const) &ydk::path::RestconfSession::invoke, return_value_policy::reference);
 
-    class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
-        .def(init<ydk::path::Repository&, const std::string&, const std::string&, const std::string&, int>(),
-             arg("repo"),
-             arg("address"),
-             arg("username"),
-             arg("password"),
-             arg("port")=57400)
-        .def(init<const std::string&, const std::string&, const std::string&, int>(),
-             arg("address"),
-             arg("username"),
-             arg("password"),
-             arg("port")=57400)
-        .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
-        .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference);
-
     class_<ydk::path::Statement>(path, "Statement")
         .def(init<const string &, const string &>(), arg("keyword"), arg("arg"))
         .def(init<>())
@@ -552,7 +535,9 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("encode", (std::string (ydk::path::Codec::*)(std::vector<ydk::path::DataNode*>&, ydk::EncodingFormat, bool))
                 &ydk::path::Codec::encode, arg("data_node"), arg("encoding"), arg("pretty"))
         .def("decode", &ydk::path::Codec::decode, arg("root_schema_node"), arg("payload"), arg("encoding"))
-        .def("decode_rpc_output", &ydk::path::Codec::decode_rpc_output, arg("root_schema_node"), arg("payload"), arg("rpc_path"), arg("encoding"));
+        .def("decode_rpc_output", &ydk::path::Codec::decode_rpc_output, arg("root_schema_node"), arg("payload"), arg("rpc_path"), arg("encoding"))
+        .def("decode_json_output", (std::shared_ptr<ydk::path::DataNode> (ydk::path::Codec::*)(ydk::path::RootSchemaNode&, const std::vector<std::string>&))
+        		&ydk::path::Codec::decode_json_output, arg("root_schema_node"), arg("buffer_list"));
 
     enum_<ydk::DataStore>(services, "Datastore")
         .value("candidate", ydk::DataStore::candidate)
@@ -936,13 +921,6 @@ PYBIND11_MODULE(ydk_, ydk)
         .def("get_node_provider", &ydk::OpenDaylightServiceProvider::get_node_provider, return_value_policy::reference)
         .def("get_node_ids", &ydk::OpenDaylightServiceProvider::get_node_ids, return_value_policy::reference);
 
-    class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
-        .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),
-            arg("repo"), arg("address"), arg("username"), arg("password"), arg("port")=57400)
-        .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
-        .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
-        .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);
-
     class_<ydk::CrudService>(services, "CRUDService")
         .def(init<>())
         .def("create",
@@ -1074,18 +1052,6 @@ PYBIND11_MODULE(ydk_, ydk)
             arg("provider"),
             arg("source_config"),
             return_value_policy::reference);
-
-    class_<ydk::gNMIService>(services, "gNMIService")
-	    .def(init<>())
-	    .def("get", &ydk::gNMIService::get, arg("provider"), arg("filter"), return_value_policy::reference)
-    	.def("set", &ydk::gNMIService::set, arg("provider"), arg("entity"), arg("operation"), return_value_policy::reference)
-    	.def("subscribe", &ydk::gNMIService::subscribe, arg("provider"),
-    	                                                arg("filter"),
-    	                                                arg("list_mode"),
-    	                                                arg("qos"),
-    	                                                arg("mode"),
-    	                                                arg("sample_interval"),
-    	                                                arg("callback_function"));
 
     class_<ydk::XmlSubtreeCodec>(entity_utils, "XmlSubtreeCodec")
         .def(init<>())

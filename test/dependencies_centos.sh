@@ -61,5 +61,5 @@ install_confd
 install_openssl
 #install_fpm
 
-./test/dependencies_centos_gnmi.sh
+./test/dependencies_linux_gnmi.sh
 

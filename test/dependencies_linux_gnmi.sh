@@ -13,19 +13,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------
 #
-# dependencies_centos.sh
-# Script to install protobuf, protoc and grpc on Centos 
-# for running ydk_gnmi on docker
+# dependencies_linux_gnmi.sh
+# Script to install protobuf, protoc and grpc on Ubuntu and CentOS
+# for running ydk_gnmi_test on docker
 #
-# --------------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_centos_gnmi.sh | $1${NOCOLOR}"
+    echo -e "${RED}*** $(date) *** dependencies_linux_gnmi.sh | $1${NOCOLOR}"
 }
 
 function install_protobuf {
@@ -36,7 +36,6 @@ function install_protobuf {
     cd protobuf-3.5.0
     ./configure > /dev/null
     make > /dev/null
-#    make check > /dev/null
     sudo make install
     sudo ldconfig
     cd -

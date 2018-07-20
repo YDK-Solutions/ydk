@@ -32,3 +32,6 @@ sdk/cpp/core/tests/confd/ydktest/cli-history
 sdk/python/core/ydk/models/ydktest
 test/gnmi*
 yang/nxos*
+grpc
+protobuf-3.5.0
+sdk/cpp/gnmi

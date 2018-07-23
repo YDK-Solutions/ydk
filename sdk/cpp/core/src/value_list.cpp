@@ -395,7 +395,7 @@ YList::pop(const std::size_t item)
 {
     if (item < key_vector.size()) {
         vector<string>::iterator it = key_vector.begin();
-        for (size_t i = 0; i < item; i++) it++;
+        for (size_t i = 0; i < item; i++) ++it;
         shared_ptr<Entity> found = entity_map[*it];
         entity_map.erase(*it);
         key_vector.erase(it);

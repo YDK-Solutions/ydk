@@ -164,19 +164,3 @@ TEST_CASE( "decode_multiple_json" )
     auto json_str = s.encode(*dn, EncodingFormat::JSON, true);
     REQUIRE(json_str == json_int_payload + json_bgp_payload);
 }
-
-/*
-TEST_CASE( "test_codec_ok" )
-{
-    ydk::path::Codec s{};
-    std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
-
-    auto & schema = sp.get_root_schema();
-
-    string pl2 = "<ok/>";
-    auto d2 = s.decode_rpc_output(schema, pl2, "/ietf-netconf:edit-config", EncodingFormat::XML);
-    REQUIRE(d2!=nullptr);
-    auto x2 = s.encode(*d2, EncodingFormat::XML, false);
-    REQUIRE(x2=="<ok/>");
-}*/

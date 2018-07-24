@@ -122,12 +122,23 @@ TEST_CASE("gnmi_service_subscribe")
     gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
+    // Build interface configuration on server
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description = "Test";
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+    ifcs.yfilter = YFilter::replace;
+    auto set_reply = gs.set(provider, ifcs);
+
+    // Build subscription
     openconfig_interfaces::Interfaces filter = {};
     auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
     i->name = "*";
     filter.interface.append(i);
 
-    // Build subscription
     gNMIService::Subscription subscription{};
     subscription.entity = &filter;
     subscription.subscription_mode = "ON_CHANGE";

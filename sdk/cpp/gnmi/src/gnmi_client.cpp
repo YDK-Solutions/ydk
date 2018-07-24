@@ -499,10 +499,7 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
 
     client_reader_writer->Write(*request);
 
-    YLOG_DEBUG("Done sending request");
-
     YLOG_INFO("Subscribe Operation Succeeded");
-    YLOG_DEBUG("\n============= Receiving Subscribe Response =============");
     YLOG_INFO("Invoking callback function to receive the subscription data");
 
     if(list_mode == "POLL")
@@ -528,13 +525,18 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
 
     while (client_reader_writer->Read(&response))
     {
-        if(func!=nullptr)
-        {
+        YLOG_INFO("\n=============== Received SubscribeResponse ================\n{}\n", response.DebugString());
+
+        if (func != nullptr) {
             string s;
             google::protobuf::TextFormat::PrintToString(response, &s);
             func(s);
         }
+        if (list_mode == "ONCE") {
+            break;
+        }
     }
+    client_reader_writer->Finish();
 }
 
 }

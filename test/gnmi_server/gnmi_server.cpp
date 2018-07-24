@@ -46,6 +46,12 @@ using grpc::SslServerCredentialsOptions;
 using grpc::SslServerCredentials;
 using grpc::Status;
 
+using grpc::ServerReaderWriter;
+using gnmi::SubscribeResponse;
+using gnmi::SubscribeRequest;
+using gnmi::SubscriptionList;
+using gnmi::Subscription;
+
 using json = nlohmann::json;
 
 static std::string cap_array[] =
@@ -137,7 +143,7 @@ class gNMIImpl final : public gNMI::Service
 
     Status Get(ServerContext* context, const GetRequest* request, GetResponse* response) override 
     {
-        std::cout << "===========Get Request Received===========" << std::endl;
+        std::cout << "=========== Get Request Received ===========" << std::endl;
         std::cout << request->DebugString() << std::endl;
 
         for(int j = 0; j < request->path_size(); ++j) 
@@ -177,14 +183,14 @@ class gNMIImpl final : public gNMI::Service
             update->set_allocated_val(value);
         }
 
-        std::cout << "===========Get Response Sent===========" << std::endl;
+        std::cout << "=========== Get Response Sent ===========" << std::endl;
         std::cout << response->DebugString() << std::endl;
         return Status::OK;
     } 
 
     Status Set(ServerContext* context, const SetRequest* request, SetResponse* response) override 
     {
-        std::cout << "===========Set Request Received===========" << std::endl;
+        std::cout << "=========== Set Request Received ===========" << std::endl;
         std::cout << request->DebugString() << std::endl;
 
         std::time_t timestamp_val = std::time(nullptr);
@@ -266,10 +272,77 @@ class gNMIImpl final : public gNMI::Service
             update_response->set_allocated_path(response_path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
         }
-        std::cout << "===========Set Response Sent===========" << std::endl;
+        std::cout << "=========== Set Response Sent ===========" << std::endl;
         std::cout << response->DebugString() << std::endl;
         return Status::OK;
-    } 
+    }
+
+    Status Subscribe(ServerContext* context, ServerReaderWriter<SubscribeResponse, SubscribeRequest>* stream) override
+    {
+        SubscribeRequest request{};
+        while (stream->Read(&request))
+        {
+            std::cout << "=========== Subscribe Request Received ===========" << std::endl;
+            std::cout << request.DebugString() << std::endl;
+
+            if (request.has_subscribe())
+            {
+                SubscribeResponse response{};
+                ::gnmi::Notification* notification = new ::gnmi::Notification;
+                std::time_t timestamp_val = std::time(nullptr);
+                notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
+
+                SubscriptionList subscription_list = request.subscribe();
+                for (int s = 0; s < subscription_list.subscription_size(); ++s)
+                {
+                    Subscription sub = subscription_list.subscription(s);
+
+                    // Build path
+                    auto req_path = sub.path();
+                    ::gnmi::Path* response_path = new ::gnmi::Path;
+                    std::string origin = req_path.origin();
+                    std::string response_payload{};
+                    if (origin.length() > 0) {
+                        response_path->set_origin(origin);
+                        if (origin == "openconfig-bgp" && bgp_set) {
+                            response_payload = bgp_payload;
+                        }
+                        else if (origin == "openconfig-interfaces" && int_set) {
+                            response_payload = int_payload;
+                        }
+                        else response_payload = null_payload;
+                    }
+                    for (int j = 0; j < req_path.elem_size(); ++j)
+                    {
+                        gnmi::PathElem* path_elem = response_path->add_elem();
+                        path_elem->CopyFrom(req_path.elem(j));
+                    }
+
+                    // Build Update
+                    ::gnmi::Update* update_response = notification->add_update();
+
+                    update_response->set_allocated_path(response_path);
+
+                    ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+                    value->set_json_ietf_val(response_payload);
+                    update_response->set_allocated_val(value);
+                }
+                response.set_allocated_update(notification);
+                std::cout << "=========== Subscribe Response Sent ===========" << std::endl;
+                std::cout << response.DebugString() << std::endl;
+
+                // Write message to the wire
+                ::grpc::WriteOptions options{};
+                options.set_last_message();
+                options.set_write_through();
+                stream->Write( response, options);
+
+                break;
+            }
+        }
+        return Status::OK;
+    }
+
 };
 
 void RunServer() 

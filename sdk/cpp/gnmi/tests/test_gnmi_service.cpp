@@ -151,22 +151,22 @@ static string bgp_update = R"(val {
       json_ietf_val: "{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}"
     })";
 
-void read_sub(const gnmi::SubscribeResponse* response)
+void read_sub(const std::string & response)
 {
-    cout << response->DebugString() << endl;
+    cout << response << endl;
 }
 
-void gnmi_service_subscribe_callback(const gnmi::SubscribeResponse* response)
+void gnmi_service_subscribe_callback(const std::string & response)
 {
-	string s = response->DebugString();
-	REQUIRE(s.find(int_update) != string::npos);
+	//read_sub(response);
+	REQUIRE(response.find(int_update) != string::npos);
 }
 
-void gnmi_service_subscribe_multiples_callback(const gnmi::SubscribeResponse* response)
+void gnmi_service_subscribe_multiples_callback(const std::string & response)
 {
-	string s = response->DebugString();
-	REQUIRE(s.find(int_update) != string::npos);
-    REQUIRE(s.find(bgp_update) != string::npos);
+	//read_sub(response);
+	REQUIRE(response.find(int_update) != string::npos);
+    REQUIRE(response.find(bgp_update) != string::npos);
 }
 
 TEST_CASE("gnmi_service_subscribe")
@@ -183,7 +183,8 @@ TEST_CASE("gnmi_service_subscribe")
     // Build subscription
     openconfig_interfaces::Interfaces filter = {};
     auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    i->name = "*";
+    i->yfilter = YFilter::read;
+    //i->name = "*";
     filter.interface.append(i);
 
     gNMIService::Subscription subscription{};
@@ -243,7 +244,7 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback, nullptr);
 }
 
-bool interactive_poll_request(const gnmi::SubscribeResponse* response)
+bool interactive_poll_request(const std::string & response)
 {
 	while (true) {
 	    cout << "Enter 'poll' for subscription update or 'end' to end subscription: ";
@@ -268,7 +269,7 @@ void set_counter(int max)
 	counter = max;
 }
 
-bool counter_poll_request(const gnmi::SubscribeResponse* response)
+bool counter_poll_request(const std::string & response)
 {
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 	return --counter >= 0;

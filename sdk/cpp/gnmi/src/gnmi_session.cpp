@@ -161,8 +161,8 @@ RootSchemaNode& gNMISession::get_root_schema() const
 }
 
 void gNMISession::invoke(Rpc& rpc,
-		std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-		std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
+		std::function<void(const std::string & response)> out_func,
+		std::function<bool(const std::string & response)> poll_func) const
 {
     SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
@@ -382,8 +382,8 @@ gNMISession::handle_get_capabilities() const
 
 void
 gNMISession::handle_subscribe(Rpc& rpc,
-		std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-		std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
+		std::function<void(const std::string & response)> out_func,
+		std::function<bool(const std::string & response)> poll_func) const
 {
     vector<gNMISubscription> sub_list{};
     SchemaNode* rpc_schema = &(rpc.get_schema_node());

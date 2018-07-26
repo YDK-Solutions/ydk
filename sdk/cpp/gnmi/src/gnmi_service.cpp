@@ -228,8 +228,8 @@ static void check_subscription_params(gNMIService::Subscription* subscription)
 void gNMIService::subscribe(gNMIServiceProvider& provider,
                             gNMIService::Subscription* subscription,
                             uint32 qos, const std::string & mode,
-                            std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-                            std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
+                            std::function<void(const std::string & response)> out_func,
+                            std::function<bool(const std::string & response)> poll_func) const
 {
     YLOG_INFO("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", mode);
 
@@ -260,8 +260,8 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 void gNMIService::subscribe(gNMIServiceProvider& provider,
                             vector<gNMIService::Subscription*> & subscription_list,
                             uint32 qos, const std::string & mode,
-                            std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-                            std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
+                            std::function<void(const std::string & response)> out_func,
+                            std::function<bool(const std::string & response)> poll_func) const
 {
     YLOG_INFO("gNMIService::subscribe: Executing subscribe request in '{}' list mode", mode);
 

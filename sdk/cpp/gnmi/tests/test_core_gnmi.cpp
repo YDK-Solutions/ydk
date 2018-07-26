@@ -156,7 +156,7 @@ TEST_CASE("gnmi_test_json_payload"  )
     })", ydk::EncodingFormat::JSON);
 
     std::string json = s.encode(*bgp, ydk::EncodingFormat::JSON, false);
-    std::cout<< json<<std::endl;
+    //std::cout<< json<<std::endl;
 
     auto edit_config = schema.create_rpc("ietf-netconf:get-config");
     edit_config->get_input_node().create_datanode("source/candidate");
@@ -225,7 +225,7 @@ TEST_CASE("gnmi_bgp_create")
 }
 */
 
-void gnmi_service_subscribe_multiples_callback(const gnmi::SubscribeResponse* response);
+void gnmi_service_subscribe_multiples_callback(const std::string & response);
 
 void build_int_config(ydk::gNMIServiceProvider& provider);
 void build_bgp_config(ydk::gNMIServiceProvider& provider);

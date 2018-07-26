@@ -73,8 +73,8 @@ public:
     RootSchemaNode& get_root_schema() const;
     std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
     std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
-    void invoke(Rpc& rpc, std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-                          std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const;
+    void invoke(Rpc& rpc, std::function<void(const std::string & response)> out_func,
+                          std::function<bool(const std::string & response)> poll_func) const;
 
     std::vector<std::string> get_capabilities() const;
     EncodingFormat get_encoding() const;
@@ -89,8 +89,8 @@ private:
     bool handle_set(path::Rpc& ydk_rpc) const;
     std::shared_ptr<path::DataNode> handle_get(path::Rpc& ydk_rpc) const;
     void handle_subscribe(path::Rpc& ydk_rpc,
-                          std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-                          std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const;
+                          std::function<void(const std::string & response)> out_func,
+                          std::function<bool(const std::string & response)> poll_func) const;
 
     void print_root_paths(ydk::path::RootSchemaNode& rsn) const;
     void print_paths(ydk::path::SchemaNode& sn) const;

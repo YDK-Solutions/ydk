@@ -23,6 +23,7 @@
 
 #include <thread>
 #include <chrono>
+#include <google/protobuf/text_format.h>
 
 #include <ydk/errors.hpp>
 #include <ydk/json.hpp>
@@ -469,11 +470,12 @@ gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response
 void
 gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
 		                                uint32 qos, const std::string & list_mode,
-                                        std::function<void(const gnmi::SubscribeResponse* response)> out_func,
-										std::function<bool(const gnmi::SubscribeResponse* response)> poll_func)
+                                        std::function<void(const std::string & response)> out_func,
+										std::function<bool(const std::string & response)> poll_func)
 {
     grpc::ClientContext context;
-    gnmi::SubscribeResponse response;
+    gnmi::SubscribeResponse response{};
+    std::string str_response{};
 
     auto request = make_shared<gnmi::SubscribeRequest>();
 
@@ -505,9 +507,9 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
 
     if (list_mode == "POLL" && poll_func != nullptr)
     {
-        std::thread writer([client_reader_writer, poll_func, &response]()
+        std::thread writer([client_reader_writer, poll_func, str_response]()
         {
-            while (poll_func(&response))
+            while (poll_func(str_response))
             {
                 gnmi::SubscribeRequest req;
                 gnmi::Poll* p = new gnmi::Poll;
@@ -526,7 +528,8 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
         YLOG_INFO("\n=============== Received SubscribeResponse ================\n{}\n", response.DebugString());
 
         if (out_func != nullptr) {
-            out_func(&response);
+        	google::protobuf::TextFormat::PrintToString(response, &str_response);
+            out_func(str_response);
         }
     }
 	auto status = client_reader_writer->Finish();

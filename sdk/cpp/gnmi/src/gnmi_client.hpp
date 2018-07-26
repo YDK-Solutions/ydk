@@ -107,7 +107,8 @@ public:
 
     void execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
                                      uint32 qos, const std::string & mode,
-                                     std::function<void(const std::string &)> func);
+                                     std::function<void(const gnmi::SubscribeResponse* response)> out_func,
+                                     std::function<bool(const gnmi::SubscribeResponse* response)> poll_func);
 
     std::vector<std::string> get_capabilities();
     gNMICapabilityResponse execute_get_capabilities();

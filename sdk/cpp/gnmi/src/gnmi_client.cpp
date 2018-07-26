@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////
 
 #include <thread>
-#include <google/protobuf/text_format.h>
+#include <chrono>
 
 #include <ydk/errors.hpp>
 #include <ydk/json.hpp>
@@ -469,7 +469,8 @@ gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response
 void
 gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
 		                                uint32 qos, const std::string & list_mode,
-                                        std::function<void(const std::string &)> func)
+                                        std::function<void(const gnmi::SubscribeResponse* response)> out_func,
+										std::function<bool(const gnmi::SubscribeResponse* response)> poll_func)
 {
     grpc::ClientContext context;
     gnmi::SubscribeResponse response;
@@ -489,7 +490,7 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
     }
     request->set_allocated_subscribe(sl);
 
-    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", request->DebugString().c_str());
+    YLOG_INFO("\n=============== Sending SubscribeList SubscribeRequest ================\n{}\n", request->DebugString());
 
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
@@ -502,23 +503,20 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
     YLOG_INFO("Subscribe Operation Succeeded");
     YLOG_INFO("Invoking callback function to receive the subscription data");
 
-    if(list_mode == "POLL")
+    if (list_mode == "POLL" && poll_func != nullptr)
     {
-        std::thread writer([client_reader_writer]() {
-            string i;
-            cout<<"Start POLL request monitor....."<<endl;
-            cout<<"Enter 'poll' to poll for update: ";
-            while(cin >> i)
+        std::thread writer([client_reader_writer, poll_func, &response]()
+        {
+            while (poll_func(&response))
             {
-                if(i == "poll")
-                {
-                    gnmi::SubscribeRequest req;
-                    gnmi::Poll* p = new gnmi::Poll;
-                    req.set_allocated_poll(p);
-                    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", req.DebugString().c_str());
-                    client_reader_writer->Write(req);
-                }
+                gnmi::SubscribeRequest req;
+                gnmi::Poll* p = new gnmi::Poll;
+                req.set_allocated_poll(p);
+                YLOG_INFO("\n=============== Sending Poll SubscribeRequest ================\n{}\n", req.DebugString());
+                client_reader_writer->Write(req);
+                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
+            client_reader_writer->WritesDone();
         });
         writer.detach();
     }
@@ -527,16 +525,12 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
     {
         YLOG_INFO("\n=============== Received SubscribeResponse ================\n{}\n", response.DebugString());
 
-        if (func != nullptr) {
-            string s;
-            google::protobuf::TextFormat::PrintToString(response, &s);
-            func(s);
-        }
-        if (list_mode == "ONCE") {
-            break;
+        if (out_func != nullptr) {
+            out_func(&response);
         }
     }
-    client_reader_writer->Finish();
+	auto status = client_reader_writer->Finish();
+	check_status(status, "SubscribeRequest failed with error");
 }
 
 }

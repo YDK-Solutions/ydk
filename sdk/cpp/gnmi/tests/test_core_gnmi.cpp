@@ -26,6 +26,7 @@
 
 #include <ydk/gnmi_path_api.hpp>
 #include <ydk/gnmi_util.hpp>
+#include <ydk/gnmi_provider.hpp>
 
 #include "../../core/src/path/path_private.hpp"
 #include "../../core/src/catch.hpp"
@@ -224,15 +225,22 @@ TEST_CASE("gnmi_bgp_create")
 }
 */
 
-void read_sub(const std::string & s);
+void gnmi_service_subscribe_multiples_callback(const gnmi::SubscribeResponse* response);
+
+void build_int_config(ydk::gNMIServiceProvider& provider);
+void build_bgp_config(ydk::gNMIServiceProvider& provider);
 
 TEST_CASE("gnmi_rpc_subscribe")
 {
     ydk::path::Repository repo{TEST_HOME};
-    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
+    ydk::gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
+    const ydk::path::gNMISession& session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
-
     ydk::path::Codec codec{};
+
+    // Build configuration on the server
+    build_int_config(provider);
+    build_bgp_config(provider);
 
     std::shared_ptr<ydk::path::Rpc> rpc { schema.create_rpc("ydk:gnmi-subscribe") };
     auto & subscription = rpc->get_input_node().create_datanode("subscription", "");
@@ -264,7 +272,7 @@ TEST_CASE("gnmi_rpc_subscribe")
     // auto json = codec.encode(rpc->get_input_node(), ydk::EncodingFormat::JSON, true);
     // std::cout << "Built RPC:" << std::endl << json << std::endl;
 
-    session.invoke(*rpc, read_sub);
+    session.invoke(*rpc, gnmi_service_subscribe_multiples_callback, nullptr);
 }
 
 TEST_CASE("gnmi_rpc_caps")

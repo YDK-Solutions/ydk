@@ -20,6 +20,8 @@
 // under the License.
 //
 //////////////////////////////////////////////////////////////////
+#include <thread>
+#include <chrono>
 
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/gnmi_service.hpp>
@@ -95,10 +97,37 @@ void config_bgp(openconfig_bgp::Bgp bgp)
     bgp.neighbors->neighbor.append(neighbor);
 }
 
-void read_sub(const string & s)
+void build_bgp_config(gNMIServiceProvider& provider)
 {
-    cout<<s<<endl;
+    // Build BGP configuration on server
+    openconfig_bgp::Bgp bgp = {};
+    bgp.yfilter = YFilter::replace;
+    config_bgp(bgp);
+    gNMIService gs{};
+    auto set_reply = gs.set(provider, bgp);
 }
+
+void build_int_config(gNMIServiceProvider& provider)
+{
+    // Build interface configuration on server
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description = "Test";
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+    ifcs.yfilter = YFilter::replace;
+    gNMIService gs{};
+    auto set_reply = gs.set(provider, ifcs);
+}
+
+static string cap_update = R"(
+      {
+        "name": "openconfig-bgp",
+        "organization": "OpenConfig working group",
+        "version": "2016-06-21"
+      },)";
 
 TEST_CASE("gnmi_service_capabilities")
 {
@@ -110,7 +139,34 @@ TEST_CASE("gnmi_service_capabilities")
     gNMIService gs{};
 
     string json_caps = gs.capabilities(provider);
-    read_sub(json_caps);
+    //std::cout << json_caps << std::endl;
+    REQUIRE(json_caps.find(cap_update) != string::npos);
+}
+
+static string int_update = R"(val {
+      json_ietf_val: "{\"interface\":[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]}"
+    })";
+
+static string bgp_update = R"(val {
+      json_ietf_val: "{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}"
+    })";
+
+void read_sub(const gnmi::SubscribeResponse* response)
+{
+    cout << response->DebugString() << endl;
+}
+
+void gnmi_service_subscribe_callback(const gnmi::SubscribeResponse* response)
+{
+	string s = response->DebugString();
+	REQUIRE(s.find(int_update) != string::npos);
+}
+
+void gnmi_service_subscribe_multiples_callback(const gnmi::SubscribeResponse* response)
+{
+	string s = response->DebugString();
+	REQUIRE(s.find(int_update) != string::npos);
+    REQUIRE(s.find(bgp_update) != string::npos);
 }
 
 TEST_CASE("gnmi_service_subscribe")
@@ -122,16 +178,7 @@ TEST_CASE("gnmi_service_subscribe")
     gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
-    // Build interface configuration on server
-    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    ifc->config->name = "Loopback10";
-    ifc->config->description = "Test";
-
-    openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
-    ifcs.yfilter = YFilter::replace;
-    auto set_reply = gs.set(provider, ifcs);
+    build_int_config(provider);
 
     // Build subscription
     openconfig_interfaces::Interfaces filter = {};
@@ -146,7 +193,7 @@ TEST_CASE("gnmi_service_subscribe")
     subscription.suppress_redundant = true;
     subscription.heartbeat_interval = 1000000000;
 
-    gs.subscribe(provider, &subscription, 10, "ONCE", read_sub);
+    gs.subscribe(provider, &subscription, 10, "ONCE", gnmi_service_subscribe_callback, nullptr);
 }
 
 TEST_CASE("gnmi_service_subscribe_multiples")
@@ -158,6 +205,11 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     gNMIServiceProvider provider{repo, address, port};
     gNMIService gs{};
 
+    // Build configuration on the server
+    build_int_config(provider);
+    build_bgp_config(provider);
+
+    // Build subscription
     openconfig_interfaces::Interfaces ifcs = {};
     auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "*";
@@ -187,8 +239,88 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     subscription_list.push_back(&ifc_subscription);
     subscription_list.push_back(&bgp_subscription);
 
-    // Get Request
-    gs.subscribe(provider, subscription_list, 10, "ONCE", read_sub);
+    // Subscribe
+    gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback, nullptr);
+}
+
+bool interactive_poll_request(const gnmi::SubscribeResponse* response)
+{
+	while (true) {
+	    cout << "Enter 'poll' for subscription update or 'end' to end subscription: ";
+	    string response;
+	    cin >> response;
+	    if (cin.fail()) {
+	        cin.clear();
+	        continue;
+	    }
+	    if (response == "poll")
+	        return true;
+	    else
+	    if (response == "end")
+	        return false;
+	}
+}
+
+static int counter;
+
+void set_counter(int max)
+{
+	counter = max;
+}
+
+bool counter_poll_request(const gnmi::SubscribeResponse* response)
+{
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+	return --counter >= 0;
+}
+
+TEST_CASE("gnmi_service_poll_subscribe")
+{
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port};
+    gNMIService gs{};
+
+    build_int_config(provider);
+
+    // Build subscription
+    openconfig_interfaces::Interfaces filter = {};
+    auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    i->name = "*";
+    filter.interface.append(i);
+
+    gNMIService::Subscription subscription{};
+    subscription.entity = &filter;
+
+    set_counter(2);
+    gs.subscribe(provider, &subscription, 10, "POLL", gnmi_service_subscribe_callback, counter_poll_request);
+}
+
+TEST_CASE("gnmi_service_stream_subscribe")
+{
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port};
+    gNMIService gs{};
+
+    build_int_config(provider);
+
+    // Build subscription
+    openconfig_interfaces::Interfaces filter = {};
+    auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    i->name = "*";
+    filter.interface.append(i);
+
+    gNMIService::Subscription subscription{};
+    subscription.entity = &filter;
+    subscription.subscription_mode = "ON_CHANGE";
+    subscription.sample_interval = 2000000;
+    subscription.suppress_redundant = true;
+    subscription.heartbeat_interval = 10000000;
+
+    gs.subscribe(provider, &subscription, 10, "STREAM", gnmi_service_subscribe_callback, nullptr);
 }
 
 TEST_CASE("gnmi_service_create")

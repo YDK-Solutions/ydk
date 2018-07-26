@@ -26,7 +26,6 @@ function print_msg {
     echo -e "${RED}*** $(date) *** dependencies_centos.sh | $1${NOCOLOR}"
 }
 
-
 function install_confd {
     print_msg "Installing confd"
 
@@ -54,35 +53,6 @@ function install_fpm {
     gem install --no-ri --no-rdoc fpm
 }
 
-function install_protobuf {
-    print_msg "Installing protobuf and protoc"
-
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
-    unzip protobuf-cpp-3.5.0.zip > /dev/null
-    cd protobuf-3.5.0
-    ./configure > /dev/null
-    make > /dev/null
-#    make check > /dev/null
-    sudo make install
-    sudo ldconfig
-    cd -
-}
-
-function install_grpc {
-    print_msg "Installing grpc"
-
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    sudo ldconfig
-    make > /dev/null
-    sudo make install
-    sudo ldconfig
-    curr_dir="$(pwd)"
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$curr_dir/grpc/libs/opt:$curr_dir/protobuf-3.5.0/src/.libs:/usr/local/lib64
-    cd -
-}
-
 ########################## EXECUTION STARTS HERE #############################
 
 ./test/dependencies_centos_basic.sh
@@ -91,5 +61,5 @@ install_confd
 install_openssl
 #install_fpm
 
-install_protobuf
-install_grpc
+./test/dependencies_linux_gnmi.sh
+

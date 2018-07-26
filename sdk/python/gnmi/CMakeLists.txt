@@ -5,9 +5,9 @@ project(path VERSION 0.8.1 LANGUAGES C CXX)
 
 set(CMAKE_MACOSX_RPATH 1)
 
-set(path_DESCRIPTION "Python wrapper around C++ path API using pybind11.")
+set(path_DESCRIPTION "Python C++ wrapper for GNMI service path API using pybind11.")
 
-set(python_src python.cpp)
+set(python_src python_gnmi.cpp)
 
 # set default build type if not specified by user
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -32,6 +32,7 @@ set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 
 # Find dependent libraries
 find_library(ydk_location ydk)
+find_library(ydk_gnmi_location ydk_gnmi)
 find_library(xml2_location xml2)
 find_library(curl_location curl)
 find_library(ssh_threads_location ssh_threads)
@@ -39,6 +40,8 @@ find_library(xslt_location xslt)
 find_library(pcre_location pcre)
 find_library(ssh_location ssh)
 find_package(PythonLibs)
+find_package(Protobuf REQUIRED)
+find_package(GRPC REQUIRED)
 
 if(PYBIND11_INCLUDE)
     message( "pybind11 include: ${PYBIND11_INCLUDE}")
@@ -66,6 +69,7 @@ set_property(TARGET ydk_ PROPERTY CXX_STANDARD_REQUIRED ON)
 
 target_link_libraries(ydk_
             ${ydk_location}
+            ${ydk_gnmi_location}
             ${xml2_location}
             ${curl_location}
             ${ssh_threads_location}
@@ -74,4 +78,6 @@ target_link_libraries(ydk_
             ${ssh_location}
             ${PYTHON_LIBRARIES}
             -rdynamic
+            ${GRPC_GRPC++_LIBRARY}
+            ${PROTOBUF_LIBRARY}
             )

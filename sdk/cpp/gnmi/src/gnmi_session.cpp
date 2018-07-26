@@ -160,14 +160,16 @@ RootSchemaNode& gNMISession::get_root_schema() const
     return *root_schema;
 }
 
-void gNMISession::invoke(Rpc& rpc, std::function<void(const std::string &)> func) const
+void gNMISession::invoke(Rpc& rpc,
+		std::function<void(const gnmi::SubscribeResponse* response)> out_func,
+		std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
 {
     SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
     SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     if (rpc_schema == gnmi_sub) {
-        handle_subscribe(rpc, func);
+        handle_subscribe(rpc, out_func, poll_func);
     }
     else {
         YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
@@ -379,7 +381,9 @@ gNMISession::handle_get_capabilities() const
 }
 
 void
-gNMISession::handle_subscribe(Rpc& rpc, std::function<void(const std::string &)> func) const
+gNMISession::handle_subscribe(Rpc& rpc,
+		std::function<void(const gnmi::SubscribeResponse* response)> out_func,
+		std::function<bool(const gnmi::SubscribeResponse* response)> poll_func) const
 {
     vector<gNMISubscription> sub_list{};
     SchemaNode* rpc_schema = &(rpc.get_schema_node());
@@ -452,7 +456,7 @@ gNMISession::handle_subscribe(Rpc& rpc, std::function<void(const std::string &)>
         sub_list.push_back(sub);
     }
 
-    client->execute_subscribe_operation(sub_list, qos, mode, func);
+    client->execute_subscribe_operation(sub_list, qos, mode, out_func, poll_func);
 }
 
 gNMIClient & gNMISession::get_client() const

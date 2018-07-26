@@ -28,7 +28,7 @@ NOCOLOR="\033[0m"
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date): tests.sh | $1${NOCOLOR}"
+    echo -e "${RED}*** $(date): test_package_centos.sh | $1${NOCOLOR}"
 }
 
 function init_confd {

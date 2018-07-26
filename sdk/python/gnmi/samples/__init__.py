@@ -13,28 +13,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
-from ydk.ext.path import Annotation
-from ydk.ext.path import Capability
-from ydk.ext.path import Codec
-from ydk.ext.path import DataNode
-from ydk.ext.path import Repository
-from ydk.ext.path import RootSchemaNode
-from ydk.ext.path import Rpc
-from ydk.ext.path import SchemaNode
-from ydk.ext.path import Statement
-
-from .sessions import NetconfSession
-from .sessions import RestconfSession
-
-__all__ = [ "Annotation",
-            "Capability",
-            "Codec",
-            "DataNode",
-            "NetconfSession",
-            "Repository",
-            "RestconfSession",
-            "RootSchemaNode",
-            "Rpc",
-            "SchemaNode",
-            "Statement" ]

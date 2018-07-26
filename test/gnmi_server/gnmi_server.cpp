@@ -27,6 +27,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include "json.hpp"
 #include "gnmi.grpc.pb.h"
@@ -280,69 +282,112 @@ class gNMIImpl final : public gNMI::Service
     Status Subscribe(ServerContext* context, ServerReaderWriter<SubscribeResponse, SubscribeRequest>* stream) override
     {
         SubscribeRequest request{};
+        SubscriptionList subscription_list{};
+
         while (stream->Read(&request))
         {
             std::cout << "=========== Subscribe Request Received ===========" << std::endl;
             std::cout << request.DebugString() << std::endl;
 
             if (request.has_subscribe())
+                subscription_list = request.subscribe();
+
+            if (subscription_list.subscription_size() > 0)
             {
-                SubscribeResponse response{};
-                ::gnmi::Notification* notification = new ::gnmi::Notification;
-                std::time_t timestamp_val = std::time(nullptr);
-                notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
-
-                SubscriptionList subscription_list = request.subscribe();
-                for (int s = 0; s < subscription_list.subscription_size(); ++s)
+                if (subscription_list.mode() == SubscriptionList::ONCE)
                 {
-                    Subscription sub = subscription_list.subscription(s);
+                    SubscribeResponse response = get_subscribe_response( subscription_list);
 
-                    // Build path
-                    auto req_path = sub.path();
-                    ::gnmi::Path* response_path = new ::gnmi::Path;
-                    std::string origin = req_path.origin();
-                    std::string response_payload{};
-                    if (origin.length() > 0) {
-                        response_path->set_origin(origin);
-                        if (origin == "openconfig-bgp" && bgp_set) {
-                            response_payload = bgp_payload;
-                        }
-                        else if (origin == "openconfig-interfaces" && int_set) {
-                            response_payload = int_payload;
-                        }
-                        else response_payload = null_payload;
-                    }
-                    for (int j = 0; j < req_path.elem_size(); ++j)
-                    {
-                        gnmi::PathElem* path_elem = response_path->add_elem();
-                        path_elem->CopyFrom(req_path.elem(j));
-                    }
-
-                    // Build Update
-                    ::gnmi::Update* update_response = notification->add_update();
-
-                    update_response->set_allocated_path(response_path);
-
-                    ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
-                    value->set_json_ietf_val(response_payload);
-                    update_response->set_allocated_val(value);
+                    // Write message to the wire
+                    ::grpc::WriteOptions options{};
+                    options.set_last_message();
+                    options.set_write_through();
+                    stream->Write( response, options);
+                    break;
                 }
-                response.set_allocated_update(notification);
-                std::cout << "=========== Subscribe Response Sent ===========" << std::endl;
-                std::cout << response.DebugString() << std::endl;
+                else
+                if (subscription_list.mode() == SubscriptionList::STREAM)
+                {
+                    Subscription sub = subscription_list.subscription(0);
+                    ::google::protobuf::uint64 timer = 0;
+                    while (timer < sub.heartbeat_interval())
+                    {
+                        SubscribeResponse response = get_subscribe_response( subscription_list);
+                        // Write message to the wire
+                        ::grpc::WriteOptions options{};
+                        options.set_write_through();
+                        timer += sub.sample_interval();
+                        if (timer >= sub.heartbeat_interval())
+                            options.set_last_message();
+                        stream->Write( response, options);
+                        std::this_thread::sleep_for(std::chrono::milliseconds(sub.sample_interval()/1000));
+                    }
+                    break;
+                }
 
-                // Write message to the wire
-                ::grpc::WriteOptions options{};
-                options.set_last_message();
-                options.set_write_through();
-                stream->Write( response, options);
+                if (subscription_list.mode() == SubscriptionList::POLL && request.has_poll())
+                {
+                    request.release_poll();
+                    SubscribeResponse response = get_subscribe_response( subscription_list);
 
-                break;
+                    // Write message to the wire
+                    ::grpc::WriteOptions options{};
+                    options.set_write_through();
+                    stream->Write( response, options);
+                }
             }
         }
         return Status::OK;
     }
 
+ private:
+    SubscribeResponse get_subscribe_response(SubscriptionList& subscription_list)
+    {
+        SubscribeResponse response{};
+
+        ::gnmi::Notification* notification = new ::gnmi::Notification;
+        std::time_t timestamp_val = std::time(nullptr);
+        notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
+
+        for (int s = 0; s < subscription_list.subscription_size(); ++s)
+        {
+            Subscription sub = subscription_list.subscription(s);
+
+            // Build path
+            auto req_path = sub.path();
+            ::gnmi::Path* response_path = new ::gnmi::Path;
+            std::string origin = req_path.origin();
+            std::string response_payload{};
+            if (origin.length() > 0) {
+                response_path->set_origin(origin);
+                if (origin == "openconfig-bgp" && bgp_set) {
+                    response_payload = bgp_payload;
+                }
+                else if (origin == "openconfig-interfaces" && int_set) {
+                    response_payload = int_payload;
+                }
+                else response_payload = null_payload;
+            }
+            for (int j = 0; j < req_path.elem_size(); ++j)
+            {
+                gnmi::PathElem* path_elem = response_path->add_elem();
+                path_elem->CopyFrom(req_path.elem(j));
+            }
+
+            // Build Update
+            ::gnmi::Update* update_response = notification->add_update();
+
+            update_response->set_allocated_path(response_path);
+
+            ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+            value->set_json_ietf_val(response_payload);
+            update_response->set_allocated_val(value);
+        }
+        response.set_allocated_update(notification);
+        std::cout << "=========== Subscribe Response Sent ===========" << std::endl;
+        std::cout << response.DebugString() << std::endl;
+        return response;
+    }
 };
 
 void RunServer() 

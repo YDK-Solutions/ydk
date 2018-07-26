@@ -34,6 +34,6 @@ sdk/python/core/ydk/models/ydktest
 test/gnmi_client
 yang/nxos*
 profiles/test/ydk-nxos*
-yang/nxos*
 grpc
 protobuf-3.5.0
+

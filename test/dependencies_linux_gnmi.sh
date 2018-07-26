@@ -15,7 +15,9 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 #
-# Script for running ydk CI on docker via travis-ci.org
+# dependencies_linux_gnmi.sh
+# Script to install protobuf, protoc and grpc on Ubuntu and CentOS
+# for running ydk_gnmi_test on docker
 #
 # ------------------------------------------------------------------
 
@@ -23,30 +25,36 @@ RED="\033[0;31m"
 NOCOLOR="\033[0m"
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_ubuntu.sh | $1${NOCOLOR}"
+    echo -e "${RED}*** $(date) *** dependencies_linux_gnmi.sh | $1${NOCOLOR}"
 }
 
-function install_confd {
-    print_msg "Installing confd"
+function install_protobuf {
+    print_msg "Installing protobuf and protoc"
 
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
-    unzip confd-basic-6.2.linux.x86_64.zip
-    ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
+    unzip protobuf-cpp-3.5.0.zip > /dev/null
+    cd protobuf-3.5.0
+    ./configure > /dev/null
+    make > /dev/null
+    sudo make install
+    sudo ldconfig
+    cd -
 }
 
-function install_fpm {
-    print_msg "Installing fpm"
-    apt-get install ruby ruby-dev rubygems build-essential -y > /dev/null
-    gem install --no-ri --no-rdoc fpm
+function install_grpc {
+    print_msg "Installing grpc"
+
+    git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make > /dev/null
+    sudo make install
+    sudo ldconfig
+    cd -
 }
 
 ########################## EXECUTION STARTS HERE #############################
 
-./test/dependencies_ubuntu_basic.sh
-
-install_confd
-
-#install_fpm
-
-./test/dependencies_linux_gnmi.sh
-
+install_protobuf
+install_grpc

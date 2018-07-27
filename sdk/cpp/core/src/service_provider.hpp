@@ -44,6 +44,8 @@ public:
 
     virtual const path::Session& get_session() const = 0;
 
+    virtual const std::string get_provider_type() const = 0;
+
 };
 
 } //namespace ydk

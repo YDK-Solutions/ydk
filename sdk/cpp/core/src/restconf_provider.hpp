@@ -50,6 +50,10 @@ public:
         EncodingFormat get_encoding() const;
         const path::Session& get_session() const;
 
+        inline const std::string get_provider_type() const {
+            return "RestconfServiceProvider";
+        }
+
 private:
         EncodingFormat encoding;
         const path::RestconfSession session;

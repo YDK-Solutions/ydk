@@ -54,6 +54,10 @@ namespace ydk
         const path::Session& get_session() const;
         std::vector<std::string> get_capabilities() const;
 
+        inline const std::string get_provider_type() const {
+            return "gNMIServiceProvider";
+        }
+
       private:
         const path::gNMISession session;
         bool is_secure;

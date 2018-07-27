@@ -39,9 +39,6 @@
 using namespace std;
 using namespace ydk;
 using namespace path;
-
-using namespace std;
-using namespace ydk;
 using namespace ydktest;
 
 void print_tree(ydk::path::DataNode* dn, const std::string& indent)
@@ -366,7 +363,7 @@ TEST_CASE("gnmi_service_get_multiple")
     gNMIService gs{};
 
     // Set Create Request
-    openconfig_bgp::Bgp bgp = {};
+    openconfig_bgp::Bgp bgp{};
     bgp.yfilter = YFilter::replace;
     config_bgp(bgp);
 

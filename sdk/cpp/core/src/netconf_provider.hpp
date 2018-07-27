@@ -66,6 +66,10 @@ public:
         const path::Session& get_session() const;
         std::vector<std::string> get_capabilities() const;
 
+        inline const std::string get_provider_type() const {
+            return "NetconfServiceProvider";
+        }
+
 private:
         const path::NetconfSession session;
 };

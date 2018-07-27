@@ -254,7 +254,7 @@ class gNMIImpl final : public gNMI::Service
             ::gnmi::UpdateResult* update_response = response->add_response();
 
             ::gnmi::Path* response_path = new ::gnmi::Path;
-            ::gnmi::Update request_update= request->replace(i);
+            ::gnmi::Update request_update= request->update(i);
             auto replace_path = request_update.path();
             std::string origin = replace_path.origin();
             if (origin.length() > 0) {

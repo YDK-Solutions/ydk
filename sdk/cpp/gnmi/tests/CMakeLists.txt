@@ -8,6 +8,7 @@ enable_testing()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(bundle_tests_src
         test_core_gnmi.cpp
+        test_gnmi_crud.cpp
         test_gnmi_provider.cpp
         test_gnmi_service.cpp
         main.cpp)

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.7.2 LANGUAGES C CXX)
+project(ydk_gnmi VERSION 0.8.0 LANGUAGES C CXX)
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The gNMI library for YDK API.")
 
@@ -123,32 +123,19 @@ else()
     option(ENABLE_VALGRIND_TESTS "Build tests with valgrind" OFF)
 endif()
 
-set(libgnmi_sources
+set(pb_grpc_sources
     ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.grpc.pb.cc
     ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.pb.cc)
 
 # Set LibYDK variables
-set(libydk_src
+set(libydk_gnmi_src
     src/gnmi_session.cpp
     src/gnmi_client.cpp
     src/gnmi_provider.cpp
     src/gnmi_service.cpp
     src/gnmi_util.cpp)
 
-
-file(GLOB SPDLOG_HEADERS src/spdlog/*.h)
-file(GLOB SPDLOG_DETAILS_HEADERS src/spdlog/details/*.h)
-file(GLOB SPDLOG_FMT_HEADERS src/spdlog/fmt/*.h)
-file(GLOB SPDLOG_FMT_BUNDLED_HEADERS src/spdlog/fmt/bundled/*.h src/spdlog/fmt/bundled/*.cc)
-file(GLOB SPDLOG_SINKS_HEADERS src/spdlog/sinks/*.h)
-
-set(spdlog_include_location include/spdlog)
-set(spdlog_details_include_location include/spdlog/details)
-set(spdlog_fmt_include_location include/spdlog/fmt)
-set(spdlog_fmt_bundled_include_location include/spdlog/fmt/bundled)
-set(spdlog_sinks_include_location include/spdlog/sinks)
-
-set(libydk_install_headers
+set(libydk_gnmi_install_headers
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
     src/gnmi_service.hpp
@@ -156,7 +143,7 @@ set(libydk_install_headers
     src/gnmi_path_api.hpp)
 
 # Set gNMI variables
-set(libgnmi_headers
+set(pb_grpc_headers
     ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.grpc.pb.h
     ${CMAKE_CURRENT_BINARY_DIR}/project_libgnmi/generated/gnmi.pb.h)
 
@@ -192,7 +179,7 @@ ExternalProject_Add(
     INSTALL_COMMAND ""
 )
 
-add_custom_command(OUTPUT ${libgnmi_sources}
+add_custom_command(OUTPUT ${pb_grpc_sources}
   DEPENDS download_generate_proto_cpp
   COMMENT "Generating GNMI code"
   VERBATIM
@@ -208,10 +195,10 @@ include_directories(
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-add_library(ydk_gnmi STATIC ${libydk_src} ${libgnmi_sources})
+add_library(ydk_gnmi STATIC ${libydk_gnmi_src} ${pb_grpc_sources})
 
 target_link_libraries(ydk_gnmi
-    ydk
+#    ydk
     ${GRPC_GRPC++_LIBRARY}
     ${PROTOBUF_LIBRARY}
 )
@@ -220,13 +207,8 @@ set_property(TARGET ydk_gnmi PROPERTY CXX_STANDARD 11)
 set_property(TARGET ydk_gnmi PROPERTY CXX_STANDARD_REQUIRED ON)
 
 install(TARGETS ydk_gnmi DESTINATION ${LIB_INSTALL_DIR})
-install(FILES ${libydk_install_headers} DESTINATION ${INCLUDE_INSTALL_DIR})
-install(FILES ${libgnmi_headers} DESTINATION ${INCLUDE_INSTALL_DIR})
-install(FILES ${SPDLOG_HEADERS} DESTINATION ${spdlog_include_location})
-install(FILES ${SPDLOG_DETAILS_HEADERS} DESTINATION ${spdlog_details_include_location})
-install(FILES ${SPDLOG_FMT_HEADERS} DESTINATION ${spdlog_fmt_include_location})
-install(FILES ${SPDLOG_FMT_BUNDLED_HEADERS} DESTINATION ${spdlog_fmt_bundled_include_location})
-install(FILES ${SPDLOG_SINKS_HEADERS} DESTINATION ${spdlog_sinks_include_location})
+install(FILES ${libydk_gnmi_install_headers} DESTINATION ${INCLUDE_INSTALL_DIR})
+install(FILES ${pb_grpc_headers} DESTINATION ${INCLUDE_INSTALL_DIR})
 
 # generate doxygen documentation for ydk_gnmi API
 find_package(Doxygen)
@@ -244,8 +226,3 @@ add_custom_target(cclean
     COMMAND find . -iname '*cmake*' -not -name CMakeLists.txt -not -path './CMakeModules*' -exec rm -rf {} +
     COMMAND rm -rf Makefile Doxyfile
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-#if(ENABLE_BUILD_TESTS)
-#    enable_testing()
-#    add_subdirectory(tests)
-#endif(ENABLE_BUILD_TESTS)

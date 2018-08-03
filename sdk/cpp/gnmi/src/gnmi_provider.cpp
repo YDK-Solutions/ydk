@@ -39,11 +39,6 @@ using namespace std;
 
 namespace ydk
 {
-
-    ServiceProvider::~ServiceProvider()
-    {
-    }
-
     gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
                    const std::string& address,
                    const std::string& username,

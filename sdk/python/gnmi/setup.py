@@ -31,25 +31,17 @@ NMSP_PKG_DEPENDENCIES = ["$DEPENDENCY$"]
 
 # Define and modify version number and package name here,
 # Namespace packages are share same prefix: "ydk-models"
-NAME = 'ydk-service-gnmi'
+NAME = 'ydk-services-gnmi'
 
-VERSION = '0.1.0-alpha'
+VERSION = '0.1.0'
 
-INSTALL_REQUIREMENTS = ['pybind11>=2.1.1']
-
+INSTALL_REQUIREMENTS = ['ydk', 'pybind11>=2.1.1']
 
 LONG_DESCRIPTION = '''
-                    The YANG Development Kit (YDK) is a Software Development Kit
-                    that provides API's that are modeled in YANG. YDK is composed
-                    of a core package that defines services and providers, 
-                    plus one or more module bundles that are based on YANG models.
-                    This package provides gNMI services in addition to the core serices.
+                    This package provides extension for YDK core - gNMI services.
                    '''
 
-
-YDK_PACKAGES = find_packages(exclude=['contrib', 'docs*', 'tests*',
-                                      'ncclient', 'samples'])
-
+YDK_PACKAGES = find_packages(exclude=['docs*', 'tests*', 'samples'])
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -139,10 +131,10 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: C++'
     ],
-    keywords='yang, C++11, python bindings gNMI',
+    keywords='yang, C++11, python bindings ',
     packages=YDK_PACKAGES,
     install_requires=INSTALL_REQUIREMENTS,
-    ext_modules=[CMakeExtension('ydk_')],
+    ext_modules=[CMakeExtension('ydk_gnmi_')],
     cmdclass={
              'build_ext' :YdkBuildExtension
              },

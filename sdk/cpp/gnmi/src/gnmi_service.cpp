@@ -93,7 +93,7 @@ gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & o
 }
 
 vector<shared_ptr<Entity>>
-gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, const string & operation)
+gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, const string & operation) const
 {
     YLOG_INFO("Executing get gRPC for multiple entities");
 

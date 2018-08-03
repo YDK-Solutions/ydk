@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
-project(ydk_bundle_test)
+project(ydk_gnmi_test)
 set(YDK_UNITTEST_TARGET_NAME "ydk_gnmi_test")
 
 enable_testing()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
-set(bundle_tests_src
+set(gnmi_tests_src
         test_core_gnmi.cpp
         test_gnmi_crud.cpp
         test_gnmi_provider.cpp
@@ -42,18 +42,17 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE debug)
 endif()
 
-include_directories(
-    ${PROJECT_SOURCE_DIR}/../core/src
-)
+#include_directories(
+#    ${PROJECT_SOURCE_DIR}/../core/src
+#)
 
-add_executable(${YDK_UNITTEST_TARGET_NAME} ${bundle_tests_src})
+add_executable(${YDK_UNITTEST_TARGET_NAME} ${gnmi_tests_src})
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD 11)
 set_property(TARGET ${YDK_UNITTEST_TARGET_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
-    ${ydk_location}
     ${ydk_gnmi_location}
+    ${ydk_location}
     ${ydk_ydktest_location}
-    ${ydk_ydktest_new_location}
     ${xml2_location}
     ${curl_location}
     ${ssh_location}
@@ -62,8 +61,8 @@ target_link_libraries(${YDK_UNITTEST_TARGET_NAME}
     ${xslt_location}
     ${pthread_location}
     ${dl_location}
-    ${GRPC_GRPC++_LIBRARY}
     -rdynamic
+    ${GRPC_GRPC++_LIBRARY}
     ${PROTOBUF_LIBRARY}
 )
 

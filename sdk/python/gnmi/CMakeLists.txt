@@ -56,20 +56,20 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE debug)
 endif()
 
-add_library(ydk_ MODULE ${python_src})
-set_target_properties(ydk_ PROPERTIES PREFIX "")
+add_library(ydk_gnmi_ MODULE ${python_src})
+set_target_properties(ydk_gnmi_ PROPERTIES PREFIX "")
 if(WIN32 AND NOT CYGWIN)
-    set_target_properties(ydk_ PROPERTIES SUFFIX ".pyd")
+    set_target_properties(ydk_gnmi_ PROPERTIES SUFFIX ".pyd")
 else()
-    set_target_properties(ydk_ PROPERTIES SUFFIX ".so")
+    set_target_properties(ydk_gnmi_ PROPERTIES SUFFIX ".so")
 endif()
 
-set_property(TARGET ydk_ PROPERTY CXX_STANDARD 14)
-set_property(TARGET ydk_ PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ydk_gnmi_ PROPERTY CXX_STANDARD 14)
+set_property(TARGET ydk_gnmi_ PROPERTY CXX_STANDARD_REQUIRED ON)
 
-target_link_libraries(ydk_
-            ${ydk_location}
+target_link_libraries(ydk_gnmi_
             ${ydk_gnmi_location}
+            ${ydk_location}
             ${xml2_location}
             ${curl_location}
             ${ssh_threads_location}

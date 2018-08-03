@@ -14,7 +14,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.ext.providers import gNMIServiceProvider
+from ydk.gnmi.path import gNMISession
 
-
-__all__ = [ "gNMIServiceProvider" ]
+__all__ = [ "gNMISession" ]

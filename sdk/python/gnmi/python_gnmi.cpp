@@ -19,92 +19,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-//#include <ydk/path_api.hpp>
-//#include <ydk/restconf_client.hpp>
-//#include <ydk/codec_provider.hpp>
-//#include <ydk/codec_service.hpp>
-//#include <ydk/crud_service.hpp>
-//#include <ydk/entity_data_node_walker.hpp>
-//#include <ydk/entity_util.hpp>
-//#include <ydk/executor_service.hpp>
-//#include <ydk/filters.hpp>
+#include <ydk/gnmi_path_api.hpp>
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/gnmi_service.hpp>
-//#include <ydk/logging_callback.hpp>
-//#include <ydk/netconf_provider.hpp>
-//#include <ydk/netconf_service.hpp>
-//#include <ydk/opendaylight_provider.hpp>
-//#include <ydk/restconf_provider.hpp>
 #include <ydk/types.hpp>
-//#include <ydk/xml_subtree_codec.hpp>
-
-//#include <spdlog/spdlog.h>
-//#include <spdlog/sinks/null_sink.h>
 
 using namespace pybind11;
 using namespace std;
-
-typedef std::map<std::string, std::shared_ptr<ydk::Entity>> ChildrenMap;
-PYBIND11_MAKE_OPAQUE(ChildrenMap)
-
-
-static object log_debug;
-static object log_info;
-static object log_warning;
-static object log_error;
-static object log_critical;
-static bool added_nullhandler = false;
-static bool enabled_logging = false;
-
-
-static void add_null_handler(object logger)
-{
-    if (added_nullhandler) { return; }
-    object version = module::import("sys").attr("version_info");
-    object ge = version.attr("__ge__");
-    // NullHandler is introduced after Python 2.7
-    // Add Nullhandler to avoid `handler not found for logger` error for Python > 2.7
-    object version_27 = pybind11::make_tuple(2,7);
-    bool result = ge(version_27).cast<bool>();
-    if (result)
-    {
-        object null_handler = module::import("logging").attr("NullHandler");
-        null_handler = null_handler();
-        object add_handler = logger.attr("addHandler");
-        add_handler(null_handler);
-        added_nullhandler = true;
-    }
-}
-
-void debug(const char* msg) { log_debug(msg); }
-void info(const char* msg) { log_info(msg); }
-void warning(const char* msg) { log_warning(msg); }
-void error(const char* msg) { log_error(msg); }
-void critical(const char* msg) { log_critical(msg); }
-
-void setup_logging()
-{
-    if (enabled_logging == false)
-    {
-        object get_logger = module::import("logging").attr("getLogger");
-        object logger = get_logger("ydk");
-
-        add_null_handler(logger);
-        log_debug = logger.attr("debug");
-        log_info = logger.attr("info");
-        log_warning = logger.attr("warning");
-        log_error = logger.attr("error");
-        log_critical = logger.attr("critical");
-
-        ydk::set_logging_callback("debug", debug);
-        ydk::set_logging_callback("info", info);
-        ydk::set_logging_callback("warning", warning);
-        ydk::set_logging_callback("error", error);
-        ydk::set_logging_callback("critical", critical);
-        enabled_logging = true;
-    }
-}
-
 
 using ListCasterBase = detail::list_caster<std::vector<ydk::path::SchemaNode *>, ydk::path::SchemaNode *>;
 namespace pybind11{ namespace detail {
@@ -118,19 +39,11 @@ template<> struct type_caster<std::vector<ydk::path::SchemaNode *>> : ListCaster
 };
 }}
 
-
-PYBIND11_MODULE(ydk_, ydk)
+PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
 {
-    module providers = ydk.def_submodule("providers", "providers module");
-    module services = ydk.def_submodule("services", "services module");
-    module filters = ydk.def_submodule("filters", "filters module");
-    module types = ydk.def_submodule("types", "types module");
-    module path = ydk.def_submodule("path", "path module");
-    module entity_utils = ydk.def_submodule("entity_utils", "entity utils module");
-    module logging = ydk.def_submodule("logging", "logging");
-    module clients = ydk.def_submodule("clients", "clients");
-
-    bind_map<ChildrenMap>(types, "ChildrenMap");
+    module providers = ydk_gnmi.def_submodule("providers", "providers module");
+    module services  = ydk_gnmi.def_submodule("services", "services module");
+    module path      = ydk_gnmi.def_submodule("path", "path module");
 
     class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
         .def(init<ydk::path::Repository&, const std::string&, const std::string&, const std::string&, int>(),
@@ -149,29 +62,60 @@ PYBIND11_MODULE(ydk_, ydk)
              arg("password"),
              arg("port")=57400)
         .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
-        .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::reference)
-        .def("invoke", &ydk::path::gNMISession::invoke, return_value_policy::void);
+        .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::gNMISession::*)(ydk::path::Rpc&) const)
+             &ydk::path::gNMISession::invoke, arg("rpc"), return_value_policy::reference)
+        .def("invoke", (void (ydk::path::gNMISession::*)(ydk::path::Rpc& rpc,
+                                                         std::function<void(const std::string & response)> out_func,
+                                                         std::function<bool(const std::string & response)> poll_func) const)
+             &ydk::path::gNMISession::invoke, arg("rpc"),
+                                              arg("output_callback_function")=nullptr,
+                                              arg("poll_callback_function")=nullptr);
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
         .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),
             arg("repo"), arg("address"), arg("username"), arg("password"), arg("port")=57400)
+        .def(init<ydk::path::Repository&, const string&, int>(),
+            arg("repo"), arg("address"), arg("port")=57400)
         .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);
 
     class_<ydk::gNMIService>(services, "gNMIService")
 	    .def(init<>())
-	    .def("get", &ydk::gNMIService::get, arg("provider"), arg("filter"), return_value_policy::reference)
-    	.def("set", &ydk::gNMIService::set, arg("provider"), arg("entity"), arg("operation"), return_value_policy::reference)
-    	.def("subscribe", &ydk::gNMIService::subscribe, arg("provider"),
-    	                                                arg("filter"),
-    	                                                arg("list_mode"),
-    	                                                arg("qos"),
-    	                                                arg("mode"),
-    	                                                arg("sample_interval"),
-    	                                                arg("callback_function"));
+        .def("get", (shared_ptr<ydk::Entity> (ydk::gNMIService::*)
+                (ydk::gNMIServiceProvider & provider, ydk::Entity& filter, const string & operation) const)
+                &ydk::gNMIService::get, arg("provider"), arg("filter"), arg ("operation"), return_value_policy::reference)
+        .def("get", (vector<shared_ptr<ydk::Entity>> (ydk::gNMIService::*)
+                (ydk::gNMIServiceProvider & provider, vector<ydk::Entity*> & filter, const string & operation) const)
+                &ydk::gNMIService::get, arg("provider"), arg("filter"), arg ("operation"), return_value_policy::reference)
+        .def("set", (bool (ydk::gNMIService::*)(ydk::gNMIServiceProvider & provider, ydk::Entity& entity) const)
+                &ydk::gNMIService::set, arg("provider"), arg("entity"), return_value_policy::reference)
+        .def("set", (bool (ydk::gNMIService::*)(ydk::gNMIServiceProvider & provider, vector<ydk::Entity*> & entity_list) const)
+                &ydk::gNMIService::set, arg("provider"), arg("entity"), return_value_policy::reference)
 
-    setup_logging();
+        .def("subscribe", (void (ydk::gNMIService::*)(ydk::gNMIServiceProvider& provider,
+                                                      ydk::gNMIService::Subscription* subscription,
+                                                      ydk::uint32 qos, const string & mode,
+                                                      std::function<void(const string & response)> out_func,
+                                                      std::function<bool(const string & response)> poll_func) const)
+                &ydk::gNMIService::subscribe, arg("provider"),
+                                              arg("subscription"),
+                                              arg("qos"),
+                                              arg("mode"),
+                                              arg("output_callback_function"),
+                                              arg("poll_callback_function"))
+
+        .def("subscribe", (void (ydk::gNMIService::*)(ydk::gNMIServiceProvider& provider,
+                                                      vector<ydk::gNMIService::Subscription*> & sub_list,
+                                                      ydk::uint32 qos, const string & mode,
+                                                      std::function<void(const string & response)> out_func,
+                                                      std::function<bool(const string & response)> poll_func) const)
+               &ydk::gNMIService::subscribe, arg("provider"),
+                                             arg("subscription_list"),
+                                             arg("qos"),
+                                             arg("mode"),
+                                             arg("output_callback_function"),
+                                             arg("poll_callback_function"));
 
 };
 

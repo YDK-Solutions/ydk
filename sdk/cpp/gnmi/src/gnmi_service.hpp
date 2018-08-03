@@ -47,7 +47,7 @@ class gNMIService
     std::shared_ptr<Entity> get(gNMIServiceProvider & provider,
                                 Entity& filter, const std::string & operation) const;
     std::vector<std::shared_ptr<Entity>> get(gNMIServiceProvider & provider,
-                                std::vector<Entity*> & filter_list, const std::string & operation);
+                                std::vector<Entity*> & filter_list, const std::string & operation) const;
 
     bool set(gNMIServiceProvider & provider, Entity& entity) const;
     bool set(gNMIServiceProvider & provider, std::vector<Entity*> & entity_list) const;

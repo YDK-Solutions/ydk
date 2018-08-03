@@ -28,6 +28,7 @@
 #include "types.hpp"
 #include "validation_service.hpp"
 #include "common_utilities.hpp"
+#include "entity_data_node_walker.hpp"
 
 using namespace std;
 
@@ -53,6 +54,19 @@ static bool operation_succeeded(vector<shared_ptr<Entity>> entity_list)
     return entity_list.size() == 0;
 }
 
+static string get_json_payload(ServiceProvider& provider, Entity & entity)
+{
+    path::Codec codec{};
+    path::RootSchemaNode & root_schema = provider.get_session().get_root_schema();
+    auto yfilter = entity.yfilter;
+    entity.yfilter = YFilter::not_set;
+    path::DataNode& datanode = get_data_node_from_entity(entity, root_schema);
+    entity.yfilter = yfilter;
+
+    string payload = codec.encode(datanode, EncodingFormat::JSON, false);
+    return payload;
+}
+
 // Class CrudService implementation
 //
 CrudService::CrudService()
@@ -66,46 +80,79 @@ CrudService::~CrudService()
 bool CrudService::create(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD create operation on [{}]", entity.get_segment_path());
-    return operation_succeeded( execute_rpc(provider, entity, "ydk:create", "entity", false) );
+    string operation = "ydk:create";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        entity.yfilter = YFilter::replace;
+    }
+    return operation_succeeded( execute_rpc(provider, entity, operation, "entity", false) );
 }
 
 bool CrudService::create(ydk::ServiceProvider & provider, vector<Entity*> & entity_list)
 {
     YLOG_INFO("Executing CRUD create operation on {}", entity_vector_to_string(entity_list));
+    string operation = "ydk:create";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        for (auto entity : entity_list)
+            entity->yfilter = YFilter::replace;
+    }
     return operation_succeeded(
-            execute_rpc(provider, entity_list, "ydk:create", "entity", false)
+            execute_rpc(provider, entity_list, operation, "entity", false)
             );
 }
 
 bool CrudService::update(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD update operation on [{}]", entity.get_segment_path());
+    string operation = "ydk:update";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        entity.yfilter = YFilter::update;
+    }
     return operation_succeeded(
-            execute_rpc(provider, entity, "ydk:update", "entity", false)
+            execute_rpc(provider, entity, operation, "entity", false)
             );
 }
 
 bool CrudService::update(ydk::ServiceProvider & provider, vector<Entity*> & entity_list)
 {
     YLOG_INFO("Executing CRUD create operation on {}", entity_vector_to_string(entity_list));
+    string operation = "ydk:update";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        for (auto entity : entity_list)
+            entity->yfilter = YFilter::update;
+    }
     return operation_succeeded(
-            execute_rpc(provider, entity_list, "ydk:update", "entity", false)
+            execute_rpc(provider, entity_list, operation, "entity", false)
             );
 }
 
 bool CrudService::delete_(ydk::ServiceProvider & provider, Entity & entity)
 {
     YLOG_INFO("Executing CRUD delete operation on [{}]", entity.get_segment_path());
+    string operation = "ydk:delete";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        entity.yfilter = YFilter::delete_;
+    }
     return operation_succeeded(
-            execute_rpc(provider, entity, "ydk:delete", "entity", false)
+            execute_rpc(provider, entity, operation, "entity", false)
             );
 }
 
 bool CrudService::delete_(ydk::ServiceProvider & provider, vector<Entity*> & entity_list)
 {
     YLOG_INFO("Executing CRUD delete operation on {}", entity_vector_to_string(entity_list));
+    string operation = "ydk:delete";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-set";
+        for (auto entity : entity_list)
+            entity->yfilter = YFilter::delete_;
+    }
     return operation_succeeded(
-            execute_rpc(provider, entity_list, "ydk:delete", "entity", false)
+            execute_rpc(provider, entity_list, operation, "entity", false)
             );
 }
 
@@ -113,27 +160,43 @@ shared_ptr<Entity>
 CrudService::read(ydk::ServiceProvider & provider, Entity & filter)
 {
     YLOG_INFO("Executing CRUD read operation on [{}]", filter.get_segment_path());
-    return execute_rpc(provider, filter, "ydk:read", "filter", false);
+    string operation = "ydk:read";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-get";
+    }
+    return execute_rpc(provider, filter, operation, "filter", false);
 }
 
 vector<shared_ptr<Entity>>
 CrudService::read(ydk::ServiceProvider & provider, vector<Entity*> & filter_list)
 {
     YLOG_INFO("Executing CRUD read operation on {}", entity_vector_to_string(filter_list));
-    return execute_rpc(provider, filter_list, "ydk:read", "filter", false);
+    string operation = "ydk:read";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-get";
+    }
+    return execute_rpc(provider, filter_list, operation, "filter", false);
 }
 
 shared_ptr<Entity> CrudService::read_config(ydk::ServiceProvider & provider, Entity & filter)
 {
     YLOG_INFO("Executing CRUD read_config operation on [{}]", filter.get_segment_path());
-    return execute_rpc(provider, filter, "ydk:read", "filter", true);
+    string operation = "ydk:read";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-get";
+    }
+    return execute_rpc(provider, filter, operation, "filter", true);
 }
 
 vector<shared_ptr<Entity>>
 CrudService::read_config(ydk::ServiceProvider & provider, vector<Entity*> & filter_list)
 {
     YLOG_INFO("Executing CRUD read operation on {}", entity_vector_to_string(filter_list));
-    return execute_rpc(provider, filter_list, "ydk:read", "filter", true);
+    string operation = "ydk:read";
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        operation = "ydk:gnmi-get";
+    }
+    return execute_rpc(provider, filter_list, operation, "filter", true);
 }
 
 //// end of class ydk::CrudService functions //////////////////////////////////
@@ -168,15 +231,42 @@ execute_rpc(ydk::ServiceProvider & provider, vector<Entity*> & filter_list,
             xml_payload += get_xml_subtree_filter_payload(*entity, provider);
         }
         else {
-            xml_payload += get_data_payload(*entity, provider);
+            if (provider.get_provider_type() == "gNMIServiceProvider") {
+                std::ostringstream path_buffer;
+                string segment_path = entity->get_segment_path();
+                switch (entity->yfilter) {
+				case YFilter::replace:
+                    path_buffer << "replace[alias='" << segment_path << "']/entity";
+                    break;
+				case YFilter::update:
+                    path_buffer << "update[alias='"  << segment_path << "']/entity";
+                    break;
+				case YFilter::delete_:
+                    path_buffer << "delete[alias='"  << segment_path << "']/entity";
+                    break;
+				default:
+                    path_buffer << "request[alias='" << segment_path << "']/entity";
+                };
+                string payload = get_json_payload(provider, *entity);
+                ydk_rpc->get_input_node().create_datanode(path_buffer.str(), payload);
+            }
+            else {
+                xml_payload += get_data_payload(*entity, provider);
+            }
         }
     }
 
-    if(set_config_flag)
-    {
-        ydk_rpc->get_input_node().create_datanode("only-config");
+    if (provider.get_provider_type() == "gNMIServiceProvider") {
+        if (operation == "ydk:gnmi-get") {
+            string flag = (set_config_flag) ? "CONFIG" : "ALL";
+            ydk_rpc->get_input_node().create_datanode("type", flag);
+        }
     }
-    ydk_rpc->get_input_node().create_datanode(data_tag, xml_payload);
+    else {
+        if (set_config_flag)
+            ydk_rpc->get_input_node().create_datanode("only-config");
+        ydk_rpc->get_input_node().create_datanode(data_tag, xml_payload);
+    }
 
     // Get root data node
     shared_ptr<path::DataNode> rnd = (*ydk_rpc)(session);

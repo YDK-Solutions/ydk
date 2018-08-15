@@ -128,19 +128,6 @@ function init_py_env {
     ${PIP_BIN} install -r requirements.txt coverage pybind11==2.2.2
 }
 
-function init_gnmi_server {
-    print_msg "starting gnmi server"
-    mkdir -p test/gnmi_server/build && cd test/gnmi_server/build
-    cmake .. && make
-    ./gnmi_server &
-    local status=$?
-    if [ $status -ne 0 ]; then
-        print_msg "Could not start gnmi server"
-        exit $status
-    fi
-    cd -
-}
-
 function init_go_env {
     print_msg "Initializing Go environment"
 
@@ -320,17 +307,23 @@ function collect_cpp_coverage {
     cp coverage.info ${YDKGEN_HOME}
 }
 
-function init_gnmi_server {
+function start_gnmi_server {
+    cd $YDKGEN_HOME/test/gnmi_server
+    if [ ! -x ./build/gnmi_server ]; then
+        print_msg "Building YDK gNMI server"
+        mkdir -p build && cd build
+        ${CMAKE_BIN} .. && make
+    fi
+
     print_msg "Starting YDK gNMI server"
-    mkdir -p $YDKGEN_HOME/test/gnmi_server/build && cd $YDKGEN_HOME/test/gnmi_server/build
-    ${CMAKE_BIN} .. && make
+    cd $YDKGEN_HOME/test/gnmi_server/build
     ./gnmi_server &
     local status=$?
     if [ $status -ne 0 ]; then
         print_msg "Could not start gNMI server"
         exit $status
     fi
-    cd -
+    cd $YDKGEN_HOME
 }
 
 function stop_gnmi_server {
@@ -355,7 +348,7 @@ function build_and_run_tests {
     cd build
     ${CMAKE_BIN} -DCOVERAGE=True .. && make
 
-    init_gnmi_server
+    start_gnmi_server
     ./ydk_gnmi_test
     stop_gnmi_server
 }
@@ -713,6 +706,36 @@ function py_test_gen {
 }
 
 #-------------------------------------
+# Python gNMI tests
+#-------------------------------------
+
+function build_and_run_python_gnmi_tests {
+    build_python_gnmi_package
+    run_python_gnmi_tests
+}
+
+function build_python_gnmi_package {
+    print_msg "Installing gNMI package for Python"
+
+    cd $YDKGEN_HOME/sdk/python/gnmi
+    python setup.py sdist
+    sudo -H pip install dist/ydk*.tar.gz -U
+    cd $YDKGEN_HOME
+}
+
+function run_python_gnmi_tests {
+    print_msg "Run Python gNMI tests"
+
+    start_gnmi_server
+
+    run_test sdk/python/gnmi/tests/test_gnmi_session.py
+    run_test sdk/python/gnmi/tests/test_gnmi_crud.py
+    run_test sdk/python/gnmi/tests/test_gnmi_service.py < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
+
+    stop_gnmi_server
+}
+
+#-------------------------------------
 # Documentation tests
 #-------------------------------------
 
@@ -783,25 +806,27 @@ init_rest_server
 init_tcp_server
 
 ######################################
-# Install/test core
+# Install and run C++ core tests
 ######################################
 install_test_cpp_core
 run_cpp_bundle_tests
 run_cpp_gnmi_tests
 
-exit
+######################################
+# Install and run Go tests
+######################################
 
-init_go_env
-install_go_core
+#init_go_env
+#install_go_core
+#run_go_bundle_tests
+
+######################################
+# Install and run Python tests
+######################################
 
 install_py_core
-
-######################################
-# Install/test bundles
-######################################
-
-run_go_bundle_tests
 run_python_bundle_tests
+build_and_run_python_gnmi_tests
 # test_gen_tests
 
 ######################################

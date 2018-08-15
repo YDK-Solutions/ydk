@@ -66,19 +66,19 @@ gNMIService::~gNMIService()
 shared_ptr<Entity>
 gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & operation) const
 {
-    YLOG_INFO("Executing get gRPC");
+	YLOG_DEBUG("Executing 'get' gRPC on single entity");
 
     gnmi::Path* path = new gnmi::Path;
     parse_entity_to_path(filter, path);
 
-    gNMIRequest request{};
+    GnmiClientRequest request{};
     request.alias = filter.get_segment_path();
     request.payload = get_data_payload(provider, filter);
     request.path = path;
     request.type = "get";
     request.operation = operation;
 
-    vector<gNMIRequest> get_request_list{};
+    vector<GnmiClientRequest> get_request_list{};
     get_request_list.push_back(request);
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
@@ -95,15 +95,15 @@ gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & o
 vector<shared_ptr<Entity>>
 gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, const string & operation) const
 {
-    YLOG_INFO("Executing get gRPC for multiple entities");
+	YLOG_DEBUG("Executing get gRPC for multiple entities");
 
-    vector<gNMIRequest> get_request_list{};
+    vector<GnmiClientRequest> get_request_list{};
     vector<shared_ptr<Entity>> response_list{};
     for (auto filter : filter_list) {
         gnmi::Path* path = new gnmi::Path;
         parse_entity_to_path(*filter, path);
 
-        gNMIRequest request{};
+        GnmiClientRequest request{};
         request.alias = filter->get_segment_path();
         request.payload = get_data_payload(provider, *filter);
         request.path = path;
@@ -142,7 +142,7 @@ gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, 
 }
 
 //set
-static gNMIRequest build_set_request(gNMIServiceProvider& provider, Entity& entity)
+static GnmiClientRequest build_set_request(gNMIServiceProvider& provider, Entity& entity)
 {
 	string operation = to_string(entity.yfilter);
 	if (operation != "replace" && operation != "update" && operation != "delete")
@@ -166,7 +166,7 @@ static gNMIRequest build_set_request(gNMIServiceProvider& provider, Entity& enti
             payload = payload.substr(pos, payload.length()-pos-1);
     }
 
-    gNMIRequest request{};
+    GnmiClientRequest request{};
     request.alias = entity.get_segment_path();
     request.path = path;
     request.payload = payload;
@@ -178,8 +178,9 @@ static gNMIRequest build_set_request(gNMIServiceProvider& provider, Entity& enti
 //set
 bool gNMIService::set(gNMIServiceProvider& provider, Entity& entity) const
 {
-    vector<gNMIRequest> set_request_list{};
-    gNMIRequest request = build_set_request(provider, entity);
+    YLOG_DEBUG("Executing get gRPC for single entity");
+    vector<GnmiClientRequest> set_request_list{};
+    GnmiClientRequest request = build_set_request(provider, entity);
     set_request_list.push_back(request);
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
@@ -190,9 +191,10 @@ bool gNMIService::set(gNMIServiceProvider& provider, Entity& entity) const
 
 bool gNMIService::set(gNMIServiceProvider& provider, vector<Entity*> & entity_list) const
 {
-    vector<gNMIRequest> set_request_list{};
+	YLOG_DEBUG("Executing set gRPC for multiple entities");
+    vector<GnmiClientRequest> set_request_list{};
     for (auto entity : entity_list) {
-        gNMIRequest request = build_set_request(provider, *entity);
+        GnmiClientRequest request = build_set_request(provider, *entity);
         set_request_list.push_back(request);
     }
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
@@ -201,16 +203,16 @@ bool gNMIService::set(gNMIServiceProvider& provider, vector<Entity*> & entity_li
     return client.execute_set_operation(set_request_list);
 }
 
-static void check_subscription_params(gNMIService::Subscription* subscription)
+static void check_subscription_params(gNMISubscription& subscription)
 {
-    if (subscription->entity == nullptr) {
+    if (subscription.entity == nullptr) {
         YLOG_ERROR("Entity is not set in the subscription");
         throw(YInvalidArgumentError{"Entity is not set in the subscription"});
     }
 
-    auto list_mode = subscription->subscription_mode;
+    auto list_mode = subscription.subscription_mode;
     if (list_mode == "") {
-        subscription->subscription_mode = "ON_CHANGE";
+        subscription.subscription_mode = "ON_CHANGE";
     }
     else if (list_mode != "ON_CHANGE" && list_mode != "SAMPLE" && list_mode!= "TARGET_DEFINED")
     {
@@ -218,20 +220,20 @@ static void check_subscription_params(gNMIService::Subscription* subscription)
         throw(YServiceProviderError{list_mode + " mode is not supported"});
     }
 
-    if (subscription->sample_interval == 0)
-        subscription->sample_interval = 60000000;
-    if (subscription->heartbeat_interval == 0)
-        subscription->heartbeat_interval = subscription->sample_interval * 10;
+    if (subscription.sample_interval == 0)
+        subscription.sample_interval = 60000000;
+    if (subscription.heartbeat_interval == 0 || subscription.heartbeat_interval < subscription.sample_interval)
+        subscription.heartbeat_interval = subscription.sample_interval * 10;
 }
 
 //subscribe
 void gNMIService::subscribe(gNMIServiceProvider& provider,
-                            gNMIService::Subscription* subscription,
+                            gNMISubscription& subscription,
                             uint32 qos, const std::string & mode,
                             std::function<void(const std::string & response)> out_func,
                             std::function<bool(const std::string & response)> poll_func) const
 {
-    YLOG_INFO("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", mode);
+    YLOG_DEBUG("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", mode);
 
     if(mode != "ONCE" && mode != "STREAM" && mode != "POLL")
     {
@@ -241,15 +243,15 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 
     check_subscription_params(subscription);
 
-    gNMISubscription sub{};
+    GnmiClientSubscription sub{};
     sub.path = new gnmi::Path;
-    parse_entity_to_path(*subscription->entity, sub.path);
-    sub.subscription_mode = subscription->subscription_mode;
-    sub.sample_interval = subscription->sample_interval;
-    sub.suppress_redundant = subscription->suppress_redundant;
-    sub.heartbeat_interval = subscription->heartbeat_interval;
+    parse_entity_to_path(*subscription.entity, sub.path);
+    sub.subscription_mode = subscription.subscription_mode;
+    sub.sample_interval = subscription.sample_interval;
+    sub.suppress_redundant = subscription.suppress_redundant;
+    sub.heartbeat_interval = subscription.heartbeat_interval;
 
-    vector<gNMISubscription> sub_list{};
+    vector<GnmiClientSubscription> sub_list{};
     sub_list.push_back(sub);
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
@@ -258,12 +260,12 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 }
 
 void gNMIService::subscribe(gNMIServiceProvider& provider,
-                            vector<gNMIService::Subscription*> & subscription_list,
+                            vector<gNMISubscription*> & subscription_list,
                             uint32 qos, const std::string & mode,
                             std::function<void(const std::string & response)> out_func,
                             std::function<bool(const std::string & response)> poll_func) const
 {
-    YLOG_INFO("gNMIService::subscribe: Executing subscribe request in '{}' list mode", mode);
+    YLOG_DEBUG("gNMIService::subscribe: Executing subscribe request in '{}' list mode", mode);
 
     if (mode != "ONCE" && mode != "STREAM" && mode != "POLL")
     {
@@ -271,10 +273,10 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
         throw(YServiceProviderError{mode + " list mode is not supported"});
     }
 
-    vector<gNMISubscription> sub_list{};
+    vector<GnmiClientSubscription> sub_list{};
     for (auto subscription : subscription_list) {
-        check_subscription_params(subscription);
-        gNMISubscription sub{};
+        check_subscription_params(*subscription);
+        GnmiClientSubscription sub{};
         sub.path = new gnmi::Path;
         parse_entity_to_path(*subscription->entity, sub.path);
         sub.subscription_mode = subscription->subscription_mode;

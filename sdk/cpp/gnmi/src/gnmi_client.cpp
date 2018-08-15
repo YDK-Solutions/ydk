@@ -97,7 +97,7 @@ static gnmi::SubscriptionList_Mode get_sublist_mode(const string & list_mode)
     return gnmi::SubscriptionList_Mode_ONCE;
 }
 
-static void populate_subscribe_request(gnmi::SubscriptionList* sl, gNMISubscription subscription)
+static void populate_subscribe_request(gnmi::SubscriptionList* sl, GnmiClientSubscription subscription)
 {
     gnmi::Subscription* sub = sl->add_subscription();
     if (subscription.path)
@@ -151,11 +151,13 @@ static string format_notification_response(const std::string& path_to_prepend, c
 gNMIClient::gNMIClient(shared_ptr<Channel> channel, const std::string & username, const  std::string & password)
  : stub_(gNMI::NewStub(channel)), username(username), password(password), is_secure(true)
 {
+    set_poll_thread_control_function(poll_thread_callback_control);
 }
 
 gNMIClient::gNMIClient(shared_ptr<Channel> channel)
  : stub_(gNMI::NewStub(channel)), username(""), password(""), is_secure(false)
 {
+    set_poll_thread_control_function(poll_thread_callback_control);
 }
 
 gNMIClient::~gNMIClient()
@@ -261,9 +263,9 @@ vector<string> gNMIClient::get_capabilities()
     return capabilities;
 }
 
-gNMICapabilityResponse gNMIClient::execute_get_capabilities()
+GnmiClientCapabilityResponse gNMIClient::execute_get_capabilities()
 {
-    gNMICapabilityResponse reply{};
+    GnmiClientCapabilityResponse reply{};
 
     CapabilityRequest request;
     CapabilityResponse response;
@@ -278,7 +280,7 @@ gNMICapabilityResponse gNMIClient::execute_get_capabilities()
     {
         auto model = response.supported_models(i);
 
-        gNMIModelData model_data{};
+        GnmiClientModelData model_data{};
         model_data.name = model.name();
         model_data.organization = model.organization();
         model_data.version = model.version();
@@ -364,7 +366,7 @@ static vector<string> parse_get_response(gnmi::GetResponse* response)
 }
 
 vector<string>
-gNMIClient::execute_get_operation(const std::vector<gNMIRequest> get_request_list, const std::string& operation)
+gNMIClient::execute_get_operation(const std::vector<GnmiClientRequest> get_request_list, const std::string& operation)
 {
     gnmi::GetRequest gnmi_get_request;
     gnmi::GetResponse gnmi_get_response;
@@ -393,7 +395,7 @@ gNMIClient::execute_get_operation(const std::vector<gNMIRequest> get_request_lis
 }
 
 bool
-gNMIClient::execute_set_operation(const std::vector<ydk::gNMIRequest> set_request_list)
+gNMIClient::execute_set_operation(const std::vector<ydk::GnmiClientRequest> set_request_list)
 {
     gnmi::SetRequest gnmi_set_request;
     gnmi::SetResponse gnmi_set_response;
@@ -467,15 +469,103 @@ gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response
     return true;
 }
 
+void gNMIClient::send_poll_request()
+{
+    gnmi::SubscribeRequest req;
+    gnmi::Poll* p = new gnmi::Poll;
+    req.set_allocated_poll(p);
+    YLOG_INFO("\n=============== Sending Poll SubscribeRequest ================\n{}\n", req.DebugString());
+    client_reader_writer->Write(req);
+}
+
+void poll_thread_callback_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func)
+{
+	YLOG_DEBUG("Invoking polling thread control from user defined callback");
+    if (poll_func == nullptr) {
+    	// Send poll request just once
+    	client->send_poll_request();
+    	return;
+    }
+    std::thread writer([client, poll_func]()
+    {
+        std::string str_response = client->get_last_subscribe_response();
+        while (poll_func(str_response))
+		{
+            client->send_poll_request();
+
+            // Wait some time for response to arrive
+            int counter = 0;
+            while (client->get_last_subscribe_response() == str_response && ++counter < 100) {
+               std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+    		if (counter >= 100) {
+    			YLOG_INFO("Could not receive subscribe response for 10 seconds");
+    		}
+    		else {
+    			YLOG_DEBUG("Received subscribe response in {} milliseconds", counter*100);
+    			str_response = client->get_last_subscribe_response();
+    		}
+        }
+		client->client_reader_writer->WritesDone();
+    });
+    writer.detach();
+}
+
+void poll_thread_cin_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func)
+{
+	YLOG_DEBUG("Invoking polling thread control from standard input stream");
+	std::thread writer([client, poll_func]()
+    {
+        std::string str_response = client->get_last_subscribe_response();
+        string input;
+        cout<<endl<<"Start POLL request monitoring"<<endl;
+        cout<<"Enter 'poll' for update; 'sleep' for 10 seconds, 'end' to end monitoring"<<endl;
+        while (cin)
+        {
+        	cout << ": "; cout.flush();
+        	cin >> input;
+        	if (input == "poll")
+        	{
+        		string before_poll = client->get_last_subscribe_response();
+        		client->send_poll_request();
+
+                // Wait some time for response to arrive
+        		int counter = 0;
+        		while (client->get_last_subscribe_response() == str_response && ++counter < 100) {
+        		    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        		}
+        		if (counter >= 100) {
+        			YLOG_INFO("Could not receive subscribe response for 10 seconds");
+        		}
+        		else {
+        			YLOG_DEBUG("Received subscribe response in {} milliseconds", counter*100);
+        			str_response = client->get_last_subscribe_response();
+        		}
+            }
+        	else if (input == "sleep") {
+        		std::this_thread::sleep_for(std::chrono::seconds(10));
+        	}
+        	else if (input == "end") {
+        	    break;
+        	}
+        	else {
+        		cout << "Wrong input" << endl;
+        		cout<<"Enter 'poll' for update; 'sleep' for sleeping 10 seconds; 'end' to end monitoring."<<endl;
+        	}
+        }
+        client->client_reader_writer->WritesDone();
+    });
+    writer.detach();
+}
+
 void
-gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
+gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
 		                                uint32 qos, const std::string & list_mode,
                                         std::function<void(const std::string & response)> out_func,
 										std::function<bool(const std::string & response)> poll_func)
 {
     grpc::ClientContext context;
     gnmi::SubscribeResponse response{};
-    std::string str_response{};
 
     auto request = make_shared<gnmi::SubscribeRequest>();
 
@@ -492,35 +582,19 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
     }
     request->set_allocated_subscribe(sl);
 
-    YLOG_INFO("\n=============== Sending SubscribeList SubscribeRequest ================\n{}\n", request->DebugString());
+    YLOG_INFO("\n=============== Sending SubscribeRequest ================\n{}\n", request->DebugString());
 
     context.AddMetadata("username", username);
     context.AddMetadata("password", password);
 
     auto a = stub_->Subscribe(&context);
-    std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer = move(a);
-
+    client_reader_writer = move(a);
     client_reader_writer->Write(*request);
+    last_subscribe_response = "";
 
-    YLOG_INFO("Subscribe Operation Succeeded");
-    YLOG_INFO("Invoking callback function to receive the subscription data");
-
-    if (list_mode == "POLL" && poll_func != nullptr)
+    if (list_mode == "POLL")
     {
-        std::thread writer([client_reader_writer, poll_func, str_response]()
-        {
-            while (poll_func(str_response))
-            {
-                gnmi::SubscribeRequest req;
-                gnmi::Poll* p = new gnmi::Poll;
-                req.set_allocated_poll(p);
-                YLOG_INFO("\n=============== Sending Poll SubscribeRequest ================\n{}\n", req.DebugString());
-                client_reader_writer->Write(req);
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-            client_reader_writer->WritesDone();
-        });
-        writer.detach();
+        poll_thread_control(this, poll_func);
     }
 
     while (client_reader_writer->Read(&response))
@@ -528,12 +602,14 @@ gNMIClient::execute_subscribe_operation(std::vector<gNMISubscription> subscripti
         YLOG_INFO("\n=============== Received SubscribeResponse ================\n{}\n", response.DebugString());
 
         if (out_func != nullptr) {
-        	google::protobuf::TextFormat::PrintToString(response, &str_response);
-            out_func(str_response);
+            YLOG_DEBUG("Invoking callback function to receive the subscription data");
+        	google::protobuf::TextFormat::PrintToString(response, &last_subscribe_response);
+            out_func(last_subscribe_response);
         }
     }
 	auto status = client_reader_writer->Finish();
 	check_status(status, "SubscribeRequest failed with error");
+    YLOG_INFO("Subscribe Operation Succeeded");
 }
 
 }

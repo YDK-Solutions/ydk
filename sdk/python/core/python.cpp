@@ -553,6 +553,7 @@ PYBIND11_MODULE(ydk_, ydk)
         .value("delete", ydk::YFilter::delete_)
         .value("replace", ydk::YFilter::replace)
         .value("read", ydk::YFilter::read)
+        .value("update", ydk::YFilter::update)
         .value("not_set", ydk::YFilter::not_set);
 
     enum_<ydk::EncodingFormat>(types, "EncodingFormat")

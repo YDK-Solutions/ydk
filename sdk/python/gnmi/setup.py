@@ -41,7 +41,7 @@ LONG_DESCRIPTION = '''
                     This package provides extension for YDK core - gNMI services.
                    '''
 
-YDK_PACKAGES = find_packages(exclude=['docs*', 'tests*', 'samples'])
+YDK_PACKAGES = ['ydk.gnmi', 'ydk.gnmi.services', 'ydk.gnmi.providers', 'ydk.gnmi.path']
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):

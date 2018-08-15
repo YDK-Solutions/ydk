@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import unittest
 import logging
 
-from test_utils import enable_logging
+from test_utils import enable_logging, get_local_repo_dir
 
 from ydk.path  import Codec
 from ydk.path  import Repository
@@ -35,7 +35,7 @@ class SanityGnmiSession(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.codec = Codec()
-        self.repo = Repository("/home/yan/ydk-workspace/ydk-gen/sdk/cpp/core/tests/models")
+        self.repo = Repository(get_local_repo_dir())
         self.session = gNMISession( repo=self.repo, address="127.0.0.1", port=50051)
         self.schema = self.session.get_root_schema()
         self.bgp_json = ''

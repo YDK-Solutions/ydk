@@ -320,7 +320,7 @@ class gNMIImpl final : public gNMI::Service
                         if (timer >= sub.heartbeat_interval())
                             options.set_last_message();
                         stream->Write( response, options);
-                        std::this_thread::sleep_for(std::chrono::milliseconds(sub.sample_interval()/1000));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(sub.sample_interval()/1000000));
                     }
                     break;
                 }

@@ -14,7 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.gnmi.services import gNMIService
+from ydk.gnmi.services import gNMIService, gNMISubscription
 
 
-__all__ = [ "gNMIService" ]
+__all__ = [ "gNMIService", "gNMISubscription" ]

@@ -223,9 +223,9 @@ static void populate_path_from_payload(gnmi::Path* path, const string & payload,
     parse_datanode_to_path(child, path);
 }
 
-static gNMIRequest build_set_request(RootSchemaNode & root_schema, DataNode* request, const string & operation)
+static GnmiClientRequest build_set_request(RootSchemaNode & root_schema, DataNode* request, const string & operation)
 {
-    gNMIRequest one_request{};
+    GnmiClientRequest one_request{};
     one_request.type = "set";
     one_request.operation = operation;
     auto entity = request->find("entity");
@@ -253,12 +253,12 @@ static gNMIRequest build_set_request(RootSchemaNode & root_schema, DataNode* req
 
 bool gNMISession::handle_set(Rpc& ydk_rpc) const
 {
-	vector<gNMIRequest> setRequest{};
+	vector<GnmiClientRequest> setRequest{};
 
     auto delete_list = ydk_rpc.get_input_node().find("delete");
     if (!delete_list.empty()) {
         for (auto request : delete_list) {
-            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "delete");
+            GnmiClientRequest one_request = build_set_request(get_root_schema(), request.get(), "delete");
             setRequest.push_back(one_request);
         }
     }
@@ -266,7 +266,7 @@ bool gNMISession::handle_set(Rpc& ydk_rpc) const
     auto replace_list = ydk_rpc.get_input_node().find("replace");
     if (!replace_list.empty()) {
         for (auto request : replace_list) {
-            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "replace");
+            GnmiClientRequest one_request = build_set_request(get_root_schema(), request.get(), "replace");
             setRequest.push_back(one_request);
         }
     }
@@ -274,7 +274,7 @@ bool gNMISession::handle_set(Rpc& ydk_rpc) const
     auto update_list = ydk_rpc.get_input_node().find("update");
     if (!update_list.empty()) {
         for (auto request : update_list) {
-            gNMIRequest one_request = build_set_request(get_root_schema(), request.get(), "update");
+            GnmiClientRequest one_request = build_set_request(get_root_schema(), request.get(), "update");
             setRequest.push_back(one_request);
         }
     }
@@ -285,7 +285,7 @@ bool gNMISession::handle_set(Rpc& ydk_rpc) const
 shared_ptr<DataNode>
 gNMISession::handle_get(Rpc& rpc) const
 {
-	vector<gNMIRequest> getRequest{};
+	vector<GnmiClientRequest> getRequest{};
 
     SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
@@ -303,7 +303,7 @@ gNMISession::handle_get(Rpc& rpc) const
     }
 
     for (auto request : request_list) {
-        gNMIRequest one_request{};
+        GnmiClientRequest one_request{};
         one_request.type = "get";
         one_request.operation = operation;
 
@@ -352,7 +352,7 @@ gNMISession::handle_get_reply(vector<string> reply_val) const
 shared_ptr<DataNode>
 gNMISession::handle_get_capabilities() const
 {
-	gNMICapabilityResponse reply = client->execute_get_capabilities();
+	GnmiClientCapabilityResponse reply = client->execute_get_capabilities();
 
 	RootSchemaNodeImpl & rs_impl = dynamic_cast<RootSchemaNodeImpl &> (*root_schema);
 
@@ -385,7 +385,7 @@ gNMISession::handle_subscribe(Rpc& rpc,
 		std::function<void(const std::string & response)> out_func,
 		std::function<bool(const std::string & response)> poll_func) const
 {
-    vector<gNMISubscription> sub_list{};
+    vector<GnmiClientSubscription> sub_list{};
     SchemaNode* rpc_schema = &(rpc.get_schema_node());
     auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     auto subscription = rpc.get_input_node().find("subscription");
@@ -413,7 +413,7 @@ gNMISession::handle_subscribe(Rpc& rpc,
     }
 
     for (auto one_subscription : subscription_list) {
-        gNMISubscription sub{};
+        GnmiClientSubscription sub{};
 
         auto entity_vector = one_subscription->find("entity");
         if (entity_vector.empty()) {

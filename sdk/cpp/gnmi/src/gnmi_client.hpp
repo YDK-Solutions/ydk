@@ -58,7 +58,7 @@ namespace ydk
 
 class Entity;
 
-struct gNMIRequest {
+struct GnmiClientRequest {
 	std::string alias;
 	std::string payload;
 	gnmi::Path* path;
@@ -66,19 +66,19 @@ struct gNMIRequest {
 	std::string operation;
 };
 
-struct gNMIModelData {
+struct GnmiClientModelData {
 	std::string name;
 	std::string organization;
 	std::string version;
 };
 
-struct gNMICapabilityResponse {
+struct GnmiClientCapabilityResponse {
     std::string gnmi_version;
-    std::vector<gNMIModelData>  supported_models;
+    std::vector<GnmiClientModelData>  supported_models;
     std::vector<std::string> supported_encodings;
 };
 
-struct gNMISubscription {
+struct GnmiClientSubscription {
     gnmi::Path* path;
     std::string subscription_mode;
     uint64 sample_interval;
@@ -86,9 +86,14 @@ struct gNMISubscription {
     uint64 heartbeat_interval;
 };
 
+class gNMIClient;
+
+void poll_thread_callback_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func);
+void poll_thread_cin_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func);
+
 class gNMIClient
 {
-public:
+  public:
     typedef struct PathPrefixValueFlags
     {
         bool path_has_value;
@@ -101,19 +106,32 @@ public:
 
     int connect();
 
-    std::vector<std::string> execute_get_operation(const std::vector<gNMIRequest> get_request_list, const std::string& operation);
+    std::vector<std::string> execute_get_operation(const std::vector<GnmiClientRequest> get_request_list, const std::string& operation);
 
-    bool execute_set_operation(const std::vector<gNMIRequest> get_request_list);
+    bool execute_set_operation(const std::vector<GnmiClientRequest> get_request_list);
 
-    void execute_subscribe_operation(std::vector<gNMISubscription> subscription_list,
+    void execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
                                      uint32 qos, const std::string & mode,
                                      std::function<void(const std::string & response)> out_func,
                                      std::function<bool(const std::string & response)> poll_func);
-
+    void send_poll_request();
     std::vector<std::string> get_capabilities();
-    gNMICapabilityResponse execute_get_capabilities();
+    GnmiClientCapabilityResponse execute_get_capabilities();
 
-private:
+    std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer;
+
+    inline void set_poll_thread_control_function(
+    		std::function<void(gNMIClient*, std::function<bool(const std::string&)>)> thread_func)
+    {
+        poll_thread_control = thread_func;
+    };
+
+    inline std::string get_last_subscribe_response()
+    {
+        return last_subscribe_response;
+    }
+
+  private:
 
     void parse_capabilities_modeldata(::gnmi::CapabilityResponse* response);
     void parse_capabilities(::gnmi::CapabilityResponse* response);
@@ -126,6 +144,9 @@ private:
     std::string username;
     std::string password;
     bool is_secure;
+
+    std::string last_subscribe_response;
+    std::function<void(gNMIClient* client, std::function<bool(const std::string & response)>)> poll_thread_control;
 };
 }
 

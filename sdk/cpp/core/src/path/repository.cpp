@@ -75,46 +75,13 @@ static void create_if_does_not_exist(const std::string & path)
     }
 }
 
-namespace path
-{
-
-void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
-{
-    std::ostringstream error_message{};
-    error_message <<msg;
-    if(path)
-    {
-        error_message << " " << "Path: '" << path<<"'";
-    }
-    switch(level)
-    {
-        case LY_LLERR:
-            if(error_message.str().find("Invalid value")!= std::string::npos
-                    || error_message.str().find("Failed to resolve")!= std::string::npos
-                    || error_message.str().find("Unexpected character")!= std::string::npos
-                    || error_message.str().find("does not satisfy the constraint")!= std::string::npos)
-            {
-                YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
-                throw(YModelError{});
-            }
-            YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
-            break;
-        case LY_LLSILENT:
-        case LY_LLWRN:
-        case LY_LLVRB:
-        case LY_LLDBG:
-            YLOG_DEBUG("Debug: {}", error_message.str());
-            break;
-    }
-}
-}
-}
+}	// namespace ydk
 
 ydk::path::RepositoryPtr::RepositoryPtr (path::ModelCachingOption caching_option)
   : using_temp_directory(true), caching_option(caching_option), server_caps()
 {
     path = get_models_download_path();
-    ly_set_log_clb(libyang_log_callback, 1);
+    set_libyang_logging_callback();
 }
 
 
@@ -128,7 +95,7 @@ ydk::path::RepositoryPtr::RepositoryPtr(const std::string& search_dir, path::Mod
         throw(YInvalidArgumentError{"path "+search_dir+" is not a valid directory"});
     }
 
-    ly_set_log_clb(libyang_log_callback, 1);
+    set_libyang_logging_callback();
 }
 
 ydk::path::RepositoryPtr::~RepositoryPtr()

@@ -184,14 +184,14 @@ TEST_CASE("gnmi_service_subscribe")
     //i->name = "*";
     filter.interface.append(i);
 
-    gNMIService::Subscription subscription{};
+    gNMISubscription subscription{};
     subscription.entity = &filter;
-    subscription.subscription_mode = "ON_CHANGE";
-    subscription.sample_interval = 10000000;
-    subscription.suppress_redundant = true;
-    subscription.heartbeat_interval = 1000000000;
+    //subscription.subscription_mode = "ON_CHANGE";
+    subscription.sample_interval = 10000000000;
+    //subscription.suppress_redundant = true;
+    subscription.heartbeat_interval = 100000000000;
 
-    gs.subscribe(provider, &subscription, 10, "ONCE", gnmi_service_subscribe_callback, nullptr);
+    gs.subscribe(provider, subscription, 10, "ONCE", gnmi_service_subscribe_callback);
 }
 
 TEST_CASE("gnmi_service_subscribe_multiples")
@@ -219,26 +219,26 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     bgp.neighbors->neighbor.append(neighbor);
 
     // Build subscriptions
-    gNMIService::Subscription ifc_subscription{};
+    gNMISubscription ifc_subscription{};
     ifc_subscription.entity = &ifcs;
-    ifc_subscription.subscription_mode = "ON_CHANGE";
-    ifc_subscription.sample_interval = 10000000;
-    ifc_subscription.suppress_redundant = true;
-    ifc_subscription.heartbeat_interval = 1000000000;
+    //ifc_subscription.subscription_mode = "ON_CHANGE";
+    ifc_subscription.sample_interval = 10000000000;
+    //ifc_subscription.suppress_redundant = true;
+    ifc_subscription.heartbeat_interval = 100000000000;
 
-    gNMIService::Subscription bgp_subscription{};
+    gNMISubscription bgp_subscription{};
     bgp_subscription.entity = &bgp;
     bgp_subscription.subscription_mode = "TARGET_DEFINED";
-    bgp_subscription.sample_interval = 20000000;
-    bgp_subscription.suppress_redundant = true;
-    bgp_subscription.heartbeat_interval = 2000000000;
+    bgp_subscription.sample_interval = 20000000000;
+    bgp_subscription.suppress_redundant = false;
+    bgp_subscription.heartbeat_interval = 200000000000;
 
-    vector<gNMIService::Subscription*> subscription_list{};
+    vector<gNMISubscription*> subscription_list{};
     subscription_list.push_back(&ifc_subscription);
     subscription_list.push_back(&bgp_subscription);
 
     // Subscribe
-    gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback, nullptr);
+    gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback);
 }
 
 bool interactive_poll_request(const std::string & response)
@@ -288,11 +288,11 @@ TEST_CASE("gnmi_service_poll_subscribe")
     i->name = "*";
     filter.interface.append(i);
 
-    gNMIService::Subscription subscription{};
+    gNMISubscription subscription{};
     subscription.entity = &filter;
 
     set_counter(2);
-    gs.subscribe(provider, &subscription, 10, "POLL", gnmi_service_subscribe_callback, counter_poll_request);
+    gs.subscribe(provider, subscription, 10, "POLL", gnmi_service_subscribe_callback, counter_poll_request);
 }
 
 TEST_CASE("gnmi_service_stream_subscribe")
@@ -311,14 +311,12 @@ TEST_CASE("gnmi_service_stream_subscribe")
     i->name = "*";
     filter.interface.append(i);
 
-    gNMIService::Subscription subscription{};
+    gNMISubscription subscription{};
     subscription.entity = &filter;
-    subscription.subscription_mode = "ON_CHANGE";
-    subscription.sample_interval = 2000000;
-    subscription.suppress_redundant = true;
-    subscription.heartbeat_interval = 10000000;
+    subscription.sample_interval = 2000000000;
+    subscription.heartbeat_interval = 10000000000;
 
-    gs.subscribe(provider, &subscription, 10, "STREAM", gnmi_service_subscribe_callback, nullptr);
+    gs.subscribe(provider, subscription, 10, "STREAM", gnmi_service_subscribe_callback);
 }
 
 TEST_CASE("gnmi_service_create")

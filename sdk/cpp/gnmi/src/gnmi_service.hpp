@@ -30,16 +30,20 @@ namespace ydk
 {
 class gNMIServiceProvider;
 
+struct gNMISubscription
+{
+    Entity* entity;
+    std::string subscription_mode;
+    uint64 sample_interval;
+    bool suppress_redundant;
+    uint64 heartbeat_interval;
+
+    gNMISubscription() {};
+};
+
 class gNMIService
 {
   public:
-    struct Subscription {
-        Entity* entity;
-        std::string subscription_mode;
-        uint64 sample_interval;
-        bool suppress_redundant;
-        uint64 heartbeat_interval;
-    };
 
     gNMIService();
     ~gNMIService();
@@ -53,15 +57,15 @@ class gNMIService
     bool set(gNMIServiceProvider & provider, std::vector<Entity*> & entity_list) const;
 
     void subscribe(gNMIServiceProvider& provider,
-                   Subscription* sub,
+                   gNMISubscription& sub,
                    uint32 qos, const std::string & mode,
                    std::function<void(const std::string & response)> out_func,
-                   std::function<bool(const std::string & response)> poll_func) const;
+                   std::function<bool(const std::string & response)> poll_func=nullptr) const;
     void subscribe(gNMIServiceProvider& provider,
-                   std::vector<Subscription*> & sub_list,
+                   std::vector<gNMISubscription*> & sub_list,
                    uint32 qos, const std::string & mode,
                    std::function<void(const std::string & response)> out_func,
-                   std::function<bool(const std::string & response)> poll_func) const;
+                   std::function<bool(const std::string & response)> poll_func=nullptr) const;
 
     std::string capabilities(gNMIServiceProvider & provider);
 };

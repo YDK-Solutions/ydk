@@ -70,8 +70,8 @@ class SanityGnmiCrud(unittest.TestCase):
  
         # Read config
         read_list = self.crud.read_config(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])
-        for entity in read_list:
-            print_entity(entity, self.schema)
+        #for entity in read_list:
+        #    print_entity(entity, self.schema)
  
         # Read all
         read_list = self.crud.read(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])
@@ -81,7 +81,7 @@ class SanityGnmiCrud(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    enable_logging(logging.INFO)
+    enable_logging(logging.ERROR)
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityGnmiCrud)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

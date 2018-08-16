@@ -169,7 +169,9 @@ function install_cpp_core {
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
     print_msg "Compiling with coverage"
-    ${CMAKE_BIN} -DCOVERAGE=True .. && sudo make install
+    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    run_exec_test make
+    sudo make install
 }
 
 function generate_libydk {
@@ -308,6 +310,7 @@ function collect_cpp_coverage {
 }
 
 function start_gnmi_server {
+    current_dir="$(pwd)"
     cd $YDKGEN_HOME/test/gnmi_server
     if [ ! -x ./build/gnmi_server ]; then
         print_msg "Building YDK gNMI server"
@@ -323,7 +326,7 @@ function start_gnmi_server {
         print_msg "Could not start gNMI server"
         exit $status
     fi
-    cd $YDKGEN_HOME
+    cd $current_dir
 }
 
 function stop_gnmi_server {
@@ -336,7 +339,8 @@ function build_gnmi_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    ${CMAKE_BIN} -DCOVERAGE=True .. && make
+    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    run_exec_test make
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -346,10 +350,14 @@ function build_and_run_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    ${CMAKE_BIN} -DCOVERAGE=True .. && make
+    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    run_exec_test make
 
     start_gnmi_server
-    ./ydk_gnmi_test
+
+    cd $YDKGEN_HOME/sdk/cpp/gnmi/tests/build
+    run_exec_test ./ydk_gnmi_test -d yes
+
     stop_gnmi_server
 }
 
@@ -719,7 +727,7 @@ function build_python_gnmi_package {
 
     cd $YDKGEN_HOME/sdk/python/gnmi
     python setup.py sdist
-    sudo -H pip install dist/ydk*.tar.gz -U
+    pip_check_install dist/ydk*.tar.gz
     cd $YDKGEN_HOME
 }
 
@@ -728,9 +736,10 @@ function run_python_gnmi_tests {
 
     start_gnmi_server
 
-    run_test sdk/python/gnmi/tests/test_gnmi_session.py
-    run_test sdk/python/gnmi/tests/test_gnmi_crud.py
-    run_test sdk/python/gnmi/tests/test_gnmi_service.py < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
+    cd $YDKGEN_HOME/sdk/python/gnmi/tests
+    run_test test_gnmi_session.py
+    run_test test_gnmi_crud.py
+    run_test test_gnmi_service.py < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
 
     stop_gnmi_server
 }

@@ -719,6 +719,7 @@ function py_test_gen {
 
 function build_and_run_python_gnmi_tests {
     build_python_gnmi_package
+    rebuild_python_ydktest_package
     run_python_gnmi_tests
 }
 
@@ -728,7 +729,14 @@ function build_python_gnmi_package {
     cd $YDKGEN_HOME/sdk/python/gnmi
     python setup.py sdist
     pip_check_install dist/ydk*.tar.gz
+}
+
+function rebuild_python_ydktest_package {
+    print_msg "Re-generating Python ydktest bundle"
+
     cd $YDKGEN_HOME
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz -U
 }
 
 function run_python_gnmi_tests {

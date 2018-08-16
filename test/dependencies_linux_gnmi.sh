@@ -17,7 +17,7 @@
 #
 # dependencies_linux_gnmi.sh
 # Script to install protobuf, protoc and grpc on Ubuntu and CentOS
-# for running ydk_gnmi_test on docker
+# for running YDK gNMI tests on docker
 #
 # ------------------------------------------------------------------
 

@@ -145,8 +145,8 @@ class gNMIImpl final : public gNMI::Service
 
     Status Get(ServerContext* context, const GetRequest* request, GetResponse* response) override 
     {
-        std::cout << "=========== Get Request Received ===========" << std::endl;
-        std::cout << request->DebugString() << std::endl;
+        //std::cout << "=========== Get Request Received ===========" << std::endl;
+        //std::cout << request->DebugString() << std::endl;
 
         for(int j = 0; j < request->path_size(); ++j) 
         {
@@ -185,15 +185,15 @@ class gNMIImpl final : public gNMI::Service
             update->set_allocated_val(value);
         }
 
-        std::cout << "=========== Get Response Sent ===========" << std::endl;
-        std::cout << response->DebugString() << std::endl;
+        //std::cout << "=========== Get Response Sent ===========" << std::endl;
+        //std::cout << response->DebugString() << std::endl;
         return Status::OK;
     } 
 
     Status Set(ServerContext* context, const SetRequest* request, SetResponse* response) override 
     {
-        std::cout << "=========== Set Request Received ===========" << std::endl;
-        std::cout << request->DebugString() << std::endl;
+        //std::cout << "=========== Set Request Received ===========" << std::endl;
+        //std::cout << request->DebugString() << std::endl;
 
         std::time_t timestamp_val = std::time(nullptr);
         response->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
@@ -274,8 +274,8 @@ class gNMIImpl final : public gNMI::Service
             update_response->set_allocated_path(response_path);
             update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
         }
-        std::cout << "=========== Set Response Sent ===========" << std::endl;
-        std::cout << response->DebugString() << std::endl;
+        //std::cout << "=========== Set Response Sent ===========" << std::endl;
+        //std::cout << response->DebugString() << std::endl;
         return Status::OK;
     }
 
@@ -286,8 +286,8 @@ class gNMIImpl final : public gNMI::Service
 
         while (stream->Read(&request))
         {
-            std::cout << "=========== Subscribe Request Received ===========" << std::endl;
-            std::cout << request.DebugString() << std::endl;
+            //std::cout << "=========== Subscribe Request Received ===========" << std::endl;
+            //std::cout << request.DebugString() << std::endl;
 
             if (request.has_subscribe())
                 subscription_list = request.subscribe();
@@ -384,8 +384,8 @@ class gNMIImpl final : public gNMI::Service
             update_response->set_allocated_val(value);
         }
         response.set_allocated_update(notification);
-        std::cout << "=========== Subscribe Response Sent ===========" << std::endl;
-        std::cout << response.DebugString() << std::endl;
+        //std::cout << "=========== Subscribe Response Sent ===========" << std::endl;
+        //std::cout << response.DebugString() << std::endl;
         return response;
     }
 };
@@ -416,8 +416,8 @@ void RunServer()
         ssl_opts.pem_root_certs = "";
         ssl_opts.pem_key_cert_pairs.push_back(pkcp);
     
-        std::cout << "server key: " << server_key << std::endl;
-        std::cout << "server cert: " << server_cert << std::endl;
+        //std::cout << "server key: " << server_key << std::endl;
+        //std::cout << "server cert: " << server_cert << std::endl;
     
         builder.AddListeningPort(server_address, grpc::SslServerCredentials(ssl_opts));
     } else {
@@ -426,7 +426,7 @@ void RunServer()
     
     builder.RegisterService(&service);
     std::unique_ptr<Server> server(builder.BuildAndStart());
-    std::cout << "Server listening on " << server_address << std::endl;
+    //std::cout << "Server listening on " << server_address << std::endl;
     server->Wait();
 }
 

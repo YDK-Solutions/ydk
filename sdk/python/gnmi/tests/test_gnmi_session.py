@@ -143,7 +143,7 @@ bgp_update = '''val {
     }'''
 
 def gnmi_service_subscribe_callback(response):
-    print(response)
+    #print(response)
     if (int_update not in response) or (bgp_update not in response):
         print("ERROR in response!")
     
@@ -151,6 +151,6 @@ if __name__ == '__main__':
     #device = get_device_info()
     import sys
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityGnmiSession)
-    #enable_logging(logging.ERROR)
+    enable_logging(logging.ERROR)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

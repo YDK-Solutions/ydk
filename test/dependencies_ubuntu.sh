@@ -47,6 +47,3 @@ function install_fpm {
 install_confd
 
 #install_fpm
-
-./test/dependencies_linux_gnmi.sh
-

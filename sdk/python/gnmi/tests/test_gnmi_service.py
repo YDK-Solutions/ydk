@@ -98,7 +98,7 @@ class SanityGnmiService(unittest.TestCase):
         ifc_filter = openconfig_interfaces.Interfaces()
         response = self.gs.get(self.provider, ifc_filter, "CONFIG")
         self.assertIsNotNone(response)
-        print_entity(response, self.schema)
+        #print_entity(response, self.schema)
  
         # Delete interface configuration
         ifc.yfilter = YFilter.delete
@@ -118,8 +118,8 @@ class SanityGnmiService(unittest.TestCase):
         response = self.gs.get(self.provider, [ifc_filter, bgp_filter], "CONFIG")
         self.assertIsNotNone(response)
         self.assertEqual(response.__len__(), 2)
-        for entity in response:
-            print_entity(entity, self.schema)
+        #for entity in response:
+        #    print_entity(entity, self.schema)
  
         # Delete interface and BGP configuration
         ifc.yfilter = YFilter.delete

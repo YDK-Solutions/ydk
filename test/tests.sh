@@ -309,71 +309,6 @@ function collect_cpp_coverage {
     cp coverage.info ${YDKGEN_HOME}
 }
 
-function start_gnmi_server {
-    current_dir="$(pwd)"
-    cd $YDKGEN_HOME/test/gnmi_server
-    if [ ! -x ./build/gnmi_server ]; then
-        print_msg "Building YDK gNMI server"
-        mkdir -p build && cd build
-        ${CMAKE_BIN} .. && make
-    fi
-
-    print_msg "Starting YDK gNMI server"
-    cd $YDKGEN_HOME/test/gnmi_server/build
-    ./gnmi_server &
-    local status=$?
-    if [ $status -ne 0 ]; then
-        print_msg "Could not start gNMI server"
-        exit $status
-    fi
-    cd $current_dir
-}
-
-function stop_gnmi_server {
-    print_msg "Stopping gNMI server"
-    pkill -f gnmi_server
-}
-
-function build_gnmi_core_library {
-    print_msg "Building core gnmi library"
-    cd $YDKGEN_HOME/sdk/cpp/gnmi
-    mkdir -p build
-    cd build
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
-    run_exec_test make
-    sudo make install
-    cd $YDKGEN_HOME
-}
-
-function build_and_run_tests {
-    print_msg "Building gnmi tests"
-    cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
-    mkdir -p build
-    cd build
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
-    run_exec_test make
-
-    start_gnmi_server
-
-    cd $YDKGEN_HOME/sdk/cpp/gnmi/tests/build
-    run_exec_test ./ydk_gnmi_test -d yes
-
-    stop_gnmi_server
-}
-
-function run_cpp_gnmi_tests {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
-            print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
-        fi
-    fi
-
-    build_gnmi_core_library
-    build_and_run_tests
-}
-
 ######################################################################
 # Go ydktest bundle install and test functions
 ######################################################################
@@ -714,45 +649,6 @@ function py_test_gen {
 }
 
 #-------------------------------------
-# Python gNMI tests
-#-------------------------------------
-
-function build_and_run_python_gnmi_tests {
-    build_python_gnmi_package
-    rebuild_python_ydktest_package
-    run_python_gnmi_tests
-}
-
-function build_python_gnmi_package {
-    print_msg "Installing gNMI package for Python"
-
-    cd $YDKGEN_HOME/sdk/python/gnmi
-    python setup.py sdist
-    pip_check_install dist/ydk*.tar.gz
-}
-
-function rebuild_python_ydktest_package {
-    print_msg "Re-generating Python ydktest bundle"
-
-    cd $YDKGEN_HOME
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json
-    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz -U
-}
-
-function run_python_gnmi_tests {
-    print_msg "Run Python gNMI tests"
-
-    start_gnmi_server
-
-    cd $YDKGEN_HOME/sdk/python/gnmi/tests
-    run_test test_gnmi_session.py
-    run_test test_gnmi_crud.py
-    run_test test_gnmi_service.py < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
-
-    stop_gnmi_server
-}
-
-#-------------------------------------
 # Documentation tests
 #-------------------------------------
 
@@ -827,23 +723,19 @@ init_tcp_server
 ######################################
 install_test_cpp_core
 run_cpp_bundle_tests
-run_cpp_gnmi_tests
 
 ######################################
 # Install and run Go tests
 ######################################
-
-#init_go_env
-#install_go_core
-#run_go_bundle_tests
+init_go_env
+install_go_core
+run_go_bundle_tests
 
 ######################################
 # Install and run Python tests
 ######################################
-
 install_py_core
 run_python_bundle_tests
-build_and_run_python_gnmi_tests
 # test_gen_tests
 
 ######################################

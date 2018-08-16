@@ -30,7 +30,7 @@
 
 #include <ydk/path_api.hpp>
 
-#include <ydk/gnmi.pb.h>
+#include "gnmi.pb.h"
 
 using namespace gnmi;
 

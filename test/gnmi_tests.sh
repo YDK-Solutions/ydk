@@ -25,9 +25,6 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
-PY_GENERATE="python2"
-PY_TEST="python3"
-
 ######################################################################
 # Utility functions
 ######################################################################
@@ -327,7 +324,7 @@ function build_python_gnmi_package {
     print_msg "Installing gNMI package for Python"
 
     cd $YDKGEN_HOME/sdk/python/gnmi
-    python setup.py sdist
+    ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
 }
 

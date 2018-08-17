@@ -40,7 +40,7 @@ function run_exec_test {
     $@
     local status=$?
     if [ $status -ne 0 ]; then
-        MSG_COLOR=$(RED)
+        MSG_COLOR=$RED
         print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
@@ -52,7 +52,7 @@ function run_test_no_coverage {
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
-        MSG_COLOR=$(RED)
+        MSG_COLOR=$RED
         print_msg "Exiting '${PYTHON_BIN} $@' with status=$status"
         exit $status
     fi
@@ -66,7 +66,7 @@ function run_test {
         local status=$?
         print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
-            MSG_COLOR=$(RED)
+            MSG_COLOR=$RED
             print_msg "Exiting 'coverage run $@' with status=$status"
             exit $status
         fi
@@ -149,7 +149,7 @@ function run_cpp_core_test {
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose mode to get more details
         ./tests/ydk_core_test -d yes
-        MSG_COLOR=$(RED)
+        MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
     fi
@@ -232,7 +232,7 @@ function start_gnmi_server {
     ./gnmi_server &
     local status=$?
     if [ $status -ne 0 ]; then
-        MSG_COLOR=$(RED)
+        MSG_COLOR=$RED
         print_msg "Could not start YDK gNMI server"
         exit $status
     fi
@@ -307,7 +307,7 @@ function install_py_core {
     cd $YDKGEN_HOME/sdk/python/core
     export YDK_COVERAGE=
     ${PYTHON_BIN} setup.py sdist
-    pip_check_install dist/ydk*.tar.gz
+    ${PIP_BIN} install dist/ydk*.tar.gz
     cd $YDKGEN_HOME
 }
 
@@ -328,7 +328,7 @@ function build_python_gnmi_package {
 
     cd $YDKGEN_HOME/sdk/python/gnmi
     python setup.py sdist
-    pip_check_install dist/ydk*.tar.gz
+    ${PIP_BIN} install dist/ydk*.tar.gz
 }
 
 function run_python_gnmi_tests {

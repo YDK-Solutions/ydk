@@ -22,6 +22,8 @@
 # Terminal colors
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 PY_GENERATE="python2"
 PY_TEST="python3"
@@ -31,13 +33,15 @@ PY_TEST="python3"
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date): tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): tests.sh | $1${NOCOLOR}"
 }
 
 function run_exec_test {
     $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
@@ -48,6 +52,8 @@ function run_test_no_coverage {
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '${PYTHON_BIN} $@' with status=$status"
         exit $status
     fi
     return $status
@@ -60,6 +66,8 @@ function run_test {
         local status=$?
         print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
+            MSG_COLOR=$RED
+            print_msg "Exiting 'coverage run $@' with status=$status"
             exit $status
         fi
         return $status
@@ -192,6 +200,8 @@ function run_cpp_core_test {
     if [ $status -ne 0 ]; then
     # If the tests fail, try to run them in verbose to get more details for debug
         ./tests/ydk_core_test -d yes
+        MSG_COLOR=$RED
+        print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
     fi
     cd $YDKGEN_HOME
@@ -271,6 +281,8 @@ function cpp_sanity_ydktest_test {
     if [ $status -ne 0 ]; then
     # If the tests fail, try to run them in verbose to get more details for  # debug
         ./ydk_bundle_test -d yes
+        MSG_COLOR=$RED
+        print_msg "Exiting C++ bundle tests with status=$status"
         exit $status
     fi
 }
@@ -510,7 +522,8 @@ function py_sanity_deviation_ydktest_gen {
 function py_sanity_deviation_ydktest_install {
     print_msg "py_sanity_deviation_ydktest_install"
 
-    ${PIP_BIN} uninstall ydk-models-ydktest -y && pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+    ${PIP_BIN} uninstall ydk-models-ydktest -y
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
 
 function py_sanity_deviation_ydktest_test {

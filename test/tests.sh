@@ -760,7 +760,6 @@ find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
 if [[ ${os_type} == "Linux" ]] ; then
-    print_msg "Combining Python coverage for Linux"
-    print_msg "Moving python coverage to ${YDKGEN_HOME}"
+    print_msg "Combining C++, Python and Go coverage"
     coverage combine > /dev/null || echo "Coverage not combined"
 fi

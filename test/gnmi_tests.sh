@@ -207,11 +207,10 @@ function run_cpp_gnmi_tests {
 
 function collect_cpp_coverage {
     print_msg "Collecting coverage for C++"
-    cd ${YDKGEN_HOME}/sdk/cpp/core/build
+    cd ${YDKGEN_HOME}/sdk/cpp/gnmi/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
     lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
     lcov --list coverage.info #debug info
-    print_msg "Moving cpp coverage to ${YDKGEN_HOME}"
     cp coverage.info ${YDKGEN_HOME}
 }
 
@@ -288,7 +287,7 @@ function run_go_samples {
 
 function run_go_sanity_tests {
     print_msg "Running go sanity tests"
-    cd $YDKGEN_HOME/sdk/go/core/tests
+    cd $YDKGEN_HOME/sdk/go/gnmi/tests
     run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
     print_msg "Moving go coverage to ${YDKGEN_HOME}"
     mv coverage.txt ${YDKGEN_HOME}
@@ -302,10 +301,18 @@ function run_go_sanity_tests {
 function install_py_core {
     print_msg "Building and installing Python core package"
     cd $YDKGEN_HOME/sdk/python/core
-    export YDK_COVERAGE=
+    export YDK_COVERAGE=1
     ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
-    cd $YDKGEN_HOME
+
+    print_msg "Verifying Python YDK core package installation"
+    ${PYTHON_BIN} -c "import ydk_"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Verification failed for the Python core package 'ydk_.so'"
+        exit $status
+    fi
 }
 
 function install_py_ydktest_bundle {
@@ -313,6 +320,15 @@ function install_py_ydktest_bundle {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydktest-cpp.json
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+
+    print_msg "Verifying Python 'ydk-models-ydktest' bundle installation"
+    ${PYTHON_BIN} -c "from ydk.models.ydktest import openconfig_bgp"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Verification failed for the Python 'ydk-models-ydktest' bundle"
+        exit $status
+    fi
 }
 
 function build_and_run_python_gnmi_tests {
@@ -326,6 +342,15 @@ function build_python_gnmi_package {
     cd $YDKGEN_HOME/sdk/python/gnmi
     ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
+
+    print_msg "Verifying Python gNMI package installation"
+    ${PYTHON_BIN} -c "import ydk_gnmi_"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Verification failed for the Python gNMI package 'ydk_gnmi_.so'"
+        exit $status
+    fi
 }
 
 function run_python_gnmi_tests {
@@ -368,7 +393,7 @@ print_msg "Running OS type: $os_type"
 print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
 print_msg "Python location: $(which ${PYTHON_BIN})"
 print_msg "Pip location: $(which ${PIP_BIN})"
-$(${PYTHON_BIN} -V)
+${PYTHON_BIN} -V
 
 CMAKE_BIN=cmake
 which cmake3
@@ -402,3 +427,16 @@ install_py_core
 install_py_ydktest_bundle
 
 build_and_run_python_gnmi_tests
+
+######################################
+# Cleanup and Combine coverage
+
+cd $YDKGEN_HOME
+find . -name '*gcda*'|xargs rm -f
+find . -name '*gcno*'|xargs rm -f
+find . -name '*gcov*'|xargs rm -f
+
+if [[ ${os_type} == "Linux" ]] ; then
+    print_msg "Combining C++, Python and Go coverage"
+    coverage combine > /dev/null || echo "Coverage not combined"
+fi

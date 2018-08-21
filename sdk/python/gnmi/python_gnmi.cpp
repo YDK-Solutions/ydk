@@ -105,6 +105,11 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
     module services  = ydk_gnmi.def_submodule("services", "services module");
     module path      = ydk_gnmi.def_submodule("path", "path module");
 
+    class_<ydk::path::Session>(path, "Session", module_local())
+        .def("get_root_schema", &ydk::path::Session::get_root_schema, return_value_policy::reference)
+        .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::Session::*)(ydk::path::Rpc& rpc) const) &ydk::path::Session::invoke, return_value_policy::reference)
+        .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::Session::*)(ydk::path::DataNode& rpc) const) &ydk::path::Session::invoke, return_value_policy::reference);
+
     class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
         .def(init<ydk::path::Repository&, const std::string&, const std::string&, const std::string&, int>(),
              arg("repo"),
@@ -130,6 +135,10 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
              &ydk::path::gNMISession::invoke, arg("rpc"),
                                               arg("output_callback_function")=nullptr,
                                               arg("poll_callback_function")=nullptr);
+
+    class_<ydk::ServiceProvider>(providers, "ServiceProvider", module_local())
+        .def("get_encoding", &ydk::ServiceProvider::get_encoding, return_value_policy::reference)
+        .def("get_session", &ydk::ServiceProvider::get_session, return_value_policy::reference);
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
         .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),

@@ -695,15 +695,32 @@ PYTHON_VERSION=${2}
 
 PYTHON_BIN=python${PYTHON_VERSION}
 
-if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+if [[ ${PYTHON_VERSION} = "2"* ]]; then
     PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
     PIP_BIN=pip3
 else
     PIP_BIN=pip${PYTHON_VERSION}
 fi
 
-print_msg "Using ${PYTHON_BIN} & ${PIP_BIN}"
+print_msg "Using Python version ${PYTHON_VERSION}"
+
+print_msg "Checking installation of ${PYTHON_BIN}"
+${PYTHON_BIN} -V
+status=$?
+if [ $status -ne 0 ]; then
+    print_msg "Could not locate ${PYTHON_BIN}"
+    exit $status
+fi
+print_msg "Checking installation of ${PIP_BIN}"
+${PIP_BIN} -V
+status=$?
+if [ $status -ne 0 ]; then
+    print_msg "Could not locate ${PIP_BIN}"
+    exit $status
+fi
+print_msg "Python location: $(which ${PYTHON_BIN})"
+print_msg "Pip location: $(which ${PIP_BIN})"
 
 ######################################
 # Set up env
@@ -713,8 +730,6 @@ export YDKGEN_HOME="$(pwd)"
 os_type=$(uname)
 print_msg "Running OS type: $os_type"
 print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
-print_msg "Python location: $(which ${PYTHON_BIN})"
-$(${PYTHON_BIN} -V)
 
 CMAKE_BIN=cmake
 which cmake3

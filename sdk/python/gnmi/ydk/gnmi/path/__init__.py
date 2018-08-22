@@ -14,6 +14,6 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.gnmi.path import gNMISession
+from ydk_gnmi_.path import gNMISession
 
 __all__ = [ "gNMISession" ]

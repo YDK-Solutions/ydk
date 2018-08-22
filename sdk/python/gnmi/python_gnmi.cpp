@@ -130,8 +130,8 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
         .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::gNMISession::*)(ydk::path::Rpc&) const)
              &ydk::path::gNMISession::invoke, arg("rpc"), return_value_policy::reference)
         .def("invoke", (void (ydk::path::gNMISession::*)(ydk::path::Rpc& rpc,
-                                                         std::function<void(const std::string & response)> out_func,
-                                                         std::function<bool(const std::string & response)> poll_func) const)
+                                                         std::function<void(const char * response)> out_func,
+                                                         std::function<bool(const char * response)> poll_func) const)
              &ydk::path::gNMISession::invoke, arg("rpc"),
                                               arg("output_callback_function")=nullptr,
                                               arg("poll_callback_function")=nullptr);
@@ -151,12 +151,6 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
 
     class_<ydk::gNMISubscription>(services, "gNMISubscription")
         .def(init<>())
-//		.def(init<ydk::Entity* entity, std::string subscription_mode, ydk::uint64 sample_interval, bool suppress_redundant, ydk::uint64 heartbeat_interval>(),
-//            arg("entity"),
-//            arg("subscription_mode")="ON_CHANGE",
-//            arg("sample_interval")=0,
-//            arg("suppress_redundant")=true,
-//            arg("heartbeat_interval")=0)
         .def_readwrite("entity", &ydk::gNMISubscription::entity)
 		.def_readwrite("subscription_mode",  &ydk::gNMISubscription::subscription_mode)
         .def_readwrite("sample_interval", &ydk::gNMISubscription::sample_interval)
@@ -183,7 +177,7 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                    ydk::gNMISubscription& subscription,
                    ydk::uint32 qos,
                    const string & mode,
-                   std::function<void(const string & response)> out_func)
+                   std::function<void(const char * response)> out_func)
                 {
                     auto & gnmi_session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
                     auto & client = gnmi_session.get_client();
@@ -197,7 +191,7 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                    vector<ydk::gNMISubscription*> & subscription_list,
                    ydk::uint32 qos,
                    const string & mode,
-                   std::function<void(const string & response)> out_func)
+                   std::function<void(const char * response)> out_func)
                 {
                     auto & gnmi_session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
                     auto & client = gnmi_session.get_client();

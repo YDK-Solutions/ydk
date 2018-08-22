@@ -306,7 +306,7 @@ function install_py_core {
     ${PIP_BIN} install dist/ydk*.tar.gz
 
     print_msg "Verifying Python YDK core package installation"
-    ${PYTHON_BIN} -c "import ydk_"
+    ${PYTHON_BIN} -c "from ydk.path import NetconfSession"
     local status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
@@ -344,7 +344,7 @@ function build_python_gnmi_package {
     ${PIP_BIN} install dist/ydk*.tar.gz
 
     print_msg "Verifying Python gNMI package installation"
-    ${PYTHON_BIN} -c "import ydk_gnmi_"
+    ${PYTHON_BIN} -c "from ydk.gnmi.path import gNMISession"
     local status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
@@ -372,28 +372,40 @@ function run_python_gnmi_tests {
 ######################################
 # Set up env
 
+os_type=$(uname)
+print_msg "Running OS type: $os_type"
+
 export YDKGEN_HOME="$(pwd)"
 
-PYTHON_VERSION=""
 args=$(getopt p:d $*)
 set -- $args
 PYTHON_VERSION=${2}
 PYTHON_BIN=python${PYTHON_VERSION}
 
-if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+if [[ ${PYTHON_VERSION} = "2"* ]]; then
     PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
     PIP_BIN=pip3
 else
     PIP_BIN=pip${PYTHON_VERSION}
 fi
 
-os_type=$(uname)
-print_msg "Running OS type: $os_type"
-print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
+print_msg "Checking installation of ${PYTHON_BIN}"
+${PYTHON_BIN} -V
+status=$?
+if [ $status -ne 0 ]; then
+    print_msg "Could not locate ${PYTHON_BIN}"
+    exit $status
+fi
+print_msg "Checking installation of ${PIP_BIN}"
+${PIP_BIN} -V
+status=$?
+if [ $status -ne 0 ]; then
+    print_msg "Could not locate ${PIP_BIN}"
+    exit $status
+fi
 print_msg "Python location: $(which ${PYTHON_BIN})"
 print_msg "Pip location: $(which ${PIP_BIN})"
-${PYTHON_BIN} -V
 
 CMAKE_BIN=cmake
 which cmake3

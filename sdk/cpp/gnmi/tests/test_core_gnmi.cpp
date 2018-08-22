@@ -225,7 +225,7 @@ TEST_CASE("gnmi_bgp_create")
 }
 */
 
-void gnmi_service_subscribe_multiples_callback(const std::string & response);
+void gnmi_service_subscribe_multiples_callback(const char *);
 
 void build_int_config(ydk::gNMIServiceProvider& provider);
 void build_bgp_config(ydk::gNMIServiceProvider& provider);

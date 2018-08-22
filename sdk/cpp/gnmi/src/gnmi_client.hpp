@@ -88,8 +88,8 @@ struct GnmiClientSubscription {
 
 class gNMIClient;
 
-void poll_thread_callback_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func);
-void poll_thread_cin_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func);
+void poll_thread_callback_control(gNMIClient* client, std::function<bool(const char * response)> poll_func);
+void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char * response)> poll_func);
 
 class gNMIClient
 {
@@ -112,8 +112,8 @@ class gNMIClient
 
     void execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
                                      uint32 qos, const std::string & mode,
-                                     std::function<void(const std::string & response)> out_func,
-                                     std::function<bool(const std::string & response)> poll_func);
+                                     std::function<void(const char * response)> out_func,
+                                     std::function<bool(const char * response)> poll_func);
     void send_poll_request();
     std::vector<std::string> get_capabilities();
     GnmiClientCapabilityResponse execute_get_capabilities();
@@ -121,7 +121,7 @@ class gNMIClient
     std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer;
 
     inline void set_poll_thread_control_function(
-    		std::function<void(gNMIClient*, std::function<bool(const std::string&)>)> thread_func)
+            std::function<void(gNMIClient*, std::function<bool(const char *)>)> thread_func)
     {
         poll_thread_control = thread_func;
     };
@@ -146,7 +146,7 @@ class gNMIClient
     bool is_secure;
 
     std::string last_subscribe_response;
-    std::function<void(gNMIClient* client, std::function<bool(const std::string & response)>)> poll_thread_control;
+    std::function<void(gNMIClient* client, std::function<bool(const char * response)>)> poll_thread_control;
 };
 }
 

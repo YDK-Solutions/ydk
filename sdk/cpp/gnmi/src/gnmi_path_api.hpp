@@ -46,7 +46,7 @@ class gNMIClient;
 namespace path {
 
 class gNMISession : public Session {
-public:
+  public:
     typedef struct SecureChannelArguments
     {
         std::shared_ptr<grpc::ChannelCredentials> channel_creds;
@@ -73,8 +73,8 @@ public:
     RootSchemaNode& get_root_schema() const;
     std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
     std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
-    void invoke(Rpc& rpc, std::function<void(const std::string & response)> out_func,
-                          std::function<bool(const std::string & response)> poll_func) const;
+    void invoke(Rpc& rpc, std::function<void(const char * response)> out_func,
+                          std::function<bool(const char * response)> poll_func) const;
 
     std::vector<std::string> get_capabilities() const;
     EncodingFormat get_encoding() const;
@@ -84,18 +84,17 @@ public:
     std::shared_ptr<path::DataNode> handle_get_reply(std::vector<std::string> reply_val) const;
     gNMIClient & get_client() const;
 
-private:
+  private:
     void initialize(Repository& repo, const std::string& address, const std::string& username, const std::string& password, int port);
     bool handle_set(path::Rpc& ydk_rpc) const;
     std::shared_ptr<path::DataNode> handle_get(path::Rpc& ydk_rpc) const;
     void handle_subscribe(path::Rpc& ydk_rpc,
-                          std::function<void(const std::string & response)> out_func,
-                          std::function<bool(const std::string & response)> poll_func) const;
+                          std::function<void(const char * response)> out_func,
+                          std::function<bool(const char * response)> poll_func) const;
 
     void print_root_paths(ydk::path::RootSchemaNode& rsn) const;
     void print_paths(ydk::path::SchemaNode& sn) const;
 
-private:
     std::unique_ptr<gNMIClient> client;
     std::shared_ptr<RootSchemaNode> root_schema;
     std::vector<std::string> server_capabilities;

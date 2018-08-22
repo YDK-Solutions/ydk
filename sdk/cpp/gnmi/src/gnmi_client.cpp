@@ -478,7 +478,7 @@ void gNMIClient::send_poll_request()
     client_reader_writer->Write(req);
 }
 
-void poll_thread_callback_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func)
+void poll_thread_callback_control(gNMIClient* client, std::function<bool(const char * response)> poll_func)
 {
 	YLOG_DEBUG("Invoking polling thread control from user defined callback");
     if (poll_func == nullptr) {
@@ -489,8 +489,8 @@ void poll_thread_callback_control(gNMIClient* client, std::function<bool(const s
     std::thread writer([client, poll_func]()
     {
         std::string str_response = client->get_last_subscribe_response();
-        while (poll_func(str_response))
-		{
+        while (poll_func(str_response.c_str()))
+        {
             client->send_poll_request();
 
             // Wait some time for response to arrive
@@ -506,12 +506,12 @@ void poll_thread_callback_control(gNMIClient* client, std::function<bool(const s
     			str_response = client->get_last_subscribe_response();
     		}
         }
-		client->client_reader_writer->WritesDone();
+        client->client_reader_writer->WritesDone();
     });
     writer.detach();
 }
 
-void poll_thread_cin_control(gNMIClient* client, std::function<bool(const std::string & response)> poll_func)
+void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char * response)> poll_func)
 {
 	YLOG_DEBUG("Invoking polling thread control from standard input stream");
 	std::thread writer([client, poll_func]()
@@ -560,9 +560,9 @@ void poll_thread_cin_control(gNMIClient* client, std::function<bool(const std::s
 
 void
 gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
-		                                uint32 qos, const std::string & list_mode,
-                                        std::function<void(const std::string & response)> out_func,
-										std::function<bool(const std::string & response)> poll_func)
+                                        uint32 qos, const std::string & list_mode,
+                                        std::function<void(const char * response)> out_func,
+                                        std::function<bool(const char * response)> poll_func)
 {
     grpc::ClientContext context;
     gnmi::SubscribeResponse response{};
@@ -603,8 +603,8 @@ gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subs
 
         if (out_func != nullptr) {
             YLOG_DEBUG("Invoking callback function to receive the subscription data");
-        	google::protobuf::TextFormat::PrintToString(response, &last_subscribe_response);
-            out_func(last_subscribe_response);
+            google::protobuf::TextFormat::PrintToString(response, &last_subscribe_response);
+            out_func(last_subscribe_response.c_str());
         }
     }
 	auto status = client_reader_writer->Finish();

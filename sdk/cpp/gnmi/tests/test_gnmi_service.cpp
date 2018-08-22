@@ -148,20 +148,22 @@ static string bgp_update = R"(val {
       json_ietf_val: "{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}"
     })";
 
-void read_sub(const std::string & response)
+void read_sub(const char * subscribe_response)
 {
-    cout << response << endl;
+    cout << subscribe_response << endl;
 }
 
-void gnmi_service_subscribe_callback(const std::string & response)
+void gnmi_service_subscribe_callback(const char * subscribe_response)
 {
-	//read_sub(response);
+	//read_sub(subscribe_response);
+	string response = subscribe_response;
 	REQUIRE(response.find(int_update) != string::npos);
 }
 
-void gnmi_service_subscribe_multiples_callback(const std::string & response)
+void gnmi_service_subscribe_multiples_callback(const char * subscribe_response)
 {
-	//read_sub(response);
+	//read_sub(subscribe_response);
+	string response = subscribe_response;
 	REQUIRE(response.find(int_update) != string::npos);
     REQUIRE(response.find(bgp_update) != string::npos);
 }
@@ -241,24 +243,6 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback);
 }
 
-bool interactive_poll_request(const std::string & response)
-{
-	while (true) {
-	    cout << "Enter 'poll' for subscription update or 'end' to end subscription: ";
-	    string response;
-	    cin >> response;
-	    if (cin.fail()) {
-	        cin.clear();
-	        continue;
-	    }
-	    if (response == "poll")
-	        return true;
-	    else
-	    if (response == "end")
-	        return false;
-	}
-}
-
 static int counter;
 
 void set_counter(int max)
@@ -266,7 +250,7 @@ void set_counter(int max)
 	counter = max;
 }
 
-bool counter_poll_request(const std::string & response)
+bool counter_poll_request(const char * subscribe_response)
 {
 	std::this_thread::sleep_for(std::chrono::seconds(2));
 	return --counter >= 0;

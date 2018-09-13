@@ -33,8 +33,6 @@ sdk/python/core/ydk/models/ydktest
 test/gnmi*
 yang/nxos*
 grpc/
-profiles/test/ydk-nxos-test.json
 protobuf-3.5.0/
 sdk/cpp/gnmi/
 sdk/python/gnmi/
-ydk.egg-info/

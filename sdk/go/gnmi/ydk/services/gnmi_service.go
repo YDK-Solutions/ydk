@@ -113,7 +113,7 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 		if sub.SuppressRedundant == true {
 			ssupress = "true"
 		}
-		path.CreateDataNode( entitySub, "supress-redundant", ssupress)
+		path.CreateDataNode( entitySub, "suppress-redundant", ssupress)
 	}
 
     session.ExecuteSubscribeRpc(rpc)

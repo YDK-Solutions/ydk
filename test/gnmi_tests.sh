@@ -255,7 +255,7 @@ function install_go_core {
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
-    run_exec_test ./generate.py --bundle profiles/test/ydktest-cpp.json --go
+    run_test ./generate.py --bundle profiles/test/ydktest-cpp.json --go
     cp -r gen-api/go/ydktest-bundle/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 

@@ -111,40 +111,35 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
         .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::Session::*)(ydk::path::DataNode& rpc) const) &ydk::path::Session::invoke, return_value_policy::reference);
 
     class_<ydk::path::gNMISession, ydk::path::Session>(path, "gNMISession")
-        .def(init<ydk::path::Repository&, const std::string&, const std::string&, const std::string&, int>(),
+        .def(init<ydk::path::Repository&, const std::string&, int, const std::string&, const std::string&, const std::string&, const std::string&>(),
              arg("repo"),
              arg("address"),
+             arg("port"),
              arg("username"),
              arg("password"),
-             arg("port")=57400)
-        .def(init<ydk::path::Repository&, const std::string&, int>(),
-             arg("repo"),
-             arg("address"),
-             arg("port")=57400)
-        .def(init<const std::string&, const std::string&, const std::string&, int>(),
-             arg("address"),
-             arg("username"),
-             arg("password"),
-             arg("port")=57400)
+			 arg("server_cerificate")="",
+			 arg("private_key")="")
         .def("get_root_schema", &ydk::path::gNMISession::get_root_schema, return_value_policy::reference)
         .def("invoke", (std::shared_ptr<ydk::path::DataNode> (ydk::path::gNMISession::*)(ydk::path::Rpc&) const)
              &ydk::path::gNMISession::invoke, arg("rpc"), return_value_policy::reference)
-        .def("invoke", (void (ydk::path::gNMISession::*)(ydk::path::Rpc& rpc,
-                                                         std::function<void(const char * response)> out_func,
-                                                         std::function<bool(const char * response)> poll_func) const)
-             &ydk::path::gNMISession::invoke, arg("rpc"),
-                                              arg("output_callback_function")=nullptr,
-                                              arg("poll_callback_function")=nullptr);
+        .def("subscribe", (void (ydk::path::gNMISession::*)
+                                 (ydk::path::Rpc& rpc,
+                                  std::function<void(const char * response)> out_func,
+                                  std::function<bool(const char * response)> poll_func) const)
+             &ydk::path::gNMISession::invoke_subscribe,
+			                      arg("rpc"),
+                                  arg("output_callback_function")=nullptr,
+                                  arg("poll_callback_function")=nullptr);
 
     class_<ydk::ServiceProvider>(providers, "ServiceProvider", module_local())
         .def("get_encoding", &ydk::ServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::ServiceProvider::get_session, return_value_policy::reference);
 
     class_<ydk::gNMIServiceProvider, ydk::ServiceProvider>(providers, "gNMIServiceProvider")
-        .def(init<ydk::path::Repository&, const string&, const string&, const string&, int>(),
-            arg("repo"), arg("address"), arg("username"), arg("password"), arg("port")=57400)
-        .def(init<ydk::path::Repository&, const string&, int>(),
-            arg("repo"), arg("address"), arg("port")=57400)
+        .def(init<ydk::path::Repository&, const string&, int, const string&, const string&, const string&, const string&>(),
+            arg("repo"), arg("address"), arg("port"),
+			arg("username"), arg("password"),
+			arg("server_cerificate")="", arg("private_key")="")
         .def("get_encoding", &ydk::gNMIServiceProvider::get_encoding, return_value_policy::reference)
         .def("get_session", &ydk::gNMIServiceProvider::get_session, return_value_policy::reference)
         .def("get_capabilities", &ydk::gNMIServiceProvider::get_capabilities, return_value_policy::reference);
@@ -179,10 +174,7 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                    const string & mode,
                    std::function<void(const char * response)> out_func)
                 {
-                    auto & gnmi_session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
-                    auto & client = gnmi_session.get_client();
-                    client.set_poll_thread_control_function( ydk::poll_thread_cin_control);
-                    ns.subscribe(provider, subscription, qos, mode, out_func);
+                    ns.subscribe(provider, subscription, qos, mode, out_func = nullptr);
                 })
 
         .def("subscribe",
@@ -191,11 +183,8 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                    vector<ydk::gNMISubscription*> & subscription_list,
                    ydk::uint32 qos,
                    const string & mode,
-                   std::function<void(const char * response)> out_func)
+                   std::function<void(const char * response)> out_func = nullptr)
                 {
-                    auto & gnmi_session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
-                    auto & client = gnmi_session.get_client();
-                    client.set_poll_thread_control_function( ydk::poll_thread_cin_control);
                     ns.subscribe(provider, subscription_list, qos, mode, out_func);
                 });
 

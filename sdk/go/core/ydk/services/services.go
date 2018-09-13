@@ -35,6 +35,7 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/datastore"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	encodingFmt "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 )
 
@@ -48,7 +49,12 @@ func (c *CrudService) Create(
 	provider types.ServiceProvider, entity types.Entity) bool {
 
 	data := map[string]interface{} { "entity": entity }
-	return operationSucceeded(path.ExecuteRPC(provider, "ydk:create", data, false))
+	var operation string  = "ydk:create"
+	if provider.GetType() == "gNMIServiceProvider" {
+		operation = "ydk:gnmi-set"
+		data["yfilter"] = yfilter.Replace
+	}
+	return operationSucceeded(path.ExecuteRPC(provider, operation, data, false))
 }
 
 // Update the entity.
@@ -57,7 +63,12 @@ func (c *CrudService) Update(
 	provider types.ServiceProvider, entity types.Entity) bool {
 
 	data := map[string]interface{} { "entity": entity }
-	return operationSucceeded(path.ExecuteRPC(provider, "ydk:update", data, false))
+	var operation string  = "ydk:update";
+	if provider.GetType() == "gNMIServiceProvider" {
+		operation = "ydk:gnmi-set"
+		data["yfilter"] = yfilter.Update
+	}
+	return operationSucceeded(path.ExecuteRPC(provider, operation, data, false))
 }
 
 // Delete the entity.
@@ -66,7 +77,12 @@ func (c *CrudService) Delete(
 	provider types.ServiceProvider, entity types.Entity) bool {
 
 	data := map[string]interface{} { "entity": entity }
-	return operationSucceeded(path.ExecuteRPC(provider, "ydk:delete", data, false))
+	var operation string  = "ydk:delete";
+	if provider.GetType() == "gNMIServiceProvider" {
+		operation = "ydk:gnmi-set"
+		data["yfilter"] = yfilter.Delete
+    }
+	return operationSucceeded(path.ExecuteRPC(provider, operation, data, false))
 }
 
 // Read the entity.
@@ -75,8 +91,12 @@ func (c *CrudService) Read(
 	provider types.ServiceProvider, filter types.Entity) types.Entity {
 
 	data := map[string]interface{} { "filter": filter }
+	var operation string  = "ydk:read";
+	if provider.GetType() == "gNMIServiceProvider" {
+		operation = "ydk:gnmi-get"
+	}
 	return path.ReadDatanode(
-		filter, path.ExecuteRPC(provider, "ydk:read", data, false))
+		filter, path.ExecuteRPC(provider, operation, data, false))
 }
 
 // ReadConfig only reads config.
@@ -85,8 +105,12 @@ func (c *CrudService) ReadConfig(
 	provider types.ServiceProvider, filter types.Entity) types.Entity {
 
 	data := map[string]interface{} { "filter": filter }
+	var operation string  = "ydk:read";
+	if provider.GetType() == "gNMIServiceProvider" {
+		operation = "ydk:gnmi-get"
+	}
 	return path.ReadDatanode(
-		filter, path.ExecuteRPC(provider, "ydk:read", data, true))
+		filter, path.ExecuteRPC(provider, operation, data, true))
 }
 
 // CodecService supports encoding and decoding Go model API objects of type

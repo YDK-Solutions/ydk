@@ -245,54 +245,50 @@ function stop_gnmi_server {
 ######################################################################
 
 function install_go_core {
-    print_msg "Installing go core"
+    print_msg "Installing Go core packages"
     cd $YDKGEN_HOME
 
     mkdir -p $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk
     cp -r sdk/go/core/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
-function run_go_bundle_tests {
-    print_msg "Generating/installing go sanity bundle tests"
-    # TODO: go get
+function install_go_bundle {
+    print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
-    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
-
-    run_go_tests
+    run_exec_test ./generate.py --bundle profiles/test/ydktest-cpp.json --go
+    cp -r gen-api/go/ydktest-bundle/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
-function run_go_tests {
-    print_msg "Running go tests"
-    run_go_samples
-    run_go_sanity_tests
+function install_go_gnmi {
+    print_msg "Installing Go gNMI package"
+    cd $YDKGEN_HOME
+
+    cp -r sdk/go/gnmi/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
-function run_go_samples {
-    print_msg "Running go samples"
+function run_go_gnmi_tests {
+    start_gnmi_server
 
-    export CXX=/usr/bin/c++
-    export CC=/usr/bin/cc
+    print_msg "Running Go gNMI tests"
 
-    print_msg "CC: ${CC}"
-    print_msg "CXX: ${CXX}"
-
-    cd $YDKGEN_HOME/sdk/go/core/samples
-    run_exec_test go run cgo_path/cgo_path.go
-    run_exec_test go run bgp_create/bgp_create.go -device ssh://admin:admin@localhost:12022
-    run_exec_test go run bgp_read/bgp_read.go -device ssh://admin:admin@localhost:12022
-    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022 -v
-    cd -
-}
-
-function run_go_sanity_tests {
-    print_msg "Running go sanity tests"
     cd $YDKGEN_HOME/sdk/go/gnmi/tests
-    run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
-    print_msg "Moving go coverage to ${YDKGEN_HOME}"
-    mv coverage.txt ${YDKGEN_HOME}
-    cd -
+    run_exec_test go test
+
+    run_go_gnmi_samples
+
+    stop_gnmi_server
+
+    cd $YDKGEN_HOME
 }
+
+function run_go_gnmi_samples {
+    print_msg "Running Go gNMI samples"
+
+    cd $YDKGEN_HOME/sdk/go/gnmi/samples
+    run_exec_test go run service_subscribe_poll.go < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
+    run_exec_test go run session_subscribe_poll.go < $YDKGEN_HOME/test/gnmi_subscribe_poll_input.txt
+}
+
 
 ######################################################################
 # Python core and ydktest bundle installation functions
@@ -428,9 +424,12 @@ run_cpp_gnmi_tests
 ######################################
 # Install and run Go tests
 
-#init_go_env
-#install_go_core
-#run_go_bundle_tests
+init_go_env
+install_go_core
+install_go_bundle
+
+install_go_gnmi
+run_go_gnmi_tests
 
 ######################################
 # Install and run Python tests

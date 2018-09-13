@@ -45,105 +45,31 @@ namespace ydk
 {
 namespace path
 {
-static SchemaNode* get_schema_for_operation(RootSchemaNode& root_schema, string operation);
-
-static gNMISession::SecureChannelArguments get_channel_credentials();
 
 const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 
-// Secure
-// Create a default SSL ChannelCredentials object
-gNMISession::gNMISession(const std::string& address,
+gNMISession::gNMISession(Repository & repo,
+                   const std::string& address, int port,
                    const std::string& username,
                    const std::string& password,
-                   int port)
+                   const std::string & server_certificate, const std::string & private_key)
 {
-    is_secure = true;
-	Repository repo;
-    initialize(repo, address, username, password, port);
-    YLOG_DEBUG("gNMISession: Connected to {} using Secure Channel", address, username, password, port);
-}
+    client = make_unique<gNMIClient>(address, port, username, password, server_certificate, private_key);
 
-gNMISession::gNMISession(Repository & repo,
-                   const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port)
-{
-    is_secure = true;
-    initialize(repo, address, username, password, port);
-    YLOG_DEBUG("gNMISession: Connected to {} using Secure Channel", address, username, password, port);
-}
-
-gNMISession::gNMISession(Repository & repo,
-                   const std::string& address,
-                   int port)
-{
-    is_secure = false;
-    initialize(repo, address, "", "", port);
-    YLOG_DEBUG("gNMISession: Connected to {} using Insecure Channel", address);
-}
-
-gNMISession::~gNMISession() = default;
-
-void gNMISession::initialize(Repository & repo, const std::string& address, const std::string& username, const std::string& password, int port)
-{
-    IetfCapabilitiesParser capabilities_parser{};
-
-    std::ostringstream address_buffer{};
-    address_buffer << address << ":" << port;
-
-    if (is_secure) {
-        gNMISession::SecureChannelArguments input_args = get_channel_credentials();
-        client = make_unique<gNMIClient>(grpc::CreateCustomChannel(address_buffer.str(), input_args.channel_creds, *(input_args.args)), username, password);
-        client->connect();
-    }
-    else {
-    	client = make_unique<gNMIClient>(grpc::CreateChannel(address_buffer.str(), grpc::InsecureChannelCredentials()));
-    }
     server_capabilities = client->get_capabilities();
     std::vector<std::string> empty_caps;
-
+    IetfCapabilitiesParser capabilities_parser{};
     root_schema = repo.create_root_schema(capabilities_parser.parse(empty_caps));
-
     if(root_schema.get() == nullptr)
     {
         YLOG_ERROR("gNMISession::initialize: Root schema cannot be obtained");
         throw(YIllegalStateError{"Root schema cannot be obtained"});
     }
+    string secure = (server_certificate.length() > 0) ? "Secure" : "Insecure";
+    YLOG_DEBUG("gNMISession: Connected to {} using {} Channel", address, secure);
 }
 
-gNMISession::SecureChannelArguments get_channel_credentials()
-{
-    // Authenticate Server at Client
-    string server_cert;
-    ifstream rf("ems.pem");
-
-    server_cert.assign((istreambuf_iterator<char>(rf)),(istreambuf_iterator<char>()));
-
-    YLOG_DEBUG("gNMISession::get_channel_credentials: Server certificate:\n{}", server_cert);
-
-    grpc::SslCredentialsOptions ssl_opts;
-    auto args = std::make_shared<grpc::ChannelArguments>();
-    gNMISession::SecureChannelArguments input_args;
-    ssl_opts.pem_root_certs = server_cert;
-
-    args->SetSslTargetNameOverride("2001:420:1101:1::b");
-    //args->SetSslTargetNameOverride("ems.cisco.com");
-
-    // TODO: Authenticate client at server
-    /* string client_key, client_cert;
-    ifstream kf("client.key");
-    ifstream cf("client.pem");
-    client_key.assign((istreambuf_iterator<char>(kf)),(istreambuf_iterator<char>()));
-    client_cert.assign((istreambuf_iterator<char>(cf)),(istreambuf_iterator<char>()));
-    ssl_opts = {server_cert, client_key, client_cert};*/
-
-    auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
-    input_args.channel_creds = channel_creds;
-    input_args.args = args;
-    return input_args;
-}
+gNMISession::~gNMISession() = default;
 
 EncodingFormat gNMISession::get_encoding() const
 {
@@ -160,7 +86,18 @@ RootSchemaNode& gNMISession::get_root_schema() const
     return *root_schema;
 }
 
-void gNMISession::invoke(Rpc& rpc,
+static SchemaNode* get_schema_for_operation(RootSchemaNode & root_schema, string operation)
+{
+    auto c = root_schema.find(operation);
+    if(c.empty())
+    {
+        YLOG_ERROR("'{}' rpc schema not found!", operation);
+        throw(YIllegalStateError{"CRUD read rpc schema not found!"});
+    }
+    return c[0];
+}
+
+void gNMISession::invoke_subscribe(Rpc& rpc,
 		std::function<void(const char * response)> out_func,
 		std::function<bool(const char * response)> poll_func) const
 {
@@ -464,15 +401,5 @@ gNMIClient & gNMISession::get_client() const
     return *client;
 }
 
-static SchemaNode* get_schema_for_operation(RootSchemaNode & root_schema, string operation)
-{
-    auto c = root_schema.find(operation);
-    if(c.empty())
-    {
-        YLOG_ERROR("'{}' rpc schema not found!", operation);
-        throw(YIllegalStateError{"CRUD read rpc schema not found!"});
-    }
-    return c[0];
-}
 }    // namespace path
 }  // namespace ydk

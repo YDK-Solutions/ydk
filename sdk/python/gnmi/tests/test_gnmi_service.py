@@ -68,7 +68,7 @@ class SanityGnmiService(unittest.TestCase):
         self.codec_provider = CodecServiceProvider()
         self.codec = CodecService()
         self.repo = Repository(get_local_repo_dir())
-        self.provider = gNMIServiceProvider( repo=self.repo, address="127.0.0.1", port=50051)
+        self.provider = gNMIServiceProvider( self.repo, "127.0.0.1", 50051, "admin", "admin")
         self.schema = self.provider.get_session().get_root_schema()
         self.gs = gNMIService()
 

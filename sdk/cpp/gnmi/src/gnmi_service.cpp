@@ -221,7 +221,7 @@ static void check_subscription_params(gNMISubscription& subscription)
     }
 
     if (subscription.sample_interval == 0)
-        subscription.sample_interval = 60000000;
+        subscription.sample_interval = 60000000000;
     if (subscription.heartbeat_interval == 0 || subscription.heartbeat_interval < subscription.sample_interval)
         subscription.heartbeat_interval = subscription.sample_interval * 10;
 }

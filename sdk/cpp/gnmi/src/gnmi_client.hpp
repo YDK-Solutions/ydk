@@ -100,11 +100,10 @@ class gNMIClient
         bool prefix_has_value;
     } PathPrefixValueFlags;
 
-    gNMIClient(std::shared_ptr<Channel> channel, const std::string & username, const std::string & password);
-    gNMIClient(std::shared_ptr<Channel> channel);
+    gNMIClient(const std::string& address, int port,
+               const std::string & username, const  std::string & password,
+               const std::string & server_certificate="", const std::string & private_key="");
     ~gNMIClient();
-
-    int connect();
 
     std::vector<std::string> execute_get_operation(const std::vector<GnmiClientRequest> get_request_list, const std::string& operation);
 
@@ -119,12 +118,7 @@ class gNMIClient
     GnmiClientCapabilityResponse execute_get_capabilities();
 
     std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer;
-
-    inline void set_poll_thread_control_function(
-            std::function<void(gNMIClient*, std::function<bool(const char *)>)> thread_func)
-    {
-        poll_thread_control = thread_func;
-    };
+    bool client_reader_is_active = false;
 
     inline std::string get_last_subscribe_response()
     {
@@ -143,10 +137,8 @@ class gNMIClient
     std::unique_ptr<gNMI::Stub> stub_;
     std::string username;
     std::string password;
-    bool is_secure;
 
     std::string last_subscribe_response;
-    std::function<void(gNMIClient* client, std::function<bool(const char * response)>)> poll_thread_control;
 };
 }
 

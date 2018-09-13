@@ -109,7 +109,7 @@ TEST_CASE("gnmi_test_json_payload"  )
 {
     ydk::path::Repository repo{TEST_HOME};
 
-    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051, "admin", "admin"};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     ydk::path::Codec s{};
@@ -233,7 +233,7 @@ void build_bgp_config(ydk::gNMIServiceProvider& provider);
 TEST_CASE("gnmi_rpc_subscribe")
 {
     ydk::path::Repository repo{TEST_HOME};
-    ydk::gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
+    ydk::gNMIServiceProvider provider{repo, "127.0.0.1", 50051, "admin", "admin"};
     const ydk::path::gNMISession& session = dynamic_cast<const ydk::path::gNMISession&> (provider.get_session());
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
     ydk::path::Codec codec{};
@@ -272,13 +272,13 @@ TEST_CASE("gnmi_rpc_subscribe")
     // auto json = codec.encode(rpc->get_input_node(), ydk::EncodingFormat::JSON, true);
     // std::cout << "Built RPC:" << std::endl << json << std::endl;
 
-    session.invoke(*rpc, gnmi_service_subscribe_multiples_callback, nullptr);
+    session.invoke_subscribe(*rpc, gnmi_service_subscribe_multiples_callback);
 }
 
 TEST_CASE("gnmi_rpc_caps")
 {
     ydk::path::Repository repo{TEST_HOME};
-    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051, "admin", "admin"};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     std::shared_ptr<ydk::path::Rpc> cap_rpc { schema.create_rpc("ydk:gnmi-caps") };
@@ -292,7 +292,7 @@ TEST_CASE("gnmi_rpc_caps")
 TEST_CASE("gnmi_rpc_set_get_bgp")
 {
     ydk::path::Repository repo{TEST_HOME};
-    ydk::path::gNMISession session{repo, "127.0.0.1", 50051};
+    ydk::path::gNMISession session{repo, "127.0.0.1", 50051, "admin", "admin"};
     ydk::path::RootSchemaNode& schema = session.get_root_schema();
 
     // Configure BGP

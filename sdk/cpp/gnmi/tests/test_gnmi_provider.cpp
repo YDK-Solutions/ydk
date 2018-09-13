@@ -28,7 +28,7 @@ using namespace std;
 TEST_CASE("GNMICreateWithRepo")
 {
 	ydk::path::Repository repo{TEST_HOME};
-	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
+	gNMIServiceProvider provider{repo, "127.0.0.1", 50051, "admin", "admin"};
 
 	CHECK_NOTHROW(provider.get_encoding());
 }
@@ -36,7 +36,7 @@ TEST_CASE("GNMICreateWithRepo")
 TEST_CASE("GNMICreateNoRepo")
 {
 	ydk::path::Repository repo{};
-	gNMIServiceProvider provider{repo, "127.0.0.1", 50051};
+	gNMIServiceProvider provider{repo, "127.0.0.1", 50051, "admin", "admin"};
 
 	CHECK_NOTHROW(provider.get_encoding());
 }

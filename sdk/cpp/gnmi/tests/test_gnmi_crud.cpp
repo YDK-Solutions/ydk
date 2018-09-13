@@ -43,7 +43,7 @@ TEST_CASE("gnmi_crud_single_entity")
     Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     CrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
@@ -83,7 +83,7 @@ TEST_CASE("gnmi_crud_multiple_entities")
     Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     CrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};

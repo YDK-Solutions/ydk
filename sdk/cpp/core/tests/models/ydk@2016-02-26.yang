@@ -976,7 +976,7 @@ container ydk {
               leaf sample-interval {
                   description "Time interval in ns between samples in STREAM mode";
                   type uint64;
-                  default 60000000;
+                  default 60000000000;
               }
 
               leaf suppress-redundant {
@@ -990,7 +990,7 @@ container ydk {
                                suppress_redundant is in use. The target should send a value at least once
                                in the period specified.";
                   type uint64;
-                  default 3600000000;
+                  default 600000000000;
               }
             }
 

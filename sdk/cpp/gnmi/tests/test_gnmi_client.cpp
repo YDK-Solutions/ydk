@@ -13,20 +13,34 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  ------------------------------------------------------------------*/
-#define TEST_MODULE gNMIClientTest
+
 #include <string.h>
-#include <ydk/gnmi_client.hpp>
-#include <ydk/errors.hpp>
 #include <iostream>
 #include <sys/time.h>
-#include "catch.hpp"
+
+#include <ydk/gnmi_client.hpp>
+#include <ydk/errors.hpp>
+
+#include "../../core/src/catch.hpp"
+#include "../../core/tests/config.hpp"
 
 using namespace ydk;
 using namespace std;
 
-//string address = "127.0.0.1:50051";
-string address = "10.30.110.86:57400";
+TEST_CASE("gnmi_secure_server")
+{
+    string model_dir = TEST_HOME;
+    auto pos = model_dir.find("sdk");
+    string gnmi_server_sert = model_dir.substr(0, pos) + "test/gnmi_server/keys/ems.pem";
 
+	gNMIClient client("127.0.0.1", 50051, "admin", "admin", gnmi_server_sert);
+
+	vector<string> caps = client.get_capabilities();
+	for (auto cap : caps)
+	    cout << cap << endl;
+}
+
+/* To Do
 TEST_CASE("gnmi_xr")	// Not running
 {
     gNMIClient client(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()), "admin", "admin");
@@ -108,7 +122,6 @@ TEST_CASE("gnmi_device_not_connected_execute")	// Not working
 
 }
 
-/* To Do
 TEST_CASE("RpcInvalid")
 {
     gNMIClient::gNMIClient(shared_ptr<Channel> channel)
@@ -220,25 +233,20 @@ TEST_CASE("EmptyRpc")
 
 TEST_CASE("gnmi_multiple_clients")
 {
-    gNMIClient client1(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client2(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client3(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client4(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client5(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client6(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client7(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client8(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client9(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client10(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client11(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client12(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client13(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client14(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-    gNMIClient client15(grpc::CreateChannel(address, grpc::InsecureChannelCredentials()));
-
-    int result = client1.connect() && client2.connect() && client3.connect() && client4.connect() && client5.connect()
-         && client6.connect() && client7.connect() && client8.connect() && client9.connect() && client10.connect()
-         && client11.connect() && client12.connect() && client13.connect() && client14.connect() && client15.connect();
-    REQUIRE(result == 0);
+    gNMIClient client1("127.0.0.1", 50051, "", "");
+    gNMIClient client2("127.0.0.1", 50051, "", "");
+    gNMIClient client3("127.0.0.1", 50051, "", "");
+    gNMIClient client4("127.0.0.1", 50051, "", "");
+    gNMIClient client5("127.0.0.1", 50051, "", "");
+    gNMIClient client6("127.0.0.1", 50051, "", "");
+    gNMIClient client7("127.0.0.1", 50051, "", "");
+    gNMIClient client8("127.0.0.1", 50051, "", "");
+    gNMIClient client9("127.0.0.1", 50051, "", "");
+    gNMIClient client10("127.0.0.1", 50051, "", "");
+    gNMIClient client11("127.0.0.1", 50051, "", "");
+    gNMIClient client12("127.0.0.1", 50051, "", "");
+    gNMIClient client13("127.0.0.1", 50051, "", "");
+    gNMIClient client14("127.0.0.1", 50051, "", "");
+    gNMIClient client15("127.0.0.1", 50051, "", "");
 }
 

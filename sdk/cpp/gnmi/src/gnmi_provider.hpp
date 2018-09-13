@@ -31,23 +31,13 @@ namespace ydk
     class gNMIServiceProvider : public ServiceProvider 
     {
       public:
-        typedef struct SecureChannelArguments
-        {
-            std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-            grpc::ChannelArguments args;
-        } SecureChannelArguments;
-
-        gNMIServiceProvider(path::Repository & repo, const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
-        gNMIServiceProvider(const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
         gNMIServiceProvider(path::Repository & repo,
-        		   const std::string& address,
-                   int port = 57400);
+                   const std::string& address, int port,
+                   const std::string& username,
+                   const std::string& password,
+                   const std::string & server_certificate="",
+                   const std::string & private_key="");
+
         ~gNMIServiceProvider();
 
         EncodingFormat get_encoding() const;
@@ -60,7 +50,6 @@ namespace ydk
 
       private:
         const path::gNMISession session;
-        bool is_secure;
     };
 }
 #endif 

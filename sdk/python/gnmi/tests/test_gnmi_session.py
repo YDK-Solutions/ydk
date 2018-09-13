@@ -36,7 +36,7 @@ class SanityGnmiSession(unittest.TestCase):
     def setUpClass(self):
         self.codec = Codec()
         self.repo = Repository(get_local_repo_dir())
-        self.session = gNMISession( repo=self.repo, address="127.0.0.1", port=50051)
+        self.session = gNMISession( self.repo, "127.0.0.1", 50051, "admin", "admin")
         self.schema = self.session.get_root_schema()
         self.bgp_json = ''
         self.int_json = ''
@@ -128,7 +128,7 @@ class SanityGnmiSession(unittest.TestCase):
         bgp_subscription.create_datanode("entity", bgp_json);
         bgp_subscription.create_datanode("sample-interval", "20000000");
 
-        self.session.invoke(rpc, gnmi_service_subscribe_callback);
+        self.session.subscribe(rpc, gnmi_service_subscribe_callback);
  
         # Delete configuration
         self._delete_configuration()

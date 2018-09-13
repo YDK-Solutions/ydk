@@ -47,34 +47,20 @@ namespace path {
 
 class gNMISession : public Session {
   public:
-    typedef struct SecureChannelArguments
-    {
-        std::shared_ptr<grpc::ChannelCredentials> channel_creds;
-        std::shared_ptr<grpc::ChannelArguments> args;
-    } SecureChannelArguments;
 
     gNMISession(Repository & repo,
-                   const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
-
-    gNMISession(const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port = 57400);
-
-    gNMISession(Repository & repo,
-                   const std::string& address,
-                   int port = 57400);
+                const std::string& address, int port,
+                const std::string& username, const std::string& password,
+                const std::string & server_certificate="",
+                const std::string & private_key="");
 
     ~gNMISession();
 
     RootSchemaNode& get_root_schema() const;
     std::shared_ptr<DataNode> invoke(Rpc& rpc) const;
     std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
-    void invoke(Rpc& rpc, std::function<void(const char * response)> out_func,
-                          std::function<bool(const char * response)> poll_func) const;
+    void invoke_subscribe(Rpc& rpc, std::function<void(const char * response)> out_func=nullptr,
+                          std::function<bool(const char * response)> poll_func=nullptr) const;
 
     std::vector<std::string> get_capabilities() const;
     EncodingFormat get_encoding() const;
@@ -85,7 +71,6 @@ class gNMISession : public Session {
     gNMIClient & get_client() const;
 
   private:
-    void initialize(Repository& repo, const std::string& address, const std::string& username, const std::string& password, int port);
     bool handle_set(path::Rpc& ydk_rpc) const;
     std::shared_ptr<path::DataNode> handle_get(path::Rpc& ydk_rpc) const;
     void handle_subscribe(path::Rpc& ydk_rpc,
@@ -98,7 +83,6 @@ class gNMISession : public Session {
     std::unique_ptr<gNMIClient> client;
     std::shared_ptr<RootSchemaNode> root_schema;
     std::vector<std::string> server_capabilities;
-    bool is_secure;
 };
 
 }	// namespace path

@@ -125,6 +125,10 @@ func (provider *OpenDaylightServiceProvider) Disconnect() {
 	path.CleanUpErrorState(&provider.State)
 }
 
+func (provider *OpenDaylightServiceProvider) GetType() string {
+    return "OpenDayLight"
+}
+
 // GetPrivate returns private pointer for NetconfServiceProvider
 func (provider *NetconfServiceProvider) GetPrivate() interface{} {
 	return provider.Private
@@ -166,6 +170,10 @@ func (provider *NetconfServiceProvider) Disconnect() {
 	path.CleanUpErrorState(&provider.State)
 }
 
+func (provider *NetconfServiceProvider) GetType() string {
+    return "NetconfServiceProvider"
+}
+
 // GetPrivate returns private pointer for RestconfServiceProvider
 func (provider *RestconfServiceProvider) GetPrivate() interface{} {
 	return provider.Private
@@ -194,6 +202,10 @@ func (provider *RestconfServiceProvider) Disconnect() {
 	}
 	path.DisconnectFromRestconfProvider(provider.Private)
 	path.CleanUpErrorState(&provider.State)
+}
+
+func (provider *RestconfServiceProvider) GetType() string {
+    return "RestconfServiceProvider"
 }
 
 // CodecServiceProvider Encode and decode to XML/JSON format

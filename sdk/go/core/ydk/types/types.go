@@ -607,6 +607,7 @@ type ServiceProvider interface {
 	Connect()
 	Disconnect()
 	GetState() *errors.State
+	GetType() string
 }
 
 // CodecServiceProvider
@@ -626,6 +627,15 @@ type DataNode struct {
 // It can be used to instantiate a DataNode tree or an Rpc object. 
 // The children of the RootSchemaNode represent the top level SchemaNode in the YANG module submodules.
 type RootSchemaNode struct {
+	Private interface{}
+}
+
+type Session struct {
+	Private		interface{}
+}
+
+type Rpc struct {
+	Input   DataNode
 	Private interface{}
 }
 

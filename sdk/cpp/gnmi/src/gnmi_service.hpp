@@ -59,12 +59,12 @@ class gNMIService
     void subscribe(gNMIServiceProvider& provider,
                    gNMISubscription& sub,
                    uint32 qos, const std::string & mode,
-                   std::function<void(const char * response)> out_func,
+                   std::function<void(const char * response)> out_func=nullptr,
                    std::function<bool(const char * response)> poll_func=nullptr) const;
     void subscribe(gNMIServiceProvider& provider,
                    std::vector<gNMISubscription*> & sub_list,
                    uint32 qos, const std::string & mode,
-                   std::function<void(const char * response)> out_func,
+                   std::function<void(const char * response)> out_func=nullptr,
                    std::function<bool(const char * response)> poll_func=nullptr) const;
 
     std::string capabilities(gNMIServiceProvider & provider);

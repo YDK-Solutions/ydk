@@ -95,9 +95,8 @@ static std::string null_payload =
 		"{\"value\":\"null\"}";
 
 // Logic and data behind the server's behavior.
-class gNMIImpl final : public gNMI::Service 
+class gNMIImpl final : public gNMI::Service
 {    
-    bool is_secure = true;
     bool int_set = false;
     bool bgp_set = false;
 
@@ -272,7 +271,7 @@ class gNMIImpl final : public gNMI::Service
                 path_elem->CopyFrom(replace_path.elem(j));
             }
             update_response->set_allocated_path(response_path);
-            update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_REPLACE);
+            update_response->set_op(::gnmi::UpdateResult_Operation::UpdateResult_Operation_UPDATE);
         }
         //std::cout << "=========== Set Response Sent ===========" << std::endl;
         //std::cout << response->DebugString() << std::endl;
@@ -390,48 +389,56 @@ class gNMIImpl final : public gNMI::Service
     }
 };
 
-void RunServer() 
+void RunServer(bool is_secure)
 {
-    std::string server_address("0.0.0.0:50051");
-    bool is_secure = false;
+    std::string server_address("127.0.0.1:50051");
 
     gNMIImpl service;
-    ServerBuilder builder; 
+    ServerBuilder builder;
     if (is_secure)
     {
+        std::cout << "Starting YDK gNMI Server in secure mode" << std::endl;
+
         // Secure Channel
         std::string server_key;
         std::string server_cert;
-    
+
         std::ifstream kf("../keys/ems-key.pem");
         std::ifstream cf("../keys/ems.pem");
-    
+
         server_key.assign((std::istreambuf_iterator<char>(kf)),(std::istreambuf_iterator<char>()));
         server_cert.assign((std::istreambuf_iterator<char>(cf)),(std::istreambuf_iterator<char>()));
-    
+
         grpc::SslServerCredentialsOptions::PemKeyCertPair pkcp = {server_key, server_cert};
-    
+
         grpc::SslServerCredentialsOptions ssl_opts;
-    
+
         ssl_opts.pem_root_certs = "";
         ssl_opts.pem_key_cert_pairs.push_back(pkcp);
-    
+
         //std::cout << "server key: " << server_key << std::endl;
         //std::cout << "server cert: " << server_cert << std::endl;
-    
+
         builder.AddListeningPort(server_address, grpc::SslServerCredentials(ssl_opts));
     } else {
+        std::cout << "Starting YDK gNMI Server in non-secure mode" << std::endl;
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());  
     }
     
     builder.RegisterService(&service);
     std::unique_ptr<Server> server(builder.BuildAndStart());
-    //std::cout << "Server listening on " << server_address << std::endl;
+    std::cout << "Server listening on " << server_address << std::endl;
     server->Wait();
 }
 
 int main(int argc, char** argv) 
 {
-    RunServer();
+    bool enable_ssl = false;
+    if (argc > 1) {
+        std::string param = argv[1];
+        if (param == "-s")
+            enable_ssl = true;
+    }
+    RunServer(enable_ssl);
     return 0;
 }

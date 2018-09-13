@@ -40,33 +40,15 @@ using namespace std;
 namespace ydk
 {
     gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
-                   const std::string& address,
+                   const std::string& address, int port,
                    const std::string& username,
                    const std::string& password,
-                   int port)
-        : session{repo, address, username, password, port}
+                   const std::string & server_certificate,
+                   const std::string & private_key)
+        : session{repo, address, port, username, password, server_certificate, private_key}
     {
-    	is_secure = true;
-        YLOG_INFO("Connected to {} via Secure Channel", address);
-    }
-
-    gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
-                   const std::string& address,
-                   int port)
-        : session{repo, address, port}
-    {
-    	is_secure = false;
-        YLOG_INFO("Connected to {} over insecure connection", address);
-    }
-
-    gNMIServiceProvider::gNMIServiceProvider(const std::string& address,
-                   const std::string& username,
-                   const std::string& password,
-                   int port)
-        : session{address, username, password, port}
-    {
-    	is_secure = true;
-        YLOG_INFO("Connected to {} via Secure Channel", address);
+        string secure = (server_certificate.length() > 0) ? "Secure" : "Insecure";
+        YLOG_INFO("gNMIServiceProvider Connected to {} via {} Channel", address, secure);
     }
 
     gNMIServiceProvider::~gNMIServiceProvider()

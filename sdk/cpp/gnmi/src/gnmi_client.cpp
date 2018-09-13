@@ -58,30 +58,39 @@ static void check_status(grpc::Status status, string message)
     }
 }
 
-static std::shared_ptr<Channel> connect_to_server()
+static std::shared_ptr<Channel> connect_to_server(const std::string & address, int port,
+                                                  const std::string & server_certificate, const std::string & private_key)
 {
-    grpc::SslCredentialsOptions ssl_opts;
+    std::ostringstream address_buffer{};
+    address_buffer << address << ":" << port;
+    auto address_str = address_buffer.str();
+
+    if (server_certificate.length() == 0) {
+        return grpc::CreateChannel(address_str, grpc::InsecureChannelCredentials());
+    }
+
+	grpc::SslCredentialsOptions ssl_opts;
     grpc::ChannelArguments      args;
 
     string server_cert;
-    string server_key;
-
-    ifstream k("ems.key");
-    ifstream p("ems.pem");
-
+    ifstream p(server_certificate);
     server_cert.assign((istreambuf_iterator<char>(p)),(istreambuf_iterator<char>()));
-    server_key.assign((istreambuf_iterator<char>(k)),(istreambuf_iterator<char>()));
-
     ssl_opts.pem_root_certs = server_cert;
-    ssl_opts.pem_private_key = server_key;
+    YLOG_DEBUG("gNMIClient::connect_to_server: Server certificate:\n{}", server_cert);
 
-    args.SetSslTargetNameOverride("2001:420:1101:1::b");
-    //args.SetSslTargetNameOverride("ems.cisco.com");
+    if (private_key.length() > 0) {
+        string client_key;
+        ifstream k(private_key);
+        client_key.assign((istreambuf_iterator<char>(k)),(istreambuf_iterator<char>()));
+        ssl_opts.pem_private_key = client_key;
+        YLOG_DEBUG("gNMIClient::connect_to_server: Client private key:\n{}", client_key);
+    }
 
-    YLOG_DEBUG("In gnmi_connect server cert: {}", server_cert);
+    //args.SetSslTargetNameOverride("2001:420:1101:1::b");
+    args.SetSslTargetNameOverride("ems.cisco.com");
 
     auto channel_creds = grpc::SslCredentials(grpc::SslCredentialsOptions(ssl_opts));
-    return grpc::CreateCustomChannel("", channel_creds, args);
+    return grpc::CreateCustomChannel(address_str, channel_creds, args);
 }
 
 static gnmi::SubscriptionList_Mode get_sublist_mode(const string & list_mode)
@@ -148,29 +157,17 @@ static string format_notification_response(const std::string& path_to_prepend, c
 // gNMIClient
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-gNMIClient::gNMIClient(shared_ptr<Channel> channel, const std::string & username, const  std::string & password)
- : stub_(gNMI::NewStub(channel)), username(username), password(password), is_secure(true)
+gNMIClient::gNMIClient(const std::string& address, int port,
+                       const std::string & username, const  std::string & password,
+                       const std::string & server_certificate, const std::string & private_key)
+ : username(username), password(password)
 {
-    set_poll_thread_control_function(poll_thread_callback_control);
-}
-
-gNMIClient::gNMIClient(shared_ptr<Channel> channel)
- : stub_(gNMI::NewStub(channel)), username(""), password(""), is_secure(false)
-{
-    set_poll_thread_control_function(poll_thread_callback_control);
+    auto channel = connect_to_server(address, port, server_certificate, private_key);
+	stub_ = gNMI::NewStub(channel);
 }
 
 gNMIClient::~gNMIClient()
 {
-}
-
-int gNMIClient::connect()
-{
-    // Authenticate Server at Client
-	if (is_secure) {
-        connect_to_server();
-	}
-    return EXIT_SUCCESS;
 }
 
 static bool has_gnmi_version(gnmi::CapabilityResponse* response)
@@ -511,6 +508,16 @@ void poll_thread_callback_control(gNMIClient* client, std::function<bool(const c
     writer.detach();
 }
 
+static string get_current_local_time()
+{
+   time_t now = time(0);
+   string cur_time = ctime(&now);
+   if (cur_time[cur_time.length()-1] == '\n') {
+       cur_time.erase(cur_time.length()-1);
+   }
+   return cur_time;
+}
+
 void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char * response)> poll_func)
 {
 	YLOG_DEBUG("Invoking polling thread control from standard input stream");
@@ -522,8 +529,8 @@ void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char *
         cout<<"Enter 'poll' for update; 'sleep' for 10 seconds, 'end' to end monitoring"<<endl;
         while (cin)
         {
-        	cout << ": "; cout.flush();
         	cin >> input;
+            cout << get_current_local_time() << ": " << input << endl;
         	if (input == "poll")
         	{
         		string before_poll = client->get_last_subscribe_response();
@@ -590,24 +597,36 @@ gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subs
     auto a = stub_->Subscribe(&context);
     client_reader_writer = move(a);
     client_reader_writer->Write(*request);
+    client_reader_is_active = true;
     last_subscribe_response = "";
 
     if (list_mode == "POLL")
     {
-        poll_thread_control(this, poll_func);
+        if (poll_func != nullptr) {
+            poll_thread_callback_control(this, poll_func);
+        }
+        else {
+            // Default poll control
+            poll_thread_cin_control(this, nullptr);
+        }
     }
 
     while (client_reader_writer->Read(&response))
     {
         YLOG_INFO("\n=============== Received SubscribeResponse ================\n{}\n", response.DebugString());
 
+        google::protobuf::TextFormat::PrintToString(response, &last_subscribe_response);
         if (out_func != nullptr) {
-            YLOG_DEBUG("Invoking callback function to receive the subscription data");
-            google::protobuf::TextFormat::PrintToString(response, &last_subscribe_response);
+            YLOG_DEBUG("Invoking user callback to receive the subscription data");
             out_func(last_subscribe_response.c_str());
+        }
+        else {
+            // By default put the response to stdout
+            cout << last_subscribe_response << endl;
         }
     }
 	auto status = client_reader_writer->Finish();
+	client_reader_is_active = false;
 	check_status(status, "SubscribeRequest failed with error");
     YLOG_INFO("Subscribe Operation Succeeded");
 }

@@ -132,7 +132,7 @@ TEST_CASE("gnmi_service_capabilities")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     string json_caps = gs.capabilities(provider);
@@ -174,7 +174,7 @@ TEST_CASE("gnmi_service_subscribe")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     build_int_config(provider);
@@ -202,7 +202,7 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     // Build configuration on the server
@@ -261,7 +261,7 @@ TEST_CASE("gnmi_service_poll_subscribe")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     build_int_config(provider);
@@ -284,7 +284,7 @@ TEST_CASE("gnmi_service_stream_subscribe")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     build_int_config(provider);
@@ -309,7 +309,7 @@ TEST_CASE("gnmi_service_create")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
@@ -337,7 +337,7 @@ TEST_CASE("gnmi_service_get_multiple")
 	// session
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
 
 //    string address = "10.30.110.86"; int port = 57400;
 //    gNMIServiceProvider provider{repo, address, "admin", "admin", port};
@@ -384,7 +384,7 @@ TEST_CASE("gnmi_service_delete")
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
-    gNMIServiceProvider provider{repo, address, port};
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
     gNMIService gs{};
 
     openconfig_bgp::Bgp filter = {};

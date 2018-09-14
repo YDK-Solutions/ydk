@@ -3,14 +3,13 @@ package test
 import (
 	"fmt"
 	"runtime"
-    "path/filepath"
+	"path/filepath"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_int "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_interfaces"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk"
-//	encoding "github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -19,8 +18,6 @@ type GnmiServiceProviderTestSuite struct {
 	suite.Suite
 	Provider providers.GnmiServiceProvider
 	CRUD     services.CrudService
-//	CodecPro providers.CodecServiceProvider
-//	Codec    services.CodecService
 }
 
 func (suite *GnmiServiceProviderTestSuite) SetupSuite() {
@@ -35,10 +32,6 @@ func (suite *GnmiServiceProviderTestSuite) SetupSuite() {
 	suite.Provider.Connect()
 	
 	suite.CRUD   = services.CrudService{}
-	
-//	suite.Codec = services.CodecService{}
-//	suite.CodecPro = providers.CodecServiceProvider{}
-//	suite.CodecPro.Encoding = encoding.JSON
 }
 
 func (suite *GnmiServiceProviderTestSuite) TearDownSuite() {
@@ -50,7 +43,7 @@ func (suite *GnmiServiceProviderTestSuite) BeforeTest(suiteName, testName string
 }
 
 func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudSingle() {
-	// Build configuration
+    // Build configuration
     ifc := ysanity_int.Interfaces_Interface{}
     ifc.Name = "Loopback10"
     ifc.Config.Name = "Loopback10"
@@ -60,7 +53,7 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudSingle() {
 
     // Set-replace Request
     reply := suite.CRUD.Create(&suite.Provider, &ifcs)
-	suite.Equal(reply, true)
+    suite.Equal(reply, true)
 
     ifc.Config.Description = "Test"
     reply = suite.CRUD.Update(&suite.Provider, &ifcs)
@@ -100,9 +93,9 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudMultiple() {
     // Create congfiguration on device
     configEC := types.NewConfig(&ifcs, &bgp)
     reply := suite.CRUD.Create(&suite.Provider, configEC)
-	suite.Equal(reply, true)
+    suite.Equal(reply, true)
 
-	// Change and update configuration
+    // Change and update configuration
     ifc.Config.Description = "Test"
     neighbor.Config.PeerAs = 65172
     reply = suite.CRUD.Update(&suite.Provider, configEC)
@@ -136,7 +129,7 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudMultiple() {
     filterBgp = ysanity_bgp.Bgp{}
     filterEc  = types.NewFilter(&filterInt, &filterBgp)
     reply = suite.CRUD.Delete(&suite.Provider, filterEc)
-	suite.Equal(reply, true)
+    suite.Equal(reply, true)
 }
 
 func TestGnmiServiceProviderTestSuite(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 	"runtime"
-    "path/filepath"
+	"path/filepath"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -48,7 +48,7 @@ func (suite *GnmiSessionTestSuite) TestGnmiRpcCaps() {
 
     json := path.CodecEncode( caps, encoding.JSON, true)
     ydk.YLogDebug(fmt.Sprintf("Server capabilities:\n%v\n", json))
-	suite.NotEqual(strings.Index(json, "supported-encodings"), -1)
+    suite.NotEqual(strings.Index(json, "supported-encodings"), -1)
 }
 
 func (suite *GnmiSessionTestSuite) TestGnmiRpcGetSetBgp() {
@@ -127,26 +127,26 @@ func deleteConfigBgp(session *path.GnmiSession, schema types.RootSchemaNode) {
 }
 
 func getBgpSubscription(gs *path.GnmiSession) {
-	previous := ""
-	for true {
-		response := gs.GetLastSubscribeResponse(previous)
-		if len(response) > 0 && response != previous {
-			// Do anything with received response
-			ydk.YLogDebug(fmt.Sprintf("%s:  Last received subscribe response:\n%s\n", time.Now().Format(time.RFC850), response))
-			previous = response
-		}
-		if !gs.SubscribeInProgress() {
-			break
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
+    previous := ""
+    for true {
+        response := gs.GetLastSubscribeResponse(previous)
+        if len(response) > 0 && response != previous {
+            // Do anything with received response
+            ydk.YLogDebug(fmt.Sprintf("%s:  Last received subscribe response:\n%s\n", time.Now().Format(time.RFC850), response))
+            previous = response
+        }
+        if !gs.SubscribeInProgress() {
+            break
+        }
+        time.Sleep(100 * time.Millisecond)
+    }
 }
 
 func (suite *GnmiSessionTestSuite) TestGnmiRpcSubscribeOnce() {
     // Configure BGP
     configureBgp(&suite.GnmiSession, suite.Schema)
     
-	// Build subscription
+    // Build subscription
     bgpReadDn := path.CreateRootDataNode( suite.Schema, "openconfig-bgp:bgp")
     bgpReadPayload := path.CodecEncode( bgpReadDn, encoding.JSON, false)
 
@@ -170,7 +170,7 @@ func (suite *GnmiSessionTestSuite) TestGnmiRpcSubscribeStream() {
     // Configure BGP
     configureBgp(&suite.GnmiSession, suite.Schema)
     
-	// Build subscription
+    // Build subscription
     bgpReadDn := path.CreateRootDataNode( suite.Schema, "openconfig-bgp:bgp")
     bgpReadPayload := path.CodecEncode( bgpReadDn, encoding.JSON, false)
 
@@ -185,7 +185,7 @@ func (suite *GnmiSessionTestSuite) TestGnmiRpcSubscribeStream() {
     path.CreateDataNode( bgpSubscription, "heartbeat-interval", "10000000000")
 
     go suite.GnmiSession.ExecuteSubscribeRpc(rpc)
-    time.Sleep(200 * time.Millisecond)
+    time.Sleep(100 * time.Millisecond)
     getBgpSubscription(&suite.GnmiSession)
     
     // Delete configuration

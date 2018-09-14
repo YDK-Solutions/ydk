@@ -43,6 +43,10 @@ function install_dependencies {
 
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+
+     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+     ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
 
      which gcc

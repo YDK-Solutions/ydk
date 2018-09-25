@@ -255,15 +255,15 @@ function install_go_core {
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
-    run_test ./generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
+    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
 
-    cp -r sdk/go/gnmi/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk/
+    cp -r sdk/go/gnmi/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
 function run_go_gnmi_tests {

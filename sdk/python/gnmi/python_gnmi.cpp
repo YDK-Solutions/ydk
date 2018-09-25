@@ -23,6 +23,7 @@
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/gnmi_service.hpp>
 #include <ydk/gnmi_client.hpp>
+#include <ydk/gnmi_crud_service.hpp>
 
 #include <ydk/logging_callback.hpp>
 
@@ -187,6 +188,45 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                 {
                     ns.subscribe(provider, subscription_list, qos, mode, out_func);
                 });
+
+	class_<ydk::gNMICrudService>(services, "gNMICRUDService")
+	    .def(init<>())
+        .def("create",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, ydk::Entity& entity)) &ydk::gNMICrudService::create,
+            return_value_policy::reference)
+        .def("create",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, vector<ydk::Entity*>& entity_list)) &ydk::gNMICrudService::create,
+            return_value_policy::reference)
+        .def("read",
+            (shared_ptr<ydk::Entity> (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, ydk::Entity& entity)) &ydk::gNMICrudService::read)
+        .def("read",
+            (vector<shared_ptr<ydk::Entity>> (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, vector<ydk::Entity*>& entity_list)) &ydk::gNMICrudService::read)
+        .def("read_config",
+            (shared_ptr<ydk::Entity> (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, ydk::Entity& entity)) &ydk::gNMICrudService::read_config)
+        .def("read_config",
+            (vector<shared_ptr<ydk::Entity>> (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, vector<ydk::Entity*>& entity_list)) &ydk::gNMICrudService::read_config)
+        .def("update",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, ydk::Entity& entity)) &ydk::gNMICrudService::update,
+            return_value_policy::reference)
+        .def("update",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, vector<ydk::Entity*>& entity_list)) &ydk::CrudService::update,
+            return_value_policy::reference)
+        .def("delete",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, ydk::Entity& entity)) &ydk::gNMICrudService::delete_,
+            return_value_policy::reference)
+        .def("delete",
+            (bool (ydk::gNMICrudService::*)
+                (ydk::ServiceProvider& provider, vector<ydk::Entity*>& entity_list)) &ydk::gNMICrudService::delete_,
+            return_value_policy::reference);
 
     setup_gnmi_logging();
 };

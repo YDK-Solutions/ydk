@@ -11,6 +11,7 @@ set(gnmi_tests_src
         test_gnmi_crud.cpp
         test_gnmi_provider.cpp
         test_gnmi_service.cpp
+        test_utils.cpp
         main.cpp)
 
 find_library(xml2_location xml2)

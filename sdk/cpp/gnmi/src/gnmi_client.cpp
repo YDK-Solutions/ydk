@@ -128,28 +128,26 @@ static void populate_subscribe_request(gnmi::SubscriptionList* sl, GnmiClientSub
     }
 }
 
-static string format_notification_response(const std::string& path_to_prepend, const std::string& value)
+static string format_notification_response(pair<string,string> prefix_suffix, const std::string& value)
 {
     string reply_val;
+    string path_to_prepend = prefix_suffix.first;
+    string path_to_append  = prefix_suffix.second;
 
     // TODO: Update again when payload format from the server(IOS XR) is made consistent with different request paths
-    if (flag.path_has_value)
-        reply_val = "{" + path_to_prepend + "{[" + value + "]}}";
+//    if (flag.path_has_value)
+//        reply_val = "{" + path_to_prepend + "{[" + value + "]}}";
 //    else if (flag.prefix_has_value)
 //        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + value + "]" + "}}");
 //    else if ((flag.prefix_has_value) && (flag.path_has_value))
 //        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
-    else {
+//    else {
         string val = (value == "{\"value\":\"null\"}") ? "{}" : value;
         if (path_to_prepend.length()==0 && val.find("{")==0)
             reply_val = val;
         else
-            reply_val = "{" + path_to_prepend + val + "}";
-    }
-    size_t pos = 0;
-    while ((pos = path_to_prepend.find ("{", ++pos)) != string::npos) {
-        reply_val.append("}");
-    }
+            reply_val = "{" + path_to_prepend + val + path_to_append + "}";
+//    }
     return reply_val;
 }
 
@@ -293,9 +291,10 @@ GnmiClientCapabilityResponse gNMIClient::execute_get_capabilities()
     return reply;
 }
 
-static string get_path_from_update(gnmi::Update update)
+static pair<string,string> get_path_from_update(gnmi::Update update)
 {
     string path_to_prepend;
+    string path_to_append;
     string path_element_to_add;
 
     if(update.has_path())
@@ -313,9 +312,24 @@ static string get_path_from_update(gnmi::Update update)
                 path_element_to_add = path.elem(l).name();	//check_if_path_has_key_values(path.elem(l));
                 if (l>0 || path_to_prepend.length()==0)
                     path_to_prepend.append("\"");
-                path_to_prepend.append(path_element_to_add + "\":{");
+                path_to_prepend.append(path_element_to_add + "\":");
+
+                // Check if the path element has keys
+                if (path.elem(l).key_size() == 0) {
+                    path_to_prepend.append("{");
+                    path_to_append = "}" + path_to_append;
+                }
+                else {
+                	path_to_prepend.append("[{");
+                	path_to_append = "}]" + path_to_append;
+                	string keys_to_append;
+                    for (auto key : path.elem(l).key()) {
+                    	keys_to_append.append("\"" + key.first + "\":\"" + key.second + "\",");
+                    }
+                    path_to_prepend.append(keys_to_append);
+                }
             }
-            path_element_to_add = path.elem(l).name();	//check_if_path_has_key_values(path.elem(elem_size-1));
+            path_element_to_add = path.elem(l).name();
             if (elem_size>1 || path_to_prepend.length()==0)
                 path_to_prepend.append("\"");
             path_to_prepend.append(path_element_to_add + "\":");
@@ -324,7 +338,7 @@ static string get_path_from_update(gnmi::Update update)
     else {
         path_to_prepend.clear();
     }
-    return path_to_prepend;
+    return make_pair(path_to_prepend, path_to_append);
 }
 
 static string get_value_from_update(gnmi::Update update)
@@ -352,9 +366,9 @@ static vector<string> parse_get_response(gnmi::GetResponse* response)
             for(int k = 0; k < notification.update_size(); ++k)
             {
                 gnmi::Update update = notification.update(k);
-                path_to_prepend = get_path_from_update(update);
+                auto prefix_suffix = get_path_from_update(update);
                 value.append(get_value_from_update(update));
-                reply_to_parse = format_notification_response(path_to_prepend, value);
+                reply_to_parse = format_notification_response(prefix_suffix, value);
             }
         }
         response_list.push_back(reply_to_parse);

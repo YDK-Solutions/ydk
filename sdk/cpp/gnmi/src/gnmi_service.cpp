@@ -73,7 +73,7 @@ gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & o
 
     GnmiClientRequest request{};
     request.alias = filter.get_segment_path();
-    request.payload = get_data_payload(provider, filter);
+    //request.payload = get_data_payload(provider, filter);
     request.path = path;
     request.type = "get";
     request.operation = operation;
@@ -105,7 +105,7 @@ gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, 
 
         GnmiClientRequest request{};
         request.alias = filter->get_segment_path();
-        request.payload = get_data_payload(provider, *filter);
+        //request.payload = get_data_payload(provider, *filter);
         request.path = path;
         request.type = "get";
         request.operation = operation;

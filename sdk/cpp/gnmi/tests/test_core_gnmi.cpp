@@ -27,11 +27,115 @@
 #include <ydk/gnmi_path_api.hpp>
 #include <ydk/gnmi_util.hpp>
 #include <ydk/gnmi_provider.hpp>
+#include <ydk/filters.hpp>
+
+# include "test_utils.hpp"
 
 #include "../../core/src/path/path_private.hpp"
 #include "../../core/src/catch.hpp"
 #include "../../core/tests/config.hpp"
 #include "../../core/tests/mock_data.hpp"
+
+#include <ydk_ydktest/openconfig_interfaces.hpp>
+#include <ydk_ydktest/ydktest_sanity.hpp>
+
+TEST_CASE( "test_gnmi_entity_to_path" )
+{
+    auto ifc = std::make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->yfilter = ydk::YFilter::read;
+
+    ydktest::openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::parse_entity_to_path(ifcs, path);
+
+    std::string expected = R"(origin: "openconfig-interfaces"
+elem {
+  name: "interfaces"
+}
+elem {
+  name: "interface"
+  key {
+    key: "name"
+    value: "Loopback10"
+  }
+}
+elem {
+  name: "config"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
+
+TEST_CASE( "test_gnmi_entity_leaf_to_path" )
+{
+    auto ifc = std::make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->description.yfilter = ydk::YFilter::read;
+
+    ydktest::openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::parse_entity_to_path(ifcs, path);
+
+    std::string expected = R"(origin: "openconfig-interfaces"
+elem {
+  name: "interfaces"
+}
+elem {
+  name: "interface"
+  key {
+    key: "name"
+    value: "Loopback10"
+  }
+}
+elem {
+  name: "config"
+}
+elem {
+  name: "description"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
+
+TEST_CASE( "test_gnmi_entity_key_and_leaf_to_path" )
+{
+    auto l_1 = std::make_shared<ydktest::ydktest_sanity::Runner::TwoList::Ldata>();
+    l_1->number = 11;
+    l_1->name.yfilter = ydk::YFilter::read;
+
+    ydktest::ydktest_sanity::Runner runner{};
+    runner.two_list->ldata.append(l_1);
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::parse_entity_to_path(runner, path);
+
+//    std::cout << path->DebugString() << std::endl;
+
+    std::string expected = R"(origin: "ydktest-sanity"
+elem {
+  name: "runner"
+}
+elem {
+  name: "two-list"
+}
+elem {
+  name: "ldata"
+  key {
+    key: "number"
+    value: "11"
+  }
+}
+elem {
+  name: "name"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
 
 TEST_CASE( "test_gnmi_datanode_to_path" )
 {
@@ -97,9 +201,6 @@ elem {
     key: "second"
     value: "222"
   }
-}
-elem {
-  name: "second"
 }
 )";
     REQUIRE(path->DebugString() == expected);
@@ -227,9 +328,6 @@ TEST_CASE("gnmi_bgp_create")
 
 void gnmi_service_subscribe_multiples_callback(const char *);
 
-void build_int_config(ydk::gNMIServiceProvider& provider);
-void build_bgp_config(ydk::gNMIServiceProvider& provider);
-
 TEST_CASE("gnmi_rpc_subscribe")
 {
     ydk::path::Repository repo{TEST_HOME};
@@ -335,4 +433,39 @@ TEST_CASE("gnmi_rpc_set_get_bgp")
     auto read_result = (*read_rpc)(session);
 
     REQUIRE(read_result != nullptr);
+}
+TEST_CASE("gnmi_rpc_get_bgp_leaf")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::gNMIServiceProvider provider{repo, "127.0.0.1", 50051, "admin", "admin"};
+    auto & session = provider.get_session();
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    // Build configuration on the server
+    build_bgp_config(provider);
+
+    // Read BGP/global/as
+    auto & bgp = schema.create_datanode("openconfig-bgp:bgp");
+    auto & as = bgp.create_datanode("global/config/as", "0");
+    ydk::path::Codec s{};
+    auto json_bgp = s.encode(bgp, ydk::EncodingFormat::JSON, false);
+
+    std::shared_ptr<ydk::path::Rpc> read_rpc { schema.create_rpc("ydk:gnmi-get") };
+    read_rpc->get_input_node().create_datanode("type", "CONFIG");
+    read_rpc->get_input_node().create_datanode("request[alias='bgp']/entity", json_bgp);
+
+    auto read_result = (*read_rpc)(session);
+    REQUIRE(read_result != nullptr);
+    //std::cout << print_tree(read_result.get(), " ") << std::endl;
+    std::string expected = R"( <>
+   <bgp>
+     <global>
+       <config>
+         <as>65172</as>
+       </config>
+     </global>
+   </bgp>
+ </>
+)";
+    REQUIRE(print_tree(read_result.get(), " ") == expected);
 }

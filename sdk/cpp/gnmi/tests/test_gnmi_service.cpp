@@ -29,9 +29,9 @@
 #include <ydk/codec_service.hpp>
 #include <ydk/entity_data_node_walker.hpp>
 
-#include <ydk_ydktest/openconfig_bgp.hpp>
-#include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/filters.hpp>
+
+#include "test_utils.hpp"
 
 #include "../../core/src/catch.hpp"
 #include "../../core/tests/config.hpp"
@@ -40,84 +40,6 @@ using namespace std;
 using namespace ydk;
 using namespace path;
 using namespace ydktest;
-
-void print_tree(ydk::path::DataNode* dn, const std::string& indent)
-{
-  try {
-    ydk::path::Statement s = dn->get_schema_node().get_statement();
-    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
-        auto val = dn->get_value();
-        std::cout << indent << "<" << s.arg << ">" << val << "</" << s.arg << ">" << std::endl;
-    } else {
-        std::string child_indent{indent};
-        child_indent+="  ";
-        std::cout << indent << "<" << s.arg << ">" << std::endl;
-        for(auto c : dn->get_children())
-            print_tree(c.get(), child_indent);
-        std::cout << indent << "</" << s.arg << ">" << std::endl;
-    }
-  }
-  catch (ydk::path::YCoreError &ex) {
-	  std::cout << ex.what() << std::endl;
-  }
-}
-
-void print_data_node(shared_ptr<ydk::path::DataNode> dn)
-{
-  try {
-	cout << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
-    print_tree(dn.get(), " ");
-  }
-  catch (ydk::path::YCoreError &ex) {
-	  std::cout << ex.what() << std::endl;
-  }
-}
-
-void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root)
-{
-    ydk::path::DataNode& dn = get_data_node_from_entity( *entity, root);
-	ydk::path::Statement s = dn.get_schema_node().get_statement();
-	cout << "\n=====>  Printing DataNode: '" << s.arg << "'" << endl;
-    print_tree( &dn, " ");
-}
-
-void config_bgp(openconfig_bgp::Bgp bgp)
-{
-    bgp.global->config->as = 65172;
-    
-    auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
-    neighbor->neighbor_address = "172.16.255.2";
-    neighbor->config->neighbor_address = "172.16.255.2";
-    neighbor->config->peer_as = 65172;
-    
-    neighbor->parent = bgp.neighbors.get();
-    bgp.neighbors->neighbor.append(neighbor);
-}
-
-void build_bgp_config(gNMIServiceProvider& provider)
-{
-    // Build BGP configuration on server
-    openconfig_bgp::Bgp bgp = {};
-    bgp.yfilter = YFilter::replace;
-    config_bgp(bgp);
-    gNMIService gs{};
-    auto set_reply = gs.set(provider, bgp);
-}
-
-void build_int_config(gNMIServiceProvider& provider)
-{
-    // Build interface configuration on server
-    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    ifc->config->name = "Loopback10";
-    ifc->config->description = "Test";
-
-    openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
-    ifcs.yfilter = YFilter::replace;
-    gNMIService gs{};
-    auto set_reply = gs.set(provider, ifcs);
-}
 
 static string cap_update = R"(
       {
@@ -398,4 +320,69 @@ TEST_CASE("gnmi_service_delete")
     // Get Request
     auto get_after_delete_reply = gs.get(provider, filter, "STATE");
     REQUIRE(get_after_delete_reply);
+}
+
+TEST_CASE("gnmi_service_get_list_element")
+{
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+    string username = "admin"; string password = "admin";
+
+    gNMIServiceProvider provider{repo, address, port, username, password};
+    gNMIService gs{};
+
+    build_int_config(provider);
+
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    auto get_reply = gs.get(provider, ifcs, "CONFIG");
+    REQUIRE(get_reply != nullptr);
+    //print_entity(get_reply, provider.get_session().get_root_schema());
+    string expected = R"( <interfaces>
+   <interface>
+     <name>Loopback10</name>
+     <config>
+       <name>Loopback10</name>
+       <description>Test</description>
+     </config>
+   </interface>
+ </interfaces>
+)";
+    REQUIRE(entity2string(get_reply, provider.get_session().get_root_schema()) == expected);
+}
+
+TEST_CASE("gnmi_service_get_leaf")
+{
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+    string username = "admin"; string password = "admin";
+
+    gNMIServiceProvider provider{repo, address, port, username, password};
+    gNMIService gs{};
+
+    build_int_config(provider);
+
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->description.yfilter = YFilter::read;
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    auto get_reply = gs.get(provider, ifcs, "CONFIG");
+    REQUIRE(get_reply != nullptr);
+    string expected = R"( <interfaces>
+   <interface>
+     <name>Loopback10</name>
+     <config>
+       <description>Test</description>
+     </config>
+   </interface>
+ </interfaces>
+)";
+    REQUIRE(entity2string(get_reply, provider.get_session().get_root_schema()) == expected);
 }

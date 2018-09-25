@@ -24,13 +24,16 @@
 #include "../../core/src/catch.hpp"
 #include "../../core/tests/config.hpp"
 
-#include <ydk/crud_service.hpp>
 #include <ydk/codec_provider.hpp>
 #include <ydk/codec_service.hpp>
 #include <ydk/gnmi_provider.hpp>
+#include <ydk/gnmi_crud_service.hpp>
+#include <ydk/filters.hpp>
 
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
+
+#include "test_utils.hpp"
 
 using namespace std;
 using namespace ydk;
@@ -44,7 +47,7 @@ TEST_CASE("gnmi_crud_single_entity")
     string address = "127.0.0.1"; int port = 50051;
 
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-    CrudService crud{};
+    gNMICrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 
@@ -75,7 +78,40 @@ TEST_CASE("gnmi_crud_single_entity")
     REQUIRE(reply);
 }
 
-void config_bgp(openconfig_bgp::Bgp bgp);
+TEST_CASE("gnmi_crud_read_leaf")
+{
+    // session
+    Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
+    gNMICrudService crud{};
+
+    build_int_config(provider);
+
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->description.yfilter = YFilter::read;
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    auto ifc_read = crud.read(provider, ifcs);
+    REQUIRE(ifc_read != nullptr);
+    string expected = R"( <interfaces>
+   <interface>
+     <name>Loopback10</name>
+     <config>
+       <description>Test</description>
+     </config>
+   </interface>
+ </interfaces>
+)";
+    REQUIRE(entity2string(ifc_read, provider.get_session().get_root_schema()) == expected);
+
+    auto reply = crud.delete_(provider, ifcs);
+    REQUIRE(reply);
+}
 
 TEST_CASE("gnmi_crud_multiple_entities")
 {
@@ -84,7 +120,7 @@ TEST_CASE("gnmi_crud_multiple_entities")
     string address = "127.0.0.1"; int port = 50051;
 
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-    CrudService crud{};
+    gNMICrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 

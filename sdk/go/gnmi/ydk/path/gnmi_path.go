@@ -105,7 +105,7 @@ func (gs *GnmiSession) GetRootSchemaNode() types.RootSchemaNode {
 	}
 
 	rsn := types.RootSchemaNode{Private: rootSchema}
-    return rsn
+	return rsn
 }
 
 func (gs *GnmiSession) ExecuteRpc(rpc types.Rpc) types.DataNode {
@@ -159,7 +159,6 @@ func (gs *GnmiSession) GetLastSubscribeResponse(previousResponse string) string 
 
 // gNMI Service Provider C-wrapper functions
 //
-
 func GnmiServiceProviderConnect(
 	state *errors.State,
 	repo types.Repository,

@@ -142,6 +142,40 @@ class gNMIImpl final : public gNMI::Service
         json::json_pointer path_ptr(path_to_string);
     }
 
+    const std::string get_response_payload(const std::string origin, const std::string last_elem)
+    {
+        std:: string response_payload = null_payload;
+        if (origin == "openconfig-bgp" && bgp_set) {
+            if (last_elem == "bgp")
+                response_payload = bgp_payload;
+            else if (last_elem == "global")
+                response_payload = "{\"config\":{\"as\":65172} }";
+            else if (last_elem == "as")
+                response_payload = "65172";
+     	    else if (last_elem == "neighbors")
+                response_payload = "{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}";
+     	    else if (last_elem == "neighbor")
+                response_payload = "[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]";
+     	    else if (last_elem == "config")
+                response_payload = "{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}";
+     	    else if (last_elem == "neighbor-address")
+                response_payload = "\"172.16.255.2\"";
+     	    else if (last_elem == "peer-as")
+                response_payload = "65172";
+        }
+        else if (origin == "openconfig-interfaces" && int_set) {
+            if (last_elem == "interfaces")
+            	response_payload = int_payload;
+            else if (last_elem == "interface")
+            	response_payload = "[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]";
+            else if (last_elem == "config")
+                response_payload = "{\"name\":\"Loopback10\",\"description\":\"Test\"}}";
+            else if (last_elem == "description")
+                response_payload = "\"Test\"";
+        }
+        return response_payload;
+    }
+
     Status Get(ServerContext* context, const GetRequest* request, GetResponse* response) override 
     {
         //std::cout << "=========== Get Request Received ===========" << std::endl;
@@ -149,37 +183,33 @@ class gNMIImpl final : public gNMI::Service
 
         for(int j = 0; j < request->path_size(); ++j) 
         {
-            std::string response_payload{};
             ::gnmi::Path* response_path = new ::gnmi::Path;
             auto notification = response->add_notification();
             std::time_t timestamp_val = std::time(nullptr);
             notification->set_timestamp(static_cast< ::google::protobuf::int64>(timestamp_val));
 
             auto req_path = request->path(j);
+            std::string last_elem{};
             std::string origin = req_path.origin();
             if (origin.length() > 0) {
                 response_path->set_origin(origin);
-                if (origin == "openconfig-bgp" && bgp_set) {
-                    response_payload = bgp_payload;
-                }
-                else if (origin == "openconfig-interfaces" && int_set) {
-                    response_payload = int_payload;
-                }
-                else response_payload = null_payload;
             }
             for (int i = 0; i < req_path.elem_size(); ++i)
             {
                 gnmi::PathElem* path_elem = response_path->add_elem();
                 path_elem->CopyFrom(req_path.elem(i));
+                last_elem = path_elem->name();
             }
             auto update = notification->add_update();
             update->set_allocated_path(response_path);
 
             ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
 
-            std::vector<std::string> path_container;
-            json json_payload = json::parse(response_payload);
-            get_value(path_container, json_payload);
+            //std::vector<std::string> path_container;
+            //json json_payload = json::parse(response_payload);
+            //get_value(path_container, json_payload);
+
+            auto response_payload = get_response_payload(origin, last_elem);
             value->set_json_ietf_val(response_payload);
             update->set_allocated_val(value);
         }

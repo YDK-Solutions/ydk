@@ -83,7 +83,7 @@ bool CrudService::create(ydk::ServiceProvider & provider, Entity & entity)
     string operation = "ydk:create";
     if (provider.get_provider_type() == "gNMIServiceProvider") {
         operation = "ydk:gnmi-set";
-        entity.yfilter = YFilter::replace;
+        entity.yfilter = YFilter::update;
     }
     return operation_succeeded( execute_rpc(provider, entity, operation, "entity", false) );
 }
@@ -95,7 +95,7 @@ bool CrudService::create(ydk::ServiceProvider & provider, vector<Entity*> & enti
     if (provider.get_provider_type() == "gNMIServiceProvider") {
         operation = "ydk:gnmi-set";
         for (auto entity : entity_list)
-            entity->yfilter = YFilter::replace;
+            entity->yfilter = YFilter::update;
     }
     return operation_succeeded(
             execute_rpc(provider, entity_list, operation, "entity", false)
@@ -205,14 +205,14 @@ static shared_ptr<Entity>
 execute_rpc(ydk::ServiceProvider & provider, Entity & entity,
             const string & operation, const string & data_tag, bool set_config_flag)
 {
-	vector<Entity*> input_list{};
-	input_list.push_back(&entity);
+    vector<Entity*> input_list{};
+    input_list.push_back(&entity);
 
-	vector<shared_ptr<Entity>> output_list = execute_rpc(provider, input_list, operation, data_tag, set_config_flag);
-	if (output_list.size() == 0)
-		return nullptr;
+    vector<shared_ptr<Entity>> output_list = execute_rpc(provider, input_list, operation, data_tag, set_config_flag);
+    if (output_list.size() == 0)
+        return nullptr;
 
-	return output_list[0];
+    return output_list[0];
 }
 
 static vector<shared_ptr<Entity>>
@@ -235,16 +235,16 @@ execute_rpc(ydk::ServiceProvider & provider, vector<Entity*> & filter_list,
                 std::ostringstream path_buffer;
                 string segment_path = entity->get_segment_path();
                 switch (entity->yfilter) {
-				case YFilter::replace:
+                case YFilter::replace:
                     path_buffer << "replace[alias='" << segment_path << "']/entity";
                     break;
-				case YFilter::update:
+                case YFilter::update:
                     path_buffer << "update[alias='"  << segment_path << "']/entity";
                     break;
-				case YFilter::delete_:
+                case YFilter::delete_:
                     path_buffer << "delete[alias='"  << segment_path << "']/entity";
                     break;
-				default:
+                default:
                     path_buffer << "request[alias='" << segment_path << "']/entity";
                 };
                 string payload = get_json_payload(provider, *entity);

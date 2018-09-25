@@ -24,11 +24,11 @@ import logging
 
 from multiprocessing import Pool
 
-from test_utils import enable_logging, get_local_repo_dir, print_entity, EmptyTest
+from test_utils import enable_logging, get_local_repo_dir, print_entity, entity_to_string, EmptyTest
 
 from ydk.filters import YFilter
 from ydk.path  import Repository
-from ydk.types import EncodingFormat
+from ydk.types import EncodingFormat, Filter, Config
 from ydk.services  import CodecService
 from ydk.providers import CodecServiceProvider
 
@@ -100,6 +100,26 @@ class SanityGnmiService(unittest.TestCase):
         self.assertIsNotNone(response)
         #print_entity(response, self.schema)
  
+        # Get interface description only
+        ifc_filter = openconfig_interfaces.Interfaces()
+        lo10 = ifc.Interface()
+        lo10.name = 'Loopback10'
+        lo10.config.description = YFilter.read
+        ifc_filter.interface.append(lo10)
+
+        response = self.gs.get(self.provider, ifc_filter, "CONFIG")
+        self.assertIsNotNone(response)
+        expected = '''<interfaces>
+  <interface>
+    <name>Loopback10</name>
+    <config>
+      <description>Test</description>
+    </config>
+  </interface>
+</interfaces>
+'''
+        self.assertEqual( entity_to_string(response, self.schema), expected)
+ 
         # Delete interface configuration
         ifc.yfilter = YFilter.delete
         reply = self.gs.set(self.provider, ifc)
@@ -110,12 +130,12 @@ class SanityGnmiService(unittest.TestCase):
         ifc.yfilter = YFilter.replace
         bgp = build_bgp_config()
         bgp.yfilter = YFilter.replace
-        reply = self.gs.set(self.provider, [ifc, bgp])
+        reply = self.gs.set(self.provider, Config(ifc, bgp))
  
         # Get and print interface and BGP configuration
         ifc_filter = openconfig_interfaces.Interfaces()
         bgp_filter = openconfig_bgp.Bgp()
-        response = self.gs.get(self.provider, [ifc_filter, bgp_filter], "CONFIG")
+        response = self.gs.get(self.provider, Filter(ifc_filter, bgp_filter), "CONFIG")
         self.assertIsNotNone(response)
         self.assertEqual(response.__len__(), 2)
         #for entity in response:

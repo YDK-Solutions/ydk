@@ -34,10 +34,10 @@ type GnmiService struct {
 
 type GnmiSubscription struct {
 	Entity types.Entity
-    SubscriptionMode string
-    SampleInterval uint64
-    SuppressRedundant bool 
-    HeartbeatInterval uint64
+	SubscriptionMode string
+	SampleInterval uint64
+	SuppressRedundant bool 
+	HeartbeatInterval uint64
 }
 
 func (gs *GnmiService) Set(provider *providers.GnmiServiceProvider, entity types.Entity) bool {
@@ -70,10 +70,10 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 	codecProvider.Encoding = encoding.JSON
 	codec := CodecService{}
 
-    rpc := path.CreateRpc( schema, "ydk:gnmi-subscribe")
-    subscription := path.CreateDataNode( rpc.Input, "subscription", "")
-    path.CreateDataNode( subscription, "mode", mode)
-    path.CreateDataNode( subscription, "qos", qos)
+	rpc := path.CreateRpc( schema, "ydk:gnmi-subscribe")
+	subscription := path.CreateDataNode( rpc.Input, "subscription", "")
+	path.CreateDataNode( subscription, "mode", mode)
+	path.CreateDataNode( subscription, "qos", qos)
 	
 	for _, sub := range subscriptionList {
 		segpath := sub.Entity.GetEntityData().SegmentPath
@@ -81,13 +81,13 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 		entitySub := path.CreateDataNode( subscription, entTag, "")
 
 		payload := codec.Encode( &codecProvider, sub.Entity)
-	    path.CreateDataNode( entitySub, "entity", payload)
+		path.CreateDataNode( entitySub, "entity", payload)
 
-	    smode := sub.SubscriptionMode
-	    if len(smode) == 0 {
-	    	smode = "ON_CHANGE"
-	    }
-	    path.CreateDataNode( entitySub, "subscription-mode", smode)
+		smode := sub.SubscriptionMode
+		if len(smode) == 0 {
+			smode = "ON_CHANGE"
+		}
+		path.CreateDataNode( entitySub, "subscription-mode", smode)
 
 		sinterval := sub.SampleInterval
 		if sinterval == 0 {
@@ -97,7 +97,7 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 				sinterval = 60000000000
 			}
 		}
-	    path.CreateDataNode( entitySub, "sample-interval", sinterval)
+		path.CreateDataNode( entitySub, "sample-interval", sinterval)
 
 		sheartbeat := sub.HeartbeatInterval
 		if sheartbeat == 0 {
@@ -116,5 +116,5 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 		path.CreateDataNode( entitySub, "suppress-redundant", ssupress)
 	}
 
-    session.ExecuteSubscribeRpc(rpc)
+	session.ExecuteSubscribeRpc(rpc)
 }

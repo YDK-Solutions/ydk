@@ -71,11 +71,11 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudSingle() {
 
     ifcs = ysanity_int.Interfaces{}
     reply = suite.CRUD.Delete(&suite.Provider, &ifcs)
-	suite.Equal(reply, true)
+    suite.Equal(reply, true)
 }
 
 func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudMultiple() {
-	// Build interface configuration
+    // Build interface configuration
     ifc := ysanity_int.Interfaces_Interface{}
     ifc.Name = "Loopback10"
     ifc.Config.Name = "Loopback10"
@@ -101,7 +101,7 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudMultiple() {
     reply = suite.CRUD.Update(&suite.Provider, configEC)
     suite.Equal(reply, true)
 
-	// Read all
+    // Read all
     filterInt := ysanity_int.Interfaces{}
     filterBgp := ysanity_bgp.Bgp{}
     filterEc := types.NewFilter(&filterInt, &filterBgp)
@@ -133,8 +133,8 @@ func (suite *GnmiServiceProviderTestSuite) TestGnmiCrudMultiple() {
 }
 
 func TestGnmiServiceProviderTestSuite(t *testing.T) {
-	if testing.Verbose() {
-		ydk.EnableLogging(ydk.Debug)
-	}
-	suite.Run(t, new(GnmiServiceProviderTestSuite))
+    if testing.Verbose() {
+        ydk.EnableLogging(ydk.Debug)
+    }
+    suite.Run(t, new(GnmiServiceProviderTestSuite))
 }

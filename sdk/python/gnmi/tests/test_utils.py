@@ -84,6 +84,10 @@ def print_entity(entity, root_schema):
     dn = get_data_node_from_entity( entity, root_schema);
     print_data_node(dn)
 
+def entity_to_string(entity, root_schema):
+    dn = get_data_node_from_entity( entity, root_schema);
+    return datanode_to_str(dn)
+
 class ParametrizedTestCase(unittest.TestCase):
     """ TestCase classes that want to be parametrized should
         inherit from this class.

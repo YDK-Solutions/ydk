@@ -7,8 +7,10 @@ matrix:
     - os: linux
       dist: trusty
       group: edge
-    - env: DOCKER=false GNMI=false
-    - env: DOCKER=false GNMI=true
+    - os: linux
+      dist: trusty
+      group: edge
+      env: GNMI=true
 #    - os: osx
 #      osx_image: xcode7.3
 #      language: generic

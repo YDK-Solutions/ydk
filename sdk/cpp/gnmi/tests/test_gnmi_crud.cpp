@@ -27,7 +27,7 @@
 #include <ydk/codec_provider.hpp>
 #include <ydk/codec_service.hpp>
 #include <ydk/gnmi_provider.hpp>
-#include <ydk/gnmi_crud_service.hpp>
+#include <ydk/crud_service.hpp>
 #include <ydk/filters.hpp>
 
 #include <ydk_ydktest/openconfig_bgp.hpp>

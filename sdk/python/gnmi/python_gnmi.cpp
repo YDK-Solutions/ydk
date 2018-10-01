@@ -23,7 +23,6 @@
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/gnmi_service.hpp>
 #include <ydk/gnmi_client.hpp>
-#include <ydk/gnmi_crud_service.hpp>
 
 #include <ydk/logging_callback.hpp>
 

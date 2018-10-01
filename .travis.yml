@@ -4,9 +4,11 @@ language: python
 
 matrix:
   include:
-#    - os: linux
-#      dist: trusty
-#      group: edge
+    - os: linux
+      dist: trusty
+      group: edge
+    - env: DOCKER=false GNMI=false
+    - env: DOCKER=false GNMI=true
 #    - os: osx
 #      osx_image: xcode7.3
 #      language: generic
@@ -33,7 +35,8 @@ before_install:
     - if [[ "$DOCKER" == "true" ]]; then docker pull ${OS_TYPE}:${OS_VERSION}                                       ; fi
 
 script:
-    - if [[ "$DOCKER" != "true" ]]; then ./test/tests.sh ;fi
+    - if [[ "$DOCKER" != "true" ]] && [[ "$GNMI" == "false" ]]; then ./test/tests.sh ;fi
+    - if [[ "$DOCKER" != "true" ]] && [[ "$GNMI" == "true" ]]; then ./test/dependencies_linux_gnmi.sh && ./test/gnmi_tests.sh ;fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" != "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/tests.sh -p ${PYTHON_VERSION} && ./test/test_package_centos.sh -p ${PYTHON_VERSION}" ; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" == "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/dependencies_linux_gnmi.sh && ./test/gnmi_tests.sh -p ${PYTHON_VERSION}"; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "ubuntu" ]] && [[ "$GNMI" != "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_ubuntu.sh && ./test/tests.sh -p ${PYTHON_VERSION} && ./test/test_package_ubuntu.sh -p ${PYTHON_VERSION}" ; fi

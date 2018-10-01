@@ -22,13 +22,14 @@ from __future__ import absolute_import
 import unittest
 import logging
 
-from test_utils import enable_logging, get_local_repo_dir, print_entity
+from test_utils import enable_logging, get_local_repo_dir, print_entity, entity_to_string
 
 from ydk.path  import Repository
 from ydk.types import EncodingFormat
 from ydk.services  import CRUDService
 from ydk.services  import CodecService
 from ydk.providers import CodecServiceProvider
+from ydk.filters import YFilter
 
 from ydk.gnmi.providers import gNMIServiceProvider
 
@@ -75,13 +76,52 @@ class SanityGnmiCrud(unittest.TestCase):
  
         # Read all
         read_list = self.crud.read(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])
+
+        # Read single container
+        ifc = openconfig_interfaces.Interfaces()
+        lo10 = ifc.Interface()
+        lo10.name = 'Loopback10'
+        lo10.config = YFilter.read
+        ifc.interface.append(lo10)
+        read_config = self.crud.read(self.provider, ifc)
+        # print_entity(read_descr, self.schema)
+        expected = '''<interfaces>
+  <interface>
+    <name>Loopback10</name>
+    <config>
+      <name>Loopback10</name>
+      <description>Test</description>
+    </config>
+  </interface>
+</interfaces>
+'''
+        self.assertEqual( entity_to_string(read_config, self.schema), expected)
  
+        # Read single leaf
+        ifc = openconfig_interfaces.Interfaces()
+        lo10 = ifc.Interface()
+        lo10.name = 'Loopback10'
+        lo10.config.description = YFilter.read
+        ifc.interface.append(lo10)
+        read_descr = self.crud.read(self.provider, ifc)
+        # print_entity(read_descr, self.schema)
+        expected = '''<interfaces>
+  <interface>
+    <name>Loopback10</name>
+    <config>
+      <description>Test</description>
+    </config>
+  </interface>
+</interfaces>
+'''
+        self.assertEqual( entity_to_string(read_descr, self.schema), expected)
+         
         # Delete configuration
         res = self.crud.delete(self.provider, [ifc, bgp])
 
 if __name__ == '__main__':
     import sys
-    enable_logging(logging.ERROR)
+    enable_logging(logging.DEBUG)
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityGnmiCrud)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

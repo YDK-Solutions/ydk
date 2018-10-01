@@ -251,19 +251,25 @@ TEST_CASE("gnmi_service_create")
     openconfig_interfaces::Interfaces filter{};
     auto get_reply = gs.get(provider, filter, "CONFIG");
     REQUIRE(get_reply != nullptr);
-    print_entity(get_reply, provider.get_session().get_root_schema());
+    //print_entity(get_reply, provider.get_session().get_root_schema());
+    string expected = R"( <interfaces>
+   <interface>
+     <name>Loopback10</name>
+     <config>
+       <name>Loopback10</name>
+       <description>Test</description>
+     </config>
+   </interface>
+ </interfaces>
+)";
+    REQUIRE(entity2string(get_reply, provider.get_session().get_root_schema()) == expected);
 }
 
 TEST_CASE("gnmi_service_get_multiple")
 {
-	// session
     path::Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-
-//    string address = "10.30.110.86"; int port = 57400;
-//    gNMIServiceProvider provider{repo, address, "admin", "admin", port};
-
     gNMIService gs{};
 
     // Set Create Request
@@ -295,9 +301,6 @@ TEST_CASE("gnmi_service_get_multiple")
 
     auto get_reply = gs.get(provider, filter, "CONFIG");
     REQUIRE(get_reply.size() == 2);
-//    for (auto entity : get_reply) {
-//        print_entity(entity, provider.get_session().get_root_schema());
-//    }
 }
 
 TEST_CASE("gnmi_service_delete")

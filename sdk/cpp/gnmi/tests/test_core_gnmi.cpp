@@ -114,7 +114,43 @@ TEST_CASE( "test_gnmi_entity_key_and_leaf_to_path" )
     gnmi::Path* path = new gnmi::Path();
     ydk::parse_entity_to_path(runner, path);
 
-//    std::cout << path->DebugString() << std::endl;
+    std::string expected = R"(origin: "ydktest-sanity"
+elem {
+  name: "runner"
+}
+elem {
+  name: "two-list"
+}
+elem {
+  name: "ldata"
+  key {
+    key: "number"
+    value: "11"
+  }
+}
+elem {
+  name: "name"
+}
+)";
+    REQUIRE(path->DebugString() == expected);
+}
+
+TEST_CASE( "test_gnmi_entity_key_and_leaf_to_path2" )
+{
+    auto l_1 = std::make_shared<ydktest::ydktest_sanity::Runner::TwoList::Ldata>();
+    l_1->number = 11;
+    l_1->name = "l1-name";
+
+    ydktest::ydktest_sanity::Runner runner{};
+    runner.two_list->ldata.append(l_1);
+
+    auto s_11 = std::make_shared<ydktest::ydktest_sanity::Runner::TwoList::Ldata::Subl1>();
+    s_11->number = 211;
+    s_11->name.yfilter = ydk::YFilter::read;
+    l_1->subl1.append(s_11);
+
+    gnmi::Path* path = new gnmi::Path();
+    ydk::parse_entity_to_path(runner, path);
 
     std::string expected = R"(origin: "ydktest-sanity"
 elem {
@@ -128,6 +164,13 @@ elem {
   key {
     key: "number"
     value: "11"
+  }
+}
+elem {
+  name: "subl1"
+  key {
+    key: "number"
+    value: "211"
   }
 }
 elem {
@@ -266,65 +309,6 @@ TEST_CASE("gnmi_test_json_payload"  )
     std::string rpc_json = s.encode(edit_config->get_input_node(), ydk::EncodingFormat::JSON, false);
     std::cout<< rpc_json<<std::endl;
 }
-
-/* NOT READY FOR THIS TEST!!
- *
-TEST_CASE("gnmi_bgp_create")
-{
-    ydk::path::Repository repo{"/Users/abhirame/.ydk/pavarotti:830"};
-
-    ydk::path::gNMISession session{repo,"pavarotti:57400", "admin", "admin"};
-    ydk::path::RootSchemaNode& schema = session.get_root_schema();
-
-    ydk::path::Codec s{};
-
-//    auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
-////    //first delete
-//    std::shared_ptr<ydk::path::Rpc> delete_rpc { schema.create_rpc("ydk:delete") };
-//    auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-//    delete_rpc->get_input_node().create_datanode("entity", json);
-//    //call delete
-//    (*delete_rpc)(session);
-//
-//    auto & as = bgp.create_datanode("global/config/as", "65172");
-//
-//    //bgp/neighbors/neighbor
-//    auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']", "");
-//    auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
-//    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
-//
-//    auto json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-//
-//    CHECK( !json.empty());
-//
-//    REQUIRE(json == gnmi_expected_bgp_output);
-//
-//    //call create
-//    std::shared_ptr<ydk::path::Rpc> create_rpc{schema.create_rpc("ydk:create")};
-//    create_rpc->get_input_node().create_datanode("entity", json);
-//    (*create_rpc)(session);
-
-    //call read
-    std::shared_ptr<ydk::path::Rpc> read_rpc{schema.create_rpc("ydk:read")};
-    auto & bgp_read = schema.create_datanode("openconfig-bgp:bgp", "");
-    auto json = s.encode(bgp_read, ydk::EncodingFormat::JSON, false);
-    REQUIRE( !json.empty() );
-    read_rpc->get_input_node().create_datanode("filter", "{\"openconfig-bgp:bgp\":{}}");
-    auto read_result = (*read_rpc)(session);
-    REQUIRE(read_result != nullptr);
-    gnmi_print_tree(read_result.get(),"");
-    json = s.encode(*read_result, ydk::EncodingFormat::JSON, false);
-//    REQUIRE(json == gnmi_expected_bgp_read);
-//
-//    //call update (update equiv. create in gnmi)
-//    peer_as.set_value("6500");
-//    json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-//    CHECK( !json.empty());
-//    std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:create") };
-//    update_rpc->get_input_node().create_datanode("entity", json);
-//    (*update_rpc)(session);
-}
-*/
 
 void gnmi_service_subscribe_multiples_callback(const char *);
 

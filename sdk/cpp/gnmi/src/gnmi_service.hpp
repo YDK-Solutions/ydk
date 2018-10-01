@@ -68,6 +68,10 @@ class gNMIService
                    std::function<bool(const char * response)> poll_func=nullptr) const;
 
     std::string capabilities(gNMIServiceProvider & provider);
+
+    std::shared_ptr<path::DataNode> get_from_path(gNMIServiceProvider& provider,
+                                                  std::vector<gnmi::Path*> path_list,
+												  const std::string & operation) const;
 };
 
 }

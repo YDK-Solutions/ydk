@@ -41,18 +41,17 @@ type GnmiSubscription struct {
 }
 
 func (gs *GnmiService) Set(provider *providers.GnmiServiceProvider, entity types.Entity) bool {
-	data := map[string]interface{} {}
-	data["entity"] = entity
+	data := map[string]string {}
 
-	readDataNode := path.ExecuteRPC(provider, "ydk:gnmi-set", data, false)
+	readDataNode := path.ExecuteGnmiRPC(provider, "ydk:gnmi-set", entity, data, )
 	return operationSucceeded(readDataNode)
 }
 
 func (gs *GnmiService) Get(provider *providers.GnmiServiceProvider, filter types.Entity, operation string) types.Entity {
-	data := map[string]interface{} {}
-	data["filter"] = filter
+	data := map[string]string {}
+	data["mode"] = operation
 
-	readDataNode := path.ExecuteRPC(provider, "ydk:gnmi-get", data, (operation=="CONFIG"))
+	readDataNode := path.ExecuteGnmiRPC(provider, "ydk:gnmi-get", filter, data)
 	return path.ReadDatanode(filter, readDataNode)
 }
 

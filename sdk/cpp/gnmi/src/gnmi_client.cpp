@@ -325,6 +325,10 @@ static pair<string,string> get_path_from_update(gnmi::Update update)
                 	string keys_to_append;
                     for (auto key : path.elem(l).key()) {
                     	keys_to_append.append("\"" + key.first + "\":\"" + key.second + "\",");
+
+                        // Remove surrounding quotes for YDK to work with XR gNMI server.
+                        // This could be an issue with other gNMI servers
+                    	// keys_to_append.append("\"" + key.first + "\":" + key.second + ",");
                     }
                     path_to_prepend.append(keys_to_append);
                 }

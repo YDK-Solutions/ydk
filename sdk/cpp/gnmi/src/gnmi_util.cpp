@@ -115,22 +115,49 @@ void parse_entity_to_prefix_and_paths(Entity& entity, pair<string, string> & pre
 }
 static void parse_entity_children(Entity & entity, gnmi::Path* path);
 
+static vector<string> get_entity_keys(Entity & entity)
+{
+    vector<string> keys;
+    auto s = entity.get_segment_path();
+    size_t pos = 0;
+    while ((pos = s.find("[", ++pos)) != std::string::npos) {
+        size_t equal_char = s.find("=", pos);
+        if (equal_char != std::string::npos) {
+            string key = s.substr(pos+1, equal_char-pos-1);
+            keys.push_back(key);
+        }
+    }
+    return keys;
+}
+
 static void parse_entity(Entity & entity, gnmi::Path* path)
 {
     EntityPath entity_path = get_entity_path(entity, entity.parent);
     auto s = entity.get_segment_path();
     map<string,string> keys{};
+    map<string,string> leafs{};
 
     auto p = s.find("[");
     if (p != std::string::npos) {
+    	auto entity_keys = get_entity_keys(entity);
         s = s.substr(0, p);
         for (const pair<string, LeafData> & name_value : entity_path.value_paths) {
             LeafData leaf_data = name_value.second;
-            if (leaf_data.is_set) {
+            bool is_key = false;
+            for (auto key : entity_keys) {
+                if (key == name_value.first) {
+                    is_key = true;
+                    break;
+                }
+            }
+            if (is_key && leaf_data.is_set) {
                 keys[name_value.first] = leaf_data.value;
 
                 // Add surrounding quotes for YDK to work with XR gNMI server
                 // keys[name_value.first] = "\"" + leaf_data.value + "\"";
+            }
+            else if (leaf_data.yfilter != YFilter::not_set) {
+                leafs[name_value.first] = to_string(leaf_data.yfilter);
             }
         }
     }
@@ -141,6 +168,14 @@ static void parse_entity(Entity & entity, gnmi::Path* path)
         auto key_map = elem->mutable_key();
         YLOG_DEBUG("gnmi_util::parse_entity: Adding key value: '{}:{}'", key.first, key.second);
         (*key_map)[key.first] = key.second;
+    }
+    for (auto leaf : leafs) {
+        YLOG_DEBUG("gnmi_util::parse_entity: Adding elem for YLeaf: '{}'", leaf.first);
+        gnmi::PathElem* elem = path->add_elem();
+        elem->set_name(leaf.first);
+
+        // Only one leaf with operation can be processed at a time
+        return;
     }
 
     parse_entity_children(entity, path);

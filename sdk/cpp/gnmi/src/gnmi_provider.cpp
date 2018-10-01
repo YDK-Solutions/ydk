@@ -34,17 +34,18 @@
 
 #include "gnmi_client.hpp"
 #include "gnmi_provider.hpp"
+#include "gnmi_service.hpp"
 
 using namespace std;
 
 namespace ydk
 {
     gNMIServiceProvider::gNMIServiceProvider(path::Repository & repo,
-                   const std::string& address, int port,
-                   const std::string& username,
-                   const std::string& password,
-                   const std::string & server_certificate,
-                   const std::string & private_key)
+                   const string& address, int port,
+                   const string& username,
+                   const string& password,
+                   const string & server_certificate,
+                   const string & private_key)
         : session{repo, address, port, username, password, server_certificate, private_key}
     {
         string secure = (server_certificate.length() > 0) ? "Secure" : "Insecure";
@@ -66,9 +67,53 @@ namespace ydk
         return session;
     }
 
-    std::vector<std::string> gNMIServiceProvider::get_capabilities() const
+    vector<string> gNMIServiceProvider::get_capabilities() const
     {
         return session.get_capabilities();
+    }
+
+    shared_ptr<Entity>
+    gNMIServiceProvider::execute_operation(const string & operation, Entity & entity, map<string,string> params)
+    {
+        gNMIService gs;
+        if (operation == "create" || operation == "update" || operation == "delete") {
+            entity.yfilter = (operation == "delete") ? YFilter::delete_ : YFilter::update;
+            gs.set(*this, entity);
+        }
+        else if (operation == "read") {
+            string read_mode = "ALL";
+            if (params["mode"] == "config")
+            	read_mode = "CONFIG";
+            return gs.get(*this, entity, read_mode);
+        }
+        else {
+            YLOG_ERROR("gNMIServiceProvider::execute_operation: Operation '{}' is not supported", operation);
+            throw(YServiceProviderError("gNMIServiceProvider::execute_operation: Operation is not supported"));
+        }
+        return nullptr;
+    }
+
+    vector<shared_ptr<Entity>>
+	gNMIServiceProvider::execute_operation(const string & operation, vector<Entity*> entity_list, map<string,string> params)
+    {
+    	vector<shared_ptr<Entity>> result;
+        gNMIService gs;
+        if (operation == "create" || operation == "update" || operation == "delete") {
+            for (auto entity : entity_list)
+                entity->yfilter = (operation == "delete") ? YFilter::delete_ : YFilter::update;
+            gs.set(*this, entity_list);
+        }
+        else if (operation == "read") {
+            string read_mode = "ALL";
+            if (params["mode"] == "config")
+            	read_mode = "CONFIG";
+            return gs.get(*this, entity_list, read_mode);
+        }
+        else {
+            YLOG_ERROR("gNMIServiceProvider::execute_operation: Operation '{}' is not supported", operation);
+            throw(YServiceProviderError("gNMIServiceProvider::execute_operation: Operation is not supported"));
+        }
+    	return result;
     }
 
 }

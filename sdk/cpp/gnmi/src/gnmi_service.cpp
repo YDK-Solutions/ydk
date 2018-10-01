@@ -63,29 +63,38 @@ gNMIService::~gNMIService()
 }
 
 //get
-shared_ptr<Entity>
-gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & operation) const
+shared_ptr<path::DataNode>
+gNMIService::get_from_path(gNMIServiceProvider& provider, vector<gnmi::Path*> path_list, const string & operation) const
 {
-	YLOG_DEBUG("Executing 'get' gRPC on single entity");
-
-    gnmi::Path* path = new gnmi::Path;
-    parse_entity_to_path(filter, path);
-
-    GnmiClientRequest request{};
-    request.alias = filter.get_segment_path();
-    //request.payload = get_data_payload(provider, filter);
-    request.path = path;
-    request.type = "get";
-    request.operation = operation;
+	YLOG_DEBUG("Executing 'get' gRPC on multiple paths");
 
     vector<GnmiClientRequest> get_request_list{};
-    get_request_list.push_back(request);
+    for (auto path : path_list) {
+        GnmiClientRequest request{};
+        request.path = path;
+        request.type = "get";
+        request.operation = operation;
+        get_request_list.push_back(request);
+    }
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
     auto & client = gnmi_session.get_client();
     vector<string> reply = client.execute_get_operation(get_request_list, operation);
 
-    auto root_dn = gnmi_session.handle_get_reply(reply);
+    return gnmi_session.handle_get_reply(reply);
+}
+
+shared_ptr<Entity>
+gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & operation) const
+{
+    YLOG_DEBUG("Executing 'get' gRPC on single entity");
+
+    gnmi::Path* path = new gnmi::Path;
+    parse_entity_to_path(filter, path);
+
+    vector<gnmi::Path*> path_list;
+    path_list.push_back(path);
+    auto root_dn = get_from_path(provider, path_list, operation);
     if (root_dn) {
         return read_datanode(filter, root_dn->get_children()[0]);
     }
@@ -95,27 +104,17 @@ gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & o
 vector<shared_ptr<Entity>>
 gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, const string & operation) const
 {
-	YLOG_DEBUG("Executing get gRPC for multiple entities");
+    YLOG_DEBUG("Executing get gRPC for multiple entities");
 
-    vector<GnmiClientRequest> get_request_list{};
-    vector<shared_ptr<Entity>> response_list{};
+    vector<gnmi::Path*> path_list;
     for (auto filter : filter_list) {
         gnmi::Path* path = new gnmi::Path;
         parse_entity_to_path(*filter, path);
-
-        GnmiClientRequest request{};
-        request.alias = filter->get_segment_path();
-        //request.payload = get_data_payload(provider, *filter);
-        request.path = path;
-        request.type = "get";
-        request.operation = operation;
-        get_request_list.push_back(request);
+        path_list.push_back(path);
     }
-    auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
-    auto & client = gnmi_session.get_client();
-    vector<string> reply = client.execute_get_operation(get_request_list, operation);
+    auto root_dn = get_from_path(provider, path_list, operation);
 
-    auto root_dn = gnmi_session.handle_get_reply(reply);
+    vector<shared_ptr<Entity>> response_list{};
     if (root_dn) {
         // Build map of data nodes in order to retain filter list order
         map<string,std::shared_ptr<path::DataNode>> path_to_dn{};
@@ -167,7 +166,7 @@ static GnmiClientRequest build_set_request(gNMIServiceProvider& provider, Entity
     }
 
     GnmiClientRequest request{};
-    request.alias = entity.get_segment_path();
+    request.alias = "entity";
     request.path = path;
     request.payload = payload;
     request.type = "set";
@@ -193,8 +192,10 @@ bool gNMIService::set(gNMIServiceProvider& provider, vector<Entity*> & entity_li
 {
 	YLOG_DEBUG("Executing set gRPC for multiple entities");
     vector<GnmiClientRequest> set_request_list{};
+    int count = 1;
     for (auto entity : entity_list) {
         GnmiClientRequest request = build_set_request(provider, *entity);
+        request.alias += "-" + count++;
         set_request_list.push_back(request);
     }
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());

@@ -47,7 +47,7 @@ TEST_CASE("gnmi_crud_single_entity")
     string address = "127.0.0.1"; int port = 50051;
 
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-    gNMICrudService crud{};
+    CrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 
@@ -80,12 +80,11 @@ TEST_CASE("gnmi_crud_single_entity")
 
 TEST_CASE("gnmi_crud_read_leaf")
 {
-    // session
     Repository repo{TEST_HOME};
     string address = "127.0.0.1"; int port = 50051;
 
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-    gNMICrudService crud{};
+    CrudService crud{};
 
     build_int_config(provider);
 
@@ -120,7 +119,7 @@ TEST_CASE("gnmi_crud_multiple_entities")
     string address = "127.0.0.1"; int port = 50051;
 
     gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
-    gNMICrudService crud{};
+    CrudService crud{};
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 

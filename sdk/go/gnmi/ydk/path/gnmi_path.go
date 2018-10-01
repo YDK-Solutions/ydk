@@ -25,11 +25,12 @@ package path
 import "C"
 
 import (
-//	"fmt"
-//	"reflect"
+	"fmt"
+	"strings"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"unsafe"
 )
 
@@ -230,4 +231,230 @@ func GnmiServiceGetCapabilities(provider types.CServiceProvider) string {
 
 	return C.GoString(ccaps)
 }
+
+func GnmiServiceGet(provider types.CServiceProvider, filter types.Entity, operation string) types.DataNode {
+	realProvider := provider.Private.(C.ServiceProvider)
+	var state errors.State
+	AddCState(&state)
+	cstate := GetCState(&state)
+
+	var cmode *C.char = C.CString(operation)
+	defer C.free(unsafe.Pointer(cmode))
+
+	ec := types.EntityToCollection(filter)	
+	pathList := C.GnmiPathListInit()
+	for _, ent := range ec.Entities() {
+		path := parseEntityToPath(ent)
+		C.GnmiPathListAdd(pathList, path)
+	}
+	cdn := C.GnmiServiceGetFromPath( *cstate, realProvider, pathList, cmode)
+	PanicOnCStateError(cstate)
+	C.GnmiPathListFree(pathList)
+
+	return types.DataNode{cdn}
+}
+
+// ExecuteRPC executes payload converted from entity for CRUD/Netconf services.
+// Returns a data node (types.DataNode) representing the result of the executed rpc.
+func ExecuteGnmiRPC(
+	provider types.ServiceProvider,
+	rpcTag string,
+	entity types.Entity,
+	options map[string]string) types.DataNode {
+
+	state := provider.GetState()
+	cstate := GetCState(state)
+	wrappedProvider := provider.GetPrivate().(types.CServiceProvider)
+	realProvider := wrappedProvider.Private.(C.ServiceProvider)
+	rootSchema := C.ServiceProviderGetRootSchema(*cstate, realProvider)
+	PanicOnCStateError(cstate)
+
+	ydkRPC := C.RootSchemaNodeRpc(*cstate, rootSchema, C.CString(rpcTag))
+	PanicOnCStateError(cstate)
+	if rootSchema == nil {
+		ydk.YLogError("ExecuteGnmiRPC: Root schema is nil!")
+		panic(1)
+	}
+
+	input := C.RpcInput(*cstate, ydkRPC)
+	PanicOnCStateError(cstate)
+
+	if rpcTag == "ydk:gnmi-get" {
+		mode, ok := options["mode"]
+		if !ok {
+			mode = "ALL"
+		}
+		C.DataNodeCreate(*cstate, input, C.CString("type"), C.CString(mode))
+		PanicOnCStateError(cstate)
+	}
+
+	// Build RPC
+	var collectionFilter yfilter.YFilter = yfilter.NotSet
+	config := types.EntityToCollection(entity)
+	for _, ent := range config.Entities() {
+		entityData := ent.GetEntityData()
+		if entityData == nil {
+			continue
+		}
+		segmentPath := entityData.SegmentPath
+		entityFilter := collectionFilter
+		if entityData.YFilter != yfilter.NotSet {
+			entityFilter = entityData.YFilter
+		}
+
+		var entityTag string
+		switch entityFilter {
+			case yfilter.Replace:
+				entityTag = "replace[alias='" + segmentPath + "']/entity"
+			case yfilter.Update:
+				entityTag = "update[alias='" + segmentPath + "']/entity"
+			case yfilter.Delete:
+				entityTag = "delete[alias='" + segmentPath + "']/entity"
+			default:
+				entityTag = "request[alias='" + segmentPath + "']/entity"
+		}
+		if entityData.YFilter != yfilter.NotSet {
+			// Remove setting of the filter before payload is calculated
+			types.SetEntityFilter(ent, yfilter.NotSet)
+		}
+		cpayload := GetDataPayload(state, ent, rootSchema, provider)
+		defer C.free(unsafe.Pointer(cpayload))
+		C.DataNodeCreate(*cstate, input, C.CString(entityTag), cpayload)
+		PanicOnCStateError(cstate)
+	}
+
+	// Send RPC and receive results
+	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
+	PanicOnCStateError(cstate)
+
+	return dataNode
+}
+
+// GNMI Path utility parses entity tree and converts it to gnmi::Path
+//
+func parseEntityToPath(entity types.Entity) C.GnmiPath {
+	path := C.GnmiPathInit()
+	parseEntityPrefix(entity, path)
+	parseEntityChildren(entity, path);
+	return path
+}
+
+func parseEntityPrefix(entity types.Entity, path C.GnmiPath) {
+	// Add origin and first container to the path
+    	// parse_entity_prefix(entity, path);
+	segPath := entity.GetEntityData().SegmentPath
+	s := strings.Split(segPath, ":")
+	if len(s) >= 2 {
+		var origin *C.char = C.CString(s[0])
+		var path_elem *C.char = C.CString(s[1])
+		defer C.free(unsafe.Pointer(origin))
+		defer C.free(unsafe.Pointer(path_elem))
+
+		C.GnmiPathAddOrigin(path, origin)
+		C.GnmiPathAddElem(path, path_elem)
+	} else {
+		ydk.YLogWarn(fmt.Sprintf("parseEntityPrefix: Missing module in the root entity path: '%s'", segPath))
+		var path_elem *C.char = C.CString(segPath)
+		defer C.free(unsafe.Pointer(path_elem))
+		C.GnmiPathAddElem(path, path_elem)
+	}
+}
+
+func parseEntityChildren( entity types.Entity, path C.GnmiPath) {
+	children := types.GetYChildren(entity.GetEntityData())	// []YChild
+	if len(children) == 0 {
+		// Check if any of the leafs has YFilter
+		entPath := types.GetEntityPath(entity) // EntityPath
+		for _, leafData := range(entPath.ValuePaths) {
+			if leafData.Data.Filter != yfilter.NotSet {
+			        ydk.YLogDebug(fmt.Sprintf("parseEntityChildren: Adding elem for YLeaf: '%s'", leafData.Name))
+				var path_elem *C.char = C.CString(leafData.Name)
+				defer C.free(unsafe.Pointer(path_elem))
+				C.GnmiPathAddElem(path, path_elem)
+			        return	// Only one flagged element can be requested at a time
+			}
+		}
+	}
+
+	// Go over children entities
+	for _, ychild := range(children) {
+		if types.HasDataOrFilter(ychild.Value) {
+			ydk.YLogDebug(fmt.Sprintf("parseEntityChildren: Looking at child '%s'", ychild.GoName));
+            		parseEntity(ychild.Value, path);
+		}
+	}
+}
+
+func getEntityKeys( path string) map[string]string {
+	s := path
+	keys := map[string]string {}
+	openbrac := strings.Index(s, "[")
+	for (openbrac >= 0) {
+		s = s[openbrac+1:]
+		equal := strings.Index(s, "=")
+		if equal > 0 {
+			name := s[:equal]
+			s = s[equal+1:]
+			closebrack := strings.Index(s, "]")
+			if closebrack > 0 {
+				value := s[1:closebrack-1]
+				s = s[closebrack+1:]
+				keys[name] = value
+			}
+		}
+		openbrac = strings.IndexByte(s, '[')
+	}
+	return keys
+}
+
+func parseEntity( entity types.Entity, path C.GnmiPath) {
+	entPath := types.GetEntityPath(entity) // EntityPath
+	s := entPath.Path //entity.GetEntityData().SegmentPath
+	ydk.YLogDebug(fmt.Sprintf("parseEntity: entity segment path: '%s'", s))
+
+	// Collect segment keys and leafs with set filter
+	keys  := map[string]string {}
+	leafs := map[string]string {}
+	p := strings.Index(s, "[")
+	if p > 0 {
+		entityKeys := getEntityKeys(s)
+		s = s[0:p]		
+		for _, leafData := range(entPath.ValuePaths) {
+			keyValue, isKey := entityKeys[leafData.Name]
+			if  isKey {
+				keys[leafData.Name] = keyValue
+			} else if leafData.Data.Filter != yfilter.NotSet {
+				leafs[leafData.Name] = leafData.Data.Filter.String()
+			}
+		}
+	}
+
+	ydk.YLogDebug(fmt.Sprintf("parseEntity: Adding elem: '%s'", s))
+	var pathElem *C.char = C.CString(s)
+	defer C.free(unsafe.Pointer(pathElem))
+	elem := C.GnmiPathAddElem(path, pathElem)
+
+	for key, value := range(keys) {
+		ydk.YLogDebug(fmt.Sprintf("parseEntity: Adding key value: '%s:%s'", key, value))
+		var ckey *C.char = C.CString(key)
+		defer C.free(unsafe.Pointer(ckey))
+		var cvalue *C.char = C.CString(value)
+		defer C.free(unsafe.Pointer(cvalue))
+		C.GnmiPathAddElemKey(elem, ckey, cvalue)
+	}
+
+	for leaf, _ := range(leafs) {
+		ydk.YLogDebug(fmt.Sprintf("parseEntity: Adding elem for YLeaf: '%s'", leaf))
+		var cleaf *C.char = C.CString(leaf)
+		defer C.free(unsafe.Pointer(cleaf))
+		C.GnmiPathAddElem(path, cleaf)
+
+		// Only one leaf with operation can be processed at a time
+		// and it must be the last in the path
+		return;
+	}
+
+	parseEntityChildren(entity, path);
+}
+
 

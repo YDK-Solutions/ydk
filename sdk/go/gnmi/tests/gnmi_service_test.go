@@ -115,6 +115,25 @@ func (suite *GnmiServiceTestSuite) TestGetSetDeleteMultiple() {
     suite.Equal(reply, true)
 }
 
+func configInt(provider *providers.GnmiServiceProvider) {
+    ifc := ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.Name = "Loopback10"
+    ifc.Config.Description = "Test"
+    ifcs := ysanity_int.Interfaces{}
+    ifcs.Interface = append(ifcs.Interface, &ifc)
+
+    service := services.CrudService{}
+    service.Create(provider, &ifcs)
+}
+
+func deleteInt(provider *providers.GnmiServiceProvider) {
+    ifcs := ysanity_int.Interfaces{}    
+
+    service := services.CrudService{}
+    service.Delete(provider, &ifcs)
+}
+
 func configBgp(provider *providers.GnmiServiceProvider) {
     bgp := ysanity_bgp.Bgp{}
     bgp.Global.Config.As = 65172
@@ -123,18 +142,16 @@ func configBgp(provider *providers.GnmiServiceProvider) {
     neighbor.Config.NeighborAddress = "172.16.255.2"
     neighbor.Config.PeerAs = 65172
     bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, &neighbor)
-    bgp.YFilter = yfilter.Replace
-    
-    service := services.GnmiService{}
-    service.Set(provider, &bgp)
+
+    service := services.CrudService{}
+    service.Create(provider, &bgp)
 }
 
 func deleteBgp(provider *providers.GnmiServiceProvider) {
     filterBgp := ysanity_bgp.Bgp{}
-    filterBgp.YFilter = yfilter.Delete
-    
-    service := services.GnmiService{}
-    service.Set(provider, &filterBgp)
+
+    service := services.CrudService{}
+    service.Delete(provider, &filterBgp)
 }
 
 func bgpSubscription(provider *providers.GnmiServiceProvider) {
@@ -198,6 +215,154 @@ func (suite *GnmiServiceTestSuite) TestSubscribeStream() {
 	
 	// Delete BGP configuration
 	deleteBgp(&suite.Provider)
+}
+
+func (suite *GnmiServiceTestSuite) TestCrudMultiples() {
+    var crud services.CrudService
+
+    // Build interface configuration
+    ifc := ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.Name = "Loopback10"
+    ifcs := ysanity_int.Interfaces{}
+    ifcs.Interface = append(ifcs.Interface, &ifc)
+    
+    // Build BGP configuration
+    bgp := ysanity_bgp.Bgp{}
+    bgp.Global.Config.As = 65172
+    neighbor := ysanity_bgp.Bgp_Neighbors_Neighbor{}
+    neighbor.NeighborAddress = "172.16.255.2"
+    neighbor.Config.NeighborAddress = "172.16.255.2"
+    bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, &neighbor)
+
+    // Create congfiguration on device
+    configEC := types.NewConfig(&ifcs, &bgp)
+    reply := crud.Create(&suite.Provider, configEC)
+    suite.Equal(reply, true)
+
+    // Change and update configuration
+    ifc.Config.Description = "Test"
+    neighbor.Config.PeerAs = 65172
+    reply = crud.Update(&suite.Provider, configEC)
+    suite.Equal(reply, true)
+
+    // Read all
+    filterInt := ysanity_int.Interfaces{}
+    filterBgp := ysanity_bgp.Bgp{}
+    filterEc := types.NewFilter(&filterInt, &filterBgp)
+    readAll := crud.Read(&suite.Provider, filterEc)
+    suite.NotNil(readAll)
+    suite.Equal(types.IsEntityCollection(readAll), true)
+    
+    // Validate response
+    ec := types.EntityToCollection(readAll)
+    readEntity, _ := ec.Get("openconfig-interfaces:interfaces")
+    suite.NotNil(readEntity)
+    ifcRead := readEntity.(*ysanity_int.Interfaces)
+    suite.Equal(types.EntityEqual(ifcRead, &ifcs), true)
+
+    // Read configuration only
+    filterInt = ysanity_int.Interfaces{}
+    filterBgp = ysanity_bgp.Bgp{}
+    filterEc  = types.NewFilter(&filterInt, &filterBgp)
+    readConfig := crud.ReadConfig(&suite.Provider, filterEc)
+    suite.NotNil(readConfig)
+    suite.Equal(types.IsEntityCollection(readConfig), true)
+
+    // Delete configuration
+    filterInt = ysanity_int.Interfaces{}
+    filterBgp = ysanity_bgp.Bgp{}
+    filterEc  = types.NewFilter(&filterInt, &filterBgp)
+    reply = crud.Delete(&suite.Provider, filterEc)
+    suite.Equal(reply, true)
+}
+
+func (suite *GnmiServiceTestSuite) TestCrudSingle() {
+    var crud services.CrudService
+
+    // Build interface configuration
+    ifc := ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.Name = "Loopback10"
+    ifcs := ysanity_int.Interfaces{}
+    ifcs.Interface = append(ifcs.Interface, &ifc)
+    
+    reply := crud.Create(&suite.Provider, &ifcs)
+    suite.Equal(reply, true)
+
+    // Change and update configuration
+    ifc.Config.Description = "Test"
+    reply = crud.Update(&suite.Provider, &ifcs)
+    suite.Equal(reply, true)
+
+    // Read all
+    filterInt := ysanity_int.Interfaces{}
+    readAll := crud.Read(&suite.Provider, &filterInt)
+    suite.NotNil(readAll)
+    suite.Equal(types.IsEntityCollection(readAll), false)
+    
+    // Validate response
+    ifcRead := readAll.(*ysanity_int.Interfaces)
+    suite.Equal(types.EntityEqual(ifcRead, &ifcs), true)
+
+    // Read configuration only
+    filterInt = ysanity_int.Interfaces{}
+    readConfig := crud.ReadConfig(&suite.Provider, &filterInt)
+    suite.NotNil(readConfig)
+
+    // Read container/entity with filter
+    filter := ysanity_int.Interfaces{}
+    ifc = ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.YFilter = yfilter.Read
+    filter.Interface = append(filter.Interface, &ifc)
+    
+    readConfig = crud.ReadConfig(&suite.Provider, &filter)
+    suite.NotNil(readConfig)
+
+    // Read single leaf
+    filter = ysanity_int.Interfaces{}
+    ifc = ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.Description = yfilter.Read
+    filter.Interface = append(filter.Interface, &ifc)
+    
+    readConfig = crud.ReadConfig(&suite.Provider, &filter)
+    suite.NotNil(readConfig)
+
+    // Delete configuration
+    filterInt = ysanity_int.Interfaces{}
+    reply = crud.Delete(&suite.Provider, &filterInt)
+    suite.Equal(reply, true)
+}
+
+func (suite *GnmiServiceTestSuite) TestCrudTwoLeafs() {
+    var crud services.CrudService
+
+    // Build interface configuration
+    configInt(&suite.Provider)
+    configBgp(&suite.Provider)
+
+    ifc := ysanity_int.Interfaces_Interface{}
+    ifc.Name = "Loopback10"
+    ifc.Config.Description = yfilter.Read
+    ifcs := ysanity_int.Interfaces{}
+    ifcs.Interface = append(ifcs.Interface, &ifc)
+    
+    bgp := ysanity_bgp.Bgp{}
+    neighbor := ysanity_bgp.Bgp_Neighbors_Neighbor{}
+    neighbor.NeighborAddress = "172.16.255.2"
+    neighbor.Config.PeerAs = yfilter.Read
+    bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, &neighbor)
+ 
+    filterEc := types.NewFilter(&ifcs, &bgp)
+    readConfig := crud.ReadConfig(&suite.Provider, filterEc)
+    suite.NotNil(readConfig)
+    suite.Equal(types.IsEntityCollection(readConfig), true)
+
+    // Delete configuration
+    deleteInt(&suite.Provider)
+    deleteBgp(&suite.Provider)
 }
 
 func TestGnmiServiceTestSuite(t *testing.T) {

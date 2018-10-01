@@ -68,100 +68,35 @@ func ExecuteRPC(
 	input := C.RpcInput(*cstate, ydkRPC)
 	PanicOnCStateError(cstate)
 
-	if provider.GetType() == "gNMIServiceProvider" {
-		if rpcTag == "ydk:gnmi-get" {
-			var flag string = "ALL"
-			if setConfigFlag {
-				flag = "CONFIG"
-			}
-            C.DataNodeCreate(*cstate, input, C.CString("type"), C.CString(flag))
-            PanicOnCStateError(cstate)
-        }
-    } else {
-		if setConfigFlag {
-			C.DataNodeCreate(*cstate, input, C.CString("only-config"), C.CString(""))
-			PanicOnCStateError(cstate)
-		}
-    }
+	if setConfigFlag {
+		C.DataNodeCreate(*cstate, input, C.CString("only-config"), C.CString(""))
+		PanicOnCStateError(cstate)
+	}
 
-	//Parse data map
 	var dataTag string = ""
 	var value interface{} = nil
-	var collectionFilter yfilter.YFilter = yfilter.NotSet
-	var entity types.Entity
-	var entityTag string
 	for dataTag, value = range data {
 		dataValue := C.CString("")
-		switch v := value.(type){
+		switch v := value.(type) {
 		case string:
 			dataValue = C.CString(value.(string))
-			C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
-			PanicOnCStateError(cstate)
-		case yfilter.YFilter:
-		    collectionFilter = value.(yfilter.YFilter)
 		default:
 			_ = v
-			entity = value.(types.Entity)
-			entityTag = dataTag
+			dataValue = GetDataPayload(state, value.(types.Entity), rootSchema, provider)
+			defer C.free(unsafe.Pointer(dataValue))
+		}
+		if !(dataTag == "filter" && len(C.GoString(dataValue)) == 0) {
+			C.DataNodeCreate(*cstate, input, C.CString(dataTag), dataValue)
 		}
 	}
 
-	// Build RPC
-	if provider.GetType() != "gNMIServiceProvider" {
-		if len(entityTag) != 0 {
-			cpayload := getDataPayload(state, entity, rootSchema, provider)
-			defer C.free(unsafe.Pointer(cpayload))
-			if !(entityTag == "filter" && len(C.GoString(cpayload)) == 0) {
-				C.DataNodeCreate(*cstate, input, C.CString(entityTag), cpayload)
-				PanicOnCStateError(cstate)
-			}
-		}
-	} else {
-		config := types.EntityToCollection(entity)
-		for _, ent := range config.Entities() {
-			entityData := ent.GetEntityData()
-			if entityData == nil {
-				continue
-			}
-			segmentPath := entityData.SegmentPath
-			entityFilter := collectionFilter
-			if entityData.YFilter != yfilter.NotSet {
-				entityFilter = entityData.YFilter
-			}
-			//fmt.Printf("entityFilter: %v\n", entityFilter)
-			switch entityFilter {
-				case yfilter.Replace:
-					entityTag = "replace[alias='" + segmentPath + "']/entity"
-				case yfilter.Update:
-					entityTag = "update[alias='" + segmentPath + "']/entity"
-				case yfilter.Delete:
-					entityTag = "delete[alias='" + segmentPath + "']/entity"
-				default:
-					entityTag = "request[alias='" + segmentPath + "']/entity"
-			}
-			if entityData.YFilter != yfilter.NotSet {
-				// Remove setting of the filter before payload is calculated
-				s := reflect.ValueOf(ent).Elem()
-				v := s.FieldByName("YFilter")
-				if v.IsValid() {
-					v.Set(reflect.ValueOf(yfilter.NotSet))
-				}
-			}
-			cpayload := getDataPayload(state, ent, rootSchema, provider)
-			defer C.free(unsafe.Pointer(cpayload))
-			C.DataNodeCreate(*cstate, input, C.CString(entityTag), cpayload)
-			PanicOnCStateError(cstate)
-		}
-	}
-
-	// Send RPC and receive results
 	dataNode := types.DataNode{C.RpcExecute(*cstate, ydkRPC, realProvider)}
 	PanicOnCStateError(cstate)
 
 	return dataNode
 }
 
-func getDataPayload(
+func GetDataPayload(
 	state *errors.State,
 	entity types.Entity,
 	rootSchema C.RootSchemaNode,
@@ -331,7 +266,7 @@ func getTopEntityFromFilter(filter types.Entity) types.Entity {
 // Returns the top entity (types.Entity) from readDataNode.
 func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity {
 
-    ec := types.NewEntityCollection()
+	ec := types.NewEntityCollection()
 
 	if readDataNode.Private == nil {
 		ydk.YLogError("path.ReadDatanode: The readDataNode is nil; returning empty EntityCollection")
@@ -941,9 +876,9 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 	cchildren := C.DataNodeGetChildren(node)
 	children := (*[1 << 30]C.DataNode)(
 		unsafe.Pointer(cchildren.datanodes))[:cchildren.count:cchildren.count]
-    nodeName := C.GoString(C.DataNodeGetArgument(node))
-    ydk.YLogDebug(fmt.Sprintf("Got %d datanode children for %v", cchildren.count, nodeName))
-    moduleName := C.GoString(C.DataNodeGetModuleName(node))
+	nodeName := C.GoString(C.DataNodeGetArgument(node))
+	ydk.YLogDebug(fmt.Sprintf("Got %d datanode children for %v", cchildren.count, nodeName))
+	moduleName := C.GoString(C.DataNodeGetModuleName(node))
 
 	for _, childDataNode := range children {
 		childName := C.GoString(C.DataNodeGetArgument(childDataNode))

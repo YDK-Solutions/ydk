@@ -46,6 +46,11 @@ public:
 
     virtual const std::string get_provider_type() const = 0;
 
+    virtual std::shared_ptr<Entity> execute_operation( const std::string & operation,
+    		Entity & entity, std::map<std::string,std::string> params) = 0;
+    virtual std::vector<std::shared_ptr<Entity>> execute_operation( const std::string & operation,
+    		std::vector<Entity*> entity_list, std::map<std::string,std::string> params) = 0;
+
 };
 
 } //namespace ydk

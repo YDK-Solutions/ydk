@@ -15,8 +15,7 @@
 # ------------------------------------------------------------------
 
 from .gnmi_service import gNMIService
-from .gnmi_crud_service import gNMICRUDService
 from ydk_gnmi_.services import gNMISubscription
 
 
-__all__ = [ "gNMIService", "gNMICRUDService", "gNMISubscription" ]
+__all__ = [ "gNMIService", "gNMISubscription" ]

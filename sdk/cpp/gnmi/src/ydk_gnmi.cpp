@@ -105,6 +105,8 @@ static RootSchemaNodeWrapper* wrap(ydk::path::RootSchemaNode * node)
     return (new RootSchemaNodeWrapper( shared_ptr<ydk::path::RootSchemaNode> (node) ));
 }
 
+typedef vector<gnmi::Path*> GnmiPathVector;
+
 /*************************************
  *  Main part
  ************************************/
@@ -158,6 +160,23 @@ GnmiSession GnmiServiceProviderGetSession(YDKStatePtr state, ServiceProvider pro
     	ydk::ServiceProvider * real_provider = static_cast<ydk::ServiceProvider*>(provider);
         ydk::path::Session& session = const_cast<ydk::path::Session&>(real_provider->get_session());
         return static_cast<void*>(&session);
+    }
+    catch(...) {
+        YDKState* real_state = static_cast<YDKState*>(state);
+        handle_error(real_state);
+        return NULL;
+    }
+}
+
+DataNode GnmiServiceGetFromPath(YDKStatePtr state, ServiceProvider provider, GnmiPathList path_list, const char* operation)
+{
+    try {
+    	ydk::gNMIServiceProvider * real_provider = static_cast<ydk::gNMIServiceProvider*>(provider);
+    	auto real_list = static_cast<GnmiPathVector*> (path_list);
+    	ydk::gNMIService gs{};
+    	string oper = operation;
+    	shared_ptr<ydk::path::DataNode> real_datanode = gs.get_from_path(*real_provider, *real_list, oper);
+        return static_cast<void*>(wrap(real_datanode));
     }
     catch(...) {
         YDKState* real_state = static_cast<YDKState*>(state);
@@ -296,3 +315,63 @@ boolean GnmiSessionSubscribeInProgress(YDKStatePtr state, GnmiSession session)
         return false;
     }
 }
+
+GnmiPath GnmiPathInit()
+{
+    gnmi::Path* path = new gnmi::Path();
+    return static_cast<void*>(path);
+}
+
+void GnmiPathFree(GnmiPath path)
+{
+    gnmi::Path* real_path = static_cast<gnmi::Path*> (path);
+    free(real_path);
+}
+
+void GnmiPathAddOrigin(GnmiPath path, const char* origin)
+{
+    gnmi::Path* real_path = static_cast<gnmi::Path*> (path);
+    real_path->set_origin(origin);
+}
+
+GnmiPathElem GnmiPathAddElem(GnmiPath path, const char* name)
+{
+    gnmi::Path* real_path = static_cast<gnmi::Path*> (path);
+    auto path_elem = real_path->add_elem();
+    path_elem->set_name(name);
+    return static_cast<void*>(path_elem);
+}
+
+void GnmiPathAddElemKey(GnmiPathElem elem, const char* key_name, const char* key_value)
+{
+    gnmi::PathElem* path_elem = static_cast<gnmi::PathElem*> (elem);
+    auto key_map = path_elem->mutable_key();
+    (*key_map)[key_name] = key_value;
+}
+
+const char* GnmiPathToString(GnmiPath path)
+{
+	gnmi::Path* real_path = static_cast<gnmi::Path*> (path);
+	auto path_str = real_path->DebugString();
+	return path_str.c_str();
+}
+
+GnmiPathList GnmiPathListInit() {
+	GnmiPathVector* path_list = new GnmiPathVector();
+	return static_cast<void*>(path_list);
+}
+void GnmiPathListAdd(GnmiPathList list, GnmiPath path)
+{
+    auto real_list = static_cast<GnmiPathVector*> (list);
+    gnmi::Path* real_path = static_cast<gnmi::Path*> (path);
+    real_list->push_back(real_path);
+}
+void GnmiPathListFree(GnmiPathList list)
+{
+    auto real_list = static_cast<GnmiPathVector*> (list);
+    for (gnmi::Path* path : *real_list)
+        free(path);
+    real_list->clear();
+    free(real_list);
+}
+

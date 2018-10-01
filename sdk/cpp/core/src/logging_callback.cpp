@@ -45,16 +45,16 @@ void libyang_log_callback(LY_LOG_LEVEL level, const char *msg, const char *path)
                     || error_message.str().find("Unexpected character")!= std::string::npos
                     || error_message.str().find("does not satisfy the constraint")!= std::string::npos)
             {
-                YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
+                YLOG_ERROR("Data is invalid according to the yang model. Libyang error: {}", error_message.str());
                 throw(YModelError{});
             }
-            YLOG_ERROR("Data is invalid according to the yang model. Error details: {}", error_message.str());
+            YLOG_ERROR("Data is invalid according to the yang model. Libyang error: {}", error_message.str());
             break;
         case LY_LLSILENT:
         case LY_LLWRN:
         case LY_LLVRB:
         case LY_LLDBG:
-            YLOG_DEBUG("Debug: {}", error_message.str());
+            YLOG_DEBUG("[libyang] {}", error_message.str());
             break;
     }
 }

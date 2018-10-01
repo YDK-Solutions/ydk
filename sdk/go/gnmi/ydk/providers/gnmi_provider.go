@@ -19,10 +19,12 @@
 package providers
 
 import (
-//	"fmt"
-//	"github.com/CiscoDevNet/ydk-go/ydk"
+	"fmt"
+	"strings"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/errors"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 )
 
@@ -70,10 +72,43 @@ func (provider *GnmiServiceProvider) GetState() *errors.State {
 }
 
 func (provider *GnmiServiceProvider) GetType() string {
-    return "gNMIServiceProvider"
+	return "gNMIServiceProvider"
 }
 
 func (provider *GnmiServiceProvider) GetSession() *path.GnmiSession {
 	session := path.GnmiServiceProviderGetSession(provider.Private)
 	return session
+}
+
+func (provider *GnmiServiceProvider) ExecuteRpc(operation string, entity types.Entity, params map[string]string) types.DataNode {
+	var rpcTag string
+	options := make(map[string]string)
+	if operation == "read" {
+		rpcTag = "ydk:gnmi-get"
+                mode, ok := params["mode"]
+		if !ok {
+			ydk.YLogError("GnmiServiceProvider.ExecuteRpc: The 'mode' for 'read' opearation is not set")
+			panic(1)
+		}
+		mode = strings.ToUpper(mode)
+		options["mode"] = mode
+		return path.GnmiServiceGet(provider.Private, entity, mode) 
+	}
+	if operation == "create" || operation == "update" || operation == "delete" {
+		rpcTag = "ydk:gnmi-set"
+		filter := yfilter.Update
+		if operation == "delete" {
+			filter = yfilter.Delete
+		}
+		if types.IsEntityCollection(entity) {
+			config := types.EntityToCollection(entity)
+			config.SetFilter(filter)
+		} else {
+			types.SetEntityFilter(entity, filter)
+		}
+	} else {
+		ydk.YLogError(fmt.Sprintf("GnmiServiceProvider.ExecuteRpc: Invalid operation '{}' requested", operation))
+		panic(1)
+	}
+	return path.ExecuteGnmiRPC(provider, rpcTag, entity, options)
 }

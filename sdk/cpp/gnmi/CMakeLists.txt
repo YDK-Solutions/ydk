@@ -133,7 +133,6 @@ set(libydk_gnmi_src
     src/gnmi_client.cpp
     src/gnmi_provider.cpp
     src/gnmi_service.cpp
-    src/gnmi_crud_service.cpp
     src/gnmi_util.cpp
     src/ydk_gnmi.cpp
     )
@@ -142,7 +141,6 @@ set(libydk_gnmi_install_headers
     src/gnmi_provider.hpp
     src/gnmi_client.hpp
     src/gnmi_service.hpp
-    src/gnmi_crud_service.hpp
     src/gnmi_util.hpp
     src/gnmi_path_api.hpp
     src/ydk_gnmi.h

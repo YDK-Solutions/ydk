@@ -169,7 +169,7 @@ class gNMIImpl final : public gNMI::Service
             else if (last_elem == "interface")
             	response_payload = "[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]";
             else if (last_elem == "config")
-                response_payload = "{\"name\":\"Loopback10\",\"description\":\"Test\"}}";
+                response_payload = "{\"name\":\"Loopback10\",\"description\":\"Test\"}";
             else if (last_elem == "description")
                 response_payload = "\"Test\"";
         }

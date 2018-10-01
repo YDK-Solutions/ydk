@@ -35,6 +35,9 @@ extern "C" {
 
 typedef void* GnmiSession;
 typedef void* GnmiServiceProvider;
+typedef void* GnmiPath;
+typedef void* GnmiPathElem;
+typedef void* GnmiPathList;
 
 ServiceProvider GnmiServiceProviderInit(YDKStatePtr state, Repository repo, const char * address, int port,
 		                                const char * username, const char * password,
@@ -44,6 +47,7 @@ RootSchemaWrapper GnmiServiceProviderGetRootSchemaNode(YDKStatePtr, ServiceProvi
 GnmiSession GnmiServiceProviderGetSession(YDKStatePtr, ServiceProvider);
 
 const char * GnmiServiceGetCapabilities(YDKStatePtr state, ServiceProvider);
+DataNode     GnmiServiceGetFromPath(YDKStatePtr state, ServiceProvider, GnmiPathList path, const char* operation);
 
 GnmiSession GnmiSessionInit(YDKStatePtr state, Repository repo, const char * address, int port,
                             const char * username, const char * password,
@@ -55,6 +59,17 @@ void GnmiSessionExecuteSubscribeRpc(YDKStatePtr state, GnmiSession session, Rpc 
 
 boolean GnmiSessionSubscribeInProgress(YDKStatePtr state, GnmiSession session);
 const char * GetLastSubscribeResponse(YDKStatePtr state, GnmiSession session, const char * previous_subscribe_response);
+
+GnmiPath GnmiPathInit();
+void GnmiPathFree(GnmiPath);
+void GnmiPathAddOrigin(GnmiPath path, const char* origin);
+GnmiPathElem GnmiPathAddElem(GnmiPath path, const char* name);
+void GnmiPathAddElemKey(GnmiPathElem elem, const char* key_name, const char* key_value);
+const char* GnmiPathToString(GnmiPath path);
+
+GnmiPathList GnmiPathListInit();
+void GnmiPathListAdd(GnmiPathList list, GnmiPath path);
+void GnmiPathListFree(GnmiPathList list);
 
 #ifdef __cplusplus
 }

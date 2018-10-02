@@ -23,7 +23,7 @@ RED="\033[0;31m"
 NOCOLOR="\033[0m"
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux.sh | $1${NOCOLOR}"
+    echo -e "${RED}*** $(date) *** dependencies_ubuntu_basic.sh | $1${NOCOLOR}"
 }
 
 function install_dependencies {

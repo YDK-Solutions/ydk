@@ -121,7 +121,7 @@ class SanityGnmiCrud(unittest.TestCase):
 
 if __name__ == '__main__':
     import sys
-    enable_logging(logging.DEBUG)
+    enable_logging(logging.ERROR)
     suite = unittest.TestLoader().loadTestsFromTestCase(SanityGnmiCrud)
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)

@@ -324,9 +324,10 @@ PYBIND11_MODULE(ydk_, ydk)
                      int port,
                      const string& protocol,
                      bool on_demand,
+                     bool common_cache,
                      int timeout)
                      {
-                         return new ydk::path::NetconfSession(address, username, password, port, protocol, on_demand, timeout);
+                         return new ydk::path::NetconfSession(address, username, password, port, protocol, on_demand, common_cache, timeout);
                      }
                  ),
                 arg("address"),
@@ -335,6 +336,7 @@ PYBIND11_MODULE(ydk_, ydk)
                 arg("port")=830,
                 arg("protocol")=string("ssh"),
                 arg("on_demand")=true,
+                arg("common_cache")=false,
                 arg("timeout")=-1)
 
         .def(init([](ydk::path::Repository& repo,

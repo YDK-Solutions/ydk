@@ -4,28 +4,24 @@ language: python
 
 matrix:
   include:
-#    - os: linux
-#      dist: trusty
-#      group: edge
-    - os: linux
-      dist: trusty
-      group: edge
-      env: GNMI=true
-#    - os: osx
-#      osx_image: xcode7.3
-#      language: generic
-#      go: 1.9
-#    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7
-#    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7 GNMI=true
-#    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6
-#    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6 GNMI=true
-#    - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7
-#    - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7 GNMI=true
-#    - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5
-#    - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5 GNMI=true
-#    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos6.9 #TODO needs more work
-#  allow_failures:
-#    - os: osx
+   - os: linux
+     dist: trusty
+     group: edge
+   - os: osx
+     osx_image: xcode7.3
+     language: generic
+     go: 1.9
+   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7
+   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7 GNMI=true
+   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6
+   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6 GNMI=true
+   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7
+   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7 GNMI=true
+   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5
+   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5 GNMI=true
+#   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos6.9 #TODO needs more work
+ allow_failures:
+   - os: osx
 
 services:
   - docker
@@ -37,8 +33,7 @@ before_install:
     - if [[ "$DOCKER" == "true" ]]; then docker pull ${OS_TYPE}:${OS_VERSION}                                       ; fi
 
 script:
-    - if [[ "$DOCKER" != "true" ]] && [[ "$GNMI" != "true" ]]; then ./test/tests.sh ; fi
-    - if [[ "$DOCKER" != "true" ]] && [[ "$GNMI" == "true" ]]; then ./test/dependencies_linux_gnmi.sh && ./test/gnmi_tests.sh ; fi
+    - if [[ "$DOCKER" != "true" ]]; then ./test/tests.sh ; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" != "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/tests.sh -p ${PYTHON_VERSION} && ./test/test_package_centos.sh -p ${PYTHON_VERSION}" ; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" == "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/dependencies_linux_gnmi.sh && ./test/gnmi_tests.sh -p ${PYTHON_VERSION}"; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "ubuntu" ]] && [[ "$GNMI" != "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_ubuntu.sh && ./test/tests.sh -p ${PYTHON_VERSION} && ./test/test_package_ubuntu.sh -p ${PYTHON_VERSION}" ; fi

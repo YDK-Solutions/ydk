@@ -29,13 +29,15 @@ function print_msg {
 }
 
 function install_protobuf {
-    print_msg "Installing protobuf and protoc"
-
+    print_msg "Downloading protobuf and protoc"
     wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
     unzip protobuf-cpp-3.5.0.zip > /dev/null
     cd protobuf-3.5.0
+    print_msg "Configuring protobuf and protoc"
     ./configure > /dev/null
+    print_msg "Compiling protobuf and protoc"
     make > /dev/null
+    print_msg "Installing protobuf and protoc"
     sudo make install
     sudo ldconfig
     cd -

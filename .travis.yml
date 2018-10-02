@@ -4,9 +4,9 @@ language: python
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      group: edge
+#    - os: linux
+#      dist: trusty
+#      group: edge
     - os: linux
       dist: trusty
       group: edge

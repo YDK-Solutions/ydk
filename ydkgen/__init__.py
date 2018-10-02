@@ -392,6 +392,7 @@ def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_f
         version (str): Package version for generated APIs.
         core_version (str): YDK core library version for generated APIs.
     """
+    version = ''.join(version.split('-')[:-1])
     cmake_file = os.path.join(gen_api_root, 'CMakeLists.txt')
 
     source_files = ['ydk/models/{}/'.format(bundle_name) + s for s in source_files]

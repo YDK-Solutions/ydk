@@ -31,8 +31,6 @@ services:
   - docker
 
 before_install:
-    - echo "The DOCKER set to: $DOCKER"
-    - echo "The Travis OS: $TRAVIS_OS_NAME"
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                            ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./test/dependencies_osx.sh             ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./test/dependencies_ubuntu.sh        ; fi

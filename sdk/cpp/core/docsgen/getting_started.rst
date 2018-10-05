@@ -75,8 +75,44 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
   $ brew install curl libssh pcre xml2 cmake
   $ xcode-select --install
 
+gNMI Requirements
+~~~~~~~~~~~~~~~~~
+
+In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+**Install protobuf and protoc**
+
+.. code-block:: sh
+
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
+    unzip protobuf-cpp-3.3.0.zip
+    cd protobuf-3.3.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
+    cd -
+
+**Install gRPC**
+
+.. code-block:: sh
+
+    git clone -b v1.4.5 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make
+    sudo make install
+    cd -
+
+**Note:** There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
+
 Building YDK
 ~~~~~~~~~~~~
+
+**Installing YDK core library**
+
 YDK uses ``cmake`` as the build system of choice. To install the ``core`` package, execute:
 
 .. code-block:: sh
@@ -85,6 +121,8 @@ YDK uses ``cmake`` as the build system of choice. To install the ``core`` packag
   $ core$ mkdir build && cd build
   $ build$ cmake .. && make
   $ build$ sudo make install
+
+**Installing model bundles**
 
 Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. To install the ``ietf`` bundle, execute:
 
@@ -114,9 +152,22 @@ To install the ``cisco-ios-xr`` bundle, execute:
   $ build$ sudo make install
   $ build$ cd ../..
 
+**Instaling YDK gNMI library**
+
+Optionaly the YDK gNMI library can be installed. Prior to this installation the YDK core library must be installed (see above).
+
+.. code-block:: sh
+
+    $ cd ydk-gen/sdk/cpp/gnmi
+    gnmi$ mkdir -p build
+    gnmi$ cd build
+    build$ cmake ..
+    build$ make
+    build$ sudo make install
+
 Samples
 =======
-To get started with using the YDK API, there are sample apps available in the `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cp/tree/master/core/samples>`_. For example, to run the ``bgp_create.cpp`` sample, execute:
+To get started using the YDK API, there are sample apps available in the `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cp/tree/master/core/samples>`_. For example, to run the ``bgp_create.cpp`` sample, execute:
 
 .. code-block:: sh
 

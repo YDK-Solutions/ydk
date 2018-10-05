@@ -15,28 +15,29 @@
 ------------------------------------------------------------------*/
 #include <iostream>
 #include <memory>
-#include "ydk/path_api.hpp"
-#include "ydk/gnmi_provider.hpp"
-#include "ydk/crud_service.hpp"
-#include "ydk_openconfig/openconfig_bgp.hpp"
 #include <spdlog/spdlog.h>
+
+#include <ydk/gnmi_provider.hpp>
+#include <ydk/crud_service.hpp>
+
+//#include <ydk_openconfig/openconfig_bgp.hpp>
+#include <ydk_ydktest/openconfig_bgp.hpp>
+#include <ydk_ydktest/openconfig_bgp_types.hpp>
 
 #include "args_parser.h"
 
 using namespace ydk;
 using namespace std;
+using namespace ydktest;
 
 int main(int argc, char* argv[])
 {
 	vector<string> args = parse_args(argc, argv);
 	if(args.empty()) return 1;
 
-	string host, username, password, port, address;
-    username = args[0]; password = args[1]; host = args[2]; port = args[3];
+	string host, username, password, sport, address;
+    username = args[0]; password = args[1]; host = args[2]; sport = args[3];
 
-	address.append(host);
-    address.append(":");
-    address.append(port);
 	bool verbose=(args[4]=="--verbose");
 	if(verbose)
 	{
@@ -44,18 +45,21 @@ int main(int argc, char* argv[])
 	    logger->set_level(spdlog::level::debug);
 	}
 
-	ydk::path::Repository repo{"/usr/local/share/ydk/0.0.0.0\:50051/"};
-    gNMIServiceProvider provider{repo, address};
+    ydk::path::Repository repo{"/home/osboxes/ydk-gen/sdk/cpp/core/tests/models/"};
+    int port = stoi(sport);
+    gNMIServiceProvider provider{repo, host, port, username, password};
 	CrudService crud{};
 
-	auto bgp = make_unique<openconfig::openconfig_bgp::Bgp>();
-	try
-	{
-        bool reply = crud.delete_(provider, *bgp);
-        if(reply) cout << "Delete operation success" << endl; else cout << "Operation failed" << endl;
+	auto bgp = openconfig_bgp::Bgp();
+	try {
+        bool reply = crud.delete_(provider, bgp);
+        if (reply)
+            cout << "BGP Delete operation success" << endl;
+        else
+            cout << "BGP Delete Operation failed" << endl;
 	}
-    catch(YCPPError & e)
+    catch (YError & e)
     {
-        cerr << e<<endl;
+    	cerr << "BGP Delete operation failed. Error details: " << e.what() << endl;
     }
 }

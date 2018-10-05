@@ -1,3 +1,10 @@
+### 2018-10-03 version 0.8.1
+ 
+#### Python, C++ & Go
+  * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
+##### CRUD / Netconf / Codec / Path API improvements
+  * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+
 ### 2018-07-02 version 0.7.2
  
 #### Python, C++ & Go

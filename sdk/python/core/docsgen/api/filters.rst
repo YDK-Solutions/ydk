@@ -58,3 +58,13 @@ Filters
         When reading configuration or operational data from a network
         device and a specific node, like a leaf or a class, is desired to be read, the yfilter attribute can
         be set to ``YFilter.read`` on that node.
+
+    .. attribute:: update
+
+        The configuration data identified by the element
+        containing this attribute updates any related configuration
+        in the configuration datastore identified by the target
+        parameter.  If no such configuration data exists in the
+        configuration datastore, it is created.
+        
+        **Note.** The ``YFilter.update`` is aplicable only to :py:class:`gNMIService<ydk.gnmi.services.gNMIService>` **set** operation.

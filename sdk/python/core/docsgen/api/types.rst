@@ -487,7 +487,7 @@ The :py:class:`openconfig BGP <ydk.models.openconfig.openconfig_bgp.Bgp.Global.C
 
 Assigning invalid type results in a :py:class:`YModelError <ydk.errors.YModelError>` being thrown.
 
-.. code-block:: ssh
+.. code-block:: bash
 
     YModelError: Invalid value Hello for 'as_'. Got type: 'str'. Expected types: 'int'
 
@@ -503,7 +503,6 @@ The :py:class:`openconfig BGP <ydk.models.openconfig.openconfig_bgp.Bgp.Global.C
 
 Assigning invalid value results in a :py:class:`YModelError <ydk.errors.YModelError>` being thrown.
 
-.. code-block:: ssh
+.. code-block:: bash
 
-    YModelError:  Value "Hello" does not satisfy the constraint "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" (range, length, or pattern). Path: /openconfig-bgp:bgp/global/config/router-id
-
+    YModelError:  Value "Hello" does not satisfy the constraint "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" (range, length, or pattern). Path: /openconfig-bgp:bgp/global/config/router-id.

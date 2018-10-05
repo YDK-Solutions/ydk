@@ -23,7 +23,7 @@ void show_usage(string name)
 {
     cerr << "\nUsage:\n\t"<< name << " [http|ssh]://user:password@host[:port] [-v]" <<endl;
     cerr << "\t\tIf host is IPv6, enclose it in square brackets. E.g. [1234:1234:1234:1234::1234]"<<endl;
-    cerr << "\t\tIf port is not specified, 830 will be used with ssh (netconf) or 80 with http (restconf)"<<endl<<endl;
+    cerr << "\t\tIf port is not specified, 57400 will be used with ssh (netconf) or 80 with http (restconf)"<<endl<<endl;
 }
 
 vector<string> parse_args(int argc, char* argv[])
@@ -49,7 +49,7 @@ vector<string> parse_args(int argc, char* argv[])
         if(s!=string::npos)
         {
             s += sizeof("ssh://")-1;
-            port = "830";
+            port = "57400";
         }
         else
         {

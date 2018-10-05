@@ -100,7 +100,7 @@ Both Python 2 and 3 are supported.  At least Python2.7 or Python 3.4 must be ins
 gNMI Requirements
 ===================
 
-In order to have YDK support for gNMI Service, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
 
 Install protobuf
 
@@ -128,7 +128,7 @@ Install gRPC
     sudo make install
     cd -
 
-**Note:** There is an open issue with gRPC on Centos/Fedora which requires an extra step before running any YDK gNMI application. See `this issue on GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
+**Note:** There is an open issue with gRPC on Centos/Fedora which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
 
 .. code-block:: sh
 
@@ -159,6 +159,7 @@ Quick Install for other platforms (Non-Centos)
 You can install the latest model packages from the DevHub artifactory and Python package index.  Note that, in some systems, you need to install the new package as root.  You get a fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) (depending on whether you're developing for an IOS XR or IOS XE platform) which automatically installs all other YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
+
     $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
@@ -181,7 +182,7 @@ Installing from Source
 ======================
 
 Installing core package
-----------------------
+-----------------------
 
 If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``YDK`` core package and then the model bundles that you plan to use.  The Python core package is dependent on C++ core library `libydk`, which must be installed prior to Python package installation:
 

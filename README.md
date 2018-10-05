@@ -25,8 +25,8 @@ YANG Development Kit (Generator)
 - [Usage](#usage)
   - [First step: choose your bundle profile](#first-step-choose-your-bundle-profile)
     - [Details](#details)
-  - [Second step: Generate & install the core](#second-step-generate--install-the-core)
-  - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
+  - [Second step. Generate and install the core](#second-step-generate-and-install-the-core)
+  - [Third step. Generate and install your bundle](#third-step-generate-and-install-model-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
   - [Documentation](#documentation)
 - [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
@@ -74,7 +74,7 @@ docker run -it ydkdev/ydk-gen
 ```
 
 # System requirements
-Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate--install-the-core) after installing the below requirements:
+Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
 ## Linux
 Ubuntu (Debian-based):
@@ -82,8 +82,8 @@ Ubuntu (Debian-based):
 **Install prebuilt libydk binary:**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.2/libydk_0.7.2-1_amd64.deb
-   $ sudo gdebi libydk_0.7.2-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/libydk_0.8.1-1_amd64.deb
+   $ sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 **To build from source:**
 ```
@@ -95,7 +95,7 @@ Centos (Fedora-based):
 ```
    $ sudo yum install epel-release
    $ sudo yum install libssh-devel gcc-c++
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.2/libydk-0.7.2-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -125,8 +125,8 @@ You can download the latest python package from [here](https://www.python.org/do
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.2/libydk-0.7.2-Darwin.pkg
-   $ sudo installer -pkg libydk-0.7.2-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 ```
 **To build from source:**
 ```
@@ -250,7 +250,7 @@ Only directory examples are shown below.
     },
 ```
 
-## Second step: Generate & install the core
+## Second step. Generate and install the core
 
 On executing `pip install ydk-cisco-ios-xr`, you will be able to install the latest released PyPi version of all the `ydk` packages.
 
@@ -283,8 +283,9 @@ For Go:
 $ ./generate.py --go --core
 $ cp -r gen-api/go/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
 ```
-## Third step: Generate & install your bundle
-Then, generate your bundle using a bundle profile and install it:
+## Third step. Generate and install model bundle
+
+Generate model bundle using a bundle profile and install it.
 
 For python:
 ```
@@ -446,4 +447,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.7.2 (alpha). The version of the latest YDK-Gen master branch is 0.7.3-dev. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.1 (alpha). The version of the latest YDK-Gen master branch is 0.7.3-dev. YDK-Gen is licensed under the Apache 2.0 License.

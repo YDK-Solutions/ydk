@@ -1,9 +1,5 @@
-FAQ
-====
-
-
-I have a question. Please help me!
-----------------------------------
+Questions and Answers
+=====================
 
 Please join the `YDK community <https://communities.cisco.com/community/developer/ydk>`_ to get answers to any YDK-related questions you may have.
 

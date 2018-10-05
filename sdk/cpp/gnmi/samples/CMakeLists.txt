@@ -6,7 +6,12 @@ project(samples)
 set(SAMPLE_DESCRIPTION "BGP sample application using YANG Development Kit Library, the library for YDK API.")
 
 
-set(samples     bgp_gnmi_create)
+set(samples
+     bgp_gnmi_create
+     bgp_gnmi_delete
+     bgp_gnmi_read
+     bgp_gnmi_service
+     )
 
 # set default build type if not specified by user
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -15,10 +20,12 @@ set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -fprofile-arcs")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
 # Find dependent libraries
-find_library(ydk_openconfig_location ydk_openconfig)
-find_library(ydk_cisco_ios_xr_location ydk_cisco_ios_xr)
-find_library(ydk_cisco_ios_xe_location ydk_cisco_ios_xe)
+#find_library(ydk_openconfig_location ydk_openconfig)
+#find_library(ydk_cisco_ios_xr_location ydk_cisco_ios_xr)
+#find_library(ydk_cisco_ios_xe_location ydk_cisco_ios_xe)
+find_library(ydk_gnmi_location ydk_gnmi)
 find_library(ydk_location ydk)
+find_library(ydk_ydktest_location ydk_ydktest)
 find_library(xml2_location xml2)
 find_library(curl_location curl)
 find_library(ssh_location ssh)
@@ -41,24 +48,22 @@ foreach(sample IN LISTS samples)
     add_executable(${sample} ${sample}.cpp args_parser.cpp)
 
     target_link_libraries(${sample}
-            ${ydk_location} 
-            ${ydk_openconfig_location}
-            ${ydk_cisco_ios_xr_location}
-            ${ydk_cisco_ios_xe_location}
-            ${xml2_location}
-            ${curl_location}
-            ${ssh_location}
-            ${ssh_threads_location}
-            ${pcre_location}
-            ${xslt_location}
-            ${pthread_location}
-            ${dl_location}
-            ${GRPC_GRPC++_LIBRARY}
-	        -rdynamic
-            ${PROTOBUF_LIBRARY}
+    ${ydk_ydktest_location}
+    ${ydk_gnmi_location}
+    ${ydk_location}
+    ${xml2_location}
+    ${curl_location}
+    ${ssh_location}
+    ${ssh_threads_location}
+    ${pcre_location}
+    ${xslt_location}
+    ${pthread_location}
+    ${dl_location}
+    -rdynamic
+    ${GRPC_GRPC++_LIBRARY}
+    ${PROTOBUF_LIBRARY}
             )
 
     set_property(TARGET ${sample} PROPERTY CXX_STANDARD 11)
     set_property(TARGET ${sample} PROPERTY CXX_STANDARD_REQUIRED ON)
 endforeach(sample)
-

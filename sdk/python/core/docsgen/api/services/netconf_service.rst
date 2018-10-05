@@ -1,4 +1,4 @@
-NETCONF service
+NETCONF Service
 ===============
 
 YDK NetconfService class provides API for various operations on device configuration. 

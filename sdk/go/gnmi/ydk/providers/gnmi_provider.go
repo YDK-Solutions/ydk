@@ -71,10 +71,6 @@ func (provider *GnmiServiceProvider) GetState() *errors.State {
 	return &provider.State
 }
 
-func (provider *GnmiServiceProvider) GetType() string {
-	return "gNMIServiceProvider"
-}
-
 func (provider *GnmiServiceProvider) GetSession() *path.GnmiSession {
 	session := path.GnmiServiceProviderGetSession(provider.Private)
 	return session

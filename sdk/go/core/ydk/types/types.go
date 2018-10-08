@@ -632,7 +632,6 @@ type ServiceProvider interface {
 	Connect()
 	Disconnect()
 	GetState() *errors.State
-	GetType() string
 	ExecuteRpc(string, Entity, map[string]string) DataNode
 }
 

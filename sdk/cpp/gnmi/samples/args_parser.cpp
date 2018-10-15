@@ -21,59 +21,57 @@
 using namespace std;
 void show_usage(string name)
 {
-    cerr << "\nUsage:\n\t"<< name << " [http|ssh]://user:password@host[:port] [-v]" <<endl;
-    cerr << "\t\tIf host is IPv6, enclose it in square brackets. E.g. [1234:1234:1234:1234::1234]"<<endl;
-    cerr << "\t\tIf port is not specified, 57400 will be used with ssh (netconf) or 80 with http (restconf)"<<endl<<endl;
+    cerr << "\nUsage:\n\t"<< name << " [http|ssh]://user:password@host[:port] [-v] [-m mode]" << endl;
+    cerr << "\t\tIf host is IPv6, enclose its address in square brackets. Ex.: [1234:1234:1234:1234::1234]"<<endl;
+    cerr << "\t\tIf port is not specified, 57400 will be used to connect to gNMI server"<<endl;
+    cerr << "\t\tOptions:"<<endl;
+    cerr << "\t\t\t-v       output debugging information"<<endl;
+    cerr << "\t\t\t-m mode  subscribe mode, one of 'ONCE', 'POLL', or 'STREAM', default - 'ONCE'"<<endl;
+    cerr << endl;
 }
 
 vector<string> parse_args(int argc, char* argv[])
 {
     vector<string> ret;
-    string host, username, password, port;
+    string host, username, password, port, verb, mode;
     string arg;
 
-    if (argc < 2)
+    if (argc < 2 || (arg = argv[1]) == "-h" || arg == "--help")
     {
-        goto fail;
-    }
-    if ((arg == "-h") || (arg == "--help"))
-    {
-        goto fail;
+        show_usage(argv[0]);
+        return ret;
     }
 
-    arg = argv[1];
-
-    try
-    {
-        size_t s = arg.find("ssh://");
-        if(s!=string::npos)
-        {
+    for (int i=1; i<argc; i++) {
+      try {
+        arg = argv[i];
+        if (arg.find("://") != string::npos) {
+          size_t s = arg.find("ssh://");
+          if (s != string::npos) {
             s += sizeof("ssh://")-1;
             port = "57400";
-        }
-        else
-        {
+          }
+          else {
             s = arg.find("http://");
-            if(s!=string::npos)
-            {
+            if (s != string::npos) {
                 s += sizeof("http://")-1;
                 port = "80";
             }
-        }
+          }
 
-        size_t col1 = arg.find(":",s);
-        size_t amp = arg.find("@")-1;
-        if(col1 == string::npos || amp == string::npos)
-        {
-            goto fail;
-        }
+          size_t col1 = arg.find(":",s);
+          size_t amp = arg.find("@")-1;
+          if(col1 == string::npos || amp == string::npos)
+          {
+              break;
+          }
 
-        username = arg.substr(s,col1-s);
-        password = arg.substr(col1+1, amp-col1);
+          username = arg.substr(s,col1-s);
+          password = arg.substr(col1+1, amp-col1);
 
-        size_t open_bracket = arg.find("[");
-        if(open_bracket != string::npos)
-        {
+          size_t open_bracket = arg.find("[");
+          if(open_bracket != string::npos)
+          {
             size_t close_bracket = arg.find("]");
             if(close_bracket!=string::npos)
             {
@@ -84,53 +82,46 @@ vector<string> parse_args(int argc, char* argv[])
                     port = arg.substr(col2+1);
                 }
             }
-        }
-        else
-        {
+          }
+          else {
             size_t col2 = arg.find(":",amp);
-            if(col2 != string::npos)
-            {
+            if(col2 != string::npos) {
                 host = arg.substr(amp+2, col2-amp-2);
                 port = arg.substr(col2+1);
             }
-            else
-            {
+            else {
                 host = arg.substr(amp+2, arg.size()-amp-2);
             }
+          }
         }
+        else if (arg == "-v") {
+        	verb = "--verbose";
+        }
+        else if (arg == "-m" && i < argc-1) {
+            mode = argv[++i];
+        }
+        else {
+        	cerr << "Unexpected argument '" << arg << "' in the command line" << endl;
+        }
+      }
+      catch(...) {
+          show_usage(argv[0]);
+          username = "";
+      }
+    }
 
+    if (username.length() > 0) {
         ret.push_back(username);
         ret.push_back(password);
         ret.push_back(host);
         ret.push_back(port);
-
-        bool verb = false;
-        if(argc == 3)
-        {
-            string v = argv[2];
-            if(v=="-v")
-                verb = true;
-        }
-
-        if(verb)
-        {
-            ret.push_back("--verbose");
-        }
-        else
-        {
-            ret.push_back("--silent");
-        }
+        ret.push_back(verb);
+        ret.push_back(mode);
     }
-    catch(...)
-    {
-        goto fail;
+    else {
+    	show_usage(argv[0]);
     }
+
     return ret;
-
-    fail:
-    {
-        show_usage(argv[0]);
-        return {};
-    }
 }
 

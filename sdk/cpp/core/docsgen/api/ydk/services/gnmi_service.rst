@@ -65,7 +65,7 @@ gNMI Service
         :return: The requested data encapsulated into **std::vector<std::shared_ptr<Entity>>** instance; if request fails - empty **std::vector**.
         :raises: YServiceError if an error has occurred.
 
-    .. cpp:function:: subscribe(gNMIServiceProvider & provider, gNMISubscription & subscription, uint qos, std::string & mode, callback)
+    .. cpp:function:: subscribe(gNMIServiceProvider & provider, gNMISubscription & subscription, uint qos, std::string & mode, std::string & encoding, callback)
 
         Subscribe to telemetry updates.
 
@@ -73,10 +73,11 @@ gNMI Service
         :param subscription: (:cpp:class:`gNMISubscription<ydk::gNMISubscription>`) An instance of structure, which represent the subscription.
         :param qos: (``uint``) QOS indicating the packet marking.
         :param mode: (``std::string``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
+        :param encoding: (``std::string``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
         :param callback: (``void*(const char*)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf ``SubscribeResponse`` message.
         :raises: YServiceError if an error has occurred.
 
-    .. cpp:function:: subscribe(gNMIServiceProvider & provider, std::vector<ydk::gNMISubscription\*> & subscription, uint qos, std::string & mode, callback)
+    .. cpp:function:: subscribe(gNMIServiceProvider & provider, std::vector<ydk::gNMISubscription\*> & subscription, uint qos, std::string & mode, std::string & encoding, callback)
 
         Subscribe to telemetry updates.
 
@@ -84,6 +85,7 @@ gNMI Service
         :param subscription: Set of (:cpp:class:`gNMISubscription<ydk::gNMISubscription>`) instances incapsulated into ``std::vector``, which represent the subscription.
         :param qos: (``uint``) QOS indicating the packet marking.
         :param mode: (``std::string``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
+        :param encoding: (``std::string``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
         :param callback: (``void*(const char*)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf ``SubscribeResponse`` message.
         :raises: YServiceError if an error has occurred.
 

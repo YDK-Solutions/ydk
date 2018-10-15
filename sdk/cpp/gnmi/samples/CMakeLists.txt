@@ -11,6 +11,7 @@ set(samples
      bgp_gnmi_delete
      bgp_gnmi_read
      bgp_gnmi_service
+     bgp_gnmi_subscribe
      )
 
 # set default build type if not specified by user

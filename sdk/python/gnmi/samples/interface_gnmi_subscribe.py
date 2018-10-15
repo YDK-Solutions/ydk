@@ -16,38 +16,72 @@
 #
 
 from argparse import ArgumentParser
-from urllib.parse import urlparse
+import sys
+if sys.version_info > (3,):
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
 from multiprocessing import Pool
 import logging
 
-from ydk.providers import gNMIServiceProvider
 from ydk.path import Repository
-from ydk.services import gNMIService
-from ydk.models.ydktest import openconfig_interfaces
 from ydk.filters import YFilter
+
+from ydk.gnmi.providers import gNMIServiceProvider
+from ydk.gnmi.services import gNMIService, gNMISubscription
+
+from ydk.models.ydktest import openconfig_interfaces
 
 
 def print_telemetry_data(s):
     print(s)
 
+def get_local_repo_dir():
+    import os
+    path = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(path, '../../../cpp/core/tests/models')
+    return path
+
+def build_int_config(provider):
+    ifc = openconfig_interfaces.Interfaces()
+    lo10 = ifc.Interface()
+    lo10.name = 'Loopback10'
+    lo10.config.name = 'Loopback10'
+    lo10.config.description = 'Test'
+    ifc.interface.append(lo10)
+    ifc.yfilter = YFilter.replace
+
+    gs = gNMIService()
+    gs.set(provider, ifc)
 
 def subscribe(args):
     func = args[0]
     device = args[1]
     mode = args[2]
+
     gnmi = gNMIService()
-    repository = Repository('/Users/abhirame/.ydk/pavarotti:830')
+    repository = Repository(get_local_repo_dir())
     provider = gNMIServiceProvider(repo=repository,
                                       address=device.hostname,
+                                      port=device.port,
                                       username=device.username,
                                       password=device.password)
 
+    build_int_config(provider)
+
     inf = openconfig_interfaces.Interfaces()
     i = openconfig_interfaces.Interfaces.Interface()
-    i.yfilter = YFilter.read
     inf.interface.append(i)
-    gnmi.subscribe(provider, inf, mode, 10, "ON_CHANGE", 100000, func)
+
+    int_subscription = gNMISubscription()
+    int_subscription.entity = inf
+    int_subscription.subscription_mode = "SAMPLE"
+    int_subscription.sample_interval = 20 * 1000000000
+    int_subscription.suppress_redundant = False
+    int_subscription.heartbeat_interval = 100 * 1000000000
+
+    gnmi.subscribe(provider, int_subscription, 10, mode, 'JSON_IETF', func)
 
 
 if __name__ == "__main__":
@@ -57,7 +91,7 @@ if __name__ == "__main__":
                         action="store_true")
     parser.add_argument("device",
                         help="gNMI device (ssh://user:password@host:port)")
-    parser.add_argument("-m", "--mode", help="Subscription mode. One of 'POLL', 'ONCE', 'STREAM'", dest='mode', default='STREAM')
+    parser.add_argument("-m", "--mode", help="Subscription mode. One of 'POLL', 'ONCE', 'STREAM'", dest='mode', default='ONCE')
     args = parser.parse_args()
     device = urlparse(args.device)
 

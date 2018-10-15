@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 	"runtime"
-    "path/filepath"
-    "os"
+	"path/filepath"
+	"os"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/path"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
@@ -67,6 +67,7 @@ func TestGnmiRpcSubscribePoll(gs *path.GnmiSession, schema types.RootSchemaNode)
     rpc := path.CreateRpc( schema, "ydk:gnmi-subscribe")
     subscription := path.CreateDataNode( rpc.Input, "subscription", "")
     path.CreateDataNode( subscription, "mode", "POLL")
+    path.CreateDataNode( subscription, "encoding", "JSON_IETF")
 
     bgpSubscription := path.CreateDataNode( subscription, "subscription-list[alias='bgp']", "")
     path.CreateDataNode( bgpSubscription, "entity", bgpReadPayload)

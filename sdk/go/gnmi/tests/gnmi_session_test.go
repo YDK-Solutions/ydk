@@ -154,6 +154,7 @@ func (suite *GnmiSessionTestSuite) TestGnmiRpcSubscribeOnce() {
     subscription := path.CreateDataNode( rpc.Input, "subscription", "")
     path.CreateDataNode( subscription, "mode", "ONCE")
     path.CreateDataNode( subscription, "qos", "10")
+    path.CreateDataNode( subscription, "encoding", "JSON_IETF")
 
     bgpSubscription := path.CreateDataNode( subscription, "subscription-list[alias='bgp']", "")
     path.CreateDataNode( bgpSubscription, "entity", bgpReadPayload)
@@ -178,6 +179,7 @@ func (suite *GnmiSessionTestSuite) TestGnmiRpcSubscribeStream() {
     subscription := path.CreateDataNode( rpc.Input, "subscription", "")
     path.CreateDataNode( subscription, "mode", "STREAM")
     path.CreateDataNode( subscription, "qos", "10")
+    path.CreateDataNode( subscription, "encoding", "JSON_IETF")
 
     bgpSubscription := path.CreateDataNode( subscription, "subscription-list[alias='bgp']", "")
     path.CreateDataNode( bgpSubscription, "entity", bgpReadPayload)

@@ -10,6 +10,44 @@ YDK Types
 
    import "github.com/CiscoDevNet/ydk-go/ydk/types"
 
+.. go:struct:: DataNode
+
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
+.. go:struct:: RootSchemaNode
+    
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
+.. go:struct:: Session
+    
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
+.. go:struct:: Rpc
+
+    .. attribute:: Input
+
+        Type is ``DataNode``
+    
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
+.. go:struct:: Repository
+
+    .. :noindex:attribute:: Path
+
+        Type is ``string``
+
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
 .. _types-service-provider:
 
 .. object:: ServiceProvider
@@ -27,6 +65,22 @@ YDK Types
     .. function:: GetState() 
 
         :rtype: :go:struct:`*State<ydk/errors/State>`
+        
+    .. function:: GetType() string
+
+    .. function:: ExecuteRpc(string, Entity, map[string]string) DataNode
+
+.. go:struct:: CServiceProvider
+
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
+
+.. go:struct:: COpenDaylightServiceProvider
+
+    .. :noindex:attribute:: Private
+
+        Type is ``interface{}``
 
 .. object:: CodecServiceProvider
 
@@ -45,40 +99,6 @@ YDK Types
     .. function:: GetState()
 
         :rtype: :go:struct:`*State<ydk/errors/State>`
-
-.. go:struct:: DataNode
-
-    .. attribute:: Private
-
-        Type is ``interface{}``
-
-.. go:struct:: RootSchemaNode
-    
-    .. attribute:: Private
-
-        Type is ``interface{}``
-
-.. go:struct:: CServiceProvider
-
-    .. attribute:: Private
-
-        Type is ``interface{}``
-
-.. go:struct:: COpenDaylightServiceProvider
-
-    .. attribute:: Private
-
-        Type is ``interface{}``
-
-.. go:struct:: Repository
-
-    .. attribute:: Path
-
-        Type is ``string``
-
-    .. attribute:: Private
-
-        Type is ``interface{}``
 
 YANG Types
 ----------
@@ -209,7 +229,7 @@ These are how YANG types are represented in Go.
        
 .. go:struct:: EntityPath
     
-    .. attribute:: Path
+    .. :noindex:attribute:: Path
 
         A Go ``string`` representing the path
 
@@ -257,9 +277,9 @@ These are how YANG types are represented in Go.
 
         A ``string`` representing the parent Yang name of the entity
 
-    .. attribute:: YFilter
+    .. :noindex:attribute:: YFilter
 
-        A :ref:`YFilter <y-filter>` representing the a filter
+        A :ref:`YFilter <y-filter>` representing a filter
 
     .. attribute:: Children
 

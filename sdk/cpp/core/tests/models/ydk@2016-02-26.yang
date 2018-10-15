@@ -1015,6 +1015,30 @@ container ydk {
                 type uint32;
                 default 0;
             }
+
+            leaf encoding {
+                description "The encoding that the target should use within the Notifications generated 
+                             corresponding to the SubscriptionList.";
+                type enumeration {
+                    enum JSON {
+                        value 0;
+                    }
+                    enum BYTES {
+                        value 1;
+                    }
+                    enum PROTO {
+                        value 2;
+                    }
+                    enum ASCII {
+                        value 3;
+                    }
+                    enum JSON_IETF {
+                        value 4;
+                    }
+                }
+                default PROTO;
+            }
+
           }
         }
     }

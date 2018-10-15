@@ -1,4 +1,4 @@
-### 2018-10-03 version 0.8.1
+### 2018-10-03 version 0.8.0-beta
  
 #### Python, C++ & Go
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.

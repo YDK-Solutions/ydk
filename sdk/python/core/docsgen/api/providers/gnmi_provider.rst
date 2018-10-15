@@ -38,6 +38,10 @@ To enable GRPC trace set environment variables as followed:
     export GRPC_VERBOSITY=debug
     export GRPC_TRACE=transport_security
 
+To get server certificate, you need to retrive the **ems.pem** file from the IOS XR device (after enabling gRPC/TLS)
+and put it to YDK application host in a folder, which is specific to the device. 
+You can find the **ems.pem** file on the router in either **/misc/config/grpc/** or **/var/xr/config/grpc** folder.
+
 Example of instantiating and using objects of ``gNMIServiceProvider`` is shown below (assuming you have ``openconfig`` bundle installed).
 
 .. code-block:: python
@@ -45,14 +49,16 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` is shown b
 
     from ydk.models.openconfig import openconfig_bgp
     from ydk.path import Repository
-    from ydk.providers import gNMIServiceProvider
+    from ydk.gnmi.providers import gNMIServiceProvider
     from ydk.services import CRUDService
 
     # Create repository with location of directory where yang models from the server are downloaded
     repository = Repository('/Users/test/yang_models_location')
+    ca_file_path = '/Users/test/device-ip/ems.pem'
 
     # Instantiate provider with non-secure connection to gNMI server
-    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400, username='admin', password='admin')
+    provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400,
+                                   username='admin', password='admin', server_cerificate=ca_file_path)
 
     # Define filter
     bgp = openconfig_bgp.Bgp()

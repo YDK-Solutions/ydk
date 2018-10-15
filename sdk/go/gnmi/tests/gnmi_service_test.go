@@ -184,7 +184,7 @@ func (suite *GnmiServiceTestSuite) TestSubscribeOnce() {
 	subList = append(subList, sub)
 	
 	// Start subscription and result monitoring
-	go suite.Service.Subscribe(&suite.Provider, subList, 10, "ONCE")
+	go suite.Service.Subscribe(&suite.Provider, subList, 10, "ONCE", "JSON_IETF")
 	time.Sleep(100 * time.Millisecond)
 	bgpSubscription(&suite.Provider)
 	
@@ -209,7 +209,7 @@ func (suite *GnmiServiceTestSuite) TestSubscribeStream() {
 	subList = append(subList, sub)
 	
 	// Start subscription and result monitoring
-	go suite.Service.Subscribe(&suite.Provider, subList, 10, "STREAM")
+	go suite.Service.Subscribe(&suite.Provider, subList, 10, "STREAM", "JSON_IETF")
 	time.Sleep(100 * time.Millisecond)
 	bgpSubscription(&suite.Provider)
 	

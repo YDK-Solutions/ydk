@@ -328,6 +328,7 @@ TEST_CASE("gnmi_rpc_subscribe")
     auto & subscription = rpc->get_input_node().create_datanode("subscription", "");
     subscription.create_datanode("mode", "ONCE");
     subscription.create_datanode("qos", "10");
+    subscription.create_datanode("encoding", "JSON_IETF");
 
     auto & ifs = schema.create_datanode("openconfig-interfaces:interfaces", "");
     ifs.create_datanode("interface[name='*']/state");

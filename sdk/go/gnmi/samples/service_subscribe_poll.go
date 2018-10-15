@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"runtime"
 	"time"
-    "path/filepath"
-    "os"
+	"path/filepath"
+	"os"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
@@ -67,7 +67,7 @@ func testSubscribePoll(provider *providers.GnmiServiceProvider) {
 	
 	// Start subscription and result monitoring
 	service := services.GnmiService{}
-	go service.Subscribe(provider, subList, 10, "POLL")
+	go service.Subscribe(provider, subList, 10, "POLL", "JSON_IETF")
 	time.Sleep(100 * time.Millisecond)
 	bgpSubscription(provider)
 	

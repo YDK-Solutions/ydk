@@ -115,7 +115,7 @@ TEST_CASE("gnmi_service_subscribe")
     //subscription.suppress_redundant = true;
     subscription.heartbeat_interval = 100000000000;
 
-    gs.subscribe(provider, subscription, 10, "ONCE", gnmi_service_subscribe_callback);
+    gs.subscribe(provider, subscription, 10, "ONCE", "JSON_IETF", gnmi_service_subscribe_callback);
 }
 
 TEST_CASE("gnmi_service_subscribe_multiples")
@@ -162,7 +162,7 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     subscription_list.push_back(&bgp_subscription);
 
     // Subscribe
-    gs.subscribe(provider, subscription_list, 10, "ONCE", gnmi_service_subscribe_multiples_callback);
+    gs.subscribe(provider, subscription_list, 10, "ONCE", "JSON_IETF", gnmi_service_subscribe_multiples_callback);
 }
 
 static int counter;
@@ -198,7 +198,7 @@ TEST_CASE("gnmi_service_poll_subscribe")
     subscription.entity = &filter;
 
     set_counter(2);
-    gs.subscribe(provider, subscription, 10, "POLL", gnmi_service_subscribe_callback, counter_poll_request);
+    gs.subscribe(provider, subscription, 10, "POLL", "JSON_IETF", gnmi_service_subscribe_callback, counter_poll_request);
 }
 
 TEST_CASE("gnmi_service_stream_subscribe")
@@ -222,7 +222,7 @@ TEST_CASE("gnmi_service_stream_subscribe")
     subscription.sample_interval = 2000000000;
     subscription.heartbeat_interval = 10000000000;
 
-    gs.subscribe(provider, subscription, 10, "STREAM", gnmi_service_subscribe_callback);
+    gs.subscribe(provider, subscription, 10, "STREAM", "JSON_IETF", gnmi_service_subscribe_callback);
 }
 
 TEST_CASE("gnmi_service_create")

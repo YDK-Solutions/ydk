@@ -60,7 +60,7 @@ func (gs *GnmiService) Capabilities(provider *providers.GnmiServiceProvider) str
 	return caps
 }
 
-func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscriptionList []GnmiSubscription, qos uint32, mode string) {
+func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscriptionList []GnmiSubscription, qos uint32, mode string, encode string) {
 
 	session := provider.GetSession()
 	schema := path.GetRootSchemaNode(provider.Private)
@@ -73,6 +73,7 @@ func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscr
 	subscription := path.CreateDataNode( rpc.Input, "subscription", "")
 	path.CreateDataNode( subscription, "mode", mode)
 	path.CreateDataNode( subscription, "qos", qos)
+	path.CreateDataNode( subscription, "encoding", encode)
 	
 	for _, sub := range subscriptionList {
 		segpath := sub.Entity.GetEntityData().SegmentPath

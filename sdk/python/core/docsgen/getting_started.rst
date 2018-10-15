@@ -211,7 +211,7 @@ Once you have installed the ``YDK`` core package, you can install one or more mo
 
 .. code-block:: sh
 
-    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.6.3
+    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.0
 
 Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
 
@@ -301,12 +301,13 @@ To get started using the YDK API, there are sample apps available in the `YDK-Py
     Options:
     -h, --help            show this help message and exit
     -v VERSION, --version=VERSION
-                        force NETCONF version 1.0 or 1.1
+                          force NETCONF version 1.0 or 1.1
     -u USERNAME, --user=USERNAME
+                          login user name
     -p PASSWORD, --password=PASSWORD
-                        password
-    --proto=PROTO         Which transport protocol to use, one of ssh or tcp
-    --host=HOST           NETCONF agent hostname
+                          login user password
+    --proto=PROTOCOL      Which transport protocol to use, one of ssh or tcp
+    --host=HOST           NETCONF agent hostname or IP address
     --port=PORT           NETCONF agent SSH port
 
     (ydk-py)samples$ ./bgp.py --host <ip-address-of-netconf-server> -u <username> -p <password> --port <port-number>

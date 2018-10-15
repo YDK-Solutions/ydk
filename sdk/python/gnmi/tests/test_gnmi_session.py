@@ -42,10 +42,10 @@ class SanityGnmiSession(unittest.TestCase):
         self.int_json = ''
 
     def test_gnmi_rpc_caps(self):
-        cap_rpc = self.schema.create_rpc("ydk:gnmi-caps");
+        cap_rpc = self.schema.create_rpc("ydk:gnmi-caps")
         caps = self.session.invoke(cap_rpc)
  
-        json = self.codec.encode(caps, EncodingFormat.JSON, True);
+        json = self.codec.encode(caps, EncodingFormat.JSON, True)
         cap_update = '''
       {
         "name": "openconfig-bgp",
@@ -61,7 +61,7 @@ class SanityGnmiSession(unittest.TestCase):
         bgp.create_datanode("global/config/as", "65172")
         neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']")
         neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2")
-        peer_as = neighbor.create_datanode("config/peer-as","65172");   
+        peer_as = neighbor.create_datanode("config/peer-as","65172")
 
         # Configure interface
         ifc = self.schema.create_datanode("openconfig-interfaces:interfaces")
@@ -92,7 +92,7 @@ class SanityGnmiSession(unittest.TestCase):
         json_bgp = self.codec.encode(bgp_read, EncodingFormat.JSON, False)
  
         int_read = self.schema.create_datanode("openconfig-interfaces:interfaces", "")
-        json_int = self.codec.encode(int_read, EncodingFormat.JSON, False);
+        json_int = self.codec.encode(int_read, EncodingFormat.JSON, False)
  
         read_rpc = self.schema.create_rpc("ydk:gnmi-get")
         read_rpc.get_input_node().create_datanode("type", "CONFIG")
@@ -110,25 +110,26 @@ class SanityGnmiSession(unittest.TestCase):
         subscription = rpc.get_input_node().create_datanode("subscription", "")
         subscription.create_datanode("mode", "ONCE")
         subscription.create_datanode("qos", "10")
+        subscription.create_datanode("encoding", "JSON_IETF")
 
         bgp_read = self.schema.create_datanode("openconfig-bgp:bgp", "")
         bgp_json = self.codec.encode(bgp_read, EncodingFormat.JSON, False)
 
         int_read = self.schema.create_datanode("openconfig-interfaces:interfaces", "")
-        int_json = self.codec.encode(int_read, EncodingFormat.JSON, False);
+        int_json = self.codec.encode(int_read, EncodingFormat.JSON, False)
 
-        int_subscription = subscription.create_datanode("subscription-list[alias='int']", "");
-        int_subscription.create_datanode("entity", int_json);
-        int_subscription.create_datanode("subscription-mode", "ON_CHANGE");
-        int_subscription.create_datanode("sample-interval", "10000000");
-        int_subscription.create_datanode("suppress-redundant", "true");
-        int_subscription.create_datanode("heartbeat-interval", "1000000000");
+        int_subscription = subscription.create_datanode("subscription-list[alias='int']", "")
+        int_subscription.create_datanode("entity", int_json)
+        int_subscription.create_datanode("subscription-mode", "ON_CHANGE")
+        int_subscription.create_datanode("sample-interval", "10000000")
+        int_subscription.create_datanode("suppress-redundant", "true")
+        int_subscription.create_datanode("heartbeat-interval", "1000000000")
 
-        bgp_subscription = subscription.create_datanode("subscription-list[alias='bgp']", "");
-        bgp_subscription.create_datanode("entity", bgp_json);
-        bgp_subscription.create_datanode("sample-interval", "20000000");
+        bgp_subscription = subscription.create_datanode("subscription-list[alias='bgp']", "")
+        bgp_subscription.create_datanode("entity", bgp_json)
+        bgp_subscription.create_datanode("sample-interval", "20000000")
 
-        self.session.subscribe(rpc, gnmi_service_subscribe_callback);
+        self.session.subscribe(rpc, gnmi_service_subscribe_callback)
  
         # Delete configuration
         self._delete_configuration()

@@ -342,6 +342,12 @@ gNMISession::handle_subscribe(Rpc& rpc,
         DataNode* mode_node = mode_dn[0].get();
         mode = mode_node->get_value();
     }
+    string encoding = "PROTO";
+    auto encoding_dn = subscription[0]->find("encoding");
+    if (!encoding_dn.empty()) {
+        DataNode* encoding_node = encoding_dn[0].get();
+        encoding = encoding_node->get_value();
+    }
 
     auto subscription_list = subscription[0]->find("subscription-list");
     if (subscription_list.empty()) {
@@ -393,7 +399,7 @@ gNMISession::handle_subscribe(Rpc& rpc,
         sub_list.push_back(sub);
     }
 
-    client->execute_subscribe_operation(sub_list, qos, mode, out_func, poll_func);
+    client->execute_subscribe_operation(sub_list, qos, mode, encoding, out_func, poll_func);
 }
 
 gNMIClient & gNMISession::get_client() const

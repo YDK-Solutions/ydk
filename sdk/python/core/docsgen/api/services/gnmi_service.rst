@@ -41,7 +41,7 @@ gNMI Service
                  For multiple filters - collection of :py:class:`Entity<ydk.types.Entity>` instances encapsulated into Python ``list`` or YDK ``EntityCollection`` :py:class:`Config<ydk.types.Config>` accordingly to the type of **read_filter**.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
-    .. py:method:: subscribe(provider, subscription, qos, mode, callback_function)
+    .. py:method:: subscribe(provider, subscription, qos, mode, encoding, callback_function)
 
         Subscribe to telemetry updates.
 
@@ -49,6 +49,7 @@ gNMI Service
         :param subscription: (:py:class:`gNMISubscription<ydk.gnmi.services.gNMISubscription>`) Single instance or Python ``list`` of instances of objects, which represent the subscription.
         :param qos: (``long``) QOS indicating the packet marking.
         :param mode: (``str``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
+        :param encoding: (``str``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
         :param callback_function: (``func(str)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf SubscribeResponse message.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
@@ -69,12 +70,13 @@ gNMI Service
         * suppress_redundant: (``bool``) Indicates whether values that not changed should be sent in a ``STREAM`` subscription; default value is ``False``
         * heartbeat_interval: (``long``) Specifies the maximum allowable silent period in nanoseconds when **suppress_redundant** is True. If not specified, the **heartbeat_interval** is set to 360000000000 (10 minutes) or **sample_interval** whatever is bigger.
 
+.. :noindex:
 Examples
 --------
 
 To enable YDK logging include the following code:
 
-.. code-block:: cpp
+.. code-block:: python
     :linenos:
 
     import logging
@@ -98,13 +100,13 @@ gNMI 'set' example
 
 Example of instantiating and using objects of ``gNMIServiceProvider`` with ``gNMIService`` is shown below (assuming you have ``openconfig`` bundle installed).
 
-.. code-block:: cpp
+.. code-block:: python
     :linenos:
 
     from ydk.models.openconfig import openconfig_bgp
     from ydk.path import Repository
-    from ydk.providers import gNMIServiceProvider
-    from ydk.services import gNMIService
+    from ydk.gnmi.providers import gNMIServiceProvider
+    from ydk.gnmi.services import gNMIService
 
     repository = Repository('/Users/test/yang_models_location')
     provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400, username='admin', password='admin')
@@ -138,13 +140,13 @@ gNMI 'get' example
 
 Example of instantiating and using objects of ``gNMIServiceProvider`` with ``gNMIService`` is shown below (assuming you have ``openconfig`` bundle installed).
 
-.. code-block:: cpp
+.. code-block:: python
     :linenos:
 
     from ydk.models.openconfig import openconfig_bgp
     from ydk.path import Repository
-    from ydk.providers import gNMIServiceProvider
-    from ydk.services import gNMIService
+    from ydk.gnmi.providers import gNMIServiceProvider
+    from ydk.gnmi.services import gNMIService
 
     repository = Repository('/Users/test/yang_models_location')
     provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400, username='admin', password='admin')
@@ -163,13 +165,13 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
 
 **NOTE:** The ``gNMIService`` class **can be** used with ``multiprocessing.Pool`` for the ``subscribe`` operation as shown below as the subcription is a long-lived connection.
 
-.. code-block:: cpp
+.. code-block:: python
     :linenos:
 
     from ydk.models.openconfig import openconfig_interfaces
     from ydk.path import Repository
-    from ydk.providers import gNMIServiceProvider
-    from ydk.services import gNMIService
+    from ydk.gnmi.providers import gNMIServiceProvider
+    from ydk.gnmi.services import gNMIService
     from ydk.filters import YFilter
 
     # Import the Pool class from multiprocessing module
@@ -199,7 +201,7 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
         subscription.heartbeat_interval = 100 * 1000000000;
         
         # Subscribe for updates in STREAM mode.
-        gnmi.subscribe(provider, subscription, 10, "STREAM", func)
+        gnmi.subscribe(provider, subscription, 10, "STREAM", "PROTO", func)
 
     pool = Pool()
     pool.map(subscribe, print_telemetry_data)

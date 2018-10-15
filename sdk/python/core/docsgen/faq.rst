@@ -30,21 +30,21 @@ Also, the pypi page provides some information about this under the “Requires D
  - https://pypi.python.org/pypi/ydk-models-cisco-ios-xr/6.3.1
  - https://pypi.python.org/pypi/ydk-models-cisco-ios-xr/6.2.2
 
-Also, we use the `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>`_ tool to generate the bundles. This tool is available for anyone to use in order to generate the bundle version in combination with ydk core version of their choice. For example, the below steps will generate & install the ``cisco-ios-xr 6.3.1`` bundle compatible with ``ydk core 0.6.2`` (assuming you have already installed the `system dependencies <https://github.com/CiscoDevNet/ydk-py#system-requirements>`_):
+Also, we use the `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>`_ tool to generate the bundles. This tool is available for anyone to use in order to generate the bundle version in combination with ydk core version of their choice. For example, the below steps will generate & install the ``cisco-ios-xr 6.3.1`` bundle compatible with ``ydk core 0.7.2`` (assuming you have already installed the `system dependencies <https://github.com/CiscoDevNet/ydk-py#system-requirements>`_):
 
 1) Install libydk (taking CentOS as example. For other OS, please see `here <https://github.com/CiscoDevNet/ydk-py#quick-install>`_)
 
 .. code-block:: sh
     :linenos:
 
-    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.6.2/libydk-0.6.2-1.x86_64.rpm
+    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
 
 2) Generate & install ydk-py core
 
 .. code-block:: sh
     :linenos:
 
-    git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.6.2
+    git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.8.0
     cd ydk-gen && pip install -r requirements.txt
     ./generate --core --python
     pip install gen-api/python/ydk/dist/ydk*.tar.gz

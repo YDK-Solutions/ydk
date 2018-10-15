@@ -64,7 +64,7 @@ class gNMIService(_gNMIService):
             result = self._gs.set(provider, entities)
         return result
 
-    def subscribe(self, provider, subscription, qos, mode, gnmi_subscribe_callback=None):
+    def subscribe(self, provider, subscription, qos=0, mode='ONCE', encoding='PROTO', gnmi_subscribe_callback=None):
         if provider is None:
             raise _YServiceError("Provider cannot be None")
 
@@ -72,5 +72,5 @@ class gNMIService(_gNMIService):
 #              (not (isinstance(subscription, list) and isinstance(subscription[0], gNMISubscription)))):
 #             raise _YServiceError("Subscription is not properly defined")
 
-        self._gs.subscribe(provider, subscription, qos, mode, gnmi_subscribe_callback)
+        self._gs.subscribe(provider, subscription, qos, mode, encoding, gnmi_subscribe_callback)
         

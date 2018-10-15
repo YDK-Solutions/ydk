@@ -29,11 +29,11 @@ class ClassGetChildrenPrinter(object):
         self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> %s::get_children() const' % clazz.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
-        self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> children{};')
-        self.ctx.writeln('char count=0;')
+        self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> children_{};')
+        self.ctx.writeln('char count_=0;')
         for child in children:
             self._print_class_get_child(child)
-        self.ctx.writeln('return children;')
+        self.ctx.writeln('return children_;')
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.ctx.bline()
@@ -46,17 +46,17 @@ class ClassGetChildrenPrinter(object):
         self.ctx.bline()
 
     def _print_class_get_child_many(self, child):
-        self.ctx.writeln('count = 0;')
-        self.ctx.writeln('for (auto c : %s.entities())' % child.name)
+        self.ctx.writeln('count_ = 0;')
+        self.ctx.writeln('for (auto ent_ : %s.entities())' % child.name)
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
-        self.ctx.writeln('if(children.find(c->get_segment_path()) == children.end())')
+        self.ctx.writeln('if(children_.find(ent_->get_segment_path()) == children_.end())')
         self.ctx.lvl_inc()
-        self.ctx.writeln('children[c->get_segment_path()] = c;')
+        self.ctx.writeln('children_[ent_->get_segment_path()] = ent_;')
         self.ctx.lvl_dec()
         self.ctx.writeln('else')
         self.ctx.lvl_inc()
-        self.ctx.writeln('children[c->get_segment_path()+count++] = c;')
+        self.ctx.writeln('children_[ent_->get_segment_path()+count_++] = ent_;')
         self.ctx.lvl_dec()
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
@@ -70,6 +70,6 @@ class ClassGetChildrenPrinter(object):
             path += child.stmt.i_module.arg
             path += ':'
         path += child.stmt.arg
-        self.ctx.writeln('children["%s"] = %s;' % (path, child.name))
+        self.ctx.writeln('children_["%s"] = %s;' % (path, child.name))
         self.ctx.lvl_dec()
         self.ctx.writeln('}')

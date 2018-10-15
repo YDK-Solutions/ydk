@@ -484,18 +484,25 @@ gNMIClient::execute_set_payload(const SetRequest& request, SetResponse* response
     return true;
 }
 
-void gNMIClient::send_poll_request()
+void gNMIClient::send_poll_request(bool last)
 {
     gnmi::SubscribeRequest req;
     gnmi::Poll* p = new gnmi::Poll;
     req.set_allocated_poll(p);
     YLOG_INFO("\n=============== Sending Poll SubscribeRequest ================\n{}\n", req.DebugString());
-    client_reader_writer->Write(req);
+    if (last) {
+        ::grpc::WriteOptions options{};
+        options.set_last_message();
+        client_reader_writer->WriteLast(req, options);
+    }
+    else {
+        client_reader_writer->Write(req);
+    }
 }
 
 void poll_thread_callback_control(gNMIClient* client, std::function<bool(const char * response)> poll_func)
 {
-	YLOG_DEBUG("Invoking polling thread control from user defined callback");
+	YLOG_DEBUG("Invoking polling/streaming thread control from user defined callback");
     if (poll_func == nullptr) {
     	// Send poll request just once
     	client->send_poll_request();
@@ -506,6 +513,10 @@ void poll_thread_callback_control(gNMIClient* client, std::function<bool(const c
         std::string str_response = client->get_last_subscribe_response();
         while (poll_func(str_response.c_str()))
         {
+        	if (!client->client_reader_is_active) {
+        		YLOG_DEBUG("Client subscription reader is not active. Ending Polling/Streaming control thread");
+        		break;
+        	}
             client->send_poll_request();
 
             // Wait some time for response to arrive
@@ -536,20 +547,35 @@ static string get_current_local_time()
    return cur_time;
 }
 
-void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char * response)> poll_func)
+static void print_prompt(const std::string & list_mode)
 {
-	YLOG_DEBUG("Invoking polling thread control from standard input stream");
-	std::thread writer([client, poll_func]()
+    if (list_mode == "POLL") {
+        cout<<endl<<"Started POLL request monitoring"<<endl;
+        cout<<"Enter 'poll' for update; 'end' to end monitoring"<<endl;
+    }
+    else if (list_mode == "STREAM") {
+    	cout<<endl<<"Started STREAM request monitoring"<<endl;
+    	cout<<"Enter 'end' to end monitoring"<<endl;
+    }
+}
+
+void poll_thread_cin_control(gNMIClient* client, const std::string & list_mode)
+{
+	YLOG_DEBUG("Invoking polling/streaming thread control from standard input");
+	std::thread writer([client, list_mode]()
     {
         std::string str_response = client->get_last_subscribe_response();
         string input;
-        cout<<endl<<"Start POLL request monitoring"<<endl;
-        cout<<"Enter 'poll' for update; 'sleep' for 10 seconds, 'end' to end monitoring"<<endl;
+        print_prompt(list_mode);
         while (cin)
         {
+        	if (!client->client_reader_is_active) {
+        		YLOG_DEBUG("Client subscription reader is not active. Ending Polling/Streaming control thread");
+        		break;
+        	}
         	cin >> input;
             cout << get_current_local_time() << ": " << input << endl;
-        	if (input == "poll")
+        	if (input == "poll" && list_mode == "POLL")
         	{
         		string before_poll = client->get_last_subscribe_response();
         		client->send_poll_request();
@@ -567,15 +593,16 @@ void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char *
         			str_response = client->get_last_subscribe_response();
         		}
             }
-        	else if (input == "sleep") {
-        		std::this_thread::sleep_for(std::chrono::seconds(10));
+        	else if (input == "last") {
+        		client->send_poll_request(true);
+        		break;
         	}
         	else if (input == "end") {
         	    break;
         	}
         	else {
         		cout << "Wrong input" << endl;
-        		cout<<"Enter 'poll' for update; 'sleep' for sleeping 10 seconds; 'end' to end monitoring."<<endl;
+        		print_prompt(list_mode);
         	}
         }
         client->client_reader_writer->WritesDone();
@@ -586,6 +613,7 @@ void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char *
 void
 gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
                                         uint32 qos, const std::string & list_mode,
+										const std::string & encoding,
                                         std::function<void(const char * response)> out_func,
                                         std::function<bool(const char * response)> poll_func)
 {
@@ -596,7 +624,15 @@ gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subs
 
     gnmi::SubscriptionList* sl = new gnmi::SubscriptionList;
     sl->set_mode(get_sublist_mode(list_mode));
-    sl->set_encoding(gnmi::Encoding::JSON_IETF);
+    sl->set_encoding(gnmi::Encoding::PROTO);
+    if (encoding == "JSON")
+    	sl->set_encoding(gnmi::Encoding::JSON);
+    else if (encoding == "JSON_IETF")
+    	sl->set_encoding(gnmi::Encoding::JSON_IETF);
+    else if (encoding == "BYTES")
+    	sl->set_encoding(gnmi::Encoding::BYTES);
+    else if (encoding == "ASCII")
+    	sl->set_encoding(gnmi::Encoding::ASCII);
 
     gnmi::QOSMarking* qosmarking = new gnmi::QOSMarking;
     qosmarking->set_marking(qos);
@@ -618,14 +654,14 @@ gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subs
     client_reader_is_active = true;
     last_subscribe_response = "";
 
-    if (list_mode == "POLL")
+    if (list_mode == "POLL" || list_mode == "STREAM")
     {
         if (poll_func != nullptr) {
             poll_thread_callback_control(this, poll_func);
         }
         else {
             // Default poll control
-            poll_thread_cin_control(this, nullptr);
+            poll_thread_cin_control(this, list_mode);
         }
     }
 

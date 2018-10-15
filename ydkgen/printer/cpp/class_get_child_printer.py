@@ -55,10 +55,10 @@ class ClassGetChildPrinter(object):
         self.ctx.writeln('}')
 
     def _print_class_get_child_many(self, child):
-        self.ctx.writeln('auto c = std::make_shared<%s>();' % (child.property_type.qualified_cpp_name()))
-        self.ctx.writeln('c->parent = this;')
-        self.ctx.writeln('%s.append(c);' % child.name)
-        self.ctx.writeln('return c;')
+        self.ctx.writeln('auto ent_ = std::make_shared<%s>();' % (child.property_type.qualified_cpp_name()))
+        self.ctx.writeln('ent_->parent = this;')
+        self.ctx.writeln('%s.append(ent_);' % child.name)
+        self.ctx.writeln('return ent_;')
 
     def _print_class_get_child_unique(self, child):
         self.ctx.writeln('if(%s == nullptr)' % child.name)

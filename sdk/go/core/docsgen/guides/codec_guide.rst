@@ -12,7 +12,7 @@ Converting between JSON and XML
 
 To parse a JSON string representing yang data into a YDK go object and then to an XML string, the below approach can be used.
 
-.. code-block:: c
+.. code-block:: go
     :linenos:
 
     package main
@@ -72,7 +72,7 @@ Converting to JSON
 
 To convert a YDK python object into a JSON string, the below approach can be used. Note that the attribute ``primary`` is an instance of a :ref:`presence type<presence-type>`, which is set to ``nil`` by default. So it needs to be assigned to a new instance of its type.
 
-.. code-block:: c
+.. code-block:: go
     :linenos:
 
     package main

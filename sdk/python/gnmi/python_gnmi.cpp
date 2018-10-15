@@ -170,22 +170,24 @@ PYBIND11_MODULE(ydk_gnmi_, ydk_gnmi)
                 [](ydk::gNMIService& ns,
                    ydk::gNMIServiceProvider& provider,
                    ydk::gNMISubscription& subscription,
-                   ydk::uint32 qos,
-                   const string & mode,
-                   std::function<void(const char * response)> out_func)
+                   ydk::uint32 qos = 0,
+                   const string & mode = "ONCE",
+				   const string & encoding = "PROTO",
+                   std::function<void(const char * response)> out_func = nullptr)
                 {
-                    ns.subscribe(provider, subscription, qos, mode, out_func = nullptr);
+                    ns.subscribe(provider, subscription, qos, mode, encoding, out_func);
                 })
 
         .def("subscribe",
                 [](ydk::gNMIService& ns,
                    ydk::gNMIServiceProvider& provider,
                    vector<ydk::gNMISubscription*> & subscription_list,
-                   ydk::uint32 qos,
-                   const string & mode,
+                   ydk::uint32 qos = 0,
+                   const string & mode = "ONCE",
+				   const string & encoding = "PROTO",
                    std::function<void(const char * response)> out_func = nullptr)
                 {
-                    ns.subscribe(provider, subscription_list, qos, mode, out_func);
+                    ns.subscribe(provider, subscription_list, qos, mode, encoding, out_func);
                 });
 
     setup_gnmi_logging();

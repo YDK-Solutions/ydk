@@ -227,21 +227,46 @@ static void check_subscription_params(gNMISubscription& subscription)
         subscription.heartbeat_interval = subscription.sample_interval * 10;
 }
 
+static string check_subscribe_mode(const string & mode)
+{
+    string list_mode = mode;
+	if (mode.length() == 0) {
+		list_mode = "ONCE";
+    }
+    else if (mode != "ONCE" && mode != "STREAM" && mode != "POLL")
+    {
+        YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
+        throw(YServiceProviderError{mode + " list mode is not supported"});
+    }
+    return list_mode;
+}
+
+static string check_subscribe_encoding(const string & encoding)
+{
+    string list_encoding = encoding;
+	if (encoding.length() == 0) {
+		list_encoding = "PROTO";
+    }
+    else if (encoding != "JSON" && encoding != "BYTES" && encoding != "PROTO" && encoding != "ASCII" && encoding != "JSON_IETF")
+    {
+        YLOG_ERROR("gNMIService::subscribe: encoding '{}' is not supported", encoding);
+        throw(YServiceProviderError{encoding + " encoding is not supported"});
+    }
+    return list_encoding;
+}
+
 //subscribe
 void gNMIService::subscribe(gNMIServiceProvider& provider,
                             gNMISubscription& subscription,
                             uint32 qos, const std::string & mode,
+							const std::string & encoding,
                             std::function<void(const char * response)> out_func,
                             std::function<bool(const char * response)> poll_func) const
 {
     YLOG_DEBUG("gNMIService::subscribe: Executing subscribe RPC in '{}' list mode", mode);
 
-    if(mode != "ONCE" && mode != "STREAM" && mode != "POLL")
-    {
-        YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
-        throw(YServiceProviderError{mode + " list mode is not supported"});
-    }
-
+    string list_mode = check_subscribe_mode(mode);
+    string list_encoding = check_subscribe_encoding(encoding);
     check_subscription_params(subscription);
 
     GnmiClientSubscription sub{};
@@ -257,23 +282,20 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
     auto & client = gnmi_session.get_client();
-    client.execute_subscribe_operation(sub_list, qos, mode, out_func, poll_func);
+    client.execute_subscribe_operation(sub_list, qos, list_mode, list_encoding, out_func, poll_func);
 }
 
 void gNMIService::subscribe(gNMIServiceProvider& provider,
                             vector<gNMISubscription*> & subscription_list,
                             uint32 qos, const std::string & mode,
+							const std::string & encoding,
                             std::function<void(const char * response)> out_func,
                             std::function<bool(const char * response)> poll_func) const
 {
     YLOG_DEBUG("gNMIService::subscribe: Executing subscribe request in '{}' list mode", mode);
 
-    if (mode != "ONCE" && mode != "STREAM" && mode != "POLL")
-    {
-        YLOG_ERROR("gNMIService::subscribe: list mode '{}' is not supported", mode);
-        throw(YServiceProviderError{mode + " list mode is not supported"});
-    }
-
+    string list_mode = check_subscribe_mode(mode);
+    string list_encoding = check_subscribe_encoding(encoding);
     vector<GnmiClientSubscription> sub_list{};
     for (auto subscription : subscription_list) {
         check_subscription_params(*subscription);
@@ -290,7 +312,7 @@ void gNMIService::subscribe(gNMIServiceProvider& provider,
 
     auto & gnmi_session = dynamic_cast<const path::gNMISession&> (provider.get_session());
     auto & client = gnmi_session.get_client();
-    client.execute_subscribe_operation(sub_list, qos, mode, out_func, poll_func);
+    client.execute_subscribe_operation(sub_list, qos, list_mode, list_encoding, out_func, poll_func);
 }
 
 std::string

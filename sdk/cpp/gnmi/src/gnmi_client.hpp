@@ -89,7 +89,7 @@ struct GnmiClientSubscription {
 class gNMIClient;
 
 void poll_thread_callback_control(gNMIClient* client, std::function<bool(const char * response)> poll_func);
-void poll_thread_cin_control(gNMIClient* client, std::function<bool(const char * response)> poll_func);
+void poll_thread_cin_control(gNMIClient* client, const std::string & list_mode);
 
 class gNMIClient
 {
@@ -111,9 +111,10 @@ class gNMIClient
 
     void execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
                                      uint32 qos, const std::string & mode,
+									 const std::string & encoding,
                                      std::function<void(const char * response)> out_func,
                                      std::function<bool(const char * response)> poll_func);
-    void send_poll_request();
+    void send_poll_request(bool last=false);
     std::vector<std::string> get_capabilities();
     GnmiClientCapabilityResponse execute_get_capabilities();
 

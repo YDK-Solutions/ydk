@@ -154,13 +154,13 @@ class SanityGnmiService(unittest.TestCase):
  
         subscription = gNMISubscription()
         bgp_filter = openconfig_bgp.Bgp()
-        subscription.subscription_mode = "ON_CHANGE";
-        subscription.sample_interval = 10 * 1000000000;
-        subscription.suppress_redundant = True;
-        subscription.heartbeat_interval = 100 * 1000000000;
+        subscription.subscription_mode = "ON_CHANGE"
+        subscription.sample_interval = 10 * 1000000000
+        subscription.suppress_redundant = True
+        subscription.heartbeat_interval = 100 * 1000000000
         subscription.entity = bgp_filter
  
-        self.gs.subscribe(self.provider, subscription, 10, "ONCE", gnmi_subscribe_callback);
+        self.gs.subscribe(self.provider, subscription, 10, "ONCE", "JSON_IETF", gnmi_subscribe_callback);
  
         # Delete BGP configuration
         bgp.yfilter = YFilter.delete
@@ -183,7 +183,7 @@ class SanityGnmiService(unittest.TestCase):
         int_subscription = gNMISubscription()
         int_subscription.entity = int_filter
  
-        self.gs.subscribe(self.provider, [int_subscription, bgp_subscription], 10, "ONCE", gnmi_subscribe_multiples_callback);
+        self.gs.subscribe(self.provider, [int_subscription, bgp_subscription], 10, "ONCE", "JSON_IETF", gnmi_subscribe_multiples_callback)
  
         # Delete BGP configuration
         bgp.yfilter = YFilter.delete
@@ -198,13 +198,13 @@ class SanityGnmiService(unittest.TestCase):
  
         subscription = gNMISubscription()
         bgp_filter = openconfig_bgp.Bgp()
-        subscription.subscription_mode = "TARGET_DEFINED";
-        subscription.sample_interval = 2 * 1000000000;
-        subscription.suppress_redundant = False;
-        subscription.heartbeat_interval = 8 * 1000000000;
+        subscription.subscription_mode = "SAMPLE"
+        subscription.sample_interval = 2 * 1000000000
+        subscription.suppress_redundant = False
+        subscription.heartbeat_interval = 8 * 1000000000
         subscription.entity = bgp_filter
  
-        self.gs.subscribe(self.provider, subscription, 10, "STREAM", gnmi_subscribe_callback);
+        self.gs.subscribe(self.provider, subscription, 10, "STREAM", "JSON_IETF", gnmi_subscribe_callback)
  
         # Delete BGP configuration
         bgp.yfilter = YFilter.delete
@@ -220,7 +220,7 @@ class SanityGnmiService(unittest.TestCase):
         bgp_filter = openconfig_bgp.Bgp()
         subscription.entity = bgp_filter
 
-        self.gs.subscribe(self.provider, subscription, 10, "POLL", gnmi_subscribe_callback);
+        self.gs.subscribe(self.provider, subscription, 10, "POLL", "JSON_IETF", gnmi_subscribe_callback)
 
         # Delete BGP configuration
         bgp.yfilter = YFilter.delete

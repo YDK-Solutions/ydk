@@ -79,15 +79,24 @@ Please follow the below instructions to install the system requirements before i
 ## Linux
 Ubuntu (Debian-based):
 
-**Install prebuilt libydk binary:**
+**Install prebuilt libydk binary**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/libydk_0.8.1-1_amd64.deb
-   $ sudo gdebi libydk_0.8.1-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+   $ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
+
+**Install prebuilt libydk_gnmi binary (optional)**
+For gNMI protocol support install third party software and prebuilt libydk_gnmi library:
+```
+   $ ./test/dependencies_linux_gnmi.sh
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
 **To build from source:**
 ```
-$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake python3-dev python-dev
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake python3-dev python-dev
 ```
 Centos (Fedora-based):
 
@@ -95,7 +104,7 @@ Centos (Fedora-based):
 ```
    $ sudo yum install epel-release
    $ sudo yum install libssh-devel gcc-c++
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -125,8 +134,8 @@ You can download the latest python package from [here](https://www.python.org/do
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 ```
 **To build from source:**
 ```
@@ -447,4 +456,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.8.1 (alpha). The version of the latest YDK-Gen master branch is 0.7.3-dev. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.0-beta. The version of the latest YDK-Gen master branch is 0.8.0-beta. YDK-Gen is licensed under the Apache 2.0 License.

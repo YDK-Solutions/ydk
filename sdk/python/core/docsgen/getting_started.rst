@@ -29,7 +29,7 @@ Ubuntu (Debian-based)
 .. code-block:: sh
 
    $ sudo apt-get install gdebi-core
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-alpha/libydk_0.8.0-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
    $ sudo gdebi libydk_0.8.0-1_amd64.deb
 
 Centos (Fedora-based)
@@ -39,7 +39,7 @@ Centos (Fedora-based)
 .. code-block:: sh
 
    $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-alpha/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -86,7 +86,7 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/libydk-0.8.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 
 Windows
@@ -149,7 +149,7 @@ You can install the latest model packages from the DevHub artifactory and Python
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/ydk-0.8.0a0.tar.gz
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
@@ -160,7 +160,7 @@ You can install the latest model packages from the DevHub artifactory and Python
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -168,14 +168,14 @@ Alternatively, you can perform a partial installation.  If you only want to inst
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-alpha/ydk-0.8.0a0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/ydk-0.8.0a0.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source

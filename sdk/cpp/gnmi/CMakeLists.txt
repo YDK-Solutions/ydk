@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
-project(ydk_gnmi VERSION 0.8.0 LANGUAGES C CXX)
+project(ydk_gnmi VERSION 0.4.0 LANGUAGES C CXX)
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The gNMI library for YDK API.")
 

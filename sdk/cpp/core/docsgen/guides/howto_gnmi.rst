@@ -134,7 +134,6 @@ YDK uses the `spdlog` logging library. The logging can be enabled as follows by 
  :linenos:
 
  if(verbose)
- {            ${dl_location}
- 
+ {
    auto console = spdlog::stdout_color_mt("ydk");
  }

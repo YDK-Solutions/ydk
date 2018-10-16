@@ -8,26 +8,38 @@ sdk
 ├── cpp
 │   ├── core # C++ core
 │   |      ├── docsgen # Core documentation
-│   |      ├-- src     # Source code
-│   |      ├-- samples # Samples
+│   |      ├── samples # Samples
+│   |      ├── src     # Source code
 │   |      └── tests   # Core tests
+|   ├── gnmi # C++ gNMI
+│   |      ├── samples # gNMI samples
+│   |      ├── src     # Source code
+│   |      └── tests   # gNMI YDK tests
 │   ├── install
 │   ├── packages
 │   ├── samples
 │   └── tests # C++ bundle tests
 ├── go
 │   ├── core # Go core
-│   |      ├── docsgen # Core documentation
-│   |      ├-- samples # Samples
-│   |      ├-- tests   # Core & bundle tests
+│   |      ├── docsgen # Core and gNMI documentation
+│   |      ├── samples # Samples
+│   |      ├── tests   # Core & bundle tests
+│   |      └── ydk     # Source code
+│   ├── gnmi # Go gNMI
+│   |      ├── samples # gNMI samples
+│   |      ├── tests   # gNMI YDK tests
 │   |      └── ydk     # Source code
 │   └── packages
-└── python
+├── python
     ├── core # Python core
-│   |      ├── docsgen # Core documentation
-│   |      ├-- samples # Samples
-│   |      ├-- tests   # Core & bundle tests
-│   |      └── ydk     # Source code
+    |      ├── docsgen # Core and gNMI documentation
+    |      ├── samples # Samples
+    |      ├── tests   # YDK core and bundle tests
+    |      └── ydk     # Source code
+    ├── gnmi # Python gNMI
+    |      ├── samples # gNMI samples
+    |      ├── tests   # YDK gNMI tests
+    |      └── ydk     # Source code
     └── packages
 
 ```

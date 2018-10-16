@@ -39,4 +39,3 @@ protobuf-3.5.0
 sdk/python/gnmi/build
 sdk/python/gnmi/dist
 sdk/python/gnmi/ydk_services_gnmi.egg-info
-ydk.egg-info

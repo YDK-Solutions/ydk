@@ -35,3 +35,4 @@ yang/nxos*
 grpc
 protobuf-3.5.0
 sdk/cpp/gnmi
+sdk/python/gnmi

@@ -97,12 +97,16 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     sudo ldconfig
     cd -
 
-**Note:** There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
+**Set LD_LIBRARY_PATH**
+
+The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 
 .. code-block:: sh
 
     PROTO="/Your-Protobuf-and-Grpc-installation-directory"
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+
+**Note:** There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
 
 Quick YDK Installation
 ----------------------
@@ -123,10 +127,21 @@ Download and install YDK gNMI library (optional):
    wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
-**CentOS  TBD**
+**CentOS**
 
+Install YDK core library:
 
-**MacOS TBD**
+.. code-block:: sh
+
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+
+Install YDK gNMI library (optional):
+
+.. code-block:: sh
+
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi-0.4.0-1.x86_64.rpm
+
+**MacOS**
 
 You can install the latest model packages using `homebrew <http://brew.sh>`_.  This utility will manage the dependencies between YDK packages and all other sytem dependencies.  First, add the third-party repository (homebrew tap) for YDK:
 

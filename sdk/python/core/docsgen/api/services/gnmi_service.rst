@@ -1,7 +1,7 @@
 .. _gnmi_service:
 
-gNMI Service
-============
+gNMI Service API
+================
 
 .. contents:: Table of Contents
 
@@ -27,7 +27,7 @@ gNMI Service
         :return: ``True`` if successful, ``False`` if not.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
-    .. py:method:: get(provider, read_filter, read_mode)
+    .. py:method:: get(provider, read_filter, read_mode='CONFIG')
 
         Read the entity.
 
@@ -41,7 +41,7 @@ gNMI Service
                  For multiple filters - collection of :py:class:`Entity<ydk.types.Entity>` instances encapsulated into Python ``list`` or YDK ``EntityCollection`` :py:class:`Config<ydk.types.Config>` accordingly to the type of **read_filter**.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
-    .. py:method:: subscribe(provider, subscription, qos, mode, encoding, callback_function)
+    .. py:method:: subscribe(provider, subscription, qos=0, mode='ONCE, encoding='PROTO', callback_function=None)
 
         Subscribe to telemetry updates.
 
@@ -50,7 +50,9 @@ gNMI Service
         :param qos: (``long``) QOS indicating the packet marking.
         :param mode: (``str``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
         :param encoding: (``str``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
-        :param callback_function: (``func(str)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf SubscribeResponse message.
+        :param callback_function: (``func(str)``) Callback function, which is used to process the subscription data.
+                                  The subscription data returned to the user as a string representation of protobuf **SubscribeResponse** message.
+                                  If not specified, the response is printed to system stdout.
         :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
 
     .. py:method:: capabilities(provider)
@@ -70,9 +72,8 @@ gNMI Service
         * suppress_redundant: (``bool``) Indicates whether values that not changed should be sent in a ``STREAM`` subscription; default value is ``False``
         * heartbeat_interval: (``long``) Specifies the maximum allowable silent period in nanoseconds when **suppress_redundant** is True. If not specified, the **heartbeat_interval** is set to 360000000000 (10 minutes) or **sample_interval** whatever is bigger.
 
-.. :noindex:
-Examples
---------
+gNMI Service Examples
+=====================
 
 To enable YDK logging include the following code:
 

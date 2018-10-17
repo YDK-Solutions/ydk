@@ -4,7 +4,7 @@ Services
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    codec_service.rst
    crud_service.rst

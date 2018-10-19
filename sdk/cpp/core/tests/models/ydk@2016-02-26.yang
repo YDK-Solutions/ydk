@@ -875,7 +875,7 @@ container ydk {
 
     rpc gnmi-caps {
 
-        description "The 'gnmi-capabilities' rpc allows the client to retrieve set of capabilities that is supported by the target.
+        description "The 'gnmi-caps' RPC allows the client to retrieve set of capabilities that is supported by the target.
                      The CapabilityRequest message is sent by the client to interrogate the target.
                      The target sends back to the client CapabilityResponse message, which contains this structure.";
 
@@ -888,7 +888,7 @@ container ydk {
 
     rpc gnmi-get {
 
-        description "The 'gnmi-get' rpc is used in the client to retrieve entity or entities from the target.";
+        description "The 'gnmi-get' RPC is used in the client to retrieve entity or entities from the target.";
 
         input {
             list request {
@@ -925,7 +925,7 @@ container ydk {
 
     rpc gnmi-set {
 
-        description "The 'gnmi-set' rpc allows the client to create/replace, update or delete entity or multiple entities on the target.
+        description "The 'gnmi-set' RPC allows the client to create/replace, update or delete entity or multiple entities on the target.
                      A client sends a SetRequest message to the target indicating the modifications it desires.";
 
         input {

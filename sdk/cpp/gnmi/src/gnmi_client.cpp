@@ -155,17 +155,37 @@ static string format_notification_response(pair<string,string> prefix_suffix, co
 // gNMIClient
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-gNMIClient::gNMIClient(const std::string& address, int port,
+gNMIClient::gNMIClient(const std::string & address, int port,
                        const std::string & username, const  std::string & password,
-                       const std::string & server_certificate, const std::string & private_key)
- : username(username), password(password)
+                       const std::string & certificate, const std::string & private_key)
+ : host(address), port(port), username(username), password(password), server_certificate(certificate), private_key(private_key)
 {
-    auto channel = connect_to_server(address, port, server_certificate, private_key);
-	stub_ = gNMI::NewStub(channel);
+    connect();
 }
 
 gNMIClient::~gNMIClient()
 {
+}
+
+int gNMIClient::connect()
+{
+    auto channel = connect_to_server(host, port, server_certificate, private_key);
+    stub_ = gNMI::NewStub(channel);
+    return EXIT_SUCCESS;
+}
+
+string gNMIClient::get_hostname_port()
+{
+    ostringstream os;
+    os<< host << "_" << port;
+    return os.str();
+}
+
+string gNMIClient::execute_payload(const std::string & payload)
+{
+    YLOG_ERROR("gNMIClient::execute_payload is not supported");
+    throw(YError{"gNMIClient::execute_payload is not supported"});
+    return payload;
 }
 
 static bool has_gnmi_version(gnmi::CapabilityResponse* response)

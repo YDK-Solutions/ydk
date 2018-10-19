@@ -37,6 +37,7 @@
 #include "gnmi.pb.h"
 
 #include <ydk/types.hpp>
+#include <ydk/netconf_client.hpp>
 
 using namespace gnmi;
 
@@ -91,7 +92,7 @@ class gNMIClient;
 void poll_thread_callback_control(gNMIClient* client, std::function<bool(const char * response)> poll_func);
 void poll_thread_cin_control(gNMIClient* client, const std::string & list_mode);
 
-class gNMIClient
+class gNMIClient : public NetconfClient
 {
   public:
     typedef struct PathPrefixValueFlags
@@ -100,7 +101,7 @@ class gNMIClient
         bool prefix_has_value;
     } PathPrefixValueFlags;
 
-    gNMIClient(const std::string& address, int port,
+    gNMIClient(const std::string & address, int port,
                const std::string & username, const  std::string & password,
                const std::string & server_certificate="", const std::string & private_key="");
     ~gNMIClient();
@@ -115,7 +116,7 @@ class gNMIClient
                                      std::function<void(const char * response)> out_func,
                                      std::function<bool(const char * response)> poll_func);
     void send_poll_request(bool last=false);
-    std::vector<std::string> get_capabilities();
+
     GnmiClientCapabilityResponse execute_get_capabilities();
 
     std::shared_ptr<grpc::ClientReaderWriter<gnmi::SubscribeRequest, ::gnmi::SubscribeResponse>> client_reader_writer;
@@ -125,6 +126,12 @@ class gNMIClient
     {
         return last_subscribe_response;
     }
+
+    // Functions to implement abstract class NetconfClient
+    int connect();
+    std::string execute_payload(const std::string & payload);
+    std::vector<std::string> get_capabilities();
+    std::string get_hostname_port();
 
   private:
 
@@ -136,8 +143,12 @@ class gNMIClient
 
     std::vector<std::string> capabilities;
     std::unique_ptr<gNMI::Stub> stub_;
+    std::string host;
+    int port;
     std::string username;
     std::string password;
+    std::string server_certificate;
+    std::string private_key;
 
     std::string last_subscribe_response;
 };

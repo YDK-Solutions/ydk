@@ -28,6 +28,7 @@
 #include <ydk/logger.hpp>
 
 #include "../../core/src/path/path_private.hpp"
+#include "../../core/src/path/netconf_model_provider.hpp"
 
 #include "gnmi_provider.hpp"
 #include "gnmi_path_api.hpp"
@@ -57,6 +58,10 @@ gNMISession::gNMISession(Repository & repo,
     client = make_unique<gNMIClient>(address, port, username, password, server_certificate, private_key);
 
     server_capabilities = client->get_capabilities();
+
+    auto model_provider = make_shared<StaticModelProvider>(*client);
+    repo.add_model_provider(model_provider.get());
+
     std::vector<std::string> empty_caps;
     IetfCapabilitiesParser capabilities_parser{};
     root_schema = repo.create_root_schema(capabilities_parser.parse(empty_caps));

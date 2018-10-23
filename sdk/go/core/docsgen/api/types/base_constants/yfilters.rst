@@ -25,7 +25,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
 
     Represents the NETCONF edit config operations with underlying type ``int``
 
-    .. attribute:: NotSet
+    .. :noindex:attribute:: NotSet
 
         Represented by a value of 0.
 

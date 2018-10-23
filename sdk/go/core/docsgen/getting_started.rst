@@ -80,16 +80,70 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 
 .. _howto-install:
 
+gNMI Requirements
+===================
+
+In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+**Install protobuf**
+
+.. code-block:: sh
+
+    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
+    unzip protobuf-cpp-3.3.0.zip
+    cd protobuf-3.3.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
+    cd -
+
+**Install gRPC**
+
+.. code-block:: sh
+
+    git clone -b v1.4.5 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make
+    sudo make install
+    cd -
+
+**Instal YDK gNMI library**
+
+Ubuntu
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+CentOS
+
+.. code-block:: sh
+
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
+
+.. code-block:: sh
+
+   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+
 How to install YDK-Go
 =====================
 
 You can install YDK-Go on macOS or Linux.  It is not currently supported on Windows.
 
-To install the latest model packages, use ``go get``. Note that, in some systems, you need to install the new package as root.
+To check out the version of ydk-gen used to generate this ydk-go, use the below commands:
 
 .. code-block:: sh
-	
-	$ go get github.com/CiscoDevNet/ydk-go/ydk
+
+    $ git clone repo-url
+    $ git checkout commit-id
 
 
 Documentation and Support
@@ -104,4 +158,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.0 (alpha). YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.0 (beta). YDK-Go is licensed under the Apache 2.0 License.

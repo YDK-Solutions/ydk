@@ -23,6 +23,13 @@ $ go run samples/bgp_create/bgp_create.go
 $ go run samples/bgp_read/bgp_read.go
 ```
 
+For gNMI package installation, which is optional, perform this steps:
+
+```
+$ cd /your/path/to/ydk-gen
+$ cp -r sdk/go/gnmi/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
+```
+
 To run tests:
 ```
 $ cd /your/path/to/ydk-gen

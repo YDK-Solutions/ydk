@@ -272,3 +272,66 @@ Netconf
 	:return: ``true`` if the operation was successful, ``false`` - otherwise
 	:rtype: ``bool``
 	:raises: :go:struct:`YError<ydk/errors/YError>`, if error has occurred
+
+gNMI
+-------
+
+.. go:struct:: GnmiService
+
+    Implements the gNMI Protocol Operations
+
+    .. function:: (gs *GnmiService) Set(provider *providers.GnmiServiceProvider, entity types.Entity) bool
+
+    Perform **set** operation using SetRequest gRPC
+
+    :param provider: An instance of :go:struct:`GnmiServiceProvider<ydk/providers/GnmiServiceProvider>`.
+    :param entity: An instance of :ref:`Entity <types-entity>` or :ref:`EntityCollection <entity-collection>` that is a hierarchy configuration of data as defined by one of the device’s data models.
+                   Each instance should have settting of :ref:`YFilter <y-filter>`, which defines set operation. 
+                   Expected filter values: **yfilter.Replace**, **yfilter.Update**, or **yfilter.Delete**.
+                   
+    :return: ``true`` if the operation was successful, ``false`` - otherwise
+    :rtype: ``bool``
+    :raises: :go:struct:`YError<ydk/errors/YError>`, if error has occurred
+
+    .. function:: (gs *GnmiService) Get(provider *providers.GnmiServiceProvider, filter types.Entity, operation string) types.Entity
+
+    Perform **get** operation using GetRequest gRPC
+
+    :param provider: An instance of :go:struct:`GnmiServiceProvider<ydk/providers/GnmiServiceProvider>`.
+    :param filter: An instance of :ref:`Entity <types-entity>` or :ref:`EntityCollection <entity-collection>` that is a hierarchy configuration of data as defined by one of the device’s data models.
+    :param operation: ``string``, which represents operation type; expected values: ``CONFIG``, ``STATE``, ``OPERATIONAL``, and ``ALL``.
+                   
+    :return: An instance of :ref:`Entity <types-entity>` or :ref:`EntityCollection <entity-collection>` according to the **filter** type, which represent gRPC message GetResponse.
+    :raises: :go:struct:`YError<ydk/errors/YError>`, if error has occurred
+
+    .. function:: (gs *GnmiService) Capabilities(provider *providers.GnmiServiceProvider) string
+
+    Sends to the gNMI server the GetCapabilities request message
+
+    :param provider: An instance of :go:struct:`GnmiServiceProvider<ydk/providers/GnmiServiceProvider>`.
+    :return: JSON encoded ``string``, which contains gNMI server capabilities 
+    :raises: :go:struct:`YError<ydk/errors/YError>`, if error has occurred
+
+    .. function:: (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscriptionList []GnmiSubscription, qos uint32, mode string, encode string)
+
+    Executed **subscribe** operation on the gNMI server
+
+    :param provider: An instance of :go:struct:`GnmiServiceProvider<ydk/providers/GnmiServiceProvider>`.
+    :param subscriptionList: Go slice of :go:struct:`GnmiSubscription<GnmiSubscription>` instances
+    :param qos: ``int`` QOS indicating the packet marking.
+    :param mode: Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
+    :param encode: ``string``, which represents how the subscription data should be encoded: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``. 
+    :return: None
+    :raises: :go:struct:`YError<ydk/errors/YError>`, if error has occurred
+
+.. go:struct::  GnmiSubscription
+
+        Instance of this structure defines subscription for a single entity. Members of the structure are:
+        
+        * Entity: (:ref:`Entity <types-entity>`) Instance of the subscription entity. This parameter must be set by the user.
+        * SubscriptionMode: (``string``) Expected one of the following string values: ``TARGET_DEFINED``, ``ON_CHANGE``, or ``SAMPLE``; default value is ``ON_CHANGE``.
+        * SampleInterval: (``uint64``) Time interval in nanoseconds between samples in ``STREAM`` mode; default value is 60000000000 (1 minute).
+        * SuppressRedundant: (``bool``) Indicates whether values that not changed should be sent in a ``STREAM`` subscription; default value is ``false``
+        * HeartbeatInterval: (``uint64``) Specifies the maximum allowable silent period in nanoseconds when **suppress_redundant** is True. If not specified, the **heartbeat_interval** is set to 360000000000 (10 minutes) or **sample_interval** whatever is bigger.
+
+	

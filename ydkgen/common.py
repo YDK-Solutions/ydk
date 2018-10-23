@@ -135,7 +135,7 @@ def iscppkeyword(word):
                     'explicit', 'class', 'if', 'try', 'while', 'and', 'or',
                     'const', 'continue', 'double', 'else', 'value', 'namespace',
                     'operation', 'volatile', 'register', 'short', 'extern',
-                    'mutable', 'unsigned', 'struct', 'switch', 'void', 'typedef',
+                    'mutable', 'unsigned', 'struct', 'switch', 'void', 'typedef', 'typename',
                     'typeid', 'using', 'char', 'goto', 'not','clock', 'major')
 
 def isgokeyword(word):

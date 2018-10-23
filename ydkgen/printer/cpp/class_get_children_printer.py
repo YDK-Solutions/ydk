@@ -26,10 +26,10 @@ class ClassGetChildrenPrinter(object):
         self.ctx = ctx
 
     def print_class_get_children(self, clazz, children):
-        self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> %s::get_children() const' % clazz.qualified_cpp_name())
+        self.ctx.writeln('std::map<std::string, std::shared_ptr<ydk::Entity>> %s::get_children() const' % clazz.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
-        self.ctx.writeln('std::map<std::string, std::shared_ptr<Entity>> _children{};')
+        self.ctx.writeln('std::map<std::string, std::shared_ptr<ydk::Entity>> _children{};')
         self.ctx.writeln('char count_=0;')
         for child in children:
             self._print_class_get_child(child)

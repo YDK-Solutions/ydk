@@ -34,7 +34,7 @@ class ClassGetChildPrinter(object):
         self._print_class_get_child_trailer(clazz)
 
     def _print_class_get_child_header(self, clazz):
-        self.ctx.writeln('std::shared_ptr<Entity> %s::get_child_by_name(const std::string & child_yang_name, const std::string & segment_path)' % clazz.qualified_cpp_name())
+        self.ctx.writeln('std::shared_ptr<ydk::Entity> %s::get_child_by_name(const std::string & child_yang_name, const std::string & segment_path)' % clazz.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
 

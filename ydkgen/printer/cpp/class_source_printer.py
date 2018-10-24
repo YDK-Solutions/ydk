@@ -76,7 +76,7 @@ class ClassSourcePrinter(object):
             self._print_namespace_identity_lookup_function(clazz)
 
     def _print_clone_ptr_function(self, clazz):
-        self.ctx.writeln('std::shared_ptr<Entity> %s::clone_ptr() const' % clazz.qualified_cpp_name())
+        self.ctx.writeln('std::shared_ptr<ydk::Entity> %s::clone_ptr() const' % clazz.qualified_cpp_name())
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
         self.ctx.writeln('return std::make_shared<%s>();' % clazz.qualified_cpp_name())

@@ -29,7 +29,7 @@ function print_msg {
 function install_dependencies {
     print_msg "Installing dependencies"
 
-    brew install curl doxygen pcre xml2 lcov
+    brew install curl doxygen xml2 lcov
     brew rm -f --ignore-dependencies python python3
     wget https://www.python.org/ftp/python/3.6.3/python-3.6.3-macosx10.6.pkg
     sudo installer -pkg python-3.6.3-macosx10.6.pkg  -target /
@@ -79,4 +79,5 @@ install_confd
 install_libssh
 install_golang
 
+sudo easy_install pip
 sudo pip install virtualenv

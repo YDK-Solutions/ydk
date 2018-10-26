@@ -131,21 +131,20 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOROOT="/usr/local/go"
-    export PATH=$GOROOT/bin:$PATH
-
-    print_msg "GOPATH is set to: ${GOPATH}"
-    print_msg "GOROOT is set to: ${GOROOT}"
-
-    cd $YDKGEN_HOME
-    if [[ -z "${GOPATH// }" ]]; then
-        export GOPATH="$(pwd)/golang"
+    if [[ $(uname) == "Darwin" ]]; then
+        source /Users/travis/.gvm/scripts/gvm
+        gvm use go1.9.2
+        print_msg "GOROOT: $GOROOT"
+        print_msg "GOPATH: $GOPATH"
     else
-        export GOPATH="$(pwd)/golang":$GOPATH
+        cd $YDKGEN_HOME
+        export GOPATH="$(pwd)/golang"
+        export GOROOT=/usr/local/go
+        export PATH=$GOROOT/bin:$PATH
+        print_msg "Setting GOROOT to $GOROOT"
+        print_msg "Setting GOPATH to $GOPATH"
     fi
-
-    print_msg "Changed GOPATH setting to: ${GOPATH}"
-    print_msg "Running $(go version)"
+    print_msg "Running GO version $(go version)"
 
     go get github.com/stretchr/testify
 }

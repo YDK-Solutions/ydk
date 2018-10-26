@@ -48,7 +48,7 @@ Installing from source
 ----------------------
 System Requirements
 ~~~~~~~~~~~~~~~~~~~
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library which is required for YDK. Please use libssh versions older than 0.8.0.
+**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
 
 **Linux**
 

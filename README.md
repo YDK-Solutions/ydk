@@ -17,16 +17,16 @@ YANG Development Kit (Generator)
 - [Docker](#docker)
 - [System requirements](#system-requirements)
   - [Linux](#linux)
-  - [macOS](#macos)
+  - [MacOS](#macos)
   - [Windows](#windows)
 - [Installation](#installation)
   - [Setting up your environment](#setting-up-your-environment)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Usage](#usage)
-  - [First step: choose your bundle profile](#first-step-choose-your-bundle-profile)
+  - [First step: choose model bundle profile](#first-step-choose-model-bundle-profile)
     - [Details](#details)
-  - [Second step: Generate & install the core](#second-step-generate--install-the-core)
-  - [Third step: Generate & install your bundle](#third-step-generate--install-your-bundle)
+  - [Second step: Generate and install the core](#second-step-generate-and-install-the-core)
+  - [Third step: Generate and install model bundle](#third-step-generate-and-install-model-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
   - [Documentation](#documentation)
 - [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
@@ -74,36 +74,36 @@ docker run -it ydkdev/ydk-gen
 ```
 
 # System requirements
-Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate--install-the-core) after installing the below requirements:
+Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp. **Please note** that if you are using the latest ydk-gen master branch code, you may not be able to use the below prebuilt `libydk` binaries. You need to [build libydk from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
 ## Linux
-Ubuntu (Debian-based):
+###Ubuntu (Debian-based)
 
 **Install prebuilt libydk binary:**
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.2/libydk_0.7.2-1_amd64.deb
-   $ sudo gdebi libydk_0.7.2-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.3/libydk_0.7.3-1_amd64.deb
+   $ sudo gdebi libydk_0.7.3-1_amd64.deb
 ```
-**To build from source:**
+**Build from source:**
 ```
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake python3-dev python-dev
 ```
-Centos (Fedora-based):
+###Centos (Fedora-based):
 
 **Install prebuilt libydk binary:**
 ```
    $ sudo yum install epel-release
    $ sudo yum install libssh-devel gcc-c++
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.2/libydk-0.7.2-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.3/libydk-0.7.3-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
    $ yum install devtoolset-4-gcc* -y > /dev/null
-   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   $ ln -s -f /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -s -f /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
-**To build from source:**
+**Build from source:**
 ```
    $ sudo yum install epel-release
    $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 clang libcurl-devel rpm-build redhat-lsb
@@ -111,11 +111,11 @@ Centos (Fedora-based):
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
    $ yum install devtoolset-4-gcc* -y > /dev/null
-   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   $ ln -s -f /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ ln -s -f /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
-## macOS
+## MacOS
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp.
 
 You can download the latest python package from [here](https://www.python.org/downloads/). Please do not use the homebrew version of python as it causes issues with installing ydk packages. Please execute `brew rm python python3` to remove any homebrew python packages.
@@ -125,14 +125,25 @@ You can download the latest python package from [here](https://www.python.org/do
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.2/libydk-0.7.2-Darwin.pkg
-   $ sudo installer -pkg libydk-0.7.2-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.3/libydk-0.7.3-Darwin.pkg
+   $ sudo installer -pkg libydk-0.7.3-Darwin.pkg -target /
 ```
-**To build from source:**
+**Build from source:**
 ```
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake
+```
+
+**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
+```
+$ brew reinstall openssl
+$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
 ```
 
 ## Windows
@@ -190,7 +201,7 @@ Options:
 ```
 The below steps specify how to use `ydk-gen` to generate the core and a bundle. Pre-generated bundles and core are available for python, go and C++: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
-## First step: choose your bundle profile
+## First step: choose model bundle profile
 
 The first step in using ydk-gen is either using one of the already existing [bundle profiles](https://github.com/CiscoDevNet/ydk-gen/tree/master/profiles/bundles) or constructing your own bundle profile, consisting of the YANG models you are interested in:
 
@@ -250,7 +261,7 @@ Only directory examples are shown below.
     },
 ```
 
-## Second step: Generate & install the core
+## Second step: Generate and install the core
 
 On executing `pip install ydk-cisco-ios-xr`, you will be able to install the latest released PyPi version of all the `ydk` packages.
 
@@ -264,15 +275,17 @@ First generate and install ``libydk`` (**required for C++, Go or Python**):
 $ ./generate.py --libydk
 $ cd gen-api/cpp/ydk/build
 $ make
-
+```
 # To create the libydk binary package to use for later installation, run the below command
+```
 $ make package
-
+```
 # To install the compiled libydk code, run the below command after the above
+```
 $ [sudo] make install
 ```
 
-For python:
+For Python:
 ```
 $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
@@ -283,20 +296,20 @@ For Go:
 $ ./generate.py --go --core
 $ cp -r gen-api/go/ydk/* $GOPATH/src/github.com/CiscoDevNet/ydk-go/ydk
 ```
-## Third step: Generate & install your bundle
+## Third step: Generate and install model bundle
 Then, generate your bundle using a bundle profile and install it:
 
-For python:
+For Python:
 ```
 $ ./generate.py --python --bundle profiles/bundles/<name-of-profile>.json
 $ pip install gen-api/python/<name-of-bundle>-bundle/dist/ydk*.tar.gz
 ```
 
-Now, doing `pip list` should show the `ydk` (refering to the core package) and `ydk-<name-of-bundle>` packages installed:
+Now, the `pip list | grep ydk` should show the `ydk` (refering to the core package) and `ydk-<name-of-bundle>` packages installed:
 ```
-$ pip list
+$ pip list | grep ydk
 ...
-ydk (0.5.2)
+ydk (0.7.3)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
@@ -446,4 +459,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.7.2 (alpha). The version of the latest YDK-Gen master branch is 0.7.3-dev. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.7.3 (alpha). The version of the latest YDK-Gen master branch is 0.7.3-dev. YDK-Gen is licensed under the Apache 2.0 License.

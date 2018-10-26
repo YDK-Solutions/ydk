@@ -1,6 +1,49 @@
+### 2018-10-02 version 0.7.3
+
+###Bundle improvements
+
+    Updated cisco-ios-xr bundle to support Cisco IOS XR 6.5.1 release.
+    Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.1 release.
+    Released cisco-nx-os bundle to support Cisco NX OS 9.2.1 release.
+    Updated openconfig to to make it compatible with ydk core version 0.7.3.
+    Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
+
+###Python, C++ and Go
+CRUD/ NETCONF / Codec API improvements
+
+    Introduced Codec feature to decode multiple JSON payload. (#812)
+    Improved support for YList (#811)
+
+###Python
+CRUD/ NETCONF / Codec API improvements
+
+    Improve handling of python native types in model API. (#733)
+    Validate leaf values based on python type of model API. (#739)
+    Improve checking of invalid attributes for model API objects. (#815)
+
+####Note about cisco-ios-xr 6.5.1 bundle
+
+    Bundle excludes the following files due to duplicate namespaces:
+
+    Cisco-IOS-XR-sysadmin-clear-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-clear-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-clear-ncs55A1.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5501.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs55A1.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-aggregator-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-aggregator-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-server-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-server-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5501.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5502.yang
+
+
 ### 2018-07-02 version 0.7.2
  
-#### Python, C++ & Go
+#### Python, C++ and Go
 
 ##### Bundle improvements
   * Released [`cisco-nx-os`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-nx-os-0_7_4.json) bundle to support Cisco NX OS 7.0-3-I7-4 release
@@ -25,7 +68,7 @@
 
 ### 2018-04-09 version 0.7.1
  
-#### Python, C++ & Go
+#### Python, C++ and Go
 
 ##### Bundle improvements
  **NOTE:** [#604](https://github.com/CiscoDevNet/ydk-gen/issues/604) and [#748](https://github.com/CiscoDevNet/ydk-gen/issues/748) introduced a backward incompatibility for python bundles. The below bundles generated with `0.7.1` or newer ydk-gen will only work with ydk `core` version `0.7.1` or newer

@@ -25,40 +25,54 @@ The YANG Development Kit (YDK) is a Software Development Kit that provides API's
 
 ## How to Install
 
-You can install YDK-Cpp on macOS or Linux.  It is not currently supported on Windows.
+You can install YDK-Cpp on MacOS or Linux.  It is not currently supported on Windows.
 
 ### System Requirements
-**Linux**  
-Ubuntu (Debian-based) - The following packages must be present in your system before installing YDK-Cpp:
+####Linux
+#####Ubuntu (Debian-based)
+The following packages must be present in your system before installing YDK-Cpp:
 
 If installing from prebuilt binary:
 ```
 $ sudo apt-get install gdebi-core libtool-bin
+
 ```
 If building from source:
 ```
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 ```
 
-Centos (Fedora-based) - The following packages must be present in your system before installing YDK-Cpp:
+#####Centos (Fedora-based)
 
-If installing from prebuilt binary:
+The following packages must be present in your system before installing YDK-Cpp:
+**From prebuilt binary:**
 ```
 $ sudo yum install epel-release
 $ sudo yum install libssh-devel gcc-c++
 ```
-If building from source:
+**Building from source:**
 ```
 $ sudo yum install epel-release
 $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
 ```
 
-**Mac**  
+####Mac OS
+
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Cpp:
 ```
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 $ xcode-select --install
+```
+**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
+```
+$ brew reinstall openssl
+$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
 ```
 
 ### Quick Install
@@ -66,39 +80,39 @@ $ xcode-select --install
 ##### Ubuntu (Debian-based)
 You can install the latest `libydk` `core` package using prebuilt binaries:
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.2/libydk_0.7.2-1_amd64.deb
-$ sudo gdebi libydk_0.7.2-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.3/libydk_0.7.3-1_amd64.deb
+$ sudo gdebi libydk_0.7.3-1_amd64.deb
 ```
 To install the `ietf` package using prebuilt binaries:
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.2/libydk-ietf_0.1.3-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.3/libydk-ietf_0.1.3-1_amd64.deb
 $ sudo gdebi libydk-ietf_0.1.3-1_amd64.deb
 ```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/debian-ydk/0.7.2) can be installed.
+Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/debian-ydk/0.7.3) can be installed.
 
 ##### Centos (Fedora-based)
 You can install the latest `libydk` `core` package using prebuilt binaries:
 ```
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.2/libydk-0.7.2-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.3/libydk-0.7.3-1.x86_64.rpm
 ```
 To install the `ietf` package using prebuilt binaries:
 ```
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.2/libydk-ietf-0.1.3-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.3/libydk-ietf-0.1.3-1.x86_64.rpm
 ```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/rpm-ydk/0.7.2) can be installed.
+Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/rpm-ydk/0.7.3) can be installed.
 
-#### macOS  
+#### MacOS  
 You can install the latest `libydk` `core` package using prebuilt binaries:
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.2/libydk-0.7.2-Darwin.pkg
-$ sudo installer -pkg libydk-0.7.2-Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.3/libydk-0.7.3-Darwin.pkg
+$ sudo installer -pkg libydk-0.7.3-Darwin.pkg -target /
 ```
 To install the `ietf` package using prebuilt binaries:
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.2/libydk-ietf-0.1.3-Darwin.pkg
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.3/libydk-ietf-0.1.3-Darwin.pkg
 $ sudo installer -pkg libydk-ietf-0.1.3-Darwin.pkg -target /
 ```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/osx-ydk/0.7.2) can be installed.
+Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/osx-ydk/0.7.3) can be installed.
 
 ####Installing from source
 #### Building YDK
@@ -152,4 +166,4 @@ $ build$ cd ../..
 - Additional YDK information can be found at [ydk.io](http://ydk.io)
 
 ## Release Notes
-The current YDK release version is 0.7.2 (alpha). YDK-Cpp is licensed under the Apache 2.0 License.
+The current YDK release version is 0.7.3. YDK-Cpp is licensed under the Apache 2.0 License.

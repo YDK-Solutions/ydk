@@ -19,28 +19,8 @@
 #
 # ------------------------------------------------------------------
 
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
-}
-
-function install_dependencies {
-    print_msg "Installing dependencies"
-
-    brew install curl doxygen xml2 lcov
-    brew rm -f --ignore-dependencies python python3
-    wget https://www.python.org/ftp/python/3.6.3/python-3.6.3-macosx10.6.pkg
-    sudo installer -pkg python-3.6.3-macosx10.6.pkg  -target /
-}
-
-function install_confd {
-    print_msg "Installing confd"
-
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
-    unzip confd-basic-6.2.darwin.x86_64.zip
-    ./confd-basic-6.2.darwin.x86_64.installer.bin ../confd
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
 function install_libssh {
@@ -53,6 +33,14 @@ function install_libssh {
     cmake ..
     sudo make install
     cd -
+}
+
+function install_confd {
+    print_msg "Installing confd"
+
+    wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
+    unzip confd-basic-6.2.darwin.x86_64.zip
+    ./confd-basic-6.2.darwin.x86_64.installer.bin ../confd
 }
 
 function install_golang {
@@ -72,12 +60,32 @@ function install_golang {
     print_msg " "
 }
 
+function check_python_installation {
+  print_msg "Checking python3 and pip3 installation"
+  python3 -V &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing python3"
+    brew install python@3
+  fi
+  pip3 -V &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing pip3"
+    sudo easy_install pip3
+  fi
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
-install_dependencies
-install_confd
-install_libssh
-install_golang
+# Terminal colors
+RED="\033[0;31m"
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
-sudo easy_install pip
-sudo pip install virtualenv
+install_libssh
+install_confd
+install_golang
+check_python_installation
+brew install pybind11

@@ -22,6 +22,8 @@
 # Terminal colors
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 PY_GENERATE="python2"
 PY_TEST="python3"
@@ -31,24 +33,28 @@ PY_TEST="python3"
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date): tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): tests.sh | $@ ${NOCOLOR}"
 }
 
 function run_exec_test {
     $@
     local status=$?
     if [ $status -ne 0 ]; then
-        exit $status
+      MSG_COLOR=$RED
+      print_msg "Failed executing '$@', exiting with status=$status"
+      exit $status
     fi
     return $status
 }
 
 function run_test_no_coverage {
-    print_msg "Executing: $@"
+    print_msg "Executing: ${PYTHON_BIN} $@"
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
-        exit $status
+      MSG_COLOR=$RED
+      print_msg "Failed executing '${PYTHON_BIN} $@', exiting with status=$status"
+      exit $status
     fi
     return $status
 }
@@ -60,7 +66,9 @@ function run_test {
         local status=$?
         print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
-            exit $status
+          MSG_COLOR=$RED
+          print_msg "Failed executing coverage run on '$@', exiting with status=$status"
+          exit $status
         fi
         return $status
     fi
@@ -189,6 +197,8 @@ function run_cpp_core_test {
     if [ $status -ne 0 ]; then
     # If the tests fail, try to run them in verbose to get more details for debug
         ./tests/ydk_core_test -d yes
+        MSG_COLOR=$RED
+        print_msg "C++ core test failed, exiting with status=$status"
         exit $status
     fi
     cd $YDKGEN_HOME
@@ -266,8 +276,10 @@ function cpp_sanity_ydktest_test {
     make test
     local status=$?
     if [ $status -ne 0 ]; then
-    # If the tests fail, try to run them in verbose to get more details for  # debug
+        # If the tests fail, try to run them in verbose to get more details for  # debug
         ./ydk_bundle_test -d yes
+        MSG_COLOR=$RED
+        print_msg "Failed executing C++ bundle test, exiting with status=$status"
         exit $status
     fi
 }
@@ -470,7 +482,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
-#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py 
+#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 #    --non-demand
 }
 
@@ -685,25 +697,47 @@ function sanity_doc_gen_cache {
 
 ########################## EXECUTION STARTS HERE #############################
 ######################################
-# Parse args
+# Parse args and check Python installation
 ######################################
 PYTHON_VERSION=""
 
-args=$(getopt p:d $*)
-set -- $args
-PYTHON_VERSION=${2}
-
-PYTHON_BIN=python${PYTHON_VERSION}
-
-if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
-    PIP_BIN=pip3
+if [[ $(uname) == "Darwin" ]]; then
+  PYTHON_BIN=python3
+  PIP_BIN=pip3
 else
-    PIP_BIN=pip${PYTHON_VERSION}
+  args=$(getopt p:d $*)
+  set -- $args
+  PYTHON_VERSION=${2}
+
+  PYTHON_BIN=python${PYTHON_VERSION}
+
+  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+  else
+      PIP_BIN=pip${PYTHON_VERSION}
+  fi
 fi
 
-print_msg "Using ${PYTHON_BIN} & ${PIP_BIN}"
+print_msg "Checking installation of ${PYTHON_BIN}"
+${PYTHON_BIN} --version &> /dev/null
+status=$?
+if [ $status -ne 0 ]; then
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PYTHON_BIN}"
+  exit $status
+fi
+print_msg "Checking installation of ${PIP_BIN}"
+${PIP_BIN} -V &> /dev/null
+status=$?
+if [ $status -ne 0 ]; then
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PIP_BIN}"
+  exit $status
+fi
+print_msg "Python location: $(which ${PYTHON_BIN})"
+print_msg "Pip location: $(which ${PIP_BIN})"
 
 ######################################
 # Set up env

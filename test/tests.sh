@@ -273,11 +273,12 @@ function cpp_sanity_ydktest_test {
     run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
     run_exec_test make
     export CTEST_OUTPUT_ON_FAILURE=1
-    make test
+    #make test
+    ./ydk_bundle_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose to get more details for  # debug
-        ./ydk_bundle_test -d yes
+        #./ydk_bundle_test -d yes
         MSG_COLOR=$RED
         print_msg "Failed executing C++ bundle test, exiting with status=$status"
         exit $status

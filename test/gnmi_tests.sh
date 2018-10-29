@@ -90,13 +90,48 @@ function pip_check_install {
 # Environment setup-teardown functions
 ######################################################################
 
+function check_python_installation {
+  PYTHON_BIN=python${PYTHON_VERSION}
+
+  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+    PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PIP_BIN=pip3
+  else
+    PIP_BIN=pip${PYTHON_VERSION}
+  fi
+
+  print_msg "Checking installation of ${PYTHON_BIN}"
+  ${PYTHON_BIN} --version &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    MSG_COLOR=$RED
+    print_msg "Could not locate ${PYTHON_BIN}"
+    exit $status
+  fi
+  print_msg "Checking installation of ${PIP_BIN}"
+  ${PIP_BIN} -V &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    MSG_COLOR=$RED
+    print_msg "Could not locate ${PIP_BIN}"
+    exit $status
+  fi
+  print_msg "Python location: $(which ${PYTHON_BIN})"
+  print_msg "Pip location: $(which ${PIP_BIN})"
+}
+
 function init_py_env {
-    print_msg "Initializing Python environment"
-    if [[ ${os_type} == "Darwin" ]] ; then
-        virtualenv macos_pyenv -p python3.6
-        source macos_pyenv/bin/activate
-    fi
+  if [[ ${os_type} == "Darwin" ]] ; then
+    print_msg "Initializing Python3 virtual environment"
+    virtualenv macos_pyenv -p python3
+    source macos_pyenv/bin/activate
+    install -r requirements.txt pybind11==2.2.2
+  else
+    check_python_installation
+    print_msg "Initializing Python requirements"
     ${PIP_BIN} install -r requirements.txt coverage pybind11==2.2.2
+  fi
 }
 
 function init_go_env {
@@ -132,8 +167,12 @@ function install_cpp_core {
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
-    print_msg "Compiling with coverage"
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    if [[ ${os_type} == "Linux" ]] ; then
+      print_msg "Compiling with coverage"
+      run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    else
+      run_exec_test ${CMAKE_BIN} ..
+    fi
     run_exec_test make
     sudo make install
 }
@@ -168,7 +207,11 @@ function build_gnmi_cpp_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    if [[ ${os_type} == "Linux" ]] ; then
+      run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    else
+      run_exec_test ${CMAKE_BIN} ..
+    fi
     run_exec_test make
     sudo make install
     cd $YDKGEN_HOME
@@ -179,7 +222,11 @@ function build_and_run_cpp_gnmi_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    if [[ ${os_type} == "Linux" ]] ; then
+      run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    else
+      run_exec_test ${CMAKE_BIN} ..
+    fi
     run_exec_test make
 
     start_gnmi_server
@@ -206,12 +253,14 @@ function run_cpp_gnmi_tests {
 }
 
 function collect_cpp_coverage {
+  if [[ ${os_type} == "Linux" ]] ; then
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/gnmi/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
     lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
     lcov --list coverage.info #debug info
     cp coverage.info ${YDKGEN_HOME}
+  fi
 }
 
 function start_gnmi_server {
@@ -297,7 +346,9 @@ function run_go_gnmi_samples {
 function install_py_core {
     print_msg "Building and installing Python core package"
     cd $YDKGEN_HOME/sdk/python/core
-    export YDK_COVERAGE=1
+    if [[ ${os_type} == "Linux" ]] ; then
+      export YDK_COVERAGE=1
+    fi
     ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
 
@@ -364,6 +415,9 @@ function run_python_gnmi_tests {
 
 ########################## EXECUTION STARTS HERE #############################
 #
+args=$(getopt p:d $*)
+set -- $args
+PYTHON_VERSION=${2}
 
 ######################################
 # Set up env
@@ -372,44 +426,6 @@ os_type=$(uname)
 print_msg "Running OS type: $os_type"
 
 export YDKGEN_HOME="$(pwd)"
-
-if [[ $(uname) == "Darwin" ]]; then
-  PYTHON_BIN=python3
-  PIP_BIN=pip3
-else
-  args=$(getopt p:d $*)
-  set -- $args
-  PYTHON_VERSION=${2}
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-      PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
-      PIP_BIN=pip3
-  else
-      PIP_BIN=pip${PYTHON_VERSION}
-  fi
-fi
-
-print_msg "Checking installation of ${PYTHON_BIN}"
-${PYTHON_BIN} --version &> /dev/null
-status=$?
-if [ $status -ne 0 ]; then
-  MSG_COLOR=$RED
-  print_msg "Could not locate ${PYTHON_BIN}"
-  exit $status
-fi
-print_msg "Checking installation of ${PIP_BIN}"
-${PIP_BIN} -V &> /dev/null
-status=$?
-if [ $status -ne 0 ]; then
-  MSG_COLOR=$RED
-  print_msg "Could not locate ${PIP_BIN}"
-  exit $status
-fi
-print_msg "Python location: $(which ${PYTHON_BIN})"
-print_msg "Pip location: $(which ${PIP_BIN})"
 
 CMAKE_BIN=cmake
 which cmake3
@@ -456,6 +472,6 @@ find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
 if [[ ${os_type} == "Linux" ]] ; then
-    print_msg "Combining C++, Python and Go coverage"
-    coverage combine > /dev/null || echo "Coverage not combined"
+  print_msg "Combining C++, Python and Go coverage"
+  coverage combine > /dev/null || echo "Coverage not combined"
 fi

@@ -25,16 +25,16 @@ function print_msg {
 }
 
 function install_protobuf {
+    print_msg "Downloading protobuf and protoc"
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
+    unzip protobuf-cpp-3.5.0.zip > /dev/null
+    cd protobuf-3.5.0
+    print_msg "Configuring protobuf and protoc"
+    ./configure > /dev/null
+    print_msg "Compiling protobuf and protoc"
+    make > /dev/null
     print_msg "Installing protobuf and protoc"
-
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-cpp-3.5.0
-    ./configure
-    make
-    make check
     sudo make install
-    sudo update_dyld_shared_cache
     cd -
 }
 
@@ -45,7 +45,7 @@ function install_grpc {
     git clone -b 1.4.5 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
-    make
+    make > /dev/null
     sudo make install
     cd -
 }

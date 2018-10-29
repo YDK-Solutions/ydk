@@ -25,12 +25,15 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
+PY_GENERATE="python2"
+PY_TEST="python3"
+
 ######################################################################
 # Utility functions
 ######################################################################
 
 function print_msg {
-    echo -e "${MSG_COLOR}*** $(date): tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): tests.sh | $@ ${NOCOLOR}"
 }
 
 function run_exec_test {
@@ -45,7 +48,7 @@ function run_exec_test {
 }
 
 function run_test_no_coverage {
-    print_msg "Executing: $@"
+    print_msg "Executing: ${PYTHON_BIN} $@"
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
@@ -136,21 +139,20 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOROOT="/usr/local/go"
-    export PATH=$GOROOT/bin:$PATH
-
-    print_msg "GOPATH is set to: ${GOPATH}"
-    print_msg "GOROOT is set to: ${GOROOT}"
-
-    cd $YDKGEN_HOME
-    if [[ -z "${GOPATH// }" ]]; then
-        export GOPATH="$(pwd)/golang"
+    if [[ $(uname) == "Darwin" ]]; then
+        source /Users/travis/.gvm/scripts/gvm
+        gvm use go1.9.2
+        print_msg "GOROOT: $GOROOT"
+        print_msg "GOPATH: $GOPATH"
     else
-        export GOPATH="$(pwd)/golang":$GOPATH
+        cd $YDKGEN_HOME
+        export GOPATH="$(pwd)/golang"
+        export GOROOT=/usr/local/go
+        export PATH=$GOROOT/bin:$PATH
+        print_msg "Setting GOROOT to $GOROOT"
+        print_msg "Setting GOPATH to $GOPATH"
     fi
-
-    print_msg "Changed GOPATH setting to: ${GOPATH}"
-    print_msg "Running $(go version)"
+    print_msg "Running GO version $(go version)"
 
     go get github.com/stretchr/testify
 }
@@ -276,7 +278,7 @@ function cpp_sanity_ydktest_test {
     make test
     local status=$?
     if [ $status -ne 0 ]; then
-    # If the tests fail, try to run them in verbose to get more details for  # debug
+        # If the tests fail, try to run them in verbose to get more details for  # debug
         ./ydk_bundle_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting C++ bundle tests with status=$status"
@@ -482,7 +484,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
-#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py 
+#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 #    --non-demand
 }
 
@@ -698,39 +700,44 @@ function sanity_doc_gen_cache {
 
 ########################## EXECUTION STARTS HERE #############################
 ######################################
-# Parse args
+# Parse args and check Python installation
 ######################################
 PYTHON_VERSION=""
 
-args=$(getopt p:d $*)
-set -- $args
-PYTHON_VERSION=${2}
-
-PYTHON_BIN=python${PYTHON_VERSION}
-
-if [[ ${PYTHON_VERSION} = "2"* ]]; then
-    PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
-    PIP_BIN=pip3
+if [[ $(uname) == "Darwin" ]]; then
+  PYTHON_BIN=python3
+  PIP_BIN=pip3
 else
-    PIP_BIN=pip${PYTHON_VERSION}
-fi
+  args=$(getopt p:d $*)
+  set -- $args
+  PYTHON_VERSION=${2}
 
-print_msg "Using Python version ${PYTHON_VERSION}"
+  PYTHON_BIN=python${PYTHON_VERSION}
+
+  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+  else
+      PIP_BIN=pip${PYTHON_VERSION}
+  fi
+fi
 
 print_msg "Checking installation of ${PYTHON_BIN}"
-${PYTHON_BIN} -V
+${PYTHON_BIN} --version &> /dev/null
 status=$?
 if [ $status -ne 0 ]; then
-    print_msg "Could not locate ${PYTHON_BIN}"
-    exit $status
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PYTHON_BIN}"
+  exit $status
 fi
 print_msg "Checking installation of ${PIP_BIN}"
-${PIP_BIN} -V
+${PIP_BIN} -V &> /dev/null
 status=$?
 if [ $status -ne 0 ]; then
-    print_msg "Could not locate ${PIP_BIN}"
-    exit $status
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PIP_BIN}"
+  exit $status
 fi
 print_msg "Python location: $(which ${PYTHON_BIN})"
 print_msg "Pip location: $(which ${PIP_BIN})"

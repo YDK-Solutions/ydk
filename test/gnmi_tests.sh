@@ -373,32 +373,40 @@ print_msg "Running OS type: $os_type"
 
 export YDKGEN_HOME="$(pwd)"
 
-args=$(getopt p:d $*)
-set -- $args
-PYTHON_VERSION=${2}
-PYTHON_BIN=python${PYTHON_VERSION}
-
-if [[ ${PYTHON_VERSION} = "2"* ]]; then
-    PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
-    PIP_BIN=pip3
+if [[ $(uname) == "Darwin" ]]; then
+  PYTHON_BIN=python3
+  PIP_BIN=pip3
 else
-    PIP_BIN=pip${PYTHON_VERSION}
+  args=$(getopt p:d $*)
+  set -- $args
+  PYTHON_VERSION=${2}
+
+  PYTHON_BIN=python${PYTHON_VERSION}
+
+  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+  else
+      PIP_BIN=pip${PYTHON_VERSION}
+  fi
 fi
 
 print_msg "Checking installation of ${PYTHON_BIN}"
-${PYTHON_BIN} -V
+${PYTHON_BIN} --version &> /dev/null
 status=$?
 if [ $status -ne 0 ]; then
-    print_msg "Could not locate ${PYTHON_BIN}"
-    exit $status
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PYTHON_BIN}"
+  exit $status
 fi
 print_msg "Checking installation of ${PIP_BIN}"
-${PIP_BIN} -V
+${PIP_BIN} -V &> /dev/null
 status=$?
 if [ $status -ne 0 ]; then
-    print_msg "Could not locate ${PIP_BIN}"
-    exit $status
+  MSG_COLOR=$RED
+  print_msg "Could not locate ${PIP_BIN}"
+  exit $status
 fi
 print_msg "Python location: $(which ${PYTHON_BIN})"
 print_msg "Pip location: $(which ${PIP_BIN})"

@@ -164,13 +164,13 @@ def get_sphinx_ref_label(named_element):
 def split_to_words(input_text):
     words = []
     ''' A word boundary starts if the current character is
-    in Caps and the previous character is in lowercase
+    in Caps and the previous character is in lower case
     for example NetworkElement , at Element the E is in Caps
-    and the previoud character is k in lower
+    and the previous character is k in lower
 
     or if the current character is in Caps and the next character
     in in lower case ApplicationCLIEvent for Event while reaching E
-    the next chracter is v
+    the next character is v
 
     '''
     word = None

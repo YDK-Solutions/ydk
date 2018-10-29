@@ -21,20 +21,20 @@ To build the RPM, all that's required is the **source** tarball and the **spec**
 For more details on setup, see [Set Up CentOS Build Environment](https://wiki.centos.org/HowTos/SetupRpmBuildEnvironment) 
 
 ## The Source Tarball
-For example, to build ydk-cpp 0.5.4, place the tarball in the SOURCES directory:
+For example, to build ydk-cpp 0.7.3, place the tarball in the SOURCES directory:
 ```
 $ cd ~/rpmbuild/SOURCES
-$ wget https://github.com/CiscoDevNet/ydk-cpp/archive/0.5.4.tar.gz
+$ wget https://github.com/CiscoDevNet/ydk-cpp/archive/0.7.3.tar.gz
 ```
 
 RPM package names follow a strict format: name-version-release.architecture.rpm
 Since the tarball will be unzipped and placed into the BUILD directory, we must sanitize the tarball such that its name and contents are consistent with the format name-version:
 ```
-$ tar -xvf 0.5.4.tar.gz                 // note: 0.5.4.tar.gz unzips to ydk-cpp-0.5.4
-$ mv ydk-cpp-0.5.4 ydk-0.5.4            // correct naming format to ydk-0.5.4
-$ tar -cvf ydk.0.5.4.tar.gz ydk-0.5.4   // repackage
-$ rm 0.5.4.tar.gz                       // clean up
-$ rm -rf ydk-0.5.4
+$ tar -xvf 0.7.3.tar.gz                 // note: 0.7.3.tar.gz unzips to ydk-cpp-0.7.3
+$ mv ydk-cpp-0.7.3 ydk-0.7.3            // correct naming format to ydk-0.7.3
+$ tar -cvf ydk.0.7.3.tar.gz ydk-0.7.3   // repackage
+$ rm 0.7.3.tar.gz                       // clean up
+$ rm -rf ydk-0.7.3
 ```
 
 ## The Spec File

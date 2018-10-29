@@ -75,9 +75,9 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
-    unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-3.3.0
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
     ./configure
     make
     make check
@@ -110,6 +110,11 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
 
 Quick YDK Installation
 ----------------------
+
+System Requirements
+~~~~~~~~~~~~~~~~~~~
+
+**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
 
 **Ubuntu**
 

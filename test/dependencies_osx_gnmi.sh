@@ -15,41 +15,38 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 #
-# dependencies_linux_gnmi.sh
-# Script to install protobuf, protoc and grpc on Ubuntu and CentOS
-# for running YDK gNMI tests on docker
+# dependencies_osx_gnmi.sh
+# Script for running ydk CI on docker via travis-ci.org
 #
 # ------------------------------------------------------------------
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux_gnmi.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx_gnmi.sh | $@ ${NOCOLOR}"
 }
 
 function install_protobuf {
-    print_msg "Downloading protobuf and protoc"
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
-    unzip protobuf-cpp-3.5.0.zip > /dev/null
-    cd protobuf-3.5.0
-    print_msg "Configuring protobuf and protoc"
-    ./configure > /dev/null
-    print_msg "Compiling protobuf and protoc"
-    make > /dev/null
     print_msg "Installing protobuf and protoc"
+
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-cpp-3.5.0
+    ./configure
+    make
+    make check
     sudo make install
-    sudo ldconfig
+    sudo update_dyld_shared_cache
     cd -
 }
 
 function install_grpc {
     print_msg "Installing grpc"
 
-    git clone -b v1.9.1 https://github.com/grpc/grpc
+    LIBTOOL=glibtool LIBTOOLIZE=glibtoolize make
+    git clone -b 1.4.5 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
-    sudo ldconfig
-    make > /dev/null
+    make
     sudo make install
-    sudo ldconfig
     cd -
 }
 
@@ -62,3 +59,4 @@ MSG_COLOR=$YELLOW
 
 install_protobuf
 install_grpc
+

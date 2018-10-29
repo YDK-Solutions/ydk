@@ -38,17 +38,24 @@ docker run -it ydkdev/ydk-go
 You can install YDK-Go on macOS or Linux.  It is not currently supported on Windows.
 
 ### System Requirements
-**Linux**  
-Ubuntu (Debian-based) - The following packages must be present in your system before installing YDK-Go:
+####Linux
+#####Ubuntu (Debian-based)
+The following packages must be present in your system before installing YDK-Go:
 
 ```
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 
+<<<<<<< HEAD
 $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
 $ sudo gdebi libydk_0.8.0-1_amd64.deb
+=======
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.3/libydk_0.7.3-1_amd64.deb
+$ sudo gdebi libydk_0.7.3-1_amd64.deb
+>>>>>>> origin
 ```
 
-Centos (Fedora-based) - The following packages must be present in your system before installing YDK-Go:
+####Centos (Fedora-based)
+The following packages must be present in your system before installing YDK-Go:
 
 ```
 $ sudo yum install epel-release
@@ -60,11 +67,15 @@ $ yum install devtoolset-4-gcc* -y > /dev/null
 $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
 $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
+<<<<<<< HEAD
 $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+=======
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.3/libydk-0.7.3-1.x86_64.rpm
+>>>>>>> origin
 
 ```
 
-**Mac**  
+####Mac OS
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Go:
 ```
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -73,6 +84,18 @@ $ xcode-select --install
 
 $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
 $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+```
+
+**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
+```
+$ brew reinstall openssl
+$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
+>>>>>>> origin
 ```
 
 ### Golang
@@ -109,5 +132,5 @@ $ go get github.com/CiscoDevNet/ydk-go/ydk
 - Additional YDK information can be found at [ydk.io](http://ydk.io)
 
 ## Release Notes
-The current YDK release version is 0.8.0 (beta). YDK-Go is licensed under the Apache 2.0 License.
 
+The current YDK release version is 0.8.0 (beta). YDK-Go is licensed under the Apache 2.0 License.

@@ -25,40 +25,54 @@ The YANG Development Kit (YDK) is a Software Development Kit that provides API's
 
 ## How to Install
 
-You can install YDK-Cpp on macOS or Linux.  It is not currently supported on Windows.
+You can install YDK-Cpp on MacOS or Linux.  It is not currently supported on Windows.
 
 ### System Requirements
-**Linux**  
-Ubuntu (Debian-based) - The following packages must be present in your system before installing YDK-Cpp:
+####Linux
+#####Ubuntu (Debian-based)
+The following packages must be present in your system before installing YDK-Cpp:
 
 If installing from prebuilt binary:
 ```
 $ sudo apt-get install gdebi-core libtool-bin
+
 ```
 If building from source:
 ```
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 ```
 
-Centos (Fedora-based) - The following packages must be present in your system before installing YDK-Cpp:
+#####Centos (Fedora-based)
 
-If installing from prebuilt binary:
+The following packages must be present in your system before installing YDK-Cpp:
+**From prebuilt binary:**
 ```
 $ sudo yum install epel-release
 $ sudo yum install libssh-devel gcc-c++
 ```
-If building from source:
+**Building from source:**
 ```
 $ sudo yum install epel-release
 $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
 ```
 
-**Mac**  
+####Mac OS
+
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Cpp:
 ```
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 $ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 $ xcode-select --install
+```
+**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
+```
+$ brew reinstall openssl
+$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
 ```
 
 ### Quick Install
@@ -87,7 +101,7 @@ $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libyd
 ```
 Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/rpm-ydk/0.8.0) can be installed.
 
-#### macOS  
+#### MacOS  
 You can install the latest `libydk` `core` package using prebuilt binaries:
 ```
 $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg

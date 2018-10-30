@@ -128,8 +128,12 @@ function stop_tcp_server {
 }
 
 function check_python_installation {
-  PYTHON_BIN=python${PYTHON_VERSION}
+  
+  if [[ ${os_type} == "Darwin" ]] ; then
+    PYTHON_VERSION=3
+  fi
 
+  PYTHON_BIN=python${PYTHON_VERSION}
   if [[ ${PYTHON_VERSION} = *"2"* ]]; then
     PIP_BIN=pip
   elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
@@ -159,17 +163,18 @@ function check_python_installation {
 }
 
 function init_py_env {
-    if [[ ${os_type} == "Darwin" ]] ; then
-        print_msg "Initializing Python3 virtual environment"
-        virtualenv macos_pyenv -p python3
-        source macos_pyenv/bin/activate
-        print_msg "Initializing Python requirements"
-        ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
-    else
-        check_python_installation
-        print_msg "Initializing Python requirements"
-        ${PIP_BIN} install -r requirements.txt coverage pybind11==2.2.2
-    fi
+  check_python_installation
+  print_msg "Initializing Python requirements"
+  sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
+  if [[ ${os_type} == "Linux" ]] ; then
+    sudo ${PIP_BIN} install coverage
+  fi
+
+  #else
+    #print_msg "Initializing Python3 virtual environment"
+    #virtualenv macos_pyenv -p python3
+    #source macos_pyenv/bin/activate
+  #fi
 }
 
 function init_go_env {

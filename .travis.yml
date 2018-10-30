@@ -11,6 +11,7 @@ matrix:
      osx_image: xcode7.3
      language: generic
    - os: osx
+     osx_image: xcode7.3
      env: GNMI=true
      language: generic
    - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7
@@ -36,7 +37,7 @@ before_install:
     - if [[ "$DOCKER" == "true" ]]; then docker pull ${OS_TYPE}:${OS_VERSION}                                ; fi
 
 script:
-    - if [[ "$DOCKER" != "true" ]]; then ./test/tests.sh ; fi
+    - if [[ "$DOCKER" != "true" ]] && [[ "$GNMI" != "true" ]]; then ./test/tests.sh ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$GNMI" == "true" ]]; then ./test/gnmi_tests.sh ; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" != "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/tests.sh -p ${PYTHON_VERSION} && ./test/test_package_centos.sh -p ${PYTHON_VERSION}" ; fi
     - if [[ "$DOCKER" == "true" ]] && [[ "$OS_TYPE" == "centos" ]] && [[ "$GNMI" == "true" ]]; then docker run -v `pwd`:/ydk-gen ${OS_TYPE}:${OS_VERSION} bash -c "cd /ydk-gen && ./test/dependencies_centos.sh && ./test/dependencies_linux_gnmi.sh && ./test/gnmi_tests.sh -p ${PYTHON_VERSION}"; fi

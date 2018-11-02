@@ -153,7 +153,7 @@ set(libydk_src
     src/netconf_tcp_client.cpp
     src/netconf_provider.cpp
     src/netconf_service.cpp
-    src/path/netconf_session.cpp
+    src/netconf_session.cpp
     src/network_topology.cpp
     src/opendaylight_parser.cpp
     src/opendaylight_provider.cpp
@@ -170,7 +170,7 @@ set(libydk_src
     src/path/annotation.cpp
     src/path/capability.cpp
     src/path/data_node.cpp
-    src/path/netconf_model_provider.cpp
+    src/netconf_model_provider.cpp
     src/path/path.cpp
     src/path/repository.cpp
     src/path/restconf_session.cpp
@@ -194,6 +194,7 @@ set(spdlog_fmt_bundled_include_location include/spdlog/fmt/bundled)
 set(spdlog_sinks_include_location include/spdlog/sinks)
 
 set(libydk_install_headers
+    src/netconf_model_provider.hpp
     src/capabilities_parser.hpp
     src/codec_provider.hpp
     src/codec_service.hpp

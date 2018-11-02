@@ -23,17 +23,16 @@
 
 #include <libyang/libyang.h>
 
-#include "../common_utilities.hpp"
-#include "../entity_data_node_walker.hpp"
-#include "../errors.hpp"
-#include "../ietf_parser.hpp"
-#include "../logger.hpp"
-#include "../netconf_ssh_client.hpp"
-#include "../netconf_tcp_client.hpp"
-#include "../types.hpp"
-#include "../ydk_yang.hpp"
-
+#include "common_utilities.hpp"
+#include "entity_data_node_walker.hpp"
+#include "errors.hpp"
+#include "ietf_parser.hpp"
+#include "logger.hpp"
 #include "netconf_model_provider.hpp"
+#include "netconf_ssh_client.hpp"
+#include "netconf_tcp_client.hpp"
+#include "types.hpp"
+#include "ydk_yang.hpp"
 
 using namespace std;
 

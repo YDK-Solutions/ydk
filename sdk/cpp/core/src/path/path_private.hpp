@@ -287,6 +287,7 @@ namespace ydk {
 
             bool has_output_node() const;
 
+            std::string get_name() const;
 
             SchemaNodeImpl& schema_node;
             std::unique_ptr<DataNodeImpl> data_node;

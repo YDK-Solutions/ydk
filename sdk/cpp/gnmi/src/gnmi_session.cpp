@@ -26,9 +26,8 @@
 
 #include <ydk/ietf_parser.hpp>
 #include <ydk/logger.hpp>
-
-#include "../../core/src/path/path_private.hpp"
-#include "../../core/src/path/netconf_model_provider.hpp"
+#include <ydk/netconf_model_provider.hpp>
+#include <ydk/common_utilities.hpp>
 
 #include "gnmi_provider.hpp"
 #include "gnmi_path_api.hpp"
@@ -109,12 +108,11 @@ void gNMISession::invoke_subscribe(Rpc& rpc,
     SchemaNode* gnmi_sub = get_schema_for_operation(*root_schema, "ydk:gnmi-subscribe");
 
     SchemaNode* rpc_schema = &(rpc.get_schema_node());
-    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     if (rpc_schema == gnmi_sub) {
         handle_subscribe(rpc, out_func, poll_func);
     }
     else {
-        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
+        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc.get_name());
         throw(YOperationNotSupportedError{"RPC is not supported!"});
     }
 }
@@ -140,8 +138,7 @@ shared_ptr<DataNode> gNMISession::invoke(Rpc& rpc) const
         return handle_get_capabilities();
     }
     else {
-        auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
-        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc_name);
+        YLOG_ERROR("gNMISession::invoke: RPC '{}' is not supported", rpc.get_name());
         throw(YOperationNotSupportedError{"RPC is not supported!"});
     }
     return nullptr;
@@ -229,11 +226,9 @@ gNMISession::handle_get(Rpc& rpc) const
 {
 	vector<GnmiClientRequest> getRequest{};
 
-    SchemaNode* rpc_schema = &(rpc.get_schema_node());
-    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
     auto request_list = rpc.get_input_node().find("request");
     if (request_list.empty()) {
-        YLOG_ERROR("Failed to get 'request' node from '{}' RPC", rpc_name);
+        YLOG_ERROR("Failed to get 'request' node from '{}' RPC", rpc.get_name());
         throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
     }
 
@@ -257,7 +252,7 @@ gNMISession::handle_get(Rpc& rpc) const
 
         auto entity = request.get()->find("entity");
         if (entity.empty()) {
-            YLOG_ERROR("Failed to get 'entity' node from '{}' RPC", rpc_name);
+            YLOG_ERROR("Failed to get 'entity' node from '{}' RPC", rpc.get_name());
             throw(YInvalidArgumentError{"Failed to get 'entity' node from RPC"});
         }
         DataNode* entity_node = entity[0].get();
@@ -296,9 +291,7 @@ gNMISession::handle_get_capabilities() const
 {
 	GnmiClientCapabilityResponse reply = client->execute_get_capabilities();
 
-	RootSchemaNodeImpl & rs_impl = dynamic_cast<RootSchemaNodeImpl &> (*root_schema);
-
-    RootDataImpl* rd = new RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+    DataNode * rd = ydk::create_root_datanode(root_schema.get());
 
 	auto & output_dn = rd->create_datanode("ydk:gnmi-capabilities", "");
 
@@ -328,11 +321,10 @@ gNMISession::handle_subscribe(Rpc& rpc,
 		std::function<bool(const char * response)> poll_func) const
 {
     vector<GnmiClientSubscription> sub_list{};
-    SchemaNode* rpc_schema = &(rpc.get_schema_node());
-    auto rpc_name = ((SchemaNodeImpl*)rpc_schema)->m_node->name;
+
     auto subscription = rpc.get_input_node().find("subscription");
     if (subscription.empty()) {
-        YLOG_ERROR("Failed to get 'subscription' node from '{}' RPC", rpc_name);
+        YLOG_ERROR("Failed to get 'subscription' node from '{}' RPC", rpc.get_name());
         throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
     }
     uint32 qos = 0;
@@ -356,7 +348,7 @@ gNMISession::handle_subscribe(Rpc& rpc,
 
     auto subscription_list = subscription[0]->find("subscription-list");
     if (subscription_list.empty()) {
-        YLOG_ERROR("Failed to get 'subscription-list' node from '{}' RPC", rpc_name);
+        YLOG_ERROR("Failed to get 'subscription-list' node from '{}' RPC", rpc.get_name());
         throw(YInvalidArgumentError{"Failed to get 'request' node from RPC"});
     }
 

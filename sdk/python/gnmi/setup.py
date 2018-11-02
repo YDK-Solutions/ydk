@@ -31,7 +31,7 @@ NMSP_PKG_DEPENDENCIES = ["$DEPENDENCY$"]
 
 # Define and modify version number and package name here,
 # Namespace packages are share same prefix: "ydk-models"
-NAME = 'ydk-services-gnmi'
+NAME = 'ydk-service-gnmi'
 
 VERSION = '0.4.0'
 

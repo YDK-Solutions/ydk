@@ -633,7 +633,7 @@ public:
     ///
     /// @brief create a DataNode corresponding to the path and set its value
     ///
-    /// This methods creates a DataNode tree based on the path passed in. The path
+    /// This method creates DataNode tree based on the path passed in. The path
     /// expression must identify a single node. If the last node created is of schema
     /// type list, leaf-list or anyxml that value is also set in the node.
     /// The returned DataNode is the last node created (the terminal part of the path).
@@ -1179,11 +1179,16 @@ public:
     ///
     /// @brief get the input data tree
     ///
-    ///@return pointer to the input DataNode or nullptr if the rpc does not have
+    /// @return pointer to the input DataNode or nullptr, if the RPC does not have
     /// an input element in the schema.
     ///
     virtual DataNode& get_input_node() const = 0;
 
+    ///
+    /// @brief checks if the RPC has output datanode
+    ///
+    /// @return true or false accordingly
+    ///
     virtual bool has_output_node() const = 0;
 
     ///
@@ -1191,6 +1196,13 @@ public:
     ///
     /// @return pointer to the SchemaNode associated with this rpc.
     virtual SchemaNode& get_schema_node() const = 0;
+
+    ///
+    /// @brief returns RPC name as defined in YANG model
+    ///
+    /// @return string value of the RPC
+    ///
+    virtual std::string get_name() const = 0;
 };
 
 }	// namespace path

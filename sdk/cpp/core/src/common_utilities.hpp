@@ -50,6 +50,8 @@ namespace ydk
                                         const std::string & operation, const std::string & data_tag, bool set_config_flag);
     std::vector<std::shared_ptr<Entity>> execute_rpc(ServiceProvider & provider, std::vector<Entity*> & filter_list,
                                         const std::string & operation, const std::string & data_tag, bool set_config_flag);
+
+    path::DataNode* create_root_datanode(path::RootSchemaNode* root_schema);
 }
 
 #endif /* YDK_UTILITIES */

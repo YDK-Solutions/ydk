@@ -92,9 +92,10 @@ MSG_COLOR=$YELLOW
 install_libssh
 install_confd
 install_golang
-check_python_installation
 
 brew install pybind11
+check_python_installation
+
 sudo pip3 install virtualenv
 
 #install_fpm

@@ -26,6 +26,7 @@
 #include "common_utilities.hpp"
 #include "entity_data_node_walker.hpp"
 #include "xml_subtree_codec.hpp"
+#include "path/path_private.hpp"
 
 using namespace std;
 namespace ydk
@@ -242,6 +243,14 @@ execute_rpc(ydk::ServiceProvider & provider, vector<Entity*> & filter_list,
     }
 
     return result_list;
+}
+
+path::DataNode* create_root_datanode(path::RootSchemaNode* root_schema)
+{
+	path::RootSchemaNodeImpl & rs_impl = dynamic_cast<path::RootSchemaNodeImpl &> (*root_schema);
+	path::RootDataImpl* rd = new path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+	path::DataNodeImpl* rdn = dynamic_cast<path::DataNodeImpl*> (rd);
+    return rdn;
 }
 
 }

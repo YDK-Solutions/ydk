@@ -173,7 +173,7 @@ You can install the latest model packages from the DevHub artifactory and Python
 .. code-block:: sh
 
     $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-services-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-service-gnmi-0.4.0.tar.gz
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
     $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
@@ -185,7 +185,7 @@ You can install the latest model packages from the DevHub artifactory and Python
 .. code-block:: sh
 
     $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-services-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-service-gnmi-0.4.0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 

@@ -19,9 +19,9 @@
 
 #include <string>
 
-#include "../netconf_client.hpp"
-#include "../path_api.hpp"
-#include "../service_provider.hpp"
+#include "netconf_client.hpp"
+#include "path_api.hpp"
+#include "service_provider.hpp"
 
 namespace ydk
 {

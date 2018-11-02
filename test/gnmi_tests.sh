@@ -30,7 +30,7 @@ MSG_COLOR=$YELLOW
 ######################################################################
 
 function print_msg {
-    echo -e "${MSG_COLOR}*** $(date): gnmi_tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): gnmi_tests.sh | $@ ${NOCOLOR}"
 }
 
 function run_exec_test {

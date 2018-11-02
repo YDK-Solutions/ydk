@@ -24,12 +24,12 @@
 #include <memory>
 
 #include "netconf_model_provider.hpp"
-#include "../errors.hpp"
-#include "../netconf_client.hpp"
-#include "../types.hpp"
-#include "../ydk_yang.hpp"
-#include "../logger.hpp"
-#include "../common_utilities.hpp"
+#include "errors.hpp"
+#include "netconf_client.hpp"
+#include "types.hpp"
+#include "ydk_yang.hpp"
+#include "logger.hpp"
+#include "common_utilities.hpp"
 
 
 using namespace std;

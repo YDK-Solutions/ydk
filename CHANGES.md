@@ -1,11 +1,13 @@
-<<<<<<< HEAD
-### 2018-10-03 version 0.8.1
+### 2018-10-03 version 0.8.0
  
 #### Python, C++ & Go
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
 ##### CRUD / Netconf / Codec / Path API improvements
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
-=======
+
+####ydk-gen
+  * Added capability to generate YDK service packages from generate.pl script.
+
 ### 2018-10-02 version 0.7.3
 
 ###Bundle improvements
@@ -47,8 +49,6 @@ CRUD/ NETCONF / Codec API improvements
     Cisco-IOS-XR-sysadmin-fabric-ncs5500.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5501.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5502.yang
-
->>>>>>> origin
 
 ### 2018-07-02 version 0.7.2
  

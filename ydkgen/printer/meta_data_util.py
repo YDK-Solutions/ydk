@@ -58,6 +58,7 @@ class MetaInfoData:
         self.is_presence = False
         self.units = ''
         self.default_value = ''
+        self.default_value_object = None
         self.status = ''
 
 
@@ -82,6 +83,7 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
 
         meta_info_data = get_meta_info_data(
             prop, prop.property_type, prop.stmt.search_one('type'), language,
+            False,
             identity_subclasses=id_subclasses)
 
         if meta_info_data is None:
@@ -204,7 +206,7 @@ def format_range_string(ranges):
     return range_string
 
 
-def get_meta_info_data(prop, property_type, type_stmt, language, identity_subclasses=None):
+def get_meta_info_data(prop, property_type, type_stmt, language, one_class_per_module, identity_subclasses=None):
     """ Gets an instance of MetaInfoData that has the useful information about the property.
 
         Args:
@@ -245,7 +247,15 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
 
     if isinstance(property_type, Class):
         meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        if one_class_per_module:
+            if property_type.is_identity():
+                meta_info_data.clazz_name = "'%s%s'" % (
+                    (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+                    property_type.name)
+            else:
+                meta_info_data.clazz_name = "'%s'" % property_type.name
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
 
         if identity_subclasses is None:
             meta_info_data.doc_link = get_class_crossref_tag(
@@ -271,21 +281,46 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.mtype = 'REFERENCE_IDENTITY_CLASS'
         else:
             meta_info_data.mtype = 'REFERENCE_CLASS'
+        # if the class is local use just the local name
+        if one_class_per_module or property_type in clazz.owned_elements:
+            meta_info_data.ptype = property_type.name
+        else:
+            meta_info_data.ptype = property_type.qn()
 
     elif isinstance(property_type, Enum):
         meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        if one_class_per_module:
+            meta_info_data.clazz_name = "'%s%s'" % (
+                (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+                property_type.name)
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
 
         meta_info_data.doc_link = get_class_crossref_tag(property_type.name,
                                                          property_type,
                                                          language)
         _set_mtype_docstring(meta_info_data, prop, 'REFERENCE_ENUM_CLASS', language)
 
+        if one_class_per_module or prop.property_type in clazz.owned_elements:
+            meta_info_data.ptype = property_type.name
+        else:
+            meta_info_data.ptype = property_type.qn()
+
     elif isinstance(property_type, Bits):
         meta_info_data.pmodule_name = "'%s'" % property_type.get_py_mod_name()
-        meta_info_data.clazz_name = "'%s'" % property_type.qn()
+        if one_class_per_module:
+            meta_info_data.clazz_name = "'%s%s'" % (
+            (property_type.owner.name + '.') if (not isinstance(property_type.owner, Package)) else '',
+            property_type.name)
+        else:
+            meta_info_data.clazz_name = "'%s'" % property_type.qn()
         meta_info_data.doc_link = get_bits_doc_link(property_type, language)
         _set_mtype_docstring(meta_info_data, prop, 'REFERENCE_BITS', language)
+
+        if one_class_per_module or prop.property_type in clazz.owned_elements:
+            meta_info_data.ptype = property_type.name
+        else:
+            meta_info_data.ptype = property_type.qn()
 
     else:
         if prop.stmt.keyword == 'leaf-list':
@@ -372,7 +407,7 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             for contained_type_stmt in type_spec.types:
                 contained_property_type = types_extractor.get_property_type(contained_type_stmt)
                 child_meta_info_data = get_meta_info_data(
-                    prop, contained_property_type, contained_type_stmt, language,
+                    prop, contained_property_type, contained_type_stmt, language, one_class_per_module,
                     identity_subclasses=identity_subclasses)
                 meta_info_data.children.append(child_meta_info_data)
 
@@ -382,6 +417,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link += get_primitive_type_tag('str', language)
         else:
             raise EmitError('Illegal path')
+
+    if default_value is not None:
+        meta_info_data.default_value_object = get_default_value_object(meta_info_data.ptype, property_type,                                                                   meta_info_data.clazz_name, default_value.arg,
+                                                                       identity_subclasses)
     return meta_info_data
 
 
@@ -680,3 +719,33 @@ def get_class_bases(clazz, language):
         for item in clazz.extends:
             bases.append(get_class_crossref_tag(item.name, item, language))
     return bases
+
+def get_default_value_object(ptype, property_type, clazz_name, default_value, identity_subclasses):
+    default_value_object = ''
+    if ptype == 'Empty':
+        default_value_object = "'Empty()'"
+    elif ptype == 'str':
+        default_value_object = '"\'%s\'"' % default_value
+    elif ptype == 'int':
+        default_value_object = '"%s"' % default_value
+    elif ptype == 'Decimal64':
+        default_value_object = '\'Decimal64("%s")\'' % default_value
+    elif ptype == 'bool':
+        default_value_object = "'%s'" % ('False' if default_value == 'false' else 'True')
+    elif isinstance(property_type, Bits):
+        default_value_object = "'%s'" % default_value
+    elif isinstance(property_type, Enum):
+        for l in property_type.literals:
+            if l.stmt.arg == default_value:
+                default_value_object = "'%s.%s'" % (property_type.fqn(), l.name)
+                break
+    elif isinstance(property_type, Class):
+        if identity_subclasses is not None:
+            if id(property_type) in identity_subclasses:
+                for c in identity_subclasses[id(property_type)]:
+                    if c.stmt.arg in default_value:
+                        default_value_object = "'%s()'" % c.fqn()
+                        break
+    else:
+        default_value_object = "'%s'" % default_value
+    return default_value_object

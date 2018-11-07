@@ -1,9 +1,76 @@
-### 2018-10-03 version 0.8.0-beta
- 
-#### Python, C++ & Go
+### 2018-11-07 version 0.8.0
+
+#### Python
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
-##### CRUD / Netconf / Codec / Path API improvements
+  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
+
+##### Codec
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+
+#### ydk-gen
+  * Added capability to generate YDK service packages from `generate.py` script.
+  
+### 2018-10-02 version 0.7.3
+
+#### Resolved issues
+
+    Introduced Codec feature to decode multiple JSON payload. (#812)
+    Improved support for YList (#811)
+    Improve handling of python native types in model API. (#733)
+    Validate leaf values based on python type of model API. (#739)
+    Improve checking of invalid attributes for model API objects. (#815)
+
+### Bundle improvements
+
+    Updated cisco-ios-xr bundle to support Cisco IOS XR 6.5.1 release.
+    Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.1 release.
+    Released cisco-nx-os bundle to support Cisco NX OS 9.2.1 release.
+    Updated openconfig to to make it compatible with ydk core version 0.7.3.
+    Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
+
+**Note**
+
+    The cisco-ios-xr 6.5.1 bundle excludes the following files due to duplicate namespaces:
+
+    Cisco-IOS-XR-sysadmin-clear-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-clear-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-clear-ncs55A1.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5501.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-controllers-ncs55A1.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-aggregator-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-aggregator-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-server-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-mgr-fsdb-server-ncs5502.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5500.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5501.yang
+    Cisco-IOS-XR-sysadmin-fabric-ncs5502.yang
+
+### 2018-07-02 version 0.7.2
+ 
+#### Bundle improvements
+  * Released [`cisco-nx-os`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-nx-os-0_7_4.json) bundle to support Cisco NX OS 7.0-3-I7-4 release
+  * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_4_1.json) bundle to support Cisco IOS XR 6.4.1 release
+  * Updated [`openconfig`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/openconfig_0_1_6.json) to introduce support for additional AFT models.
+  * Updated [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_8_1_post1.json) bundle to continue to support Cisco IOS XE 16.8.1 release and make it compatible with `ydk core` version 0.7.2
+  * Also updated [`ietf`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/ietf_0_1_5_post1.json) bundle to make it compatible with `ydk core` version 0.7.2
+
+#### CRUD / Netconf / Codec / Path API improvements
+  * Introduced support for key-based access to list items in Python, C++ and Go model API ([#231](https://github.com/CiscoDevNet/ydk-gen/issues/231))
+  * Introduced support for multiple entities in Go ([#768](https://github.com/CiscoDevNet/ydk-gen/pull/768))
+  * Improved support for YANG `presence` nodes ([#629](https://github.com/CiscoDevNet/ydk-gen/pull/629), [#738](https://github.com/CiscoDevNet/ydk-gen/pull/738), [#763](https://github.com/CiscoDevNet/ydk-gen/pull/763))
+  * Fixed issue with invoking sequential CRUD operations on different model APIs ([#727](https://github.com/CiscoDevNet/ydk-gen/issues/727))
+  * Improved NETCONF service commit API ([#796](https://github.com/CiscoDevNet/ydk-gen/issues/796))
+  * Enhanced support for leaf value patterns ([#786](https://github.com/CiscoDevNet/ydk-gen/issues/786))
+
+#### Netconf provider improvements
+  * Improved support for YANG `feature`s included in NETCONF hello message ([#777](https://github.com/CiscoDevNet/ydk-gen/issues/777))
+
+#### Documentation improvements
+  * Enhanced Go documentation ([#681](https://github.com/CiscoDevNet/ydk-gen/issues/681), [#684](https://github.com/CiscoDevNet/ydk-gen/issues/684), [#720](https://github.com/CiscoDevNet/ydk-gen/issues/720))
+  * Improved documentation logos ([#754](https://github.com/CiscoDevNet/ydk-gen/issues/754), [#755](https://github.com/CiscoDevNet/ydk-gen/issues/755), [#756](https://github.com/CiscoDevNet/ydk-gen/issues/756))
+
 
 ### 2018-01-31 version 0.7.0
 
@@ -12,12 +79,15 @@
 * Added support for all existing `ydk core` services, providers, types and errors in Go
 * Added support for all existing `ydk bundles` including `ietf`, `openconfig`, `cisco-ios-xr` and `cisco-ios-xe` in Go
 * [#673](https://github.com/CiscoDevNet/ydk-gen/pull/673), [#663](https://github.com/CiscoDevNet/ydk-gen/pull/), [#660](https://github.com/CiscoDevNet/ydk-gen/pull/660), [#658](https://github.com/CiscoDevNet/ydk-gen/pull/658), [#606](https://github.com/CiscoDevNet/ydk-gen/pull/606), [#605](https://github.com/CiscoDevNet/ydk-gen/pull/605)
+
 ##### CRUD service improvements
 * Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664)) 
 * Improved formatting of payloads in logging output ([#670](https://github.com/CiscoDevNet/ydk-gen/issues/670))
+
 ##### Error handling improvements
 * Fixed naming of errors across C++ and Go to be consistent. Changed YCPPError, YError etc to YError ([#669](https://github.com/CiscoDevNet/ydk-gen/issues/669), [#668](https://github.com/CiscoDevNet/ydk-gen/issues/668))
 * Fixed warning in CMake build system to look for CMake version of `3.0.0` or greater ([#655](https://github.com/CiscoDevNet/ydk-gen/issues/655))
+
 ##### Documentation improvements
 * Improved documentation for models which augment other models ([#426](https://github.com/CiscoDevNet/ydk-gen/issues/426))
 

@@ -410,6 +410,13 @@ if __name__ == '__main__':
         help="Generate an SDK from a specified list of files")
 
     parser.add_argument(
+        "--generate-meta",
+        action="store_true",
+        dest="genmeta",
+        default=False,
+        help="Generate meta-data for Python bundle")
+
+    parser.add_argument(
         "--generate-doc",
         action="store_true",
         dest="gendoc",
@@ -524,6 +531,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
@@ -547,6 +555,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = (generator.generate(options.bundle))
 

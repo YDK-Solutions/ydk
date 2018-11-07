@@ -285,7 +285,7 @@ def get_ptypes(prop, property_type, type_stmt, one_class_per_module, identity_su
 
 
 def get_ptype(prop, property_type, type_stmt, one_class_per_module, identity_subclasses):
-    meta_info_data = get_meta_info_data(prop, property_type, type_stmt, 'py', identity_subclasses)
+    meta_info_data = get_meta_info_data(prop, property_type, type_stmt, 'py', one_class_per_module, identity_subclasses)
     if meta_info_data.pmodule_name is None:
         return "'%s'" % meta_info_data.ptype
 

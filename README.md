@@ -24,7 +24,6 @@ YANG Development Kit (Generator)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Generate YDK components](#generate-ydk-components)
   - [First step: choose model bundle profile](#first-step-choose-model-bundle-profile)
-    - [Details](#details)
   - [Second step. Generate and install the core](#second-step-generate-and-install-the-core)
   - [Third step. Generate and install your bundle](#third-step-generate-and-install-model-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
@@ -78,7 +77,7 @@ Please follow the below instructions to install the system requirements before i
 **Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages. In this case you you need to build all the components [from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
 ## Linux
-###Ubuntu (Debian-based)
+### Ubuntu (Debian-based)
 
 **Install OS dependency packages**
 ```
@@ -101,7 +100,7 @@ For gNMI protocol support install third party software and then prebuilt libydk_
    $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
-###Centos (Fedora-based)
+### Centos (Fedora-based)
 
 **Install OS dependency packages**
 ```
@@ -120,7 +119,7 @@ For gNMI protocol support install third party software and then prebuilt libydk_
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
 ```
 
-###Build from source
+### Build from source
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
 ```
    # Generate and install libydk library
@@ -165,7 +164,7 @@ $ cmake ..
 $ sudo make install
 ```
 
-###Build from source
+### Build from source
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
 ```
    # Generate and install libydk library
@@ -217,7 +216,7 @@ $ ./generate.py --help
 usage: generate.py [-h] [-l] [--core] [--service SERVICE] [--bundle BUNDLE]
                    [--adhoc-bundle-name ADHOC_BUNDLE_NAME]
                    [--adhoc-bundle ADHOC_BUNDLE [ADHOC_BUNDLE ...]]
-                   [--generate-doc] [--generate-tests]
+                   [--generate-meta] [--generate-doc] [--generate-tests]
                    [--output-directory OUTPUT_DIRECTORY] [--cached-output-dir]
                    [-p] [-c] [-g] [-v] [-o]
 
@@ -233,6 +232,7 @@ optional arguments:
                         Name of the adhoc bundle
   --adhoc-bundle ADHOC_BUNDLE [ADHOC_BUNDLE ...]
                         Generate an SDK from a specified list of files
+  --generate-meta       Generate meta-data for Python bundle
   --generate-doc        Generate documentation
   --generate-tests      Generate tests
   --output-directory OUTPUT_DIRECTORY
@@ -258,8 +258,6 @@ The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be u
 The first step in using ydk-gen is either using one of the already built [bundle profiles](https://github.com/CiscoDevNet/ydk-gen/tree/master/profiles/bundles) or constructing your own bundle profile, consisting of the YANG models you are interested to include into the bundle:
 
 Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies.
-
-### Details
 
 A sample bundle profile file is described below. The file is in a JSON format. Specify the `name` of your bundle, the `version` of the bundle and the `ydk_version`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `name` of the bundle here is especially important as this will form part of the installation path of the bundle.
 
@@ -328,9 +326,9 @@ $ make
 $ [sudo] make install
 ```
 
-# To create the libydk binary package to use for later installation, run the below command
+To create the libydk binary package to use for later installation, run the below command
 ```
-$ make package
+$ [sudo] make package
 ```
 
 For Python:

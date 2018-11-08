@@ -82,11 +82,11 @@ function pip_check_install {
         os_info=$(cat /etc/*-release)
         if [[ ${os_info} == *"fedora"* ]]; then
             print_msg "Custom pip install of $@ for CentOS"
-            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
+            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
             return
         fi
     fi
-    ${PIP_BIN} install $@
+    ${PIP_BIN} install $@ -U
 }
 
 ######################################################################
@@ -461,14 +461,12 @@ function py_sanity_ydktest_gen {
 }
 
 function py_sanity_ydktest_install {
-    print_msg "py_sanity_ydktest_install"
-    print_msg "Installing"
+    print_msg "Running py_sanity_ydktest_install"
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
-    print_msg "running import tests"
+    print_msg "Running import tests on generated bundle"
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
-
 }
 
 function run_py_sanity_ydktest_tests {
@@ -713,16 +711,16 @@ function test_gen_tests {
     cpp_test_gen
 }
 
-function py_test_gen_test {
-    print_msg "py_test_gen_test"
-
-    cd $YDKGEN_HOME
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
-    cd gen-api/python/models_test-bundle/ydk/models/models_test/test/
-    ${PYTHON_BIN} import_tests.py
-    cd models_test/
-    ${PYTHON_BIN} -m unittest discover
-}
+#function py_test_gen_test {
+#    print_msg "py_test_gen_test"
+#
+#    cd $YDKGEN_HOME
+#    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
+#    cd gen-api/python/models_test-bundle/ydk/models/models_test/test/
+#    ${PYTHON_BIN} import_tests.py
+#    cd models_test/
+#    ${PYTHON_BIN} -m unittest discover
+#}
 
 function py_test_gen {
     print_msg "py_test_gen"

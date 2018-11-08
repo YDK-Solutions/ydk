@@ -157,7 +157,7 @@ class ClassConstructorPrinter(FunctionPrinter):
             id_subclasses = self.identity_subclasses
 
         meta_info_data = get_meta_info_data(
-            prop, property_type, type_stmt, 'go', False, identity_subclasses=id_subclasses)
+            prop, property_type, type_stmt, 'go', identity_subclasses=id_subclasses)
 
         if type(prop.property_type) in (Class, Enum, Bits):
             meta_info_data.clazz_name = "'%s'" % property_type.qualified_go_name()

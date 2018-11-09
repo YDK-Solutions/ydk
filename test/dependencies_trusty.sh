@@ -1,6 +1,6 @@
 #!/bin/bash
 #  ----------------------------------------------------------------
-# Copyright 2016 Cisco Systems
+# Copyright 2018 Cisco Systems
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,65 +16,38 @@
 # ------------------------------------------------------------------
 #
 # Script for running ydk CI on docker via travis-ci.org
-#
+# 
+# dependencies_trusty (Ubuntu 14.04)
 # ------------------------------------------------------------------
 
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_ubuntu_basic.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_trusty.sh | $@ ${NOCOLOR}"
 }
 
 function install_dependencies {
-    print_msg "Installing dependencies"
+    print_msg "Installing OS dependencies"
 
     apt update -y > /dev/null
     apt install sudo -y > /dev/null
     sudo apt-get update > /dev/null
-    sudo apt-get install libtool-bin -y > /dev/null
-    local status=$?
-    if [[ ${status} != 0 ]]; then
-        sudo apt-get install libtool -y > /dev/null
-    fi
-    sudo apt-get install -y bison \
-                            curl \
-                            doxygen \
-                            flex \
-                            git \
-                            libcmocka0 \
-                            libcurl4-openssl-dev \
-                            libpcre3-dev \
-                            libpcre++-dev \
-                            libssh-dev \
-                            libxml2-dev \
-                            libxslt1-dev \
-                            pkg-config \
-                            python-dev \
-                            python-pip \
-                            python3-dev \
-                            python-lxml \
-                            python3-lxml \
-                            python3-pip \
-                            python-virtualenv \
-                            software-properties-common \
-                            unzip \
-                            wget \
-                            zlib1g-dev\
-                            lcov \
-                            openjdk-8-jre \
-                            cmake \
-                            gdebi-core\
-                            lcov > /dev/null
+    sudo apt-get install libtool -y > /dev/null
+    sudo apt-get install -y bison curl doxygen flex git unzip wget cmake cmake3 lcov > /dev/null
+    sudo apt-get install -y libcmocka0 libcurl4-openssl-dev libpcre3-dev libpcre++-dev libssh-dev libxml2-dev libxslt1-dev > /dev/null
+    sudo apt-get install -y python-dev python-pip python-lxml > /dev/null
+}
 
-    # gcc-5 and g++5 for modern c++
+function install_gcc5 {
+    print_msg "Installing gcc-5 and g++5"
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     sudo apt-get update > /dev/null
     sudo apt-get install gcc-5 g++-5 -y > /dev/null
     sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
     sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
+    sudo ln -f -s /usr/bin/g++-5 /usr/bin/g++
+    sudo ln -f -s /usr/bin/gcc-5 /usr/bin/gcc
+}
 
-    # install go1.9.2
+function install_go {
     print_msg "Removing pre-installed Golang"
     sudo apt-get remove golang -y
     print_msg "Installing Golang version 1.9.2"
@@ -82,6 +55,22 @@ function install_dependencies {
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
 }
 
+function install_confd {
+    print_msg "Installing confd"
+
+    wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
+    unzip confd-basic-6.2.linux.x86_64.zip
+    ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
+# Terminal colors
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
+
 install_dependencies
+install_gcc5
+install_go
+install_confd

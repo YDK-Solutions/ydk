@@ -143,20 +143,19 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOROOT="/usr/local/go"
-    export PATH=$GOROOT/bin:$PATH
-
-    print_msg "GOPATH is set to: ${GOPATH}"
-    print_msg "GOROOT is set to: ${GOROOT}"
-
-    cd $YDKGEN_HOME
-    if [[ -z "${GOPATH// }" ]]; then
-        export GOPATH="$(pwd)/golang"
+    if [[ $(uname) == "Darwin" ]]; then
+        source /Users/travis/.gvm/scripts/gvm
+        gvm use go1.9.2
+        print_msg "GOROOT: $GOROOT"
+        print_msg "GOPATH: $GOPATH"
     else
-        export GOPATH="$(pwd)/golang":$GOPATH
+        cd $YDKGEN_HOME
+        export GOPATH="$(pwd)/golang"
+        export GOROOT=/usr/local/go
+        export PATH=$GOROOT/bin:$PATH
+        print_msg "Setting GOROOT to $GOROOT"
+        print_msg "Setting GOPATH to $GOPATH"
     fi
-
-    print_msg "Changed GOPATH setting to: ${GOPATH}"
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
@@ -302,23 +301,19 @@ function stop_gnmi_server {
 function install_go_core {
     print_msg "Installing Go core packages"
     cd $YDKGEN_HOME
-
-    mkdir -p $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk
-    cp -r sdk/go/core/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --core --go
 }
 
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
     run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-
-    cp -r sdk/go/gnmi/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --service profiles/services/gnmi-0.4.0.json --go
 }
 
 function run_go_gnmi_tests {

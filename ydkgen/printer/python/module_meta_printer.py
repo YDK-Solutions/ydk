@@ -37,21 +37,17 @@ class ModuleMetaPrinter(FilePrinter):
 
     def print_header(self, package):
         self.ctx.str("""
-
-
-import re
-import collections
-
-from enum import Enum
+'''
+This is auto-generated file,
+which includes metadata for module %s
+'''
 
 from ydk._core._dm_meta_info import _MetaInfoClassMember, _MetaInfoClass, _MetaInfoEnum
-from ydk.types import Empty, YList, YLeafList, DELETE, Decimal64, FixedBitsDict
-from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_CLASS, REFERENCE_LIST, REFERENCE_LEAFLIST, \
-    REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, REFERENCE_BITS, REFERENCE_UNION, ANYXML_CLASS
+from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_LIST, REFERENCE_LEAFLIST, REFERENCE_BITS, REFERENCE_UNION
+from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, ANYXML_CLASS
+from ydk._core._importer import _yang_ns
 
-from ydk.errors import YPYError, YPYModelError
-from ydk.providers._importer import _yang_ns
-""")
+""" % package.name)
     def print_body(self, package):
         self.ctx.writeln('_meta_table = {')
         self.ctx.lvl_inc()

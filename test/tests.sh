@@ -193,7 +193,7 @@ function init_go_env {
         print_msg "Setting GOROOT to $GOROOT"
         print_msg "Setting GOPATH to $GOPATH"
     fi
-    print_msg "Running GO version $(go version)"
+    print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
 }
@@ -252,11 +252,9 @@ function run_cpp_core_test {
 }
 
 function install_go_core {
-    print_msg "Installing go core"
+    print_msg "Installing Go YDK core"
     cd $YDKGEN_HOME
-
-    mkdir -p $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk
-    cp -r sdk/go/core/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --core --go
 }
 
 function install_py_core {
@@ -381,7 +379,6 @@ function run_go_bundle_tests {
     # TODO: go get
     cd $YDKGEN_HOME
     run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 
     run_go_tests
 }
@@ -701,15 +698,15 @@ function py_sanity_backward_compatibility {
 # Python generated model tests bundle
 #-------------------------------------
 
-function test_gen_tests {
-    print_msg "test_gen_tests"
-
-    cd $YDKGEN_HOME
-    git clone https://github.com/psykokwak4/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
-
-    py_test_gen
-    cpp_test_gen
-}
+#function test_gen_tests {
+#    print_msg "test_gen_tests"
+#
+#    cd $YDKGEN_HOME
+#    git clone https://github.com/psykokwak4/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
+#
+#    py_test_gen
+#    cpp_test_gen
+#}
 
 #function py_test_gen_test {
 #    print_msg "py_test_gen_test"
@@ -732,6 +729,20 @@ function py_test_gen {
     pip_check_install gen-api/python/models_test-bundle/dist/ydk*.tar.gz
 
     # py_test_gen_test
+}
+
+#-------------------------------------
+# Meta-data test
+#-------------------------------------
+
+function run_py_metadata_test {
+    print_msg "Building ydktest bundle with metadata"
+    cd $YDKGEN_HOME
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json --generate-meta
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running metadata test"
+    run_test sdk/python/core/tests/test_metadata.py
 }
 
 #-------------------------------------
@@ -807,6 +818,8 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
+run_py_metadata_test
+
 # test_gen_tests
 
 ######################################

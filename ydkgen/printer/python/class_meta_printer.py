@@ -116,7 +116,7 @@ class ClassMetaPrinter(object):
         if clazz.is_grouping():
             self.ctx.writeln('None,')
         else:
-            self.ctx.writeln("_yang_ns._namespaces['%s']," % module_name)
+            self.ctx.writeln("_yang_ns.NAMESPACE_LOOKUP['%s']," % module_name)
         self.ctx.lvl_dec()
         self.ctx.writeln("'%s'" % clazz.get_py_mod_name())
         self.ctx.writeln('),')

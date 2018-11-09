@@ -47,7 +47,7 @@ class EnumPrinter(object):
         for literal in enum_class.literals:
             self.ctx.writeln("'%s':'%s'," % (literal.stmt.arg, literal.name))
         self.ctx.lvl_dec()
-        self.ctx.writeln("}, '%s', _yang_ns._namespaces['%s'])," % (get_module_name(enum_class.stmt), get_module_name(enum_class.stmt)))
+        self.ctx.writeln("}, '%s', _yang_ns.NAMESPACE_LOOKUP['%s'])," % (get_module_name(enum_class.stmt), get_module_name(enum_class.stmt)))
         self.ctx.lvl_dec()
 
     def _print_enum_header(self, enum_class):

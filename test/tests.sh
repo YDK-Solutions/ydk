@@ -255,13 +255,13 @@ function install_go_core {
 }
 
 function install_py_core {
-    print_msg "Installing py core"
-    cd $YDKGEN_HOME
-    cd $YDKGEN_HOME/sdk/python/core
+    print_msg "Installing Python YDK core"
+
     if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       print_msg "Building python with coverage"
       export YDK_COVERAGE=
     fi
+    cd $YDKGEN_HOME/sdk/python/core
     ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
 
@@ -439,7 +439,6 @@ function py_sanity_ydktest {
 
     py_sanity_ydktest_gen
     py_sanity_ydktest_test
-    py_sanity_ydktest_install
 }
 
 function py_sanity_ydktest_gen {
@@ -449,28 +448,13 @@ function py_sanity_ydktest_gen {
 
     print_msg "py_sanity_ydktest_gen: testing bundle and documentation generation"
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --python --generate-doc &> /dev/null
-
-    print_msg "py_sanity_ydktest_gen: testing core and documentation generation"
-    run_test generate.py --core
-}
-
-function py_sanity_ydktest_install {
-    print_msg "Running py_sanity_ydktest_install"
-    cd $YDKGEN_HOME
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
     print_msg "Running import tests on generated bundle"
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
-}
 
-function run_py_sanity_ydktest_tests {
-    run_test sdk/python/core/tests/test_ydk_types.py
-    run_test sdk/python/core/tests/test_sanity_codec.py
-
-    py_sanity_ydktest_test_netconf_ssh
-    py_sanity_ydktest_test_tcp
-
-    stop_tcp_server
+    print_msg "py_sanity_ydktest_gen: testing core and documentation generation"
+    run_test generate.py --core
 }
 
 function py_sanity_ydktest_test {
@@ -505,6 +489,16 @@ function py_sanity_ydktest_test {
   else
     run_py_sanity_ydktest_tests
   fi
+}
+
+function run_py_sanity_ydktest_tests {
+    run_test sdk/python/core/tests/test_ydk_types.py
+    run_test sdk/python/core/tests/test_sanity_codec.py
+
+    py_sanity_ydktest_test_netconf_ssh
+    py_sanity_ydktest_test_tcp
+
+    stop_tcp_server
 }
 
 function py_sanity_ydktest_test_netconf_ssh {

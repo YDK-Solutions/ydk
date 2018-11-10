@@ -60,7 +60,7 @@ function run_test_no_coverage {
 }
 
 function run_test {
-    if [[ $(command -v coverage) && ${os_type} == "Linux" ]]; then
+    if [[ $(command -v coverage) && ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]]; then
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
@@ -78,15 +78,12 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            print_msg "Custom pip install of $@ for CentOS"
-            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
-            return
-        fi
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
+        print_msg "Custom pip install of $@ for CentOS"
+        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
+    else
+        ${PIP_BIN} install $@ -U
     fi
-    ${PIP_BIN} install $@ -U
 }
 
 ######################################################################
@@ -166,7 +163,7 @@ function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
   sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
-  if [[ ${os_type} == "Linux" ]] ; then
+  if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     sudo ${PIP_BIN} install coverage
   fi
 
@@ -216,7 +213,7 @@ function install_cpp_core {
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
-    if [[ $(uname) == "Linux" ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       print_msg "Compiling with coverage"
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
@@ -261,7 +258,7 @@ function install_py_core {
     print_msg "Installing py core"
     cd $YDKGEN_HOME
     cd $YDKGEN_HOME/sdk/python/core
-    if [[ $(uname) == "Linux" ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       print_msg "Building python with coverage"
       export YDK_COVERAGE=
     fi
@@ -316,7 +313,7 @@ function cpp_sanity_ydktest_test {
 
     print_msg "Building and running cpp bundle tests"
     mkdir -p $YDKGEN_HOME/sdk/cpp/tests/build && cd sdk/cpp/tests/build
-    if [[ $(uname) == "Linux" ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       print_msg "Compiling with coverage"
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
     else
@@ -359,7 +356,7 @@ function cpp_test_gen {
 }
 
 function collect_cpp_coverage {
-  if [[ $(uname) == "Linux" ]] ; then
+  if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/core/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
@@ -409,7 +406,7 @@ function run_go_samples {
 function run_go_sanity_tests {
     print_msg "Running go sanity tests"
     cd $YDKGEN_HOME/sdk/go/core/tests
-    if [[ $(uname) == "Linux" ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
         run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
         print_msg "Moving go coverage to ${YDKGEN_HOME}"
         mv coverage.txt ${YDKGEN_HOME}
@@ -479,7 +476,7 @@ function run_py_sanity_ydktest_tests {
 function py_sanity_ydktest_test {
   print_msg "py_sanity_ydktest_test"
   cd $YDKGEN_HOME
-  if [[ $(uname) == "Linux" ]]; then
+  if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
@@ -785,6 +782,12 @@ PYTHON_VERSION=${2}
 export YDKGEN_HOME="$(pwd)"
 
 os_type=$(uname)
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info="darwin"
+fi
+
 print_msg "Running OS type: $os_type"
 print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
 
@@ -833,7 +836,7 @@ find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
-if [[ ${os_type} == "Linux" ]] ; then
+if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     print_msg "Combining C++, Python and Go coverage"
     coverage combine > /dev/null || echo "Coverage not combined"
 fi

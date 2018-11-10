@@ -57,7 +57,7 @@ function run_test_no_coverage {
 }
 
 function run_test {
-    if [[ $(command -v coverage) && ${os_type} == "Linux" ]]; then
+    if [[ $(command -v coverage) && ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]]; then
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
@@ -75,15 +75,12 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            print_msg "Custom pip install of $@ for CentOS"
-            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
-            return
-        fi
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
+        print_msg "Custom pip install of $@ for CentOS"
+        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
+    else
+        ${PIP_BIN} install $@
     fi
-    ${PIP_BIN} install $@
 }
 
 ######################################################################
@@ -129,7 +126,7 @@ function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
   sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
-  if [[ ${os_type} == "Linux" ]] ; then
+  if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     sudo ${PIP_BIN} install coverage
   fi
 
@@ -172,7 +169,7 @@ function install_cpp_core {
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       print_msg "Compiling with coverage"
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
@@ -212,7 +209,7 @@ function build_gnmi_cpp_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
       run_exec_test ${CMAKE_BIN} ..
@@ -227,7 +224,7 @@ function build_and_run_cpp_gnmi_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
       run_exec_test ${CMAKE_BIN} ..
@@ -245,12 +242,9 @@ function build_and_run_cpp_gnmi_tests {
 }
 
 function run_cpp_gnmi_tests {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
-            print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
-        fi
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
+        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
     fi
 
     build_gnmi_cpp_core_library
@@ -258,7 +252,7 @@ function run_cpp_gnmi_tests {
 }
 
 function collect_cpp_coverage {
-  if [[ ${os_type} == "Linux" ]] ; then
+  if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/gnmi/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
@@ -347,7 +341,7 @@ function run_go_gnmi_samples {
 function install_py_core {
     print_msg "Building and installing Python core package"
     cd $YDKGEN_HOME/sdk/python/core
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
       export YDK_COVERAGE=1
     fi
     ${PYTHON_BIN} setup.py sdist
@@ -426,6 +420,12 @@ PYTHON_VERSION=${2}
 os_type=$(uname)
 print_msg "Running OS type: $os_type"
 
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info="darwin"
+fi
+
 export YDKGEN_HOME="$(pwd)"
 
 CMAKE_BIN=cmake
@@ -472,7 +472,7 @@ find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
-if [[ ${os_type} == "Linux" ]] ; then
+if [[ ${os_type} == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
   print_msg "Combining C++, Python and Go coverage"
   coverage combine > /dev/null || echo "Coverage not combined"
 fi

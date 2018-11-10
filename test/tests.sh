@@ -438,14 +438,12 @@ function py_sanity_ydktest {
     print_msg "Generating, installing and testing python ydktest bundle"
 
     py_sanity_ydktest_gen
-    py_sanity_ydktest_test
+    # py_sanity_ydktest_test
+    run_py_sanity_ydktest_tests
 }
 
 function py_sanity_ydktest_gen {
-    print_msg "Generating python ydk core and ydktest bundle"
-
     cd $YDKGEN_HOME
-
     print_msg "py_sanity_ydktest_gen: testing bundle and documentation generation"
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --python --generate-doc &> /dev/null
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
@@ -458,27 +456,30 @@ function py_sanity_ydktest_gen {
 }
 
 function py_sanity_ydktest_test {
-  print_msg "py_sanity_ydktest_test"
+  print_msg "Running py_sanity_ydktest_test"
   cd $YDKGEN_HOME
   if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
     cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
     ${PIP_BIN} uninstall ydk -y
+    
     export OLDPYTHONPATH=$PYTHONPATH
+    print_msg "Setting OLDPYTHONPATH to $OLDPYTHONPATH"
 
     print_msg "Build & copy cpp-wrapper to sdk directory to gather coverage"
-    cd $YDKGEN_HOME
     cd sdk/python/core/ && ${PYTHON_BIN} setup.py build
+
     print_msg "Set new python path to gather coverage"
     export PYTHONPATH=$PYTHONPATH:$(pwd)
+    print_msg "Setting PYTHONPATH to $PYTHONPATH"
     cp build/lib*/*.so .
     cd -
 
     run_py_sanity_ydktest_tests
 
-    print_msg "Restore old python path"
     export PYTHONPATH=$OLDPYTHONPATH
+    print_msg "Restored PYTHONPATH to $PYTHONPATH"
 
     cd sdk/python/core/
     rm -f *.so
@@ -492,6 +493,7 @@ function py_sanity_ydktest_test {
 }
 
 function run_py_sanity_ydktest_tests {
+    print_msg "Running run_py_sanity_ydktest_tests"
     run_test sdk/python/core/tests/test_ydk_types.py
     run_test sdk/python/core/tests/test_sanity_codec.py
 

@@ -60,6 +60,7 @@ function install_dependencies {
                             wget \
                             zlib1g-dev\
                             cmake \
+                            openjdk-8-jre \
                             gdebi-core\
                             lcov > /dev/null
 }

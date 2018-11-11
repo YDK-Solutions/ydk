@@ -438,27 +438,41 @@ function py_sanity_ydktest {
     print_msg "Generating, installing and testing python ydktest bundle"
 
     py_sanity_ydktest_gen
-    # py_sanity_ydktest_test
-    run_py_sanity_ydktest_tests
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
+        py_sanity_ydktest_test
+        py_sanity_ydktest_install
+    else
+        py_sanity_ydktest_install
+        run_py_sanity_ydktest_tests
+    fi
 }
 
 function py_sanity_ydktest_gen {
+    print_msg "Generating python ydk core and ydktest bundle"
+
     cd $YDKGEN_HOME
+
     print_msg "py_sanity_ydktest_gen: testing bundle and documentation generation"
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --python --generate-doc &> /dev/null
-    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
-
-    print_msg "Running import tests on generated bundle"
-    run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
 
     print_msg "py_sanity_ydktest_gen: testing core and documentation generation"
     run_test generate.py --core
 }
 
+function py_sanity_ydktest_install {
+    print_msg "py_sanity_ydktest_install"
+    print_msg "Installing"
+    cd $YDKGEN_HOME
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running import tests on generated bundle"
+    run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
+
+}
+
 function py_sanity_ydktest_test {
-  print_msg "Running py_sanity_ydktest_test"
-  cd $YDKGEN_HOME
-  if [[ $(uname) == "Linux" ]] && [[ ${os_info} != *"trusty"* ]] ; then
+    print_msg "Running py_sanity_ydktest_test"
+    cd $YDKGEN_HOME
     cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
@@ -487,9 +501,6 @@ function py_sanity_ydktest_test {
     ${PIP_BIN} install dist/ydk*.tar.gz
 
     cd $YDKGEN_HOME
-  else
-    run_py_sanity_ydktest_tests
-  fi
 }
 
 function run_py_sanity_ydktest_tests {

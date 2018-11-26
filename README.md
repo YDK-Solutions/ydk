@@ -313,7 +313,7 @@ Only directory examples are shown below.
 
 ## Second step: Generate and install the core
 
-Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
+Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-models-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
 
 **Note:** 
 There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.

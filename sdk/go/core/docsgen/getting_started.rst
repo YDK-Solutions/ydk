@@ -89,9 +89,9 @@ In order to have YDK support for gNMI protocol, which is optional, the following
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
-    unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-3.3.0
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
     ./configure
     make
     make check
@@ -103,7 +103,7 @@ In order to have YDK support for gNMI protocol, which is optional, the following
 
 .. code-block:: sh
 
-    git clone -b v1.4.5 https://github.com/grpc/grpc
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     sudo ldconfig

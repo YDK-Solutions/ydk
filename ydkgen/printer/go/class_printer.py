@@ -69,6 +69,7 @@ class ClassPrinter(object):
         fp.ctx.writeln('%s.BundleName = "%s"' % (data_alias, self.bundle_name.lower()))
         fp.ctx.writeln('%s.ParentYangName = "%s"' % (data_alias, clazz.owner.stmt.arg))
         self._print_segment_path(fp, data_alias)
+        self._print_absolute_path(fp, data_alias)
         fp.ctx.writeln('%s.CapabilitiesTable = %s.GetCapabilities()' % (data_alias, bundle_name))
         fp.ctx.writeln('%s.NamespaceTable = %s.GetNamespaces()' % (data_alias, bundle_name))
         fp.ctx.writeln('%s.BundleYangModelsLocation = %s.GetModelsPath()' % (data_alias, bundle_name))
@@ -105,6 +106,34 @@ class ClassPrinter(object):
 
         fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
 
+    @staticmethod
+    def _print_absolute_path(fp, data_alias):
+        parents = []
+        p = fp.clazz
+        while p is not None and not isinstance(p, Package):
+            if p != fp.clazz:
+                parents.append(p)
+            p = p.owner
+
+        parents.reverse()
+        path = ''
+        for p in parents:
+            if len(path) == 0:
+                path += p.owner.stmt.arg
+                path += ':'
+                path += p.stmt.arg
+            else:
+                path += '/'
+                if p.stmt.i_module.arg != p.owner.stmt.i_module.arg:
+                    path += p.stmt.i_module.arg
+                    path += ':'
+                path += p.stmt.arg
+
+        if len(path) == 0:
+            fp.ctx.writeln('%s.AbsolutePath = %s.SegmentPath' % (data_alias, data_alias))
+        else:
+            fp.ctx.writeln('%s.AbsolutePath = "%s/" + %s.SegmentPath' % (data_alias, path, data_alias))
+        
     @staticmethod
     def _print_children(fp, children, data_alias):
         fp.ctx.writeln('%s.Children = types.NewOrderedMap()' % data_alias)

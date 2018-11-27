@@ -677,20 +677,26 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(runner, runner_read)
 
     def test_iden_list(self):
-        runner = Runner()
-        e_1 = Runner.IdentityList()
-        e_1.name = ChildIdentity()
-        runner.identity_list.append(e_1)
+        # CREATE
+        il = Runner.OneList.IdentityList()
+        il.config.id = ChildIdentity()
+        il.id_ref = ChildIdentity()
+        self.crud.create(self.ncc, il)
 
-        e_1 = Runner.EnumList()
-        e_1.name = YdkEnumTest.none
-        runner.identity_list.append(e_1)
+        # READ & VALIDATE
+        filter = Runner.OneList()
+        read_one = self.crud.read(self.ncc, filter)
+        self.assertIsNotNone(read_one)
 
-        self.crud.create(self.ncc, runner)
-
+        read_il = read_one.identity_list.get(ChildIdentity().to_string())
+        self.assertIsNotNone(read_il)
+        read_il.parent = None
+        self.assertEqual(read_il, il)
+        
+        # DELETE & VALIDATE
+        self.crud.delete(self.ncc, il)
         runner_read = self.crud.read(self.ncc, Runner())
-
-        self.assertEqual(runner, runner_read)
+        self.assertIsNone(runner_read)
 
     @unittest.skip('Fails on travis. Passes locally')
     def test_oc_pattern(self):

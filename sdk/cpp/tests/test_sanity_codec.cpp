@@ -39,8 +39,8 @@ using namespace ydktest_new;
 using namespace ydk;
 
 std::string XML_OC_PATTERN_PAYLOAD = R"(<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
-  <a>Hello</a>
-<B><b>Hello</b></B>
+  <a>xyz</a>
+<B><b>xyz</b></B>
 </oc-A>
 )";
 
@@ -318,9 +318,9 @@ TEST_CASE("multiple_encode")
 //    string payload = R"({
 //  "oc-pattern:oc-A": [
 //    {
-//      "a": "Hello",
+//      "a": "xyz",
 //      "B": {
-//        "b": "Hello"
+//        "b": "xyz"
 //      }
 //    }
 //  ]
@@ -328,7 +328,7 @@ TEST_CASE("multiple_encode")
 //    auto entity = codec_service.decode(codec_provider, payload, make_unique<oc_pattern::OcA>());
 //
 //    oc_pattern::OcA * entity_ptr = dynamic_cast<oc_pattern::OcA*>(entity.get());
-//    CHECK(entity_ptr->a.get() == "Hello");
+//    CHECK(entity_ptr->a.get() == "xyz");
 //}
 
 TEST_CASE("enum_2")

@@ -1,3 +1,8 @@
+### 2018-11-27 version 0.8.1
+
+#### Python, C++ & Go
+  * Introduced support for non-top level objects/entities for CRUD and Netconf operations.
+
 ### 2018-10-03 version 0.8.0-beta
  
 #### Python, C++ & Go

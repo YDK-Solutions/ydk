@@ -213,6 +213,14 @@ class SanityYang(unittest.TestCase):
         self.crud.create(self.ncc, obj_A)
 
         obj_A_read = self.crud.read(self.ncc, oc_pattern.OcA())
+        self.assertIsNotNone(obj_A_read)
+
+        obj_A = oc_pattern.OcA()
+        obj_A.a = 'hello'
+        self.crud.delete(self.ncc, obj_A)
+
+        obj_A_read = self.crud.read(self.ncc, oc_pattern.OcA())
+        self.assertIsNone(obj_A_read)
 
 
 if __name__ == '__main__':

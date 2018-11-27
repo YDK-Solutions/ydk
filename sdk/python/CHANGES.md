@@ -1,8 +1,13 @@
+### 2018-11-27 version 0.8.1
+
+#### Python
+  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
+  * Added support for CRUD operations on non-top level objects.
+
 ### 2018-11-07 version 0.8.0
 
 #### Python
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
-  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
 
 ##### Codec
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 

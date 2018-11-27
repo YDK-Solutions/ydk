@@ -337,7 +337,13 @@ YList::extend(initializer_list<shared_ptr<Entity>> ep_list)
 shared_ptr<Entity>
 YList::operator [] (const string& key) const
 {
-	return entity_map.at(key);
+    auto it = entity_map.find(key);
+    if (it != entity_map.end())
+        return it->second;
+    else {
+        YLOG_ERROR("Key value '{}' is not in the YList", key);
+        throw(YInvalidArgumentError{"Key value is not in the YList"});
+    }
 }
 
 shared_ptr<Entity>

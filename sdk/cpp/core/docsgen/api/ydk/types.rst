@@ -170,7 +170,6 @@ Examples of how to instantiate and use objects of :cpp:class:`Entity<Entity>` ty
 
   // Instantiate a shared pointer object representing the afi-safi list member from the openconfig-bgp YANG model
   auto afi_safi = make_shared<ydk::openconfig_bgp::Bgp::Global::AfiSafis::AfiSafi>();
-  afi_safi->parent = bgp->global->afi_safis.get();
   
   // Append the afi-safi to the YList instance
   bgp->global->afi_safis->afi_safi.append(afi_safi);

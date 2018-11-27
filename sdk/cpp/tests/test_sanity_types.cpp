@@ -427,18 +427,18 @@ TEST_CASE("test_types_identity")
     REQUIRE(reply);
 
     //CREATE
-    r_1->ytypes->built_in_t->identity_ref_value = ydktest_sanity_types::Other();
-    reply = crud.create(provider, *r_1);
+    auto built_in_t = make_unique<ydktest_sanity::Runner::Ytypes::BuiltInT>();
+    built_in_t->identity_ref_value = ydktest_sanity_types::Other();
+    reply = crud.create(provider, *built_in_t);
     REQUIRE(reply);
 
     //READ
     auto filter = make_unique<ydktest_sanity::Runner>();
-    auto r_read = crud.read(provider, *filter);
+    auto r_read = crud.read(provider, *(filter->ytypes->built_in_t));
     REQUIRE(r_read!=nullptr);
 
-    ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-    cout<<r_2->ytypes->built_in_t->identity_ref_value<<endl;
-    REQUIRE(r_1->ytypes->built_in_t->identity_ref_value == r_2->ytypes->built_in_t->identity_ref_value);
+    auto r_2 = dynamic_cast<ydktest_sanity::Runner::Ytypes::BuiltInT*>(r_read.get());
+    REQUIRE(built_in_t->identity_ref_value == r_2->identity_ref_value);
 }
 
 TEST_CASE("test_types_submodule")

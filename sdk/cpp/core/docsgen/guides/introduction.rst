@@ -84,9 +84,6 @@ After establishing the connection, we instantiate the entities and set some data
  neighbor->config->local_as = 65001;
  neighbor->config->peer_group = "IBGP";
 
- // Set the parent container of the neighbor
- neighbor->parent = bgp->neighbors.get();
-
  // Add the neighbor config to the BGP neighbors list
  bgp->neighbors->neighbor.append(neighbor);
 
@@ -115,8 +112,75 @@ Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudSer
 
 Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YError<ydk::YError>`
 
+Using non-top level objects
+---------------------------
+In the example above you noticed that we started building model from top-level object `openconfig_bgp::Bgp` and build the object tree down the hierarchy. 
+However in certain conditions we can build independently non-top level objects and still be able to do all CRUD and Netconf operations.
+
+Top level object vs. non-top
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The top level object represents top-level container in the Yang model. Examples of top-level objects:
+
+ * openconfig_bgp::Bgp
+ * openconfig_interfaces::Interfaces
+
+The non-top level object represents a container in the Yang model, which is located under top level container. A member of a non-top level list can also be considered as non-top level object.
+Examples of non-top level objects:
+
+ * openconfig_bgp::Bgp::Neighbors
+ * openconfig_bgp::Bgp::Neighbors::Neighbor
+ * openconfig_bgp::Bgp::Neighbors::Neighbor::Config
+ * openconfig_Interfaces::Interfaces
+ * openconfig_Interfaces::Interfaces::Interface
+
+How to use non-top level objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You should be able to work with non-top level objects similarly as with top level. Your program will look more simple and straight to the point.
+
+.. code-block:: c++
+ :linenos:
+
+ // Create BGP neighbor
+ auto neighbor = make_unique<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+ neighbor->neighbor_address = "6.7.8.9";    // This is the list object key
+ neighbor->config->neighbor_address = "6.7.8.9";
+ neighbor->config->peer_as = 65001;
+ neighbor->config->local_as = 65001;
+ neighbor->config->peer_group = "IBGP";
+
+ crud_service.create(provider, *neighbor);
+ 
+ // Read all configuration of specific BGP neighbor
+ auto bgp = make_unique<openconfig_bgp::Bgp>();
+ auto filter = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+ filter->neighbor_address = "6.7.8.9";    // This is the list object key
+ bgp->neighbors->neighbor.append(filter);
+ 
+ // Get the neighbor configuration
+ auto bgp_entity = crud_service.read_config(provider, *bgp);
+ auto bgp_object = dynamic_cast<openconfig_bgp::Bgp*> (bgp_entity.get());
+ auto neighbor_entity = bgp_object->neighbors->neighbor.get("6.7.8.9");
+ auto neighbor_object = dynamic_cast<openconfig_bgp::Bgp::Neighbors::Neighbor*> (neighbor_entity.get());
+
+Limitations
+~~~~~~~~~~~
+
+Not all non-top level objects can be used independently. Here is the rule:
+
+  When building non-top level object, we have to define all the list keys on the way up to the top level object. 
+  In the example above the object `Neighbor` is a member of the list. We can use it as long as its key `neighbor_address` is defined. 
+  Other words - the absolute Yang model path of the object must be non-ambiguous. 
+  In the example above the absolute path would be: `/openconfig-bgp/bgp/neighbors/neighbor[neighbor-address='6.7.8.9']`
+  
+Current YDK implementation in C++ does not allow to instantiate Entity class object based on its name. 
+Therefore all read/get operations still require to specify top level filter object in read and get operations (see example above).
+This feature is to be developed in future YDK releases.
+
+
 Logging
-----------------------
+-------
+
 YDK uses the `spdlog` logging library. The logging can be enabled as follows by creating a logger called "ydk". For other options like logging the "ydk" log to a file, see the `spdlog reference <https://github.com/gabime/spdlog#usage-example>`_.
 
 .. code-block:: c++

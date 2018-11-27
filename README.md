@@ -24,7 +24,6 @@ YANG Development Kit (Generator)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Generate YDK components](#generate-ydk-components)
   - [First step: choose model bundle profile](#first-step-choose-model-bundle-profile)
-    - [Details](#details)
   - [Second step. Generate and install the core](#second-step-generate-and-install-the-core)
   - [Third step. Generate and install your bundle](#third-step-generate-and-install-model-bundle)
   - [Fourth step: Writing your first app](#fourth-step-writing-your-first-app)
@@ -78,7 +77,7 @@ Please follow the below instructions to install the system requirements before i
 **Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages. In this case you you need to build all the components [from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
 ## Linux
-###Ubuntu (Debian-based)
+### Ubuntu (Debian-based)
 
 **Install OS dependency packages**
 ```
@@ -101,7 +100,7 @@ For gNMI protocol support install third party software and then prebuilt libydk_
    $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
-###Centos (Fedora-based)
+### Centos (Fedora-based)
 
 **Install OS dependency packages**
 ```
@@ -120,7 +119,7 @@ For gNMI protocol support install third party software and then prebuilt libydk_
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
 ```
 
-###Build from source
+### Build from source
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
 ```
    # Generate and install libydk library
@@ -165,7 +164,7 @@ $ cmake ..
 $ sudo make install
 ```
 
-###Build from source
+### Build from source
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
 ```
    # Generate and install libydk library
@@ -183,6 +182,45 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 ## Windows
 Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
+
+##gNMI Requirements
+
+In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+###Install protobuf and protoc
+
+```
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
+```
+
+###Install gRPC
+
+```
+    git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    make
+    sudo make install
+    sudo ldconfig
+    cd -
+```
+
+###Run-time environment
+
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
+for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
+
+```
+    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+```
 
 # Installation
 ## Setting up your environment
@@ -259,8 +297,6 @@ The first step in using ydk-gen is either using one of the already built [bundle
 
 Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies.
 
-### Details
-
 A sample bundle profile file is described below. The file is in a JSON format. Specify the `name` of your bundle, the `version` of the bundle and the `ydk_version`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `name` of the bundle here is especially important as this will form part of the installation path of the bundle.
 
 ```
@@ -315,7 +351,7 @@ Only directory examples are shown below.
 
 ## Second step: Generate and install the core
 
-Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
+Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-models-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
 
 **Note:** 
 There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.
@@ -328,9 +364,9 @@ $ make
 $ [sudo] make install
 ```
 
-# To create the libydk binary package to use for later installation, run the below command
+To create the libydk binary package to use for later installation, run the below command
 ```
-$ make package
+$ [sudo] make package
 ```
 
 For Python:

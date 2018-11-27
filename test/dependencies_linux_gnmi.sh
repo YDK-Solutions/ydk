@@ -22,7 +22,7 @@
 # ------------------------------------------------------------------
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux_gnmi.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_linux_gnmi.sh | $@ ${NOCOLOR}"
 }
 
 function install_protobuf {

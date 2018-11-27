@@ -17,6 +17,7 @@
 #
 # Script for running YDK gNMI tests on travis-ci.org
 #
+# gnmi_tests.sh
 # ------------------------------------------------------------------
 
 # Terminal colors
@@ -57,7 +58,7 @@ function run_test_no_coverage {
 }
 
 function run_test {
-    if [[ $(command -v coverage) && ${os_type} == "Linux" ]]; then
+    if [[ $(command -v coverage) && $run_with_coverage ]]; then
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
@@ -75,13 +76,10 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            print_msg "Custom pip install of $@ for CentOS"
-            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
-            return
-        fi
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+        print_msg "Custom pip install of $@ for CentOS"
+        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
+        return
     fi
     ${PIP_BIN} install $@
 }
@@ -129,7 +127,7 @@ function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
   sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
-  if [[ ${os_type} == "Linux" ]] ; then
+  if [[ $run_with_coverage ]] ; then
     sudo ${PIP_BIN} install coverage
   fi
 
@@ -143,20 +141,19 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOROOT="/usr/local/go"
-    export PATH=$GOROOT/bin:$PATH
-
-    print_msg "GOPATH is set to: ${GOPATH}"
-    print_msg "GOROOT is set to: ${GOROOT}"
-
-    cd $YDKGEN_HOME
-    if [[ -z "${GOPATH// }" ]]; then
-        export GOPATH="$(pwd)/golang"
+    if [[ $(uname) == "Darwin" ]]; then
+        source /Users/travis/.gvm/scripts/gvm
+        gvm use go1.9.2
+        print_msg "GOROOT: $GOROOT"
+        print_msg "GOPATH: $GOPATH"
     else
-        export GOPATH="$(pwd)/golang":$GOPATH
+        cd $YDKGEN_HOME
+        export GOPATH="$(pwd)/golang"
+        export GOROOT=/usr/local/go
+        export PATH=$GOROOT/bin:$PATH
+        print_msg "Setting GOROOT to $GOROOT"
+        print_msg "Setting GOPATH to $GOPATH"
     fi
-
-    print_msg "Changed GOPATH setting to: ${GOPATH}"
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
@@ -173,7 +170,7 @@ function install_cpp_core {
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ $run_with_coverage ]] ; then
       print_msg "Compiling with coverage"
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
@@ -213,7 +210,7 @@ function build_gnmi_cpp_core_library {
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ $run_with_coverage ]] ; then
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
       run_exec_test ${CMAKE_BIN} ..
@@ -228,7 +225,7 @@ function build_and_run_cpp_gnmi_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests
     mkdir -p build
     cd build
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ $run_with_coverage ]] ; then
       run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
     else
       run_exec_test ${CMAKE_BIN} ..
@@ -246,12 +243,9 @@ function build_and_run_cpp_gnmi_tests {
 }
 
 function run_cpp_gnmi_tests {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
-            print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
-        fi
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
+        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
     fi
 
     build_gnmi_cpp_core_library
@@ -259,7 +253,7 @@ function run_cpp_gnmi_tests {
 }
 
 function collect_cpp_coverage {
-  if [[ ${os_type} == "Linux" ]] ; then
+  if [[ $run_with_coverage ]] ; then
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/gnmi/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
@@ -302,23 +296,19 @@ function stop_gnmi_server {
 function install_go_core {
     print_msg "Installing Go core packages"
     cd $YDKGEN_HOME
-
-    mkdir -p $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk
-    cp -r sdk/go/core/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --core --go
 }
 
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
     run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 }
 
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-
-    cp -r sdk/go/gnmi/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --service profiles/services/gnmi-0.4.0.json --go
 }
 
 function run_go_gnmi_tests {
@@ -352,7 +342,7 @@ function run_go_gnmi_samples {
 function install_py_core {
     print_msg "Building and installing Python core package"
     cd $YDKGEN_HOME/sdk/python/core
-    if [[ ${os_type} == "Linux" ]] ; then
+    if [[ $run_with_coverage ]] ; then
       export YDK_COVERAGE=1
     fi
     ${PYTHON_BIN} setup.py sdist
@@ -429,7 +419,16 @@ PYTHON_VERSION=${2}
 # Set up env
 
 os_type=$(uname)
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info=$(sw_vers)
+fi
 print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+if [[ $run_with_coverage ]] ; then
+    run_with_coverage=1
+fi
 
 export YDKGEN_HOME="$(pwd)"
 
@@ -477,7 +476,7 @@ find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
-if [[ ${os_type} == "Linux" ]] ; then
+if [[ $run_with_coverage ]] ; then
   print_msg "Combining C++, Python and Go coverage"
   coverage combine > /dev/null || echo "Coverage not combined"
 fi

@@ -35,19 +35,19 @@ function install_protobuf {
     make > /dev/null
     print_msg "Installing protobuf and protoc"
     sudo make install
-    cd -
+    cd $curr_dir
 }
 
 function install_grpc {
     print_msg "Installing grpc"
 
-    LIBTOOL=glibtool LIBTOOLIZE=glibtoolize make
-    git clone -b 1.4.5 https://github.com/grpc/grpc
+    #LIBTOOL=glibtool LIBTOOLIZE=glibtoolize make
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     make > /dev/null
     sudo make install
-    cd -
+    cd $curr_dir
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -57,6 +57,7 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
+curr_dir="$(pwd)"
 install_protobuf
 install_grpc
 

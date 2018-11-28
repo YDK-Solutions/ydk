@@ -72,9 +72,11 @@ def _datanode_to_entity(data_node):
             yang_ns = importlib.import_module('ydk.models.{}._yang_ns'.format(name))
             entity_lookup = yang_ns.__dict__['ENTITY_LOOKUP']
             if (module, container) in entity_lookup:
-                mod, entity_str = entity_lookup[(module, container)].split('.', 1)
-                mod = importlib.import_module('ydk.models.{}.{}'.format(name, mod))
-                entity = getattr(mod, entity_str)()
+#                 print("name='{}', module='{}', container='{}', lookup='{}'".format(name, module, container, entity_lookup[(module, container)]))
+                module_name, class_name = entity_lookup[(module, container)].split('.', 1)
+#                 print("module_name='{}', entity_class='{}'".format(mod, class_name))
+                imported_module = importlib.import_module('ydk.models.{}.{}'.format(name, module_name))
+                entity = getattr(imported_module, class_name)()
                 top_entity = entity.clone_ptr()
                 get_entity_from_data_node(data_node, top_entity);
                 return top_entity

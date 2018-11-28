@@ -32,7 +32,7 @@ The following packages must be present in your system before installing YDK-Go:
 .. code-block:: sh
 
 	$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
-	$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+	$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
 	$ sudo gdebi libydk_0.8.0-1_amd64.deb
 
 **Centos (Fedora-based)**
@@ -43,7 +43,7 @@ The following packages must be present in your system before installing YDK-Go:
 	
 	$ sudo yum install epel-release
 	$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
-	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
 **Golang**
 
@@ -67,7 +67,7 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 	$ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 	$ xcode-select --install
 
-	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
+	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
 	$ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 	
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
@@ -89,9 +89,9 @@ In order to have YDK support for gNMI protocol, which is optional, the following
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
-    unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-3.3.0
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
     ./configure
     make
     make check
@@ -103,7 +103,7 @@ In order to have YDK support for gNMI protocol, which is optional, the following
 
 .. code-block:: sh
 
-    git clone -b v1.4.5 https://github.com/grpc/grpc
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     sudo ldconfig
@@ -117,14 +117,14 @@ Ubuntu
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
 
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 
@@ -158,4 +158,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.0 (beta). YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.0. YDK-Go is licensed under the Apache 2.0 License.

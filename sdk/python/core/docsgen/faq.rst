@@ -37,7 +37,7 @@ Also, we use the `ydk-gen <https://github.com/CiscoDevNet/ydk-gen>`_ tool to gen
 .. code-block:: sh
     :linenos:
 
-    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
 2) Generate & install ydk-py core
 

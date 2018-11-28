@@ -28,21 +28,28 @@ Linux
 -----
 
 Ubuntu (Debian-based)
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: sh
 
-   $ sudo apt-get install gdebi-core
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+   # Install Third-party software dependencies
+   $ sudo apt-get install gdebi-core python-dev libtool-bin
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+
+   # Install YDK core library
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
    $ sudo gdebi libydk_0.8.0-1_amd64.deb
 
 Centos (Fedora-based)
+~~~~~~~~~~~~~~~~~~~~~
 
 **Note:** Currently, only Centos7/RHEL7 are known to work.
 
 .. code-block:: sh
 
+   # Install Third-party software dependencies
    $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -52,36 +59,10 @@ Centos (Fedora-based)
 
 Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
 
-To install the core and bundles on Centos, please follow the below steps.
-
-``Python2.7``::
-
-    pip install ydk
-    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
-    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
-    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
-    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xe
-
-``Python3.4``::
-
-    pip install ydk
-    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-ietf
-    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-openconfig
-    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xr
-    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xe
-
-``Python3.6``::
-
-    pip install ydk
-    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-ietf
-    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-openconfig
-    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xr
-    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xe
-
 MacOS
 -----
 
-You can download the latest python package from here. **Note:** Please do not use the homebrew version of python as it causes issues with installing ydk packages. Please execute ``brew rm python python3`` to remove any homebrew python packages.
+**Note:** Please do not use the homebrew version of python as it causes issues with installation of YDK packages. Please execute ``brew rm python python3`` to remove any homebrew python packages.
 
 It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py.
 
@@ -90,7 +71,7 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 
 Windows
@@ -108,7 +89,8 @@ gNMI Requirements
 
 In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
 
-**Install protobuf**
+Install protobuf
+----------------
 
 .. code-block:: sh
 
@@ -120,9 +102,9 @@ In order to have YDK support for gNMI protocol, which is optional, the following
     make check
     sudo make install
     sudo ldconfig
-    cd -
 
-**Install gRPC**
+Install gRPC
+------------
 
 .. code-block:: sh
 
@@ -132,22 +114,27 @@ In order to have YDK support for gNMI protocol, which is optional, the following
     sudo ldconfig
     make
     sudo make install
-    cd -
 
-**Instal YDK gNMI library**
+Instal YDK gNMI library
+-----------------------
 
 Ubuntu
+~~~~~~
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
+~~~~~~
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+Run-time environment
+~~~~~~~~~~~~~~~~~~~~
 
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 
@@ -156,9 +143,6 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 
-Backwards Compatibility Notes
-=============================
-When installing and using the ``0.6.0`` and newer releases of ``YDK-Py``, please refer to the :ref:`compatibility`.
 
 .. _howto-install:
 
@@ -168,39 +152,71 @@ Quick install
 Centos (Fedora-based)
 ---------------------
 
-You can install the latest model packages from the DevHub artifactory and Python package index.  Note that, in some systems, you need to install the new package as root.
+You can install the latest model packages from the DevHub artifactory and Python package index.  
+Note that, in some systems, you need to install the new package as root.
+
+To install the core and model bundles on Centos, please follow the below steps.
+
+``Python2.7``::
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-service-gnmi-0.4.0.tar.gz
-    $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
-    $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
-    $ pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python2.7/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.4``::
+
+.. code-block:: sh
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.4/site-packages" --no-deps ydk-models-cisco-ios-xe
+
+``Python3.6``::
+
+ .. code-block:: sh
+
+    pip install ydk
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-ietf
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-openconfig
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xr
+    pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xe
+
 
 Other platforms
-----------------------------------------------
-You can install the latest model packages from the DevHub artifactory and Python package index.  Note that, in some systems, you need to install the new package as root.  You get fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) (depending on whether you're developing for an IOS XR or IOS XE platform) which automatically installs all other YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
+---------------
+
+You can install the latest model packages from the DevHub artifactory and Python package index.  
+Note that, in some systems, you need to install the new package as root.  
+You get fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) 
+(depending on whether you're developing for an IOS XR or IOS XE platform) which automatically installs all other 
+YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-service-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-service-gnmi-0.4.0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
-Alternatively, you can perform a partial installation.  If you only want to install the ``openconfig`` bundle and its dependencies (``YDK`` and ``ietf`` packages), execute:
+Alternatively, you can perform a partial installation.  
+If you only prefer to install the ``openconfig`` bundle and its dependencies (``YDK`` and ``ietf`` packages), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0-beta/ydk-0.8.0b0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source

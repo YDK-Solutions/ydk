@@ -48,12 +48,12 @@ The following packages must be present in your system before installing YDK-Cpp:
    sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 wget
    #
    # gcc-5 and g++5 for modern c++
-   yum install centos-release-scl -y > /dev/null
-   yum install devtoolset-4-gcc* -y > /dev/null
-   ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
-   ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
-   ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+   sudo yum install centos-release-scl -y > /dev/null
+   sudo yum install devtoolset-4-gcc* -y > /dev/null
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
 MacOS
 ~~~~~
@@ -111,8 +111,8 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
 Quick YDK Installation
 ----------------------
 
-System Requirements
-~~~~~~~~~~~~~~~~~~~
+Install prebuilt libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
 
@@ -122,14 +122,14 @@ Download and install YDK core library:
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
    sudo gdebi libydk_0.8.0-1_amd64.deb
 
 Download and install YDK gNMI library (optional):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 **CentOS**
@@ -138,13 +138,13 @@ Install YDK core library:
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
 Install YDK gNMI library (optional):
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi-0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi-0.4.0-1.x86_64.rpm
 
 **MacOS**
 
@@ -152,9 +152,13 @@ You can install the latest model packages using `homebrew <http://brew.sh>`_.  T
 
 .. code-block:: sh
 
-  brew tap CiscoDevNet/ydk
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
+   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
-You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
+You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
@@ -166,7 +170,7 @@ Alternatively, you can perform partial installation.  If you only want to instal
 
   brew install ydk-openconfig
 
-If you only want to install the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
+If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
 
 .. code-block:: sh
 
@@ -175,6 +179,8 @@ If you only want to install the ``ietf`` bundle and its dependencies (``ydk`` pa
 Installing from source
 ----------------------
 
+In order to build YDK components from source, download or clone source files from `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cpp>`_
+
 Installing YDK core library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -182,68 +188,70 @@ YDK uses ``cmake`` as the build system of choice. To install the ``core`` packag
 
 .. code-block:: sh
 
-  $ ydk-cpp$ cd core/ydk
-  $ core$ mkdir build && cd build
-  $ build$ cmake .. && make
-  $ build$ sudo make install
+  $ cd ydk-cpp/core/ydk
+  ydk$ mkdir build && cd build
+  build$ cmake .. && make
+  build$ sudo make install
 
 Installing model bundles
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. To install the ``ietf`` bundle, execute:
+Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. 
+
+To install the ``ietf`` bundle, execute:
 
 .. code-block:: sh
 
-  $ core$ cd ../../ietf
-  $ ietf$ mkdir build && cd build
-  $ build$ cmake .. && make
-  $ build$ sudo make install
+  $ cd ydk-cpp/ietf
+  ietf$ mkdir build && cd build
+  build$ cmake .. && make
+  build$ sudo make install
 
 To install the ``openconfig`` bundle, execute:
 
 .. code-block:: sh
 
-  $ ietf$ cd ../openconfig
-  $ openconfig$ mkdir build && cd build
-  $ build$ cmake .. && make
-  $ build$ sudo make install
-
+  $ cd ydk-cpp/openconfig
+  openconfig$ mkdir build && cd build
+  build$ cmake .. && make
+  build$ sudo make install
+only 
 To install the ``cisco-ios-xr`` bundle, execute:
 
 .. code-block:: sh
 
-  $ openconfig$ cd ../cisco-ios-xr
-  $ cisco-ios-xr$ mkdir build && cd build
-  $ build$ cmake .. && make
-  $ build$ sudo make install
-  $ build$ cd ../..
+  $ cd ydk-cpp/cisco-ios-xr
+  cisco-ios-xr$ mkdir build && cd build
+  build$ cmake .. && make
+  build$ sudo make install
 
 Instaling YDK gNMI library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Optionaly the YDK gNMI library can be installed. Prior to this installation the YDK core library must be installed (see above).
+Optionaly the YDK gNMI Service library can be installed. Prior to this installation the YDK core library must be installed (see above).
 
 .. code-block:: sh
 
-    $ cd ydk-gen/sdk/cpp/gnmi
-    gnmi$ mkdir -p build
-    gnmi$ cd build
-    build$ cmake ..
-    build$ make
-    build$ sudo make install
+  $ cd ydk-cpp/gnmi
+  gnmi$ mkdir -p build
+  gnmi$ cd build
+  build$ cmake ..
+  build$ make
+  build$ sudo make install
 
 Samples
 =======
-To get started using the YDK API, there are sample apps available in the `YDK-Cpp repository <https://github.com/CiscoDevNet/ydk-cp/tree/master/core/samples>`_. For example, to run the ``bgp_create.cpp`` sample, execute:
+
+To get started using the YDK API, there are sample apps available in the `YDK-Cpp samples repository <https://github.com/CiscoDevNet/ydk-cpp/tree/master/core/ydk/samples>`_. For example, to run the ``bgp_create.cpp`` sample execute:
 
 .. code-block:: sh
 
-    ydk-cpp$ cd core/samples
-    samples$ mkdir build && cd build
-    build$ cmake .. && make
-    build$ ./bgp_create ssh://<username>:<password>@<host-address>:<port> [-v]
+  $ ydk-cpp$ cd core/samples
+  samples$ mkdir build && cd build
+  build$ cmake .. && make
+  build$ ./bgp_create ssh://<username>:<password>@<host-address>:<port> [-v]
 
 Documentation and Support
 =========================
-- Numerous additional samples can be found in the `YDK-Cpp samples repository <https://github.com/CiscoDevNet/ydk-cpp-samples>`_
+- Numerous additional samples can be found in the `YDK-Cpp samples repository <https://github.com/CiscoDevNet/ydk-cpp/tree/master/core/ydk/samples>`_
 - Join the `YDK community <https://communities.cisco.com/community/developer/ydk>`_ to connect with other users and with the makers of YDK

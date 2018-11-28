@@ -44,9 +44,9 @@ YANG Development Kit (Generator)
 
 # Overview
 
-**ydk-gen** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python, Go and C++ with planned support for other language bindings in the future.
+**YDK** is a developer tool that can generate API's that are modeled in YANG. Currently, it generates language binding for Python, Go and C++ with planned support for other language bindings in the future.
 
-Other tools and libraries are used to deliver `ydk-gen` functionality:
+Other tools and libraries are used to deliver `YDK` functionality:
 
 * YANG model analysis and code generation is implemented using APIs from the [pyang](https://github.com/mbj4668/pyang) library
 * Documentation is generated using [Sphinx](http://www.sphinx-doc.org/en/stable/)
@@ -60,7 +60,8 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 
 # Backward compatibility
-Please see [this page](http://ydk.cisco.com/py/docs/guides/backward_compatibility.html) for details on some backward incompatible changes introduced as part of the 0.6.0 release. Note also that [#604](https://github.com/CiscoDevNet/ydk-gen/issues/604) and [#748](https://github.com/CiscoDevNet/ydk-gen/issues/748) introduced backward incompatibility for python. The bundles generated with `0.7.1` or newer ydk-gen will only work with ydk `core` version `0.7.1` or newer. Also error types for python were renamed from `YPYError` to `YError`.
+
+The YDK-0.8.0 core is bacward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
 
 # Docker
 
@@ -73,6 +74,7 @@ docker run -it ydkdev/ydk-gen
 ```
 
 # System requirements
+
 Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp/YDK-Go. 
 **Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages. In this case you you need to build all the components [from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
@@ -80,23 +82,26 @@ Please follow the below instructions to install the system requirements before i
 ### Ubuntu (Debian-based)
 
 **Install OS dependency packages**
+
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 ```
 
 **Install libydk library**
+
 ```
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
    $ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
 
 **Install libydk_gnmi library (optional)**
 
 For gNMI protocol support install third party software and then prebuilt libydk_gnmi library:
+
 ```
    $ ./test/dependencies_linux_gnmi.sh
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
    $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
@@ -116,7 +121,7 @@ For gNMI protocol support install third party software and then prebuilt libydk_
 
 **Install prebuilt libydk binary**
 ```  
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 ```
 
 ### Build from source
@@ -146,10 +151,10 @@ You can download the latest python package from [here](https://www.python.org/do
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
    $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk_gnmi-0.4.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
@@ -547,4 +552,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.8.0-beta. The version of the latest YDK-Gen master branch is 0.8.0-beta. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.0. The version of the latest YDK-Gen master branch is 0.8.0. YDK-Gen is licensed under the Apache 2.0 License.

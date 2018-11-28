@@ -533,6 +533,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
+    run_test sdk/python/core/tests/test_non_top_operations.py
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 
     print_msg "py_sanity_ydktest_test_netconf_ssh no on-demand"

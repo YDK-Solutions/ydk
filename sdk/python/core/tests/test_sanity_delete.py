@@ -160,21 +160,6 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(runner_compare, runner_read)
         self.assertEqual(runner_compare.ytypes.built_in_t.llstring, runner_read.ytypes.built_in_t.llstring)
 
-    def test_delete_on_list_with_identitykey(self):
-        a1 = ysanity.Runner.OneList.IdentityList()
-        a1.config.id = ysanity.ChildIdentity()
-        a1.id_ref =  a1.config.id
-        self.crud.create(self.ncc, a1)
-
-        k = ysanity.Runner.OneList.IdentityList()
-        k.config.id = ysanity.ChildIdentity()
-        k.id_ref = k.config.id
-        k.yfilter = YFilter.delete
-        self.crud.update(self.ncc, k)
-
-        runner_read = self.crud.read(self.ncc, ysanity.Runner())
-        self.assertIsNone(runner_read)
-
     def test_delete_on_container(self):
         # create runner with a container
         runner_create = ysanity.Runner()

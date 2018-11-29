@@ -81,33 +81,35 @@ Please follow the below instructions to install the system requirements before i
 ## Linux
 ### Ubuntu (Debian-based)
 
-**Install OS dependency packages**
+#### Install OS dependency packages
 
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 ```
 
-**Install libydk library**
+#### Install libydk library
+
+You can install the latest `libydk` core library using prebuilt binaries for Xenial and Bionic. For other Ubuntu distributions it is recommended to build `libydk` library from source.
+
+For Xenial (Ubuntu 16.04.4):
 
 ```
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
-   $ sudo gdebi libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
+$ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
 
-**Install libydk_gnmi library (optional)**
-
-For gNMI protocol support install third party software and then prebuilt libydk_gnmi library:
+For Bionic (Ubuntu 18.04.1):
 
 ```
-   $ ./test/dependencies_linux_gnmi.sh
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
-   $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+$ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
 
 ### Centos (Fedora-based)
 
-**Install OS dependency packages**
+#### Install OS dependency packages
+
 ```
    $ sudo yum install epel-release
    $ sudo yum install libssh-devel gcc-c++
@@ -119,13 +121,16 @@ For gNMI protocol support install third party software and then prebuilt libydk_
    $ sudo ln -s -f /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
-**Install prebuilt libydk binary**
+#### Install prebuilt libydk binary
+
 ```  
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 ```
 
 ### Build from source
+
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
+
 ```
    # Generate and install libydk library
    $ ./generate --cpp --core
@@ -141,11 +146,13 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 ```
 
 ## MacOS
+
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp/YDK-Go.
 
-You can download the latest python package from [here](https://www.python.org/downloads/). Please do not use the homebrew version of python as it causes issues with installing ydk packages. Please execute `brew rm python python3` to remove any homebrew python packages.
+You can download the latest Python package from [here](https://www.python.org/downloads/). Please do not use the homebrew version of Python as it causes issues with installation of YDK packages. Please execute `brew rm python python3` to remove any homebrew Python packages.
 
-**Install prebuilt libydk and optionally libydk_gnmi libraries:**
+#### Install prebuilt libydk and optionally libydk_gnmi libraries
+
 ```
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -159,6 +166,7 @@ You can download the latest python package from [here](https://www.python.org/do
 ```
 
 **Note**. The `libssh-0.8.0` and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall `libssh-0.7.x`.
+
 ```
 $ brew reinstall openssl
 $ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
@@ -170,7 +178,9 @@ $ sudo make install
 ```
 
 ### Build from source
+
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
+
 ```
    # Generate and install libydk library
    $ ./generate --cpp --core
@@ -186,13 +196,14 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 ```
 
 ## Windows
+
 Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
 
-##gNMI Requirements
+## gNMI Requirements
 
 In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
 
-###Install protobuf and protoc
+### Install protobuf and protoc
 
 ```
     wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
@@ -205,7 +216,7 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     sudo ldconfig
 ```
 
-###Install gRPC
+### Install gRPC
 
 ```
     git clone -b v1.9.1 https://github.com/grpc/grpc
@@ -217,7 +228,31 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd -
 ```
 
-###Run-time environment
+### Instal YDK gNMI library
+
+#### Ubuntu
+
+For Xenial (Ubuntu 16.04.4):
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For Bionic (Ubuntu 18.04.1)
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+#### CentOS
+
+```
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+```
+
+### Run-time environment
 
 There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
 for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
@@ -246,6 +281,7 @@ Create new virtual environment:
 ```
 
 ## Clone ydk-gen and install the requirements
+
 ```
 $ git clone https://github.com/CiscoDevNet/ydk-gen.git
 $ cd ydk-gen
@@ -362,6 +398,7 @@ Some model bundles have bin packaged and published in [Pypi](https://pypi.org) r
 There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.
 
 First generate and install ``libydk``
+
 ```
 $ ./generate.py --libydk
 $ cd gen-api/cpp/ydk/build
@@ -370,17 +407,20 @@ $ [sudo] make install
 ```
 
 To create the libydk binary package to use for later installation, run the below command
+
 ```
 $ [sudo] make package
 ```
 
 For Python:
+
 ```
 $ ./generate.py --python --core
 $ pip install gen-api/python/ydk/dist/ydk*.tar.gz
 ```
 
 For Go:
+
 ```
 $ export $GOPATH=/your-go-path-installation-directory
 $ ./generate.py --go --core
@@ -391,27 +431,32 @@ $ ./generate.py --go --core
 Generate model bundle using a bundle profile and install it.
 
 For Python:
+
 ```
 $ ./generate.py --python --bundle profiles/bundles/<name-of-profile>.json
 $ [sudo] pip install gen-api/python/<name-of-bundle>-bundle/dist/ydk*.tar.gz
 ```
 
 Now, the `pip list | grep ydk` should show the `ydk` (referring to the core package) and `ydk-<name-of-bundle>` packages installed:
+
 ```
 $ pip list | grep ydk
 ...
-ydk (0.7.3)
+
+ydk (0.8.0)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
 
 For Go:
+
 ```
 $ export $GOPATH=/your-go-path-installation-directory
 $ ./generate.py --go --bundle profiles/bundles/<name-of-profile>.json
 ```
 
 For C++:
+
 ```
 $ ./generate.py --cpp --bundle profiles/bundles/<name-of-profile>.json
 $ cd gen-api/cpp/<name-of-bundle>-bundle/build
@@ -503,7 +548,9 @@ pyang *.yang
 # Running Unit Tests
 
 ## Python
+
 First, generate and install the [test](profiles/test/ydktest.json) bundle and core package
+
 ```
 $ ./generate.py --core
 $ pip install gen-api/python/core/dist/ydk*.tar.gz
@@ -522,7 +569,9 @@ $ python test/test_sanity_filters.py
 ```
 
 ## C++
+
 First, install the core and [test](profiles/test/ydktest-cpp.json) bundle package.
+
 ```
 $ ./generate.py --core --cpp
 $ ./generate.py --bundle profiles/test/ydktest-cpp.json --cpp
@@ -544,6 +593,7 @@ $ cmake .. && make all test
 ```
 
 ## Go
+
 Please refer [here](https://github.com/CiscoDevNet/ydk-gen/blob/master/sdk/go/core/README.md).
 
 Support

@@ -43,6 +43,8 @@ You can install YDK-Go on macOS or Linux.  It is not currently supported on Wind
 
 The following packages must be present in your system before installing YDK-Go:
 
+Install third-party dependency software:
+
 ```
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 
@@ -52,15 +54,22 @@ sudo apt-get update > /dev/null
 sudo apt-get install gcc-5 g++-5 -y > /dev/null
 sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
 sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
+```
 
-# Install YDK core library
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
+Install YDK core library:
+
+For Xenial (Ubuntu 16.04.4):
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
 $ sudo gdebi libydk_0.8.0-1_amd64.deb
+```
 
-# Install libydk_gnmi library (optional)
-$ ./test/dependencies_linux_gnmi.sh
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+For Bionic (Ubuntu 18.04.1):
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+$ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
 
 #### Centos (Fedora-based)
@@ -158,7 +167,22 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     make
     sudo make install
     sudo ldconfig
-    cd -
+```
+
+#### Install gNMI library
+
+For Xenial (Ubuntu 16.04.4):
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For Bionic (Ubuntu 18.04.1)
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
 #### Run-time environment

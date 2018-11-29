@@ -29,11 +29,19 @@ Linux
 
 The following packages must be present in your system before installing YDK-Go:
 
+For Xenial (Ubuntu 16.04.4):
+
 .. code-block:: sh
 
-	$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
-	$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
-	$ sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -78,8 +86,6 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 	$ export GOROOT_BOOTSTRAP=$GOROOT
 	$ gvm install go1.9.2
 
-.. _howto-install:
-
 gNMI Requirements
 ===================
 
@@ -115,9 +121,18 @@ In order to have YDK support for gNMI protocol, which is optional, the following
 
 Ubuntu
 
+For Xenial (Ubuntu 16.04.4):
+
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
@@ -126,12 +141,16 @@ CentOS
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
 
+**Set run-time environment**
+
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 
 .. code-block:: sh
 
    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+
+.. _howto-install:
 
 How to install YDK-Go
 =====================

@@ -116,84 +116,140 @@ for details. As a workaround, the YDK based application runtime environment must
 ### Quick Install
 #### Linux
 ##### Ubuntu (Debian-based)
-You can install the latest `libydk` `core` package using prebuilt binaries:
+
+You can install the latest `libydk` core package using prebuilt binaries for Xenial and Bionic. For other Ubuntu distributions it is recommended to build core libraries from source.
+
+For Xenial (Ubuntu 16.04.4):
+
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
 $ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
-To install the `ietf` package using prebuilt binaries:
+
+For Bionic (Ubuntu 18.04.1):
+
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk-ietf_0.1.3-1_amd64.deb
-$ sudo gdebi libydk-ietf_0.1.3-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+$ sudo gdebi libydk_0.8.0-1_amd64.deb
 ```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/debian-ydk/0.8.0) can be installed.
 
 ##### Centos (Fedora-based)
+
 You can install the latest `libydk` `core` package using prebuilt binaries:
+
 ```
 $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 ```
-To install the `ietf` package using prebuilt binaries:
-```
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-ietf-0.1.3-1.x86_64.rpm
-```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/rpm-ydk/0.8.0) can be installed.
 
 #### MacOS  
+
 You can install the latest `libydk` `core` package using prebuilt binaries:
+
 ```
 $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
 $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 ```
-To install the `ietf` package using prebuilt binaries:
+
+### gNMI Requirements
+
+In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+#### Install protobuf and protoc
+
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-ietf-0.1.3-Darwin.pkg
-$ sudo installer -pkg libydk-ietf-0.1.3-Darwin.pkg -target /
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
 ```
-Similarly other model bundle packages listed [here](http://devhub.cisco.com/artifactory/webapp/#/artifacts/browse/tree/General/osx-ydk/0.8.0) can be installed.
+
+#### Install gRPC
+
+```
+    git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    make
+    sudo make install
+    sudo ldconfig
+```
+
+#### Install gNMI library
+
+For Xenial (Ubuntu 16.04.4):
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For Bionic (Ubuntu 18.04.1)
+
+```
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+#### Run-time environment
+
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
+for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
+
+```
+    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+```
 
 #### Installing from source
 #### Building YDK
-YDK uses ``cmake`` as the build system of choice. To install the ``core`` package, execute:
+
+YDK uses ``cmake`` as the build system of choice. To install the core package, execute:
+
 ```
-$ ydk-cpp$ cd core/ydk
-$ core$ mkdir build && cd build
-$ build$ cmake .. && make
-$ build$ sudo make install
+ydk-cpp$ cd core/ydk
+core$ mkdir build && cd build
+build$ cmake .. && make
+build$ sudo make install
 ```
 
-Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. To install the `ietf` bundle, execute:
+Once you have installed the core package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. To install the `ietf` bundle, execute:
+
 ```
-$ core$ cd ../../ietf
-$ ietf$ mkdir build && cd build
-$ build$ cmake .. && make
-$ build$ sudo make install
+core$ cd ../../ietf
+ietf$ mkdir build && cd build
+build$ cmake .. && make
+build$ sudo make install
 ```
 
 To install the `openconfig` bundle, execute:
+
 ```
-$ ietf$ cd ../openconfig
-$ openconfig$ mkdir build && cd build
-$ build$ cmake .. && make
-$ build$ sudo make install
+ietf$ cd ../openconfig
+openconfig$ mkdir build && cd build
+build$ cmake .. && make
+build$ sudo make install
 ```
 
 To install the `cisco-ios-xr` bundle, execute:
+
 ```
-$ openconfig$ cd ../cisco-ios-xr
-$ cisco-ios-xr$ mkdir build && cd build
-$ build$ cmake .. && make
-$ build$ sudo make install
-$ build$ cd ../..
+openconfig$ cd ../cisco-ios-xr
+cisco-ios-xr$ mkdir build && cd build
+build$ cmake .. && make
+build$ sudo make install
 ```
 
 To install the `cisco-ios-xe` bundle, execute:
+
 ```
-$ openconfig$ cd ../cisco-ios-xe
-$ cisco-ios-xe$ mkdir build && cd build
-$ build$ cmake .. && make
-$ build$ sudo make install
-$ build$ cd ../..
+openconfig$ cd ../cisco-ios-xe
+cisco-ios-xe$ mkdir build && cd build
+build$ cmake .. && make
+build$ sudo make install
 ```
 
 ## Documentation and Support

@@ -30,20 +30,34 @@ Linux
 Ubuntu (Debian-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
+Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
+For other Ubuntu distributions it is recommended to build core library from source.
+
+Install Third-party software dependencies
+
 .. code-block:: sh
 
-   # Install Third-party software dependencies
    $ sudo apt-get install gdebi-core python-dev libtool-bin
    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 
-   # Install YDK core library
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_0.8.0-1_amd64.deb
-   $ sudo gdebi libydk_0.8.0-1_amd64.deb
+For Xenial (Ubuntu 16.04.4):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
 
 Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
-**Note:** Currently, only Centos7/RHEL7 are known to work.
+**Note:** Currently, only Centos7 and RHEL7 are known to work with YDK.
 
 .. code-block:: sh
 
@@ -121,9 +135,18 @@ Instal YDK gNMI library
 Ubuntu
 ~~~~~~
 
+For Xenial (Ubuntu 16.04.4):
+
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
@@ -229,7 +252,7 @@ If you prefer not to use the YDK packages in the DevHub artifactory or Python pa
 
 .. code-block:: sh
 
-    $ git clone https://github.com/CiscoDevNet/ydk-gen.git -b gnmi
+    $ git clone https://github.com/CiscoDevNet/ydk-gen.git
     $ cd ydk-gen/sdk/cpp/core
     core$ mkdir -p build
     core$ cd build

@@ -170,8 +170,8 @@ CentOS
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
 
-Run-time environment
-~~~~~~~~~~~~~~~~~~~~
+Runtime environment
+~~~~~~~~~~~~~~~~~~~
 
 There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
 for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:

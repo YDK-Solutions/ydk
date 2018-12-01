@@ -24,15 +24,18 @@ function usage {
 }
 
 function check_gen_api_directories {
-GEN_API_CONTENTS=$(ls ${1} &> /dev/null)
-if [[ ${GEN_API_CONTENTS} != *"cisco_ios_xe-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"cisco_ios_xr-bundle"* ]] \
+  GEN_API_CONTENTS=$(ls ${1})
+  printf "Examining content of directory ${1}\n$GEN_API_CONTENTS\n"
+  if [[ ${GEN_API_CONTENTS} != *"cisco_ios_xe-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"cisco_ios_xr-bundle"* ]] \
             || [[ ${GEN_API_CONTENTS} != *"openconfig-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"ietf-bundle"* ]] \
-             || [[ ${GEN_API_CONTENTS} != *"cisco_nx_os-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"ydk"* ]]; then
-    printf "\n    All packages have not been generated.\n\
+             || [[ ${GEN_API_CONTENTS} != *"cisco_nx_os-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"ydk"* ]] \
+            || [[ ${GEN_API_CONTENTS} != *"ydk-service-gnmi"* ]]; then
+    printf "\n    Not all packages have been generated.\n\
         Please run './generate.py --${LANGUAGE} --bundle profile/bundles/<profile>.json' for all desired bundles.\n\
-        Run './generate.py --${LANGUAGE} --core' for core\n\n"
+        Run './generate.py --${LANGUAGE} --core' for core\n\
+        Run './generate.py --${LANGUAGE} --service' for gnmi\n\n"
     exit 1
-fi
+  fi
 }
 
 function copy_bundle_packages {
@@ -49,18 +52,40 @@ function copy_bundle_packages {
     cp -r ${GEN_API_PATH}/cisco_ios_xe-bundle/* ${SDK_PATH}/cisco-ios-xe
 
     echo "Copying cisco-ios-nx from ${GEN_API_PATH}/cisco_ios_nx-bundle/ to ${SDK_PATH}"
-    cp -r ${GEN_API_PATH}/cisco_ios_nx-bundle/* ${SDK_PATH}/cisco-ios-nx
+    cp -r ${GEN_API_PATH}/cisco_nx_os-bundle/* ${SDK_PATH}/cisco-nx-os
 }
 
 function copy_readme {
+    echo " "
     echo "Copying README from ${SDK_STUB_PATH} to ${SDK_PATH}"
     cp -r ${SDK_STUB_PATH}/README.${1} ${SDK_PATH}
 }
 
 function copy_gen_api_to_go_sdk {
     GO_GEN_API_DIR=${1}
-    echo "Copying ${GO_GEN_API_DIR} from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to ${SDK_PATH}"
-    cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk/* ${SDK_PATH}/ydk
+    source_path=${GEN_API_PATH}/${GO_GEN_API_DIR}
+    local copy_samples
+    if [[ $GO_GEN_API_DIR == "ydk" ]]; then
+        target_path="$SDK_PATH/core"
+        copy_samples=1
+    elif [[ $GO_GEN_API_DIR == "ydk-service-gnmi" ]]; then
+        target_path="$SDK_PATH/gnmi"
+        copy_samples=1
+    else
+        target_path="$SDK_PATH/models"
+    fi
+
+    if [[ $copy_samples ]]; then
+        echo " "
+        echo "Copying ${GO_GEN_API_DIR}/ydk from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to ${target_path}"
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk ${target_path}
+        echo "Copying samples from ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples to ${target_path}"
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples ${target_path}
+    else
+        echo " "
+        echo "Copying ${GO_GEN_API_DIR} model bundle from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to ${target_path}"
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk/models/* ${target_path}
+    fi
 }
 
 function clear_sdk_directories {
@@ -116,7 +141,7 @@ GEN_API_PATH=$(pwd)/gen-api/${LANGUAGE}
 SDK_STUB_PATH=$(pwd)/sdk/${LANGUAGE}
 
 if [[ ! -d ${SDK_PATH} ]]; then
-    echo "SDK path '${SDK_PATH}' is invalid! Please provide a valid path to a cloned of the YDK github SDK repository\n"
+    echo "SDK path '${SDK_PATH}' is invalid! Please provide valid path to the repository cloned of the YDK github SDK \n"
     exit 1
 fi
 
@@ -124,7 +149,7 @@ check_gen_api_directories ${GEN_API_PATH}
 
 while true; do
     printf "\n"
-    read -p "    About to delete docs directories. Do you wish to continue? " yn
+    read -p "    About to delete docs directories. Continue? (y/n)" yn
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) printf "\nExiting...\n\n";exit;;
@@ -140,9 +165,19 @@ echo "${LANGUAGE} being copied to ${SDK_PATH}"
 if [[ ${LANGUAGE} == "cpp" ]]; then
     clear_sdk_directories
     rm -rf ${SDK_PATH}/core/ydk/*
+    rm -rf ${SDK_PATH}/gnmi/ydk/*
 
-    echo "Copying core from ${GEN_API_PATH}/ydk/ to ${SDK_PATH}"
-    cp -r ${GEN_API_PATH}/ydk/* ${SDK_PATH}/core/ydk
+    echo "Deleting ${GEN_API_PATH}/ydk/tests"
+    rm -rf ${GEN_API_PATH}/ydk/tests
+    echo "Deleting ${GEN_API_PATH}/ydk-service-gnmi/tests"
+    rm -rf ${GEN_API_PATH}/ydk-service-gnmi/tests
+
+    echo " "
+    echo "Copying core ${GEN_API_PATH}/ydk/* to ${SDK_PATH}/core"
+    cp -r ${GEN_API_PATH}/ydk/* ${SDK_PATH}/core
+
+    echo "Copying gnmi ${GEN_API_PATH}/ydk-service-gnmi/* to ${SDK_PATH}/gnmi"
+    cp -r ${GEN_API_PATH}/ydk-service-gnmi/* ${SDK_PATH}/gnmi
 
     copy_bundle_packages
 
@@ -151,35 +186,46 @@ if [[ ${LANGUAGE} == "cpp" ]]; then
 elif [[ ${LANGUAGE} == "python" ]]; then
     clear_sdk_directories
     rm -rf ${SDK_PATH}/core/ydk/*
+    rm -rf ${SDK_PATH}/gnmi/ydk/*
 
     echo "Deleting ${GEN_API_PATH}/ydk/tests"
     rm -rf ${GEN_API_PATH}/ydk/tests
-
-    echo "Copying core from ${GEN_API_PATH}/ydk/ to ${SDK_PATH}"
+    echo "Deleting ${GEN_API_PATH}/ydk-service-gnmi/tests"
+    rm -rf ${GEN_API_PATH}/ydk-service-gnmi/tests
+    echo " "
+    echo "Copying core ${GEN_API_PATH}/ydk/* to ${SDK_PATH}/core"
     cp -r ${GEN_API_PATH}/ydk/* ${SDK_PATH}/core/
+
+    echo "Copying gnmi ${GEN_API_PATH}/ydk-service-gnmi/* to ${SDK_PATH}/gnmi"
+    cp -r ${GEN_API_PATH}/ydk-service-gnmi/* ${SDK_PATH}/gnmi/
 
     copy_bundle_packages
 
     copy_readme rst
 
 elif [[ ${LANGUAGE} == "go" ]]; then
-    echo "Clearing ${SDK_PATH} of existing files"
+    echo " "
+    echo "Cleaning ${SDK_PATH} of existing files"
     rm -rf ${SDK_PATH}/ydk/*
-    rm -rf ${SDK_PATH}/samples/*
+    rm -rf ${SDK_PATH}/core/*
+    rm -rf ${SDK_PATH}/gnmi/*
+    rm -rf ${SDK_PATH}/models/*
 
     echo "Deleting ${GEN_API_PATH}/ydk/tests"
     rm -rf ${GEN_API_PATH}/ydk/tests
 
+    echo "Deleting ${GEN_API_PATH}/ydk-service-gnmi/tests"
+    rm -rf ${GEN_API_PATH}/ydk-service-gnmi/tests
+
     copy_gen_api_to_go_sdk ydk
-    echo "Copying samples from ${GEN_API_PATH}/ydk/samples/* to ${SDK_PATH}/samples/"
-    cp -r ${GEN_API_PATH}/ydk/samples/* ${SDK_PATH}/samples/
+    copy_gen_api_to_go_sdk ydk-service-gnmi
+
     copy_gen_api_to_go_sdk ietf-bundle
     copy_gen_api_to_go_sdk openconfig-bundle
     copy_gen_api_to_go_sdk cisco_ios_xr-bundle
     copy_gen_api_to_go_sdk cisco_ios_xe-bundle
-    copy_gen_api_to_go_sdk cisco_ios_nx-bundle
+    copy_gen_api_to_go_sdk cisco_nx_os-bundle
     copy_readme md
-
 fi
 
 printf "\n\n    Please check ${SDK_PATH} and perform the git commit and push\n\n"

@@ -76,7 +76,7 @@ docker run -it ydkdev/ydk-gen
 # System requirements
 
 Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp/YDK-Go. 
-**Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages. In this case you you need to build all the components [from source](#second-step-generate-and-install-the-core) after installing the below requirements:
+**Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages. In this case you need to build all the components [from source](#second-step-generate-and-install-the-core) after installing the below requirements:
 
 ## Linux
 ### Ubuntu (Debian-based)
@@ -254,7 +254,8 @@ $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 ### Run-time environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
+See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041).
 for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
@@ -328,7 +329,7 @@ optional arguments:
                         Generate separate modules for each python class
                         corresponding to yang containers or lists.
 ```
-The below steps specify how to use `generate.py` to generate YDK core, model bundle, and service packages. All these package are available for Python, Go and C++ in corresponding github repositories: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). 
+The below steps specify how to use `generate.py` to generate YDK core, model bundle, and service packages. All these packages are available for Python, Go and C++ in corresponding github repositories: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). 
 
 The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 

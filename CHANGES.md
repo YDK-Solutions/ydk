@@ -1,6 +1,6 @@
 ### 2018-11-27 version 0.8.0
  
-#### Python, C++ & Go
+#### Python, C++, Go
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
 ##### CRUD / Netconf / Codec / Path API improvements
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
@@ -123,7 +123,7 @@ CRUD/ NETCONF / Codec API improvements
 
 ### 2018-01-31 version 0.7.0
 
-#### Python, C++ & Go
+#### Python, C++, Go
 ##### Introduced Go language YDK support
   * Added support for all existing `ydk core` services, providers, types and errors in Go
   * Added support for all existing `ydk bundles` including `ietf`, `openconfig`, `cisco-ios-xr` and `cisco-ios-xe` in Go

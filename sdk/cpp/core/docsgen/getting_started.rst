@@ -234,7 +234,7 @@ CentOS
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
 
-**Set run-time environment**
+**Set runtime environment**
 
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 

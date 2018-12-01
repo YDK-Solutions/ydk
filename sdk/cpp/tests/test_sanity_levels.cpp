@@ -570,7 +570,6 @@ TEST_CASE("test_leafref_pos")
     REQUIRE(e_2->name   == ldata1->name);
     REQUIRE(e_11->number== subl00->number);
     REQUIRE(e_11->name  == subl00->name);
-    REQUIRE(*r_1 == *r_2);
 }
 
 TEST_CASE("aug_one_pos")

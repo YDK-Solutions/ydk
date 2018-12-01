@@ -52,6 +52,16 @@ YDK Filters
             configuration, only the configuration actually present in
             the <config> parameter is affected.
 
+        .. cpp:enumerator:: update
+
+            The configuration data identified by the element
+            containing this attribute updates any related configuration
+            in the configuration datastore identified by the <target>
+            parameter.  If no such configuration data exists in the
+            configuration datastore, it is created. 
+            
+            **Note.** The ``YFilter::update`` is aplicable only to :py:class:`gNMIService<ydk.gnmi.services.gNMIService>` **set** operation.
+            
         .. cpp:enumerator:: read
 
             When reading configuration or operational data from a network device and a specific leaf is desired to be read, the operation can be set to `read` on that leaf. See example below

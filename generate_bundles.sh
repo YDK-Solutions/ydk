@@ -96,24 +96,28 @@ fi
 
 print_msg "Generating Python core and bundles"
 run_cmd ./generate.py --core
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json
+
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_1.json
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_1.json
-run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_1.json
+run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_2.json
 
 print_msg "Generating C++ core and bundles"
 run_cmd ./generate.py --core --cpp
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_1.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_1.json  --cpp
-run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_1.json  --cpp
+run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_2.json  --cpp
 
 print_msg "Generating Go core and bundles"
 run_cmd ./generate.py --core --go
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json --go
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json --go
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json --go
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_1.json --go
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_1.json  --go
-run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_1.json --go
+run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_2_2.json --go

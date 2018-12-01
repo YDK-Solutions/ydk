@@ -106,7 +106,7 @@ Path API can be used to work with a ``action`` as defined in the YANG 1.1 standa
 
 Consider the below snippet from an example ``action-config.yang`` model compliant with the YANG 1.1 standard.
 
-.. code-block:: yang
+.. code-block:: cpp
 
     container data {
       action action-node {

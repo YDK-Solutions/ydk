@@ -3,7 +3,7 @@ YDK API
 
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 2
 
     services/services.rst
     providers/providers.rst

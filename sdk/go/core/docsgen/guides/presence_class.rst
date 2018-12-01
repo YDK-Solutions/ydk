@@ -34,7 +34,7 @@ According to `RFC 6020 <https://tools.ietf.org/html/rfc6020#section-7.5.1>`_, YA
         // against. The type is slice of
         // Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries_PrefixListEntry.
         PrefixListEntry []Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries_PrefixListEntry
-}
+    }
 
 Since the existence of container `prefix-list-entries` itself represents configuration data, YDK does not instantiate an instance of :go:struct:`Ipv4AclAndPrefixList_Prefixes_Prefix_PrefixListEntries<ydk/models/cisco_ios_xr/ipv4_acl_cfg/Ipv4AclAndPrefixList/Prefixes/Prefix/PrefixListEntries>` with the YPresence attribute. The user needs manually instantiate and assign this object as follows:
 

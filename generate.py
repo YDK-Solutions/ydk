@@ -79,6 +79,49 @@ def update_setup_file_version(language, ydk_root):
             fd.writelines(lines)
 
 
+def get_service_profile(ydk_root, profile_location):
+    with open(os.path.join(ydk_root, profile_location)) as f:
+        profile = json.load(f)
+    return profile
+
+def get_service_release(ydk_root, profile_location):
+    profile = get_service_profile(ydk_root, profile_location)
+    name = profile['name']
+    release = profile['version']
+    dev = '-dev' if release[-4:] == '-dev' else ''
+    release = release.replace('-dev', '')
+    return (name, release, dev)
+
+def update_service_setup_file_version(language, ydk_root, profile):
+    name, release, dev = get_service_release(ydk_root, profile)
+
+    replacer_table = {}     # KEY is file name; VALUE is 2-tuple: substr match, replacement template
+    if language == 'python':
+        replacer_table = {
+            'setup.py': {'NAME =': "NAME = 'ydk-service-%s'\n" % name,
+                         'VERSION =': "VERSION = '%s%s'\n" % (release, dev)},
+            'CMakeLists.txt': {'project(path VERSION': 'project(path VERSION %s LANGUAGES C CXX)\n' % release}
+        }
+    elif language == 'cpp':
+        replacer_table = {
+            'CMakeLists.txt': {'project(ydk_%s VERSION' % name: 'project(ydk_%s VERSION %s LANGUAGES C CXX)\n' % (name, release)}
+        }
+    else:
+        raise Exception('Language {0} has no setup file'.format(language))
+    
+    for file_name, keyword_replacer_table in replacer_table.items():
+        setup_file = os.path.join(ydk_root, 'sdk', language, name, file_name)
+        lines = []
+        with open(setup_file, 'r+') as fd:
+            lines = fd.readlines()
+        for i, line in enumerate(lines):
+            for keyword, replace_value in keyword_replacer_table.items():
+                if keyword == line[:len(keyword)]:
+                    lines[i] = replace_value
+        with open(setup_file, 'w+') as fd:
+            fd.writelines(lines)
+
+
 def print_about_page(ydk_root, docs_rst_directory, release):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
@@ -173,7 +216,6 @@ def copy_files_to_cache(output_root_directory, language, docs_rst_directory):
     docs_expanded_directory = os.path.join(output_root_directory, 'cache', language, 'ydk', 'docs_expanded')
     return (docs_rst_directory, docs_expanded_directory)
 
-
 def generate_documentations(output_directory, ydk_root, language, is_bundle, is_core,
                             output_directory_contains_cache, output_root_directory):
     print('\nBuilding docs using sphinx-build...\n')
@@ -237,10 +279,32 @@ def create_pip_packages(output_directory):
     else:
         print('\nFailed to create source distribution')
         sys.exit(exit_code)
-    print('=================================================')
-    print('Successfully generated Python YDK at %s' % (py_sdk_root,))
+
+    package = generator.package_type
+    if generator.package_name != '':
+        package = '%s %s' % (generator.package_name, package)
+    print('\n=================================================')
+    print('Successfully generated Python YDK %s package at %s' % (package, py_sdk_root))
     print('Please refer to the README for information on how to install the package in your environment')
 
+
+def install_go_package(gen_api_dir, generator):
+    gopath = os.environ.get('GOPATH')
+    if gopath is None:
+        gopath = os.path.join(os.environ['HOME'], 'go')
+        print('\nEnvironment variable GOPATH has not been set!!!')
+        print('\nSetting GOPATH to %s' % gopath)
+    source_dir = os.path.join(gen_api_dir, 'ydk')
+    target_dir = os.path.join(gopath, 'src/github.com/CiscoDevNet/ydk-go/ydk')
+    logger.debug('Copying %s to %s' % (source_dir, target_dir))
+    dir_util.copy_tree(source_dir, target_dir)
+
+    package = generator.package_type
+    if generator.package_name != '':
+        package = '%s %s' % (generator.package_name, package)
+    print('\n=================================================')
+    print('Successfully generated and installed Go YDK %s package at %s' % 
+          (package, target_dir))
 
 def generate_adhoc_bundle(adhoc_bundle_name, adhoc_bundle_files):
     adhoc_bundle = {
@@ -292,7 +356,7 @@ def preconfigure_generated_cpp_code(output_directory, generate_libydk):
     make_command = 'To build and install, run "make && [sudo] make install" from {0}'.format(cmake_build_dir)
     if generate_libydk:
         make_command = make_command+'\n\nTo build the libydk package, run "make && make package" from {0}'.format(cmake_build_dir)
-    print('\nSuccessfully generated code at {0}.\n\n{1}'.format(output_directory, make_command))
+    print('\nSuccessfully generated C++ code at {0}.\n\n{1}'.format(output_directory, make_command))
     print('\n=================================================')
     print('Successfully generated C++ YDK at %s' % (cpp_sdk_root,))
     print('Please refer to the README for information on how to use YDK\n')
@@ -311,12 +375,28 @@ def _get_time_taken(start_time):
 if __name__ == '__main__':
     start_time = time.time()
 
-    parser = ArgumentParser(description='Generate YDK artefacts:')
+    parser = ArgumentParser(description='Generate YDK artifacts:')
+
+    parser.add_argument(
+        "-l", "--libydk",
+        action="store_true",
+        default=False,
+        help="Generate libydk core package")
+
+    parser.add_argument(
+        "--core",
+        action='store_true',
+        help="Generate and/or install core library")
+
+    parser.add_argument(
+        "--service",
+        type=str,
+        help="Location of service profile JSON file")
 
     parser.add_argument(
         "--bundle",
         type=str,
-        help="Specify a bundle profile file to generate a bundle from")
+        help="Location of bundle profile JSON file")
 
     parser.add_argument(
         "--adhoc-bundle-name",
@@ -330,9 +410,18 @@ if __name__ == '__main__':
         help="Generate an SDK from a specified list of files")
 
     parser.add_argument(
-        "--core",
-        action='store_true',
-        help="Generate and/or install core library")
+        "--generate-doc",
+        action="store_true",
+        dest="gendoc",
+        default=False,
+        help="Generate documentation")
+
+    parser.add_argument(
+        "--generate-tests",
+        action="store_true",
+        dest="gentests",
+        default=False,
+        help="Generate tests")
 
     parser.add_argument(
         "--output-directory",
@@ -365,30 +454,10 @@ if __name__ == '__main__':
         help="Generate Go SDK")
 
     parser.add_argument(
-        "-l", "--libydk",
-        action="store_true",
-        default=False,
-        help="Generate libydk core package")
-
-    parser.add_argument(
         "-v", "--verbose",
         action="store_true",
         default=False,
         help="Verbose mode")
-
-    parser.add_argument(
-        "--generate-doc",
-        action="store_true",
-        dest="gendoc",
-        default=False,
-        help="Generate documentation")
-
-    parser.add_argument(
-        "--generate-tests",
-        action="store_true",
-        dest="gentests",
-        default=False,
-        help="Generate tests")
 
     parser.add_argument(
         "-o", "--one-class-per-module",
@@ -438,6 +507,9 @@ if __name__ == '__main__':
     if language != 'go' and options.core:
         update_setup_file_version(language, ydk_root)
 
+    if language != 'go' and options.service:
+        update_service_setup_file_version(language, ydk_root, options.service)
+
     try:
         if options.adhoc_bundle_name:
             adhoc_bundle_file = generate_adhoc_bundle(
@@ -456,17 +528,6 @@ if __name__ == '__main__':
             output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
 
-        if options.bundle:
-            generator = YdkGenerator(
-                output_directory,
-                ydk_root,
-                options.gentests,
-                language,
-                'bundle',
-                options.one_class_per_module)
-
-            output_directory = (generator.generate(options.bundle))
-
         if options.core:
             generator = YdkGenerator(
                 output_directory,
@@ -478,6 +539,28 @@ if __name__ == '__main__':
 
             output_directory = (generator.generate(options.core))
 
+        if options.bundle:
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.gentests,
+                language,
+                'bundle',
+                options.one_class_per_module)
+
+            output_directory = (generator.generate(options.bundle))
+
+        if options.service:
+            generator = YdkGenerator(
+                output_directory,
+                ydk_root,
+                options.gentests,
+                language,
+                'service',
+                options.one_class_per_module)
+
+            output_directory = (generator.generate(options.service))
+
     except YdkGenException as e:
         print('\nError(s) occurred in YdkGenerator()!\n')
         print(e.msg)
@@ -486,19 +569,16 @@ if __name__ == '__main__':
     if options.gendoc:
         generate_documentations(output_directory, ydk_root, language, options.bundle, options.core,
                                 options.cached_output_dir, options.output_directory)
-
-    minutes_str, seconds_str = _get_time_taken(start_time)
-    print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
-    print('\nCreating {0} package...\n'.format(language))
+        minutes_str, seconds_str = _get_time_taken(start_time)
+        print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
 
     if options.cpp:
         preconfigure_generated_cpp_code(output_directory, options.libydk)
     elif options.go:
-        # todo: implement go packaging with the output_directory
-        pass
+        install_go_package(output_directory, generator)
     elif options.python:
         create_pip_packages(output_directory)
 
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print('Code generation and installation completed successfully!')
+    print('\nCode generation and installation completed successfully!')
     print('Total time taken: {0} {1}\n'.format(minutes_str, seconds_str))

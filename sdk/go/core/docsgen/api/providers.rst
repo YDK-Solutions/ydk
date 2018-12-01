@@ -17,7 +17,7 @@ Open Daylight
 
 .. go:struct:: OpendaylightServiceProvider
 
-	OpenDaylightServiceProvider A service provider to be used to communicate with an OpenDaylight instance: https://www.opendaylight.org
+	OpenDaylightServiceProvider is a service provider to be used to communicate with an OpenDaylight instance: https://www.opendaylight.org
 
 	.. attribute:: Path
 
@@ -39,29 +39,29 @@ Open Daylight
 
 		An ``int`` that represents the device port used to access the open daylight interface.
 
-	.. attribute:: EncodingFormat
+	.. :noindex:attribute:: EncodingFormat
 
 		An instance of :ref:`encoding-format-ydk`
 
-	.. attribute:: Protocol
+	.. :noindex:attribute:: Protocol
 
 		A Go ``string`` that represents protocol used to connect to the device
 
-.. function:: (provider *OpenDaylightServiceProvider) Connect()
+.. method:: (provider *OpenDaylightServiceProvider) Connect()
 
 	Connect to OpenDaylightServiceProvider using Path/Address/Username/Password/Port
 
-.. function:: (provider *OpenDaylightServiceProvider) GetNodeIDs()
+.. method:: (provider *OpenDaylightServiceProvider) GetNodeIDs()
 
 	:return: OpenDaylightServiceProvider Node IDs
-	:rtype: [] ``string``
+	:rtype: ``[]string``
 
-.. function:: (provider *OpenDaylightServiceProvider) GetNodeProvider(nodeID string)
+.. method:: (provider *OpenDaylightServiceProvider) GetNodeProvider(nodeID string)
 
 	:return: Node provider by ID
 	:rtype: :ref:`ServiceProvider <types-service-provider>`
 
-.. function:: (provider *OpenDaylightServiceProvider) Disconnect()
+.. method:: (provider *OpenDaylightServiceProvider) Disconnect()
 
 	Disconnect from OpenDaylightServiceProvider
 
@@ -93,24 +93,40 @@ Netconf
 
 		An ``int`` that represents the device port used to access the netconf interface.
 
-	.. attribute:: Protocol
+	.. :noindex:attribute:: Protocol
 
 		A Go ``string`` that represents protocol used to connect to the device
 
-.. function:: (provider *NetconfServiceProvider) Connect()
+.. method:: (provider *NetconfServiceProvider) Connect()
 	
-	Connect to NetconfServiceProvider using Repo/Address/Username/Password/Port
+	Implementation of ServiceProvider interface. Connects to Netconf Server using Repo/Address/Username/Password/Port.
 
-.. function:: (provider *NetconfServiceProvider) Disconnect()
+.. method:: (provider *NetconfServiceProvider) Disconnect()
 
-	Disconnect from NetconfServiceProvider
+	Implementation of ServiceProvider interface. Disconnects from Netconf Server.
 
-.. function:: (provider *NetconfServiceProvider) GetCapabilities()
+.. method:: (provider *NetconfServiceProvider) GetState() *errors.State
+	
+	Implementation of ServiceProvider interface. Returns error state for the NetconfServiceProvider.
+
+.. method:: (provider *NetconfServiceProvider) ExecuteRpc(oper string, ent Entity, options map[string]string) DataNode
+	
+	Implementation of ServiceProvider interface, which is designed specifically for CRUD operations.
+	Sends RPC to Netconf server and gets response.
+
+	:param oper: Go ``string`` containing requested operation; one of values ``create``, ``read``, ``update``, ``delete``.
+	:param ent: YDK Entity (single entity) or EntityCollection (multiple entities) representing data model.
+	:param options: Go ``map[string]string`` to hold options for operations. 
+	                Currently is used only for **read** operation: key - ``mode``, values - ``config``, ``state``.
+	:return: YDK data node, containing requested data (gnmi-get RPC) or ``nil``.
+	:rtype: ``DataNode``
+
+.. method:: (provider *NetconfServiceProvider) GetCapabilities()
 
 	Gets the capabilities supported by NetconfServiceProvider
 
 	:return: The list of capabilities.
-    :rtype: ``[]string``
+	:rtype: ``[]string``
 
 
 Restconf
@@ -152,13 +168,102 @@ Restconf
 
 		A Go ``string``. This attribute provides backwards compatibility with older drafts of restconf RFC, this can be "/config" or "/data" (which is the default)
 
-.. function:: (provider *RestconfServiceProvider) Connect()
+.. method:: (provider *RestconfServiceProvider) Connect()
 
-	Connect to RestconfServiceProvider using Path/Address/Username/Password/Port
+	Implementation of ServiceProvider interface. Connects to Restconf Server using Path/Address/Username/Password/Port.
 
-.. function:: (provider *RestconfServiceProvider) Disconnect
+.. method:: (provider *RestconfServiceProvider) Disconnect
 	
-	Disconnect from RestconfServiceProvider
+	Implementation of ServiceProvider interface. Disconnects from Restconf Server.
+
+.. method:: (provider *RestconfServiceProvider) GetState() *errors.State
+	
+	Implementation of ServiceProvider interface. Returns error state for the RestconfServiceProvider.
+
+.. method:: (provider *RestconfServiceProvider) ExecuteRpc(oper string, ent Entity, options map[string]string) DataNode
+	
+	Implementation of ServiceProvider interface, which is designed specifically for CRUD operations.
+	Sends RPC to Restconf server and gets response.
+
+	:param oper: Go ``string`` containing requested operation; one of values ``create``, ``read``, ``update``, ``delete``.
+	:param ent: YDK Entity (single entity) or EntityCollection (multiple entities) representing data model.
+	:param options: Go ``map[string]string`` to hold options for operations. 
+	                Currently is used only for **read** operation: key - ``mode``, values - ``config``, ``state``.
+	:return: YDK data node, containing requested data (gnmi-get RPC) or ``nil``.
+	:rtype: ``DataNode``
+
+
+gNMI
+-------
+
+.. go:struct:: GnmiServiceProvider
+
+	Implementation of ServiceProvider for the gNMI protocol.
+
+	.. attribute:: Repo
+
+		An instance of :go:struct:`Repository<ydk/types/Repository>` This attribute represents the repository of YANG models.
+
+	.. attribute:: Address
+
+		A Go ``string`` that represents the IP address of the device supporting a netconf interface.
+
+	.. attribute:: Username
+
+		A Go ``string`` that represents the username to log in to the device.
+
+	.. attribute:: Password
+
+		A Go ``string`` that represents the password to log in to the device.
+
+	.. attribute:: Port
+
+		An ``int`` that represents the device port used to access the gRPC interface.
+
+	.. attribute:: ServerCert
+	
+	    A Go ``string`` that represents full path to a file containing gNMI server certificate of authorization (public key).
+	    If not specified the service provider creates non-secure connection to the gNMI server.
+	    
+	.. attribute:: PrivateKey
+
+		A Go ``string`` that represents full path to a file containing private key of YDK application host.
+		If not specified and **ServerCert** attribute is defined (secure connection) the gRPC protocol uses its own private key.
+
+.. method:: (provider *GnmiServiceProvider) GetPrivate() interface{}
+	
+	Implementation of ServiceProvider interface. Returns private interface value.
+
+.. method:: (provider *GnmiServiceProvider) Connect()
+	
+	Implementation of ServiceProvider interface. Connects to gNMI server using Repo/Address/Username/Password/Port.
+
+.. method:: (provider *GnmiServiceProvider) Disconnect()
+
+	Implementation of ServiceProvider interface. Disconnects from gNMI server.
+
+.. method:: (provider *GnmiServiceProvider) GetState() *errors.State
+	
+	Implementation of ServiceProvider interface. Returns error state for the GnmiServiceProvider.
+
+.. method:: (provider *GnmiServiceProvider) ExecuteRpc(oper string, ent Entity, options map[string]string) DataNode
+	
+	Implementation of ServiceProvider interface, which is designed specifically for CRUD operations.
+	Sends RPC to gNMI server and gets response.
+
+	:param oper: Go ``string`` containing requested operation; one of values ``create``, ``read``, ``update``, ``delete``.
+	:param ent: YDK Entity (single entity) or EntityCollection (multiple entities) representing data model.
+	:param options: Go ``map[string]string`` to hold options for operations. 
+	                Currently is used only for **read** operation: key - ``mode``, values - ``CONFIG``, ``STATE``, ``OPEARATIONAL``, or ``ALL``.
+	:return: YDK data node, containing requested data (gnmi-get RPC) or ``nil``.
+	:rtype: ``DataNode``
+
+.. method:: (provider *GnmiServiceProvider) GetSession() *path.GnmiSession
+
+	Gets pointer to GnmiSession structure
+
+	:return: Pointer to GnmiSession structure.
+	:rtype: ``*path.GnmiSession``
 
 
 Codec

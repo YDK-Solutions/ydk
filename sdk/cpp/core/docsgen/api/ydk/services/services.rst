@@ -12,3 +12,4 @@ Service
    executor_service.rst
    netconf_service.rst
    validation_service.rst
+   gnmi_service.rst

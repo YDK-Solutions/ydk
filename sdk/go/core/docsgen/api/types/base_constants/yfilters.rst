@@ -25,7 +25,7 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
 
     Represents the NETCONF edit config operations with underlying type ``int``
 
-    .. attribute:: NotSet
+    .. :noindex:attribute:: NotSet
 
         Represented by a value of 0.
 
@@ -87,6 +87,14 @@ filtering read operations by leaf to be used with various :go:struct:`Services<y
         in the configuration datastore identified by the target
         parameter.  If no such configuration data exists in the
         configuration datastore, it is created.
+
+    .. attribute:: Update
+
+        Represented by a value of 7.
+
+        Currently used only for gNMI Services. The configuration data identified
+        by the elementcontaining this attribute updates any related configuration.
+        If no such configuration data exists in the configuration, it is created.
 
 .. function:: (yf YFilter) String()
 

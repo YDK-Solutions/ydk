@@ -15,15 +15,18 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 #
+# dependencies_ubuntu_basic.sh
 # Script for running ydk CI on docker via travis-ci.org
 #
 # ------------------------------------------------------------------
 
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_ubuntu_basic.sh | $@ ${NOCOLOR}"
 }
 
 function install_dependencies {

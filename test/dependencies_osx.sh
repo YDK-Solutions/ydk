@@ -15,6 +15,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 #
+# dependencies_osx.sh
 # Script for running ydk CI on docker via travis-ci.org
 #
 # ------------------------------------------------------------------
@@ -41,6 +42,12 @@ function install_confd {
     wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.darwin.x86_64.zip
     ./confd-basic-6.2.darwin.x86_64.installer.bin ../confd
+}
+
+function install_fpm {
+    print_msg "Installing fpm"
+    brew install gnu-tar > /dev/null
+    gem install --no-ri --no-rdoc fpm
 }
 
 function install_golang {
@@ -79,7 +86,6 @@ function check_python_installation {
 ########################## EXECUTION STARTS HERE #############################
 
 # Terminal colors
-RED="\033[0;31m"
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
@@ -87,5 +93,10 @@ MSG_COLOR=$YELLOW
 install_libssh
 install_confd
 install_golang
-check_python_installation
+
 brew install pybind11
+check_python_installation
+
+sudo pip3 install virtualenv
+
+#install_fpm

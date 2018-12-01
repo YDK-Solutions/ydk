@@ -24,7 +24,7 @@ function usage {
 }
 
 function check_gen_api_directories {
-GEN_API_CONTENTS=$(ls ${1} &> /dev/null)
+GEN_API_CONTENTS=$(ls ${1})
 if [[ ${GEN_API_CONTENTS} != *"cisco_ios_xe-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"cisco_ios_xr-bundle"* ]] \
             || [[ ${GEN_API_CONTENTS} != *"openconfig-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"ietf-bundle"* ]] \
              || [[ ${GEN_API_CONTENTS} != *"cisco_nx_os-bundle"* ]] || [[ ${GEN_API_CONTENTS} != *"ydk"* ]]; then
@@ -48,8 +48,8 @@ function copy_bundle_packages {
     echo "Copying cisco-ios-xe from ${GEN_API_PATH}/cisco_ios_xe-bundle/ to ${SDK_PATH}"
     cp -r ${GEN_API_PATH}/cisco_ios_xe-bundle/* ${SDK_PATH}/cisco-ios-xe
 
-    echo "Copying cisco-ios-nx from ${GEN_API_PATH}/cisco_ios_nx-bundle/ to ${SDK_PATH}"
-    cp -r ${GEN_API_PATH}/cisco_ios_nx-bundle/* ${SDK_PATH}/cisco-ios-nx
+    echo "Copying cisco-nx-os from ${GEN_API_PATH}/cisco_nx_os-bundle/ to ${SDK_PATH}"
+    cp -r ${GEN_API_PATH}/cisco_nx_os-bundle/* ${SDK_PATH}/cisco-nx-os
 }
 
 function copy_readme {
@@ -65,7 +65,7 @@ function copy_gen_api_to_go_sdk {
 
 function clear_sdk_directories {
     echo "Clearing ${SDK_PATH} of existing files"
-    rm -rf ${SDK_PATH}/ietf/* ${SDK_PATH}/openconfig/* ${SDK_PATH}/cisco-ios-xr/* ${SDK_PATH}/cisco-ios-xe/* ${SDK_PATH}/cisco-ios-nx/*
+    rm -rf ${SDK_PATH}/ietf/* ${SDK_PATH}/openconfig/* ${SDK_PATH}/cisco-ios-xr/* ${SDK_PATH}/cisco-ios-xe/* ${SDK_PATH}/cisco-nx-os/*
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -177,7 +177,7 @@ elif [[ ${LANGUAGE} == "go" ]]; then
     copy_gen_api_to_go_sdk openconfig-bundle
     copy_gen_api_to_go_sdk cisco_ios_xr-bundle
     copy_gen_api_to_go_sdk cisco_ios_xe-bundle
-    copy_gen_api_to_go_sdk cisco_ios_nx-bundle
+    copy_gen_api_to_go_sdk cisco_nx_os-bundle
     copy_readme md
 
 fi

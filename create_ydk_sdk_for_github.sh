@@ -51,6 +51,7 @@ function copy_bundle_packages {
     echo "Copying cisco-ios-xe from ${GEN_API_PATH}/cisco_ios_xe-bundle/ to ${SDK_PATH}"
     cp -r ${GEN_API_PATH}/cisco_ios_xe-bundle/* ${SDK_PATH}/cisco-ios-xe
 
+
     echo "Copying cisco-ios-nx from ${GEN_API_PATH}/cisco_ios_nx-bundle/ to ${SDK_PATH}"
     cp -r ${GEN_API_PATH}/cisco_nx_os-bundle/* ${SDK_PATH}/cisco-nx-os
 }
@@ -90,7 +91,7 @@ function copy_gen_api_to_go_sdk {
 
 function clear_sdk_directories {
     echo "Clearing ${SDK_PATH} of existing files"
-    rm -rf ${SDK_PATH}/ietf/* ${SDK_PATH}/openconfig/* ${SDK_PATH}/cisco-ios-xr/* ${SDK_PATH}/cisco-ios-xe/* ${SDK_PATH}/cisco-ios-nx/*
+    rm -rf ${SDK_PATH}/ietf/* ${SDK_PATH}/openconfig/* ${SDK_PATH}/cisco-ios-xr/* ${SDK_PATH}/cisco-ios-xe/* ${SDK_PATH}/cisco-nx-os/*
 }
 
 ########################## EXECUTION STARTS HERE #############################

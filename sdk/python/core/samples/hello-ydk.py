@@ -17,15 +17,14 @@
 # hello-ydk.py
 # Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system uptime.
 #
+import logging
 
-# import providers, services and models
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
 from datetime import timedelta
 
 def enable_logging(level):
-    import logging
     log = logging.getLogger('ydk')
     log.setLevel(level)
     handler = logging.StreamHandler()
@@ -39,7 +38,7 @@ if __name__ == "__main__":
     enable_logging(logging.INFO)
     
     # create NETCONF session
-    provider = NetconfServiceProvider(address="192.168.122.169",
+    provider = NetconfServiceProvider(address="domingo",
                                       port=830,
                                       username="admin",
                                       password="admin",

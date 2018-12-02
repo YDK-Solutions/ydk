@@ -24,3 +24,5 @@ YDK Python provides a new interface in the form of Path API, which can be used t
     statement.rst
     netconf_session.rst
     restconf_session.rst
+    gnmi_session.rst
+    

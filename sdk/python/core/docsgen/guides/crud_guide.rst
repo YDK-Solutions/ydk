@@ -86,7 +86,7 @@ Now, let us replace the above configuration with a new configuration for the :py
 
 
 Creating and reading a list
---------------
+---------------------------
 
 For example, to read the instances of a deeply nested :py:class:`YList<ydk.types.YList>` called :py:class:`Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route<ydk.models.cisco_ios_xr.Cisco_IOS_XR_ip_rib_ipv4_oper.Rib.Vrfs.Vrf.Afs.Af.Safs.Saf.IpRibRouteTableNames.IpRibRouteTableName.Routes.Route>`  in the ``Cisco_IOS_XR_ip_rib_ipv4_oper`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
 

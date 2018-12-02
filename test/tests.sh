@@ -22,6 +22,8 @@
 # Terminal colors
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 PY_GENERATE="python2"
 PY_TEST="python3"
@@ -31,35 +33,41 @@ PY_TEST="python3"
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date): tests.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): tests.sh | $@ ${NOCOLOR}"
 }
 
 function run_exec_test {
     $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
         exit $status
     fi
     return $status
 }
 
 function run_test_no_coverage {
-    print_msg "Executing: $@"
+    print_msg "Executing: ${PYTHON_BIN} $@"
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '${PYTHON_BIN} $@' with status=$status"
         exit $status
     fi
     return $status
 }
 
 function run_test {
-    if [[ $(command -v coverage) && ${os_type} == "Linux" ]]; then
+    if [[ $(command -v coverage) && $run_with_coverage ]]; then
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
         print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
+            MSG_COLOR=$RED
+            print_msg "Exiting 'coverage run $@' with status=$status"
             exit $status
         fi
         return $status
@@ -70,15 +78,13 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" ]] ; then
-        os_info=$(cat /etc/*-release)
-        if [[ ${os_info} == *"fedora"* ]]; then
-            print_msg "Custom pip install of $@ for CentOS"
-            ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
-            return
-        fi
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]
+    then
+        print_msg "Custom pip install of $@ for CentOS"
+        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
+    else
+        ${PIP_BIN} install $@ -U
     fi
-    ${PIP_BIN} install $@
 }
 
 ######################################################################
@@ -119,32 +125,72 @@ function stop_tcp_server {
     kill $TCP_SERVER_PID
 }
 
+function check_python_installation {
+  
+  if [[ ${os_type} == "Darwin" ]] ; then
+    PYTHON_VERSION=3
+  fi
+
+  PYTHON_BIN=python${PYTHON_VERSION}
+  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+    PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PIP_BIN=pip3
+  else
+    PIP_BIN=pip${PYTHON_VERSION}
+  fi
+
+  print_msg "Checking installation of ${PYTHON_BIN}"
+  ${PYTHON_BIN} --version &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    MSG_COLOR=$RED
+    print_msg "Could not locate ${PYTHON_BIN}"
+    exit $status
+  fi
+  print_msg "Checking installation of ${PIP_BIN}"
+  ${PIP_BIN} -V &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    MSG_COLOR=$RED
+    print_msg "Could not locate ${PIP_BIN}"
+    exit $status
+  fi
+  print_msg "Python location: $(which ${PYTHON_BIN})"
+  print_msg "Pip location: $(which ${PIP_BIN})"
+}
+
 function init_py_env {
-    print_msg "Initializing Python environment"
-    if [[ ${os_type} == "Darwin" ]] ; then
-        virtualenv macos_pyenv -p python3.6
-        source macos_pyenv/bin/activate
-    fi
-    ${PIP_BIN} install -r requirements.txt coverage pybind11==2.2.2
+  check_python_installation
+  print_msg "Initializing Python requirements"
+  sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
+  if [[ $run_with_coverage ]] ; then
+    sudo ${PIP_BIN} install coverage
+  fi
+
+  #else
+    #print_msg "Initializing Python3 virtual environment"
+    #virtualenv macos_pyenv -p python3
+    #source macos_pyenv/bin/activate
+  #fi
 }
 
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    export GOROOT="/usr/local/go"
-    export PATH=$GOROOT/bin:$PATH
-
-    print_msg "GOPATH is set to: ${GOPATH}"
-    print_msg "GOROOT is set to: ${GOROOT}"
-
-    cd $YDKGEN_HOME
-    if [[ -z "${GOPATH// }" ]]; then
-        export GOPATH="$(pwd)/golang"
+    if [[ $(uname) == "Darwin" ]]; then
+        source /Users/travis/.gvm/scripts/gvm
+        gvm use go1.9.2
+        print_msg "GOROOT: $GOROOT"
+        print_msg "GOPATH: $GOPATH"
     else
-        export GOPATH="$(pwd)/golang":$GOPATH
+        cd $YDKGEN_HOME
+        export GOPATH="$(pwd)/golang"
+        export GOROOT=/usr/local/go
+        export PATH=$GOROOT/bin:$PATH
+        print_msg "Setting GOROOT to $GOROOT"
+        print_msg "Setting GOPATH to $GOPATH"
     fi
-
-    print_msg "Changed GOPATH setting to: ${GOPATH}"
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
@@ -168,8 +214,14 @@ function install_cpp_core {
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
     cd $YDKGEN_HOME/sdk/cpp/core/build
 
-    print_msg "Compiling with coverage"
-    ${CMAKE_BIN} -DCOVERAGE=True .. && sudo make install
+    if [[ $run_with_coverage ]] ; then
+      print_msg "Compiling with coverage"
+      run_exec_test ${CMAKE_BIN} -DCOVERAGE=True ..
+    else
+      run_exec_test ${CMAKE_BIN} ..
+    fi
+    run_exec_test make
+    sudo make install
 }
 
 function generate_libydk {
@@ -190,25 +242,27 @@ function run_cpp_core_test {
     if [ $status -ne 0 ]; then
     # If the tests fail, try to run them in verbose to get more details for debug
         ./tests/ydk_core_test -d yes
+        MSG_COLOR=$RED
+        print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
     fi
     cd $YDKGEN_HOME
 }
 
 function install_go_core {
-    print_msg "Installing go core"
+    print_msg "Installing Go YDK core"
     cd $YDKGEN_HOME
-
-    mkdir -p $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk
-    cp -r sdk/go/core/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
+    run_test generate.py --core --go
 }
 
 function install_py_core {
-    print_msg "Installing py core"
-    cd $YDKGEN_HOME
+    print_msg "Installing Python YDK core"
+
+    if [[ $run_with_coverage ]] ; then
+      print_msg "Building python with coverage"
+      export YDK_COVERAGE=
+    fi
     cd $YDKGEN_HOME/sdk/python/core
-    print_msg "Building python with coverage"
-    export YDK_COVERAGE=
     ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
 
@@ -260,15 +314,21 @@ function cpp_sanity_ydktest_test {
 
     print_msg "Building and running cpp bundle tests"
     mkdir -p $YDKGEN_HOME/sdk/cpp/tests/build && cd sdk/cpp/tests/build
-    print_msg "Compiling with coverage"
-    run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
+    if [[ $run_with_coverage ]] ; then
+      print_msg "Compiling with coverage"
+      run_exec_test ${CMAKE_BIN} -DCOVERAGE=True  ..
+    else
+      run_exec_test ${CMAKE_BIN} ..
+    fi
     run_exec_test make
     export CTEST_OUTPUT_ON_FAILURE=1
     make test
     local status=$?
     if [ $status -ne 0 ]; then
-    # If the tests fail, try to run them in verbose to get more details for  # debug
+        # If the tests fail, try to run them in verbose to get more details for  # debug
         ./ydk_bundle_test -d yes
+        MSG_COLOR=$RED
+        print_msg "Exiting C++ bundle tests with status=$status"
         exit $status
     fi
 }
@@ -283,7 +343,6 @@ function cpp_test_gen_test {
     run_exec_test ${CMAKE_BIN} ..
     run_exec_test make
     ctest --output-on-failure
-
 }
 
 function cpp_test_gen {
@@ -298,6 +357,7 @@ function cpp_test_gen {
 }
 
 function collect_cpp_coverage {
+  if [[ $run_with_coverage ]] ; then
     print_msg "Collecting coverage for C++"
     cd ${YDKGEN_HOME}/sdk/cpp/core/build
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
@@ -305,6 +365,7 @@ function collect_cpp_coverage {
     lcov --list coverage.info #debug info
     print_msg "Moving cpp coverage to ${YDKGEN_HOME}"
     cp coverage.info ${YDKGEN_HOME}
+  fi
 }
 
 ######################################################################
@@ -316,7 +377,6 @@ function run_go_bundle_tests {
     # TODO: go get
     cd $YDKGEN_HOME
     run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
-    cp -r gen-api/go/ydktest-bundle/ydk/* $YDKGEN_HOME/golang/src/github.com/CiscoDevNet/ydk-go/ydk/
 
     run_go_tests
 }
@@ -347,9 +407,13 @@ function run_go_samples {
 function run_go_sanity_tests {
     print_msg "Running go sanity tests"
     cd $YDKGEN_HOME/sdk/go/core/tests
-    run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
-    print_msg "Moving go coverage to ${YDKGEN_HOME}"
-    mv coverage.txt ${YDKGEN_HOME}
+    if [[ $run_with_coverage ]] ; then
+        run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
+        print_msg "Moving go coverage to ${YDKGEN_HOME}"
+        mv coverage.txt ${YDKGEN_HOME}
+    else
+        run_exec_test go test
+    fi
     cd -
 }
 
@@ -375,8 +439,14 @@ function py_sanity_ydktest {
     print_msg "Generating, installing and testing python ydktest bundle"
 
     py_sanity_ydktest_gen
-    py_sanity_ydktest_test
-    py_sanity_ydktest_install
+    if [[ $run_with_coverage ]]
+    then
+        py_sanity_ydktest_test
+        py_sanity_ydktest_install
+    else
+        py_sanity_ydktest_install
+        run_py_sanity_ydktest_tests
+    fi
 }
 
 function py_sanity_ydktest_gen {
@@ -397,39 +467,35 @@ function py_sanity_ydktest_install {
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
-    print_msg "running import tests"
+    print_msg "Running import tests on generated bundle"
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
 
 }
 
 function py_sanity_ydktest_test {
-    print_msg "py_sanity_ydktest_test"
-
+    print_msg "Running py_sanity_ydktest_test with coverage"
     cd $YDKGEN_HOME
     cp -r gen-api/python/ydktest-bundle/ydk/models/* sdk/python/core/ydk/models
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
     ${PIP_BIN} uninstall ydk -y
+    
     export OLDPYTHONPATH=$PYTHONPATH
+    print_msg "Setting OLDPYTHONPATH to $OLDPYTHONPATH"
 
     print_msg "Build & copy cpp-wrapper to sdk directory to gather coverage"
-    cd $YDKGEN_HOME
     cd sdk/python/core/ && ${PYTHON_BIN} setup.py build
+
     print_msg "Set new python path to gather coverage"
     export PYTHONPATH=$PYTHONPATH:$(pwd)
+    print_msg "Setting PYTHONPATH to $PYTHONPATH"
     cp build/lib*/*.so .
     cd -
 
-    run_test sdk/python/core/tests/test_ydk_types.py
-    run_test sdk/python/core/tests/test_sanity_codec.py
+    run_py_sanity_ydktest_tests
 
-    py_sanity_ydktest_test_netconf_ssh
-    py_sanity_ydktest_test_tcp
-
-    stop_tcp_server
-
-    print_msg "Restore old python path"
     export PYTHONPATH=$OLDPYTHONPATH
+    print_msg "Restored PYTHONPATH to $PYTHONPATH"
 
     cd sdk/python/core/
     rm -f *.so
@@ -437,6 +503,17 @@ function py_sanity_ydktest_test {
     ${PIP_BIN} install dist/ydk*.tar.gz
 
     cd $YDKGEN_HOME
+}
+
+function run_py_sanity_ydktest_tests {
+    print_msg "Running run_py_sanity_ydktest_tests"
+    run_test sdk/python/core/tests/test_ydk_types.py
+    run_test sdk/python/core/tests/test_sanity_codec.py
+
+    py_sanity_ydktest_test_netconf_ssh
+    py_sanity_ydktest_test_tcp
+
+    stop_tcp_server
 }
 
 function py_sanity_ydktest_test_netconf_ssh {
@@ -471,7 +548,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
-#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py 
+#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 #    --non-demand
 }
 
@@ -509,7 +586,8 @@ function py_sanity_deviation_ydktest_gen {
 function py_sanity_deviation_ydktest_install {
     print_msg "py_sanity_deviation_ydktest_install"
 
-    ${PIP_BIN} uninstall ydk-models-ydktest -y && pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+    ${PIP_BIN} uninstall ydk-models-ydktest -y
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
 
 function py_sanity_deviation_ydktest_test {
@@ -626,26 +704,26 @@ function py_sanity_backward_compatibility {
 # Python generated model tests bundle
 #-------------------------------------
 
-function test_gen_tests {
-    print_msg "test_gen_tests"
+#function test_gen_tests {
+#    print_msg "test_gen_tests"
+#
+#    cd $YDKGEN_HOME
+#    git clone https://github.com/psykokwak4/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
+#
+#    py_test_gen
+#    cpp_test_gen
+#}
 
-    cd $YDKGEN_HOME
-    git clone https://github.com/psykokwak4/ydk-test-yang.git sdk/cpp/core/tests/confd/testgen
-
-    py_test_gen
-    cpp_test_gen
-}
-
-function py_test_gen_test {
-    print_msg "py_test_gen_test"
-
-    cd $YDKGEN_HOME
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
-    cd gen-api/python/models_test-bundle/ydk/models/models_test/test/
-    ${PYTHON_BIN} import_tests.py
-    cd models_test/
-    ${PYTHON_BIN} -m unittest discover
-}
+#function py_test_gen_test {
+#    print_msg "py_test_gen_test"
+#
+#    cd $YDKGEN_HOME
+#    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
+#    cd gen-api/python/models_test-bundle/ydk/models/models_test/test/
+#    ${PYTHON_BIN} import_tests.py
+#    cd models_test/
+#    ${PYTHON_BIN} -m unittest discover
+#}
 
 function py_test_gen {
     print_msg "py_test_gen"
@@ -686,36 +764,31 @@ function sanity_doc_gen_cache {
 
 ########################## EXECUTION STARTS HERE #############################
 ######################################
-# Parse args
+# Parse args to get python version
 ######################################
-PYTHON_VERSION=""
 
 args=$(getopt p:d $*)
 set -- $args
 PYTHON_VERSION=${2}
 
-PYTHON_BIN=python${PYTHON_VERSION}
-
-if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
-    PIP_BIN=pip3
-else
-    PIP_BIN=pip${PYTHON_VERSION}
-fi
-
-print_msg "Using ${PYTHON_BIN} & ${PIP_BIN}"
-
 ######################################
 # Set up env
 ######################################
-export YDKGEN_HOME="$(pwd)"
 
 os_type=$(uname)
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info=$(sw_vers)
+fi
 print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* ]] ; then
+    run_with_coverage=1
+fi
+
+export YDKGEN_HOME="$(pwd)"
 print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
-print_msg "Python location: $(which ${PYTHON_BIN})"
-$(${PYTHON_BIN} -V)
 
 CMAKE_BIN=cmake
 which cmake3
@@ -730,20 +803,22 @@ init_rest_server
 init_tcp_server
 
 ######################################
-# Install/test core
+# Install and run C++ core tests
 ######################################
 install_test_cpp_core
+run_cpp_bundle_tests
 
+######################################
+# Install and run Go tests
+######################################
 init_go_env
 install_go_core
-
-install_py_core
-
-######################################
-# Install/test bundles
-######################################
-run_cpp_bundle_tests
 run_go_bundle_tests
+
+######################################
+# Install and run Python tests
+######################################
+install_py_core
 run_python_bundle_tests
 # test_gen_tests
 
@@ -758,8 +833,7 @@ find . -name '*gcda*'|xargs rm -f
 find . -name '*gcno*'|xargs rm -f
 find . -name '*gcov*'|xargs rm -f
 
-if [[ ${os_type} == "Linux" ]] ; then
-    print_msg "Combining Python coverage for Linux"
-    print_msg "Moving python coverage to ${YDKGEN_HOME}"
+if [[ $run_with_coverage ]] ; then
+    print_msg "Combining C++, Python and Go coverage"
     coverage combine > /dev/null || echo "Coverage not combined"
 fi

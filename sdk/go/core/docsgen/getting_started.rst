@@ -20,7 +20,7 @@ To use the docker image, `install docker <https://docs.docker.com/install/>`_ on
 
 System Requirements
 ===================
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library which is required for YDK. Please use libssh versions older than 0.8.0.
+**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh-0.7.x.
 
 Linux
 -----
@@ -29,11 +29,19 @@ Linux
 
 The following packages must be present in your system before installing YDK-Go:
 
+For Xenial (Ubuntu 16.04.4):
+
 .. code-block:: sh
 
-	$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
-	$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.7.3/libydk_0.7.3-1_amd64.deb
-	$ sudo gdebi libydk_0.7.3-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -43,7 +51,7 @@ The following packages must be present in your system before installing YDK-Go:
 	
 	$ sudo yum install epel-release
 	$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
-	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.7.3/libydk-0.7.3-1.x86_64.rpm
+	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
 **Golang**
 
@@ -67,8 +75,8 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 	$ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 	$ xcode-select --install
 
-	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.7.3/libydk-0.7.3-Darwin.pkg
-	$ sudo installer -pkg libydk-0.7.3-Darwin.pkg -target /
+	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
+	$ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 	
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
 
@@ -78,6 +86,70 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 	$ export GOROOT_BOOTSTRAP=$GOROOT
 	$ gvm install go1.9.2
 
+gNMI Requirements
+===================
+
+In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+**Install protobuf**
+
+.. code-block:: sh
+
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig
+    cd -
+
+**Install gRPC**
+
+.. code-block:: sh
+
+    git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make
+    sudo make install
+    cd -
+
+**Instal YDK gNMI library**
+
+Ubuntu
+
+For Xenial (Ubuntu 16.04.4):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+CentOS
+
+.. code-block:: sh
+
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+**Set runtime environment**
+
+The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
+
+.. code-block:: sh
+
+   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+
 .. _howto-install:
 
 How to install YDK-Go
@@ -85,11 +157,12 @@ How to install YDK-Go
 
 You can install YDK-Go on macOS or Linux.  It is not currently supported on Windows.
 
-To install the latest model packages, use ``go get``. Note that, in some systems, you need to install the new package as root.
+To check out the version of ydk-gen used to generate this ydk-go, use the below commands:
 
 .. code-block:: sh
-	
-	$ go get github.com/CiscoDevNet/ydk-go/ydk
+
+    $ git clone repo-url
+    $ git checkout commit-id
 
 
 Documentation and Support
@@ -104,4 +177,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.7.3 (alpha). YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.0. YDK-Go is licensed under the Apache 2.0 License.

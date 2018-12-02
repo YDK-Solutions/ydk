@@ -19,13 +19,9 @@
 #
 # ------------------------------------------------------------------
 
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_centos.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_centos.sh | $@ ${NOCOLOR}"
 }
-
 
 function install_confd {
     print_msg "Installing confd"
@@ -55,8 +51,13 @@ function install_fpm {
 }
 
 ########################## EXECUTION STARTS HERE #############################
+# Terminal colors
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 ./test/dependencies_centos_basic.sh
+
 install_confd
 install_openssl
 #install_fpm

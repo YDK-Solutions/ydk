@@ -11,4 +11,4 @@ ServiceProvider
    restconf_provider.rst
    codec_provider.rst
    opendaylight_provider.rst
-
+   gnmi_provider.rst

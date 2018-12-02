@@ -6,7 +6,7 @@ project(samples)
 set(SAMPLE_DESCRIPTION "BGP sample application using YANG Development Kit Library, the library for YDK API.")
 
 
-set(samples bgp_create 
+set(samples     bgp_create
                 bgp_update 
                 bgp_read
                 bgp_delete
@@ -26,6 +26,7 @@ set(samples bgp_create
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -fprofile-arcs")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
 # Find dependent libraries
 find_library(ydk_openconfig_location ydk_openconfig)
@@ -64,7 +65,7 @@ foreach(sample IN LISTS samples)
             ${xslt_location}
             ${pthread_location}
             ${dl_location}
-            -rdynamic
+ 	        -rdynamic
             )
 
     set_property(TARGET ${sample} PROPERTY CXX_STANDARD 11)

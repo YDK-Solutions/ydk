@@ -19,11 +19,8 @@
 #
 # ------------------------------------------------------------------
 
-RED="\033[0;31m"
-NOCOLOR="\033[0m"
-
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_centos.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_centos_basic.sh | $@ ${NOCOLOR}"
 }
 
 function install_dependencies {
@@ -43,6 +40,10 @@ function install_dependencies {
 
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+
+     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+     ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+
      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
 
      which gcc
@@ -57,5 +58,9 @@ function install_dependencies {
 
 
 ########################## EXECUTION STARTS HERE #############################
+# Terminal colors
+NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 install_dependencies

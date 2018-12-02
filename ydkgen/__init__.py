@@ -74,6 +74,7 @@ class YdkGenerator(object):
             self.iskeyword = ispythonkeyword
         elif self.language == 'go':
             self.iskeyword = isgokeyword
+        self.package_name = ""
 
     def generate(self, description_file):
         """ Generate ydk bundle packages or ydk core library.
@@ -87,6 +88,8 @@ class YdkGenerator(object):
         """
         if self.package_type == 'bundle':
             return self._generate_bundle(description_file)
+        elif self.package_type == 'service':
+            return self._generate_service(description_file)
         elif self.package_type == 'core':
             return self._generate_core()
         else:
@@ -103,6 +106,12 @@ class YdkGenerator(object):
             gen_api_root (str): Root directory for generated APIs.
         """
         _check_description_file(profile_file)
+        with open(os.path.join(self.ydk_root, profile_file)) as f:
+            profile = json.load(f)
+            self.package_name = profile.get('name')
+            if self.package_name is None:
+                raise YdkGenException("Attribute 'name' in the bundle profile is not defined")
+        
         tmp_file = tempfile.mkstemp(suffix='.bundle')[-1]
         bundle_translator.translate(profile_file, tmp_file, self.ydk_root)
 
@@ -117,7 +126,7 @@ class YdkGenerator(object):
             raise YdkGenException('No YANG models were found. Please check your JSON profile file to make sure it is valid')
 
         _set_original_bundle_name_for_packages(all_bundles, packages, curr_bundle)
-        gen_api_root = self._init_bundle_directories(packages=packages, bundle=curr_bundle)
+        gen_api_root = self._init_bundle_directories(packages, curr_bundle)
 
         yang_models = _create_models_archive(curr_bundle, gen_api_root)
 
@@ -128,6 +137,24 @@ class YdkGenerator(object):
                     curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
 
         os.remove(tmp_file)
+
+        return gen_api_root
+
+    def _generate_service(self, profile_file):
+        """ Generate ydk service package.
+            Copy service library sdk template to generated APIs root directory.
+
+        Returns:
+            gen_api_root (str): Root directory for generated APIs.
+        """
+        _check_description_file(profile_file)
+        with open(os.path.join(self.ydk_root, profile_file)) as f:
+            profile = json.load(f)
+            self.package_name = profile.get('name')
+            if self.package_name is None:
+                raise YdkGenException("Attribute 'name' in the service profile is not defined")
+        
+        gen_api_root = self._initialize_gen_api_directories('ydk-service-%s'%self.package_name, self.package_type)
 
         return gen_api_root
 
@@ -242,14 +269,25 @@ class YdkGenerator(object):
         """
         target_dir = os.path.join(self.ydk_root, 'sdk', self.language)
         if self.language == 'python':
-            target_dir = os.path.join(target_dir, package_type)
+            if package_type == 'service':
+                service_name = gen_api_root.split('-')[-1]
+                target_dir = os.path.join(target_dir, service_name)
+            else:
+                target_dir = os.path.join(target_dir, package_type)
         elif self.language == 'cpp':
             if package_type == 'packages':
                 target_dir = os.path.join(target_dir, package_type)
             elif package_type == 'core':
                 target_dir = os.path.join(target_dir, 'core')
+            elif package_type == 'service':
+                service_name = gen_api_root.split('-')[-1]
+                target_dir = os.path.join(target_dir, service_name)
         elif self.language == 'go':
-            target_dir = os.path.join(target_dir, package_type)
+            if package_type == 'service':
+                service_name = gen_api_root.split('-')[-1]
+                target_dir = os.path.join(target_dir, service_name)
+            else:
+                target_dir = os.path.join(target_dir, package_type)
 
         shutil.rmtree(gen_api_root)
         logger.debug('Copying %s to %s' % (target_dir, gen_api_root))

@@ -6,7 +6,9 @@ YDK CrudService class provides API for Create/Read/Update/Delete operations on d
 
 All CRUD operations performed on entities, where :py:class:`Entity<ydk.types.Entity>` instance represents single container in one of the device supported models.
 
-.. py:class:: ydk.services.CRUDService()
+.. py:class:: ydk.services.CRUDService
+
+    Supports CRUD operations on model API entities.
 
     .. py:method:: create(provider, entities)
 

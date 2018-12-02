@@ -15,15 +15,18 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 #
+# dependencies_ubuntu.sh
 # Script for running ydk CI on docker via travis-ci.org
 #
 # ------------------------------------------------------------------
 
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 function print_msg {
-    echo -e "${RED}*** $(date) *** dependencies_linux.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date) *** dependencies_ubuntu.sh | $@ ${NOCOLOR}"
 }
 
 function install_confd {
@@ -34,7 +37,16 @@ function install_confd {
     ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
 }
 
+function install_fpm {
+    print_msg "Installing fpm"
+    apt-get install ruby ruby-dev rubygems build-essential -y > /dev/null
+    gem install --no-ri --no-rdoc fpm
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 ./test/dependencies_ubuntu_basic.sh
+
 install_confd
+
+#install_fpm

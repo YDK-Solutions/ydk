@@ -21,3 +21,4 @@ Encoding Format
     .. attribute:: JSON
 
         Represented by a value of 1
+        

@@ -97,7 +97,6 @@ fi
 print_msg "Generating Python core and bundles"
 run_cmd ./generate.py --core
 run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json
-
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_1.json

@@ -168,11 +168,6 @@ if [[ ${LANGUAGE} == "cpp" ]]; then
     rm -rf ${SDK_PATH}/core/ydk/*
     rm -rf ${SDK_PATH}/gnmi/ydk/*
 
-    echo "Deleting ${GEN_API_PATH}/ydk/tests"
-    rm -rf ${GEN_API_PATH}/ydk/tests/*
-    echo "Deleting ${GEN_API_PATH}/ydk-service-gnmi/tests"
-    rm -rf ${GEN_API_PATH}/ydk-service-gnmi/tests/*
-
     echo " "
     echo "Copying core ${GEN_API_PATH}/ydk/* to ${SDK_PATH}/core"
     cp -r ${GEN_API_PATH}/ydk/* ${SDK_PATH}/core/ydk

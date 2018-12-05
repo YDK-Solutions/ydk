@@ -64,26 +64,21 @@ function copy_readme {
 
 function copy_gen_api_to_go_sdk {
     GO_GEN_API_DIR=${1}
-    source_path=${GEN_API_PATH}/${GO_GEN_API_DIR}
-    local copy_samples
+    echo " "
     if [[ $GO_GEN_API_DIR == "ydk" ]]; then
-        target_path="$SDK_PATH/core"
-        copy_samples=1
+        target_path="$SDK_PATH"
+        echo "Copying ${GO_GEN_API_DIR}/ydk from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to $SDK_PATH"
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk $SDK_PATH
+        echo "Copying samples from ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples to $SDK_PATH"
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples $SDK_PATH
     elif [[ $GO_GEN_API_DIR == "ydk-service-gnmi" ]]; then
         target_path="$SDK_PATH/gnmi"
-        copy_samples=1
-    else
-        target_path="$SDK_PATH/models"
-    fi
-
-    if [[ $copy_samples ]]; then
-        echo " "
         echo "Copying ${GO_GEN_API_DIR}/ydk from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to ${target_path}"
         cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk ${target_path}
         echo "Copying samples from ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples to ${target_path}"
-        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples ${target_path}
+        cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/samples $target_path
     else
-        echo " "
+        target_path="$SDK_PATH/ydk/models"
         echo "Copying ${GO_GEN_API_DIR} model bundle from ${GEN_API_PATH}/${GO_GEN_API_DIR}/ to ${target_path}"
         cp -r ${GEN_API_PATH}/${GO_GEN_API_DIR}/ydk/models/* ${target_path}
     fi
@@ -203,9 +198,8 @@ elif [[ ${LANGUAGE} == "go" ]]; then
     echo " "
     echo "Cleaning ${SDK_PATH} of existing files"
     rm -rf ${SDK_PATH}/ydk/*
-    rm -rf ${SDK_PATH}/core/*
     rm -rf ${SDK_PATH}/gnmi/*
-    rm -rf ${SDK_PATH}/models/*
+    rm -rf ${SDK_PATH}/samples/*
 
     echo "Deleting ${GEN_API_PATH}/ydk/tests"
     rm -rf ${GEN_API_PATH}/ydk/tests

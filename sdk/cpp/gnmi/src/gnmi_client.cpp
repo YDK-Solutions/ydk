@@ -379,9 +379,10 @@ static string get_value_from_update(gnmi::Update update)
     gnmi::TypedValue value;
     string value_for_payload;
 
-    if(update.has_val())
+    if (update.has_val()) {
         value = update.val();
         value_for_payload.append(value.json_ietf_val());
+    }
     return value_for_payload;
 }
 

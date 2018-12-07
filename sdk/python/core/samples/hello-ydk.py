@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 # hello-ydk.py
-# Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system uptime.
+# Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system name and uptime.
 #
 import logging
 from datetime import timedelta
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     enable_logging(logging.INFO)
     
     # create NETCONF session
-    provider = NetconfServiceProvider(address="domingo",
+    provider = NetconfServiceProvider(address="192.168.122.169",
                                       port=830,
                                       username="admin",
                                       password="admin",
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     system_time = crud.read(provider, system_time)
 
     # print system uptime
-    print("System uptime is " +
+    print("System '%s' uptime is "%system_time.uptime.host_name +
           str(timedelta(seconds=system_time.uptime.uptime)))
 
     exit()

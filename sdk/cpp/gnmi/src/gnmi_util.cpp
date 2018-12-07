@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <ctype.h>
 
 #include <ydk/errors.hpp>
 #include <ydk/logger.hpp>
@@ -151,10 +152,15 @@ static void parse_entity(Entity & entity, gnmi::Path* path)
                 }
             }
             if (is_key && leaf_data.is_set) {
-                keys[name_value.first] = leaf_data.value;
-
-                // Add surrounding quotes for YDK to work with XR gNMI server
-                // keys[name_value.first] = "\"" + leaf_data.value + "\"";
+                bool is_number = all_of(leaf_data.value.begin(), leaf_data.value.end(), ::isdigit);
+                if (is_number) {
+                    // Standard: Accept the key value "as is"
+                    keys[name_value.first] = leaf_data.value;
+                }
+                else {
+                    // Add surrounding quotes for YDK to work with XR gNMI server
+                    keys[name_value.first] = "\"" + leaf_data.value + "\"";
+                }
             }
             else if (leaf_data.yfilter != YFilter::not_set) {
                 leafs[name_value.first] = to_string(leaf_data.yfilter);
@@ -243,11 +249,16 @@ static void add_path_elem(gnmi::Path* path, string s)
             auto close_bracket_pos = key_path.find("]", equal_pos);
             string key_name = key_path.substr(open_bracket_pos+1, equal_pos-open_bracket_pos-1);
             string key_value = key_path.substr(equal_pos+2, close_bracket_pos-equal_pos-3);
-            keys[key_name] = key_value;
 
-            // Add surrounding quotes for YDK to work with XR gNMI server.
-            // This could be an issue with other gNMI servers
-            // keys[key_name] = "\""+key_value+"\"";
+            bool is_number = all_of(key_value.begin(), key_value.end(), ::isdigit);
+            if (is_number) {
+                // Standard: Accept the key value "as is"
+                keys[key_name] = key_value;
+            }
+            else {
+                // Add surrounding quotes for YDK to work with XR gNMI server.
+                keys[key_name] = "\""+key_value+"\"";
+            }
 
             if (close_bracket_pos == key_path.length()-1)
                 break;

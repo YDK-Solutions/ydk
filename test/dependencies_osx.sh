@@ -52,7 +52,6 @@ function install_fpm {
 
 function install_golang {
     print_msg "Installing Go1.9.2"
-    print_msg "Before installation GO version: $(go version)"
     bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
     source /Users/travis/.gvm/scripts/gvm
     print_msg "GO version before installation: $(go version)"
@@ -69,6 +68,7 @@ function install_golang {
 
 function check_python_installation {
   print_msg "Checking python3 and pip3 installation"
+  brew rm -f --ignore-dependencies python python3
   python3 -V &> /dev/null
   status=$?
   if [ $status -ne 0 ]; then
@@ -81,6 +81,7 @@ function check_python_installation {
     print_msg "Installing pip3"
     sudo easy_install pip3
   fi
+  sudo pip3 install virtualenv
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -96,7 +97,5 @@ install_golang
 
 brew install pybind11
 check_python_installation
-
-sudo pip3 install virtualenv
 
 #install_fpm

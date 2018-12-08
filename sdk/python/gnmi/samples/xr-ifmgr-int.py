@@ -68,8 +68,8 @@ def run_test(provider):
     """Read interface configuration"""
     ifc_filter = ifmgr.InterfaceConfigurations()
     ifc = ifmgr.InterfaceConfigurations.InterfaceConfiguration()
-    ifc.active = 'act'
-    ifc.interface_name = 'Loopback10'
+    ifc.active = '"act"'
+    ifc.interface_name = '"Loopback10"'
     ifc_filter.interface_configuration.append(ifc)
 
     ifc_read = service.get(provider, ifc_filter)
@@ -90,8 +90,8 @@ def run_test(provider):
     """Delete interface configuration"""
     ifc_delete = ifmgr.InterfaceConfigurations()
     ifc = ifmgr.InterfaceConfigurations.InterfaceConfiguration()
-    ifc.active = 'act'
-    ifc.interface_name = "Loopback10"
+    ifc.active = '"act"'
+    ifc.interface_name = '"Loopback10"'
     ifc_delete.interface_configuration.append(ifc)
     ifc_delete.yfilter = YFilter.delete
     reply = service.set(provider, ifc_delete)

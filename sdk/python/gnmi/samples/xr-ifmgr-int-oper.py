@@ -68,15 +68,15 @@ def run_test(provider):
     """Read interface operational data"""
     ifc_oper_filter = ifoper.InterfaceProperties()
     dn = ifoper.InterfaceProperties.DataNodes.DataNode()
-    dn.data_node_name = '0/RP0/CPU0'
+    dn.data_node_name = '"0/RP0/CPU0"'
     ifc_oper_filter.data_nodes.data_node.append(dn)
 
     lview = ifoper.InterfaceProperties.DataNodes.DataNode.Locationviews.Locationview()
-    lview.locationview_name = '0/RP0/CPU0'
+    lview.locationview_name = '"0/RP0/CPU0"'
     dn.locationviews.locationview.append(lview)
     
     ifc = ifoper.InterfaceProperties.DataNodes.DataNode.Locationviews.Locationview.Interfaces.Interface()
-    ifc.interface_name = "Loopback10"
+    ifc.interface_name = '"Loopback10"'
     ifc.state = YFilter.read
     lview.interfaces.interface.append(ifc)
 

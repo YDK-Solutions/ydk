@@ -1,5 +1,5 @@
 /*  ----------------------------------------------------------------
- Copyright 2016 Cisco Systems
+ Copyright 2018 Cisco Systems
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,12 +49,9 @@ int main(int argc, char* argv[])
     gNMIServiceProvider provider{repo, host, port, username, password};
     gNMIService gs{};
 
-    //auto provider = NetconfServiceProvider(host, username, password, port);
-    //CrudService crud{};
-
     auto ifc = make_shared<Cisco_IOS_XR_ifmgr_cfg::InterfaceConfigurations::InterfaceConfiguration>();
-    ifc->active = "act";
-    ifc->interface_name = "Loopback10";
+    ifc->active = "\"act\"";
+    ifc->interface_name = "\"Loopback10\"";
     ifc->description.yfilter = YFilter::read;
 
     auto ifc_filter = make_unique<Cisco_IOS_XR_ifmgr_cfg::InterfaceConfigurations>();

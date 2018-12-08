@@ -41,15 +41,15 @@ using namespace cisco_ios_xr;
 void config_prop(Cisco_IOS_XR_ifmgr_oper::InterfaceProperties & ifc_prop)
 {
     auto dn = make_shared<Cisco_IOS_XR_ifmgr_oper::InterfaceProperties::DataNodes::DataNode>();
-    dn->data_node_name = "0/RP0/CPU0";
+    dn->data_node_name = "\"0/RP0/CPU0\"";
     ifc_prop.data_nodes->data_node.append(dn);
 
     auto lview = make_shared<Cisco_IOS_XR_ifmgr_oper::InterfaceProperties::DataNodes::DataNode::Locationviews::Locationview>();
-    lview->locationview_name = "0/RP0/CPU0";
+    lview->locationview_name = "\"0/RP0/CPU0\"";
     dn->locationviews->locationview.append(lview);
     
     auto ifc = make_shared<Cisco_IOS_XR_ifmgr_oper::InterfaceProperties::DataNodes::DataNode::Locationviews::Locationview::Interfaces::Interface>();
-    ifc->interface_name = "Loopback10";
+    ifc->interface_name = "\"Loopback10\"";
     ifc->state.yfilter = YFilter::read;
     lview->interfaces->interface.append(ifc);
 }
@@ -80,7 +80,6 @@ int main(int argc, char* argv[])
     ydk::path::Repository repo{"/home/ygorelik/ydk-gen/scripts/samples/repository/192.168.122.107"};
     int port = stoi(sport);
     gNMIServiceProvider provider{repo, host, port, username, password};
-
     gNMIService gs;
 
     // Set Create Request

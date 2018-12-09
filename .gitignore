@@ -33,16 +33,9 @@ sdk/cpp/gnmi/tests/main.cpp
 sdk/python/core/ydk/models/ydktest
 test/gnmi_client
 yang/nxos*
-<<<<<<< HEAD
 profiles/test/ydk-nxos*
 grpc
 protobuf-3.5.0
 sdk/python/gnmi/build
 sdk/python/gnmi/dist
-sdk/python/gnmi/ydk_services_gnmi.egg-info
-=======
-grpc/
-protobuf-3.5.0/
-sdk/cpp/gnmi/
-sdk/python/gnmi/
->>>>>>> origin
+sdk/python/gnmi/ydk_service_gnmi.egg-info

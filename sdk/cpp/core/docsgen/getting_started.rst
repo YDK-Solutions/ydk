@@ -114,21 +114,26 @@ Quick YDK Installation
 Install prebuilt libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
+
 **Ubuntu**
 
-Download and install YDK core library:
+Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
+For other Ubuntu distributions it is recommended to build core library from source.
+
+For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
    sudo gdebi libydk_0.8.0-1_amd64.deb
 
-Download and install YDK gNMI library (optional):
+For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0-beta/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
+   sudo gdebi libydk_0.8.0-1_amd64.deb
 
 **CentOS**
 
@@ -136,15 +141,33 @@ Install YDK core library:
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
 
 Install YDK gNMI library (optional):
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk_gnmi-0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi-0.4.0-1.x86_64.rpm
 
 **MacOS**
+
+You can install the latest model packages using `homebrew <http://brew.sh>`_.  This utility will manage the dependencies between YDK packages and all other sytem dependencies.  First, add the third-party repository (homebrew tap) for YDK:
+
+.. code-block:: sh
+
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
+   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+
+You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
+
+.. code-block:: sh
+
+  brew install ydk-cisco-ios-xr
+
+Alternatively, you can perform partial installation.  If you only want to install the ``openconfig`` bundle and its dependencies (``ydk`` and ``ietf`` packages), execute:
 
 .. code-block:: sh
 
@@ -154,6 +177,74 @@ Install YDK gNMI library (optional):
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk_gnmi-0.4.0-Darwin.pkg
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
+If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
+
+.. code-block:: sh
+
+  brew install ydk-ietf
+
+gNMI Requirements
+=================
+
+In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+
+**Install protobuf**
+
+.. code-block:: sh
+
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
+    ./configure
+    make
+    sudo make install
+    sudo ldconfig
+    cd -
+
+**Install gRPC**
+
+.. code-block:: sh
+
+    git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    sudo ldconfig
+    make
+    sudo make install
+    cd -
+
+**Instal YDK gNMI library**
+
+Ubuntu
+
+For Xenial (Ubuntu 16.04.4):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+For Bionic (Ubuntu 18.04.1):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+
+CentOS
+
+.. code-block:: sh
+
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+**Set runtime environment**
+
+The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
+
+.. code-block:: sh
+
+   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 
 Installing from source
 ----------------------

@@ -120,18 +120,16 @@ func configInt(provider *providers.GnmiServiceProvider) {
     ifc.Name = "Loopback10"
     ifc.Config.Name = "Loopback10"
     ifc.Config.Description = "Test"
-    ifcs := ysanity_int.Interfaces{}
-    ifcs.Interface = append(ifcs.Interface, &ifc)
 
-    service := services.CrudService{}
-    service.Create(provider, &ifcs)
+    crud := services.CrudService{}
+    crud.Create(provider, &ifc)
 }
 
 func deleteInt(provider *providers.GnmiServiceProvider) {
     ifcs := ysanity_int.Interfaces{}    
 
-    service := services.CrudService{}
-    service.Delete(provider, &ifcs)
+    crud := services.CrudService{}
+    crud.Delete(provider, &ifcs)
 }
 
 func configBgp(provider *providers.GnmiServiceProvider) {
@@ -175,10 +173,11 @@ func (suite *GnmiServiceTestSuite) TestSubscribeOnce() {
 	// Build BGP configuration
 	configBgp(&suite.Provider)
 	
-	// Build subscription request
+	// Build subscription request for one BGP neighbor
+	neighbor := ysanity_bgp.Bgp_Neighbors_Neighbor{}
+	neighbor.NeighborAddress = "172.16.255.2"
 	sub := services.GnmiSubscription{}
-	bgp := ysanity_bgp.Bgp{}
-	sub.Entity = &bgp
+	sub.Entity = &neighbor
 	sub.SubscriptionMode = "ON_CHANGE"
 	var subList []services.GnmiSubscription
 	subList = append(subList, sub)
@@ -284,55 +283,46 @@ func (suite *GnmiServiceTestSuite) TestCrudSingle() {
     ifc := ysanity_int.Interfaces_Interface{}
     ifc.Name = "Loopback10"
     ifc.Config.Name = "Loopback10"
-    ifcs := ysanity_int.Interfaces{}
-    ifcs.Interface = append(ifcs.Interface, &ifc)
     
-    reply := crud.Create(&suite.Provider, &ifcs)
+    reply := crud.Create(&suite.Provider, &ifc)
     suite.Equal(reply, true)
 
     // Change and update configuration
     ifc.Config.Description = "Test"
-    reply = crud.Update(&suite.Provider, &ifcs)
+    reply = crud.Update(&suite.Provider, &ifc)
     suite.Equal(reply, true)
 
     // Read all
-    filterInt := ysanity_int.Interfaces{}
-    readAll := crud.Read(&suite.Provider, &filterInt)
-    suite.NotNil(readAll)
-    suite.Equal(types.IsEntityCollection(readAll), false)
+    ifcFilter := ysanity_int.Interfaces_Interface{}
+    ifcFilter.Name = "Loopback10"
+    readIfc := crud.Read(&suite.Provider, &ifcFilter)
+    suite.NotNil(readIfc)
+    suite.Equal(types.IsEntityCollection(readIfc), false)
     
     // Validate response
-    ifcRead := readAll.(*ysanity_int.Interfaces)
-    suite.Equal(types.EntityEqual(ifcRead, &ifcs), true)
+    ifcRead := readIfc.(*ysanity_int.Interfaces_Interface)
+    suite.Equal(types.EntityEqual(ifcRead, &ifc), true)
 
     // Read configuration only
-    filterInt = ysanity_int.Interfaces{}
-    readConfig := crud.ReadConfig(&suite.Provider, &filterInt)
+    readConfig := crud.ReadConfig(&suite.Provider, &ifcFilter)
     suite.NotNil(readConfig)
 
     // Read container/entity with filter
-    filter := ysanity_int.Interfaces{}
-    ifc = ysanity_int.Interfaces_Interface{}
-    ifc.Name = "Loopback10"
-    ifc.Config.YFilter = yfilter.Read
-    filter.Interface = append(filter.Interface, &ifc)
-    
-    readConfig = crud.ReadConfig(&suite.Provider, &filter)
+    ifcFilter.Config.YFilter = yfilter.Read
+    readConfig = crud.ReadConfig(&suite.Provider, &ifcFilter)
     suite.NotNil(readConfig)
 
     // Read single leaf
-    filter = ysanity_int.Interfaces{}
-    ifc = ysanity_int.Interfaces_Interface{}
-    ifc.Name = "Loopback10"
-    ifc.Config.Description = yfilter.Read
-    filter.Interface = append(filter.Interface, &ifc)
+    ifcFilter.Config.YFilter = yfilter.NotSet
+    ifcFilter.Config.Description = yfilter.Read
     
-    readConfig = crud.ReadConfig(&suite.Provider, &filter)
+    readConfig = crud.ReadConfig(&suite.Provider, &ifcFilter)
     suite.NotNil(readConfig)
 
     // Delete configuration
-    filterInt = ysanity_int.Interfaces{}
-    reply = crud.Delete(&suite.Provider, &filterInt)
+    ifcFilter = ysanity_int.Interfaces_Interface{}
+    ifcFilter.Name = "Loopback10"
+    reply = crud.Delete(&suite.Provider, &ifcFilter)
     suite.Equal(reply, true)
 }
 

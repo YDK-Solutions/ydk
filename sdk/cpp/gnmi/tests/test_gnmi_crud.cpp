@@ -51,30 +51,35 @@ TEST_CASE("gnmi_crud_single_entity")
     CodecServiceProvider codec_provider{EncodingFormat::JSON};
     CodecService codec_service{};
 
-    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    ifc->config->name = "Loopback10";
-
-    openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
+    auto ifc = openconfig_interfaces::Interfaces::Interface();
+    ifc.name = "Loopback10";
+    ifc.config->name = "Loopback10";
 
     // Set-replace Request
-    auto reply = crud.create(provider, ifcs);
+    auto reply = crud.create(provider, ifc);
     REQUIRE(reply);
 
-    ifc->config->description = "Test";
-    reply = crud.update(provider, ifcs);
+    ifc.config->description = "Test";
+    reply = crud.update(provider, ifc);
     REQUIRE(reply);
 
+    // READ and VERIFY
     openconfig_interfaces::Interfaces filter{};
-    auto ifc_read = crud.read(provider, filter);
-    REQUIRE(ifc_read != nullptr);
-    REQUIRE(*ifc_read == ifcs);
+    auto ifc_filter = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc_filter->name = "Loopback10";
+    filter.interface.append(ifc_filter);
 
-    ifc_read = crud.read_config(provider, filter);
+    auto ifc_read = crud.read(provider, *ifc_filter);
     REQUIRE(ifc_read != nullptr);
+    REQUIRE(*ifc_read == ifc);
 
-    reply = crud.delete_(provider, ifcs);
+    ifc_read = crud.read_config(provider, *ifc_filter);
+    REQUIRE(ifc_read != nullptr);
+    REQUIRE(*ifc_read == ifc);
+
+    auto ifc_delete = openconfig_interfaces::Interfaces::Interface();
+    ifc_delete.name = "Loopback10";
+    reply = crud.delete_(provider, ifc_delete);
     REQUIRE(reply);
 }
 
@@ -95,21 +100,18 @@ TEST_CASE("gnmi_crud_read_leaf")
     openconfig_interfaces::Interfaces ifcs{};
     ifcs.interface.append(ifc);
 
-    auto ifc_read = crud.read(provider, ifcs);
+    auto ifc_read = crud.read(provider, *ifc);
     REQUIRE(ifc_read != nullptr);
-    string expected = R"( <interfaces>
-   <interface>
-     <name>Loopback10</name>
-     <config>
-       <description>Test</description>
-     </config>
-   </interface>
- </interfaces>
+    string expected = R"( <interface>
+   <name>Loopback10</name>
+   <config>
+     <description>Test</description>
+   </config>
+ </interface>
 )";
     REQUIRE(entity2string(ifc_read, provider.get_session().get_root_schema()) == expected);
 
-    auto reply = crud.delete_(provider, ifcs);
-    REQUIRE(reply);
+    delete_int_config(provider);
 }
 
 TEST_CASE("gnmi_crud_multiple_entities")

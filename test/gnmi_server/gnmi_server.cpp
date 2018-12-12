@@ -386,21 +386,15 @@ class gNMIImpl final : public gNMI::Service
             auto req_path = sub.path();
             ::gnmi::Path* response_path = new ::gnmi::Path;
             std::string origin = req_path.origin();
-            std::string response_payload{};
+            std::string last_elem{};
             if (origin.length() > 0) {
                 response_path->set_origin(origin);
-                if (origin == "openconfig-bgp" && bgp_set) {
-                    response_payload = bgp_payload;
-                }
-                else if (origin == "openconfig-interfaces" && int_set) {
-                    response_payload = int_payload;
-                }
-                else response_payload = null_payload;
             }
             for (int j = 0; j < req_path.elem_size(); ++j)
             {
                 gnmi::PathElem* path_elem = response_path->add_elem();
                 path_elem->CopyFrom(req_path.elem(j));
+                last_elem = path_elem->name();
             }
 
             // Build Update
@@ -409,6 +403,7 @@ class gNMIImpl final : public gNMI::Service
             update_response->set_allocated_path(response_path);
 
             ::gnmi::TypedValue* value = new ::gnmi::TypedValue;
+            auto response_payload = get_response_payload(origin, last_elem);
             value->set_json_ietf_val(response_payload);
             update_response->set_allocated_val(value);
         }

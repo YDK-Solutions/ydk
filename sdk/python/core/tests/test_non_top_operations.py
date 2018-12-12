@@ -32,7 +32,11 @@ from ydk.services  import CRUDService
 from ydk.ext.types import Empty, EncodingFormat
 from ydk.filters import YFilter
 
-from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
+try:
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
+except:
+    from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, YdkEnumTest
 
 class SanityTest(unittest.TestCase):
 

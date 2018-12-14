@@ -46,14 +46,16 @@ namespace ydk
 namespace path
 {
 
-const char* TEMP_CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
-
 gNMISession::gNMISession(Repository & repo,
                    const std::string& address, int port,
                    const std::string& username,
                    const std::string& password,
                    const std::string & server_certificate, const std::string & private_key)
 {
+    // Correct default settings
+	if (port == 0)
+        port = 57400;
+
     client = make_unique<gNMIClient>(address, port, username, password, server_certificate, private_key);
 
     server_capabilities = client->get_capabilities();

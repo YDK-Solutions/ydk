@@ -1,16 +1,21 @@
 ### 2018-11-27 version 0.8.1
 
-#### Python, C++, Go
-  * Introduced support for non-top level objects/entities for CRUD and Netconf operations.
+#### C++
+  * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI operations.
+
 
 ### 2018-11-27 version 0.8.0
  
-#### Python, C++, Go
+#### C++
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
 
 #### CRUD / Netconf / Codec / Path API improvements
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+  * For Netconf and gNMI Sessions and Service Providers added capability to specify CA server certificate and client private key file locations individually for each device.
 
+#### ydk-gen
+  * Added capability to generate YDK service packages from `generate.py` script.
+  
 ### 2018-10-02 version 0.7.3
 
 #### Bundle improvements

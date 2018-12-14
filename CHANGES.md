@@ -1,3 +1,14 @@
+### 2018-11-27 version 0.8.1
+
+#### Python, C++, Go
+  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
+  * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI operations.
+
+#### Resolved GitHub issues
+  * Test for non-top level Entity fails when bundle created with 'one-class-per-module' flag ([#839](https://github.com/CiscoDevNet/ydk-gen/issues/839))
+  * NETCONF Session constructor doesn't allow port to be None ([#846](https://github.com/CiscoDevNet/ydk-gen/issues/846))
+
+
 ### 2018-11-27 version 0.8.0
  
 #### Python, C++, Go
@@ -5,13 +16,11 @@
 
 ##### CRUD / Netconf / Codec / Path API improvements
   * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+  * For Netconf and gNMI sessions and service providers added capability to specify CA server certificate and client private key file locations individually for each device.
 
 #### ydk-gen
   * Added capability to generate YDK service packages from `generate.py` script.
   
-#### Python bundle improvements
-  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
-
 ### 2018-10-02 version 0.7.3
 
 ### Bundle improvements

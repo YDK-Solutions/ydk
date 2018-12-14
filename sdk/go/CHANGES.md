@@ -1,3 +1,22 @@
+### 2018-11-27 version 0.8.1
+
+#### Go
+  * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI operations.
+
+
+### 2018-11-27 version 0.8.0
+ 
+#### Go
+  * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
+  * For Netconf and gNMI Sessions and Service Providers added capability to specify CA server certificate and client private key file locations individually for each device.
+
+#### CRUD / Netconf / Codec / Path API improvements
+  * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+  * For Netconf and gNMI sessions and service providers added capability to specify CA server certificate and client private key file locations individually for each device.
+
+#### ydk-gen
+  * Added capability to generate YDK service packages from `generate.py` script.
+  
 ### 2018-10-02 version 0.7.3
 
 #### Bundle improvements
@@ -7,7 +26,7 @@
   * Updated [`openconfig`](http://ydk.cisco.com/py/docs/ydk.models.openconfig.html) to  to make it compatible with `ydk core` version 0.7.3.
   * Also updated [`ietf`](http://ydk.cisco.com/py/docs/ydk.models.ietf.html) bundle to make it compatible with `ydk core` version 0.7.3.
 
-#### Python, C++ & Go
+#### Go
 
 ##### CRUD/ NETCONF / Codec API improvements
   * Introduced Codec feature to decode multiple JSON payload. ([#812](https://github.com/CiscoDevNet/ydk-gen/issues/812))

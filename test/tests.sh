@@ -400,7 +400,7 @@ function run_go_samples {
     run_exec_test go run cgo_path/cgo_path.go
     run_exec_test go run bgp_create/bgp_create.go -device ssh://admin:admin@localhost:12022
     run_exec_test go run bgp_read/bgp_read.go -device ssh://admin:admin@localhost:12022
-    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022 -v
+    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022
     cd -
 }
 
@@ -774,7 +774,7 @@ function sanity_doc_gen_cache {
    run_test generate.py --bundle profiles/test/ydktest-cpp.json
 
    print_msg "Generating core docs with cache option"
-   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api -v
+   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api
 }
 
 ########################## EXECUTION STARTS HERE #############################

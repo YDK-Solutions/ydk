@@ -1,14 +1,24 @@
-### 2018-11-27 version 0.8.0
- 
-#### Python, C++, Go
+### 2018-12-17 version 0.8.0
+
+#### CRUD / Netconf / gNMI/ Codec / Path API
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
-##### CRUD / Netconf / Codec / Path API improvements
-  * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
+  * Added Netconf support for certificate-based authentication for multiple servers
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to include previously missing action models in Cisco IOS XR 6.5.1 release
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.2.2 release
 
 #### ydk-gen
   * Added capability to generate YDK service packages from generate.pl script.
 
 ### 2018-10-02 version 0.7.3
+
+#### CRUD/ NETCONF / Codec API
+  * Introduced Codec feature to decode multiple JSON payload. ([#812](https://github.com/CiscoDevNet/ydk-gen/issues/812))
+  * Improved support for `YList` ([#811](https://github.com/CiscoDevNet/ydk-gen/pull/811))
+  * Improve handling of python native types in model API. ([#733](https://github.com/CiscoDevNet/ydk-gen/issues/733))
+  * Validate leaf values based on python type of model API. ([#739](https://github.com/CiscoDevNet/ydk-gen/issues/739))
+  * Improve checking of invalid attributes for model API objects. ([#815](https://github.com/CiscoDevNet/ydk-gen/issues/815))
 
 #### Bundle improvements
   * Updated [`cisco-ios-xr`](http://ydk.cisco.com/py/docs/ydk.models.cisco_ios_xr.html) bundle to support Cisco IOS XR 6.5.1 release.
@@ -16,18 +26,6 @@
   * Released [`cisco-nx-os`](http://ydk.cisco.com/py/docs/ydk.models.cisco_nx_os.html) bundle to support Cisco NX OS 9.2.1 release.
   * Updated [`openconfig`](http://ydk.cisco.com/py/docs/ydk.models.openconfig.html) to  to make it compatible with `ydk core` version 0.7.3.
   * Also updated [`ietf`](http://ydk.cisco.com/py/docs/ydk.models.ietf.html) bundle to make it compatible with `ydk core` version 0.7.3.
-
-#### Python, C++ and Go
-##### CRUD/ NETCONF / Codec API improvements
-  * Introduced Codec feature to decode multiple JSON payload. ([#812](https://github.com/CiscoDevNet/ydk-gen/issues/812))
-  * Improved support for `YList` ([#811](https://github.com/CiscoDevNet/ydk-gen/pull/811))
-
-#### Python
-
-##### CRUD/ NETCONF / Codec API improvements
-  * Improve handling of python native types in model API. ([#733](https://github.com/CiscoDevNet/ydk-gen/issues/733))
-  * Validate leaf values based on python type of model API. ([#739](https://github.com/CiscoDevNet/ydk-gen/issues/739))
-  * Improve checking of invalid attributes for model API objects. ([#815](https://github.com/CiscoDevNet/ydk-gen/issues/815))
 
 #### Note about `cisco-ios-xr` 6.5.1 bundle
   * Bundle excludes the following files due to duplicate namespaces:
@@ -66,15 +64,13 @@
   * Fixed issue with invoking sequential CRUD operations on different model APIs ([#727](https://github.com/CiscoDevNet/ydk-gen/issues/727))
   * Improved NETCONF service commit API ([#796](https://github.com/CiscoDevNet/ydk-gen/issues/796))
   * Enhanced support for leaf value patterns ([#786](https://github.com/CiscoDevNet/ydk-gen/issues/786))
-
-##### Netconf provider improvements
   * Improved support for YANG `feature`s included in NETCONF hello message ([#777](https://github.com/CiscoDevNet/ydk-gen/issues/777))
 
 ##### Documentation improvements
   * Enhanced Go documentation ([#681](https://github.com/CiscoDevNet/ydk-gen/issues/681), [#684](https://github.com/CiscoDevNet/ydk-gen/issues/684), [#720](https://github.com/CiscoDevNet/ydk-gen/issues/720))
   * Improved documentation logos ([#754](https://github.com/CiscoDevNet/ydk-gen/issues/754), [#755](https://github.com/CiscoDevNet/ydk-gen/issues/755), [#756](https://github.com/CiscoDevNet/ydk-gen/issues/756))
 
-##### ydk-gen improvements
+#### ydk-gen improvements
   * Fixed issue with mixed case objects in Go language model API ([#686](https://github.com/CiscoDevNet/ydk-gen/issues/686))
 
 ### 2018-04-09 version 0.7.1

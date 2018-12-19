@@ -100,7 +100,6 @@ In order to have YDK support for gNMI protocol, which is optional, the following
     cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
     cd -

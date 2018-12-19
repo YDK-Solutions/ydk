@@ -45,8 +45,6 @@ Linux
 
 The following packages must be present in your system before installing YDK-Py::
 
-   $ sudo apt-get update > /dev/null
-   $ sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin  
    
    # Upgrade compiler to gcc 5.*
@@ -125,7 +123,6 @@ Install protobuf and protoc
     $ cd protobuf-3.5.0
     $ ./configure
     $ make
-    $ make check
     $ sudo make install
     $ sudo ldconfig
 

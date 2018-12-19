@@ -86,6 +86,11 @@ Please follow the below instructions to install the system requirements before i
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+
+   $ # Upgrade compiler to gcc 5.*
+   $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
+   $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
+   $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
 ```
 
 #### Install libydk library
@@ -117,8 +122,8 @@ $ sudo gdebi libydk_0.8.0-1_amd64.deb
    # Upgrade compiler to gcc 5.*
    $ sudo yum install centos-release-scl -y > /dev/null
    $ sudo yum install devtoolset-4-gcc* -y > /dev/null
-   $ sudo ln -s -f /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   $ sudo ln -s -f /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   $ sudo ln -sf /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
 #### Install prebuilt libydk binary
@@ -211,7 +216,6 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
 ```

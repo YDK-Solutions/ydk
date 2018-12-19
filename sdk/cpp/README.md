@@ -134,7 +134,6 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
 ```
@@ -200,35 +199,9 @@ $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin
 $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
 ```
 
-### gNMI Requirements
+### gNMI Service Installation
 
-In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
-
-#### Install protobuf and protoc
-
-```
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    make check
-    sudo make install
-    sudo ldconfig
-```
-
-#### Install gRPC
-
-```
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    make
-    sudo make install
-    sudo ldconfig
-```
-
-#### Install gNMI library
+#### Install gNMI service library
 
 For Xenial:
 
@@ -244,7 +217,7 @@ $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
-#### Installing from source
+### Installing from source
 #### Building YDK
 
 YDK uses ``cmake`` as the build system of choice. To install the core package, execute:

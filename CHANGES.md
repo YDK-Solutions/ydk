@@ -1,35 +1,30 @@
 ### 2018-11-27 version 0.8.1
 
 #### Python, C++, Go
-  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI operations.
+
+#### ydk-gen
+  * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
 
 #### Resolved GitHub issues
   * Test for non-top level Entity fails when bundle created with 'one-class-per-module' flag ([#839](https://github.com/CiscoDevNet/ydk-gen/issues/839))
   * NETCONF Session constructor doesn't allow port to be None ([#846](https://github.com/CiscoDevNet/ydk-gen/issues/846))
 
 
-### 2018-11-27 version 0.8.0
- 
-#### Python, C++, Go
-  * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
+### 2018-12-17 version 0.8.0
 
-##### CRUD / Netconf / Codec / Path API improvements
-  * Introduced support for ydk::path::Codec to encode and decode multiple data nodes using JSON encoding. 
-  * For Netconf and gNMI sessions and service providers added capability to specify CA server certificate and client private key file locations individually for each device.
+#### CRUD / Netconf / gNMI/ Codec / Path API
+  * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
+  * Added Netconf support for certificate-based authentication for multiple servers
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to include previously missing action models in Cisco IOS XR 6.5.1 release
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.2.2 release
 
 #### ydk-gen
   * Added capability to generate YDK service packages from `generate.py` script.
   
 ### 2018-10-02 version 0.7.3
-
-### Bundle improvements
-
-    Updated cisco-ios-xr bundle to support Cisco IOS XR 6.5.1 release.
-    Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.1 release.
-    Released cisco-nx-os bundle to support Cisco NX OS 9.2.1 release.
-    Updated openconfig to to make it compatible with ydk core version 0.7.3.
-    Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
 
 ### Python, C++ and Go
 CRUD/ NETCONF / Codec API improvements
@@ -44,10 +39,17 @@ CRUD/ NETCONF / Codec API improvements
     Validate leaf values based on python type of model API. (#739)
     Improve checking of invalid attributes for model API objects. (#815)
 
+### Bundle improvements
+
+    Updated cisco-ios-xr bundle to support Cisco IOS XR 6.5.1 release.
+    Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.1 release.
+    Released cisco-nx-os bundle to support Cisco NX OS 9.2.1 release.
+    Updated openconfig to to make it compatible with ydk core version 0.7.3.
+    Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
+
 #### Note about cisco-ios-xr 6.5.1 bundle
-
     Bundle excludes the following files due to duplicate namespaces:
-
+```
     Cisco-IOS-XR-sysadmin-clear-ncs5500.yang
     Cisco-IOS-XR-sysadmin-clear-ncs5502.yang
     Cisco-IOS-XR-sysadmin-clear-ncs55A1.yang
@@ -62,34 +64,31 @@ CRUD/ NETCONF / Codec API improvements
     Cisco-IOS-XR-sysadmin-fabric-ncs5500.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5501.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5502.yang
+```
 
 ### 2018-07-02 version 0.7.2
  
-#### Python, C++ and Go
-
-##### Bundle improvements
+#### Bundle improvements
   * Released [`cisco-nx-os`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-nx-os-0_7_4.json) bundle to support Cisco NX OS 7.0-3-I7-4 release
   * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_4_1.json) bundle to support Cisco IOS XR 6.4.1 release
   * Updated [`openconfig`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/openconfig_0_1_6.json) to introduce support for additional AFT models.
   * Updated [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_8_1_post1.json) bundle to continue to support Cisco IOS XE 16.8.1 release and make it compatible with `ydk core` version 0.7.2
   * Also updated [`ietf`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/ietf_0_1_5_post1.json) bundle to make it compatible with `ydk core` version 0.7.2
 
-##### CRUD / Netconf / Codec / Path API improvements
+#### CRUD / Netconf / Codec / Path API improvements
   * Introduced support for key-based access to list items in Python, C++ and Go model API ([#231](https://github.com/CiscoDevNet/ydk-gen/issues/231))
   * Introduced support for multiple entities in Go ([#768](https://github.com/CiscoDevNet/ydk-gen/pull/768))
   * Improved support for YANG `presence` nodes ([#629](https://github.com/CiscoDevNet/ydk-gen/pull/629), [#738](https://github.com/CiscoDevNet/ydk-gen/pull/738), [#763](https://github.com/CiscoDevNet/ydk-gen/pull/763))
   * Fixed issue with invoking sequential CRUD operations on different model APIs ([#727](https://github.com/CiscoDevNet/ydk-gen/issues/727))
   * Improved NETCONF service commit API ([#796](https://github.com/CiscoDevNet/ydk-gen/issues/796))
   * Enhanced support for leaf value patterns ([#786](https://github.com/CiscoDevNet/ydk-gen/issues/786))
-
-##### Netconf provider improvements
   * Improved support for YANG `feature`s included in NETCONF hello message ([#777](https://github.com/CiscoDevNet/ydk-gen/issues/777))
 
-##### Documentation improvements
+#### Documentation improvements
   * Enhanced Go documentation ([#681](https://github.com/CiscoDevNet/ydk-gen/issues/681), [#684](https://github.com/CiscoDevNet/ydk-gen/issues/684), [#720](https://github.com/CiscoDevNet/ydk-gen/issues/720))
   * Improved documentation logos ([#754](https://github.com/CiscoDevNet/ydk-gen/issues/754), [#755](https://github.com/CiscoDevNet/ydk-gen/issues/755), [#756](https://github.com/CiscoDevNet/ydk-gen/issues/756))
 
-##### ydk-gen improvements
+#### ydk-gen improvements
   * Fixed issue with mixed case objects in Go language model API ([#686](https://github.com/CiscoDevNet/ydk-gen/issues/686))
 
 ### 2018-04-09 version 0.7.1

@@ -49,8 +49,6 @@ Install third-party dependency software:
 $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
 
 # Install gcc-5 and g++-5
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-sudo apt-get update > /dev/null
 sudo apt-get install gcc-5 g++-5 -y > /dev/null
 sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
 sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc

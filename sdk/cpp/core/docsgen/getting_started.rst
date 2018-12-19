@@ -31,8 +31,6 @@ The following packages must be present in your system before installing YDK-Cpp:
    sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
    #
    # gcc-5 and g++5 for modern c++
-   sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-   sudo apt-get update > /dev/null
    sudo apt-get install gcc-5 g++-5 -y > /dev/null
    sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
    sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
@@ -80,7 +78,6 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
     cd -
@@ -96,17 +93,6 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     sudo make install
     sudo ldconfig
     cd -
-
-**Set LD_LIBRARY_PATH**
-
-The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
-
-.. code-block:: sh
-
-    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
-
-**Note:** There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
 
 Quick YDK Installation
 ----------------------
@@ -183,39 +169,13 @@ If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` pa
 
   brew install ydk-ietf
 
-gNMI Requirements
-=================
+gNMI Service Installation
+-------------------------
 
-In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
+Instal YDK gNMI library
+~~~~~~~~~~~~~~~~~~~~~~~
 
-**Install protobuf**
-
-.. code-block:: sh
-
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
-
-**Install gRPC**
-
-.. code-block:: sh
-
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    sudo ldconfig
-    make
-    sudo make install
-    cd -
-
-**Instal YDK gNMI library**
-
-Ubuntu
+**Ubuntu**
 
 For Xenial (Ubuntu 16.04.4):
 
@@ -231,13 +191,14 @@ For Bionic (Ubuntu 18.04.1):
    wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
-CentOS
+**CentOS**
 
 .. code-block:: sh
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
 
-**Set runtime environment**
+Set runtime environment
+~~~~~~~~~~~~~~~~~~~~~~~
 
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 

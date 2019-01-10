@@ -571,7 +571,7 @@ static shared_ptr<path::DataNode> handle_netconf_get_output(const string & reply
         throw(YServiceProviderError{reply});
     }
     data_start += sizeof("<data>") - 1;
-    auto data_end = reply.find("</data>", data_start);
+    auto data_end = reply.rfind("</data>");
     if(data_end == string::npos)
     {
         YLOG_ERROR( "No end data tag found in reply sent by device {}", reply);

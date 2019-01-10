@@ -59,15 +59,15 @@ Install YDK core library:
 For Xenial (Ubuntu 16.04.4):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-$ sudo gdebi libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+$ sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-$ sudo gdebi libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+$ sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 #### Centos (Fedora-based)
@@ -85,11 +85,11 @@ $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
 $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
 # Install YDK core library
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 # Install libydk_gnmi library (optional)
 $ ./test/dependencies_linux_gnmi.sh
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi-0.4.0-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi-0.4.0-1.x86_64.rpm
 ```
 
 #### Mac OS
@@ -102,8 +102,8 @@ $ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 $ xcode-select --install
 
 # Install YDK core library
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-$ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+$ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 ```
 
 **Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
@@ -171,14 +171,14 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
 For Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
@@ -211,4 +211,4 @@ $ go get github.com/CiscoDevNet/ydk-go/ydk
 ## Release Notes
 
 
-The current YDK release version is 0.8.0. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.1. YDK-Go is licensed under the Apache 2.0 License.

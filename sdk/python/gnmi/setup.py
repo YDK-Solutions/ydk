@@ -35,7 +35,7 @@ NAME = 'ydk-service-gnmi'
 
 VERSION = '0.4.0'
 
-INSTALL_REQUIREMENTS = ['ydk>=0.8.0', 'pybind11>=2.1.1']
+INSTALL_REQUIREMENTS = ['ydk==0.8.1', 'pybind11>=2.1.1']
 
 LONG_DESCRIPTION = '''
                     This package provides extension for YDK core - gNMI services.

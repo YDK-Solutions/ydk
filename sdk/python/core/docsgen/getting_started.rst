@@ -44,15 +44,15 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
@@ -63,7 +63,7 @@ Centos (Fedora-based)
 
    # Install Third-party software dependencies
    $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -85,8 +85,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
 Windows
 -------
@@ -138,14 +138,14 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
@@ -153,7 +153,7 @@ CentOS
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~~
@@ -221,8 +221,8 @@ YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-service-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-service-gnmi-0.4.0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -231,14 +231,14 @@ If you only prefer to install the ``openconfig`` bundle and its dependencies (``
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source

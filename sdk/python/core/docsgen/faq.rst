@@ -42,15 +42,17 @@ For example, the below steps will generate & install the ``cisco-ios-xr 6.5.1`` 
 .. code-block:: sh
     :linenos:
 
-    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0-beta/libydk-0.8.0-1.x86_64.rpm
+    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1-beta/libydk-0.8.1-1.x86_64.rpm
 
 2) Generate and install ydk-py core
 
 .. code-block:: sh
     :linenos:
 
-    git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.8.0
-    cd ydk-gen && pip install -r requirements.txt
+    git clone https://github.com/CiscoDevNet/ydk-gen.git
+    git checkout tags/0.8.1 -b 0.8.1
+    cd ydk-gen
+    pip install -r requirements.txt
     ./generate --core --python
     pip install gen-api/python/ydk/dist/ydk*.tar.gz
 

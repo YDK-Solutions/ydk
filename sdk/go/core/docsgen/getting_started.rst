@@ -33,15 +33,15 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -51,7 +51,7 @@ The following packages must be present in your system before installing YDK-Go:
 	
 	$ sudo yum install epel-release
 	$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
-	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 **Golang**
 
@@ -75,8 +75,8 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 	$ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 	$ xcode-select --install
 
-	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-	$ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+	$ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 	
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
 
@@ -124,21 +124,21 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
 **Set runtime environment**
 
@@ -176,4 +176,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.0. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.1. YDK-Go is licensed under the Apache 2.0 License.

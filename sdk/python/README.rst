@@ -57,13 +57,13 @@ For other Ubuntu distributions it is recommended to build core library from sour
 
 For Xenial (Ubuntu 16.04.4)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -80,7 +80,7 @@ The following packages must be present in your system before installing YDK-Py. 
    $ sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
    # Install YDK core library
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 MacOS
 ~~~~~
@@ -94,8 +94,8 @@ Please do not use the homebrew version of python as it causes issues with instal
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
 
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
 Windows
 ~~~~~~~
@@ -145,19 +145,19 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 **CentOS**
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~
@@ -277,4 +277,4 @@ Documentation and Support
 Release Notes
 --------------
 
-The current YDK release version is 0.8.0. YDK-Py is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.1. YDK-Py is licensed under the Apache 2.0 License.

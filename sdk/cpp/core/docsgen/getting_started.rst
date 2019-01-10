@@ -100,8 +100,6 @@ Quick YDK Installation
 Install prebuilt libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
-
 **Ubuntu**
 
 Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
@@ -111,15 +109,15 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 **CentOS**
 
@@ -127,13 +125,13 @@ Install YDK core library:
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 Install YDK gNMI library (optional):
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi-0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi-0.4.0-1.x86_64.rpm
 
 **MacOS**
 
@@ -141,10 +139,10 @@ You can install the latest model packages using `homebrew <http://brew.sh>`_.  T
 
 .. code-block:: sh
 
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
@@ -157,10 +155,10 @@ Alternatively, you can perform partial installation.  If you only want to instal
 
 .. code-block:: sh
 
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0-beta/libydk_gnmi-0.4.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk_gnmi-0.4.0-Darwin.pkg
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
@@ -181,21 +179,21 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 **CentOS**
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~

@@ -131,6 +131,7 @@ class ClassMetaPrinter(object):
         name = meta_info_data.name
         mtype = meta_info_data.mtype
         ptype = meta_info_data.ptype
+        ytype = meta_info_data.ytype
         pmodule_name = meta_info_data.pmodule_name
         clazz_name = meta_info_data.clazz_name
         prange = meta_info_data.prange
@@ -140,8 +141,8 @@ class ClassMetaPrinter(object):
         min_elements = meta_info_data.min_elements
         default_value_object = meta_info_data.default_value_object
 
-        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\' , %s, %s, " %
-                    (name, mtype, ptype, pmodule_name, clazz_name))
+        ctx.writeln("_MetaInfoClassMember('%s', %s, \'%s\', \'%s\', %s, %s, " %
+                    (name, mtype, ptype, ytype, pmodule_name, clazz_name))
         ctx.lvl_inc()
         ctx.writeln("%s, %s, " % (str(prange), str(pattern)))
         ctx.write("'''")
@@ -163,13 +164,14 @@ class ClassMetaPrinter(object):
             ctx.write("'%s', %s" %
                       (meta_info_data.module_name, meta_info_data.is_key))
 
-        if max_elements or min_elements or default_value_object:
-            if max_elements:
-                ctx.str(", max_elements=%s" % max_elements)
-            if min_elements:
-                ctx.str(", min_elements=%s" % min_elements)
-            if default_value_object:
-                ctx.str(", default_value=%s" % default_value_object)
+        if max_elements:
+            ctx.str(", max_elements=%s" % max_elements)
+        if min_elements:
+            ctx.str(", min_elements=%s" % min_elements)
+        if default_value_object:
+            ctx.str(", default_value=%s" % default_value_object)
+        if not meta_info_data.is_config:
+            ctx.str(", is_config=False")
         ctx.str('),\n')
 
         ctx.lvl_dec()

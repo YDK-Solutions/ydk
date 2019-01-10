@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2016 Cisco Systems, Inc.
+# Copyright 2018 Cisco Systems, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# hello-ydk.py
+# hello-xr.py
 # Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system name and uptime.
 #
 import logging
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     system_time = crud.read(provider, system_time)
 
     # print system uptime
-    print("System '%s' uptime is "%system_time.uptime.host_name +
+    print("\nSystem '%s' uptime is "%system_time.uptime.host_name +
           str(timedelta(seconds=system_time.uptime.uptime)))
 
     exit()

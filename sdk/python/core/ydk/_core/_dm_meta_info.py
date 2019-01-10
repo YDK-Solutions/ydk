@@ -27,14 +27,15 @@ ANYXML_CLASS = 8
 
 class _MetaInfoClassMember(object):
 
-    def __init__(self, name, mtype, ptype,
+    def __init__(self, name, mtype, ptype, ytype,
                  pmodule_name, clazz_name,
                  prange, pattern, doc,
                  presentation_name, module_name, is_key,
-                 members=[], max_elements=None, min_elements=None, default_value=None):
+                 members=[], max_elements=None, min_elements=None, default_value=None, is_config=True):
         self._name = name
         self._mtype = mtype
         self._ptype = ptype
+        self._ytype = ytype
         self._pmodule_name = pmodule_name
         self._clazz_name = clazz_name
         self._range = prange
@@ -49,6 +50,7 @@ class _MetaInfoClassMember(object):
         self._max_elements = max_elements
         self._min_elements = min_elements
         self._default_value = default_value
+        self._is_config = is_config
 
     @property
     def members(self):
@@ -61,6 +63,10 @@ class _MetaInfoClassMember(object):
     @property
     def ptype(self):
         return self._ptype
+
+    @property
+    def ytype(self):
+        return self._ytype
 
     @property
     def pmodule_name(self):
@@ -97,6 +103,17 @@ class _MetaInfoClassMember(object):
     @property
     def default_value(self):
         return self._default_value
+
+    def union_list(self):
+        _list = []
+        if self._mtype == REFERENCE_UNION:
+            for union_member in self._members:
+                if (union_member._ptype == 'str'):
+                    pattern = union_member._pattern
+                else:
+                    pattern = union_member._range
+                _list.append((union_member._ptype, union_member._ytype, pattern))
+        return _list
 
 
 class _MetaInfoClass(object):
@@ -135,3 +152,15 @@ class _MetaInfoEnum(object):
         self.literal_map = literal_map
         self.module_name = module_name
         self.namespace = namespace
+
+    def enum_map(self, entity):
+        _map = dict()
+        index = 0
+        for key in self.literal_map:
+            if hasattr(entity, key):
+                attr = getattr(entity, key)
+                _map[key] = attr.value
+            else:
+                _map[key] = index
+            index += 1
+        return _map

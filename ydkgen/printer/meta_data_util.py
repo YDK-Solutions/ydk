@@ -21,7 +21,7 @@
 """
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.builder import TypesExtractor
-from ydkgen.common import convert_to_reStructuredText, get_module_name
+from ydkgen.common import convert_to_reStructuredText, get_module_name, is_config_stmt
 from pyang import types
 from pyang.error import EmitError
 from pyang.types import BinaryTypeSpec, BooleanTypeSpec, Decimal64TypeSpec, EmptyTypeSpec, \
@@ -39,6 +39,7 @@ class MetaInfoData:
         self.name = prop.stmt.arg
         self.mtype = ''
         self.ptype = ''
+        self.ytype = ''
         self.prange = []
         self.pattern = []
         self.presentation_name = "%s" % prop.name
@@ -59,6 +60,7 @@ class MetaInfoData:
         self.units = ''
         self.default_value = ''
         self.default_value_object = None
+        self.is_config = is_config_stmt(prop.stmt)
         self.status = ''
 
 
@@ -106,6 +108,8 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
             properties_description.append('\t**mandatory**\: True\n\n')
         if meta_info_data.is_presence:
             properties_description.append('\t**presence node**\: True\n\n')
+        if not meta_info_data.is_config:
+            properties_description.append('\t**config**\: False\n\n')
         if len(meta_info_data.units) > 0:
             properties_description.append('\t**units**\: %s\n\n' % meta_info_data.units)
         if len(meta_info_data.default_value) > 0:
@@ -215,6 +219,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
     """
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
+    if type_stmt is not None:
+        meta_info_data.ytype = type_stmt.arg
     types_extractor = TypesExtractor()
     target_type_stmt = type_stmt
 

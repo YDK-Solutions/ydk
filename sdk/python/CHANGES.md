@@ -1,4 +1,4 @@
-### 2018-11-27 version 0.8.1
+### 2019-01-11 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Added support for CRUD, Netconf Service, and gNMI Service operations on non-top level objects.
@@ -7,8 +7,10 @@
   * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
 
 #### Resolved GitHub issues
+  * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))
   * Test for non-top level Entity fails when bundle created with 'one-class-per-module' flag ([#839](https://github.com/CiscoDevNet/ydk-gen/issues/839))
   * NETCONF Session constructor doesn't allow port to be None ([#846](https://github.com/CiscoDevNet/ydk-gen/issues/846))
+  * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
 
 
 ### 2018-12-17 version 0.8.0

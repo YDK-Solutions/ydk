@@ -23,6 +23,7 @@
 #include <ydk_ydktest/openconfig_bgp.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/types.hpp>
+#include <ydk/filters.hpp>
 #include <ydk/common_utilities.hpp>
 
 #include <spdlog/spdlog.h>
@@ -98,7 +99,6 @@ TEST_CASE("delete_config")
 
     DataStore target = DataStore::url;
 
-//    auto reply = ns.delete_config(session, target, "http://test");
     CHECK_THROWS_AS(ns.delete_config(provider, target, "http://test"), YError);
 }
 
@@ -329,6 +329,66 @@ TEST_CASE("ietf_get_rpc")
     catch (YError& ex) {
         cout << "Exception while executing RPC: " << ex.what() << endl;
     }
+}
+
+TEST_CASE("create_list_with_yfilter")
+{
+    path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& schema = provider.get_session().get_root_schema();
+    NetconfService ns{};
+
+    auto runner = ydktest_sanity::Runner{};
+    runner.yfilter = YFilter::delete_;
+    auto reply = ns.edit_config(provider, DataStore::running, runner);
+    REQUIRE(reply);
+
+    runner.yfilter = YFilter::merge;
+    vector<Entity*> merge_list{};
+    merge_list.push_back(&runner);
+
+    reply = ns.edit_config(provider, DataStore::running, merge_list);
+    REQUIRE(reply);
+
+    reply = ns.discard_changes(provider);
+    REQUIRE(reply);
+}
+
+TEST_CASE("create_get_non_top")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    NetconfService ns{};
+
+    // Create global configuration
+    auto bgp_set = openconfig_bgp::Bgp();
+    bgp_set.yfilter = YFilter::replace;
+    bgp_set.global->config->as = 65001;
+    bgp_set.global->config->router_id = "1.2.3.4";
+    auto reply = ns.edit_config(provider, DataStore::candidate, bgp_set);
+    REQUIRE(reply);
+
+    // Add neighbor configuration
+    auto neighbor = openconfig_bgp::Bgp::Neighbors::Neighbor();
+    neighbor.neighbor_address = "1.2.3.4";
+    neighbor.config->neighbor_address = "1.2.3.4";
+    reply = ns.edit_config(provider, DataStore::candidate, neighbor);
+    REQUIRE(reply);
+
+    // Get and validate neighbor configuration
+    auto bgp_filter = openconfig_bgp::Bgp();
+    auto neighbor_filter = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    neighbor_filter->neighbor_address = "1.2.3.4";
+    bgp_filter.neighbors->neighbor.append(neighbor_filter);
+    auto neighbor_entity = ns.get_config(provider, DataStore::candidate, *neighbor_filter);
+    REQUIRE(neighbor_entity!=nullptr);
+
+    auto neighbor_ptr = dynamic_cast<openconfig_bgp::Bgp::Neighbors::Neighbor*>(neighbor_entity.get());
+    REQUIRE(neighbor_ptr!=nullptr);
+    REQUIRE(*neighbor_ptr == neighbor);
+
+    reply = ns.discard_changes(provider);
+    REQUIRE(reply);
 }
 
 TEST_CASE("get_openconfig_interfaces_and_bgp")

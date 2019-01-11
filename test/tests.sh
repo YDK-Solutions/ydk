@@ -749,7 +749,7 @@ function run_py_metadata_test {
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
     print_msg "Running metadata test"
-    run_test sdk/python/core/tests/test_metadata.py
+    run_test sdk/python/core/tests/test_meta.py
 }
 
 #-------------------------------------

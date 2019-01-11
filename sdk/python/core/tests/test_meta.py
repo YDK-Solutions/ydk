@@ -63,7 +63,7 @@ class MetaSanityTest(unittest.TestCase):
         # Print PeerType enum
         peer_type_meta = openconfig_bgp_types.PeerType()._meta_info()
         if isinstance(peer_type_meta, _MetaInfoEnum):
-            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_map(openconfig_bgp_types.PeerTypeEnum))
+            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_map(openconfig_bgp_types.PeerType))
 
 
 if __name__ == '__main__':

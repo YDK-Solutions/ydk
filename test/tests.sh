@@ -129,15 +129,17 @@ function check_python_installation {
   
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"

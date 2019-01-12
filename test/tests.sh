@@ -206,7 +206,10 @@ function install_test_cpp_core {
     print_msg "Installing / testing cpp core"
     install_cpp_core
     run_cpp_core_test
-    generate_libydk
+
+    if [[ $(uname) == "Linux" ]]; then
+        generate_libydk
+    fi
 }
 
 function install_cpp_core {

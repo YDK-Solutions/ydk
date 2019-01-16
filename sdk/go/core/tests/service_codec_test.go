@@ -162,6 +162,22 @@ const (
   <a>Hello</a>
 </oc-A>
 `
+	jsonNoKeyList = `{
+  "ydktest-sanity:runner": {
+    "no-key-list": [
+      {
+        "test": "t1"
+      },
+      {
+        "test": "t2"
+      },
+      {
+        "test": "t3"
+      }
+    ]
+  }
+}
+`
 )
 
 func equalPayload(s1, s2 string, um func([]uint8, interface{}) error, m func(interface{}) ([]byte, error)) bool {
@@ -526,6 +542,19 @@ func (suite *CodecTestSuite) TestOneKeyList() {
 		i, rdata = ylist.Get(runner.TwoList.Ldata, 22)
 		suite.Nil(rdata)
 	}
+}
+
+func (suite *CodecTestSuite) TestListNoKeys() {
+	runner := ysanity.Runner{}
+	t1 := ysanity.Runner_NoKeyList{Test: "t1"}
+	t2 := ysanity.Runner_NoKeyList{Test: "t2"}
+	t3 := ysanity.Runner_NoKeyList{Test: "t3"}
+	runner.NoKeyList = []*ysanity.Runner_NoKeyList {&t1, &t2, &t3}
+
+	suite.Provider.Encoding = encoding.JSON
+	payload := suite.Codec.Encode(&suite.Provider, &runner)
+	fmt.Printf("\nGot payload:\n%s", payload)
+	//suite.Equal(jsonNoKeyList, payload)
 }
 
 func TestCodecTestSuite(t *testing.T) {

@@ -168,6 +168,25 @@ bool Entity::operator != (Entity & other) const
     return false;
 }
 
+std::string
+Entity::get_ylist_key() const
+{
+    string key = ylist_key;
+    if (!key.empty() && ylist_key_names.size() == 0) {
+        try {
+            // This is keyless entry of a list. Expected value: 1000000 + key
+            auto index = std::stoi(ylist_key) % 1000000;
+            ostringstream os;
+            os << index;
+            key = os.str();
+        }
+        catch (const std::exception& ex) {
+            YLOG_ERROR("Failed to convert key '{}' to string", ylist_key);
+        }
+    }
+    return key;
+}
+
 std::ostream& operator<< (std::ostream& stream, Entity& entity)
 {
     stream<<get_entity_path(entity, entity.parent);
@@ -246,4 +265,5 @@ std::ostream& operator<< (std::ostream& stream, const EntityPath& path)
     stream << " )";
     return stream;
 }
+
 }

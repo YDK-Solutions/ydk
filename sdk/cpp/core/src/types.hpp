@@ -152,6 +152,9 @@ class Entity {
     bool is_top_level_class;
     bool has_list_ancestor;
     std::vector<std::string> ylist_key_names;
+    std::string ylist_key;
+
+    std::string get_ylist_key() const;
 };
 
 class Bits {

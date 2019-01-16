@@ -981,7 +981,7 @@ func getEntityFromDataNode(node C.DataNode, entity types.Entity) {
 			var childEntity types.Entity
 			if dataNodeIsList(childDataNode) {
 				segmentPath := C.GoString(C.DataNodeGetSegmentPath(childDataNode))
-				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s' '%s'", childName, segmentPath))
+				ydk.YLogDebug(fmt.Sprintf("Creating child list instance '%s' with path '%s'", childName, segmentPath))
 				childEntity = types.GetChildByName(entity, childName, segmentPath)
 			} else {
 				ydk.YLogDebug(fmt.Sprintf("Creating child entity '%s'", childName))

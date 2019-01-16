@@ -27,6 +27,7 @@ from ydkgen.builder import TypesExtractor
 from pyang.types import Decimal64TypeSpec, PathTypeSpec, UnionTypeSpec
 from ydkgen.printer.meta_data_util import get_class_docstring, get_meta_info_data, format_range_string
 from .function_printer import FunctionPrinter
+from ydkgen.common import is_list_element
 
 class ClassConstructorPrinter(FunctionPrinter):
     def __init__(self, ctx, clazz, leafs, identity_subclasses):
@@ -41,6 +42,8 @@ class ClassConstructorPrinter(FunctionPrinter):
     def print_function_body(self):
         self.ctx.writeln('EntityData types.CommonEntityData')
         self.ctx.writeln('YFilter yfilter.YFilter')
+        if is_list_element(self.clazz):
+            self.ctx.writeln('YListKey string')
         if self.clazz.stmt.search_one('presence') is not None:
             self.ctx.writeln('YPresence bool')
         self._print_inits()

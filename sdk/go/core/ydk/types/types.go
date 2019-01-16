@@ -539,11 +539,17 @@ func GetChildByName(
 			} else {
 				sliceType := v.Type().Elem().Elem()
 				childValue := reflect.New(sliceType).Elem()
+				v.Set(reflect.Append(v, childValue.Addr()))
 
-				method := reflect.New(sliceType).MethodByName("GetEntityData")
+				cv := childValue.FieldByName("YListKey")
+				if cv.IsValid() {
+					key := fmt.Sprintf("%d", v.Len())
+					cv.Set(reflect.ValueOf(key))
+				}
+
+				method := childValue.Addr().MethodByName("GetEntityData")
 				in := make([]reflect.Value, method.Type().NumIn())
 				data := method.Call(in)[0].Elem().Interface().(CommonEntityData)
-				v.Set(reflect.Append(v, childValue.Addr()))
 
 				entityData = entity.GetEntityData()
 				yChild, ok = GetYChild(entityData, data.SegmentPath)
@@ -839,4 +845,26 @@ func AddKeyToken(attr interface{}, attrName string) string {
         token = fmt.Sprintf("[%s='%s']", attrName, attrStr)
     }
     return token
+}
+
+func AddNoKeyToken(ent Entity) string {
+	var token string
+	s := reflect.ValueOf(ent).Elem()
+	v := s.FieldByName("YListKey")
+	if v.IsValid() {
+		key := v.Interface().(string)
+		if len(key) > 0 {
+			token = fmt.Sprintf("[%s]", key)
+		}
+	}
+	return token
+}
+
+func SetYListKey(ent Entity, index int) {
+	key := fmt.Sprintf("%d", index+1)
+	s := reflect.ValueOf(ent).Elem()
+	v := s.FieldByName("YListKey")
+	if v.IsValid() {
+		v.Set(reflect.ValueOf(key))
+	}
 }

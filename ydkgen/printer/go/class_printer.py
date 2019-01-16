@@ -21,7 +21,7 @@ source_printer.py
 
 """
 from ydkgen.api_model import Class, Enum, Package, snake_case
-from ydkgen.common import get_qualified_yang_name, sort_classes_at_same_level
+from ydkgen.common import get_qualified_yang_name, sort_classes_at_same_level, is_list_element
 
 from .function_printer import FunctionPrinter
 from .class_constructor_printer import ClassConstructorPrinter
@@ -94,15 +94,19 @@ class ClassPrinter(object):
         path.append('%s%s"' % (prefix, fp.clazz.stmt.arg))
 
         key_props = fp.clazz.get_key_props()
-        predicate = '"'
-        for key_prop in key_props:
-            key_name = ''
-            if key_prop.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
-                key_name += key_prop.stmt.i_module.arg
-                key_name += ':'
-            key_name += key_prop.stmt.arg
+        if len(key_props) > 0:
+            predicate = '"'
+            for key_prop in key_props:
+                key_name = ''
+                if key_prop.stmt.i_module.arg != fp.clazz.stmt.i_module.arg:
+                    key_name += key_prop.stmt.i_module.arg
+                    key_name += ':'
+                key_name += key_prop.stmt.arg
 
-            path.append(" + types.AddKeyToken(%s.%s, \"%s\")" % (fp.class_alias, key_prop.go_name(), key_name))
+                path.append(" + types.AddKeyToken(%s.%s, \"%s\")" % (fp.class_alias, key_prop.go_name(), key_name))
+        elif is_list_element(fp.clazz):
+            # list element with no keys
+            path.append(" + types.AddNoKeyToken(%s)" % fp.class_alias)
 
         fp.ctx.writeln('%s.SegmentPath = %s' % (data_alias, ''.join(path)))
 
@@ -147,6 +151,8 @@ class ClassPrinter(object):
                 fp.ctx.writeln('for i := range %s {' % (child_stmt))
                 fp.ctx.lvl_inc()
                 child_stmt = '%s[i]' % child_stmt
+                if child.stmt.keyword == 'list' and len(child.stmt.i_key) == 0:
+                    fp.ctx.writeln('types.SetYListKey(%s, i)' % child_stmt)
                 fp.ctx.writeln('%s.Children.Append(types.GetSegmentPath(%s), types.YChild{"%s", %s})' %(
                     data_alias, child_stmt, child.property_type.go_name(), child_stmt))
                 fp.ctx.lvl_dec()

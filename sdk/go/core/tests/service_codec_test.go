@@ -553,8 +553,10 @@ func (suite *CodecTestSuite) TestListNoKeys() {
 
 	suite.Provider.Encoding = encoding.JSON
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
-	fmt.Printf("\nGot payload:\n%s", payload)
-	//suite.Equal(jsonNoKeyList, payload)
+	suite.Equal(jsonNoKeyList, payload)
+
+	runnerDecode := suite.Codec.Decode(&suite.Provider, payload)
+	suite.Equal(types.EntityEqual(&runner, runnerDecode), true)
 }
 
 func TestCodecTestSuite(t *testing.T) {

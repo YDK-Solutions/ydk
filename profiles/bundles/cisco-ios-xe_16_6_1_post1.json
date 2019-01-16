@@ -1,6 +1,6 @@
 {
   "name": "cisco-ios-xe",
-  "version": "16.6.1.post1",
+  "version": "16.6.1-post1",
   "core_version": "0.6.1",
   "author": "Cisco",
   "copyright": "Cisco",

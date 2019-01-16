@@ -1,6 +1,6 @@
 {
   "name": "openconfig",
-  "version": "0.1.6.post1",
+  "version": "0.1.6-post1",
   "core_version": "0.7.3",
   "author": "Cisco",
   "copyright": "Cisco",
@@ -93,7 +93,7 @@
   "dependency": [
     {
       "name": "ietf",
-      "version": "0.1.5.post2",
+      "version": "0.1.5-post2",
       "core_version": "0.7.3",
       "uri": "file://profiles/bundles/ietf_0_1_5_post2.json"
     }

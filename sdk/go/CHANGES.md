@@ -1,4 +1,4 @@
-### 2019-01-11 version 0.8.1
+### 2019-01-16 version 0.8.1
 
 #### Go
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
@@ -6,6 +6,7 @@
 #### Resolved GitHub issues
   * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))
   * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
+  * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
 
 
 ### 2018-12-17 version 0.8.0

@@ -14,6 +14,7 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
+import importlib
 
 ATTRIBUTE = 0
 REFERENCE_CLASS = 1
@@ -115,12 +116,28 @@ class _MetaInfoClassMember(object):
                 _list.append((union_member._ptype, union_member._ytype, pattern))
         return _list
 
+    def ydk_class(self):
+        if (self.mtype != REFERENCE_ENUM_CLASS and self.mtype != REFERENCE_CLASS and self.mtype != REFERENCE_IDENTITY_CLASS) or \
+            len(self._pmodule_name) == 0 or len(self._clazz_name) == 0:
+            return None
+        m = importlib.import_module(self._pmodule_name)
+        cls_list = self._clazz_name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
+
+    def enum_dict(self):
+        yclass = self.ydk_class()
+        enum_meta = yclass._meta_info()
+        return enum_meta.enum_dict()
+
 
 class _MetaInfoClass(object):
 
     def __init__(
             self,
             name,
+            doc,
             is_abstract,
             meta_info_class_members,
             module_name,
@@ -128,6 +145,7 @@ class _MetaInfoClass(object):
             namespace,
             pmodule_name):
         self.name = name
+        self.doc = doc
         self.namespace = namespace
         self.meta_info_class_members = meta_info_class_members
         self.module_name = module_name
@@ -138,29 +156,47 @@ class _MetaInfoClass(object):
     def key_members(self):
         return [ member for member in self.meta_info_class_members if member.is_key]
 
+    def member(self, name):
+        for m in self.meta_info_class_members:
+            if m.name == name:
+                return m
+        return None
+
+    def ydk_class(self):
+        m = importlib.import_module(self.pmodule_name)
+        cls_list = self.name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
 
 class _MetaInfoEnum(object):
     def __init__(
                  self,
                  name,
                  pmodule_name,
+                 clazz_name,
+                 doc,
                  literal_map,
                  module_name,
                  namespace):
         self.name = name
         self.pmodule_name = pmodule_name
+        self.clazz_name = clazz_name
+        self.doc = doc
         self.literal_map = literal_map
         self.module_name = module_name
         self.namespace = namespace
 
-    def enum_map(self, entity):
-        _map = dict()
-        index = 0
-        for key in self.literal_map:
-            if hasattr(entity, key):
-                attr = getattr(entity, key)
-                _map[key] = attr.value
-            else:
-                _map[key] = index
-            index += 1
-        return _map
+    def ydk_class(self):
+        m = importlib.import_module(self.pmodule_name)
+        cls_list = self.clazz_name.split('.')
+        for cls in cls_list:
+            m = getattr(m, cls)
+        return m
+
+    def enum_dict(self):
+        d = dict()
+        yclass = self.ydk_class()
+        for k in self.literal_map:
+            d[k] = getattr(yclass, k)
+        return d

@@ -78,6 +78,12 @@ class ClassMetaPrinter(object):
         self.ctx.lvl_inc()
         self.ctx.writeln("'meta_info' : _MetaInfoClass('%s'," % clazz.qn())
         self.ctx.lvl_inc()
+        description = " "
+        for st in clazz.stmt.substmts:
+            if st.keyword == 'description':
+                description = st.arg
+                break
+        self.ctx.writeln("'''%s'''," % description)
         if clazz.is_grouping():
             self.ctx.writeln('True, ')
         else:

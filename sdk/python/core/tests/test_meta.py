@@ -31,19 +31,33 @@ except:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.openconfig_bgp.bgp.bgp import Bgp
 
-from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION
+from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION, REFERENCE_ENUM_CLASS
 
 class MetaSanityTest(unittest.TestCase):
 
     def test_runner(self):
         runner = Runner()
-        meta = runner._meta_info()
-        self.assertEqual(meta.module_name, "ydktest-sanity")
-        self.assertEqual(meta.name, "Runner")
-        self.assertEqual(meta.yang_name, "runner")
-        for member_meta in meta.meta_info_class_members:
-            name = member_meta.name
-            print(name)
+        runner_meta = runner._meta_info()
+        self.assertEqual(runner_meta.module_name, "ydktest-sanity")
+        self.assertEqual(runner_meta.name, "Runner")
+        self.assertEqual(runner_meta.yang_name, "runner")
+        print(runner_meta.name, runner_meta.doc)
+        for member_meta in runner_meta.meta_info_class_members:
+            print("{}  --  {}".format(member_meta.name, member_meta._doc.strip()))
+
+        one_list_meta = runner_meta.member('one-list')
+        self.assertIsNotNone(one_list_meta)
+        self.assertEqual(one_list_meta.name, 'one-list')
+
+        built_in_t_meta = runner.ytypes.built_in_t._meta_info()
+        embeded_enum_meta = built_in_t_meta.member('embeded-enum')
+        self.assertIsNotNone(embeded_enum_meta)
+
+        embeded_enum_map = embeded_enum_meta.enum_dict()
+        print("\nEnum dictionary:\n    %s" % embeded_enum_map)
+        self.assertTrue(len(embeded_enum_map) > 0)
+        self.assertEqual(embeded_enum_map['seven'].value, 7L)
+
 
     def test_enum_union_meta(self):
         nbr_ipv6 = Bgp.Neighbors.Neighbor()
@@ -54,6 +68,7 @@ class MetaSanityTest(unittest.TestCase):
 
         # Print neighbor address Union
         config_meta = nbr_ipv6.config._meta_info()
+        print("{}  --  {}".format(config_meta.name, config_meta.doc))
         for member in config_meta.meta_info_class_members:
             if member.mtype == REFERENCE_UNION:
                 print("\nUnion list of tuples:")
@@ -63,7 +78,7 @@ class MetaSanityTest(unittest.TestCase):
         # Print PeerType enum
         peer_type_meta = openconfig_bgp_types.PeerType()._meta_info()
         if isinstance(peer_type_meta, _MetaInfoEnum):
-            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_map(openconfig_bgp_types.PeerType))
+            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_dict())
 
 
 if __name__ == '__main__':

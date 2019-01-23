@@ -60,7 +60,7 @@ gNMISession::gNMISession(Repository & repo,
 
     server_capabilities = client->get_capabilities();
 
-    auto model_provider = make_shared<StaticModelProvider>(*client);
+    model_provider = make_shared<StaticModelProvider>(*client);
     repo.add_model_provider(model_provider.get());
 
     std::vector<std::string> empty_caps;

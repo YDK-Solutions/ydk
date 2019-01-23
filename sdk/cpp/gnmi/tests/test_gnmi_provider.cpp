@@ -17,13 +17,17 @@
 #include <iostream>
 
 #include <ydk/gnmi_provider.hpp>
+#include <ydk/gnmi_service.hpp>
 #include <ydk/errors.hpp>
 
 #include "../../core/src/catch.hpp"
 #include "../../core/tests/config.hpp"
 
+#include <ydk_ydktest/openconfig_interfaces.hpp>
+
 using namespace ydk;
 using namespace std;
+using namespace ydktest;
 
 TEST_CASE("GNMICreateWithRepo")
 {
@@ -40,3 +44,18 @@ TEST_CASE("GNMICreateNoRepo")
 
 	CHECK_NOTHROW(provider.get_encoding());
 }
+
+TEST_CASE("GNMICreateWithNoFiles")
+{
+	ydk::path::Repository repo{};
+	gNMIServiceProvider provider{repo, "127.0.0.1", 50051, "admin", "admin"};
+	gNMIService gs{};
+
+	openconfig_interfaces::Interfaces ifcs{};
+
+	CHECK_THROWS_AS(
+		gs.get(provider, ifcs, "ALL"),
+		ydk::path::YCoreError
+	);
+}
+

@@ -1,4 +1,4 @@
-### 2019-01-16 version 0.8.1
+### 2019-01-24 version 0.8.1
 
 #### Python, C++, Go
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
@@ -11,6 +11,7 @@
   * Test for non-top level Entity fails when bundle created with 'one-class-per-module' flag ([#839](https://github.com/CiscoDevNet/ydk-gen/issues/839))
   * NETCONF Session constructor doesn't allow port to be None ([#846](https://github.com/CiscoDevNet/ydk-gen/issues/846))
   * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
+  * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
   * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
 
 

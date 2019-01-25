@@ -48,8 +48,8 @@ function check_install_gcc {
 
     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
 
-    which gcc
-    gcc --version
+    gcc_version=$(echo `gcc --version` | awk '{ print $3 }')
+    print_msg "Installed gcc/g++ version is $gcc_version"
   fi
 }
 

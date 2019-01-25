@@ -53,8 +53,10 @@ function install_gcc5 {
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     sudo apt-get update > /dev/null
     sudo apt-get install gcc-5 g++-5 -y > /dev/null
-    sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
-    sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
+    sudo ln -fs /usr/bin/g++-5 /usr/bin/c++
+    sudo ln -fs /usr/bin/gcc-5 /usr/bin/cc
+    gcc_version=$(echo `gcc --version` | awk '{ print $3 }' | cut -d '-' -f 1)
+    print_msg "Installed gcc/g++ version is $gcc_version"
   fi
 }
 

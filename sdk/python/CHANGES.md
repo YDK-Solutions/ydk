@@ -1,4 +1,4 @@
-### 2019-01-24 version 0.8.1
+### 2019-02-02 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Added support for CRUD, Netconf Service, and gNMI Service operations on non-top level objects.
@@ -15,6 +15,7 @@
   * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
   * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
   * Decoding gNMI payload failes with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+  * gNMI missing from ydk-py docker ([#860](https://github.com/CiscoDevNet/ydk-gen/issues/860))
 
 
 ### 2018-12-17 version 0.8.0

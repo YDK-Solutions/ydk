@@ -1,4 +1,4 @@
-### 2019-01-24 version 0.8.1
+### 2019-02-02 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.

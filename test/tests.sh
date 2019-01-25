@@ -750,11 +750,11 @@ function py_test_gen {
 function run_py_metadata_test {
     print_msg "Building ydktest bundle with metadata"
     cd $YDKGEN_HOME
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json --generate-meta
+    ${PYTHON_BIN} generate.py --bundle profiles/test/ydktest-cpp.json --generate-meta
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
     print_msg "Running metadata test"
-    run_test sdk/python/core/tests/test_meta.py
+    ${PYTHON_BIN} sdk/python/core/tests/test_meta.py
 }
 
 #-------------------------------------

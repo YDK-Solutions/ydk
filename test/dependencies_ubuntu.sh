@@ -66,12 +66,27 @@ function install_dependencies {
 }
 
 function install_gcc5 {
-    # gcc-5 and g++5 for modern c++
+  which gcc
+  local status=$?
+  if [[ $status == 0 ]]
+  then
+    gcc_version=$(echo `gcc --version` | awk '{ print $3 }' | cut -d '-' -f 1)
+    print_msg "Current gcc/g++ version is $gcc_version"
+  else
+    print_msg "The gcc/g++ not installed"
+    gcc_version="4.0"
+  fi
+  gcc_version=$(echo `gcc --version` | awk '{ print $3 }' | cut -d '-' -f 1)
+  print_msg "Current gcc/g++ version is $gcc_version"
+  if [[ $(echo $gcc_version | cut -d '.' -f 1) < 5 ]]
+  then
+    print_msg "Upgrading gcc/g++ to version 5"
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
     sudo apt-get update > /dev/null
     sudo apt-get install gcc-5 g++-5 -y > /dev/null
     sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
     sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
+  fi
 }
 
 function install_go {

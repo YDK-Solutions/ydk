@@ -196,3 +196,26 @@ TEST_CASE("test_no_key_list_path") {
     REQUIRE(xml == xml_rt);
 }
 
+std::string value_error_json = R"({
+  "ydktest-sanity:runner": {
+    "ytypes": {
+      "built-in-t": {
+        "identity-llist": [
+          "ydktest-sanity:child-identity",
+          "ydktest-sanity:child-child-identity"
+        ]
+      }
+    }
+  }
+}
+)";
+
+TEST_CASE("value_error")
+{
+    ydk::path::Codec s{};
+    std::string searchdir{TEST_HOME};
+    mock::MockSession sp{searchdir, test_openconfig};
+    auto & schema = sp.get_root_schema();
+
+    CHECK_NOTHROW(s.decode(schema, value_error_json, EncodingFormat::JSON));
+}

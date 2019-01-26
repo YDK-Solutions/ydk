@@ -65,7 +65,7 @@ function install_dependencies {
                             lcov > /dev/null
 }
 
-function install_gcc5 {
+function check_install_gcc {
   which gcc
   local status=$?
   if [[ $status == 0 ]]
@@ -121,7 +121,7 @@ YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
 install_dependencies
-install_gcc5
+check_install_gcc
 install_go
 
 install_confd

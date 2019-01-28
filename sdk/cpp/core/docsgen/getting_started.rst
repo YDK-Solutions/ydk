@@ -200,6 +200,13 @@ For Bionic (Ubuntu 18.04.1):
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
+**MacOS**
+
+.. code-block:: sh
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~
 

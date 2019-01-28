@@ -34,34 +34,33 @@ You can install YDK-Cpp on MacOS or Linux.  It is not currently supported on Win
 
 The following packages must be present in your system before installing YDK-Cpp:
 
-If installing from prebuilt binary:
-
 ```
-$ sudo apt-get install gdebi-core libtool-bin libssh-dev
-
-```
-If building from source:
-
-```
-$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+$ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
+$ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 ```
 
-##### Centos (Fedora-based)
+Install gcc-5 for Xenial (Ubuntu 16.04.4):
+
+```
+$ # Upgrade compiler to gcc 5.*
+$ sudo apt-get install gcc-5 g++-5 -y > /dev/null
+$ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
+$ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+```
+
+#### Centos (Fedora-based)
 
 The following packages must be present in your system before installing YDK-Cpp:
-
-If installing from prebuilt binary:
-
-```
-$ sudo yum install epel-release
-$ sudo yum install libssh-devel gcc-c++
-```
-
-If building from source:
 
 ```
 $ sudo yum install epel-release
 $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
+
+# Install gcc-5 and g++-5
+$ yum install centos-release-scl -y > /dev/null
+$ yum install devtoolset-4-gcc* -y > /dev/null
+$ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+$ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 ```
 
 #### Mac OS
@@ -169,18 +168,25 @@ $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
 #### Install gNMI service library
 
-For Xenial:
+For Ubuntu/Xenial:
 
 ```
 $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
-For Bionic:
+For Ubuntu/Bionic:
 
 ```
 $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For MacOS:
+
+```
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
 ### Installing from source

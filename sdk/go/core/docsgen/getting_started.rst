@@ -28,29 +28,43 @@ Linux
 
 The following packages must be present in your system before installing YDK-Go:
 
-For Xenial (Ubuntu 16.04.4):
+Install Third-party software dependencies::
 
-.. code-block:: sh
+    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
+    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+For Xenial (Ubuntu 16.04.4)::
 
-For Bionic (Ubuntu 18.04.1):
+    # Upgrade compiler to gcc 5.*
+    $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
+    $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+    $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
-.. code-block:: sh
+    # Install YDK core library
+    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+    $ sudo gdebi libydk_0.8.1-1_amd64.deb
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+For Bionic (Ubuntu 18.04.1)::
+
+    # Install YDK core library
+    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+    $ sudo gdebi libydk_0.8.1-1_amd64.deb
 
 **Centos (Fedora-based)**
 
-The following packages must be present in your system before installing YDK-Go:
+The following packages must be present in your system before installing YDK-Go::
 
-.. code-block:: sh
-	
-	$ sudo yum install epel-release
-	$ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
-	$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+    $ sudo yum install epel-release
+    $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
+
+    # Upgrade compiler to gcc 5.*
+    $ yum install centos-release-scl -y > /dev/null
+    $ yum install devtoolset-4-gcc* -y > /dev/null
+    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+
+    # Install YDK core library
+    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 **Golang**
 
@@ -58,10 +72,10 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 
 .. code-block:: sh
 
-        $ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
-        $ sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
-        $ export GOROOT="/usr/local/go"
-        $ export PATH=$GOROOT/bin:$PATH
+    $ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
+    $ sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+    $ export GOROOT="/usr/local/go"
+    $ export PATH=$GOROOT/bin:$PATH
 
 Mac
 ---
@@ -74,6 +88,7 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 	$ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 	$ xcode-select --install
 
+    # Install YDK core library
 	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
 	$ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 	
@@ -98,7 +113,8 @@ gNMI Requirements
 
 In order to have YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
 
-**Install protobuf**
+Install protobuf
+----------------
 
 .. code-block:: sh
 
@@ -111,7 +127,8 @@ In order to have YDK support for gNMI protocol, which is optional, the following
     sudo ldconfig
     cd -
 
-**Install gRPC**
+Install gRPC
+------------
 
 .. code-block:: sh
 
@@ -123,31 +140,39 @@ In order to have YDK support for gNMI protocol, which is optional, the following
     sudo make install
     cd -
 
-**Instal YDK gNMI library**
+Instal YDK gNMI library
+-----------------------
 
 Ubuntu
+~~~~~~
 
-For Xenial (Ubuntu 16.04.4):
-
-.. code-block:: sh
+For Xenial (Ubuntu 16.04.4)::
 
    wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
-For Bionic (Ubuntu 18.04.1):
-
-.. code-block:: sh
+For Bionic (Ubuntu 18.04.1)::
 
    wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
+~~~~~~
 
 .. code-block:: sh
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 
-**Set runtime environment**
+MacOS
+~~~~~
+
+.. code-block:: sh
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+
+Set runtime environment
+-----------------------
 
 The YDK based application runtime environment must include setting of **LD_LIBRARY_PATH** variable:
 

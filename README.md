@@ -85,7 +85,7 @@ Please follow the below instructions to install the system requirements before i
 
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
    $ # Upgrade compiler to gcc 5.*
    $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
@@ -165,9 +165,6 @@ You can download the latest Python package from [here](https://www.python.org/do
    $
    $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
    $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
-   $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
-   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -250,6 +247,13 @@ For Bionic (Ubuntu 18.04.1)
 ```
 $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For MacOS:
+
+```
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
 #### CentOS

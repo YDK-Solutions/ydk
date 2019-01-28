@@ -41,7 +41,7 @@ For other Ubuntu distributions it is recommended to build core library from sour
 Install Third-party software dependencies::
 
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
 For Xenial (Ubuntu 16.04.4)::
 
@@ -163,6 +163,15 @@ CentOS
 .. code-block:: sh
 
    sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   
+MacOS
+~~~~~
+
+.. code-block:: sh
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~~
@@ -173,9 +182,6 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
 
    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
-
-
-.. _howto-install:
 
 Python Requirements
 ===================
@@ -188,6 +194,8 @@ It is also required for Python installation to include corresponding shared libr
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
 Please follow `System Requirements` to assure presence of shared Python libraries.
+
+.. _howto-install:
 
 Quick install
 =============

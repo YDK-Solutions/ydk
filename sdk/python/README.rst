@@ -47,6 +47,7 @@ The following packages must be present in your system before installing YDK-Py::
 
    # Install Third-party software
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin  
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
    
 Download and install YDK core library `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
 For other Ubuntu distributions it is recommended to build core library from source.
@@ -151,11 +152,14 @@ For Bionic (Ubuntu 18.04.1)::
    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
-**CentOS**
-
-.. code-block:: sh
+**CentOS**::
 
    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+**MacOS**::
+
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~

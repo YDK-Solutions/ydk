@@ -30,7 +30,7 @@ YANG Development Kit (Generator)
   - [Documentation](#documentation)
 - [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
 - [Notes](#notes)
-  - [Python version](#python-version)
+  - [Python Requirements](#python-requirements)
   - [Directory structure](#directory-structure)
   - [Troubleshooting](#troubleshooting)
 - [Running Unit Tests](#running-unit-tests)
@@ -170,18 +170,6 @@ You can download the latest Python package from [here](https://www.python.org/do
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
-**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall `libssh-0.7.x`.
-
-```
-$ brew reinstall openssl
-$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
-$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
-$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
-$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
-$ cmake ..
-$ sudo make install
-```
-
 ### Build from source
 
 Install dependencies OS dependencies then generate and install YDK C++ libraries:
@@ -198,6 +186,20 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
    $ cd gen-api/cpp/ydk-service-gnmi/build/
    $ make
    $ sudo make install
+```
+
+## Libssh installation
+
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher.
+
+```
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
 ```
 
 ## Windows
@@ -516,10 +518,16 @@ When run in this way, we will generate a bundle that only contains the files spe
 
 # Notes
 
-## Python version
+## Python Requirements
 
-- If your environment has both python 2 and python 3 and uses python 2 by default, you may need to use `python3` and `pip3` instead of `python` and `pip` in the commands mentioned in this document.
+YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 along with corresponding utilities pip and pip3 must be installed on your system. 
 
+It is also required for Python installation to include corresponding shared library. As example: 
+
+ - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
+ - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
+
+Please follow [System requirements](#system-requirements) to assure presence of shared Python libraries.
 
 ## Directory structure
 
@@ -539,6 +547,7 @@ test            - test code
 ```
 
 ## Troubleshooting
+
 Sometimes, developers using ydk-gen may run across errors when generating a YDK bundle using generate.py with some yang models. If there are issues with the .json profile file being used, such errors will be easily evident. Other times, when the problem is not so evident, it is recommended to try running with the `[--verbose|-v]` flag, which may reveal syntax problems with the yang models being used. For example,
 
 ```

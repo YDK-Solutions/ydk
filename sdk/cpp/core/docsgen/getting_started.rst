@@ -16,8 +16,6 @@ You can install YDK-Cpp on Linux or MacOS.  It is currently not supported on Win
 System Requirements
 -------------------
 
-**Note:** The **libssh** release 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use **libssh** versions older than 0.8.0, for example 0.7.5.
-
 Linux
 ~~~~~
 
@@ -64,6 +62,13 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
   brew install curl libssh pcre xml2 cmake
   xcode-select --install
 
+Libssh Installation
+-------------------
+
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+or upgrade to libssh-0.8.1 or higher.
+
 gNMI Requirements
 ~~~~~~~~~~~~~~~~~
 
@@ -86,7 +91,7 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 
 .. code-block:: sh
 
-    git clone -b v1.4.5 https://github.com/grpc/grpc
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     make

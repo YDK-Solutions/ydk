@@ -106,11 +106,13 @@ $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin
 $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 ```
 
-**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall libssh-0.7.x
+#### Libssh installation
+
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher. Example:
 
 ```
-$ brew reinstall openssl
-$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
 $ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
 $ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
 $ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build

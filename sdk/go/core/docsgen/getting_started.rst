@@ -20,7 +20,6 @@ To use the docker image, `install docker <https://docs.docker.com/install/>`_ on
 
 System Requirements
 ===================
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh-0.7.x.
 
 Linux
 -----
@@ -85,6 +84,14 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 	$ export CGO_ENABLED=0
 	$ export GOROOT_BOOTSTRAP=$GOROOT
 	$ gvm install go1.9.2
+
+Libssh Installation
+-------------------
+
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+or upgrade to libssh-0.8.1 or higher.
+
 
 gNMI Requirements
 ===================

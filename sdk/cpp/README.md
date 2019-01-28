@@ -28,14 +28,16 @@ The YANG Development Kit (YDK) is a Software Development Kit that provides API's
 You can install YDK-Cpp on MacOS or Linux.  It is not currently supported on Windows.
 
 ### System Requirements
+
 #### Linux
 ##### Ubuntu (Debian-based)
+
 The following packages must be present in your system before installing YDK-Cpp:
 
 If installing from prebuilt binary:
 
 ```
-$ sudo apt-get install gdebi-core libtool-bin
+$ sudo apt-get install gdebi-core libtool-bin libssh-dev
 
 ```
 If building from source:
@@ -72,55 +74,18 @@ $ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
 $ xcode-select --install
 ```
 
-**Note**. The libssh-0.8.0 and following versions do not support multi-threading feature, which is required by YDK. 
-Therefore it is required to install or reinstall libssh-0.7.x
+#### Libssh installation
+
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher. Example:
 
 ```
-$ brew reinstall openssl
-$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
 $ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
 $ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
 $ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
 $ cmake ..
 $ sudo make install
-```
-###gNMI Requirements
-
-In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
-
-####Install protobuf and protoc
-
-```
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    make check
-    sudo make install
-    sudo ldconfig
-```
-
-####Install gRPC
-
-```
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
-```
-
-####Run-time environment
-
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
-for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
-
-```
-    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 ```
 
 ### gNMI Requirements
@@ -135,6 +100,7 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd protobuf-3.5.0
     ./configure
     make
+    make check
     sudo make install
     sudo ldconfig
 ```
@@ -151,11 +117,10 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd -
 ```
 
-#### Runtime environment
+#### Run-time environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details. 
-As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
+for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
     PROTO="/Your-Protobuf-and-Grpc-installation-directory"

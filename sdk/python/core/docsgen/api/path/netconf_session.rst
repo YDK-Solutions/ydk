@@ -5,30 +5,33 @@ NetconfSession
     :synopsis: NetconfSession
 
 
-.. py:class:: NetconfSession(address, usename, password, port=830, on_demand=True, common_cache=False, int timeout=None, repo=None, private_key_path="", public_key_path="")
+.. py:class:: NetconfSession(address, username, password, port=830, protocol="ssh", on_demand=True, common_cache=False, int timeout=None, repo=None, private_key_path="", public_key_path="")
 
-    :param address: (``str``) IP address of the device supporting a netconf interface.
-    :param username: (``str``) Username to log in to the device.
-    :param password: (``str``) Password to log in to the device
-    :param port: (``int``) Device port used to access the netconf interface. Default value is 830.
+    Constructs an instance of the `NetconfSession` class and connects to Netconf server, which **must** support model download. 
+
+    :param address: (``str``) IP address or DNS name of device, which supports Netconf server; required parameter.
+    :param username: (``str``) Username to log in to the device; required parameter.
+    :param password: (``str``) Password to log in to the device.
+    :param port: (``int``) Device port used to access the Netconf interface. Default value is 830.
+    :param protocol: (``str``) Currently supported `ssh` for secure connection and `tcp` for insecure connection; default - `ssh`.
     :param on_demand: (``bool``) On demand model downloading by default.
-    :param common_cache: (``bool``) Use common cache directory if enabled.
+    :param common_cache: (``bool``) Use common cache directory, if enabled.
     :param timeout: (``int``) The timeout in microseconds: None or -1 for infinite timeout, 0 - for non-blocking
-    :param repo: (:py:class:`Repository<Repository>`) User customized repository.
-    :param private_key_path: (``str``) Path to private key file. Requires public_key_path field. Does not allow password field.
-    :param public_key_path: (``str``) Path to public key file. Requires private_key_path field. Does not allow password field.
+    :param repo: (:py:class:`Repository<Repository>`) User provided repository - directory, which stores cached Yang models.
+    :param private_key_path: (``str``) Path to private key file. Requires public_key_path field.
+    :param public_key_path: (``str``) Path to public key file. Does not allow `password` field, if specified.
 
     .. py:method:: get_root_schema()
 
-        Return :py:class:`RootSchemaNode<RootSchemaNode>` for this NETCONF session.
+        Return :py:class:`RootSchemaNode<RootSchemaNode>` for this Netconf session.
 
-        :returns: :py:class:`RootSchemaNode<RootSchemaNode>` for this NETCONF session.
+        :returns: :py:class:`RootSchemaNode<RootSchemaNode>` for this Netconf session.
 
     .. py:method:: invoke(rpc)
 
-        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) Given Rpc to be executed.
+        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) Given RPC to be executed.
 
-        Invokes or executes the given rpc and returns a :py:class:`DataNode<DataNode>` pointer if the Rpc has an output modelled in YANG.
+        Invokes or executes the given RPC and returns a :py:class:`DataNode<DataNode>` pointer, if the RPC has an output modeled in YANG.
 
         :returns: :py:class:`DataNode<DataNode>`.
 
@@ -36,7 +39,7 @@ NetconfSession
 
         :param datanode: (:py:class:`Rpc<ydk.path.DataNode>`) Given DataNode containing YANG 1.1 action to be executed.
 
-        Invokes or executes the given DataNode and returns a :py:class:`DataNode<DataNode>` pointer if the action has an output modelled in YANG.
+        Invokes or executes the given DataNode and returns a :py:class:`DataNode<DataNode>` pointer if the action has an output modeled in YANG.
 
         :returns: :py:class:`DataNode<DataNode>`.
 

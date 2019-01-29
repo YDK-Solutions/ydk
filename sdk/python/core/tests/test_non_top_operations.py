@@ -23,20 +23,18 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 import unittest
-import logging
 
-from ydk.errors    import YModelError, YServiceError, YCoreError
+from ydk.errors    import YModelError, YServiceError
 from ydk.providers import NetconfServiceProvider
-from ydk.services  import NetconfService, Datastore
+from ydk.services  import NetconfService
 from ydk.services  import CRUDService
-from ydk.ext.types import Empty, EncodingFormat
 from ydk.filters import YFilter
 
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
-except:
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity
 
 class SanityTest(unittest.TestCase):
 
@@ -77,15 +75,15 @@ class SanityTest(unittest.TestCase):
         self.crud.create(self.ncc, il)
 
         # READ & VALIDATE
-        filter = Runner.OneList()
-        read_one = self.crud.read(self.ncc, filter)
+        runner_filter = Runner.OneList()
+        read_one = self.crud.read(self.ncc, runner_filter)
         self.assertIsNotNone(read_one)
 
         read_il = read_one.identity_list.get(ChildIdentity().to_string())
         self.assertIsNotNone(read_il)
         read_il.parent = None
         self.assertEqual(read_il, il)
-        
+
         # DELETE & VALIDATE
         self.crud.delete(self.ncc, il)
         runner_read = self.crud.read(self.ncc, Runner())

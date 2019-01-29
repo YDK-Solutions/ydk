@@ -20,18 +20,17 @@ getting Enum and Union info
 """
 from __future__ import absolute_import
 
-import os
 import unittest
 
 try:
     from ydk.models.ydktest import openconfig_bgp_types
     from ydk.models.ydktest.ydktest_sanity import Runner
     from ydk.models.ydktest.openconfig_bgp import Bgp
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.openconfig_bgp.bgp.bgp import Bgp
 
-from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION, REFERENCE_ENUM_CLASS
+from ydk._core._dm_meta_info import _MetaInfoEnum, REFERENCE_UNION
 
 class MetaSanityTest(unittest.TestCase):
 
@@ -78,7 +77,9 @@ class MetaSanityTest(unittest.TestCase):
         # Print PeerType enum
         peer_type_meta = openconfig_bgp_types.PeerType()._meta_info()
         if isinstance(peer_type_meta, _MetaInfoEnum):
-            print("\nEnum dictionary:\n    %s" % peer_type_meta.enum_dict())
+            peer_type_meta_enum_dict = peer_type_meta.enum_dict()
+            self.assertTrue(len(peer_type_meta_enum_dict) > 0)
+            print("\nEnum dictionary:\n    %s" % peer_type_meta_enum_dict)
 
 
 if __name__ == '__main__':

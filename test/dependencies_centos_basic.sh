@@ -28,7 +28,7 @@ function check_install_gcc {
   local status=$?
   if [[ $status == 0 ]]
   then
-    gcc_version=$(echo `gcc --version` | awk '{ print $3 }')
+    gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
     print_msg "Current gcc/g++ version is $gcc_version"
   else
     print_msg "The gcc/g++ not installed"
@@ -48,7 +48,7 @@ function check_install_gcc {
 
     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
 
-    gcc_version=$(echo `gcc --version` | awk '{ print $3 }')
+    gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
     print_msg "Installed gcc/g++ version is $gcc_version"
   fi
 }

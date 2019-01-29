@@ -167,7 +167,7 @@ class NetconfService(_NetconfService):
             raise _YServiceError("provider and source/source_config cannot be None")
 
         with _handle_error():
-            if type(source) == Datastore:
+            if isinstance(source, Datastore):
                 return self._ns.validate(provider, source, url)
             elif source_config is not None:
                 return self._ns.validate(provider, source_config)

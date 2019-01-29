@@ -24,11 +24,11 @@ import unittest
 
 from ydk.types import Empty
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity
     from ydk.models.ydktest.oc_pattern import OcA
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity
     from ydk.models.ydktest.oc_pattern.oc_a.oc_a import OcA
 
 from ydk.providers import NetconfServiceProvider

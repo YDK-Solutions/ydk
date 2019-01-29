@@ -65,6 +65,7 @@ class SanityGnmiCrud(unittest.TestCase):
         # Update configuration
         lo10.config.description = 'Test'
         res = self.crud.update(self.provider, lo10)
+        self.assertTrue(res)
  
         # Read all
         read_list = self.crud.read(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])

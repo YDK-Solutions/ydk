@@ -28,6 +28,6 @@ __all__ = [ "get_data_node_from_entity",
             "_payload_to_top_entity",
             "_read_entities",
             "XmlSubtreeCodec",
-            _get_top_level_entity,
-            _get_child_entity_from_top,
+            "_get_top_level_entity",
+            "_get_child_entity_from_top",
             ]

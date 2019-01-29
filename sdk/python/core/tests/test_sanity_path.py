@@ -164,7 +164,7 @@ class SanityTest(unittest.TestCase):
         from ydk.services  import CRUDService
         try:
             from ydk.models.ydktest.ydktest_sanity import Native
-        except:
+        except ImportError:
             # bundle is generated with 'one_class_per_module' flag
             from ydk.models.ydktest.ydktest_sanity.native.native import Native
 

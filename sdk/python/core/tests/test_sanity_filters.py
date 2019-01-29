@@ -58,7 +58,7 @@ class SanityYang(unittest.TestCase):
         one = ysanity.Runner.YdktestSanityOne()
         one.number, one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, one)
-        
+
         one_filter = ysanity.Runner.YdktestSanityOne()
         one_read = self.crud.read(self.ncc, one_filter)
         self.assertIsNotNone(one_read)
@@ -173,9 +173,9 @@ class SanityYang(unittest.TestCase):
 
         self.crud.create(self.ncc, element)
 
-        filter = ysanity.Runner().OneList.Ldata()
-        filter.number = 5
-        element_read = self.crud.read(self.ncc, filter)
+        runner_filter = ysanity.Runner().OneList.Ldata()
+        runner_filter.number = 5
+        element_read = self.crud.read(self.ncc, runner_filter)
         self.assertEqual(element, element_read)
 
 

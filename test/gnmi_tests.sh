@@ -183,13 +183,16 @@ function install_cpp_core {
 }
 
 function run_cpp_core_test {
-    print_msg "Running cpp core test"
+    print_msg "Running C++ core tests"
     cd $YDKGEN_HOME/sdk/cpp/core/build
-    make test
+
+    #make test
+
+    ./tests/ydk_core_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose mode to get more details
-        ./tests/ydk_core_test -d yes
+        #./tests/ydk_core_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
@@ -208,7 +211,7 @@ function install_cpp_ydktest_bundle {
 }
 
 function build_gnmi_cpp_core_library {
-    print_msg "Building core gnmi library"
+    print_msg "Building C++ core gnmi library"
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build

@@ -242,11 +242,14 @@ function generate_libydk {
 function run_cpp_core_test {
     print_msg "Running cpp core test"
 
-    make test
+    #export CTEST_OUTPUT_ON_FAILURE=1
+    #make test
+
+    ./tests/ydk_core_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
-    # If the tests fail, try to run them in verbose to get more details for debug
-        ./tests/ydk_core_test -d yes
+        # If the tests fail, try to run them in verbose to get more details for debug
+        #./tests/ydk_core_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
@@ -326,12 +329,15 @@ function cpp_sanity_ydktest_test {
       run_exec_test ${CMAKE_BIN} ..
     fi
     run_exec_test make
-    export CTEST_OUTPUT_ON_FAILURE=1
-    make test
+
+    #export CTEST_OUTPUT_ON_FAILURE=1
+    #make test
+
+    ./ydk_bundle_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose to get more details for  # debug
-        ./ydk_bundle_test -d yes
+        #./ydk_bundle_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting C++ bundle tests with status=$status"
         exit $status

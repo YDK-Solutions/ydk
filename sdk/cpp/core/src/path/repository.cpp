@@ -172,10 +172,12 @@ namespace ydk {
                 yang_file_path += ".yang";
                 YLOG_DEBUG("Opening file '{}'", yang_file_path);
 
-                YLOG_DEBUG("Path found with rev: {}. Path without rev: {}",
-                        file_exists(yang_file_path), file_exists(yang_file_path_no_revision));
+                if (file_exists(yang_file_path) || file_exists(yang_file_path_no_revision)) {
+                    if (file_exists(yang_file_path))
+                        YLOG_DEBUG("Path found with revision: {}", yang_file_path);
+                    else
+                        YLOG_DEBUG("Path found without revision: {}", yang_file_path_no_revision);
 
-                if(file_exists(yang_file_path) || file_exists(yang_file_path_no_revision)) {
                     //open the file read the data and return it
                     std::string model_data {""};
                     std::ifstream yang_file {yang_file_path};
@@ -193,7 +195,9 @@ namespace ydk {
                         YLOG_ERROR("Cannot open file '{}'", yang_file_path);
                         throw(YIllegalStateError("Cannot open file " + yang_file_path));
                     }
-
+                }
+                else {
+                    YLOG_DEBUG("File '{}' is not found in repository", yang_file_path);
                 }
 
                 for(auto model_provider : repo->get_model_providers()) {
@@ -211,19 +215,14 @@ namespace ydk {
                     if(!model_data.empty()){
                         sink_to_file(yang_file_path, model_data);
                         return get_enlarged_data(model_data, yang_file_path);
-                    } else {
-                        YLOG_DEBUG("Cannot find model with module_name '{}' and module_rev '{}'", module_name, (module_rev !=nullptr ? module_rev : ""));
-//                        throw(YIllegalStateError{"Cannot find model"});
-                        return {};
                     }
                 }
             }
-            YLOG_DEBUG("Cannot find model with module_name: {}", module_name);
-//            throw(YIllegalStateError{"Cannot find model"});
+            YLOG_ERROR("Cannot find model with module name '{}'", module_name);
+            //throw(YServiceProviderError("Cannot find model with module name: " + std::string(module_name)));
             return {};
         }
     }
-
 }
 
 ly_ctx* ydk::path::RepositoryPtr::create_ly_context()

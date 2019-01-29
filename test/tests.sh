@@ -129,15 +129,17 @@ function check_python_installation {
   
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -204,7 +206,10 @@ function install_test_cpp_core {
     print_msg "Installing / testing cpp core"
     install_cpp_core
     run_cpp_core_test
-    generate_libydk
+
+    if [[ $(uname) == "Linux" ]]; then
+        generate_libydk
+    fi
 }
 
 function install_cpp_core {
@@ -400,7 +405,7 @@ function run_go_samples {
     run_exec_test go run cgo_path/cgo_path.go
     run_exec_test go run bgp_create/bgp_create.go -device ssh://admin:admin@localhost:12022
     run_exec_test go run bgp_read/bgp_read.go -device ssh://admin:admin@localhost:12022
-    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022 -v
+    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022
     cd -
 }
 
@@ -533,6 +538,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
+    run_test sdk/python/core/tests/test_non_top_operations.py
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 
     print_msg "py_sanity_ydktest_test_netconf_ssh no on-demand"
@@ -738,6 +744,20 @@ function py_test_gen {
 }
 
 #-------------------------------------
+# Meta-data test
+#-------------------------------------
+
+function run_py_metadata_test {
+    print_msg "Building ydktest bundle with metadata"
+    cd $YDKGEN_HOME
+    ${PYTHON_BIN} generate.py --bundle profiles/test/ydktest-cpp.json --generate-meta
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running metadata test"
+    ${PYTHON_BIN} sdk/python/core/tests/test_meta.py
+}
+
+#-------------------------------------
 # Documentation tests
 #-------------------------------------
 
@@ -759,7 +779,7 @@ function sanity_doc_gen_cache {
    run_test generate.py --bundle profiles/test/ydktest-cpp.json
 
    print_msg "Generating core docs with cache option"
-   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api -v
+   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -820,6 +840,8 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
+run_py_metadata_test
+
 # test_gen_tests
 
 ######################################

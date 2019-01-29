@@ -29,6 +29,7 @@ from ydkgen.common import get_rst_file_name
 
 from .import_test_printer import ImportTestPrinter
 from .module_printer import ModulePrinter
+from .module_meta_printer import ModuleMetaPrinter
 from .namespace_printer import NamespacePrinter
 from .init_file_printer import InitPrinter
 from ..doc import DocPrinter
@@ -43,6 +44,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         self.bundle = bundle
         self.bundle_name = bundle.name
         self.bundle_version = bundle.str_version
+        self.generate_meta = False
 
     def print_files(self):
         self._print_init_file(self.models_dir)
@@ -79,6 +81,8 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
         sub = package.sub_name
 
         test_output_dir = self.initialize_output_directory(self.test_dir)
+        if self.generate_meta:
+            meta_dir = self.initialize_output_directory(self.models_dir + '/_meta')
 
         if self.one_class_per_module:
             path = os.path.join(self.models_dir, package.name)
@@ -87,6 +91,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
             extra_args = {'one_class_per_module': self.one_class_per_module,
                           'identity_subclasses': self.identity_subclasses,
+                          'generate_meta': self.generate_meta,
                           'module_namespace_lookup': self.module_namespace_lookup}
             self.print_file(get_python_module_file_name(path, package),
                             emit_module,
@@ -94,9 +99,11 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
             self._print_python_modules(package, index, path, size, sub)
         else:
-        # RST Documentation
+            # RST Documentation
             self._print_python_module(package, index, self.models_dir, size, sub)
 
+        if self.generate_meta:
+            self._print_meta_module(package, meta_dir)
         if self.generate_tests:
             self._print_tests(package, test_output_dir)
 
@@ -143,6 +150,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         package.parent_pkg_name = sub
         extra_args = {'one_class_per_module': self.one_class_per_module,
+                      'generate_meta': self.generate_meta,
                       'identity_subclasses': self.identity_subclasses,
                       'module_namespace_lookup' : self.module_namespace_lookup}
         self.print_file(get_python_module_file_name(path, package),
@@ -151,6 +159,14 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         if self.one_class_per_module:
             self._print_python_modules(package, index, path, size, sub)
+
+    def _print_meta_module(self, package, path):
+        self._print_init_file(path)
+        extra_args = {'one_class_per_module': self.one_class_per_module,
+                      'identity_subclasses': self.identity_subclasses}
+        self.print_file(get_meta_module_file_name(path, package),
+                        emit_meta,
+                        _EmitArgs(self.ypy_ctx, package, extra_args))
 
     def _print_tests(self, package, path):
         self._print_init_file(self.test_dir)
@@ -232,6 +248,10 @@ def get_python_module_file_name(path, package):
         return '%s/%s.py' % (path, get_property_name(package, package.iskeyword))
 
 
+def get_meta_module_file_name(path, package):
+    return '%s/_%s.py' % (path, package.name)
+
+
 def get_test_module_file_name(path, package):
     return '%s/test_%s.py' % (path, package.stmt.arg.replace('-', '_'))
 
@@ -262,6 +282,9 @@ def emit_module(ctx, package, extra_args):
 def emit_test_module(ctx, package, identity_subclasses):
     TestPrinter(ctx, 'py').print_tests(package, identity_subclasses)
 
+def emit_meta(ctx, package, extra_args):
+    ModuleMetaPrinter(ctx, extra_args['one_class_per_module'],
+                      extra_args['identity_subclasses']).print_output(package)
 
 def emit_nmsp_declare_init(ctx, package):
     InitPrinter(ctx).print_nmsp_declare_init(package)

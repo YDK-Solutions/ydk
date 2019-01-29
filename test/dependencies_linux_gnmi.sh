@@ -46,7 +46,6 @@ function install_grpc {
     git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
-    sudo ldconfig
     make > /dev/null
     sudo make install
     sudo ldconfig

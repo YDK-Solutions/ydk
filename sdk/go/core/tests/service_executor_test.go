@@ -162,7 +162,7 @@ func (suite *ExecutorServiceTestSuite) TestDiscardChanges(){
 
 	readEntity = suite.ExecutorService.ExecuteRpc(
 		&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &ysanity.Runner{}), true)
+	suite.Nil(readEntity)
 }
 
 func (suite *ExecutorServiceTestSuite) TestConfirmedCommit() {
@@ -286,7 +286,7 @@ func (suite *ExecutorServiceTestSuite) TestCopyConfig() {
 
 	readEntity = suite.ExecutorService.ExecuteRpc(
 		&suite.NetconfProvider, &getConfigRpc, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+	suite.Equal(readEntity, nil)
 
 	// DiscardChanges
 	readEntity = suite.ExecutorService.ExecuteRpc(

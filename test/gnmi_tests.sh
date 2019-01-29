@@ -76,12 +76,12 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
-        return
+    else
+        ${PIP_BIN} install $@
     fi
-    ${PIP_BIN} install $@
 }
 
 ######################################################################
@@ -92,15 +92,17 @@ function check_python_installation {
   
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -428,6 +430,12 @@ print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
 if [[ $run_with_coverage ]] ; then
     run_with_coverage=1
+fi
+
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info="darwin"
 fi
 
 export YDKGEN_HOME="$(pwd)"

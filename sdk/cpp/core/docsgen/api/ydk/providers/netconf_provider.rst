@@ -90,7 +90,7 @@ NetconfServiceProvider
 
     .. cpp:function:: EncodingFormat get_encoding() const
 
-        Returns the type of encoding supported by the service provider. In the case of netconf service provider, :cpp:enum:`EncodingFormat::XML<EncodingFormat>` is returned.
+        Returns the type of encoding supported by the service provider. In the case of Netconf Service Provider, the :cpp:enum:`EncodingFormat::XML<EncodingFormat>` is returned.
 
     .. cpp:function:: const NetconfSession get_session() const
 

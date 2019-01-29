@@ -126,6 +126,72 @@ service provider instance and our entity (``bgp_cfg``):
 
 Note if there were any errors the above API will raise a YError exception.
 
+Using non-top level objects
+---------------------------
+
+In the example above you noticed that we started building model from top-level object - :py:class:`Bgp<ydk.models.openconfig.openconfig_bgp.Bgp>` and then built the object tree down the hierarchy. 
+However in certain conditions we can build independently non-top level objects and still be able to do all the CRUD operations.
+
+Top level object vs. non-top
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The top level object represents top-level container in the Yang model. Examples of top-level objects:
+
+ * openconfig_bgp.Bgp
+ * openconfig_interfaces.Interfaces
+
+The non-top level object represents a container in the Yang model, which is located under top level container. A member of a non-top level list can also be considered as non-top level object.
+Examples of non-top level objects:
+
+ * openconfig_bgp.Bgp.Global\_.AfiSafis.AfiSafi
+ * openconfig_bgp.Bgp.Neighbors
+ * openconfig_bgp.Bgp.Neighbors.Neighbor
+ * openconfig_bgp.Bgp.Neighbors.Neighbor.Config
+ * openconfig_interfaces.Interfaces.Interface
+
+How to use non-top level objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You should be able to work with non-top level objects similarly as with top level. 
+Your program will look more simple and straight to the point.
+The above example will look now like this:
+
+.. code-block:: python
+ :linenos:
+
+    from ydk.models.openconfig import openconfig_bgp
+    from ydk.models.openconfig import openconfig_bgp_types
+ 
+    # Create an AFI SAFI config
+    ipv4_afsf = openconfig_bgp.Bgp.Global_.AfiSafis.AfiSafi()
+    ipv4_afsf.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
+    ipv4_afsf.config.afi_safi_name = openconfig_bgp_types.Ipv4Unicast()
+    ipv4_afsf.config.enabled = True
+
+    crud_service = CRUDService()
+    crud_service.create(sp_instance, ipv4_afsf)
+    
+    # Read single AFI SAFI config
+    afisafiFilter = openconfig_bgp.Bgp.Global_.AfiSafis.AfiSafi()
+    afisafiFilter.afi_safi_name = openconfig_bgp_types.IPV6UNICAST{}
+
+    afisafi = crud.ReadConfig(sp_instance, afisafiFilter)
+
+Limitations
+~~~~~~~~~~~
+
+Not all non-top level objects can be used independently. Here is the rule:
+
+  When building non-top level object, we have to define all the list keys on the way up to the top level object. 
+  In the example above the object `ipv4_afsf` is a member of the list. We can use it as long as its key `afi_safi_name` is defined. 
+  
+Under the hood
+~~~~~~~~~~~~~~
+
+The programmability protocols like Netconf, gNMI, etc. are always working with top level model objects. 
+When non-top level object is presented to `CRUDService` or `NetconfService`, the YDK creates corresponding top-level object and perform the requested operation.
+In case of read/get operation the protocol returns always top-level objects. 
+When specified filter is a non-top level object, the YDK traverses the response object tree and finds corresponding non-top level object.
+
 .. _howto-logging:
 
 Logging

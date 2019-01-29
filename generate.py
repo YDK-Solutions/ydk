@@ -410,6 +410,13 @@ if __name__ == '__main__':
         help="Generate an SDK from a specified list of files")
 
     parser.add_argument(
+        "--generate-meta",
+        action="store_true",
+        dest="genmeta",
+        default=False,
+        help="Generate meta-data for Python bundle")
+
+    parser.add_argument(
         "--generate-doc",
         action="store_true",
         dest="gendoc",
@@ -464,6 +471,20 @@ if __name__ == '__main__':
         action="store_true",
         default=False,
         help="Generate separate modules for each python class corresponding to yang containers or lists.")
+
+    parser.add_argument(
+        "-i", "--install",
+        action="store_true",
+        dest="install",
+        default=False,
+        help="Install generated component")
+
+    parser.add_argument(
+        "-s", "--sudo",
+        action="store_true",
+        dest="sudo",
+        default=False,
+        help="Install with sudo access")
 
     # try:
     #     arg = sys.argv[1]
@@ -524,6 +545,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
@@ -547,6 +569,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = (generator.generate(options.bundle))
 
@@ -572,13 +595,32 @@ if __name__ == '__main__':
         minutes_str, seconds_str = _get_time_taken(start_time)
         print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
 
+    success = True
     if options.cpp:
         preconfigure_generated_cpp_code(output_directory, options.libydk)
     elif options.go:
         install_go_package(output_directory, generator)
     elif options.python:
         create_pip_packages(output_directory)
+        if options.install:
+            dist_dir = '%s/dist' % output_directory
+            file_list=os.listdir(dist_dir)
+            if len(file_list) == 1:
+                dist = file_list[0]
+                print('\nInstalling {0} package {1} ...\n'.format(language, dist))
+                sudo = ''
+                if options.sudo:
+                    sudo = 'sudo '
+                os.system('%spip install %s/%s -U' % (sudo, dist_dir, dist))
 
+            elif len(file_list) == 0:
+                print('\nCannot find installation package in directory %s' % dist_dir)
+                success = False
+            else:
+                print('\nThe directory %s contains multiple packages:\n  %s' % (dist_dir, file_list))
+                print('Please manually complete the installation process')
+
+    if success:
+        print('\nCode generation and installation completed successfully!')
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print('\nCode generation and installation completed successfully!')
-    print('Total time taken: {0} {1}\n'.format(minutes_str, seconds_str))
+    print('\nTotal time taken: {0} {1}\n'.format(minutes_str, seconds_str))

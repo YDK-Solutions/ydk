@@ -36,6 +36,7 @@ class ModulePrinter(FilePrinter):
         self.one_class_per_module = extra_args.get('one_class_per_module', False)
         self.identity_subclasses = extra_args.get('identity_subclasses', {})
         self.module_namespace_lookup = extra_args.get('module_namespace_lookup', {})
+        self.generate_meta = extra_args.get('generate_meta', False)
 
     def print_header(self, package):
         self._print_module_description(package)
@@ -48,6 +49,7 @@ class ModulePrinter(FilePrinter):
                 identities = [child for child in package.owned_elements if
                               isinstance(child, Class) and child.is_identity()]
                 ClassPrinter(self.ctx, self.module_namespace_lookup, self.one_class_per_module,
+                             self.generate_meta,
                              self.identity_subclasses).print_output(identities)
             else:
                 self._print_module_classes(package)
@@ -110,12 +112,14 @@ class ModulePrinter(FilePrinter):
     def _print_module_classes(self, package):
         if self.one_class_per_module:
             ClassPrinter(self.ctx, self.module_namespace_lookup, self.one_class_per_module,
+                         self.generate_meta,
                          self.identity_subclasses).print_output([package])
         else:
             ClassPrinter(self.ctx, self.module_namespace_lookup, self.one_class_per_module,
+                         self.generate_meta,
                          self.identity_subclasses).print_output(
                         [clazz for clazz in package.owned_elements if isinstance(clazz, Class)])
 
     def _print_enum(self, enum_class):
-        EnumPrinter(self.ctx).print_enum(enum_class, False)
+        EnumPrinter(self.ctx).print_enum(enum_class, self.generate_meta)
 

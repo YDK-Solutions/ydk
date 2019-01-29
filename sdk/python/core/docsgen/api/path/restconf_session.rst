@@ -11,13 +11,13 @@ RestconfSession
             config_url_root="/data", state_url_root="/data")
 
         :param repo: (:py:class:`Repository`) Reference to an instance of :py:class:`Repository<Repository>`
-        :param address: (``str``) IP address of the device supporting a netconf interface.
+        :param address: (``str``) IP address or DNC name of the device supporting Netconf interface.
         :param username: (``str``) Username to log in to the device.
         :param password: (``str``) Password to log in to the device.
         :param port: (``int``) Type of encoding to be used for the payload. Default is 80.
         :param encoding: (:py:class:`EncodingFormat<ydk.types.EncodingFormat>`) Encoding Format, default is :py:attr:`JSON<ydk.types.EncodingFormat.JSON>`.
-        :param config_url_root: (``str``) To provider backwards compatibility with older drafts of restconf RFC, this can be ``/config`` or ``/data`` (which is the default).
-        :param state_url_root: (``str``) To provider backwards compatibility with older drafts of restconf RFC, this can be ``/operational`` or ``/data`` (which is the default)
+        :param config_url_root: (``str``) To provider backwards compatibility with older drafts of Restconf RFC, this can be ``/config`` or ``/data`` (which is the default).
+        :param state_url_root: (``str``) To provider backwards compatibility with older drafts of Restconf RFC, this can be ``/operational`` or ``/data`` (which is the default)
 
     .. py:method:: get_root_schema()
 

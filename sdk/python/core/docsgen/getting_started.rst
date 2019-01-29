@@ -6,23 +6,27 @@ Getting Started
 Overview
 ========
 
-The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, plus one or more module bundles that are based on YANG models.
+The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. 
+The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API 
+and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, 
+plus one or more module bundles that are based on YANG models.
 
 Docker
 ======
 
-A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed. This be used to run ydk-py without installing anything natively on your machine.
+A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed. 
+This be used to run ydk-py without installing anything natively on your machine.
 
-To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command. See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
+To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command. 
+See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
 
   docker run -it ydkdev/ydk-py
 
 
 System Requirements
 ===================
-Please follow the below instructions to install the system requirements before installing YDK-Py:
 
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh-0.7.x.
+Please follow the below instructions to install the system requirements before installing YDK-Py:
 
 Linux
 -----
@@ -30,40 +34,43 @@ Linux
 Ubuntu (Debian-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
-Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
+Download and install third party dependency packages and then YDK core library `libydk`. 
+You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
 For other Ubuntu distributions it is recommended to build core library from source.
 
-Install Third-party software dependencies
+Install Third-party software dependencies::
 
-.. code-block:: sh
+   $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
-   $ sudo apt-get install gdebi-core python-dev libtool-bin
-   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+For Xenial (Ubuntu 16.04.4)::
 
-For Xenial (Ubuntu 16.04.4):
+   # Upgrade compiler to gcc 5.*
+   $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
+   $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+   $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
-.. code-block:: sh
+   # Install YDK core library
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   $ sudo gdebi libydk_0.8.1-1_amd64.deb
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+For Bionic (Ubuntu 18.04.1)::
 
-For Bionic (Ubuntu 18.04.1):
-
-.. code-block:: sh
-
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   # Install YDK core library
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   $ sudo gdebi libydk_0.8.1-1_amd64.deb
 
 Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
 **Note:** Currently, only Centos7 and RHEL7 are known to work with YDK.
+Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
 
 .. code-block:: sh
 
    # Install Third-party software dependencies
-   $ sudo yum install epel-release libssh-devel gcc-c++ python-devel
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install epel-release
+   $ sudo yum install libssh-devel gcc-c++ python-devel python3-devel
 
    # Upgrade compiler to gcc 5.*
    $ yum install centos-release-scl -y > /dev/null
@@ -71,7 +78,9 @@ Centos (Fedora-based)
    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
-Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
+   # Install YDK core library
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+
 
 MacOS
 -----
@@ -82,21 +91,21 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 
 .. code-block:: sh
 
+   # Install Third-party software dependencies
    $ xcode-select --install
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
 
-Windows
--------
+   # Install YDK core library
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
-Currently, ``YDK-Py`` from release ``0.6.0`` onwards is not supported on Windows.
+Libssh Installation
+-------------------
 
-Python Requirements
-===================
-
-Both Python 2 and 3 are supported.  At least Python2.7 or Python 3.4 must be installed in your system.
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+or upgrade to libssh-0.8.1 or higher.
 
 gNMI Requirements
 ===================
@@ -108,12 +117,11 @@ Install protobuf
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.3.0/protobuf-cpp-3.3.0.zip
-    unzip protobuf-cpp-3.3.0.zip
-    cd protobuf-3.3.0
+    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+    unzip protobuf-cpp-3.5.0.zip
+    cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
 
@@ -122,7 +130,7 @@ Install gRPC
 
 .. code-block:: sh
 
-    git clone -b v1.4.5 https://github.com/grpc/grpc
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     sudo ldconfig
@@ -139,14 +147,14 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 CentOS
@@ -154,7 +162,16 @@ CentOS
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   
+MacOS
+~~~~~
+
+.. code-block:: sh
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~~
@@ -166,6 +183,17 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 
+Python Requirements
+===================
+
+YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system. 
+
+It is also required for Python installation to include corresponding shared library. As example: 
+
+ - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
+ - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
+
+Please follow `System Requirements` to assure presence of shared Python libraries.
 
 .. _howto-install:
 
@@ -222,8 +250,8 @@ YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-service-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-service-gnmi-0.4.0.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -232,14 +260,14 @@ If you only prefer to install the ``openconfig`` bundle and its dependencies (``
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.0/ydk-0.8.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source
@@ -248,7 +276,8 @@ Installing from Source
 Installing core package
 -----------------------
 
-If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``YDK`` core package and then the model bundles that you plan to use.  The Python core package is dependent on C++ core library `libydk`, which must be installed prior to Python package installation:
+If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``YDK`` core package and then the model bundles that you plan to use.  
+The Python core package is dependent on C++ core library `libydk`, which must be installed prior to Python package installation:
 
 .. code-block:: sh
 
@@ -275,7 +304,7 @@ Once you have installed the ``YDK`` core package, you can install one or more mo
 
 .. code-block:: sh
 
-    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.0
+    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.1
 
 Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
 
@@ -305,7 +334,8 @@ To install the ``cisco-ios-xr`` bundle, execute:
 Installing gNMI package
 -----------------------
 
-Optionaly the gNMI package for Python can be installed. The Python gNMI package is dependent on C++ core library `libydk` (see installation of Python core package above) and C++ gNMI library `libydk_gnmi`, which must be installed prior to Python package installation:
+Optionaly the gNMI package for Python can be installed. The Python gNMI package is dependent on C++ core library `libydk` 
+(see installation of Python core package above) and C++ gNMI library `libydk_gnmi`, which must be installed prior to Python package installation:
 
 .. code-block:: sh
 
@@ -336,12 +366,7 @@ To install virtual environment on your system, execute:
     $ pip install virtualenv virtualenvwrapper
     $ source /usr/local/bin/virtualenvwrapper.sh
 
-In some systems (e.g. Debian-based Linux), you need to be a root user:
-
-.. code-block:: sh
-
-    $ sudo pip install virtualenv virtualenvwrapper
-    $ source /usr/local/bin/virtualenvwrapper.sh
+**Note**  In some systems (e.g. Debian-based Linux), you need to be a root user or use `sudo` access.
 
 Create new virtual environment:
 
@@ -354,7 +379,7 @@ At this point, you can perform the quick install or the installation from source
 Samples
 =======
 
-To get started using the YDK API, there are sample apps available in the `YDK-Py repository <https://github.com/CiscoDevNet/ydk-py/tree/master/core/samples>`_. For example, to run the ``bgp.py`` sample, execute:
+To get started using the YDK API, there are sample applications available in the `YDK-Py repository <https://github.com/CiscoDevNet/ydk-py/tree/master/core/samples>`_. For example, to run the ``bgp.py`` sample, execute:
 
 .. code-block:: sh
 

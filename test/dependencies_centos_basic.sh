@@ -23,6 +23,36 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_centos_basic.sh | $@ ${NOCOLOR}"
 }
 
+function check_install_gcc {
+  which gcc
+  local status=$?
+  if [[ $status == 0 ]]
+  then
+    gcc_version=$(echo `gcc --version` | awk '{ print $3 }')
+    print_msg "Current gcc/g++ version is $gcc_version"
+  else
+    print_msg "The gcc/g++ not installed"
+    gcc_version="4.0"
+  fi
+  if [[ $(echo $gcc_version | cut -d '.' -f 1) < 5 ]]
+  then
+    print_msg "Upgrading gcc/g++ to version 5"
+    yum install centos-release-scl -y > /dev/null
+    yum install devtoolset-4-gcc* -y > /dev/null
+
+    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+    ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+
+    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+    ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+
+    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
+
+    gcc_version=$(echo `gcc --version` | awk '{ print $3 }')
+    print_msg "Installed gcc/g++ version is $gcc_version"
+  fi
+}
+
 function install_dependencies {
     print_msg "Installing dependencies"
 
@@ -33,29 +63,13 @@ function install_dependencies {
                 cmake3 wget curl-devel unzip python-devel python-pip make java sudo \
                 python36u-devel python36u-pip  rpm-build redhat-lsb lcov -y  \
                 > /dev/null
-
-     print_msg "Installing gcc5"
-     yum install centos-release-scl -y > /dev/null
-     yum install devtoolset-4-gcc* -y > /dev/null
-
-     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-     ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
-
-     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
-     ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
-
-     ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
-
-     which gcc
-     gcc --version
-     print_msg "Done installing gcc5"
-
+}
+    
+function check_install_go {
     print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
 }
-
-
 
 ########################## EXECUTION STARTS HERE #############################
 # Terminal colors
@@ -64,3 +78,5 @@ YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
 install_dependencies
+check_install_gcc
+check_install_go

@@ -70,23 +70,22 @@ class SanityNetconf(ParametrizedTestCase):
         pass
 
     def test_edit_commit_get(self):
-        runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner-one-name'
+        one = ysanity.Runner.YdktestSanityOne()
+        one.number = 1
+        one.name = 'runner-one-name'
 
-        get_filter = ysanity.Runner()
-
-        op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
+        op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, one)
         self.assertEqual(True, op)
 
-        result = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
-        self.assertEqual(runner, result)
+        get_filter = ysanity.Runner().YdktestSanityOne()
+        one_result = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
+        self.assertEqual(one, one_result)
 
         op = self.netconf_service.commit(self.ncc)
         self.assertEqual(True, op)
 
-        result = self.netconf_service.get(self.ncc, get_filter)
-        self.assertEqual(runner, result)
+        one_result = self.netconf_service.get(self.ncc, get_filter)
+        self.assertEqual(one, one_result)
 
     def test_lock_unlock(self):
         op = self.netconf_service.lock(self.ncc, Datastore.running)
@@ -429,6 +428,26 @@ class SanityNetconf(ParametrizedTestCase):
                 print(entity.path())
         except YError as err:
             self.logger.error("Failed to get device state due to error: {}".format(err.message))
+
+    def test_passive_interface(self):
+        ospf = ysanity.Runner.YdktestSanityOne.Ospf()
+        ospf.id = 22
+        ospf.passive_interface.interface = "xyz"
+        test = ysanity.Runner.YdktestSanityOne.Ospf.Test()
+        test.name = "abc"
+        ospf.test.append(test)
+
+        op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, ospf)
+        self.assertEqual(True, op)
+
+        ospf_filter = ysanity.Runner().YdktestSanityOne().Ospf()
+        ospf_filter.id = 22
+        ospf_result = self.netconf_service.get_config(self.ncc, Datastore.candidate, ospf_filter)
+        self.assertIsNotNone(ospf_result)
+        self.assertEqual(ospf, ospf_result)
+
+        op = self.netconf_service.discard_changes(self.ncc)
+        self.assertEqual(True, op)        
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

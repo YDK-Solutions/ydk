@@ -160,9 +160,13 @@ class SanityTest(unittest.TestCase):
     def test_create_gre_tunnel_on_demand(self):
         enable_logging(logging.ERROR)
 
-        from ydk.models.ydktest import ydktest_sanity as ysanity
         from ydk.providers import NetconfServiceProvider
         from ydk.services  import CRUDService
+        try:
+            from ydk.models.ydktest.ydktest_sanity import Native
+        except:
+            # bundle is generated with 'one_class_per_module' flag
+            from ydk.models.ydktest.ydktest_sanity.native.native import Native
 
         provider = NetconfServiceProvider(
             "127.0.0.1",
@@ -170,7 +174,7 @@ class SanityTest(unittest.TestCase):
             "admin",
             12022)
 
-        native = ysanity.Native()
+        native = Native()
 
         tunnel = native.interface.Tunnel()
         tunnel.name = 521

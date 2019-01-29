@@ -75,6 +75,7 @@ class YdkGenerator(object):
         elif self.language == 'go':
             self.iskeyword = isgokeyword
         self.package_name = ""
+        self.generate_meta = False
 
     def generate(self, description_file):
         """ Generate ydk bundle packages or ydk core library.
@@ -203,6 +204,8 @@ class YdkGenerator(object):
         factory = printer_factory.PrinterFactory()
         bundle_packages = _filter_bundle_from_packages(pkgs, bundle)
         ydk_printer = factory.get_printer(self.language)(output_dir, bundle, self.generate_tests, self.one_class_per_module)
+        if self.language =='python':
+            ydk_printer.generate_meta = self.generate_meta
         generated_files = ydk_printer.emit(bundle_packages, classes_per_source_file)
         return generated_files
 

@@ -87,13 +87,9 @@ After establishing the connection, we instantiate the entities and set some data
  auto global_af = make_shared<Bgp::Instance::InstanceAs::FourByteAs::DefaultVrf::Global::GlobalAfs::GlobalAf>();
  global_af->af_name = BgpAddressFamilyEnum::ipv4_unicast;
  global_af->enable = Empty();
- global_af->parent = four_byte_as->default_vrf->global->global_afs.get();
  four_byte_as->default_vrf->global->global_afs->global_af.append(global_af);
 
  // add the instance to the parent BGP object
- four_byte_as->parent = instance_as.get();
- instance_as->parent = instance.get();
- instance->parent = bgp.get();
  instance_as->four_byte_as.append(four_byte_as);
  instance->instance_as.append(instance_as);
  bgp->instance.append(instance);

@@ -30,7 +30,7 @@ YANG Development Kit (Generator)
   - [Documentation](#documentation)
 - [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
 - [Notes](#notes)
-  - [Python version](#python-version)
+  - [Python Requirements](#python-requirements)
   - [Directory structure](#directory-structure)
   - [Troubleshooting](#troubleshooting)
 - [Running Unit Tests](#running-unit-tests)
@@ -61,7 +61,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 # Backward compatibility
 
-The YDK-0.8.0 core is bacward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
+The YDK-0.8.1 core is bacward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
 
 # Docker
 
@@ -85,7 +85,12 @@ Please follow the below instructions to install the system requirements before i
 
 ```
    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
+
+   $ # Upgrade compiler to gcc 5.*
+   $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
+   $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
+   $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
 ```
 
 #### Install libydk library
@@ -95,15 +100,15 @@ You can install the latest `libydk` core library using prebuilt binaries for Xen
 For Xenial (Ubuntu 16.04.4):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-$ sudo gdebi libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+$ sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-$ sudo gdebi libydk_0.8.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+$ sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 ### Centos (Fedora-based)
@@ -117,14 +122,14 @@ $ sudo gdebi libydk_0.8.0-1_amd64.deb
    # Upgrade compiler to gcc 5.*
    $ sudo yum install centos-release-scl -y > /dev/null
    $ sudo yum install devtoolset-4-gcc* -y > /dev/null
-   $ sudo ln -s -f /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   $ sudo ln -s -f /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   $ sudo ln -sf /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   $ sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
 #### Install prebuilt libydk binary
 
 ```  
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 ```
 
 ### Build from source
@@ -158,23 +163,8 @@ You can download the latest Python package from [here](https://www.python.org/do
    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
-   $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
-   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
-```
-
-**Note**. The `libssh-0.8.0` and following versions do not support multi-threading feature, which is required by YDK. Therefore it is required to install or reinstall `libssh-0.7.x`.
-
-```
-$ brew reinstall openssl
-$ export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
-$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
-$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
-$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
-$ cmake ..
-$ sudo make install
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -195,6 +185,20 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
    $ sudo make install
 ```
 
+## Libssh installation
+
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher.
+
+```
+$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+$ cmake ..
+$ sudo make install
+```
+
 ## Windows
 
 Currently, ``YDK-Py`` and ``YDK-Cpp`` from release ``0.6.0`` onwards is not supported on Windows.
@@ -211,7 +215,6 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
     cd protobuf-3.5.0
     ./configure
     make
-    make check
     sudo make install
     sudo ldconfig
 ```
@@ -235,28 +238,35 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial (Ubuntu 16.04.4):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1)
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
 $ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+```
+
+For MacOS:
+
+```
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 ```
 
 #### CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 ```
 
 ### Run-time environment
 
 There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041).
-for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
+See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details. 
+As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
     PROTO="/Your-Protobuf-and-Grpc-installation-directory"
@@ -297,7 +307,7 @@ $ ./generate.py --help
 usage: generate.py [-h] [-l] [--core] [--service SERVICE] [--bundle BUNDLE]
                    [--adhoc-bundle-name ADHOC_BUNDLE_NAME]
                    [--adhoc-bundle ADHOC_BUNDLE [ADHOC_BUNDLE ...]]
-                   [--generate-doc] [--generate-tests]
+                   [--generate-meta] [--generate-doc] [--generate-tests]
                    [--output-directory OUTPUT_DIRECTORY] [--cached-output-dir]
                    [-p] [-c] [-g] [-v] [-o]
 
@@ -313,6 +323,7 @@ optional arguments:
                         Name of the adhoc bundle
   --adhoc-bundle ADHOC_BUNDLE [ADHOC_BUNDLE ...]
                         Generate an SDK from a specified list of files
+  --generate-meta       Generate meta-data for Python bundle
   --generate-doc        Generate documentation
   --generate-tests      Generate tests
   --output-directory OUTPUT_DIRECTORY
@@ -345,7 +356,7 @@ A sample bundle profile file is described below. The file is in a JSON format. S
 {
     "name":"cisco-ios-xr",
     "version": "0.1.0",
-    "ydk_version": "0.8.0",
+    "ydk_version": "0.8.1",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
@@ -444,7 +455,7 @@ Now, the `pip list | grep ydk` should show the `ydk` (referring to the core pack
 $ pip list | grep ydk
 ...
 
-ydk (0.8.0)
+ydk (0.8.1)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
@@ -511,10 +522,16 @@ When run in this way, we will generate a bundle that only contains the files spe
 
 # Notes
 
-## Python version
+## Python Requirements
 
-- If your environment has both python 2 and python 3 and uses python 2 by default, you may need to use `python3` and `pip3` instead of `python` and `pip` in the commands mentioned in this document.
+YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 along with corresponding utilities pip and pip3 must be installed on your system. 
 
+It is also required for Python installation to include corresponding shared library. As example: 
+
+ - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
+ - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
+
+Please follow [System requirements](#system-requirements) to assure presence of shared Python libraries.
 
 ## Directory structure
 
@@ -534,6 +551,7 @@ test            - test code
 ```
 
 ## Troubleshooting
+
 Sometimes, developers using ydk-gen may run across errors when generating a YDK bundle using generate.py with some yang models. If there are issues with the .json profile file being used, such errors will be easily evident. Other times, when the problem is not so evident, it is recommended to try running with the `[--verbose|-v]` flag, which may reveal syntax problems with the yang models being used. For example,
 
 ```
@@ -603,4 +621,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.8.0. The version of the latest YDK-Gen master branch is 0.8.0. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.1. The version of the latest YDK-Gen master branch is 0.8.1. YDK-Gen is licensed under the Apache 2.0 License.

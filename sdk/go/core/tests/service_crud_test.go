@@ -180,25 +180,17 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 // }
 
 func (suite *CrudTestSuite) TestDeleteOnListWithIdentitykey() {
-	runner := ysanity.Runner{}
 	il := ysanity.Runner_OneList_IdentityList{}
 	il.Config.Id = ysanity.ChildIdentity{}
 	il.IdRef = ysanity.ChildIdentity{}
 
-	runner.OneList.IdentityList = append(runner.OneList.IdentityList, &il)
-	suite.CRUD.Create(&suite.Provider, &runner)
+	suite.CRUD.Create(&suite.Provider, &il)
 
-	runnerUpdate := ysanity.Runner{}
-	k := ysanity.Runner_OneList_IdentityList{}
-	k.Config.Id = ysanity.ChildIdentity{}
-	k.IdRef = ysanity.ChildIdentity{}
-	k.YFilter = yfilter.Delete
-	runnerUpdate.OneList.IdentityList = append(runnerUpdate.OneList.IdentityList, &k)
-	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	il.YFilter = yfilter.Delete
+	suite.CRUD.Update(&suite.Provider, &il)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-
-	suite.Equal(types.EntityEqual(entityRead, &ysanity.Runner{}), true)
+	suite.Nil(entityRead)
 }
 
 func (suite *CrudTestSuite) TestDeleteOnContainer() {

@@ -87,6 +87,7 @@ In our main function, we'll create a :go:struct:`Bgp<ydk/models/openconfig/openc
 
 Invoking the CRUD Service
 -------------------------
+
 The CRUD service provides methods to create, read, update and delete entities on a device making use of the session provided by a service provider (NETCONF in this case). To use the :go:struct:`CrudService<ydk/services/CrudService>` service, we need to include the import statment:
 
 .. code-block:: c
@@ -112,6 +113,79 @@ service provider instance and our entity (``bgp_cfg``):
     }
 
 Note if there were any errors the above API will raise an exception.
+
+Using non-top level objects
+---------------------------
+
+In the example above you noticed that we started building model from top-level object - :go:struct:`Bgp<ydk/models/openconfig/openconfig_bgp/Bgp>` and then built the object tree down the hierarchy. 
+However in certain conditions we can build independently non-top level objects and still be able to do all the CRUD operations.
+
+Top level object vs. non-top
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The top level object represents top-level container in the Yang model. Examples of top-level objects:
+
+ * oc_bgp.Bgp
+ * oc_int.Interfaces
+
+The non-top level object represents a container in the Yang model, which is located under top level container. A member of a non-top level list can also be considered as non-top level object.
+Examples of non-top level objects:
+
+ * oc_bgp.Bgp_Global_AfiSafis_AfiSafi
+ * oc_bgp.Bgp_Neighbors
+ * oc_bgp.Bgp_Neighbors_Neighbor
+ * oc_bgp.Bgp_Neighbors_Neighbor_Config
+ * oc_int.Interfaces_Interface
+
+How to use non-top level objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You should be able to work with non-top level objects similarly as with top level. 
+Your program will look more simple and straight to the point.
+The above example will look now like this:
+
+.. code-block:: c
+ :linenos:
+
+    import oc_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+    import oc_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
+    import "github.com/CiscoDevNet/ydk-go/ydk/services"
+    import "github.com/CiscoDevNet/ydk-go/ydk/providers"
+ 
+    func createBgpAfisafiConfig(provider NetconfServiceProvider) {
+        // Create single AFI SAFI configuration
+        ipv6_afisafi := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+        ipv6_afisafi.AfiSafiName = &oc_bgp_types.IPV6UNICAST{}
+        ipv6_afisafi.Config.AfiSafiName = &oc_bgp_types.IPV6UNICAST{}
+        ipv6_afisafi.Config.Enabled = true
+
+        crud := services.CrudService{}
+        crud.Create(&provider, &ipv6_afisafi)
+    }
+    
+    func readBgpAfisafiConfig(provider NetconfServiceProvider) {
+        // Read single AFI SAFI configuration
+        afisafiFilter := oc_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+        afisafiFilter.AfiSafiName = &oc_bgp_types.IPV6UNICAST{}
+        crud := services.CrudService{}
+        afisafiEntity := crud.ReadConfig(&provider, &afisafiFilter)
+        afisafi := afisafiEntity.(*oc_bgp.Bgp_Global_AfiSafis_AfiSafi)
+    }
+
+Limitations
+~~~~~~~~~~~
+
+Not all non-top level objects can be used independently. Here is the rule:
+
+  When building non-top level object, we have to define all the list keys on the way up to the top level object. 
+  In the example above the object `ipv6_afisafi` is a member of the list. We can use it as long as its key `AfiSafiName` is defined. 
+  
+Under the hood
+~~~~~~~~~~~~~~
+
+The programmability protocols like Netconf, gNMI, etc. are always working with top level model objects. 
+When non-top level object is presented to `CrudService` or `NetconfService`, the YDK creates corresponding top-level object and perform the requested operation.
+In case of read/get operation the protocol returns always top-level objects. 
+When specified filter is a non-top level object, the YDK traverses the response object tree and finds corresponding non-top level object.
 
 .. _howto-logging:
 

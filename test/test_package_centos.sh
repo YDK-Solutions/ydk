@@ -22,13 +22,15 @@
 # Terminal colors
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
+YELLOW='\033[1;33m'
+MSG_COLOR=$YELLOW
 
 ######################################################################
 # Utility functions
 ######################################################################
 
 function print_msg {
-    echo -e "${RED}*** $(date): test_package_centos.sh | $1${NOCOLOR}"
+    echo -e "${MSG_COLOR}*** $(date): test_package_centos.sh | $@ ${NOCOLOR}"
 }
 
 function init_confd {
@@ -86,8 +88,10 @@ ${PIP_BIN} install -v dist/ydk*.tar.gz
 # Test
 ######################################
 print_msg "Running basic python test"
-${PYTHON_BIN} -c 'import os;from ydk.path import Repository; from ydk.providers import NetconfServiceProvider; repo=Repository(os.getcwd()); p=NetconfServiceProvider(repo, "127.0.0.1", "admin","admin",12022)'
+${PYTHON_BIN} -c 'import os;from ydk.path import Repository; from ydk.providers import NetconfServiceProvider; repo=Repository(os.getcwd()); p=NetconfServiceProvider("127.0.0.1","admin","admin",12022,repo=repo)'
 status=$?
 if [ $status -ne 0 ]; then
+    MSG_COLOR=$RED
+    print_msg "Failed execute basic Python test"
     exit $status
 fi

@@ -235,7 +235,12 @@ ly_ctx* ydk::path::RepositoryPtr::create_ly_context()
         {
             for(auto model_provider : get_model_providers())
             {
-                path+="/"+model_provider->get_hostname_port();
+                //path+="/"+model_provider->get_hostname_port();
+                auto hostname_port = model_provider->get_hostname_port();
+                auto underscore_pos = hostname_port.rfind("_");
+                if (underscore_pos != std::string::npos)
+                    hostname_port = hostname_port.substr(0, underscore_pos);
+                path += "/" + hostname_port;
                 break;
             }
         }

@@ -166,7 +166,7 @@ function init_go_env {
 ######################################################################
 
 function install_cpp_core {
-    print_msg "Installing CPP core"
+    print_msg "Installing C++ core library"
 
     cd $YDKGEN_HOME
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
@@ -178,7 +178,7 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
 }
 
@@ -205,7 +205,7 @@ function install_cpp_ydktest_bundle {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --cpp
     cd gen-api/cpp/ydktest-bundle/build
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
     cd -
 }
@@ -220,7 +220,7 @@ function build_gnmi_cpp_core_library {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -235,7 +235,7 @@ function build_and_run_cpp_gnmi_tests {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
 
     start_gnmi_server
 
@@ -274,7 +274,8 @@ function start_gnmi_server {
     if [ ! -x ./build/gnmi_server ]; then
         print_msg "Building YDK gNMI server"
         mkdir -p build && cd build
-        ${CMAKE_BIN} .. && make
+        ${CMAKE_BIN} ..
+        run_exec_test make > /dev/null
     fi
 
     print_msg "Starting YDK gNMI server"

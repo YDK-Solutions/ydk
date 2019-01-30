@@ -203,7 +203,7 @@ function init_go_env {
 ######################################################################
 
 function install_test_cpp_core {
-    print_msg "Installing / testing cpp core"
+    print_msg "Installing / testing C++ core"
     install_cpp_core
     run_cpp_core_test
 
@@ -213,7 +213,7 @@ function install_test_cpp_core {
 }
 
 function install_cpp_core {
-    print_msg "Installing cpp core"
+    print_msg "Installing C++ core library"
 
     cd $YDKGEN_HOME
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
@@ -225,7 +225,7 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
 }
 
@@ -240,7 +240,7 @@ function generate_libydk {
 }
 
 function run_cpp_core_test {
-    print_msg "Running cpp core test"
+    print_msg "Running C++ core test"
 
     #export CTEST_OUTPUT_ON_FAILURE=1
     #make test
@@ -298,7 +298,8 @@ function generate_install_specified_cpp_bundle {
 
    run_test generate.py --bundle ${bundle_profile} --cpp --generate-doc &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
-   run_exec_test sudo make install
+   run_exec_test make > /dev/null
+   sudo make install
    cd -
 }
 
@@ -311,7 +312,7 @@ function cpp_sanity_ydktest_gen_install {
 }
 
 function cpp_sanity_ydktest_test {
-    print_msg "Running cpp bundle tests"
+    print_msg "Running C++ bundle tests"
 
     print_msg "Initializing ssh keys for key-based authentication"
     sudo mkdir -p /var/confd/homes/admin/.ssh
@@ -320,7 +321,7 @@ function cpp_sanity_ydktest_test {
     sudo sh -c 'cat sdk/cpp/tests/ssh_host_rsa_key.pub >> /var/confd/homes/admin/.ssh/authorized_keys'
     cd -
 
-    print_msg "Building and running cpp bundle tests"
+    print_msg "Building and running C++ bundle tests"
     mkdir -p $YDKGEN_HOME/sdk/cpp/tests/build && cd sdk/cpp/tests/build
     if [[ $run_with_coverage ]] ; then
       print_msg "Compiling with coverage"
@@ -328,7 +329,7 @@ function cpp_sanity_ydktest_test {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
 
     #export CTEST_OUTPUT_ON_FAILURE=1
     #make test
@@ -352,7 +353,7 @@ function cpp_test_gen_test {
     mkdir -p gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     cd gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     run_exec_test ${CMAKE_BIN} ..
-    run_exec_test make
+    run_exec_test make > /dev/null
     ctest --output-on-failure
 }
 
@@ -362,7 +363,8 @@ function cpp_test_gen {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
-    run_exec_test sudo make install
+    run_exec_test make > /dev/null
+    sudo make install
 
     # cpp_test_gen_test
 }
@@ -374,7 +376,7 @@ function collect_cpp_coverage {
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
     lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
     lcov --list coverage.info #debug info
-    print_msg "Moving cpp coverage to ${YDKGEN_HOME}"
+    print_msg "Moving C++ coverage to ${YDKGEN_HOME}"
     cp coverage.info ${YDKGEN_HOME}
   fi
 }

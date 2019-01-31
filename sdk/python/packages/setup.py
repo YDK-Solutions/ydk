@@ -14,29 +14,28 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-
-"""Setup for YDK
-
-
 """
+Setup for YDK model bundle
+$PACKAGE$
+"""
+
 from os import path
 from setuptools import setup, find_packages
 
 HERE = path.abspath(path.dirname(__file__))
 
-INSTALL_REQUIREMENTS = ['ydk==0.8.1']
+INSTALL_REQUIREMENTS = ['ydk>=$CORE_VERSION$']
 
 NMSP_PKG_NAME = "$PACKAGE$"
 NMSP_PKG_VERSION = "$VERSION$"
 NMSP_PKG_DEPENDENCIES = ['$DEPENDENCY$']
 
-if NMSP_PKG_DEPENDENCIES != "$DEPENDENCY$":
+if len(NMSP_PKG_DEPENDENCIES) > 0:
     INSTALL_REQUIREMENTS.extend(NMSP_PKG_DEPENDENCIES)
 
 NMSP_PACKAGES = ['ydk', 'ydk.models']
 YDK_PACKAGES = find_packages(exclude=['contrib', 'docs*', 'tests*',
                                       'ncclient', 'samples'])
-
 
 DESCRIPTION = "$DESCRIPTION$"
 LONG_DESCRIPTION = "$LONG_DESCRIPTION$"

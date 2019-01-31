@@ -302,19 +302,19 @@ function stop_gnmi_server {
 function install_go_core {
     print_msg "Installing Go core packages"
     cd $YDKGEN_HOME
-    run_test generate.py --core --go
+    run_test generate.py -i --core --go
 }
 
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
-    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
+    run_test  generate.py -i --bundle profiles/test/ydktest-cpp.json --go
 }
 
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-    run_test generate.py --service profiles/services/gnmi-0.4.0.json --go
+    run_test generate.py -i --service profiles/services/gnmi-0.4.0.json --go
 }
 
 function run_go_gnmi_tests {

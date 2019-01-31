@@ -260,7 +260,7 @@ function run_cpp_core_test {
 function install_go_core {
     print_msg "Installing Go YDK core"
     cd $YDKGEN_HOME
-    run_test generate.py --core --go
+    run_test generate.py --core --go --install
 }
 
 function install_py_core {
@@ -389,7 +389,7 @@ function run_go_bundle_tests {
     print_msg "Generating/installing go sanity bundle tests"
     # TODO: go get
     cd $YDKGEN_HOME
-    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
+    run_test generate.py -i --bundle profiles/test/ydktest-cpp.json --go
 
     run_go_tests
 }

@@ -53,13 +53,11 @@ def build_bgp_config():
     return bgp
 
 def build_int_config():
-    ifc = openconfig_interfaces.Interfaces()
-    lo10 = ifc.Interface()
+    lo10 = openconfig_interfaces.Interfaces.Interface()
     lo10.name = 'Loopback10'
     lo10.config.name = 'Loopback10'
     lo10.config.description = 'Test'
-    ifc.interface.append(lo10)
-    return ifc
+    return lo10
 
 class SanityGnmiService(unittest.TestCase):
 
@@ -89,40 +87,41 @@ class SanityGnmiService(unittest.TestCase):
         reply = self.gs.set(self.provider, ifc)
  
         # Update interface configuration
-        interface = ifc.interface['Loopback10']
-        interface.config.description = 'Test'
+        ifc.config.description = 'Test'
         ifc.yfilter = YFilter.update
         reply = self.gs.set(self.provider, ifc)
  
         # Get interface configuration
-        ifc_filter = openconfig_interfaces.Interfaces()
+        ifc_filter = openconfig_interfaces.Interfaces.Interface()
+        ifc_filter.name = 'Loopback10'
         response = self.gs.get(self.provider, ifc_filter, "CONFIG")
         self.assertIsNotNone(response)
-        #print_entity(response, self.schema)
+        self.assertTrue(hasattr(response, 'name'))
+        self.assertEqual(response.name, 'Loopback10')
  
         # Get interface description only
-        ifc_filter = openconfig_interfaces.Interfaces()
-        lo10 = ifc.Interface()
-        lo10.name = 'Loopback10'
-        lo10.config.description = YFilter.read
-        ifc_filter.interface.append(lo10)
+        ifc_filter = openconfig_interfaces.Interfaces.Interface()
+        ifc_filter.name = 'Loopback10'
+        ifc_filter.config.description = YFilter.read
 
         response = self.gs.get(self.provider, ifc_filter, "CONFIG")
         self.assertIsNotNone(response)
-        expected = '''<interfaces>
-  <interface>
+        #print_entity(ifc_config, self.schema)
+        expected = '''<interface>
+  <name>Loopback10</name>
+  <config>
     <name>Loopback10</name>
-    <config>
-      <description>Test</description>
-    </config>
-  </interface>
-</interfaces>
+    <description>Test</description>
+  </config>
+</interface>
 '''
         self.assertEqual( entity_to_string(response, self.schema), expected)
  
         # Delete interface configuration
-        ifc.yfilter = YFilter.delete
-        reply = self.gs.set(self.provider, ifc)
+        ifc_delete = openconfig_interfaces.Interfaces.Interface()
+        ifc_delete.name = 'Loopback10'
+        ifc_delete.yfilter = YFilter.delete
+        reply = self.gs.set(self.provider, ifc_delete)
  
     def test_gnmi_service_set_get_multiple(self):
         # Create interface and BGP configuration
@@ -195,7 +194,7 @@ class SanityGnmiService(unittest.TestCase):
         bgp = build_bgp_config()
         bgp.yfilter = YFilter.replace
         reply = self.gs.set(self.provider, bgp)
- 
+
         subscription = gNMISubscription()
         bgp_filter = openconfig_bgp.Bgp()
         subscription.subscription_mode = "SAMPLE"
@@ -203,9 +202,9 @@ class SanityGnmiService(unittest.TestCase):
         subscription.suppress_redundant = False
         subscription.heartbeat_interval = 8 * 1000000000
         subscription.entity = bgp_filter
- 
+
         self.gs.subscribe(self.provider, subscription, 10, "STREAM", "JSON_IETF", gnmi_subscribe_callback)
- 
+
         # Delete BGP configuration
         bgp.yfilter = YFilter.delete
         reply = self.gs.set(self.provider, bgp)

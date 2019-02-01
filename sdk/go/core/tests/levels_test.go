@@ -58,8 +58,7 @@ func (suite *SanityLevelsTestSuite) TestOneLevelPos() {
 	runner = ysanity.Runner{}
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(types.HasDataOrFilter(entityRead), false)
+	suite.Nil(entity)
 }
 
 func (suite *SanityLevelsTestSuite) TestTwoLevelPos() {
@@ -85,8 +84,7 @@ func (suite *SanityLevelsTestSuite) TestTwoLevelPos() {
 	runner = ysanity.Runner{}
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(types.HasDataOrFilter(entityRead), false)
+	suite.Nil(entity)
 }
 
 func (suite *SanityLevelsTestSuite) TestThreeLevelPos() {
@@ -115,8 +113,7 @@ func (suite *SanityLevelsTestSuite) TestThreeLevelPos() {
 	runner = ysanity.Runner{}
 	suite.CRUD.Delete(&suite.Provider, &runner)
 	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	entityRead := entity.(*ysanity.Runner)
-	suite.Equal(types.HasDataOrFilter(entityRead), false)
+	suite.Nil(entity)
 }
 
 func (suite *SanityLevelsTestSuite) TestOneListNegDupKeyPos() {
@@ -195,6 +192,8 @@ func (suite *SanityLevelsTestSuite) TestThreeListPos() {
 	elem2.Number = 32
 	elem2.Name = "runner:threelist:ldata:31"
 	elem2.Name = "runner:threelist:ldata:32"
+	runner.ThreeList.Ldata = append(runner.ThreeList.Ldata, &elem1)
+	runner.ThreeList.Ldata = append(runner.ThreeList.Ldata, &elem2)
 
 	elem11 := ysanity.Runner_ThreeList_Ldata_Subl1{}
 	elem12 := ysanity.Runner_ThreeList_Ldata_Subl1{}
@@ -263,7 +262,9 @@ func (suite *SanityLevelsTestSuite) TestThreeListPos() {
 	elem2.Subl1 = append(elem2.Subl1, &elem22)
 
 	suite.CRUD.Create(&suite.Provider, &runner)
-	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	
+	filter := ysanity.Runner{}
+	entityRead := suite.CRUD.Read(&suite.Provider, &filter)
 	suite.Equal(types.EntityEqual(&runner, entityRead), true)
 }
 
@@ -330,17 +331,18 @@ func (suite *SanityLevelsTestSuite) TestLeafrefSimplePos() {
 }
 
 func (suite *SanityLevelsTestSuite) TestAugOnePos() {
-	runner := ysanity.Runner{}
-	runner.YdktestSanityOne.OneAug.Number = 1
-	runner.YdktestSanityOne.OneAug.Name = "runner:one:one_aug"
+	oneAug := ysanity.Runner_YdktestSanityOne_OneAug{}
+	oneAug.Number = 1
+	oneAug.Name = "runner:one:one_aug"
 
-	suite.CRUD.Create(&suite.Provider, &runner)
-	runnerRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+	suite.CRUD.Create(&suite.Provider, &oneAug)
+
+	oneRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner_YdktestSanityOne_OneAug{})
+	suite.Equal(types.EntityEqual(&oneAug, oneRead), true)
 }
 
 func (suite *SanityLevelsTestSuite) TestAugOneListPos() {
-	runner := ysanity.Runner{}
+	oneAugList := ysanity.Runner_OneList_OneAugList{}
 	elem1 := ysanity.Runner_OneList_OneAugList_Ldata{}
 	elem2 := ysanity.Runner_OneList_OneAugList_Ldata{}
 
@@ -350,13 +352,14 @@ func (suite *SanityLevelsTestSuite) TestAugOneListPos() {
 	elem2.Number = 2
 	elem2.Name = "elem2"
 
-	runner.OneList.OneAugList.Ldata = append(runner.OneList.OneAugList.Ldata, &elem1)
-	runner.OneList.OneAugList.Ldata = append(runner.OneList.OneAugList.Ldata, &elem2)
-	runner.OneList.OneAugList.Enabled = true
+	oneAugList.Ldata = append(oneAugList.Ldata, &elem1)
+	oneAugList.Ldata = append(oneAugList.Ldata, &elem2)
+	oneAugList.Enabled = true
 
-	suite.CRUD.Create(&suite.Provider, &runner)
-	runnerRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+	suite.CRUD.Create(&suite.Provider, &oneAugList)
+
+	listRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner_OneList_OneAugList{})
+	suite.Equal(types.EntityEqual(&oneAugList, listRead), true)
 }
 
 func (suite *SanityLevelsTestSuite) TestParentEmpty() {
@@ -370,17 +373,24 @@ func (suite *SanityLevelsTestSuite) TestParentEmpty() {
 }
 
 func (suite *SanityLevelsTestSuite) TestMtus() {
-    runner := ysanity.Runner{}
+	// CREATE
 	mtu := ysanity.Runner_Mtus_Mtu{}
-
 	mtu.Owner = "test"
-    mtu.Mtu = 12
+	mtu.Mtu = 12
+	suite.CRUD.Create(&suite.Provider, &mtu)
 
-	runner.Mtus.Mtu = append(runner.Mtus.Mtu, &mtu)
-
-	suite.CRUD.Create(&suite.Provider, &runner)
-	runnerRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+	// READ and VALIDATE
+	mtuFilter := ysanity.Runner_Mtus_Mtu{}
+	mtuFilter.Owner = "test"
+	mtuReadEntity := suite.CRUD.Read(&suite.Provider, &mtuFilter)
+	suite.NotNil(mtuReadEntity)
+	mtuRead := mtuReadEntity.(*ysanity.Runner_Mtus_Mtu)
+	suite.Equal(types.EntityEqual(&mtu, mtuRead), true)
+	
+	// DELETE and VALIDATE
+	suite.CRUD.Delete(&suite.Provider, &mtuFilter)
+	mtuReadEntity = suite.CRUD.Read(&suite.Provider, &mtuFilter)
+	suite.Nil(mtuReadEntity)
 }
 
 func (suite *SanityLevelsTestSuite) TestOcPattern() {

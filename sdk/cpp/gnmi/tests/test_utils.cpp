@@ -92,7 +92,6 @@ void config_bgp(openconfig_bgp::Bgp& bgp)
     neighbor->config->neighbor_address = "172.16.255.2";
     neighbor->config->peer_as = 65172;
 
-    neighbor->parent = bgp.neighbors.get();
     bgp.neighbors->neighbor.append(neighbor);
 }
 
@@ -108,17 +107,14 @@ void build_bgp_config(gNMIServiceProvider& provider)
 
 void build_int_config(gNMIServiceProvider& provider)
 {
-    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    ifc->config->name = "Loopback10";
-    ifc->config->description = "Test";
-
-    openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
-    ifcs.yfilter = YFilter::replace;
+    auto ifc = openconfig_interfaces::Interfaces::Interface();
+    ifc.name = "Loopback10";
+    ifc.config->name = "Loopback10";
+    ifc.config->description = "Test";
+    ifc.yfilter = YFilter::replace;
 
     gNMIService gs{};
-    gs.set(provider, ifcs);
+    gs.set(provider, ifc);
 }
 
 void delete_bgp_config(gNMIServiceProvider& provider)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #
-# Copyright 2016 Cisco Systems, Inc.
+# ========================================================================
+# Copyright 2018 Cisco Systems, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +14,30 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# hello-ydk.py
-# Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system name and uptime.
-#
+# ========================================================================
+'''
+hello-xr.py
+Read all data for model Cisco-IOS-XR-shellutil-oper.yang and print system name and uptime.
+
+Usage: hello-xr.py [-h] [-v] device
+Positional arguments:
+  device      gNMI enabled device (ssh://user:password@host:port)
+Optional arguments:
+  -h, --help     show this help message and exit
+  -v, --verbose  print debugging messages
+Example:
+  hello-xr.py -v ssh://root:Cisco123!@172.27.150.154:830
+'''
+
 import logging
 from datetime import timedelta
+from argparse import ArgumentParser
+import sys
+if sys.version_info > (3,):
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
 
-# import providers, services and models
 from ydk.services import CRUDService
 from ydk.providers import NetconfServiceProvider
 from ydk.models.cisco_ios_xr import Cisco_IOS_XR_shellutil_oper as xr_shellutil_oper
@@ -35,15 +52,22 @@ def enable_logging(level):
 
 if __name__ == "__main__":
     """Main execution path"""
+    parser = ArgumentParser()
+    parser.add_argument("-v", "--verbose", help="print debugging messages",
+                        action="store_true")
+    parser.add_argument("device",
+                        help="Netconf enabled device (ssh://user:password@host:port)")
+    args = parser.parse_args()
+    device = urlparse(args.device)
 
-    enable_logging(logging.INFO)
+    if args.verbose:
+        enable_logging(logging.INFO)
     
     # create NETCONF session
-    provider = NetconfServiceProvider(address="192.168.122.169",
-                                      port=830,
-                                      username="admin",
-                                      password="admin",
-                                      protocol="ssh")
+    provider = NetconfServiceProvider( address=device.hostname,
+                                       port=device.port,
+                                       username=device.username,
+                                       password=device.password)
     # create CRUD service
     crud = CRUDService()
 
@@ -54,7 +78,6 @@ if __name__ == "__main__":
     system_time = crud.read(provider, system_time)
 
     # print system uptime
-    print("System '%s' uptime is "%system_time.uptime.host_name +
+    print("\nSystem '%s' uptime is "%system_time.uptime.host_name +
           str(timedelta(seconds=system_time.uptime.uptime)))
 
-    exit()

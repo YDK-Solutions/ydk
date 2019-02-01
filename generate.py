@@ -49,79 +49,6 @@ def init_verbose_logger():
     # add the handlers to the logger
     logger.addHandler(ch)
 
-def update_setup_file_version(language, ydk_root):
-    release, dev = get_release(ydk_root)
-
-    replacer_table = {}     # KEY is file name; VALUE is 2-tuple: substr match, replacement template
-    if language == 'python':
-        replacer_table = {
-            'setup.py': ('VERSION =', "VERSION = '%s%s'\n" % ('%s', dev)),
-            'CMakeLists.txt': ('project(path VERSION', 'project(path VERSION %s LANGUAGES C CXX)\n')
-        }
-    elif language == 'cpp':
-        replacer_table = {
-            'CMakeLists.txt': ('project(ydk VERSION', 'project(ydk VERSION %s LANGUAGES C CXX)\n')
-        }
-    else:
-        raise Exception('Language {0} has no setup file'.format(language))
-
-    for local_name in replacer_table:
-        keyword = replacer_table[local_name][0]
-        setup_file = os.path.join(ydk_root, 'sdk', language, 'core', local_name)
-        lines = []
-        with open(setup_file, 'r+') as fd:
-            lines = fd.readlines()
-        for i, line in enumerate(lines):
-            if keyword == line[:len(keyword)]:
-                template = replacer_table[local_name][1]
-                lines[i] = template % release
-        with open(setup_file, 'w+') as fd:
-            fd.writelines(lines)
-
-
-def get_service_profile(ydk_root, profile_location):
-    with open(os.path.join(ydk_root, profile_location)) as f:
-        profile = json.load(f)
-    return profile
-
-def get_service_release(ydk_root, profile_location):
-    profile = get_service_profile(ydk_root, profile_location)
-    name = profile['name']
-    release = profile['version']
-    dev = '-dev' if release[-4:] == '-dev' else ''
-    release = release.replace('-dev', '')
-    return (name, release, dev)
-
-def update_service_setup_file_version(language, ydk_root, profile):
-    name, release, dev = get_service_release(ydk_root, profile)
-
-    replacer_table = {}     # KEY is file name; VALUE is 2-tuple: substr match, replacement template
-    if language == 'python':
-        replacer_table = {
-            'setup.py': {'NAME =': "NAME = 'ydk-service-%s'\n" % name,
-                         'VERSION =': "VERSION = '%s%s'\n" % (release, dev)},
-            'CMakeLists.txt': {'project(path VERSION': 'project(path VERSION %s LANGUAGES C CXX)\n' % release}
-        }
-    elif language == 'cpp':
-        replacer_table = {
-            'CMakeLists.txt': {'project(ydk_%s VERSION' % name: 'project(ydk_%s VERSION %s LANGUAGES C CXX)\n' % (name, release)}
-        }
-    else:
-        raise Exception('Language {0} has no setup file'.format(language))
-    
-    for file_name, keyword_replacer_table in replacer_table.items():
-        setup_file = os.path.join(ydk_root, 'sdk', language, name, file_name)
-        lines = []
-        with open(setup_file, 'r+') as fd:
-            lines = fd.readlines()
-        for i, line in enumerate(lines):
-            for keyword, replace_value in keyword_replacer_table.items():
-                if keyword == line[:len(keyword)]:
-                    lines[i] = replace_value
-        with open(setup_file, 'w+') as fd:
-            fd.writelines(lines)
-
-
 def print_about_page(ydk_root, docs_rst_directory, release):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
@@ -353,13 +280,6 @@ def preconfigure_generated_cpp_code(output_directory, generate_libydk):
     except subprocess.CalledProcessError as e:
         print('\nERROR: Failed to configure build!\n')
         sys.exit(e.returncode)
-    make_command = 'To build and install, run "make && [sudo] make install" from {0}'.format(cmake_build_dir)
-    if generate_libydk:
-        make_command = make_command+'\n\nTo build the libydk package, run "make && make package" from {0}'.format(cmake_build_dir)
-    print('\nSuccessfully generated C++ code at {0}.\n\n{1}'.format(output_directory, make_command))
-    print('\n=================================================')
-    print('Successfully generated C++ YDK at %s' % (cpp_sdk_root,))
-    print('Please refer to the README for information on how to use YDK\n')
 
 
 def _get_time_taken(start_time):
@@ -408,6 +328,13 @@ if __name__ == '__main__':
         type=str,
         nargs='+',
         help="Generate an SDK from a specified list of files")
+
+    parser.add_argument(
+        "--generate-meta",
+        action="store_true",
+        dest="genmeta",
+        default=False,
+        help="Generate meta-data for Python bundle")
 
     parser.add_argument(
         "--generate-doc",
@@ -465,6 +392,20 @@ if __name__ == '__main__':
         default=False,
         help="Generate separate modules for each python class corresponding to yang containers or lists.")
 
+    parser.add_argument(
+        "-i", "--install",
+        action="store_true",
+        dest="install",
+        default=False,
+        help="Install generated component")
+
+    parser.add_argument(
+        "-s", "--sudo",
+        action="store_true",
+        dest="sudo",
+        default=False,
+        help="Install with sudo access")
+
     # try:
     #     arg = sys.argv[1]
     # except IndexError:
@@ -504,12 +445,6 @@ if __name__ == '__main__':
     elif options.python:
         language = 'python'
 
-    if language != 'go' and options.core:
-        update_setup_file_version(language, ydk_root)
-
-    if language != 'go' and options.service:
-        update_service_setup_file_version(language, ydk_root, options.service)
-
     try:
         if options.adhoc_bundle_name:
             adhoc_bundle_file = generate_adhoc_bundle(
@@ -524,6 +459,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = generator.generate(adhoc_bundle_file)
             os.remove(adhoc_bundle_file)
@@ -547,6 +483,7 @@ if __name__ == '__main__':
                 language,
                 'bundle',
                 options.one_class_per_module)
+            generator.generate_meta = options.genmeta and language == 'python'
 
             output_directory = (generator.generate(options.bundle))
 
@@ -572,13 +509,59 @@ if __name__ == '__main__':
         minutes_str, seconds_str = _get_time_taken(start_time)
         print('\nTime taken for code/doc generation: {0} {1}\n'.format(minutes_str, seconds_str))
 
+    success = True
     if options.cpp:
         preconfigure_generated_cpp_code(output_directory, options.libydk)
+        cpp_package = os.path.basename(output_directory)
+        print('\nSuccessfully generated {0} code for {1}\n'.format(language, cpp_package))
+        cmake_build_dir = os.path.join(output_directory, 'build')
+        if options.install:
+            os.chdir(cmake_build_dir)
+            print('\nCompiling {0} package ...\n'.format(language))
+            if os.system('make') != 0:
+                print('\nCompilation failed!!')
+                success = False
+            else:
+                sudo = ''
+                if options.sudo:
+                    sudo = 'sudo '
+                print('\nInstalling {0} package ...\n'.format(language, cpp_package))
+                if os.system('%smake install' % sudo) != 0:
+                    print('\nInstallation failed!!')
+                    success = False
+                os.chdir(ydk_root)
+        else:
+            make_command = '\nTo build and install, run "make && [sudo] make install" from {0}'.format(cmake_build_dir)
+            print(make_command)
+
     elif options.go:
-        install_go_package(output_directory, generator)
+        if options.install:
+            install_go_package(output_directory, generator)
     elif options.python:
         create_pip_packages(output_directory)
+        if options.install:
+            dist_dir = '%s/dist' % output_directory
+            file_list=os.listdir(dist_dir)
+            if len(file_list) == 1:
+                dist = file_list[0]
+                print('\nInstalling {0} package {1} ...\n'.format(language, dist))
+                sudo = ''
+                if options.sudo:
+                    sudo = 'sudo '
+                os.system('%spip install %s/%s -U' % (sudo, dist_dir, dist))
+
+            elif len(file_list) == 0:
+                print('\nCannot find installation package in directory %s' % dist_dir)
+                success = False
+            else:
+                print('\nThe directory %s contains multiple packages:\n  %s' % (dist_dir, file_list))
+                print('Please manually complete the installation process')
+
+    if success:
+        if options.install:
+            print('\nCode generation and installation completed successfully!')
+        else:
+            print('\nCode generation completed successfully!  Manual installation required!')
 
     minutes_str, seconds_str = _get_time_taken(start_time)
-    print('\nCode generation and installation completed successfully!')
-    print('Total time taken: {0} {1}\n'.format(minutes_str, seconds_str))
+    print('\nTotal time taken: {0} {1}\n'.format(minutes_str, seconds_str))

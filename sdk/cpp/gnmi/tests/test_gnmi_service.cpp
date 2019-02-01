@@ -62,17 +62,13 @@ TEST_CASE("gnmi_service_capabilities")
     REQUIRE(json_caps.find(cap_update) != string::npos);
 }
 
-static string int_update = R"(val {
-      json_ietf_val: "{\"interface\":[{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}]}"
-    })";
+static string int_update = R"([{\"name\":\"Loopback10\",\"config\":{\"name\":\"Loopback10\",\"description\":\"Test\"}}])";
 
-static string bgp_update = R"(val {
-      json_ietf_val: "{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}"
-    })";
+static string bgp_update = R"([{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}])";
 
 void read_sub(const char * subscribe_response)
 {
-    cout << subscribe_response << endl;
+    cout << endl << subscribe_response << endl;
 }
 
 void gnmi_service_subscribe_callback(const char * subscribe_response)
@@ -102,14 +98,11 @@ TEST_CASE("gnmi_service_subscribe")
     build_int_config(provider);
 
     // Build subscription
-    openconfig_interfaces::Interfaces filter = {};
     auto i = make_shared<openconfig_interfaces::Interfaces::Interface>();
     i->yfilter = YFilter::read;
-    //i->name = "*";
-    filter.interface.append(i);
 
     gNMISubscription subscription{};
-    subscription.entity = &filter;
+    subscription.entity = i.get();
     //subscription.subscription_mode = "ON_CHANGE";
     subscription.sample_interval = 10000000000;
     //subscription.suppress_redundant = true;
@@ -132,26 +125,22 @@ TEST_CASE("gnmi_service_subscribe_multiples")
     build_bgp_config(provider);
 
     // Build subscription
-    openconfig_interfaces::Interfaces ifcs = {};
     auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "*";
-    ifcs.interface.append(ifc);
 
-    openconfig_bgp::Bgp bgp = {};
     auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
     neighbor->neighbor_address = "*";
-    bgp.neighbors->neighbor.append(neighbor);
 
     // Build subscriptions
     gNMISubscription ifc_subscription{};
-    ifc_subscription.entity = &ifcs;
+    ifc_subscription.entity = ifc.get();
     //ifc_subscription.subscription_mode = "ON_CHANGE";
     ifc_subscription.sample_interval = 10000000000;
     //ifc_subscription.suppress_redundant = true;
     ifc_subscription.heartbeat_interval = 100000000000;
 
     gNMISubscription bgp_subscription{};
-    bgp_subscription.entity = &bgp;
+    bgp_subscription.entity = neighbor.get();
     bgp_subscription.subscription_mode = "TARGET_DEFINED";
     bgp_subscription.sample_interval = 20000000000;
     bgp_subscription.suppress_redundant = false;

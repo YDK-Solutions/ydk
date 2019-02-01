@@ -55,38 +55,31 @@ class SanityYang(unittest.TestCase):
         self.crud.delete(self.ncc, runner)
 
     def test_read_on_ref_class(self):
-        r_1 = ysanity.Runner()
-        r_1.ydktest_sanity_one.number, r_1.ydktest_sanity_one.name = 1, 'runner:one:name'
-        self.crud.create(self.ncc, r_1)
-        r_2 = ysanity.Runner()
+        one = ysanity.Runner.YdktestSanityOne()
+        one.number, one.name = 1, 'runner:one:name'
+        self.crud.create(self.ncc, one)
 
-        r_2.ydktest_sanity_one.yfilter = YFilter.read
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1, r_2)
+        one_filter = ysanity.Runner.YdktestSanityOne()
+        one_read = self.crud.read(self.ncc, one_filter)
+        self.assertIsNotNone(one_read)
+        self.assertEqual(one, one_read)
 
     def test_read_on_leaf(self):
-        r_1 = ysanity.Runner()
-        r_1.ydktest_sanity_one.number, r_1.ydktest_sanity_one.name = 1, 'runner:one:name'
-        self.crud.create(self.ncc, r_1)
+        one = ysanity.Runner.YdktestSanityOne()
+        one.number, one.name = 1, 'runner:one:name'
+        self.crud.create(self.ncc, one)
 
-        r_1 = ysanity.Runner()
-        r_1.ydktest_sanity_one.number = 1
-
-        r_2 = ysanity.Runner()
-        r_2.ydktest_sanity_one.number = YFilter.read
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1, r_2)
-
-        r_2 = ysanity.Runner()
-        r_2.ydktest_sanity_one.number = 1
-        r_2 = self.crud.read(self.ncc, r_2)
-        # self.assertEqual(r_1.ydktest_sanity_one.number, r_2.ydktest_sanity_one.number) # TODO open issue #733
+        one_filter = ysanity.Runner.YdktestSanityOne()
+        one_filter.number = YFilter.read
+        one_read = self.crud.read(self.ncc, one_filter)
+        self.assertIsNotNone(one_read)
+        self.assertEqual(one, one_read)
 
         # no such value, will return empty data
-        r_2 = ysanity.Runner()
-        r_2.ydktest_sanity_one.number = 2
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_2, None)
+        one_filter = ysanity.Runner.YdktestSanityOne()
+        one_filter.number = 2
+        one_read = self.crud.read(self.ncc, one_filter)
+        self.assertIsNone(one_read)
 
     def test_read_on_ref_enum_class(self):
         from ydk.models.ydktest.ydktest_sanity import YdkEnumTest
@@ -94,21 +87,22 @@ class SanityYang(unittest.TestCase):
         r_1.enum_value = YdkEnumTest.local
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.enum_value = YFilter.read
+        r_2 = ysanity.Runner().Ytypes.BuiltInT()
+        r_2.enum_value = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
+        self.assertIsNotNone(runner_read)
+        self.assertEqual(r_1.enum_value, runner_read.enum_value)
 
-        r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.enum_value = YdkEnumTest.local
+        r_2 = ysanity.Runner().Ytypes.BuiltInT()
+        r_2.enum_value = YdkEnumTest.local
         runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1.enum_value, runner_read.ytypes.built_in_t.enum_value)
+        self.assertEqual(r_1.enum_value, runner_read.enum_value)
 
         # no such value, nothing returned
         r_2 = ysanity.Runner.Ytypes.BuiltInT()
         r_2.enum_value = YdkEnumTest.remote
-        r_2 = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_2, None)
+        runner_read = self.crud.read(self.ncc, r_2)
+        self.assertIsNone(runner_read)
 
     def test_read_on_ref_list(self):
         r_1 = ysanity.Runner()
@@ -130,8 +124,8 @@ class SanityYang(unittest.TestCase):
         r_1.ldata.extend([l_1, l_2])
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner()
-        r_2.one_list.ldata.extend([l_1])
+        r_2 = ysanity.Runner().OneList()
+        r_2.ldata.extend([l_1])
         runner_read = self.crud.read(self.ncc, r_2)
 
         self.assertEqual(runner_read, r_2)
@@ -151,10 +145,11 @@ class SanityYang(unittest.TestCase):
         r_1.identity_ref_value = ysanity.ChildIdentity()
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner()
-        r_2.ytypes.built_in_t.identity_ref_value = YFilter.read
-        runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(r_1.identity_ref_value, runner_read.ytypes.built_in_t.identity_ref_value)
+        r_2 = ysanity.Runner().Ytypes.BuiltInT()
+        r_2.identity_ref_value = YFilter.read
+        t_read = self.crud.read(self.ncc, r_2)
+        self.assertIsNotNone(t_read)
+        self.assertEqual(r_1.identity_ref_value, t_read.identity_ref_value)
 
     def test_read_only_config(self):
         r_1 = ysanity.Runner()
@@ -172,18 +167,16 @@ class SanityYang(unittest.TestCase):
 
     def test_decoder(self):
         # send payload to device
-        runner = ysanity.Runner()
         element = ysanity.Runner.OneList.Ldata()
         element.number = 5
         element.name = 'five'
-        runner.one_list.ldata.append(element)
 
-        self.crud.create(self.ncc, runner)
+        self.crud.create(self.ncc, element)
 
-        r_2 = ysanity.Runner()
-        runner_read = self.crud.read(self.ncc, r_2)
-        self.assertEqual(runner, runner_read)
-        self.assertEqual(runner.one_list.ldata[0].name, runner_read.one_list.ldata[0].name)
+        runner_filter = ysanity.Runner().OneList.Ldata()
+        runner_filter.number = 5
+        element_read = self.crud.read(self.ncc, runner_filter)
+        self.assertEqual(element, element_read)
 
 
 if __name__ == '__main__':

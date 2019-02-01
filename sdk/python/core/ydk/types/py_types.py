@@ -98,6 +98,7 @@ class Entity(_Entity):
         super(Entity, self).__init__()
         self._is_frozen = False
         self.parent = None
+        self.ylist_key = None
         self.logger = logging.getLogger("ydk.types.EntityCollection")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
@@ -311,6 +312,13 @@ class Entity(_Entity):
                 else:
                     # should never get here
                     return self._segment_path()
+        elif self.ylist_key is not None:
+            # the entity is member of keyless YList
+            try:
+                index = int(self.ylist_key) % 1000000
+            except:
+                index = self.ylist_key
+            path += '[%s]' % index
         return path
 
     def path(self):
@@ -578,8 +586,8 @@ class YList(EntityCollection):
                         break
                     key_list.append(attr)
         if len(key_list) == 0:
-            key = format(self.counter)
             self.counter += 1
+            key = format(self.counter)
         elif len(key_list) == 1:
             key = key_list[0]
             if not isinstance(key, str):
@@ -600,6 +608,7 @@ class YList(EntityCollection):
         elif isinstance(entities, Entity):
             key = self._key(entities)
             self._cache_dict[key] = entities
+            entities.ylist_key = key
         else:
             msg = "Argument %s is not supported by YList class; data ignored"%type(entities)
             self._log_error_and_raise_exception(msg, YInvalidArgumentError)

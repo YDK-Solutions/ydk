@@ -241,7 +241,7 @@ bool NetconfService::edit_config(NetconfServiceProvider& provider, DataStore tar
 
     string payload = "";
     for (auto entity : config_list) {
-        payload += get_xml_subtree_filter_payload(*entity, provider);
+        payload += get_data_payload(*entity, provider);
     }
 
     return edit_payload(provider, target, payload, default_operation, test_option, error_option);
@@ -256,7 +256,9 @@ get_from_list(NetconfServiceProvider& provider, DataStore source, vector<Entity*
     // Build filter
     string filter_string = "";
     for (auto entity : filter_list) {
-        filter_string += get_xml_subtree_filter_payload(*entity, provider);
+        filter_string += (entity->is_top_level_class) ?
+            get_xml_subtree_filter_payload(*entity, provider) :
+            get_data_payload(*entity, provider);
     }
 
     // Source options: candidate | running | startup
@@ -328,7 +330,9 @@ get_entity(NetconfServiceProvider& provider, DataStore source, Entity& filter, c
     }
 
     // filter
-    std::string filter_string  = get_xml_subtree_filter_payload(filter, provider);
+    string filter_string = (filter.is_top_level_class) ?
+        get_xml_subtree_filter_payload(filter, provider) :
+        get_data_payload(filter, provider);
     rpc->get_input_node().create_datanode("filter", filter_string);
 
     shared_ptr<path::DataNode> result_datanode = (*rpc)(provider.get_session());

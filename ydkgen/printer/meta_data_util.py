@@ -21,7 +21,7 @@
 """
 from ydkgen.api_model import Bits, Class, Enum, Package
 from ydkgen.builder import TypesExtractor
-from ydkgen.common import convert_to_reStructuredText, get_module_name
+from ydkgen.common import convert_to_reStructuredText, get_module_name, is_config_stmt
 from pyang import types
 from pyang.error import EmitError
 from pyang.types import BinaryTypeSpec, BooleanTypeSpec, Decimal64TypeSpec, EmptyTypeSpec, \
@@ -39,6 +39,7 @@ class MetaInfoData:
         self.name = prop.stmt.arg
         self.mtype = ''
         self.ptype = ''
+        self.ytype = ''
         self.prange = []
         self.pattern = []
         self.presentation_name = "%s" % prop.name
@@ -58,6 +59,8 @@ class MetaInfoData:
         self.is_presence = False
         self.units = ''
         self.default_value = ''
+        self.default_value_object = None
+        self.is_config = is_config_stmt(prop.stmt)
         self.status = ''
 
 
@@ -105,6 +108,8 @@ def get_class_docstring(clazz, language, identity_subclasses=None):
             properties_description.append('\t**mandatory**\: True\n\n')
         if meta_info_data.is_presence:
             properties_description.append('\t**presence node**\: True\n\n')
+        if not meta_info_data.is_config:
+            properties_description.append('\t**config**\: False\n\n')
         if len(meta_info_data.units) > 0:
             properties_description.append('\t**units**\: %s\n\n' % meta_info_data.units)
         if len(meta_info_data.default_value) > 0:
@@ -214,6 +219,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
     """
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
+    if type_stmt is not None:
+        meta_info_data.ytype = type_stmt.arg
     types_extractor = TypesExtractor()
     target_type_stmt = type_stmt
 
@@ -382,6 +389,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link += get_primitive_type_tag('str', language)
         else:
             raise EmitError('Illegal path')
+
+    if default_value is not None:
+        meta_info_data.default_value_object = get_default_value_object(meta_info_data.ptype, property_type,                                                                   meta_info_data.clazz_name, default_value.arg,
+                                                                       identity_subclasses)
     return meta_info_data
 
 
@@ -680,3 +691,33 @@ def get_class_bases(clazz, language):
         for item in clazz.extends:
             bases.append(get_class_crossref_tag(item.name, item, language))
     return bases
+
+def get_default_value_object(ptype, property_type, clazz_name, default_value, identity_subclasses):
+    default_value_object = ''
+    if ptype == 'Empty':
+        default_value_object = "'Empty()'"
+    elif ptype == 'str':
+        default_value_object = '"\'%s\'"' % default_value
+    elif ptype == 'int':
+        default_value_object = '"%s"' % default_value
+    elif ptype == 'Decimal64':
+        default_value_object = '\'Decimal64("%s")\'' % default_value
+    elif ptype == 'bool':
+        default_value_object = "'%s'" % ('False' if default_value == 'false' else 'True')
+    elif isinstance(property_type, Bits):
+        default_value_object = "'%s'" % default_value
+    elif isinstance(property_type, Enum):
+        for l in property_type.literals:
+            if l.stmt.arg == default_value:
+                default_value_object = "'%s.%s'" % (property_type.fqn(), l.name)
+                break
+    elif isinstance(property_type, Class):
+        if identity_subclasses is not None:
+            if id(property_type) in identity_subclasses:
+                for c in identity_subclasses[id(property_type)]:
+                    if c.stmt.arg in default_value:
+                        default_value_object = "'%s()'" % c.fqn()
+                        break
+    else:
+        default_value_object = "'%s'" % default_value
+    return default_value_object

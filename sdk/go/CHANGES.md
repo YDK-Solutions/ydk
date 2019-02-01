@@ -1,3 +1,16 @@
+### 2019-02-02 version 0.8.1
+
+#### Go
+  * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
+
+#### Resolved GitHub issues
+  * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))
+  * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
+  * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
+  * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
+  * Decoding gNMI payload fails with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+
+
 ### 2018-12-17 version 0.8.0
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
@@ -7,6 +20,7 @@
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to include previously missing action models in Cisco IOS XR 6.5.1 release
   * Released cisco-nx-os bundle to support Cisco NX OS 9.2.2 release
+
 
 ### 2018-10-02 version 0.7.3
 
@@ -24,10 +38,10 @@
   * Updated openconfig to to make it compatible with ydk core version 0.7.3.
   * Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
 
-**Note**
+#### Note about `cisco-ios-xr` 6.5.1 bundle
+  Bundle excludes the following files due to duplicate namespaces:
 
-    The cisco-ios-xr 6.5.1 bundle excludes the following files due to duplicate namespaces:
-
+```
     Cisco-IOS-XR-sysadmin-clear-ncs5500.yang
     Cisco-IOS-XR-sysadmin-clear-ncs5502.yang
     Cisco-IOS-XR-sysadmin-clear-ncs55A1.yang
@@ -42,6 +56,7 @@
     Cisco-IOS-XR-sysadmin-fabric-ncs5500.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5501.yang
     Cisco-IOS-XR-sysadmin-fabric-ncs5502.yang
+```
 
 ### 2018-07-02 version 0.7.2
 

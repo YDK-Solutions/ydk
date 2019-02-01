@@ -189,6 +189,29 @@ class SanityTest(unittest.TestCase):
             count += elem.test
         self.assertEqual(count, 't1t2t3')
 
+        from ydk.providers import CodecServiceProvider
+        from ydk.services  import CodecService
+        provider = CodecServiceProvider(type='xml')
+        codec = CodecService()
+
+        payload = codec.encode(provider, runner)
+        expected = '''<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
+  <no-key-list>
+    <test>t1</test>
+  </no-key-list>
+  <no-key-list>
+    <test>t2</test>
+  </no-key-list>
+  <no-key-list>
+    <test>t3</test>
+  </no-key-list>
+</runner>
+'''
+        self.assertEqual(payload, expected)
+
+        runner_decode = codec.decode(provider, payload)
+        self.assertEqual(runner_decode, runner)
+
 if __name__ == '__main__':
     suite = unittest.TestSuite()
     testloader = unittest.TestLoader()

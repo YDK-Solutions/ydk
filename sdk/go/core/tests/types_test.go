@@ -340,7 +340,7 @@ func cascadingTypesHelper(suite *SanityTypesTestSuite, enum1 ysanity.CompInstTyp
 	ctypes.CompNicInstType = enum2
 	suite.CRUD.Create(&suite.Provider, &ctypes)
 
-	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	ctypesRead := suite.CRUD.Read(&suite.Provider, &ysanity.CascadingTypes{})
 	suite.Equal(types.EntityEqual(ctypesRead, &ctypes), true)
 }
 

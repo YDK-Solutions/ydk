@@ -1,5 +1,27 @@
-### 2018-12-17 version 0.8.0
+### 2019-02-02 version 0.8.1
 
+#### CRUD / Netconf / gNMI/ Codec / Path API
+  * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
+
+#### ydk-gen
+  * Use CMake build number for release numbers with suffix ([#864](https://github.com/CiscoDevNet/ydk-gen/issues/864))
+
+#### Resolved GitHub issues
+  * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))
+  * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
+  * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
+  * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
+  * Segmentation fault when decoding gNMI config payload ([#856](https://github.com/CiscoDevNet/ydk-gen/issues/856))
+  * Decoding gNMI payload fails with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+
+#### Documentation improvements
+  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848), 
+  [#850](https://github.com/CiscoDevNet/ydk-gen/issues/850), [#861](https://github.com/CiscoDevNet/ydk-gen/issues/861),
+  [#862](https://github.com/CiscoDevNet/ydk-gen/issues/862)
+
+
+### 2018-11-27 version 0.8.0
+ 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
   * Added Netconf support for certificate-based authentication for multiple servers
@@ -8,6 +30,9 @@
   * Updated cisco-ios-xr bundle to include previously missing action models in Cisco IOS XR 6.5.1 release
   * Released cisco-nx-os bundle to support Cisco NX OS 9.2.2 release
 
+#### ydk-gen
+  * Added capability to generate YDK service packages from `generate.py` script.
+  
 ### 2018-10-02 version 0.7.3
 
 #### Resolved issues
@@ -24,10 +49,11 @@
   * Updated openconfig to to make it compatible with ydk core version 0.7.3.
   * Also updated ietf bundle to make it compatible with ydk core version 0.7.3.
 
-**Note**
 
-    The cisco-ios-xr 6.5.1 bundle excludes the following files due to duplicate namespaces:
+#### Note about `cisco-ios-xr` 6.5.1 bundle
+  Bundle excludes the following files due to duplicate namespaces:
 
+```
     Cisco-IOS-XR-sysadmin-clear-ncs5500.yang
     Cisco-IOS-XR-sysadmin-clear-ncs5502.yang
     Cisco-IOS-XR-sysadmin-clear-ncs55A1.yang
@@ -148,7 +174,7 @@
 
 ### 2017-09-25 version 0.6.1
 
-#### Python & C++
+#### Python and C++
   * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_3_1.json) bundle to support Cisco IOS XR 6.3.1 release
  * Also updated [`openconfig`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/openconfig_0_1_4.json) bundle version 0.1.4 with additional support for optical transport (channel monitor, optical amplifier, terminal device and transport line)
  * Improved Service Providers

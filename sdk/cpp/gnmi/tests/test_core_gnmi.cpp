@@ -41,15 +41,12 @@
 
 TEST_CASE( "test_gnmi_entity_to_path" )
 {
-    auto ifc = std::make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
-    ifc->name = "Loopback10";
-    ifc->config->yfilter = ydk::YFilter::read;
-
-    ydktest::openconfig_interfaces::Interfaces ifcs{};
-    ifcs.interface.append(ifc);
+    auto ifc = ydktest::openconfig_interfaces::Interfaces::Interface();
+    ifc.name = "Loopback10";
+    ifc.config->yfilter = ydk::YFilter::read;
 
     gnmi::Path* path = new gnmi::Path();
-    ydk::parse_entity_to_path(ifcs, path);
+    ydk::parse_entity_to_path(ifc, path);
 
     std::string expected = R"(origin: "openconfig-interfaces"
 elem {
@@ -331,11 +328,10 @@ TEST_CASE("gnmi_rpc_subscribe")
     subscription.create_datanode("encoding", "JSON_IETF");
 
     auto & ifs = schema.create_datanode("openconfig-interfaces:interfaces", "");
-    ifs.create_datanode("interface[name='*']/state");
     auto int_json = codec.encode(ifs, ydk::EncodingFormat::JSON, false);
 
     auto & bgp = schema.create_datanode("openconfig-bgp:bgp", "");
-    bgp.create_datanode("neighbors/neighbor[neighbor-address='0.0.0.0']/state");
+    bgp.create_datanode("neighbors");
     auto bgp_json = codec.encode(bgp, ydk::EncodingFormat::JSON, false);
 
     auto & int_subscription = subscription.create_datanode("subscription-list[alias='int']", "");

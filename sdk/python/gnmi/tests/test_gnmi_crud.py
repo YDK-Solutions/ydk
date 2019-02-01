@@ -48,75 +48,77 @@ class SanityGnmiCrud(unittest.TestCase):
 
     def test_gnmi_crud_all_operations(self):
         # Configure interface
-        ifc = openconfig_interfaces.Interfaces()
-        lo10 = ifc.Interface()
+        lo10 = openconfig_interfaces.Interfaces.Interface()
         lo10.name = 'Loopback10'
         lo10.config.name = 'Loopback10'
-        ifc.interface.append(lo10)
 
         # Configure BGP
-        bgp = openconfig_bgp.Bgp()
-        bgp.global_.config.as_ = 65172
-        neighbor = bgp.Neighbors.Neighbor()
+        bgp_global_config = openconfig_bgp.Bgp.Global.Config()
+        bgp_global_config.as_ = 65172
+        neighbor = openconfig_bgp.Bgp.Neighbors.Neighbor()
         neighbor.neighbor_address = '172.16.255.2'
         neighbor.config.neighbor_address = '172.16.255.2'
         neighbor.config.peer_as = 65172
-        bgp.neighbors.neighbor.append(neighbor)
 
-        res = self.crud.create(self.provider, [ifc, bgp])
+        res = self.crud.create(self.provider, [lo10, bgp_global_config, neighbor])
 
         # Update configuration
         lo10.config.description = 'Test'
-        res = self.crud.update(self.provider, [ifc, bgp])
- 
-        # Read config
-        read_list = self.crud.read_config(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])
-        #for entity in read_list:
-        #    print_entity(entity, self.schema)
+        res = self.crud.update(self.provider, lo10)
+        self.assertTrue(res)
  
         # Read all
         read_list = self.crud.read(self.provider, [openconfig_interfaces.Interfaces(), openconfig_bgp.Bgp()])
 
+        # Read config
+        ifc_filter = openconfig_interfaces.Interfaces.Interface()
+        ifc_filter.name = 'Loopback10'
+        bgp_neighbor_filter = openconfig_bgp.Bgp.Neighbors.Neighbor()
+        bgp_neighbor_filter.neighbor_address = '172.16.255.2'
+
+        read_list = self.crud.read_config(self.provider, [ifc_filter, bgp_neighbor_filter])
+        self.assertIsNotNone(read_list)
+        self.assertEqual(isinstance(read_list, list), True)
+        self.assertEqual(len(read_list), 2)
+        #for entity in read_list:
+        #    print_entity(entity, self.schema)
+ 
         # Read single container
-        ifc = openconfig_interfaces.Interfaces()
-        lo10 = ifc.Interface()
+        lo10 = openconfig_interfaces.Interfaces.Interface()
         lo10.name = 'Loopback10'
         lo10.config = YFilter.read
-        ifc.interface.append(lo10)
-        read_config = self.crud.read(self.provider, ifc)
-        # print_entity(read_descr, self.schema)
-        expected = '''<interfaces>
-  <interface>
+        ifc_config = self.crud.read(self.provider, lo10)
+        #print_entity(ifc_config, self.schema)
+        expected = '''<interface>
+  <name>Loopback10</name>
+  <config>
     <name>Loopback10</name>
-    <config>
-      <name>Loopback10</name>
-      <description>Test</description>
-    </config>
-  </interface>
-</interfaces>
+    <description>Test</description>
+  </config>
+</interface>
 '''
-        self.assertEqual( entity_to_string(read_config, self.schema), expected)
+        self.assertEqual( entity_to_string(ifc_config, self.schema), expected)
  
         # Read single leaf
-        ifc = openconfig_interfaces.Interfaces()
-        lo10 = ifc.Interface()
+        lo10 = openconfig_interfaces.Interfaces.Interface()
         lo10.name = 'Loopback10'
         lo10.config.description = YFilter.read
-        ifc.interface.append(lo10)
-        read_descr = self.crud.read(self.provider, ifc)
-        # print_entity(read_descr, self.schema)
-        expected = '''<interfaces>
-  <interface>
+        read_descr = self.crud.read(self.provider, lo10)
+        #print_entity(read_descr, self.schema)
+        expected = '''<interface>
+  <name>Loopback10</name>
+  <config>
     <name>Loopback10</name>
-    <config>
-      <description>Test</description>
-    </config>
-  </interface>
-</interfaces>
+    <description>Test</description>
+  </config>
+</interface>
 '''
         self.assertEqual( entity_to_string(read_descr, self.schema), expected)
          
         # Delete configuration
+        ifc = openconfig_interfaces.Interfaces.Interface()
+        ifc.name = 'Loopback10'
+        bgp = openconfig_bgp.Bgp()
         res = self.crud.delete(self.provider, [ifc, bgp])
 
 if __name__ == '__main__':

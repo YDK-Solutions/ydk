@@ -76,12 +76,12 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
-        return
+    else
+        ${PIP_BIN} install $@
     fi
-    ${PIP_BIN} install $@
 }
 
 ######################################################################
@@ -92,15 +92,17 @@ function check_python_installation {
   
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -164,7 +166,7 @@ function init_go_env {
 ######################################################################
 
 function install_cpp_core {
-    print_msg "Installing CPP core"
+    print_msg "Installing C++ core library"
 
     cd $YDKGEN_HOME
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
@@ -176,18 +178,21 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
 }
 
 function run_cpp_core_test {
-    print_msg "Running cpp core test"
+    print_msg "Running C++ core tests"
     cd $YDKGEN_HOME/sdk/cpp/core/build
-    make test
+
+    #make test
+
+    ./tests/ydk_core_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose mode to get more details
-        ./tests/ydk_core_test -d yes
+        #./tests/ydk_core_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
@@ -200,13 +205,13 @@ function install_cpp_ydktest_bundle {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --cpp
     cd gen-api/cpp/ydktest-bundle/build
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
     cd -
 }
 
 function build_gnmi_cpp_core_library {
-    print_msg "Building core gnmi library"
+    print_msg "Building C++ core gnmi library"
     cd $YDKGEN_HOME/sdk/cpp/gnmi
     mkdir -p build
     cd build
@@ -215,7 +220,7 @@ function build_gnmi_cpp_core_library {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -230,7 +235,7 @@ function build_and_run_cpp_gnmi_tests {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
 
     start_gnmi_server
 
@@ -269,7 +274,8 @@ function start_gnmi_server {
     if [ ! -x ./build/gnmi_server ]; then
         print_msg "Building YDK gNMI server"
         mkdir -p build && cd build
-        ${CMAKE_BIN} .. && make
+        ${CMAKE_BIN} ..
+        run_exec_test make > /dev/null
     fi
 
     print_msg "Starting YDK gNMI server"
@@ -296,19 +302,19 @@ function stop_gnmi_server {
 function install_go_core {
     print_msg "Installing Go core packages"
     cd $YDKGEN_HOME
-    run_test generate.py --core --go
+    run_test generate.py -i --core --go
 }
 
 function install_go_bundle {
     print_msg "Generating/installing Go 'ysanity' package"
     cd $YDKGEN_HOME
-    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
+    run_test  generate.py -i --bundle profiles/test/ydktest-cpp.json --go
 }
 
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-    run_test generate.py --service profiles/services/gnmi-0.4.0.json --go
+    run_test generate.py -i --service profiles/services/gnmi-0.4.0.json --go
 }
 
 function run_go_gnmi_tests {
@@ -428,6 +434,12 @@ print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
 if [[ $run_with_coverage ]] ; then
     run_with_coverage=1
+fi
+
+if [[ ${os_type} == "Linux" ]] ; then
+    os_info=$(cat /etc/*-release)
+else
+    os_info="darwin"
 fi
 
 export YDKGEN_HOME="$(pwd)"

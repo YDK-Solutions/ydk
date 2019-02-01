@@ -18,6 +18,8 @@
 #include <sstream>
 #include <string.h>
 
+#include <ydk/codec_provider.hpp>
+#include <ydk/codec_service.hpp>
 #include "ydk/netconf_provider.hpp"
 #include "ydk/crud_service.hpp"
 #include "ydk_ydktest/ydktest_sanity.hpp"
@@ -427,18 +429,18 @@ TEST_CASE("test_types_identity")
     REQUIRE(reply);
 
     //CREATE
-    r_1->ytypes->built_in_t->identity_ref_value = ydktest_sanity_types::Other();
-    reply = crud.create(provider, *r_1);
+    auto built_in_t = make_unique<ydktest_sanity::Runner::Ytypes::BuiltInT>();
+    built_in_t->identity_ref_value = ydktest_sanity_types::Other();
+    reply = crud.create(provider, *built_in_t);
     REQUIRE(reply);
 
     //READ
     auto filter = make_unique<ydktest_sanity::Runner>();
-    auto r_read = crud.read(provider, *filter);
+    auto r_read = crud.read(provider, *(filter->ytypes->built_in_t));
     REQUIRE(r_read!=nullptr);
 
-    ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-    cout<<r_2->ytypes->built_in_t->identity_ref_value<<endl;
-    REQUIRE(r_1->ytypes->built_in_t->identity_ref_value == r_2->ytypes->built_in_t->identity_ref_value);
+    auto r_2 = dynamic_cast<ydktest_sanity::Runner::Ytypes::BuiltInT*>(r_read.get());
+    REQUIRE(built_in_t->identity_ref_value == r_2->identity_ref_value);
 }
 
 TEST_CASE("test_types_submodule")
@@ -767,19 +769,43 @@ TEST_CASE("test_ylist_two_keys") {
 }
 
 TEST_CASE("test_ylist_no_keys") {
-	auto runner = make_shared<ydktest_sanity::Runner>();
+	auto runner = ydktest_sanity::Runner();
 	auto t1 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t1->test = "t1";
 	auto t2 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t2->test = "t2";
 	auto t3 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t3->test = "t3";
-	runner->no_key_list.extend({t1, t2, t3});
+	runner.no_key_list.extend({t1, t2, t3});
 
-	auto testKeys = runner->no_key_list.keys();
-	REQUIRE(vector_to_string(testKeys) == R"("1000000", "1000001", "1000002")");
+	auto testKeys = runner.no_key_list.keys();
+	REQUIRE(vector_to_string(testKeys) == R"("1000001", "1000002", "1000003")");
 
 	string count{};
-	for (auto ent : runner->no_key_list.entities()) {
+	for (auto ent : runner.no_key_list.entities()) {
 		auto elem = dynamic_cast<ydktest_sanity::Runner::NoKeyList*> (ent.get());
 		count += elem->test;
 	}
 	REQUIRE(count == "t1t2t3");
+
+    CodecServiceProvider codec_provider{EncodingFormat::JSON};
+    CodecService codec_service{};
+
+    string json = codec_service.encode(codec_provider, runner, true);
+    auto expected = R"({
+  "ydktest-sanity:runner": {
+    "no-key-list": [
+      {
+        "test": "t1"
+      },
+      {
+        "test": "t2"
+      },
+      {
+        "test": "t3"
+      }
+    ]
+  }
+}
+)";
+
+    auto runner_decoded = codec_service.decode(codec_provider, json, std::make_unique<ydktest_sanity::Runner>());
+    CHECK(*runner_decoded == runner);
 }

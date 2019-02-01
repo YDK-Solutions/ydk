@@ -129,15 +129,17 @@ function check_python_installation {
   
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -201,14 +203,17 @@ function init_go_env {
 ######################################################################
 
 function install_test_cpp_core {
-    print_msg "Installing / testing cpp core"
+    print_msg "Installing / testing C++ core"
     install_cpp_core
     run_cpp_core_test
-    generate_libydk
+
+    if [[ $(uname) == "Linux" ]]; then
+        generate_libydk
+    fi
 }
 
 function install_cpp_core {
-    print_msg "Installing cpp core"
+    print_msg "Installing C++ core library"
 
     cd $YDKGEN_HOME
     mkdir -p $YDKGEN_HOME/sdk/cpp/core/build
@@ -220,7 +225,7 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
+    run_exec_test make > /dev/null
     sudo make install
 }
 
@@ -235,13 +240,16 @@ function generate_libydk {
 }
 
 function run_cpp_core_test {
-    print_msg "Running cpp core test"
+    print_msg "Running C++ core test"
 
-    make test
+    #export CTEST_OUTPUT_ON_FAILURE=1
+    #make test
+
+    ./tests/ydk_core_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
-    # If the tests fail, try to run them in verbose to get more details for debug
-        ./tests/ydk_core_test -d yes
+        # If the tests fail, try to run them in verbose to get more details for debug
+        #./tests/ydk_core_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
         exit $status
@@ -252,7 +260,7 @@ function run_cpp_core_test {
 function install_go_core {
     print_msg "Installing Go YDK core"
     cd $YDKGEN_HOME
-    run_test generate.py --core --go
+    run_test generate.py --core --go --install
 }
 
 function install_py_core {
@@ -290,7 +298,8 @@ function generate_install_specified_cpp_bundle {
 
    run_test generate.py --bundle ${bundle_profile} --cpp --generate-doc &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
-   run_exec_test sudo make install
+   run_exec_test make > /dev/null
+   sudo make install
    cd -
 }
 
@@ -303,7 +312,7 @@ function cpp_sanity_ydktest_gen_install {
 }
 
 function cpp_sanity_ydktest_test {
-    print_msg "Running cpp bundle tests"
+    print_msg "Running C++ bundle tests"
 
     print_msg "Initializing ssh keys for key-based authentication"
     sudo mkdir -p /var/confd/homes/admin/.ssh
@@ -312,7 +321,7 @@ function cpp_sanity_ydktest_test {
     sudo sh -c 'cat sdk/cpp/tests/ssh_host_rsa_key.pub >> /var/confd/homes/admin/.ssh/authorized_keys'
     cd -
 
-    print_msg "Building and running cpp bundle tests"
+    print_msg "Building and running C++ bundle tests"
     mkdir -p $YDKGEN_HOME/sdk/cpp/tests/build && cd sdk/cpp/tests/build
     if [[ $run_with_coverage ]] ; then
       print_msg "Compiling with coverage"
@@ -320,13 +329,16 @@ function cpp_sanity_ydktest_test {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make
-    export CTEST_OUTPUT_ON_FAILURE=1
-    make test
+    run_exec_test make > /dev/null
+
+    #export CTEST_OUTPUT_ON_FAILURE=1
+    #make test
+
+    ./ydk_bundle_test -d yes
     local status=$?
     if [ $status -ne 0 ]; then
         # If the tests fail, try to run them in verbose to get more details for  # debug
-        ./ydk_bundle_test -d yes
+        #./ydk_bundle_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting C++ bundle tests with status=$status"
         exit $status
@@ -341,7 +353,7 @@ function cpp_test_gen_test {
     mkdir -p gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     cd gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     run_exec_test ${CMAKE_BIN} ..
-    run_exec_test make
+    run_exec_test make > /dev/null
     ctest --output-on-failure
 }
 
@@ -351,7 +363,8 @@ function cpp_test_gen {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
-    run_exec_test sudo make install
+    run_exec_test make > /dev/null
+    sudo make install
 
     # cpp_test_gen_test
 }
@@ -363,7 +376,7 @@ function collect_cpp_coverage {
     lcov --directory . --capture --output-file coverage.info &> /dev/null # capture coverage info
     lcov --remove coverage.info '/usr/*' '/Applications/*' '/opt/*' '*/json.hpp' '*/catch.hpp' '*/network_topology.cpp' '*/spdlog/*' --output-file coverage.info # filter out system
     lcov --list coverage.info #debug info
-    print_msg "Moving cpp coverage to ${YDKGEN_HOME}"
+    print_msg "Moving C++ coverage to ${YDKGEN_HOME}"
     cp coverage.info ${YDKGEN_HOME}
   fi
 }
@@ -376,7 +389,7 @@ function run_go_bundle_tests {
     print_msg "Generating/installing go sanity bundle tests"
     # TODO: go get
     cd $YDKGEN_HOME
-    run_test  generate.py --bundle profiles/test/ydktest-cpp.json --go
+    run_test generate.py -i --bundle profiles/test/ydktest-cpp.json --go
 
     run_go_tests
 }
@@ -400,7 +413,7 @@ function run_go_samples {
     run_exec_test go run cgo_path/cgo_path.go
     run_exec_test go run bgp_create/bgp_create.go -device ssh://admin:admin@localhost:12022
     run_exec_test go run bgp_read/bgp_read.go -device ssh://admin:admin@localhost:12022
-    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022 -v
+    run_exec_test go run bgp_delete/bgp_delete.go -device ssh://admin:admin@localhost:12022
     cd -
 }
 
@@ -533,6 +546,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py
     run_test sdk/python/core/tests/test_sanity_types.py
+    run_test sdk/python/core/tests/test_non_top_operations.py
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 
     print_msg "py_sanity_ydktest_test_netconf_ssh no on-demand"
@@ -566,6 +580,7 @@ function py_sanity_ydktest_test_tcp {
 function py_sanity_deviation {
     print_msg "py_sanity_deviation"
 
+    rm -rf $HOME/.ydk/*
     py_sanity_deviation_ydktest_gen
     py_sanity_deviation_ydktest_install
     py_sanity_deviation_ydktest_test
@@ -573,6 +588,7 @@ function py_sanity_deviation {
     py_sanity_deviation_bgp_gen
     py_sanity_deviation_bgp_install
     py_sanity_deviation_bgp_test
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_deviation_ydktest_gen {
@@ -626,9 +642,11 @@ function py_sanity_deviation_bgp_test {
 function py_sanity_augmentation {
     print_msg "py_sanity_augmentation"
 
+    rm -rf $HOME/.ydk/*
     py_sanity_augmentation_gen
     py_sanity_augmentation_install
     py_sanity_augmentation_test
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_augmentation_gen {
@@ -661,6 +679,7 @@ function py_sanity_augmentation_test {
 function py_sanity_common_cache {
     print_msg "py_sanity_common_cache"
 
+    rm -rf $HOME/.ydk/*
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
@@ -668,6 +687,7 @@ function py_sanity_common_cache {
 
     run_test sdk/python/core/tests/test_sanity_levels.py --common-cache
     run_test sdk/python/core/tests/test_sanity_types.py --common-cache
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_run_limited_tests {
@@ -738,6 +758,20 @@ function py_test_gen {
 }
 
 #-------------------------------------
+# Meta-data test
+#-------------------------------------
+
+function run_py_metadata_test {
+    print_msg "Building ydktest bundle with metadata"
+    cd $YDKGEN_HOME
+    ${PYTHON_BIN} generate.py --bundle profiles/test/ydktest-cpp.json --generate-meta
+    pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running metadata test"
+    ${PYTHON_BIN} sdk/python/core/tests/test_meta.py
+}
+
+#-------------------------------------
 # Documentation tests
 #-------------------------------------
 
@@ -759,7 +793,7 @@ function sanity_doc_gen_cache {
    run_test generate.py --bundle profiles/test/ydktest-cpp.json
 
    print_msg "Generating core docs with cache option"
-   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api -v
+   run_test generate.py --core --python --generate-doc --cached-output-dir --output-directory gen-api
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -820,6 +854,8 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
+run_py_metadata_test
+
 # test_gen_tests
 
 ######################################

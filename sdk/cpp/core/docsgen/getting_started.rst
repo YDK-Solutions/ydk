@@ -16,8 +16,6 @@ You can install YDK-Cpp on Linux or MacOS.  It is currently not supported on Win
 System Requirements
 -------------------
 
-**Note:** The **libssh** release 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use **libssh** versions older than 0.8.0, for example 0.7.5.
-
 Linux
 ~~~~~
 
@@ -64,6 +62,13 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
   brew install curl libssh pcre xml2 cmake
   xcode-select --install
 
+Libssh Installation
+-------------------
+
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+or upgrade to libssh-0.8.1 or higher.
+
 gNMI Requirements
 ~~~~~~~~~~~~~~~~~
 
@@ -86,7 +91,7 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 
 .. code-block:: sh
 
-    git clone -b v1.4.5 https://github.com/grpc/grpc
+    git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
     make
@@ -100,8 +105,6 @@ Quick YDK Installation
 Install prebuilt libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note:** libssh 0.8.0 and later `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, which is required for YDK. Please use libssh versions 0.7.x.
-
 **Ubuntu**
 
 Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
@@ -111,15 +114,15 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_0.8.0-1_amd64.deb
-   sudo gdebi libydk_0.8.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 
 **CentOS**
 
@@ -127,13 +130,13 @@ Install YDK core library:
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk-0.8.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 
 Install YDK gNMI library (optional):
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi-0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi-0.4.0-1.x86_64.rpm
 
 **MacOS**
 
@@ -141,10 +144,10 @@ You can install the latest model packages using `homebrew <http://brew.sh>`_.  T
 
 .. code-block:: sh
 
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk-0.8.0-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.0-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
    $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.0/libydk_gnmi-0.4.0-Darwin.pkg
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
    $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
@@ -157,7 +160,11 @@ Alternatively, you can perform partial installation.  If you only want to instal
 
 .. code-block:: sh
 
-  brew install ydk-openconfig
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk-0.8.1-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   $
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk_gnmi-0.4.0-Darwin.pkg
+   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
 
@@ -177,21 +184,28 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.0/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
    sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 
 **CentOS**
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.0/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+
+**MacOS**
+
+.. code-block:: sh
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
 
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~

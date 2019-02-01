@@ -24,11 +24,11 @@ import unittest
 
 from ydk.types import Empty
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity
     from ydk.models.ydktest.oc_pattern import OcA
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
-    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity, YdkEnumTest
+    from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity
     from ydk.models.ydktest.oc_pattern.oc_a.oc_a import OcA
 
 from ydk.providers import NetconfServiceProvider
@@ -669,22 +669,6 @@ class SanityYang(unittest.TestCase):
         runner = Runner()
         runner.ytypes.enabled = Empty()
         runner.ytypes.built_in_t.emptee = Empty()
-
-        self.crud.create(self.ncc, runner)
-
-        runner_read = self.crud.read(self.ncc, Runner())
-
-        self.assertEqual(runner, runner_read)
-
-    def test_iden_list(self):
-        runner = Runner()
-        e_1 = Runner.IdentityList()
-        e_1.name = ChildIdentity()
-        runner.identity_list.append(e_1)
-
-        e_1 = Runner.EnumList()
-        e_1.name = YdkEnumTest.none
-        runner.identity_list.append(e_1)
 
         self.crud.create(self.ncc, runner)
 

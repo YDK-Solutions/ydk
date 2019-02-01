@@ -41,6 +41,7 @@ func (suite *NetconfServiceTestSuite) TearDownSuite() {
 
 func (suite *NetconfServiceTestSuite) BeforeTest(suiteName, testName string) {
 	suite.Crud.Delete(&suite.Provider, &ysanity.Runner{})
+	suite.NS.DiscardChanges(&suite.Provider)
 	fmt.Printf("%v: %v ...\n", suiteName, testName)
 }
 
@@ -115,7 +116,7 @@ func (suite *NetconfServiceTestSuite) TestDiscardChanges(){
 
 	// GetConfig
 	readEntity := suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &ysanity.Runner{}), true)
+	suite.Nil(readEntity)
 }
 
 func (suite *NetconfServiceTestSuite) TestConfirmedCommit() {
@@ -161,7 +162,6 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
 	runner.Two.Name = "runner:two:name"
-	getFilter := ysanity.Runner{}
 
 	var op bool
 	var readEntity types.Entity
@@ -171,9 +171,8 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
 	suite.Equal(op, true)
 
-	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &getFilter)
+	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
-	getFilter = ysanity.Runner{}
 
 	// Modify Candidate via CopyConfig from runner
 	runner.Two.Name = fmt.Sprintf("%s_modified", runner.Two.Name)
@@ -182,16 +181,15 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
 	suite.Equal(op, true)
 
-	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &getFilter)
+	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
-	getFilter = ysanity.Runner{}
 
-	// Modify Candidate via CopyConfig from Running
+	// Modify Candidate via CopyConfig from Running. That will remove config.
 	op = suite.NS.CopyConfig(&suite.Provider, datastore.Candidate, datastore.Running, nil, "")
 	suite.Equal(op, true)
 
-	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &getFilter)
-	suite.Equal(types.EntityEqual(readEntity, &ysanity.Runner{}), true)
+	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
+	suite.Nil(readEntity)
 
 	// DiscardChanges
 	op = suite.NS.DiscardChanges(&suite.Provider)

@@ -2,7 +2,7 @@ gNMI Service Provider
 ========================
 
 
-.. py:class:: ydk.gnmi.providers.gNMIServiceProvider(repo, address, port=57400, username, password, server_cerificate="", private_key="")
+.. py:class:: ydk.gnmi.providers.gNMIServiceProvider(repo, address, port=57400, username, password, server_certificate="", private_key="")
 
     A service provider, which allows YDK connect to a `gNMI <https://github.com/openconfig/gnmi>`_ server. By default, the provider works in non-secure mode (tls is off). In order to enable secure mode connection the user must provide the gNMI server certificate of authorization (public key) and optionally the client (YDK application host) private key.
 
@@ -11,8 +11,8 @@ gNMI Service Provider
     :param port: (``int``)Port on which the gNMI interface can be accessed on the device. If not specified, the default value of ``57400`` is assigned.
     :param username: (``str``) Username.
     :param password: (``str``) Password.
-    :param server_cerificate: (``str``) Full path to a file, which contains server certificate of authorization (public key). If not specified, it is assumed non-secure connection to gNMI server.
-    :param private_key: (``str``) Full path to a file, which contains private key of the application host. If not specified and **server_cerificate** is defined (secure connection), the GRPC internally defined private key is used.
+    :param server_certificate: (``str``) Full path to a file, which contains server certificate of authorization (public key). If not specified, it is assumed non-secure connection to gNMI server.
+    :param private_key: (``str``) Full path to a file, which contains private key of the application host. If not specified and **server_certificate** is defined (secure connection), the GRPC internally defined private key is used.
 
 Examples
 --------
@@ -58,7 +58,7 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` is shown b
 
     # Instantiate provider with non-secure connection to gNMI server
     provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400,
-                                   username='admin', password='admin', server_cerificate=ca_file_path)
+                                   username='admin', password='admin', server_certificate=ca_file_path)
 
     # Define filter
     bgp = openconfig_bgp.Bgp()

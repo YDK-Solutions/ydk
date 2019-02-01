@@ -32,7 +32,30 @@ from test_utils import get_device_info
 
 from ydk.models.ydktest import ietf_netconf
 
-from ydk.models.ydktest.ydktest_sanity import YdkEnumIntTest
+def _get_runner_entity():
+    r_1 = ysanity.Runner()
+    e_1, e_2 = ysanity.Runner.TwoList.Ldata(), ysanity.Runner.TwoList.Ldata()
+    e_11, e_12 = ysanity.Runner.TwoList.Ldata.Subl1(), ysanity.Runner.TwoList.Ldata.Subl1()
+    e_1.number = 21
+    e_1.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:name'
+    e_11.number = 211
+    e_11.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:subl1[' + str(e_11.number) + ']:name'
+    e_12.number = 212
+    e_12.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:subl1[' + str(e_12.number) + ']:name'
+    e_1.subl1.extend([e_11, e_12])
+    e_21, e_22 = ysanity.Runner.TwoList.Ldata.Subl1(), ysanity.Runner.TwoList.Ldata.Subl1()
+    e_2.number = 22
+    e_2.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:name'
+    e_21.number = 221
+    e_21.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:subl1[' + str(e_21.number) + ']:name'
+    e_22.number = 222
+    e_22.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:subl1[' + str(e_22.number) + ']:name'
+    e_2.subl1.extend([e_21, e_22])
+    r_1.two_list.ldata.extend([e_1, e_2])
+    return r_1
+
+_entity_pattern = "'provider' and 'entity_holder' cannot be None"
+_payload_pattern = "'provider' and 'payload_holder' cannot be None"
 
 class SanityCodec(unittest.TestCase):
     @classmethod
@@ -83,42 +106,17 @@ class SanityCodec(unittest.TestCase):
 </runner>
 """
 
-    def _get_runner_entity(self):
-        r_1 = ysanity.Runner()
-        e_1, e_2 = ysanity.Runner.TwoList.Ldata(), ysanity.Runner.TwoList.Ldata()
-        e_11, e_12 = ysanity.Runner.TwoList.Ldata.Subl1(), ysanity.Runner.TwoList.Ldata.Subl1()
-        e_1.number = 21
-        e_1.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:name'
-        e_11.number = 211
-        e_11.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:subl1[' + str(e_11.number) + ']:name'
-        e_12.number = 212
-        e_12.name = 'runner:twolist:ldata[' + str(e_1.number) + ']:subl1[' + str(e_12.number) + ']:name'
-        e_1.subl1.extend([e_11, e_12])
-        e_21, e_22 = ysanity.Runner.TwoList.Ldata.Subl1(), ysanity.Runner.TwoList.Ldata.Subl1()
-        e_2.number = 22
-        e_2.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:name'
-        e_21.number = 221
-        e_21.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:subl1[' + str(e_21.number) + ']:name'
-        e_22.number = 222
-        e_22.name = 'runner:twolist:ldata[' + str(e_2.number) + ']:subl1[' + str(e_22.number) + ']:name'
-        e_2.subl1.extend([e_21, e_22])
-        r_1.two_list.ldata.extend([e_1, e_2])
-        return r_1
-
-    _entity_pattern = "'provider' and 'entity_holder' cannot be None"
-    _payload_pattern = "'provider' and 'payload_holder' cannot be None"
-
     @assert_with_error(_entity_pattern, YServiceError)
     def test_encode_invalid_1(self):
         self.codec.encode(self.provider, None)
 
     @assert_with_error(_entity_pattern, YServiceError)
     def test_encode_invalid_2(self):
-            self.codec.encode(None, self._get_runner_entity())
+        self.codec.encode(None, _get_runner_entity())
 
     @assert_with_error(_entity_pattern, YServiceError)
     def test_encode_invalid_3(self):
-            self.codec.encode(None, None)
+        self.codec.encode(None, None)
 
     @assert_with_error(_payload_pattern, YServiceError)
     def test_decode_invalid_1(self):
@@ -241,7 +239,7 @@ class SanityExecutor(unittest.TestCase):
         runner_xml = self.codec.encode(self.codec_provider, runner)
         edit_rpc.input.config = runner_xml
         try:
-            op = self.executor.execute_rpc(None, edit_rpc)
+            self.executor.execute_rpc(None, edit_rpc)
         except YServiceError as err:
             expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
@@ -250,7 +248,7 @@ class SanityExecutor(unittest.TestCase):
 
     def test_execute_rpc_invalid_2(self):
         try:
-            op = self.executor.execute_rpc(self.ncc, None)
+            self.executor.execute_rpc(self.ncc, None)
         except YServiceError as err:
             expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
@@ -259,12 +257,18 @@ class SanityExecutor(unittest.TestCase):
 
     def test_execute_rpc_invalid_3(self):
         try:
-            op = self.executor.execute_rpc(None, None)
+            self.executor.execute_rpc(None, None)
         except YServiceError as err:
             expected_msg = "provider and entity cannot be None"
             self.assertEqual(err.message, expected_msg)
         else:
             raise Exception('YServiceError not raised')
+
+def _create_runner():
+    runner = ysanity.Runner()
+    runner.ydktest_sanity_one.number = 1
+    runner.ydktest_sanity_one.name = 'runner:one:name'
+    return runner
 
 class SanityNetconf(unittest.TestCase):
 
@@ -285,12 +289,6 @@ class SanityNetconf(unittest.TestCase):
         crud = CRUDService()
         runner = ysanity.Runner()
         crud.delete(self.ncc, runner)
-
-    def _create_runner(self):
-        runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
-        return runner
 
     def test_copy_config_invalid_1(self):
         try:
@@ -340,7 +338,7 @@ class SanityNetconf(unittest.TestCase):
 
     def test_edit_config_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             self.netconf_service.edit_config(self.ncc, None, runner)
         except YServiceError as err:
             expected_msg = "provider, target, and config cannot be None"
@@ -368,56 +366,56 @@ class SanityNetconf(unittest.TestCase):
 
     def test_edit_config_invalid_4(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner, default_operation=1)
         except YServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
     2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
-Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, 1, '', ''"""
+Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk.providers.netconf_provider.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, 1, '', ''"""
             res = re.match(expected_msg, err.message.strip())
-            self.assertEqual(res is not None, True)
+            self.assertIsNotNone(res)
         else:
             raise Exception('YServiceError not raised')
 
     def test_edit_config_invalid_5(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner, error_option=1)
         except YServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
     2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
-Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', '', 1"""
+Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk.providers.netconf_provider.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', '', 1"""
             res = re.match(expected_msg, err.message.strip())
-            self.assertEqual(res is not None, True)
+            self.assertIsNotNone(res)
         else:
             raise Exception('YServiceError not raised')
 
     def test_edit_config_invalid_6(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner, test_option=1)
         except YServiceError as err:
             expected_msg = """incompatible function arguments. The following argument types are supported:
     1. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: ydk_.types.Entity, default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
     2. \(self: ydk_.services.NetconfService, provider: ydk_.providers.NetconfServiceProvider, target: ydk_.services.Datastore, config: List\[ydk_.types.Entity\], default_operation: (unicode|str)=[u]?'', test_option: (unicode|str)=[u]?'', error_option: (unicode|str)=[u]?''\) -> bool
 
-Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.providers.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', 1, ''"""
+Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk.providers.netconf_provider.NetconfServiceProvider object at [0-9a-z]+>, Datastore.candidate, <ydk.models.ydktest.ydktest_sanity.Runner object at [0-9a-z]+>, '', 1, ''"""
             res = re.match(expected_msg, err.message.strip())
-            self.assertEqual(res is not None, True)
+            self.assertIsNotNone(res)
         else:
             raise Exception('YServiceError not raised')
 
     def test_get_config_invalid_1(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             get_filter = ysanity.Runner()
 
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-            result = self.netconf_service.get_config(self.ncc, None, get_filter)
+            self.netconf_service.get_config(self.ncc, None, get_filter)
         except YServiceError as err:
             expected_msg = 'provider and source cannot be None'
             self.assertEqual(err.message, expected_msg)
@@ -426,11 +424,11 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
     def test_get_config_invalid_2(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             get_filter = ysanity.Runner()
 
             self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
-            result = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter, with_defaults_option=1)
+            self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter, with_defaults_option=1)
         except TypeError as err:
             expected_msg = "get_config() got an unexpected keyword argument 'with_defaults_option'"
             self.assertEqual(err.args[0], expected_msg)
@@ -439,7 +437,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
     def test_get_invalid(self):
         try:
-            runner = self._create_runner()
+            runner = _create_runner()
             get_filter = ysanity.Runner()
 
             op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, runner)
@@ -464,7 +462,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
     def test_lock_invalid(self):
         try:
-            op = self.netconf_service.lock(self.ncc, None)
+            self.netconf_service.lock(self.ncc, None)
         except YServiceError as err:
             expected_msg = "provider and target cannot be None"
             self.assertEqual(err.message, expected_msg)
@@ -473,8 +471,8 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
     def test_unlock_invalid(self):
         try:
-            op = self.netconf_service.lock(self.ncc, Datastore.candidate)
-            op = self.netconf_service.unlock(self.ncc, None)
+            self.netconf_service.lock(self.ncc, Datastore.candidate)
+            self.netconf_service.unlock(self.ncc, None)
         except YServiceError as err:
             expected_msg = "provider and target cannot be None"
             self.assertEqual(err.message, expected_msg)
@@ -483,7 +481,7 @@ Invoked with: <ydk_.services.NetconfService object at [0-9a-z]+>, <ydk_.provider
 
     def test_validate_invalid(self):
         try:
-            op = self.netconf_service.validate(self.ncc)
+            self.netconf_service.validate(self.ncc)
         except YServiceError as err:
             expected_msg = "provider and source/source_config cannot be None"
             self.assertEqual(err.message, expected_msg)

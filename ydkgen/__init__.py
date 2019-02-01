@@ -168,7 +168,8 @@ class YdkGenerator(object):
         package_name = 'ydk-service-%s' % self.package_name
         gen_api_root = self._initialize_gen_api_directories(package_name, self.package_type)
 
-        update_setup_file_version(self.language, gen_api_root, self.package_name, package_name, self.version)
+        if self.language != 'go':
+            update_setup_file_version(self.language, gen_api_root, self.package_name, package_name, self.version)
 
         return gen_api_root
 

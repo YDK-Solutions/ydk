@@ -580,6 +580,7 @@ function py_sanity_ydktest_test_tcp {
 function py_sanity_deviation {
     print_msg "py_sanity_deviation"
 
+    rm -rf $HOME/.ydk/*
     py_sanity_deviation_ydktest_gen
     py_sanity_deviation_ydktest_install
     py_sanity_deviation_ydktest_test
@@ -587,6 +588,7 @@ function py_sanity_deviation {
     py_sanity_deviation_bgp_gen
     py_sanity_deviation_bgp_install
     py_sanity_deviation_bgp_test
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_deviation_ydktest_gen {
@@ -640,9 +642,11 @@ function py_sanity_deviation_bgp_test {
 function py_sanity_augmentation {
     print_msg "py_sanity_augmentation"
 
+    rm -rf $HOME/.ydk/*
     py_sanity_augmentation_gen
     py_sanity_augmentation_install
     py_sanity_augmentation_test
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_augmentation_gen {
@@ -675,6 +679,7 @@ function py_sanity_augmentation_test {
 function py_sanity_common_cache {
     print_msg "py_sanity_common_cache"
 
+    rm -rf $HOME/.ydk/*
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
@@ -682,6 +687,7 @@ function py_sanity_common_cache {
 
     run_test sdk/python/core/tests/test_sanity_levels.py --common-cache
     run_test sdk/python/core/tests/test_sanity_types.py --common-cache
+    rm -rf $HOME/.ydk/*
 }
 
 function py_sanity_run_limited_tests {

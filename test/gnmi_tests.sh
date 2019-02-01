@@ -314,7 +314,7 @@ function install_go_bundle {
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-    run_test generate.py -i --service profiles/services/gnmi-0.4.0.json --go
+    run_test generate.py -i --service profiles/services/gnmi-0.4.0_post2.json --go
 }
 
 function run_go_gnmi_tests {
@@ -388,9 +388,8 @@ function build_and_run_python_gnmi_tests {
 function build_python_gnmi_package {
     print_msg "Installing gNMI package for Python"
 
-    cd $YDKGEN_HOME/sdk/python/gnmi
-    ${PYTHON_BIN} setup.py sdist
-    ${PIP_BIN} install dist/ydk*.tar.gz
+    cd $YDKGEN_HOME
+    run_test generate.py -i --service profiles/services/gnmi-0.4.0_post2.json
 
     print_msg "Verifying Python gNMI package installation"
     ${PYTHON_BIN} -c "from ydk.gnmi.path import gNMISession"

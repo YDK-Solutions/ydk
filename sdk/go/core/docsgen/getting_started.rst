@@ -148,20 +148,20 @@ Ubuntu
 
 For Xenial (Ubuntu 16.04.4)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 CentOS
 ~~~~~~
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-2.x86_64.rpm
 
 MacOS
 ~~~~~

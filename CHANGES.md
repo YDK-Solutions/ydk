@@ -6,15 +6,23 @@
 #### ydk-gen
   * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.
   * Added `generate.py` script options '-i --install' and '-s --sudo' to generate and install packages in one step.
+  * Use CMake build number for release numbers with suffix ([#864](https://github.com/CiscoDevNet/ydk-gen/issues/864))
 
 #### Resolved GitHub issues
   * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))
   * Test for non-top level Entity fails when bundle created with 'one-class-per-module' flag ([#839](https://github.com/CiscoDevNet/ydk-gen/issues/839))
+  * generate.py always creates model bundles with requirements for current YDK version ([#844](https://github.com/CiscoDevNet/ydk-gen/issues/844))
   * NETCONF Session constructor doesn't allow port to be None ([#846](https://github.com/CiscoDevNet/ydk-gen/issues/846))
   * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
   * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
   * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
-  * Decoding gNMI payload failes with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+  * Segmentation fault when decoding gNMI config payload ([#856](https://github.com/CiscoDevNet/ydk-gen/issues/856))
+  * Decoding gNMI payload fails with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+
+#### Documentation improvements
+  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848), 
+  [#850](https://github.com/CiscoDevNet/ydk-gen/issues/850), [#861](https://github.com/CiscoDevNet/ydk-gen/issues/861),
+  [#862](https://github.com/CiscoDevNet/ydk-gen/issues/862)
 
 
 ### 2018-12-17 version 0.8.0

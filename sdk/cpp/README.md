@@ -168,25 +168,33 @@ $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
 #### Install gNMI service library
 
+##### Linux
+
 For Ubuntu/Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
-For MacOS:
+For CentOS
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
-$ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-2.x86_64.rpm
+```
+
+##### MacOS
+
+```
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-2_Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Installing from source

@@ -447,7 +447,7 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(ospf, ospf_result)
 
         op = self.netconf_service.discard_changes(self.ncc)
-        self.assertEqual(True, op)        
+        self.assertEqual(True, op)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

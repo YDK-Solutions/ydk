@@ -188,7 +188,7 @@ def _get_top_level_entity(read_filter, root_schema):
 
     if isinstance(read_filter, list):
         entities = []
-        for i in range(0, len(read_filter)):
+        for i in range(len(read_filter)):
             entity = _get_top_level_entity(read_filter[i], root_schema)
             entities.append(entity)
         return entities
@@ -208,7 +208,7 @@ def _get_top_level_entity(read_filter, root_schema):
             data_node = parent_datanode
         return _datanode_to_entity(data_node)
 
-    return _get_top_level_entity(read_filter.parent)
+    return _get_top_level_entity(read_filter.parent, root_schema)
 
 def _find_child_entity(parent_entity, filter_abs_path):
     parent_abs_path = parent_entity.get_absolute_path()
@@ -234,23 +234,23 @@ def _get_child_entity_from_top(top_entity, filter_entity):
 
     Args:
         top_entity (Entity or [Entity ..]): Top-level entity, usually returned from CRUD read operation.
-        
+
         filter_entity (Entity or [Entity ..]): Top-level or non-top-level entity, which is expected to be in the 'top_entity' hierarchy.
-        
+
         Argument type and list size must be matching.
 
     Returns:
         Top-level or non-top-level entity, which matches given filter under top-entity hierarchy.
-        
-    Raises: 
-        YServiceError, if specified argument types are not matching or 'filter_entity' does not belong to 'top_entity' hierarchy. 
+
+    Raises:
+        YServiceError, if specified argument types are not matching or 'filter_entity' does not belong to 'top_entity' hierarchy.
     """
     if filter_entity is None:
         return top_entity
 
     if isinstance(top_entity, list) and isinstance(filter_entity, list) and len(top_entity) == len(filter_entity):
         entities = []
-        for i in range(0, len(top_entity)):
+        for i in range(len(top_entity)):
             entity = _get_child_entity_from_top(top_entity[i], filter_entity[i])
             entities.append(entity)
         return entities

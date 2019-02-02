@@ -35,7 +35,7 @@ class ModuleMetaPrinter(FilePrinter):
         self.one_class_per_module = one_class_per_module
         self.identity_subclasses = identity_subclasses
 
-    def print_header(self, package):
+    def print_header(self, packages):
         self.ctx.str("""
 '''
 This is auto-generated file,
@@ -48,16 +48,17 @@ from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_IDENTITY_CLASS, R
 from ydk._core._importer import _yang_ns
 
 """ % package.name)
-    def print_body(self, package):
+
+    def print_body(self, packages):
         self.ctx.writeln('_meta_table = {')
         self.ctx.lvl_inc()
-        for nested_enumz in [e for e in package.owned_elements if isinstance(e, Enum)]:
+        for nested_enumz in [e for e in packages.owned_elements if isinstance(e, Enum)]:
             self.print_enum_meta(nested_enumz)
-        self.print_classes_meta([c for c in package.owned_elements if isinstance(c, Class)])
+        self.print_classes_meta([c for c in packages.owned_elements if isinstance(c, Class)])
         self.ctx.lvl_dec()
         self.ctx.writeln('}')
         self.print_classes_meta_parents(
-            [c for c in package.owned_elements if isinstance(c, Class)])
+            [c for c in packages.owned_elements if isinstance(c, Class)])
 
     def print_classes_meta(self, unsorted_classes):
         ClassMetaPrinter(self.ctx, self.one_class_per_module, self.identity_subclasses).print_output(

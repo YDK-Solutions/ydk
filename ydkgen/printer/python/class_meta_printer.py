@@ -102,20 +102,7 @@ class ClassMetaPrinter(object):
                 self.identity_subclasses)
             self.print_meta_class_member(meta_info_data, self.ctx)
 
-        '''
-        class _MetaInfoClass(object):
-
-    def __init__(
-            self,
-            name,
-            is_abstract,
-            meta_info_class_members,
-            module_name,
-            yang_name,
-            namespace,
-            pmodule_name):
-        '''
-        self.ctx.writeln('],'),
+        self.ctx.writeln('],')
         module_name = "%s" % get_module_name(clazz.stmt)
         self.ctx.writeln("'%s'," % module_name)
         self.ctx.writeln("'%s'," % clazz.stmt.arg)

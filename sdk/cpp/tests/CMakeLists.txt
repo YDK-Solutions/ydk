@@ -16,7 +16,7 @@ set(bundle_tests_src
         test_netconf_provider.cpp
         test_netconf_service.cpp
         test_netconf_ssh_client.cpp
-        test_netconf_tcp_client.cpp
+#        test_netconf_tcp_client.cpp
         test_on_demand_loading.cpp
         test_opendaylight.cpp
         test_path_api.cpp

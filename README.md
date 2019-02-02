@@ -70,7 +70,7 @@ A [docker image](https://docs.docker.com/engine/reference/run/) is automatically
 To use the docker image, [install docker](https://docs.docker.com/install/) on your system and run the below command. See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
 
 ```
-docker run -it ydkdev/ydk-gen
+   docker run -it ydkdev/ydk-gen
 ```
 
 # System requirements
@@ -84,13 +84,13 @@ Please follow the below instructions to install the system requirements before i
 #### Install OS dependency packages
 
 ```
-   $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-   $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
+   sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
+   sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
-   $ # Upgrade compiler to gcc 5.*
-   $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
-   $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
-   $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+   # Upgrade compiler to gcc 5.*
+   sudo apt-get install gcc-5 g++-5 -y > /dev/null
+   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
+   sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
 ```
 
 #### Install libydk library
@@ -100,15 +100,15 @@ You can install the latest `libydk` core library using prebuilt binaries for Xen
 For Xenial (Ubuntu 16.04.4):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-$ sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-$ sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
+   sudo gdebi libydk_0.8.1-1_amd64.deb
 ```
 
 ### Centos (Fedora-based)
@@ -116,20 +116,20 @@ $ sudo gdebi libydk_0.8.1-1_amd64.deb
 #### Install OS dependency packages
 
 ```
-   $ sudo yum install epel-release
-   $ sudo yum install libssh-devel gcc-c++
+   sudo yum install epel-release
+   sudo yum install libssh-devel gcc-c++
 
    # Upgrade compiler to gcc 5.*
-   $ sudo yum install centos-release-scl -y > /dev/null
-   $ sudo yum install devtoolset-4-gcc* -y > /dev/null
-   $ sudo ln -sf /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   $ sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   sudo yum install centos-release-scl -y > /dev/null
+   sudo yum install devtoolset-4-gcc* -y > /dev/null
+   sudo ln -sf /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 ```
 
 #### Install prebuilt libydk binary
 
 ```  
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
 ```
 
 ### Build from source
@@ -138,16 +138,16 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 ```
    # Generate and install libydk library
-   $ ./generate --cpp --core
-   $ cd gen-api/cpp/ydk/build/
-   $ make
-   $ sudo make install
+   ./generate --cpp --core
+   cd gen-api/cpp/ydk/build/
+   make
+   sudo make install
    
    # Generate and install libydk_gnmi library (optional)
-   $ ./generate --cpp --service profiles/services/gnmi-0.4.0.json
-   $ cd gen-api/cpp/ydk-service-gnmi/build/
-   $ make
-   $ sudo make install
+   ./generate --cpp --service profiles/services/gnmi-0.4.0.json
+   cd gen-api/cpp/ydk-service-gnmi/build/
+   make
+   sudo make install
 ```
 
 ## MacOS
@@ -159,12 +159,15 @@ You can download the latest Python package from [here](https://www.python.org/do
 #### Install prebuilt libydk and optionally libydk_gnmi libraries
 
 ```
-   $ xcode-select --install
-   $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   $ brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
-   $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   xcode-select --install
+   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
+   
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
+   sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -173,16 +176,16 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 ```
    # Generate and install libydk library
-   $ ./generate --cpp --core
-   $ cd gen-api/cpp/ydk/build/
-   $ make
-   $ sudo make install
+   ./generate --cpp --core
+   cd gen-api/cpp/ydk/build/
+   make
+   sudo make install
    
    # Generate and install libydk_gnmi library (optional)
-   $ ./generate --cpp --service profiles/services/gnmi-0.4.0.json
-   $ cd gen-api/cpp/ydk-service-gnmi/build/
-   $ make
-   $ sudo make install
+   ./generate --cpp --service profiles/services/gnmi-0.4.0.json
+   cd gen-api/cpp/ydk-service-gnmi/build/
+   make
+   sudo make install
 ```
 
 ## Libssh installation
@@ -192,11 +195,11 @@ which is required for YDK. Therefore, if after installation of libssh package yo
 please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher.
 
 ```
-$ wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
-$ tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
-$ mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
-$ cmake ..
-$ sudo make install
+   wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+   tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+   mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+   cmake ..
+   sudo make install
 ```
 
 ## Windows
@@ -210,25 +213,25 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 ### Install protobuf and protoc
 
 ```
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    sudo make install
-    sudo ldconfig
+   wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+   unzip protobuf-cpp-3.5.0.zip
+   cd protobuf-3.5.0
+   ./configure
+   make
+   sudo make install
+   sudo ldconfig
 ```
 
 ### Install gRPC
 
 ```
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
+   git clone -b v1.9.1 https://github.com/grpc/grpc
+   cd grpc
+   git submodule update --init
+   make
+   sudo make install
+   sudo ldconfig
+   cd -
 ```
 
 ### Instal YDK gNMI library
@@ -238,28 +241,28 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial (Ubuntu 16.04.4):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1)
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
-```
-
-For MacOS:
-
-```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
-$ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 #### CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-2.x86_64.rpm
+```
+
+#### MacOS:
+
+```
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Run-time environment
@@ -269,8 +272,8 @@ See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuec
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
-    PROTO="/Your-Protobuf-and-Grpc-installation-directory"
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 ```
 
 # Installation
@@ -279,8 +282,8 @@ As a workaround, the YDK based application runtime environment must include sett
 We recommend that you run ydk-gen under Python virtual environment (``virtualenv``/``virtualenvwrapper``).  To install Python virtual environment in your system, execute:
 
 ```
-  $ pip install virtualenv virtualenvwrapper
-  $ source /usr/local/bin/virtualenvwrapper.sh
+   pip install virtualenv virtualenvwrapper
+   source /usr/local/bin/virtualenvwrapper.sh
 ```
 
 In some systems (e.g. Debian-based Linux), you may need to install support for Python virtual environments as root
@@ -288,15 +291,15 @@ In some systems (e.g. Debian-based Linux), you may need to install support for P
 Create new virtual environment:
 
 ```
-  $ mkvirtualenv -p python2.7 py2
+   mkvirtualenv -p python2.7 py2
 ```
 
 ## Clone ydk-gen and install the requirements
 
 ```
-$ git clone https://github.com/CiscoDevNet/ydk-gen.git
-$ cd ydk-gen
-$ pip install -r requirements.txt
+   git clone https://github.com/CiscoDevNet/ydk-gen.git
+   cd ydk-gen
+   pip install -r requirements.txt
 ```
 
 ## Generate YDK components

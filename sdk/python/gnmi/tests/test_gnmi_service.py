@@ -96,7 +96,8 @@ class SanityGnmiService(unittest.TestCase):
         ifc_filter.name = 'Loopback10'
         response = self.gs.get(self.provider, ifc_filter, "CONFIG")
         self.assertIsNotNone(response)
-        self.assertEqual(isinstance(response, openconfig_interfaces.Interfaces.Interface), True)
+        self.assertTrue(hasattr(response, 'name'))
+        self.assertEqual(response.name, 'Loopback10')
  
         # Get interface description only
         ifc_filter = openconfig_interfaces.Interfaces.Interface()

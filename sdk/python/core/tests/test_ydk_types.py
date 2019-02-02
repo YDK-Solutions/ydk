@@ -188,7 +188,7 @@ class SanityTest(unittest.TestCase):
         for elem in runner.no_key_list:
             count += elem.test
         self.assertEqual(count, 't1t2t3')
-        
+
         from ydk.providers import CodecServiceProvider
         from ydk.services  import CodecService
         provider = CodecServiceProvider(type='xml')

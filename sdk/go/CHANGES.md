@@ -8,7 +8,7 @@
   * YDK fails process RPC payload, which contain 'data' tag ([#851](https://github.com/CiscoDevNet/ydk-gen/issues/851))
   * gNMI script results in a segmentation fault if repository is missing a required model ([#852](https://github.com/CiscoDevNet/ydk-gen/issues/852))
   * CodecService fails correctly encode multiple entries in keyless list ([#854](https://github.com/CiscoDevNet/ydk-gen/issues/854))
-  * Decoding gNMI payload failes with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
+  * Decoding gNMI payload fails with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
 
 
 ### 2018-12-17 version 0.8.0

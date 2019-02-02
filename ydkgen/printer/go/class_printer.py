@@ -137,7 +137,7 @@ class ClassPrinter(object):
             fp.ctx.writeln('%s.AbsolutePath = %s.SegmentPath' % (data_alias, data_alias))
         else:
             fp.ctx.writeln('%s.AbsolutePath = "%s/" + %s.SegmentPath' % (data_alias, path, data_alias))
-        
+
     @staticmethod
     def _print_children(fp, children, data_alias):
         fp.ctx.writeln('%s.Children = types.NewOrderedMap()' % data_alias)

@@ -19,7 +19,7 @@ from ydk.errors import YServiceError as _YServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 
 from ydk.types import EntityCollection, Config
-from ydk.entity_utils import _read_entities, _get_top_level_entity, _get_child_entity_from_top
+from ydk.entity_utils import _get_top_level_entity, _get_child_entity_from_top
 
 class gNMIService(_gNMIService):
     """ Python wrapper for gNMIService

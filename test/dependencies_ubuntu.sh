@@ -70,7 +70,7 @@ function check_install_gcc {
   local status=$?
   if [[ $status == 0 ]]
   then
-    gcc_version=$(echo `gcc --version` | awk '{ print $3 }' | cut -d '-' -f 1)
+    gcc_version=$(echo $(gcc --version) | awk '{ print $3 }' | cut -d '-' -f 1)
     print_msg "Current gcc/g++ version is $gcc_version"
   else
     print_msg "The gcc/g++ not installed"
@@ -86,7 +86,7 @@ function check_install_gcc {
     sudo apt-get install gcc-5 g++-5 -y > /dev/null
     sudo ln -fs /usr/bin/g++-5 /usr/bin/c++
     sudo ln -fs /usr/bin/gcc-5 /usr/bin/cc
-    gcc_version=$(echo `gcc --version` | awk '{ print $3 }' | cut -d '-' -f 1)
+    gcc_version=$(echo $(gcc --version) | awk '{ print $3 }' | cut -d '-' -f 1)
     print_msg "Installed gcc/g++ version is $gcc_version"
   fi
 }

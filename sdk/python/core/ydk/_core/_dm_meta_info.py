@@ -32,7 +32,7 @@ class _MetaInfoClassMember(object):
                  pmodule_name, clazz_name,
                  prange, pattern, doc,
                  presentation_name, module_name, is_key,
-                 members=[], max_elements=None, min_elements=None, default_value=None, is_config=True):
+                 members=None, max_elements=None, min_elements=None, default_value=None, is_config=True):
         self._name = name
         self._mtype = mtype
         self._ptype = ptype
@@ -48,6 +48,8 @@ class _MetaInfoClassMember(object):
         self._module_name = module_name
         self._is_key = is_key
         self._members = members
+        if members is None:
+            self._members = []
         self._max_elements = max_elements
         self._min_elements = min_elements
         self._default_value = default_value

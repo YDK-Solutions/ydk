@@ -27,6 +27,7 @@ import logging
 import os, sys, shutil
 import tarfile
 import tempfile
+import re
 
 from .common import YdkGenException, iscppkeyword, ispythonkeyword, isgokeyword
 from ydkgen.builder import (ApiModelBuilder, PyangModelBuilder, SubModuleBuilder)
@@ -75,6 +76,7 @@ class YdkGenerator(object):
         elif self.language == 'go':
             self.iskeyword = isgokeyword
         self.package_name = ""
+        self.version = ""
         self.generate_meta = False
 
     def generate(self, description_file):
@@ -110,8 +112,9 @@ class YdkGenerator(object):
         with open(os.path.join(self.ydk_root, profile_file)) as f:
             profile = json.load(f)
             self.package_name = profile.get('name')
-            if self.package_name is None:
-                raise YdkGenException("Attribute 'name' in the bundle profile is not defined")
+            self.version = profile.get('version')
+            if self.package_name is None or self.version is None:
+                raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
         
         tmp_file = tempfile.mkstemp(suffix='.bundle')[-1]
         bundle_translator.translate(profile_file, tmp_file, self.ydk_root)
@@ -129,12 +132,17 @@ class YdkGenerator(object):
         _set_original_bundle_name_for_packages(all_bundles, packages, curr_bundle)
         gen_api_root = self._init_bundle_directories(packages, curr_bundle)
 
-        yang_models = _create_models_archive(curr_bundle, gen_api_root)
+        bundle_name = curr_bundle.fqn
+        if self.language == 'cpp':
+            t = bundle_name.split('@')
+            cpp_version, cpp_build = get_cpp_version_and_build(t[1])
+            bundle_name = "%s@%s" % (t[0], cpp_version)
+        yang_models = _create_models_archive(curr_bundle, gen_api_root, bundle_name)
 
         generated_files = self._print_packages(packages, gen_api_root, curr_bundle)
 
         if self.language == 'cpp':
-            _modify_cpp_cmake(gen_api_root, curr_bundle.name, curr_bundle.str_version, 
+            _modify_cpp_cmake(gen_api_root, curr_bundle.name, cpp_version, cpp_build, 
                     curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
 
         os.remove(tmp_file)
@@ -152,10 +160,16 @@ class YdkGenerator(object):
         with open(os.path.join(self.ydk_root, profile_file)) as f:
             profile = json.load(f)
             self.package_name = profile.get('name')
-            if self.package_name is None:
-                raise YdkGenException("Attribute 'name' in the service profile is not defined")
-        
-        gen_api_root = self._initialize_gen_api_directories('ydk-service-%s'%self.package_name, self.package_type)
+            self.version = profile.get('version')
+            if self.package_name is None or self.version is None:
+                raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
+            dependency = profile.get('dependency')
+
+        package_name = 'ydk-service-%s' % self.package_name
+        gen_api_root = self._initialize_gen_api_directories(package_name, self.package_type)
+
+        if self.language != 'go':
+            update_setup_file_version(self.language, gen_api_root, self.package_name, package_name, self.version)
 
         return gen_api_root
 
@@ -327,7 +341,7 @@ def _create_tar(resolved_models_dir, tar_file_path):
     return yang_models_base_names
 
 
-def _create_models_archive(bundle, target_dir):
+def _create_models_archive(bundle, target_dir, bundle_name):
     '''
     Creates yang models archive as part of bundle package.
     Args:
@@ -337,7 +351,7 @@ def _create_models_archive(bundle, target_dir):
     '''
     global YDK_YANG_MODEL
     assert isinstance(bundle, bundle_resolver.Bundle)
-    tar_file = '{}.tar.gz'.format(bundle.fqn)
+    tar_file = '{}.tar.gz'.format(bundle_name)
     tar_file_path = os.path.join(target_dir, tar_file)
     ydk_yang = os.path.join(target_dir, YDK_YANG_MODEL)
     if os.path.isfile(ydk_yang):
@@ -364,6 +378,24 @@ def _set_original_bundle_name_for_packages(bundles, packages, curr_bundle):
                 if pkg.name == module.pkg_name:
                     pkg.bundle_name = bundle.name
 
+def get_cpp_version_and_build(version):
+    m = re.match('(\d+).(\d+).(\d+)', version)
+    if m:
+        ver = '.'.join(m.group(i) for i in range(1,4))
+        rest = version.split(ver)[1]
+        build = '1'
+        if len(rest)>0:
+            b = re.match('[-_.a-z]+(\d+)', rest)
+            if b:
+                build = b.group(1)
+        return ver, build
+    else:
+        raise YdkGenException('Invalid version format %s\n\nExpected format: <major>.<minor>.<patch>[[.|-|_\w]+<build>]' % version)
+
+def normalize_version(version):
+    version = version.replace('_', '.')
+    version = version.replace('-', '.')
+    return version
 
 def _modify_python_setup(gen_api_root, package_name, version, core_version, dependencies, description, long_description):
     """ Modify setup.py template for python packages. Replace package name
@@ -388,19 +420,19 @@ def _modify_python_setup(gen_api_root, package_name, version, core_version, depe
     replaced_description = False
     replaced_long_description = False
     for line in fileinput.input(setup_file, inplace=True):
-        if not replaced_package and "$PACKAGE$" in line:
+        if "$PACKAGE$" in line:
             replaced_package = True
             print(line.replace("$PACKAGE$", package_name.replace('_', '-')), end='')
         elif not replaced_version and "$VERSION$" in line:
             replaced_version = True
-            print(line.replace("$VERSION$", version), end='')
+            print(line.replace("$VERSION$", normalize_version(version)), end='')
         elif not replaced_core_version and "$CORE_VERSION$" in line:
             replaced_core_version = True
-            print(line.replace("$CORE_VERSION$", core_version), end='')
+            print(line.replace("$CORE_VERSION$", normalize_version(core_version)), end='')
         elif not replaced_dependencies and "$DEPENDENCY$" in line:
             replaced_dependencies = True
             if dependencies:
-                additional_requires = ["'ydk-models-%s>=%s'" % (d.name, d.str_version)
+                additional_requires = ["'ydk-models-%s>=%s'" % (d.name, normalize_version(d.str_version))
                                        for d in dependencies]
                 print(line.replace("'$DEPENDENCY$'", ", ".join(additional_requires)))
             else:
@@ -424,7 +456,41 @@ def _modify_python_manifest(gen_api_root, bundle_name):
             print(line, end='')
 
 
-def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_files, header_files, model_names):
+def update_setup_file_version(language, gen_api_root, name, package_name, version):
+    cpp_version, cpp_build = get_cpp_version_and_build(version)
+    replacer_table = {}     # KEY is file name; VALUE is dictionary: substr match: replacement template
+    if language == 'python':
+        replacer_table = {
+            'setup.py': {'NAME =': "NAME = '%s'\n" % package_name,
+                         'VERSION =': "VERSION = '%s'\n" % normalize_version(version),
+                        },
+            'CMakeLists.txt': {'project(path VERSION': 'project(path VERSION %s LANGUAGES C CXX)\n' % cpp_version,
+                               'set (CPACK_PACKAGE_RELEASE': 'set (CPACK_PACKAGE_RELEASE "%s")\n' % cpp_build,
+                              }
+        }
+    elif language == 'cpp':
+        replacer_table = {
+            'CMakeLists.txt': {'project(ydk_%s VERSION' % name: 'project(ydk_%s VERSION %s LANGUAGES C CXX)\n' % (name, cpp_version),
+                               'set (CPACK_PACKAGE_RELEASE': 'set (CPACK_PACKAGE_RELEASE "%s")\n' % cpp_build,
+                              }
+        }
+    else:
+        raise Exception('Language {0} has no setup file'.format(language))
+
+    for file_name, keyword_replacer_table in replacer_table.items():
+        setup_file = os.path.join(gen_api_root, file_name)
+        lines = []
+        with open(setup_file, 'r+') as fd:
+            lines = fd.readlines()
+        for i, line in enumerate(lines):
+            for keyword, replace_value in keyword_replacer_table.items():
+                if keyword == line[:len(keyword)]:
+                    lines[i] = replace_value
+        with open(setup_file, 'w+') as fd:
+            fd.writelines(lines)
+
+
+def _modify_cpp_cmake(gen_api_root, bundle_name, cpp_version, cpp_build, core_version, source_files, header_files, model_names):
     """ Modify CMakeLists.txt template for cpp libraries.
 
     Args:
@@ -433,8 +499,6 @@ def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_f
         version (str): Package version for generated APIs.
         core_version (str): YDK core library version for generated APIs.
     """
-    if '-' in version:
-        version = ''.join(version.split('-')[:-1])
     cmake_file = os.path.join(gen_api_root, 'CMakeLists.txt')
 
     source_files = ['ydk/models/{}/'.format(bundle_name) + s for s in source_files]
@@ -451,14 +515,18 @@ def _modify_cpp_cmake(gen_api_root, bundle_name, version, core_version, source_f
             elif "@HEADER_FILES@" in line:
                 line = line.replace("@HEADER_FILES@", header_file_names)
             elif "@VERSION@" in line:
-                line = line.replace("@VERSION@", version)
+                line = line.replace("@VERSION@", cpp_version)
             elif "@CORE_VERSION@" in line:
+                core_version, _ = get_cpp_version_and_build(core_version)
                 line = line.replace("@CORE_VERSION@", core_version)
             elif "@YANG_FILES@" in line:
                 line = line.replace("@YANG_FILES@", model_file_names)
             print(line, end='')
         elif "@BRIEF_NAME_WITH_DASHES@" in line:
             line = line.replace("@BRIEF_NAME_WITH_DASHES@", bundle_name.replace('_', '-'))
+            print(line, end='')
+        elif "@BUILD_NUMBER@" in line:
+            line = line.replace("@BUILD_NUMBER@", cpp_build)
             print(line, end='')
         else:
             print(line, end='')

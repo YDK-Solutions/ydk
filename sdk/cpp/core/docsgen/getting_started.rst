@@ -27,7 +27,7 @@ The following packages must be present in your system before installing YDK-Cpp:
 
    # Linux dependencies
    sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
-   #
+
    # gcc-5 and g++5 for modern c++
    sudo apt-get install gcc-5 g++-5 -y > /dev/null
    sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
@@ -42,7 +42,7 @@ The following packages must be present in your system before installing YDK-Cpp:
    # Linux dependencies
    sudo yum install epel-release
    sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 wget
-   #
+
    # gcc-5 and g++5 for modern c++
    sudo yum install centos-release-scl -y > /dev/null
    sudo yum install devtoolset-4-gcc* -y > /dev/null
@@ -58,9 +58,9 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 
 .. code-block:: sh
 
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  brew install curl libssh pcre xml2 cmake
-  xcode-select --install
+   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   brew install curl libssh pcre xml2 cmake
+   xcode-select --install
 
 Libssh Installation
 -------------------
@@ -78,26 +78,26 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
+   wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+   unzip protobuf-cpp-3.5.0.zip
+   cd protobuf-3.5.0
+   ./configure
+   make
+   sudo make install
+   sudo ldconfig
+   cd -
 
 **Install gRPC**
 
 .. code-block:: sh
 
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
+   git clone -b v1.9.1 https://github.com/grpc/grpc
+   cd grpc
+   git submodule update --init
+   make
+   sudo make install
+   sudo ldconfig
+   cd -
 
 Quick YDK Installation
 ----------------------
@@ -140,37 +140,24 @@ Install YDK gNMI library (optional):
 
 **MacOS**
 
-You can install the latest model packages using `homebrew <http://brew.sh>`_.  This utility will manage the dependencies between YDK packages and all other sytem dependencies.  First, add the third-party repository (homebrew tap) for YDK:
-
-.. code-block:: sh
-
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
-   $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
-   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
-
 You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-  brew install ydk-cisco-ios-xr
+   brew install ydk-models-cisco-ios-xr
 
 Alternatively, you can perform partial installation.  If you only want to install the ``openconfig`` bundle and its dependencies (``ydk`` and ``ietf`` packages), execute:
 
 .. code-block:: sh
 
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
-   $
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk_gnmi-0.4.0-Darwin.pkg
-   $ sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1-beta/libydk-0.8.1-Darwin.pkg
+   sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
 
 If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
 
 .. code-block:: sh
 
-  brew install ydk-ietf
+   brew install ydk-ietf
 
 gNMI Service Installation
 -------------------------
@@ -184,28 +171,28 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 **CentOS**
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-2.x86_64.rpm
 
 **MacOS**
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~

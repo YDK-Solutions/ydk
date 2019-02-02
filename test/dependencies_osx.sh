@@ -68,7 +68,7 @@ function install_golang {
 
 function check_python_installation {
   print_msg "Checking python3 and pip3 installation"
-  brew rm -f --ignore-dependencies python python3
+  #brew rm -f --ignore-dependencies python python3
   python3 -V &> /dev/null
   status=$?
   if [ $status -ne 0 ]; then

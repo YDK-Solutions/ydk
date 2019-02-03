@@ -30,8 +30,8 @@ The following packages must be present in your system before installing YDK-Cpp:
 
    # gcc-5 and g++5 for modern c++
    sudo apt-get install gcc-5 g++-5 -y > /dev/null
-   sudo ln -f -s /usr/bin/g++-5 /usr/bin/c++
-   sudo ln -f -s /usr/bin/gcc-5 /usr/bin/cc
+   sudo ln -f -s /usr/bin/g++-5 /usr/bin/g++
+   sudo ln -f -s /usr/bin/gcc-5 /usr/bin/gcc
 
 **Centos (Fedora-based)**
 

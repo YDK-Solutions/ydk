@@ -44,8 +44,8 @@ Install gcc-5 for Xenial (Ubuntu 16.04.4):
 ```
 $ # Upgrade compiler to gcc 5.*
 $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
-$ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
-$ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+$ sudo ln -sf /usr/bin/g++-5 /usr/bin/g++
+$ sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 ```
 
 #### Centos (Fedora-based)

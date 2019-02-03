@@ -57,8 +57,8 @@ For Xenial (Ubuntu 16.04.4):
 ```
 $ # Upgrade compiler to gcc 5.*
 $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
-$ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
-$ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+$ sudo ln -sf /usr/bin/g++-5 /usr/bin/g++
+$ sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 
 $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
 $ sudo gdebi libydk_0.8.1-1_amd64.deb

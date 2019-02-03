@@ -389,7 +389,7 @@ function build_python_gnmi_package {
     print_msg "Installing gNMI package for Python"
 
     cd $YDKGEN_HOME
-    run_test generate.py -i --service profiles/services/gnmi-0.4.0_post2.json
+    run_test generate.py -is --service profiles/services/gnmi-0.4.0_post2.json
 
     print_msg "Verifying Python gNMI package installation"
     ${PYTHON_BIN} -c "from ydk.gnmi.path import gNMISession"

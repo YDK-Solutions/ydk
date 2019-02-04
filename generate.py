@@ -291,6 +291,13 @@ def _get_time_taken(start_time):
     seconds_str = str(seconds) + ' seconds'
     return minutes_str, seconds_str
 
+def get_python_version():
+    import sysconfig
+    python_version = sysconfig.get_config_var('LDVERSION')
+    if python_version is None or len(python_version) == 0:
+        python_version = sysconfig.get_config_var('VERSION')
+    return python_version
+
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -543,12 +550,17 @@ if __name__ == '__main__':
             dist_dir = '%s/dist' % output_directory
             file_list=os.listdir(dist_dir)
             if len(file_list) == 1:
-                dist = file_list[0]
-                print('\nInstalling {0} package {1} ...\n'.format(language, dist))
+                dest = file_list[0]
+                print('\nInstalling {0} package {1} ...\n'.format(language, dest))
                 sudo = ''
                 if options.sudo:
                     sudo = 'sudo '
-                os.system('%spip install %s/%s -U' % (sudo, dist_dir, dist))
+                pip_command = 'pip'
+                python_version = get_python_version()
+                if python_version.startswith('3.'):
+                    pip_command = 'pip3'
+                #print('\nExecuting command: %s%s install %s/%s -U\n' % (sudo, pip_command, dist_dir, dest))
+                os.system('%s%s install %s/%s -U' % (sudo, pip_command, dist_dir, dest))
 
             elif len(file_list) == 0:
                 print('\nCannot find installation package in directory %s' % dist_dir)

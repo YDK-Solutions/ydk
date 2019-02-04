@@ -89,8 +89,8 @@ Please follow the below instructions to install the system requirements before i
 
    # Upgrade compiler to gcc 5.*
    sudo apt-get install gcc-5 g++-5 -y > /dev/null
-   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
-   sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+   sudo ln -sf /usr/bin/g++-5 /usr/bin/g++
+   sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 ```
 
 #### Install libydk library
@@ -122,8 +122,8 @@ For Bionic (Ubuntu 18.04.1):
    # Upgrade compiler to gcc 5.*
    sudo yum install centos-release-scl -y > /dev/null
    sudo yum install devtoolset-4-gcc* -y > /dev/null
-   sudo ln -sf /opt/r h/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 ```
 
 #### Install prebuilt libydk binary

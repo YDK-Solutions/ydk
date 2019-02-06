@@ -21,15 +21,18 @@ from __future__ import absolute_import
 
 import sys
 import unittest
+import logging
 
-from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
 from ydk.filters import YFilter
 
-from test_utils import ParametrizedTestCase
-from test_utils import get_device_info
+from ydk.models.ydktest import ydktest_sanity as ysanity
+from ydk.models.ydktest import openconfig_interfaces
+from ydk.models.ydktest import iana_if_type
 
+from test_utils import ParametrizedTestCase
+from test_utils import get_device_info, enable_logging, print_entity
 
 class SanityYang(unittest.TestCase):
 
@@ -69,7 +72,9 @@ class SanityYang(unittest.TestCase):
         one.number, one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, one)
 
-        one_filter = ysanity.Runner.YdktestSanityOne()
+        r = ysanity.Runner()
+        one_filter = r.ydktest_sanity_one
+        one_filter.name = YFilter.read
         one_filter.number = YFilter.read
         one_read = self.crud.read(self.ncc, one_filter)
         self.assertIsNotNone(one_read)
@@ -87,7 +92,8 @@ class SanityYang(unittest.TestCase):
         r_1.enum_value = YdkEnumTest.local
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner().Ytypes.BuiltInT()
+        r = ysanity.Runner()
+        r_2 = r.ytypes.built_in_t
         r_2.enum_value = YFilter.read
         runner_read = self.crud.read(self.ncc, r_2)
         self.assertIsNotNone(runner_read)
@@ -145,7 +151,8 @@ class SanityYang(unittest.TestCase):
         r_1.identity_ref_value = ysanity.ChildIdentity()
         self.crud.create(self.ncc, r_1)
 
-        r_2 = ysanity.Runner().Ytypes.BuiltInT()
+        r = ysanity.Runner()
+        r_2 = r.ytypes.built_in_t
         r_2.identity_ref_value = YFilter.read
         t_read = self.crud.read(self.ncc, r_2)
         self.assertIsNotNone(t_read)
@@ -178,6 +185,15 @@ class SanityYang(unittest.TestCase):
         element_read = self.crud.read(self.ncc, runner_filter)
         self.assertEqual(element, element_read)
 
+    def test_iana_if_type_decode(self):
+        ifcs = openconfig_interfaces.Interfaces()
+        ifc = openconfig_interfaces.Interfaces.Interface()
+        ifc.name = 'GigabitEthernet0/0/0/2'
+        ifc.config.type = YFilter.read
+        ifcs.interface.append(ifc)
+        ifc_read = self.crud.read(self.ncc, ifc)
+        self.assertIsNotNone(ifc_read)
+        self.assertEqual(ifc_read.config.type, iana_if_type.EthernetCsmacd())
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

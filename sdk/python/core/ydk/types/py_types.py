@@ -248,7 +248,8 @@ class Entity(_Entity):
                     self._assign_yleaflist(name, value, v)
 
     def set_filter(self, path, yfilter):
-        pass
+        if hasattr(self, path):
+            setattr(self, path, yfilter)
 
     def has_leaf_or_child_of_name(self, name):
         for _, leaf in self._leafs.items():

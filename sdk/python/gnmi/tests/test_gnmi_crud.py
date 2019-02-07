@@ -100,15 +100,16 @@ class SanityGnmiCrud(unittest.TestCase):
         self.assertEqual( entity_to_string(ifc_config, self.schema), expected)
  
         # Read single leaf
+        ifcs = openconfig_interfaces.Interfaces()
         lo10 = openconfig_interfaces.Interfaces.Interface()
         lo10.name = 'Loopback10'
         lo10.config.description = YFilter.read
+        ifcs.interface.append(lo10)
         read_descr = self.crud.read(self.provider, lo10)
         #print_entity(read_descr, self.schema)
         expected = '''<interface>
   <name>Loopback10</name>
   <config>
-    <name>Loopback10</name>
     <description>Test</description>
   </config>
 </interface>

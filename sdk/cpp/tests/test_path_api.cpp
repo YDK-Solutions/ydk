@@ -24,13 +24,16 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#include "path_api.hpp"
 #include "config.hpp"
 #include "catch.hpp"
-#include "entity_data_node_walker.hpp"
+
+#include "path_api.hpp"
+#include <ydk/entity_data_node_walker.hpp>
 
 #include "ydk/netconf_provider.hpp"
-#include "ydk_ydktest/ydktest_sanity.hpp"
+#include "ydk/crud_service.hpp"
+
+#include "ydk_ydktest/openconfig_interfaces.hpp"
 
 using namespace std;
 
@@ -91,37 +94,69 @@ R"(
     </native>
 )";
 
-
-void print_tree(ydk::path::DataNode* dn, const std::string& indent)
+std::string yfilter2str(ydk::path::DataNode* dn)
 {
+	auto filter = ydk::get_data_node_yfilter(dn);
+	if (filter == ydk::YFilter::not_set)
+	    return "";
+	std::string filter_str = " yfilter=";
+	filter_str += to_string(filter);
+	return filter_str;
+}
+
+std::string print_tree(ydk::path::DataNode* dn, const std::string& indent)
+{
+  ostringstream buffer;
   try {
     ydk::path::Statement s = dn->get_schema_node().get_statement();
+    auto filter = yfilter2str(dn);
     if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
         auto val = dn->get_value();
-        std::cout << indent << "<" << s.arg << ">" << val << "</" << s.arg << ">" << std::endl;
+        buffer << indent << "<" << s.arg << filter << ">" << val << "</" << s.arg << ">" << std::endl;
     } else {
         std::string child_indent{indent};
         child_indent+="  ";
-        std::cout << indent << "<" << s.arg << ">" << std::endl;
+        buffer << indent << "<" << s.arg << filter << ">" << std::endl;
         for(auto c : dn->get_children())
-            print_tree(c.get(), child_indent);
-        std::cout << indent << "</" << s.arg << ">" << std::endl;
+            buffer << print_tree(c.get(), child_indent);
+        buffer << indent << "</" << s.arg << ">" << std::endl;
     }
   }
   catch (ydk::path::YCoreError &ex) {
 	  std::cout << ex.what() << std::endl;
   }
+  return buffer.str();
+}
+
+std::string data_node_to_xml(shared_ptr<ydk::path::DataNode> dn)
+{
+  ostringstream buffer;
+  try {
+	buffer << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
+	buffer << print_tree(dn.get(), " ");
+  }
+  catch (ydk::path::YCoreError &ex) {
+	std::cout << ex.what() << std::endl;
+  }
+  return buffer.str();
+}
+
+std::string data_node_to_xml(ydk::path::DataNode & dn)
+{
+  ostringstream buffer;
+  try {
+	buffer << "\n=====>  Printing DataNode: '" << dn.get_path() << "'" << endl;
+	buffer << print_tree(&dn, " ");
+  }
+  catch (ydk::path::YCoreError &ex) {
+	std::cout << ex.what() << std::endl;
+  }
+  return buffer.str();
 }
 
 void print_data_node(shared_ptr<ydk::path::DataNode> dn)
 {
-  try {
-	cout << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
-    print_tree(dn.get(), " ");
-  }
-  catch (ydk::path::YCoreError &ex) {
-	  std::cout << ex.what() << std::endl;
-  }
+	std::cout << data_node_to_xml(dn);
 }
 
 TEST_CASE( "decode_encode_interfaces" )
@@ -239,8 +274,6 @@ TEST_CASE( "bgp_netconf_create" )
     REQUIRE( !xml.empty() );
     update_rpc->get_input_node().create_datanode("entity", xml);
     (*update_rpc)(session);
-
-
 }
 
 
@@ -284,11 +317,6 @@ TEST_CASE("core_validate")
     CHECK( !xml.empty());
 
     std::cout << xml << std::endl;
-
-    //call create
-    // std::shared_ptr<ydk::path::Rpc> create_rpc { schema.create_rpc("ydk:create") };
-    // create_rpc->get_input_node().create_datanode("entity", xml);
-    // (*create_rpc)(session);
 }
 
 
@@ -640,3 +668,67 @@ TEST_CASE("test_embedded_slash_path") {
     string first = R"(<first>ab/c</first>)";
     REQUIRE(xml.find(first) != string::npos);
 }
+
+TEST_CASE( "decode_encode_interfaces_with_filters" )
+{
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& root = session.get_root_schema();
+
+    auto ifcs = ydktest::openconfig_interfaces::Interfaces();
+    auto ifc = make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description.yfilter = ydk::YFilter::read;
+    ifc->config->yfilter = ydk::YFilter::read;
+    ifcs.interface.append(ifc);
+
+    auto & ifcs_dn = get_data_node_from_entity( ifcs, root);
+    auto xml1 = data_node_to_xml(ifcs_dn);
+
+    auto top_entity = std::make_shared<ydktest::openconfig_interfaces::Interfaces>();
+    get_entity_from_data_node(&ifcs_dn, top_entity);
+
+    auto & ifcs_dn_2 = get_data_node_from_entity( *top_entity, root);
+    auto xml2 = data_node_to_xml(ifcs_dn_2);
+    REQUIRE(xml1==xml2);
+}
+
+const std::string ifc_payload = R"(<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>TenGigE0/0/0/0</name>
+    <config>
+      <name>TenGigE0/0/0/0</name>
+      <type xmlns:idx="urn:ietf:params:xml:ns:yang:iana-if-type">idx:ethernetCsmacd</type>
+      <enabled>false</enabled>
+    </config>
+  </interface>
+</interfaces>
+)";
+
+TEST_CASE("iana-if-type_decode")
+{
+    // Remove iana-if-type.yang file from repository to assure correct test flow
+	if (const char* env_p = std::getenv("HOME")) {
+        string path = env_p;
+        path += "/.ydk/127.0.0.1/iana-if-type.yang";
+        cout << "Deleting file " << path << endl;
+        remove(path.c_str());
+    }
+
+    ydk::path::NetconfSession session{"127.0.0.1", "admin", "admin", 12022};
+    ydk::path::RootSchemaNode& root = session.get_root_schema();
+    ydk::path::Codec codec{};
+
+    auto root_data_node = codec.decode(root, ifc_payload, ydk::EncodingFormat::XML);
+    REQUIRE(root_data_node != nullptr);
+
+    auto ifcs_data_node = root_data_node->get_children()[0];
+    auto xml = codec.encode( *ifcs_data_node, ydk::EncodingFormat::XML, true);
+    auto pos = xml.find("ianaift");
+    while (pos != std::string::npos) {
+        xml = xml.replace(pos, 7, "idx");
+        pos = xml.find("ianaift");
+    }
+    REQUIRE(xml == ifc_payload);
+}
+

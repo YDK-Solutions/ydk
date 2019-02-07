@@ -172,28 +172,28 @@ sudo ldconfig
 For Ubuntu/Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
+$ sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
 ```
 
 For CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-2.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
 ```
 
 ##### MacOS:
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-2_Darwin.pkg
-$ sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
 ```
 
 #### Runtime environment

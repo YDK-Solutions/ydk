@@ -110,7 +110,6 @@ class SanityGnmiService(unittest.TestCase):
         expected = '''<interface>
   <name>Loopback10</name>
   <config>
-    <name>Loopback10</name>
     <description>Test</description>
   </config>
 </interface>

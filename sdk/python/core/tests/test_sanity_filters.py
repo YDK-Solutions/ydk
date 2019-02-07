@@ -21,7 +21,6 @@ from __future__ import absolute_import
 
 import sys
 import unittest
-import logging
 
 from ydk.providers import NetconfServiceProvider
 from ydk.services import CRUDService
@@ -32,7 +31,7 @@ from ydk.models.ydktest import openconfig_interfaces
 from ydk.models.ydktest import iana_if_type
 
 from test_utils import ParametrizedTestCase
-from test_utils import get_device_info, enable_logging, print_entity
+from test_utils import get_device_info
 
 class SanityYang(unittest.TestCase):
 

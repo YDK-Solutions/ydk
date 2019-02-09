@@ -40,7 +40,8 @@ namespace ydk
 /// Entity
 //////////////////////////////////////////////////////////////////
 Entity::Entity()
-  : parent(nullptr), yfilter(YFilter::not_set), is_presence_container(false), is_top_level_class(false), has_list_ancestor(false)
+  : parent(nullptr), yfilter(YFilter::not_set), is_presence_container(false),
+    is_top_level_class(false), has_list_ancestor(false), ignore_validation(false)
 {
 }
 

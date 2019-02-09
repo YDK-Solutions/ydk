@@ -36,8 +36,9 @@ using namespace std;
             || Catch::Contains("Unexpected character") \
             || Catch::Contains("does not satisfy the constraint") \
             || Catch::Contains("is an invalid value") \
+            || Catch::Contains("is not a valid value") \
+            || Catch::Contains("got unexpected data") \
             || Catch::Contains("YModelError")
-
 
 TEST_CASE("int8_invalid")
 {
@@ -53,6 +54,24 @@ TEST_CASE("int8_invalid")
     //CREATE
     r_1->ytypes->built_in_t->number8 = "test";
     CHECK_THROWS_WITH(crud.create(provider, *r_1), CONTAINS_ERROR_MESSAGE);
+}
+
+TEST_CASE("int8_invalid_ignore_validation")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    //DELETE
+    auto r = ydktest_sanity::Runner();
+    bool reply = crud.delete_(provider, r);
+    REQUIRE(reply);
+
+    //CREATE
+    r.ignore_validation = true;
+    r.ytypes->built_in_t->number8 = "test";
+    r.ytypes->built_in_t->number8.yfilter = YFilter::create;
+    CHECK_THROWS_WITH(crud.update(provider, r), Catch::Contains("\"test\" is not a valid value"));
 }
 
 TEST_CASE("int16_invalid")

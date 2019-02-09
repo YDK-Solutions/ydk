@@ -28,6 +28,7 @@ set(bundle_tests_src
         test_xml_subtree.cpp
         testsanitynctest.cpp
         testsanityvalidationtest.cpp
+        test_utils.cpp
         )
 
 find_library(xml2_location xml2)

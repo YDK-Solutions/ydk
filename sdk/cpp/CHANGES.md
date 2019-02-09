@@ -1,10 +1,12 @@
-### 2019-02-02 version 0.8.1
+### 2019-02-11 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
+  * Introduced a feature, which allows to disable validation of entity data processed by NetconfServiceProvider.
 
 #### ydk-gen
   * Use CMake build number for release numbers with suffix ([#864](https://github.com/CiscoDevNet/ydk-gen/issues/864))
+  * Added `generate.py` script options '-i --install' and '-s --sudo' to generate and install packages in one step.
 
 #### Resolved GitHub issues
   * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))

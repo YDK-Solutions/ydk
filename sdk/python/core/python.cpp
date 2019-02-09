@@ -582,6 +582,7 @@ PYBIND11_MODULE(ydk_, ydk)
         .def_readwrite("is_presence_container", &ydk::Entity::is_presence_container, return_value_policy::reference)
         .def_readwrite("is_top_level_class", &ydk::Entity::is_top_level_class)
         .def_readwrite("has_list_ancestor", &ydk::Entity::has_list_ancestor)
+        .def_readwrite("ignore_validation", &ydk::Entity::ignore_validation)
         .def_property("parent", &ydk::Entity::get_parent, &ydk::Entity::set_parent);
 
 

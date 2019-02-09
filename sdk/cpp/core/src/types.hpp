@@ -151,6 +151,7 @@ class Entity {
     bool is_presence_container;
     bool is_top_level_class;
     bool has_list_ancestor;
+    bool ignore_validation;
     std::vector<std::string> ylist_key_names;
     std::string ylist_key;
 

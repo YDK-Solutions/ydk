@@ -1,7 +1,10 @@
-### 2019-02-02 version 0.8.1
+### 2019-02-11 version 0.8.1
 
 #### Go
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
+
+#### ydk-gen
+  * Added `generate.py` script options '-i --install' and '-s --sudo' to generate and install packages in one step.
 
 #### Resolved GitHub issues
   * YFilter dropped when used with NetconfService and EntityCollection ([#803](https://github.com/CiscoDevNet/ydk-gen/issues/803))

@@ -19,9 +19,6 @@
 
 #include <ydk/netconf_provider.hpp>
 #include <ydk/netconf_service.hpp>
-#include <ydk_ydktest/ydktest_sanity.hpp>
-#include <ydk_ydktest/openconfig_bgp.hpp>
-#include <ydk_ydktest/openconfig_interfaces.hpp>
 #include <ydk/types.hpp>
 #include <ydk/filters.hpp>
 #include <ydk/common_utilities.hpp>
@@ -30,13 +27,16 @@
 
 #include "config.hpp"
 #include "catch.hpp"
+#include "test_utils.hpp"
+
+#include <ydk_ydktest/ydktest_sanity.hpp>
+#include <ydk_ydktest/openconfig_bgp.hpp>
+#include <ydk_ydktest/openconfig_interfaces.hpp>
+#include <ydk_ydktest/iana_if_type.hpp>
 
 using namespace ydk;
 using namespace ydktest;
 using namespace std;
-
-void print_data_node(shared_ptr<ydk::path::DataNode> dn);
-void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root);
 
 // cancel_commit -- issues in netsim
 //TEST_CASE("cancel_commit")
@@ -113,7 +113,7 @@ TEST_CASE("discard_changes")
     auto reply = ns.discard_changes(provider);
     REQUIRE(reply);
 }
-
+/* Needs more work
 TEST_CASE("get_edit_copy_config")
 {
     path::Repository repo{TEST_HOME};
@@ -122,6 +122,21 @@ TEST_CASE("get_edit_copy_config")
 
     DataStore target = DataStore::candidate;
     DataStore source = DataStore::running;
+
+    // Buils some configuration
+    auto bgp = openconfig_bgp::Bgp();
+    bgp.global->config->as = 6500;
+    bgp.global->config->router_id = "10.20.30.40";
+    auto ifcs = openconfig_interfaces::Interfaces();
+    auto ifc  = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifcs.interface.append(ifc);
+
+    vector<ydk::Entity*> config_list;
+    config_list.push_back(&bgp);
+    config_list.push_back(&ifcs);
+    if (ns.edit_config(provider, target, config_list))
+        ns.commit(provider);
 
     // Build filter
     openconfig_interfaces::Interfaces interfaces_filter{};
@@ -148,6 +163,41 @@ TEST_CASE("get_edit_copy_config")
     // Discard changes
     result = ns.discard_changes(provider);
     REQUIRE(result);
+} */
+
+TEST_CASE("iana_if_type_filter")
+{
+    NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    NetconfService ns{};
+
+    // Buils some configuration
+    auto ifcs_config = openconfig_interfaces::Interfaces();
+    auto ifc_config  = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc_config->name = "GigabitEthernet0/0/0/2";
+    ifc_config->config->name = "GigabitEthernet0/0/0/2";
+    ifc_config->config->description = "Test interface";
+    ifc_config->config->type = iana_if_type::EthernetCsmacd();
+    ifcs_config.interface.append(ifc_config);
+    if (ns.edit_config(provider, DataStore::candidate, ifcs_config)) {
+        ns.commit(provider);
+    }
+
+    auto ifcs = openconfig_interfaces::Interfaces();
+    auto ifc  = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "GigabitEthernet0/0/0/2";
+    ifc->config->type.yfilter = YFilter::read;
+    ifcs.interface.append(ifc);
+    auto ifc_ent = ns.get(provider, *ifc);
+    REQUIRE(ifc_ent != nullptr);
+    auto ifc_xml = entity2string(ifc_ent, provider.get_session().get_root_schema());
+    std::string expected = R"(<interface>
+  <name>GigabitEthernet0/0/0/2</name>
+  <config>
+    <type>iana-if-type:ethernetCsmacd</type>
+  </config>
+</interface>
+)";
+    REQUIRE(ifc_xml == expected);
 }
 
 // edit_config, get_config

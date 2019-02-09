@@ -337,9 +337,9 @@ class Entity(_Entity):
 
     def _perform_setattr(self, clazz, leaf_names, name, value):
         with _handle_type_error():
-            if name != 'yfilter' and name != 'parent' and hasattr(self,
-                                                                  '_is_frozen') and self._is_frozen and \
-                                                                    name not in self.__dict__:
+            if name != 'yfilter' and name != 'parent' and name != 'ignore_validation' \
+                                 and hasattr(self, '_is_frozen') and self._is_frozen \
+                                 and name not in self.__dict__:
                 raise _YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".format(name,
                                                                                             self.__class__.__name__))
             if name in self.__dict__ and isinstance(self.__dict__[name], YList):

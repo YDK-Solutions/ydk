@@ -47,7 +47,7 @@ from ydk._core._dm_meta_info import ATTRIBUTE, REFERENCE_LIST, REFERENCE_LEAFLIS
 from ydk._core._dm_meta_info import REFERENCE_CLASS, REFERENCE_IDENTITY_CLASS, REFERENCE_ENUM_CLASS, ANYXML_CLASS
 from ydk._core._importer import _yang_ns
 
-""" % package.name)
+""" % packages.name)
 
     def print_body(self, packages):
         self.ctx.writeln('_meta_table = {')

@@ -26,6 +26,7 @@
 
 #include "config.hpp"
 #include "catch.hpp"
+#include "test_utils.hpp"
 
 #include "path_api.hpp"
 #include <ydk/entity_data_node_walker.hpp>
@@ -93,71 +94,6 @@ R"(
       </interface>
     </native>
 )";
-
-std::string yfilter2str(ydk::path::DataNode* dn)
-{
-	auto filter = ydk::get_data_node_yfilter(dn);
-	if (filter == ydk::YFilter::not_set)
-	    return "";
-	std::string filter_str = " yfilter=";
-	filter_str += to_string(filter);
-	return filter_str;
-}
-
-std::string print_tree(ydk::path::DataNode* dn, const std::string& indent)
-{
-  ostringstream buffer;
-  try {
-    ydk::path::Statement s = dn->get_schema_node().get_statement();
-    auto filter = yfilter2str(dn);
-    if(s.keyword == "leaf" || s.keyword == "leaf-list" || s.keyword == "anyxml") {
-        auto val = dn->get_value();
-        buffer << indent << "<" << s.arg << filter << ">" << val << "</" << s.arg << ">" << std::endl;
-    } else {
-        std::string child_indent{indent};
-        child_indent+="  ";
-        buffer << indent << "<" << s.arg << filter << ">" << std::endl;
-        for(auto c : dn->get_children())
-            buffer << print_tree(c.get(), child_indent);
-        buffer << indent << "</" << s.arg << ">" << std::endl;
-    }
-  }
-  catch (ydk::path::YCoreError &ex) {
-	  std::cout << ex.what() << std::endl;
-  }
-  return buffer.str();
-}
-
-std::string data_node_to_xml(shared_ptr<ydk::path::DataNode> dn)
-{
-  ostringstream buffer;
-  try {
-	buffer << "\n=====>  Printing DataNode: '" << dn->get_path() << "'" << endl;
-	buffer << print_tree(dn.get(), " ");
-  }
-  catch (ydk::path::YCoreError &ex) {
-	std::cout << ex.what() << std::endl;
-  }
-  return buffer.str();
-}
-
-std::string data_node_to_xml(ydk::path::DataNode & dn)
-{
-  ostringstream buffer;
-  try {
-	buffer << "\n=====>  Printing DataNode: '" << dn.get_path() << "'" << endl;
-	buffer << print_tree(&dn, " ");
-  }
-  catch (ydk::path::YCoreError &ex) {
-	std::cout << ex.what() << std::endl;
-  }
-  return buffer.str();
-}
-
-void print_data_node(shared_ptr<ydk::path::DataNode> dn)
-{
-	std::cout << data_node_to_xml(dn);
-}
 
 TEST_CASE( "decode_encode_interfaces" )
 {
@@ -705,7 +641,7 @@ const std::string ifc_payload = R"(<interfaces xmlns="http://openconfig.net/yang
 </interfaces>
 )";
 
-TEST_CASE("iana-if-type_decode")
+TEST_CASE("iana_if_type_decode")
 {
     // Remove iana-if-type.yang file from repository to assure correct test flow
 	if (const char* env_p = std::getenv("HOME")) {

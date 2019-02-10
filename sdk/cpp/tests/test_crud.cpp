@@ -29,20 +29,11 @@
 #include "ydk_ydktest/ydktest_sanity.hpp"
 
 #include "config.hpp"
+#include "test_utils.hpp"
 
 using namespace ydk;
 using namespace ydktest;
 using namespace std;
-
-void print_tree(ydk::path::DataNode* dn, const std::string& indent);
-
-void print_entity(shared_ptr<ydk::Entity> entity, ydk::path::RootSchemaNode& root)
-{
-    ydk::path::DataNode& dn = get_data_node_from_entity( *entity, root);
-	ydk::path::Statement s = dn.get_schema_node().get_statement();
-	cout << "\n=====>  Printing DataNode: '" << s.arg << "'" << endl;
-    print_tree( &dn, " ");
-}
 
 void config_bgp(openconfig_bgp::Bgp* bgp)
 {

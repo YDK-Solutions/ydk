@@ -9,6 +9,7 @@ Developer Guide
     guides/crud_guide.rst
     guides/codec_guide.rst
     guides/executor_guide.rst
+    guides/validation.rst
     guides/presence_class.rst
     guides/deviation.rst
     guides/path.rst

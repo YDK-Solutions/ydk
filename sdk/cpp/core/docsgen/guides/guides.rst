@@ -13,8 +13,8 @@ YDK C++ provides a new interface in the form of Path API, which can be used to w
     howto_rpc.rst
     presence_class.rst
     howto_gnmi.rst
+    howto_validation.rst
 
 .. howto_codec.rst
 .. howto_data.rst
 .. howto_serviceprovider.rst
-.. howto_validation.rst

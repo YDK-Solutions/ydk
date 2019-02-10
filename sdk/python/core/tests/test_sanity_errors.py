@@ -19,7 +19,7 @@ from __future__ import absolute_import
 import sys
 import unittest
 
-from ydk.errors import YModelError
+from ydk.errors import YModelError, YServiceProviderError
 from ydk.services import CRUDService
 from ydk.models.ydktest import ydktest_sanity as ysanity
 from ydk.providers import NetconfServiceProvider
@@ -75,6 +75,16 @@ class SanityTest(unittest.TestCase):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number8 = 8.5
         self.crud.create(self.ncc, runner)
+
+    def test_int8_invalid_ignore_validation(self):
+        runner = ysanity.Runner()
+        runner.ignore_validation = True
+        runner.ytypes.built_in_t.number8 = 888
+        try:
+            self.crud.create(self.ncc, runner)
+            self.assertTrue(False)
+        except YServiceProviderError as err:
+            self.assertTrue('"888" is not a valid value.' in err.message)
 
     @assert_with_error("Invalid value {} for 'number16'..*Expected types: 'int'", YModelError)
     def test_int16_invalid(self):

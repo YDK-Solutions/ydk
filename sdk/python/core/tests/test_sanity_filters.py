@@ -185,6 +185,17 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(element, element_read)
 
     def test_iana_if_type_decode(self):
+        # Build some configuration
+        ifcs_config = openconfig_interfaces.Interfaces()
+        ifc_config  = openconfig_interfaces.Interfaces.Interface()
+        ifc_config.name = "GigabitEthernet0/0/0/2"
+        ifc_config.config.name = "GigabitEthernet0/0/0/2"
+        ifc_config.config.description = "Test interface"
+        ifc_config.config.type = iana_if_type.EthernetCsmacd()
+        ifcs_config.interface.append(ifc_config)
+        self.assertTrue( self.crud.create(self.ncc, ifc_config) )
+
+        # Read interface type only
         ifcs = openconfig_interfaces.Interfaces()
         ifc = openconfig_interfaces.Interfaces.Interface()
         ifc.name = 'GigabitEthernet0/0/0/2'

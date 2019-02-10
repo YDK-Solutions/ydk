@@ -1,7 +1,8 @@
-### 2019-02-02 version 0.8.1
+### 2019-02-11 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Added support for CRUD, Netconf Service, and gNMI Service operations on non-top level objects.
+  * Introduced a feature, which allows to disable validation of entity data processed by NetconfServiceProvider.
 
 #### ydk-gen
   * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.

@@ -1,7 +1,8 @@
-### 2019-02-02 version 0.8.1
+### 2019-02-11 version 0.8.1
 
 #### Python, C++, Go
   * Introduced support for non-top level objects/entities for CRUD, Netconf, and gNMI services.
+  * Introduced a feature, which allows to disable validation of entity data processed by NetconfServiceProvider.
 
 #### ydk-gen
   * Added capability to generate meta-data in Python bundles by adding `--generate-meta` flag in `generate.py` script.

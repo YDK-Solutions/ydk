@@ -359,7 +359,6 @@ string NetconfSession::execute_payload(const string & payload) const
 vector<string> NetconfSession::get_yang_1_1_capabilities() const
 {
     IetfCapabilitiesXmlParser parser{};
-    IetfCapabilitiesParser capabilities_parser{};
     string payload = get_caps_rpc_payload();
 
     YLOG_INFO("============= Requesting YANG 1.1 capabilities =============");

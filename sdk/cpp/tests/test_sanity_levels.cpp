@@ -365,7 +365,7 @@ TEST_CASE("test_twolist_pos")
     REQUIRE(r_read != nullptr);
 }
 
-TEST_CASE("test_threelist_pos")
+TEST_CASE("test_three_list_pos")
 {
     ydk::path::Repository repo{TEST_HOME};
     NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
@@ -377,7 +377,6 @@ TEST_CASE("test_threelist_pos")
     REQUIRE(reply);
 
     //CREATE
-    auto r_2 = make_shared<ydktest_sanity::Runner>();
     auto l_1 = make_shared<ydktest_sanity::Runner::ThreeList::Ldata>();
     auto l_2 = make_shared<ydktest_sanity::Runner::ThreeList::Ldata>();
     auto s_1 = make_shared<ydktest_sanity::Runner::ThreeList::Ldata::Subl1>();
@@ -408,7 +407,8 @@ TEST_CASE("test_threelist_pos")
     REQUIRE(reply);
 
     //READ
-    auto r_read = crud.read(provider, *r_2);
+    auto r_2 = ydktest_sanity::Runner();
+    auto r_read = crud.read(provider, r_2);
     REQUIRE(r_read != nullptr);
 
     //UPDATE
@@ -426,7 +426,9 @@ TEST_CASE("test_threelist_pos")
     ss_2->name = "2224name";
     reply = crud.update(provider, *r_1);
     REQUIRE(reply);
-    r_read = crud.read(provider, *r_2);
+
+    r_2 = ydktest_sanity::Runner();
+    r_read = crud.read(provider, r_2);
     REQUIRE(r_read != nullptr);
 }
 
@@ -749,15 +751,13 @@ TEST_CASE("mtus")
     REQUIRE(mt_read!=nullptr);
     auto mtr = dynamic_cast<ydktest_sanity::Runner::Mtus::Mtu *> (mt_read.get());
     REQUIRE(mtr->mtu.value == "1200");
-    //print_entity(mt_read, provider.get_session().get_root_schema());
 
     //DELETE
     reply = crud.delete_(provider, *mt);
     REQUIRE(reply);
 
     //READ
-    r_filter = make_unique<ydktest_sanity::Runner>();
-    auto r_read = crud.read(provider, *r_filter);
+    auto r_read = crud.read(provider, *mt_filter);
     REQUIRE(r_read==nullptr);
 }
 

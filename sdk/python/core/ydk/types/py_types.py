@@ -99,7 +99,7 @@ class Entity(_Entity):
         self._is_frozen = False
         self.parent = None
         self.ylist_key = None
-        self.logger = logging.getLogger("ydk.types.EntityCollection")
+        self.logger = logging.getLogger("ydk.types.Entity")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
         self._children_yang_names = set()
@@ -108,7 +108,6 @@ class Entity(_Entity):
         self._segment_path = lambda : ''
         self._absolute_path = lambda : ''
         self._python_type_validation_enabled = True
-        self.logger = logging.getLogger("ydk.types.Entity")
 
     def __eq__(self, other):
         if not isinstance(other, Entity):
@@ -406,10 +405,10 @@ class EntityCollection(object):
     Each Entity instance has unique segment path value, which is used as a key in the dictionary.
     """
     def __init__(self, *entities):
+        self.logger = logging.getLogger("ydk.types.EntityCollection")
         self._entity_map = OrderedDict()
         for entity in entities:
             self.append(entity)
-        self.logger = logging.getLogger("ydk.types.EntityCollection")
 
     def __eq__(self, other):
         if not isinstance(other, EntityCollection):
@@ -432,7 +431,7 @@ class EntityCollection(object):
           - list of Entity class instances
         """
         if entities is None:
-            self._log_error_and_raise_exception("Cannot add None object to the EntityCollection", YInvalidArgumentError)
+            self.logger.debug("Cannot add None object to the EntityCollection")
         elif isinstance(entities, Entity):
             key = self._key(entities)
             self._entity_map[key] = entities
@@ -441,6 +440,8 @@ class EntityCollection(object):
                 if isinstance(entity, Entity):
                     key = self._key(entity)
                     self._entity_map[key] = entity
+                elif entity is None:
+                    self.logger.debug("Cannot add None object to the EntityCollection")
                 else:
                     msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(entity)
                     self._log_error_and_raise_exception(msg, YInvalidArgumentError)

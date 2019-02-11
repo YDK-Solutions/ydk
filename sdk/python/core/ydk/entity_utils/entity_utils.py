@@ -248,10 +248,15 @@ def _get_child_entity_from_top(top_entity, filter_entity):
     if filter_entity is None:
         return top_entity
 
-    if isinstance(top_entity, list) and isinstance(filter_entity, list) and len(top_entity) == len(filter_entity):
+    if isinstance(top_entity, list) and isinstance(filter_entity, list):
         entities = []
-        for i in range(len(top_entity)):
-            entity = _get_child_entity_from_top(top_entity[i], filter_entity[i])
+        for filter in filter_entity:
+            filter_abs_path = filter.get_absolute_path()
+            entity = None
+            for ent in top_entity:
+                if ent.get_segment_path() in filter_abs_path:
+                    entity = _get_child_entity_from_top(top_entity[i], filter_entity[i])
+                    break;
             entities.append(entity)
         return entities
     elif isinstance(top_entity, Entity) and isinstance(filter_entity, Entity):

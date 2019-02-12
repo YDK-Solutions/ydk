@@ -141,7 +141,7 @@ find_child_entity(shared_ptr<Entity> parent_entity, Entity & filter_entity)
     return nullptr;
 }
 
-static shared_ptr<Entity>
+shared_ptr<Entity>
 get_child_entity_from_top(shared_ptr<Entity> top_entity, Entity & filter_entity)
 {
 	shared_ptr<Entity> child_entity;

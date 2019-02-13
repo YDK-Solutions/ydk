@@ -61,8 +61,7 @@ class SanityTest(unittest.TestCase):
         k = Runner.OneList.IdentityList()
         k.config.id = ChildIdentity()
         k.id_ref = k.config.id
-        k.yfilter = YFilter.delete
-        self.crud.update(self.ncc, k)
+        self.crud.delete(self.ncc, k)
 
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertIsNone(runner_read)

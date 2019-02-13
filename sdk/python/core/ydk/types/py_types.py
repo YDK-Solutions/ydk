@@ -325,7 +325,12 @@ class Entity(_Entity):
         return self.get_segment_path()
 
     def get_absolute_path(self):
-        return self._absolute_path()
+        path = self._absolute_path()
+        if len(path) == 0 and self.is_top_level_class:
+            path = self.get_segment_path()
+            if '[' in path:
+                path = path.split('[')[0]
+        return path
 
     def _get_child_by_seg_name(self, segs):
         for seg in segs:

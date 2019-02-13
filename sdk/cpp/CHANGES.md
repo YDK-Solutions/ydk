@@ -1,3 +1,12 @@
+### 2019-02-12 version 0.8.2
+
+#### New features and enhancements
+  * Expanded disabling of data validation to read operations with NetconfServiceProvider. 
+
+#### Resolved GitHub issues
+  * AttributeError: 'Config' object has no attribute 'logger' ([#876](https://github.com/CiscoDevNet/ydk-gen/issues/876))
+
+
 ### 2019-02-11 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API

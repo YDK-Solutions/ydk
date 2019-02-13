@@ -255,7 +255,7 @@ def _get_child_entity_from_top(top_entity, filter_entity):
             entity = None
             for ent in top_entity:
                 if ent.get_segment_path() in filter_abs_path:
-                    entity = _get_child_entity_from_top(top_entity[i], filter_entity[i])
+                    entity = _get_child_entity_from_top(ent, filter)
                     break;
             entities.append(entity)
         return entities

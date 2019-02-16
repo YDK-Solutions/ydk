@@ -14,12 +14,14 @@
  limitations under the License.
  ------------------------------------------------------------------*/
 #include <string.h>
-#include "ydk/path_api.hpp"
-#include "ydk/restconf_provider.hpp"
-#include "../core/src/errors.hpp"
 #include <iostream>
+
 #include "config.hpp"
 #include "catch.hpp"
+
+#include <ydk/path_api.hpp>
+#include <ydk/restconf_provider.hpp>
+#include <ydk/errors.hpp>
 
 using namespace ydk;
 using namespace std;
@@ -71,8 +73,6 @@ TEST_CASE("CreateDelRead")
     std::shared_ptr<ydk::path::Rpc> update_rpc { schema.create_rpc("ydk:update") };
     update_rpc->get_input_node().create_datanode("entity", json);
     (*update_rpc)(provider.get_session());
-
-
 }
 
 TEST_CASE("ActionRest")

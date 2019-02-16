@@ -159,6 +159,7 @@ set(libydk_src
     src/opendaylight_provider.cpp
     src/restconf_client.cpp
     src/restconf_provider.cpp
+    src/restconf_session.cpp
     src/validation_service.cpp
     src/value.cpp
     src/value_list.cpp
@@ -173,7 +174,6 @@ set(libydk_src
     src/netconf_model_provider.cpp
     src/path/path.cpp
     src/path/repository.cpp
-    src/path/restconf_session.cpp
     src/path/root_data_node.cpp
     src/path/root_schema_node.cpp
     src/path/rpc.cpp

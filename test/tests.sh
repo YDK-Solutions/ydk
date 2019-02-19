@@ -758,6 +758,20 @@ function py_test_gen {
 }
 
 #-------------------------------------
+# oc-network-instance tests
+#-------------------------------------
+
+function run_python_oc_nis_tests {
+    print_msg "Installing ydktest_oc_nis bundle"
+    cd $YDKGEN_HOME
+    run_test generate.py --bundle profiles/test/ydktest-oc-nis.json
+    pip_check_install gen-api/python/ydktest_oc_nis-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running ydktest_oc_nis bundle tests"
+    run_test sdk/python/core/tests/test_oc_nis.py
+}
+
+#-------------------------------------
 # Meta-data test
 #-------------------------------------
 
@@ -854,6 +868,7 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
+run_python_oc_nis_tests
 run_py_metadata_test
 
 # test_gen_tests

@@ -225,7 +225,12 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    print_msg "Compiling C++ core library"
+    if [[ ${os_type} == "Darwin" ]] ; then
+        run_exec_test make
+    else
+        run_exec_test make > /dev/null
+    fi
     sudo make install
 }
 
@@ -795,10 +800,12 @@ function run_py_metadata_test {
 function sanity_doc_gen {
    print_msg "Generating docs"
    print_msg "Removing previously generated code with sudo to avoid permission issues"
-   sudo rm -rf gen-api/cpp/ydk
-   run_test generate.py --core --cpp --generate-doc &> /dev/null
-   run_test generate.py --core --go --generate-doc &> /dev/null
-   run_test generate.py --core --python --generate-doc &> /dev/null
+   sudo rm -rf gen-api/cpp/ydk*
+   sudo rm -rf gen-api/go/ydk*
+   sudo rm -rf gen-api/python/ydk*
+   run_test generate.py --core --cpp --generate-doc > /dev/null
+   run_test generate.py --core --go --generate-doc > /dev/null
+   run_test generate.py --core --python --generate-doc > /dev/null
 }
 
 function sanity_doc_gen_cache {

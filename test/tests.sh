@@ -798,13 +798,18 @@ function run_py_metadata_test {
 #-------------------------------------
 
 function sanity_doc_gen {
-   print_msg "Generating docs"
    print_msg "Removing previously generated code with sudo to avoid permission issues"
    sudo rm -rf gen-api/cpp/ydk*
    sudo rm -rf gen-api/go/ydk*
    sudo rm -rf gen-api/python/ydk*
+
+   print_msg "Generating C++ docs"
    run_test generate.py --core --cpp --generate-doc > /dev/null
+
+   print_msg "Generating Go docs"
    run_test generate.py --core --go --generate-doc > /dev/null
+
+   print_msg "Generating Python docs"
    run_test generate.py --core --python --generate-doc > /dev/null
 }
 
@@ -887,7 +892,7 @@ run_py_metadata_test
 # Documentation tests
 ######################################
 sanity_doc_gen
-sanity_doc_gen_cache
+#sanity_doc_gen_cache
 
 cd $YDKGEN_HOME
 find . -name '*gcda*'|xargs rm -f

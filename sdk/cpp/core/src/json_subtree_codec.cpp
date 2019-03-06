@@ -341,7 +341,7 @@ static void check_and_set_content(Entity & entity, const string & leaf_name, jso
             }
         }
     }
-    YLOG_DEBUG("JsonCodec: Creating leaf '{}' with value '{}'", leaf_name, content);
+    YLOG_DEBUG("JsonCodec: Creating leaf '{}' with value '{}' in entity '{}'", leaf_name, content, entity.yang_name);
     entity.set_value(leaf_name, content, name_space, name_space_prefix);
 }
 
@@ -349,7 +349,7 @@ static void check_and_set_leaf(Entity & entity, Entity * parent, const string & 
 {
     if (json_node.is_null())
     {
-        YLOG_DEBUG("JsonCodec: Creating leaf '{}' with no value", node_name);
+        YLOG_DEBUG("JsonCodec: Creating leaf '{}' with no value in entity '{}'", node_name, entity.yang_name);
         entity.set_filter(node_name, YFilter::read);
     }
     else if (json_node.is_primitive())

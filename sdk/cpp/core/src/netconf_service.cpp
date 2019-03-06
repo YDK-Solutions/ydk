@@ -41,7 +41,6 @@ static shared_ptr<path::Rpc> get_rpc_instance(NetconfServiceProvider& provider, 
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string, string & url);
 static void create_input_leaf(path::DataNode & input_datanode, DataStore datastore, string && datastore_string);
 static string datastore_to_string(DataStore datastore);
-static Entity * get_top_entity(Entity * entity);
 static map<string,string> split_xml_payload(string reply);
 
 NetconfService::NetconfService()
@@ -561,18 +560,6 @@ static string datastore_to_string(DataStore datastore)
         default:
             return "na";
     }
-}
-
-static Entity * get_top_entity(Entity * entity)
-{
-	Entity * top_entity = entity;
-    while (top_entity->parent && !top_entity->is_top_level_class) {
-        top_entity = top_entity->parent;
-    }
-    if (entity->ignore_validation && !top_entity->is_top_level_class) {
-        YLOG_WARN("get_top_entity: Validation cannot be disable on non-top-level entity '{}'", entity->yang_name);
-    }
-    return top_entity;
 }
 
 static map<string,string> split_xml_payload(string reply)

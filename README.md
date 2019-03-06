@@ -61,7 +61,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 # Backward compatibility
 
-The YDK-0.8.1 core is bacward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
+The YDK-0.8.2 core is backward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
 
 # Docker
 
@@ -100,15 +100,15 @@ You can install the latest `libydk` core library using prebuilt binaries for Xen
 For Xenial (Ubuntu 16.04.4):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
+   sudo gdebi libydk-0.8.2-1.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
+   sudo gdebi libydk-0.8.2-1.amd64.deb
 ```
 
 ### Centos (Fedora-based)
@@ -129,7 +129,7 @@ For Bionic (Ubuntu 18.04.1):
 #### Install prebuilt libydk binary
 
 ```  
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
 ```
 
 ### Build from source
@@ -163,10 +163,10 @@ You can download the latest Python package from [here](https://www.python.org/do
    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
    
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
+   sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-1_Darwin.pkg
    sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
 ```
 
@@ -241,28 +241,28 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial (Ubuntu 16.04.4):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1)
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 #### CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
 ```
 
 #### MacOS:
 
 ```
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Run-time environment
@@ -359,7 +359,7 @@ A sample bundle profile file is described below. The file is in a JSON format. S
 {
     "name":"cisco-ios-xr",
     "version": "0.1.0",
-    "ydk_version": "0.8.1",
+    "ydk_version": "0.8.2",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
@@ -458,7 +458,7 @@ Now, the `pip list | grep ydk` should show the `ydk` (referring to the core pack
 $ pip list | grep ydk
 ...
 
-ydk (0.8.1)
+ydk (0.8.2)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
@@ -624,4 +624,4 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 Release Notes
 ===============
-The current YDK release version is 0.8.1. The version of the latest YDK-Gen master branch is 0.8.1. YDK-Gen is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.2. The version of the latest YDK-Gen master branch is 0.8.2. YDK-Gen is licensed under the Apache 2.0 License.

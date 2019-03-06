@@ -1,10 +1,16 @@
-### 2019-02-12 version 0.8.2
+### 2019-03-15 version 0.8.2
 
 #### New features and enhancements
   * Expanded disabling of data validation to read operations with NetconfServiceProvider. 
+  * Expanded disabling of data validation to gNMIServiceProvider.
 
 #### Resolved GitHub issues
+  * When MacOS is updated from Homebrew any Python2 YDK application fails ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837))
+  * ImportError: dynamic module does not define module export function (PyInit_ydk_) ([#840](https://github.com/CiscoDevNet/ydk-gen/issues/840))
+  * Libyang error: Reached limit (65535) for storing typedefs ([#874](https://github.com/CiscoDevNet/ydk-gen/issues/874))
   * AttributeError: 'Config' object has no attribute 'logger' ([#876](https://github.com/CiscoDevNet/ydk-gen/issues/876))
+  * gNMI provider requires 'port' argument ([#880](https://github.com/CiscoDevNet/ydk-gen/issues/880))
+  * 'delete' and 'replace' filters doesn't work properly with gNMI and CRUD service ([#881](https://github.com/CiscoDevNet/ydk-gen/issues/881))
 
 
 ### 2019-02-11 version 0.8.1

@@ -1,3 +1,11 @@
+### 2019-03-15 version 0.8.2
+
+#### Resolved GitHub issues
+  * Libyang error: Reached limit (65535) for storing typedefs ([#874](https://github.com/CiscoDevNet/ydk-gen/issues/874))
+  * Segmentation Fault in API when connection to Netconf fails ([#879](https://github.com/CiscoDevNet/ydk-gen/issues/879))
+  * 'delete' and 'replace' filters do not work properly with gNMI and CRUD service ([#881](https://github.com/CiscoDevNet/ydk-gen/issues/881))
+
+
 ### 2019-02-11 version 0.8.1
 
 #### Go

@@ -51,14 +51,14 @@ For Xenial (Ubuntu 16.04.4)::
    $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
    # Install YDK core library
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-   $ sudo gdebi libydk_0.8.1-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
+   $ sudo gdebi libydk-0.8.2-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
    # Install YDK core library
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-   $ sudo gdebi libydk_0.8.1-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
+   $ sudo gdebi libydk-0.8.2-1.amd64.deb
 
 Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +79,7 @@ Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/iss
    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
    # Install YDK core library
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
 
 
 MacOS
@@ -97,8 +97,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
 
    # Install YDK core library
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
 
 Libssh Installation
 -------------------
@@ -147,30 +147,30 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 CentOS
 ~~~~~~
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
    
 MacOS
 ~~~~~
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 
 
 Runtime environment
@@ -250,8 +250,8 @@ YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-service-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-service-gnmi-0.4.0.post2.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -260,14 +260,14 @@ If you only prefer to install the ``openconfig`` bundle and its dependencies (``
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source
@@ -304,7 +304,7 @@ Once you have installed the ``YDK`` core package, you can install one or more mo
 
 .. code-block:: sh
 
-    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.1
+    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.2
 
 Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
 

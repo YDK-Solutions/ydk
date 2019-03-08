@@ -226,11 +226,7 @@ function install_cpp_core {
       run_exec_test ${CMAKE_BIN} ..
     fi
     print_msg "Compiling C++ core library"
-    if [[ ${os_type} == "Darwin" ]] ; then
-        run_exec_test make
-    else
-        run_exec_test make > /dev/null
-    fi
+    run_exec_test make &> /dev/null
     sudo make install
 }
 
@@ -303,7 +299,7 @@ function generate_install_specified_cpp_bundle {
 
    run_test generate.py --bundle ${bundle_profile} --cpp &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
-   run_exec_test make > /dev/null
+   run_exec_test make &> /dev/null
    sudo make install
    cd -
 }
@@ -337,7 +333,7 @@ function cpp_sanity_ydktest_test {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
 
     #export CTEST_OUTPUT_ON_FAILURE=1
     #make test
@@ -361,7 +357,7 @@ function cpp_test_gen_test {
     mkdir -p gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     cd gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     run_exec_test ${CMAKE_BIN} ..
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     ctest --output-on-failure
 }
 
@@ -371,7 +367,7 @@ function cpp_test_gen {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     sudo make install
 
     # cpp_test_gen_test

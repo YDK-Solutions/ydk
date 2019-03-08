@@ -528,13 +528,15 @@ function run_py_sanity_ydktest_tests {
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_netconf_ssh
-    py_sanity_ydktest_test_tcp
+    if [[ ${os_type} != "Darwin" ]] ; then
+      py_sanity_ydktest_test_tcp
+    fi
 
     stop_tcp_server
 }
 
 function py_sanity_ydktest_test_netconf_ssh {
-    print_msg "py_sanity_ydktest_test_netconf_ssh"
+    print_msg "Running py_sanity_ydktest_test_netconf_ssh"
 
     run_test sdk/python/core/tests/test_netconf_operations.py
     run_test sdk/python/core/tests/test_opendaylight.py
@@ -552,8 +554,8 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test sdk/python/core/tests/test_non_top_operations.py
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
-
-    print_msg "py_sanity_ydktest_test_netconf_ssh no on-demand"
+  if [[ ${os_type} != "Darwin" ]] ; then
+    print_msg "Running py_sanity_ydktest_test_netconf_ssh with no on-demand"
     run_test sdk/python/core/tests/test_netconf_operations.py --non-demand
     run_test sdk/python/core/tests/test_sanity_delete.py --non-demand
     run_test sdk/python/core/tests/test_sanity_errors.py --non-demand
@@ -568,6 +570,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 #    --non-demand
+  fi
 }
 
 function py_sanity_ydktest_test_tcp {

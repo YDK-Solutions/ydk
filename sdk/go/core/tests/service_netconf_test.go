@@ -218,6 +218,7 @@ func (suite *NetconfServiceTestSuite) TestCloseSession() {
 
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Lock(&suite.Provider, datastore.Running) })
 	suite.Equal(funcDidPanic, true)
+	fmt.Printf("%s\n", panicValue)
 	//suite.True(panicValue, "YClientError: Could not send payload")
 
 	suite.Provider.Connect()

@@ -126,7 +126,7 @@ function stop_tcp_server {
 }
 
 function check_python_installation {
-  
+
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
     PYTHON_BIN=python3
@@ -496,7 +496,7 @@ function py_sanity_ydktest_test {
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
     ${PIP_BIN} uninstall ydk -y
-    
+
     export OLDPYTHONPATH=$PYTHONPATH
     print_msg "Setting OLDPYTHONPATH to $OLDPYTHONPATH"
 
@@ -596,7 +596,7 @@ function py_sanity_deviation {
 }
 
 function py_sanity_deviation_ydktest_gen {
-    print_msg "py_sanity_deviation_ydktest_gen"
+    print_msg "Running py_sanity_deviation_ydktest_gen"
 
     rm -rf gen-api/python/*
     cd $YDKGEN_HOME
@@ -604,22 +604,22 @@ function py_sanity_deviation_ydktest_gen {
 }
 
 function py_sanity_deviation_ydktest_install {
-    print_msg "py_sanity_deviation_ydktest_install"
+    print_msg "Running py_sanity_deviation_ydktest_install"
 
     ${PIP_BIN} uninstall ydk-models-ydktest -y
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
 
 function py_sanity_deviation_ydktest_test {
-    print_msg "py_sanity_deviation_ydktest_test"
+    print_msg "Running py_sanity_deviation_ydktest_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py
-    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
 }
 
 function py_sanity_deviation_bgp_gen {
-    print_msg "py_sanity_deviation_bgp_gen"
+    print_msg "Running py_sanity_deviation_bgp_gen"
 
     rm -rf gen-api/python/*
     cd $YDKGEN_HOME
@@ -627,24 +627,24 @@ function py_sanity_deviation_bgp_gen {
 }
 
 function py_sanity_deviation_bgp_install {
-    print_msg "py_sanity_deviation_bgp_install"
+    print_msg "Running py_sanity_deviation_bgp_install"
 
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/deviation-bundle/dist/*.tar.gz
 }
 
 function py_sanity_deviation_bgp_test {
-    print_msg "py_sanity_deviation_bgp_test"
+    print_msg "Running py_sanity_deviation_bgp_test"
 
     run_test sdk/python/core/tests/test_sanity_deviation_bgp.py
-    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
 }
 
 #--------------------------
 # Python augmentation bundle
 #--------------------------
 function py_sanity_augmentation {
-    print_msg "py_sanity_augmentation"
+    print_msg "Running py_sanity_augmentation"
 
     rm -rf $HOME/.ydk/*
     py_sanity_augmentation_gen
@@ -654,7 +654,7 @@ function py_sanity_augmentation {
 }
 
 function py_sanity_augmentation_gen {
-    print_msg "py_sanity_augmentation_gen"
+    print_msg "Running py_sanity_augmentation_gen"
 
     cd $YDKGEN_HOME && rm -rf gen-api/python/*
     run_test generate.py --core
@@ -662,7 +662,7 @@ function py_sanity_augmentation_gen {
 }
 
 function py_sanity_augmentation_install {
-    print_msg "py_sanity_augmentation_install"
+    print_msg "Running py_sanity_augmentation_install"
 
     cd $YDKGEN_HOME
     ${PIP_BIN} uninstall ydk -y
@@ -671,17 +671,17 @@ function py_sanity_augmentation_install {
 }
 
 function py_sanity_augmentation_test {
-    print_msg "py_sanity_augmentation_test"
+    print_msg "Running py_sanity_augmentation_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
 
     run_test sdk/python/core/tests/test_sanity_augmentation.py
-    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
     run_test sdk/python/core/tests/test_on_demand.py
 }
 
 function py_sanity_common_cache {
-    print_msg "py_sanity_common_cache"
+    print_msg "Running py_sanity_common_cache"
 
     rm -rf $HOME/.ydk/*
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation

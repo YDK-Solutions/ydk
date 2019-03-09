@@ -109,11 +109,11 @@ else
     PYTHON_VERSION=2
 fi
 
-#install_libssh
-#install_confd
-#install_golang
+install_libssh
+install_confd
+install_golang
 
-#brew install pybind11
+brew install pybind11
 check_python_installation
 
 #install_fpm

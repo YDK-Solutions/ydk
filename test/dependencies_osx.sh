@@ -25,6 +25,12 @@ function print_msg {
 }
 
 function install_libssh {
+    print_msg "Checking installation of libssh"
+    locate libssh_threads.dylib
+    local status=$?
+    if [[ ${status} == 0 ]]; then
+        return
+    fi
     print_msg "Installing libssh-0.7.6"
     brew reinstall openssl
     export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
@@ -67,35 +73,47 @@ function install_golang {
 }
 
 function check_python_installation {
-  print_msg "Checking python3 and pip3 installation"
-  #brew rm -f --ignore-dependencies python
-  python3 -V
+  print_msg "Checking python and pip installation"
+  python${PYTHON_VERSION} -V
   status=$?
   if [ $status -ne 0 ]; then
-    print_msg "Installing python3"
+    print_msg "Installing python${PYTHON_VERSION}"
     brew install python
   fi
-  pip3 -V
+  pip${PYTHON_VERSION} -V
   status=$?
   if [ $status -ne 0 ]; then
-    print_msg "Installing pip3"
-    sudo easy_install pip3
+    print_msg "Installing pip${PYTHON_VERSION}"
+    sudo easy_install pip${PYTHON_VERSION}
   fi
-  sudo pip3 install virtualenv
+  print_msg "Installing python${PYTHON_VERSION} virtualenv"
+  sudo pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
+  source /usr/local/bin/virtualenvwrapper.sh
+  mkvirtualenv -p python${PYTHON_VERSION} ydk_python
+  deactivate
 }
 
 ########################## EXECUTION STARTS HERE #############################
 
 # Terminal colors
-NOCOLOR="\033[0m"
+NOCOLOR='\033[0m'
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
-install_libssh
-install_confd
-install_golang
+# Parse args to get python version
+args=$(getopt p:d $*)
+set -- $args
+if [[ ${2}. == "." || ${2} == "3"* ]]; then
+    PYTHON_VERSION=3
+else
+    PYTHON_VERSION=2
+fi
 
-brew install pybind11
+#install_libssh
+#install_confd
+#install_golang
+
+#brew install pybind11
 check_python_installation
 
 #install_fpm

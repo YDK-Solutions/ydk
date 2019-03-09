@@ -89,20 +89,22 @@ function pip_check_install {
 ######################################################################
 
 function check_python_installation {
-  
+
   if [[ ${os_type} == "Darwin" ]] ; then
-    PYTHON_VERSION=3
-    PYTHON_BIN=python3
+    # activate virtual environment
+    source ~/.virtualenvs/ydk_python/bin/activate
+    PYTHON_BIN=python
+    PIP_BIN=pip
+    return
+  fi
+
+  PYTHON_BIN=python${PYTHON_VERSION}
+  if [[ ${PYTHON_VERSION} = "2"* ]]; then
+    PIP_BIN=pip
+  elif [[ ${PYTHON_VERSION} = "3"* ]]; then
     PIP_BIN=pip3
   else
-    PYTHON_BIN=python${PYTHON_VERSION}
-    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
-      PIP_BIN=pip
-    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
-      PIP_BIN=pip3
-    else
-      PIP_BIN=pip${PYTHON_VERSION}
-    fi
+    PIP_BIN=pip${PYTHON_VERSION}
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -132,12 +134,6 @@ function init_py_env {
   if [[ $run_with_coverage ]] ; then
     sudo ${PIP_BIN} install coverage
   fi
-
-  #else
-    #print_msg "Initializing Python3 virtual environment"
-    #virtualenv macos_pyenv -p python3
-    #source macos_pyenv/bin/activate
-  #fi
 }
 
 function init_go_env {

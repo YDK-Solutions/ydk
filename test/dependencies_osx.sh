@@ -100,9 +100,9 @@ function check_python_installation {
     run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     run_cmd sudo -H python${PYTHON_VERSION} get-pip.py
   fi
-  print_msg "Installing python${PYTHON_VERSION} virtualenv"
-  run_cmd sudo -H pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
-  export VIRTUALENVWRAPPER_PYTHON=$(which python${PYTHON_VERSION})
+  print_msg "Installing python virtualenv"
+  run_cmd sudo -H pip3 install virtualenv virtualenvwrapper
+  export VIRTUALENVWRAPPER_PYTHON=$(which python3)
   run_cmd source /usr/local/bin/virtualenvwrapper.sh
   run_cmd mkvirtualenv -p python${PYTHON_VERSION} ydk_python
   run_cmd deactivate
@@ -118,11 +118,7 @@ MSG_COLOR=$YELLOW
 # Parse args to get python version
 args=$(getopt p:d $*)
 set -- $args
-if [[ ${2} == "3"* ]]; then
-    PYTHON_VERSION=3
-else
-    PYTHON_VERSION=""
-fi
+PYTHON_VERSION=${2}
 
 install_libssh
 install_confd

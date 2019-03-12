@@ -84,10 +84,11 @@ function check_python_installation {
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing pip${PYTHON_VERSION}"
-    sudo easy_install pip${PYTHON_VERSION}
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    python${PYTHON_VERSION} get-pip.py
   fi
   print_msg "Installing python${PYTHON_VERSION} virtualenv"
-  sudo pip install virtualenv virtualenvwrapper
+  sudo pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
   source /usr/local/bin/virtualenvwrapper.sh
   mkvirtualenv -p python${PYTHON_VERSION} ydk_python
   deactivate

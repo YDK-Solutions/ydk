@@ -138,7 +138,7 @@ function check_python_installation {
   PYTHON_BIN=python${PYTHON_VERSION}
   if [[ ${PYTHON_VERSION} = "2"* ]]; then
     PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = "3"* ]]; then
+  elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
     PIP_BIN=pip3
   else
     PIP_BIN=pip${PYTHON_VERSION}

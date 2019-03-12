@@ -87,7 +87,7 @@ function check_python_installation {
     sudo easy_install pip${PYTHON_VERSION}
   fi
   print_msg "Installing python${PYTHON_VERSION} virtualenv"
-  sudo pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
+  sudo pip install virtualenv virtualenvwrapper
   source /usr/local/bin/virtualenvwrapper.sh
   mkvirtualenv -p python${PYTHON_VERSION} ydk_python
   deactivate
@@ -103,10 +103,10 @@ MSG_COLOR=$YELLOW
 # Parse args to get python version
 args=$(getopt p:d $*)
 set -- $args
-if [[ ${2}. == "." || ${2} == "3"* ]]; then
+if [[ ${2} == "3"* ]]; then
     PYTHON_VERSION=3
 else
-    PYTHON_VERSION=2
+    PYTHON_VERSION=""
 fi
 
 install_libssh

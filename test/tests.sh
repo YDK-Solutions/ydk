@@ -129,7 +129,7 @@ function check_python_installation {
 
   if [[ ${os_type} == "Darwin" ]] ; then
     # activate virtual environment
-    source ~/.virtualenvs/ydk_python/bin/activate
+    source /Users/travis/.virtualenvs/ydk_python/bin/activate
     PYTHON_BIN=python
     PIP_BIN=pip
     return
@@ -167,9 +167,9 @@ function check_python_installation {
 function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
-  sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
+  ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
   if [[ $run_with_coverage ]] ; then
-    sudo ${PIP_BIN} install coverage
+    ${PIP_BIN} install coverage
   fi
 }
 

@@ -88,10 +88,7 @@ The following packages must be present in your system before installing YDK-Py. 
 MacOS
 ~~~~~
 
-It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py.
-
-You can download the latest python package from `here <https://www.python.org/downloads/>`_. 
-Please do not use the homebrew version of python as it causes issues with installing ydk packages. Please execute ``brew rm python python3`` to remove any homebrew python packages::
+It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py::
 
   xcode-select --install
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -184,8 +181,41 @@ It is also required for Python installation to include corresponding shared libr
  
 Please follow `System Requirements` to assure presence of shared Python libraries.
 
+Mac OS
+======
+
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
+This is well know and well documented issue. Each developer might have different approaches for its resolution. 
+One of them is to use Python2 virtual environment. See section below for details.
+  
 How to install
 --------------
+
+Using Python virtual environment
+================================
+
+You may want to perform the installation under Python virtual environment (`virtualenv <https://pypi.python.org/pypi/virtualenv/>`_/`virtualenvwrapper  <https://pypi.python.org/pypi/virtualenvwrapper>`_).  
+The virtual environment allows you to install multiple versions of YDK if needed.  In addition, it prevents any potential conflicts between package dependencies in your system.
+
+To install virtual environment support in your system, execute::
+
+  pip install virtualenv virtualenvwrapper
+  source /usr/local/bin/virtualenvwrapper.sh
+
+To create and activate new virtual environment::
+
+  mkvirtualenv -p python2.7 ydk-py
+  
+To activate existing virtual environment::
+
+  source ~/.virtualenvs/py2/bin/activate
+  
+To exit virtual environment::
+
+  deactivate
+
+Once Python virtual environment is activated, you can perform quick installation or installation from source described above. 
+Take into consideration that you must not attempt to install YDK as root user under virtual environment.
 
 Quick Install
 ~~~~~~~~~~~~~
@@ -260,22 +290,6 @@ To install the ``cisco-ios-xr`` bundle, execute::
   cisco-ios-xr$ python setup.py sdist
   cisco-ios-xr$ pip install dist/ydk*.gz
   cisco-ios-xr$ cd ..
-
-Using a Virtual Environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-You may want to perform the installation under a Python virtual environment (`virtualenv <https://pypi.python.org/pypi/virtualenv/>`_/`virtualenvwrapper  <https://pypi.python.org/pypi/virtualenvwrapper>`_).  
-A virtual environment allows you to install multiple versions of YDK if needed.  In addition, it prevents any potential conflicts between package dependencies in your system.
-
-To install virtual environment support in your system, execute::
-
-  pip install virtualenv virtualenvwrapper
-  source /usr/local/bin/virtualenvwrapper.sh
-
-Create new virtual environment::
-
-  mkvirtualenv -p python2.7 ydk-py
-
-At this point, you can perform the quick install or the installation from source described above.  Take into account that must not attempt to install YDK as root under a virtual environment.
 
 Documentation and Support
 --------------------------

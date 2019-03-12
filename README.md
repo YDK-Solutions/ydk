@@ -20,7 +20,7 @@ YANG Development Kit (Generator)
   - [MacOS](#macos)
   - [Windows](#windows)
 - [Installation](#installation)
-  - [Setting up your environment](#setting-up-your-environment)
+  - [Setting up Python virtual environment](#setting-up-python-virtual-environment)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Generate YDK components](#generate-ydk-components)
   - [First step: choose model bundle profile](#first-step-choose-model-bundle-profile)
@@ -154,9 +154,7 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp/YDK-Go.
 
-You can download the latest Python package from [here](https://www.python.org/downloads/). Please do not use the homebrew version of Python as it causes issues with installation of YDK packages. Please execute `brew rm python python3` to remove any homebrew Python packages.
-
-#### Install prebuilt libydk and optionally libydk_gnmi libraries
+### Install prebuilt libydk and optionally libydk_gnmi libraries
 
 ```
    xcode-select --install
@@ -277,7 +275,7 @@ As a workaround, the YDK based application runtime environment must include sett
 ```
 
 # Installation
-## Setting up your environment
+## Setting up Python virtual environment
 
 We recommend that you run ydk-gen under Python virtual environment (``virtualenv``/``virtualenvwrapper``).  To install Python virtual environment in your system, execute:
 
@@ -288,10 +286,22 @@ We recommend that you run ydk-gen under Python virtual environment (``virtualenv
 
 In some systems (e.g. Debian-based Linux), you may need to install support for Python virtual environments as root
 
-Create new virtual environment:
+Create and activate new virtual environment:
 
 ```
    mkvirtualenv -p python2.7 py2
+```
+
+Activate previously created virtusl environment:
+
+```
+   source ~/.virtualenvs/py2/bin/activate
+```
+
+Exit virtual environment:
+
+```
+   deactivate
 ```
 
 ## Clone ydk-gen and install the requirements
@@ -535,6 +545,12 @@ It is also required for Python installation to include corresponding shared libr
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
 Please follow [System requirements](#system-requirements) to assure presence of shared Python libraries.
+
+### Mac OS
+
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
+This is well know and well documented issue. Each developer might have different approaches for its resolution. 
+One of them is to use Python2 virtual environment. See [Setting up Python virtual environment](#setting-up-python-virtual-environment) for details.
 
 ## Directory structure
 

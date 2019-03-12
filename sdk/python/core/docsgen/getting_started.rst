@@ -85,8 +85,6 @@ Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/iss
 MacOS
 -----
 
-**Note:** Please do not use the homebrew version of python as it causes issues with installation of YDK packages. Please execute ``brew rm python python3`` to remove any homebrew python packages.
-
 It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py.
 
 .. code-block:: sh
@@ -194,6 +192,13 @@ It is also required for Python installation to include corresponding shared libr
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
 Please follow `System Requirements` to assure presence of shared Python libraries.
+
+Mac OS
+~~~~~~
+
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
+This is well know and well documented issue. Each developer might have different approaches for its resolution. 
+One of them is to use Python2 virtual environment. See section Using Python Virtual_ Environment for details
 
 .. _howto-install:
 
@@ -354,8 +359,10 @@ To install the ``YDK`` Python gNMI package, execute:
     gnmi$ python setup.py sdist
     gnmi$ pip install dist/ydk*.gz
 
-Using Virtual Environment
-=========================
+.. _Virtual:
+
+Using Python Virtual Environment
+================================
 
 You may want to perform the installation under Python virtual environment (`virtualenv <https://pypi.python.org/pypi/virtualenv/>`_/`virtualenvwrapper  <https://pypi.python.org/pypi/virtualenvwrapper>`_).  A virtual environment allows you to install multiple versions of YDK if needed.  In addition, it prevents any potential conflicts between package dependencies in your system.
 
@@ -365,8 +372,6 @@ To install virtual environment on your system, execute:
 
     $ pip install virtualenv virtualenvwrapper
     $ source /usr/local/bin/virtualenvwrapper.sh
-
-**Note**  In some systems (e.g. Debian-based Linux), you need to be a root user or use `sudo` access.
 
 Create new virtual environment:
 

@@ -5,6 +5,7 @@
   * Expanded disabling of data validation to gNMIServiceProvider.
 
 #### Resolved GitHub issues
+  * ydk-py and ydk-gen Travis tests fail on Mac ([#834](https://github.com/CiscoDevNet/ydk-gen/issues/834))
   * When MacOS is updated from Homebrew any Python2 YDK application fails ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837))
   * ImportError: dynamic module does not define module export function (PyInit_ydk_) ([#840](https://github.com/CiscoDevNet/ydk-gen/issues/840))
   * Libyang error: Reached limit (65535) for storing typedefs ([#874](https://github.com/CiscoDevNet/ydk-gen/issues/874))

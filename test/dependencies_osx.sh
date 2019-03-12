@@ -24,6 +24,19 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function install_libssh {
     print_msg "Checking installation of libssh"
     locate libssh_threads.dylib
@@ -84,14 +97,15 @@ function check_python_installation {
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing pip${PYTHON_VERSION}"
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    python${PYTHON_VERSION} get-pip.py
+    run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    run_cmd sudo -H python${PYTHON_VERSION} get-pip.py
   fi
   print_msg "Installing python${PYTHON_VERSION} virtualenv"
-  sudo pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
-  source /usr/local/bin/virtualenvwrapper.sh
-  mkvirtualenv -p python${PYTHON_VERSION} ydk_python
-  deactivate
+  run_cmd sudo -H pip${PYTHON_VERSION} install virtualenv virtualenvwrapper
+  export VIRTUALENVWRAPPER_PYTHON=$(which python${PYTHON_VERSION})
+  run_cmd source /usr/local/bin/virtualenvwrapper.sh
+  run_cmd mkvirtualenv -p python${PYTHON_VERSION} ydk_python
+  run_cmd deactivate
 }
 
 ########################## EXECUTION STARTS HERE #############################

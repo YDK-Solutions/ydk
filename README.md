@@ -164,8 +164,8 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
    curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
    sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Build from source

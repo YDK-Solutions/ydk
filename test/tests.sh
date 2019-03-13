@@ -25,9 +25,6 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
-PY_GENERATE="python2"
-PY_TEST="python3"
-
 ######################################################################
 # Utility functions
 ######################################################################
@@ -128,22 +125,19 @@ function stop_tcp_server {
 function check_python_installation {
 
   if [[ ${os_type} == "Darwin" ]] ; then
-    # activate virtual environment
-    source /Users/travis/.virtualenvs/ydk_python/bin/activate
-    PYTHON_BIN=python
-    PIP_BIN=pip
-    return
-  fi
-
-  PYTHON_BIN=python${PYTHON_VERSION}
-  if [[ ${PYTHON_VERSION} = "2"* ]]; then
-    PIP_BIN=pip
-  elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
+    PYTHON_VERSION=3
+    PYTHON_BIN=python3
     PIP_BIN=pip3
   else
-    PIP_BIN=pip${PYTHON_VERSION}
+    PYTHON_BIN=python${PYTHON_VERSION}
+    if [[ ${PYTHON_VERSION} = "2"* ]]; then
+      PIP_BIN=pip
+    elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
+      PIP_BIN=pip3
+    else
+      PIP_BIN=pip${PYTHON_VERSION}
+    fi
   fi
-
   print_msg "Checking installation of ${PYTHON_BIN}"
   ${PYTHON_BIN} --version &> /dev/null
   status=$?
@@ -181,7 +175,7 @@ function init_go_env {
         gvm use go1.9.2
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
-    else
+   else
         cd $YDKGEN_HOME
         export GOPATH="$(pwd)/golang"
         export GOROOT=/usr/local/go
@@ -192,6 +186,7 @@ function init_go_env {
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
+    export CGO_ENABLED=1
 }
 
 ######################################################################
@@ -437,9 +432,11 @@ function run_go_sanity_tests {
 function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
-    py_sanity_deviation
-    py_sanity_augmentation
-    py_sanity_common_cache
+    if [[ ${os_type} != "Darwin" ]] ; then
+        py_sanity_deviation
+        py_sanity_augmentation
+        py_sanity_common_cache
+    fi
     py_sanity_one_class_per_module
     py_sanity_backward_compatibility
 }

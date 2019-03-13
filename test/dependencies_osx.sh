@@ -87,25 +87,19 @@ function install_golang {
 
 function check_python_installation {
   print_msg "Checking python and pip installation"
-  python${PYTHON_VERSION} -V
+  python3 -V
   status=$?
   if [ $status -ne 0 ]; then
-    print_msg "Installing python${PYTHON_VERSION}"
+    print_msg "Installing python3"
     brew install python
   fi
-  pip${PYTHON_VERSION} -V
+  pip3 -V
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing pip${PYTHON_VERSION}"
     run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    run_cmd sudo -H python${PYTHON_VERSION} get-pip.py
+    run_cmd sudo -H python3 get-pip.py
   fi
-  print_msg "Installing python virtualenv"
-  run_cmd sudo -H pip3 install virtualenv virtualenvwrapper
-  export VIRTUALENVWRAPPER_PYTHON=$(which python3)
-  run_cmd source /usr/local/bin/virtualenvwrapper.sh
-  run_cmd mkvirtualenv -p python${PYTHON_VERSION} ydk_python
-  run_cmd deactivate
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -114,11 +108,6 @@ function check_python_installation {
 NOCOLOR='\033[0m'
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
-
-# Parse args to get python version
-args=$(getopt p:d $*)
-set -- $args
-PYTHON_VERSION=${2}
 
 install_libssh
 install_confd

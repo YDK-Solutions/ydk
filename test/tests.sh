@@ -434,9 +434,9 @@ function run_python_bundle_tests {
     py_sanity_ydktest
     if [[ ${os_type} != "Darwin" ]] ; then
         py_sanity_deviation
-        py_sanity_augmentation
         py_sanity_common_cache
     fi
+    py_sanity_augmentation
     py_sanity_one_class_per_module
     py_sanity_backward_compatibility
 }
@@ -883,7 +883,7 @@ run_py_metadata_test
 ######################################
 # Documentation tests
 ######################################
-sanity_doc_gen
+#sanity_doc_gen
 #sanity_doc_gen_cache
 
 cd $YDKGEN_HOME

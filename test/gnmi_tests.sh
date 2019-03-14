@@ -105,7 +105,7 @@ function check_python_installation {
     fi
   fi
   print_msg "Checking installation of ${PYTHON_BIN}"
-  ${PYTHON_BIN} --version &> /dev/null
+  ${PYTHON_BIN} -V
   status=$?
   if [ $status -ne 0 ]; then
     MSG_COLOR=$RED
@@ -113,7 +113,7 @@ function check_python_installation {
     exit $status
   fi
   print_msg "Checking installation of ${PIP_BIN}"
-  ${PIP_BIN} -V &> /dev/null
+  ${PIP_BIN} -V
   status=$?
   if [ $status -ne 0 ]; then
     MSG_COLOR=$RED

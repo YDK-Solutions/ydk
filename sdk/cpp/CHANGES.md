@@ -9,6 +9,11 @@
   * Segmentation Fault in API when connection to Netconf fails ([#879](https://github.com/CiscoDevNet/ydk-gen/issues/879))
   * 'delete' and 'replace' filters do not work properly with gNMI and CRUD service ([#881](https://github.com/CiscoDevNet/ydk-gen/issues/881))
 
+#### Model bundle additions
+  * Released cisco-ios-xr bundle to support Cisco IOS XR 6.5.2
+  * Released cisco-ios-xe bundle to support Cisco IOS XE 16.9.3
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.2.3
+
 
 ### 2019-02-11 version 0.8.1
 

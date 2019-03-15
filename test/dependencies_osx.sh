@@ -86,6 +86,9 @@ function install_golang {
 }
 
 function check_python_installation {
+  print_msg "Checking python libraries location"
+  locate libpython2.7.dylib
+
   print_msg "Checking python and pip installation"
   python3 -V
   status=$?

@@ -549,7 +549,7 @@ Please follow [System requirements](#system-requirements) to assure presence of 
 ### Mac OS
 
 The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
-This is well know and well documented issue. Each developer might have different approaches for its resolution. 
+This is well known and documented issue. Each developer might have different approaches for its resolution. 
 One of them is to use Python2 virtual environment. See [Setting up Python virtual environment](#setting-up-python-virtual-environment) for details.
 
 ## Directory structure
@@ -634,10 +634,10 @@ $ cmake .. && make all test
 
 Please refer [here](https://github.com/CiscoDevNet/ydk-gen/blob/master/sdk/go/core/README.md).
 
-Support
-=======
+#### Support
+
 Join the [YDK community](https://communities.cisco.com/community/developer/ydk) to connect with other users and with the makers of YDK.
 
-Release Notes
-===============
+#### Release Notes
+
 The current YDK release version is 0.8.2. The version of the latest YDK-Gen master branch is 0.8.2. YDK-Gen is licensed under the Apache 2.0 License.

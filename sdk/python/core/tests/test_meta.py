@@ -55,7 +55,7 @@ class MetaSanityTest(unittest.TestCase):
         embeded_enum_map = embeded_enum_meta.enum_dict()
         print("\nEnum dictionary:\n    %s" % embeded_enum_map)
         self.assertTrue(len(embeded_enum_map) > 0)
-        self.assertEqual(embeded_enum_map['seven'].value, 7L)
+        self.assertEqual(embeded_enum_map['seven'].value, 7)
 
 
     def test_enum_union_meta(self):

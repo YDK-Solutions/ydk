@@ -89,24 +89,23 @@ function pip_check_install {
 ######################################################################
 
 function check_python_installation {
-  
+
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
     PYTHON_BIN=python3
     PIP_BIN=pip3
   else
     PYTHON_BIN=python${PYTHON_VERSION}
-    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+    if [[ ${PYTHON_VERSION} = "2"* ]]; then
       PIP_BIN=pip
-    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
       PIP_BIN=pip3
     else
       PIP_BIN=pip${PYTHON_VERSION}
     fi
   fi
-
   print_msg "Checking installation of ${PYTHON_BIN}"
-  ${PYTHON_BIN} --version &> /dev/null
+  ${PYTHON_BIN} -V
   status=$?
   if [ $status -ne 0 ]; then
     MSG_COLOR=$RED
@@ -114,7 +113,7 @@ function check_python_installation {
     exit $status
   fi
   print_msg "Checking installation of ${PIP_BIN}"
-  ${PIP_BIN} -V &> /dev/null
+  ${PIP_BIN} -V
   status=$?
   if [ $status -ne 0 ]; then
     MSG_COLOR=$RED
@@ -128,16 +127,10 @@ function check_python_installation {
 function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
-  sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
+  ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
   if [[ $run_with_coverage ]] ; then
-    sudo ${PIP_BIN} install coverage
+    ${PIP_BIN} install coverage
   fi
-
-  #else
-    #print_msg "Initializing Python3 virtual environment"
-    #virtualenv macos_pyenv -p python3
-    #source macos_pyenv/bin/activate
-  #fi
 }
 
 function init_go_env {
@@ -159,6 +152,7 @@ function init_go_env {
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
+    export CGO_ENABLED=1
 }
 
 ######################################################################
@@ -178,7 +172,7 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     sudo make install
 }
 
@@ -205,7 +199,7 @@ function install_cpp_ydktest_bundle {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --cpp
     cd gen-api/cpp/ydktest-bundle/build
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     sudo make install
     cd -
 }
@@ -220,7 +214,7 @@ function build_gnmi_cpp_core_library {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     sudo make install
     cd $YDKGEN_HOME
 }
@@ -235,7 +229,7 @@ function build_and_run_cpp_gnmi_tests {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
 
     start_gnmi_server
 
@@ -275,7 +269,7 @@ function start_gnmi_server {
         print_msg "Building YDK gNMI server"
         mkdir -p build && cd build
         ${CMAKE_BIN} ..
-        run_exec_test make > /dev/null
+        run_exec_test make &> /dev/null
     fi
 
     print_msg "Starting YDK gNMI server"
@@ -314,7 +308,7 @@ function install_go_bundle {
 function install_go_gnmi {
     print_msg "Installing Go gNMI package"
     cd $YDKGEN_HOME
-    run_test generate.py -i --service profiles/services/gnmi-0.4.0_post1.json --go
+    run_test generate.py -i --service profiles/services/gnmi-0.4.0_post2.json --go
 }
 
 function run_go_gnmi_tests {
@@ -389,7 +383,7 @@ function build_python_gnmi_package {
     print_msg "Installing gNMI package for Python"
 
     cd $YDKGEN_HOME
-    run_test generate.py --service profiles/services/gnmi-0.4.0_post1.json
+    run_test generate.py --service profiles/services/gnmi-0.4.0_post2.json
     ${PIP_BIN} install gen-api/python/ydk-service-gnmi/dist/ydk*.tar.gz
 
     print_msg "Verifying Python gNMI package installation"

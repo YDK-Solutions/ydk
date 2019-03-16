@@ -24,7 +24,26 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_osx.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function install_libssh {
+    print_msg "Checking installation of libssh"
+    locate libssh_threads.dylib
+    local status=$?
+    if [[ ${status} == 0 ]]; then
+        return
+    fi
     print_msg "Installing libssh-0.7.6"
     brew reinstall openssl
     export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
@@ -67,27 +86,29 @@ function install_golang {
 }
 
 function check_python_installation {
-  print_msg "Checking python3 and pip3 installation"
-  #brew rm -f --ignore-dependencies python python3
-  python3 -V &> /dev/null
+  print_msg "Checking python libraries location"
+  locate libpython2.7.dylib
+
+  print_msg "Checking python and pip installation"
+  python3 -V
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing python3"
-    brew install python@3
+    brew install python
   fi
-  pip3 -V &> /dev/null
+  pip3 -V
   status=$?
   if [ $status -ne 0 ]; then
-    print_msg "Installing pip3"
-    sudo easy_install pip3
+    print_msg "Installing pip${PYTHON_VERSION}"
+    run_cmd curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    run_cmd sudo -H python3 get-pip.py
   fi
-  sudo pip3 install virtualenv
 }
 
 ########################## EXECUTION STARTS HERE #############################
 
 # Terminal colors
-NOCOLOR="\033[0m"
+NOCOLOR='\033[0m'
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 

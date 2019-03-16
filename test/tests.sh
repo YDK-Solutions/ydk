@@ -25,9 +25,6 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
-PY_GENERATE="python2"
-PY_TEST="python3"
-
 ######################################################################
 # Utility functions
 ######################################################################
@@ -126,22 +123,21 @@ function stop_tcp_server {
 }
 
 function check_python_installation {
-  
+
   if [[ ${os_type} == "Darwin" ]] ; then
     PYTHON_VERSION=3
     PYTHON_BIN=python3
     PIP_BIN=pip3
   else
     PYTHON_BIN=python${PYTHON_VERSION}
-    if [[ ${PYTHON_VERSION} = *"2"* ]]; then
+    if [[ ${PYTHON_VERSION} = "2"* ]]; then
       PIP_BIN=pip
-    elif [[ ${PYTHON_VERSION} = *"3.5"* ]]; then
+    elif [[ ${PYTHON_VERSION} = "3.5"* ]]; then
       PIP_BIN=pip3
     else
       PIP_BIN=pip${PYTHON_VERSION}
     fi
   fi
-
   print_msg "Checking installation of ${PYTHON_BIN}"
   ${PYTHON_BIN} --version &> /dev/null
   status=$?
@@ -165,16 +161,10 @@ function check_python_installation {
 function init_py_env {
   check_python_installation
   print_msg "Initializing Python requirements"
-  sudo ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
+  ${PIP_BIN} install -r requirements.txt pybind11==2.2.2
   if [[ $run_with_coverage ]] ; then
-    sudo ${PIP_BIN} install coverage
+    ${PIP_BIN} install coverage
   fi
-
-  #else
-    #print_msg "Initializing Python3 virtual environment"
-    #virtualenv macos_pyenv -p python3
-    #source macos_pyenv/bin/activate
-  #fi
 }
 
 function init_go_env {
@@ -185,7 +175,7 @@ function init_go_env {
         gvm use go1.9.2
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
-    else
+   else
         cd $YDKGEN_HOME
         export GOPATH="$(pwd)/golang"
         export GOROOT=/usr/local/go
@@ -196,6 +186,7 @@ function init_go_env {
     print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
+    export CGO_ENABLED=1
 }
 
 ######################################################################
@@ -225,7 +216,8 @@ function install_cpp_core {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    print_msg "Compiling C++ core library"
+    run_exec_test make &> /dev/null
     sudo make install
 }
 
@@ -296,9 +288,9 @@ function generate_install_specified_cpp_bundle {
    bundle_profile=$1
    bundle_name=$2
 
-   run_test generate.py --bundle ${bundle_profile} --cpp --generate-doc &> /dev/null
+   run_test generate.py --bundle ${bundle_profile} --cpp &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
-   run_exec_test make > /dev/null
+   run_exec_test make &> /dev/null
    sudo make install
    cd -
 }
@@ -309,6 +301,9 @@ function cpp_sanity_ydktest_gen_install {
 
     print_msg "Generating and installing new C++ ydktest bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-cpp-new.json ydktest_new-bundle
+
+    print_msg "Generating and installing C++ ydktest-oc-nis bundle"
+    generate_install_specified_cpp_bundle profiles/test/ydktest-oc-nis.json ydktest_oc_nis-bundle
 }
 
 function cpp_sanity_ydktest_test {
@@ -329,7 +324,7 @@ function cpp_sanity_ydktest_test {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
 
     #export CTEST_OUTPUT_ON_FAILURE=1
     #make test
@@ -353,7 +348,7 @@ function cpp_test_gen_test {
     mkdir -p gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     cd gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     run_exec_test ${CMAKE_BIN} ..
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     ctest --output-on-failure
 }
 
@@ -363,7 +358,7 @@ function cpp_test_gen {
     cd $YDKGEN_HOME
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
-    run_exec_test make > /dev/null
+    run_exec_test make &> /dev/null
     sudo make install
 
     # cpp_test_gen_test
@@ -437,9 +432,11 @@ function run_go_sanity_tests {
 function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
-    py_sanity_deviation
+    if [[ ${os_type} != "Darwin" ]] ; then
+        py_sanity_deviation
+        py_sanity_common_cache
+    fi
     py_sanity_augmentation
-    py_sanity_common_cache
     py_sanity_one_class_per_module
     py_sanity_backward_compatibility
 }
@@ -492,7 +489,7 @@ function py_sanity_ydktest_test {
 
     print_msg "Uninstall ydk py core from pip for testing with coverage"
     ${PIP_BIN} uninstall ydk -y
-    
+
     export OLDPYTHONPATH=$PYTHONPATH
     print_msg "Setting OLDPYTHONPATH to $OLDPYTHONPATH"
 
@@ -524,13 +521,15 @@ function run_py_sanity_ydktest_tests {
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_netconf_ssh
-    py_sanity_ydktest_test_tcp
+    if [[ ${os_type} != "Darwin" ]] ; then
+      py_sanity_ydktest_test_tcp
+    fi
 
     stop_tcp_server
 }
 
 function py_sanity_ydktest_test_netconf_ssh {
-    print_msg "py_sanity_ydktest_test_netconf_ssh"
+    print_msg "Running py_sanity_ydktest_test_netconf_ssh"
 
     run_test sdk/python/core/tests/test_netconf_operations.py
     run_test sdk/python/core/tests/test_opendaylight.py
@@ -548,8 +547,8 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_types.py
     run_test sdk/python/core/tests/test_non_top_operations.py
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
-
-    print_msg "py_sanity_ydktest_test_netconf_ssh no on-demand"
+  if [[ ${os_type} != "Darwin" ]] ; then
+    print_msg "Running py_sanity_ydktest_test_netconf_ssh with no on-demand"
     run_test sdk/python/core/tests/test_netconf_operations.py --non-demand
     run_test sdk/python/core/tests/test_sanity_delete.py --non-demand
     run_test sdk/python/core/tests/test_sanity_errors.py --non-demand
@@ -564,6 +563,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
 #    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
 #    --non-demand
+  fi
 }
 
 function py_sanity_ydktest_test_tcp {
@@ -592,7 +592,7 @@ function py_sanity_deviation {
 }
 
 function py_sanity_deviation_ydktest_gen {
-    print_msg "py_sanity_deviation_ydktest_gen"
+    print_msg "Running py_sanity_deviation_ydktest_gen"
 
     rm -rf gen-api/python/*
     cd $YDKGEN_HOME
@@ -600,22 +600,22 @@ function py_sanity_deviation_ydktest_gen {
 }
 
 function py_sanity_deviation_ydktest_install {
-    print_msg "py_sanity_deviation_ydktest_install"
+    print_msg "Running py_sanity_deviation_ydktest_install"
 
     ${PIP_BIN} uninstall ydk-models-ydktest -y
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 }
 
 function py_sanity_deviation_ydktest_test {
-    print_msg "py_sanity_deviation_ydktest_test"
+    print_msg "Running py_sanity_deviation_ydktest_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py
-    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
 }
 
 function py_sanity_deviation_bgp_gen {
-    print_msg "py_sanity_deviation_bgp_gen"
+    print_msg "Running py_sanity_deviation_bgp_gen"
 
     rm -rf gen-api/python/*
     cd $YDKGEN_HOME
@@ -623,24 +623,24 @@ function py_sanity_deviation_bgp_gen {
 }
 
 function py_sanity_deviation_bgp_install {
-    print_msg "py_sanity_deviation_bgp_install"
+    print_msg "Running py_sanity_deviation_bgp_install"
 
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/deviation-bundle/dist/*.tar.gz
 }
 
 function py_sanity_deviation_bgp_test {
-    print_msg "py_sanity_deviation_bgp_test"
+    print_msg "Running py_sanity_deviation_bgp_test"
 
     run_test sdk/python/core/tests/test_sanity_deviation_bgp.py
-    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
 }
 
 #--------------------------
 # Python augmentation bundle
 #--------------------------
 function py_sanity_augmentation {
-    print_msg "py_sanity_augmentation"
+    print_msg "Running py_sanity_augmentation"
 
     rm -rf $HOME/.ydk/*
     py_sanity_augmentation_gen
@@ -650,7 +650,7 @@ function py_sanity_augmentation {
 }
 
 function py_sanity_augmentation_gen {
-    print_msg "py_sanity_augmentation_gen"
+    print_msg "Running py_sanity_augmentation_gen"
 
     cd $YDKGEN_HOME && rm -rf gen-api/python/*
     run_test generate.py --core
@@ -658,7 +658,7 @@ function py_sanity_augmentation_gen {
 }
 
 function py_sanity_augmentation_install {
-    print_msg "py_sanity_augmentation_install"
+    print_msg "Running py_sanity_augmentation_install"
 
     cd $YDKGEN_HOME
     ${PIP_BIN} uninstall ydk -y
@@ -667,17 +667,17 @@ function py_sanity_augmentation_install {
 }
 
 function py_sanity_augmentation_test {
-    print_msg "py_sanity_augmentation_test"
+    print_msg "Running py_sanity_augmentation_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
 
     run_test sdk/python/core/tests/test_sanity_augmentation.py
-    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
+#    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
     run_test sdk/python/core/tests/test_on_demand.py
 }
 
 function py_sanity_common_cache {
-    print_msg "py_sanity_common_cache"
+    print_msg "Running py_sanity_common_cache"
 
     rm -rf $HOME/.ydk/*
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
@@ -758,6 +758,20 @@ function py_test_gen {
 }
 
 #-------------------------------------
+# oc-network-instance tests
+#-------------------------------------
+
+function run_python_oc_nis_tests {
+    print_msg "Installing ydktest_oc_nis bundle"
+    cd $YDKGEN_HOME
+    run_test generate.py --bundle profiles/test/ydktest-oc-nis.json
+    pip_check_install gen-api/python/ydktest_oc_nis-bundle/dist/ydk*.tar.gz
+
+    print_msg "Running ydktest_oc_nis bundle tests"
+    run_test sdk/python/core/tests/test_oc_nis.py
+}
+
+#-------------------------------------
 # Meta-data test
 #-------------------------------------
 
@@ -776,12 +790,19 @@ function run_py_metadata_test {
 #-------------------------------------
 
 function sanity_doc_gen {
-   print_msg "Generating docs"
    print_msg "Removing previously generated code with sudo to avoid permission issues"
-   sudo rm -rf gen-api/cpp/ydk
-   run_test generate.py --core --cpp --generate-doc &> /dev/null
-   run_test generate.py --core --go --generate-doc &> /dev/null
-   run_test generate.py --core --python --generate-doc &> /dev/null
+   sudo rm -rf gen-api/cpp/ydk*
+   sudo rm -rf gen-api/go/ydk*
+   sudo rm -rf gen-api/python/ydk*
+
+   print_msg "Generating C++ docs"
+   run_test generate.py --core --cpp --generate-doc > /dev/null
+
+   print_msg "Generating Go docs"
+   run_test generate.py --core --go --generate-doc > /dev/null
+
+   print_msg "Generating Python docs"
+   run_test generate.py --core --python --generate-doc > /dev/null
 }
 
 function sanity_doc_gen_cache {
@@ -854,6 +875,7 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
+run_python_oc_nis_tests
 run_py_metadata_test
 
 # test_gen_tests
@@ -861,8 +883,8 @@ run_py_metadata_test
 ######################################
 # Documentation tests
 ######################################
-sanity_doc_gen
-sanity_doc_gen_cache
+#sanity_doc_gen
+#sanity_doc_gen_cache
 
 cd $YDKGEN_HOME
 find . -name '*gcda*'|xargs rm -f

@@ -51,14 +51,14 @@ For Xenial (Ubuntu 16.04.4)::
    $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
    # Install YDK core library
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-   $ sudo gdebi libydk_0.8.1-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
+   $ sudo gdebi libydk-0.8.2-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
    # Install YDK core library
-   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-   $ sudo gdebi libydk_0.8.1-1_amd64.deb
+   $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
+   $ sudo gdebi libydk-0.8.2-1.amd64.deb
 
 Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
@@ -79,13 +79,11 @@ Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/iss
    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
    # Install YDK core library
-   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
 
 
 MacOS
 -----
-
-**Note:** Please do not use the homebrew version of python as it causes issues with installation of YDK packages. Please execute ``brew rm python python3`` to remove any homebrew python packages.
 
 It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py.
 
@@ -97,8 +95,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
    $ brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
 
    # Install YDK core library
-   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   $ sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   $ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
+   $ sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
 
 Libssh Installation
 -------------------
@@ -147,30 +145,30 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 CentOS
 ~~~~~~
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
    
 MacOS
 ~~~~~
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 
 
 Runtime environment
@@ -194,6 +192,50 @@ It is also required for Python installation to include corresponding shared libr
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
 Please follow `System Requirements` to assure presence of shared Python libraries.
+
+Mac OS
+~~~~~~
+
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
+This is well known and documented issue. Each developer might have different approaches for its resolution. 
+One of them is to use Python2 virtual environment. See section Using Python Virtual_ Environment for details
+
+In addition it is required properly set CMAKE_LIBRARY_PATH environment variable to assure that `cmake` uses correct Python library. 
+Follow these steps to find and set correct library path.
+
+1. Find installations of `libpython2.7` library. Example:
+
+.. code-block:: sh
+
+  $ locate libpython2.7.dylib
+  /System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
+  /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
+  /usr/lib/libpython2.7.dylib
+  /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
+  /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
+  
+2. Choose non-system Python library installation and set CMAKE_LIBRARY_PATH before any YDK component installation. Example:
+
+.. code-block:: sh
+
+  export CMAKE_LIBRARY_PATH=/usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib
+  
+3. Run YDK core package installation with '-v' flag to check that `PythonLibs` points to correct library path. Example:
+
+.. code-block:: sh
+
+  $ ./generate.py --core
+  $ pip install -v gen-api/python/ydk/dist/ydk*.tar.gz
+  
+  # Look for these lines
+  -- Found PythonLibs: /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib (found version "2.7.15")
+
+4. Finally test you YDK core library installation, making sure there are no errors:
+
+.. code-block:: sh
+
+  $ python -c "import ydk.types"
+  
 
 .. _howto-install:
 
@@ -250,8 +292,8 @@ YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages):
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-service-gnmi-0.4.0.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-service-gnmi-0.4.0.post2.tar.gz
     $ pip install ydk-models-cisco-ios-xr
     $ pip install ydk-models-cisco-ios-xe
 
@@ -260,14 +302,14 @@ If you only prefer to install the ``openconfig`` bundle and its dependencies (``
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
     $ pip install ydk-models-openconfig
 
 If you only want to install the ``ietf`` bundle and its dependencies (``YDK`` package), execute:
 
 .. code-block:: sh
 
-    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.1/ydk-0.8.1.tar.gz
+    $ pip install https://devhub.cisco.com/artifactory/pypi-ydk/0.8.2/ydk-0.8.2.tar.gz
     $ pip install ydk-models-ietf
 
 Installing from Source
@@ -304,7 +346,7 @@ Once you have installed the ``YDK`` core package, you can install one or more mo
 
 .. code-block:: sh
 
-    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.1
+    $ git clone https://github.com/CiscoDevNet/ydk-py.git -b 0.8.2
 
 Note that some bundles have dependencies on other bundles.  Those dependencies are already captured in the bundle package.  Make sure you install the desired bundles in the order below.  To install the ``ietf`` bundle, execute:
 
@@ -354,8 +396,10 @@ To install the ``YDK`` Python gNMI package, execute:
     gnmi$ python setup.py sdist
     gnmi$ pip install dist/ydk*.gz
 
-Using Virtual Environment
-=========================
+.. _Virtual:
+
+Using Python Virtual Environment
+================================
 
 You may want to perform the installation under Python virtual environment (`virtualenv <https://pypi.python.org/pypi/virtualenv/>`_/`virtualenvwrapper  <https://pypi.python.org/pypi/virtualenvwrapper>`_).  A virtual environment allows you to install multiple versions of YDK if needed.  In addition, it prevents any potential conflicts between package dependencies in your system.
 
@@ -365,8 +409,6 @@ To install virtual environment on your system, execute:
 
     $ pip install virtualenv virtualenvwrapper
     $ source /usr/local/bin/virtualenvwrapper.sh
-
-**Note**  In some systems (e.g. Debian-based Linux), you need to be a root user or use `sudo` access.
 
 Create new virtual environment:
 

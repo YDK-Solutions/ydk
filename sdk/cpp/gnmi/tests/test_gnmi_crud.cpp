@@ -56,10 +56,12 @@ TEST_CASE("gnmi_crud_single_entity")
     ifc.config->name = "Loopback10";
 
     // Set-replace Request
+    ifc.yfilter = YFilter::replace;
     auto reply = crud.create(provider, ifc);
     REQUIRE(reply);
 
     ifc.config->description = "Test";
+    ifc.yfilter = YFilter::not_set;
     reply = crud.update(provider, ifc);
     REQUIRE(reply);
 
@@ -73,6 +75,7 @@ TEST_CASE("gnmi_crud_single_entity")
     REQUIRE(ifc_read != nullptr);
     REQUIRE(*ifc_read == ifc);
 
+    ifc_filter->ignore_validation = true;
     ifc_read = crud.read_config(provider, *ifc_filter);
     REQUIRE(ifc_read != nullptr);
     REQUIRE(*ifc_read == ifc);
@@ -164,3 +167,53 @@ TEST_CASE("gnmi_crud_multiple_entities")
     reply = crud.delete_(provider, create_entities);
     REQUIRE(reply);
 }
+
+TEST_CASE("gnmi_crud_multiple_entities_no_validation")
+{
+    // session
+    Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+
+    gNMIServiceProvider provider{repo, address, port, "admin", "admin"};
+    CrudService crud{};
+    CodecServiceProvider codec_provider{EncodingFormat::JSON};
+    CodecService codec_service{};
+
+    // Configure Interfaces
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description = "Test";
+
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    // Configure BGP
+    openconfig_bgp::Bgp bgp{};
+    config_bgp(bgp);
+    bgp.ignore_validation = true;
+    ifcs.ignore_validation = true;
+
+    vector<Entity*> create_entities;
+    create_entities.push_back(&bgp);
+    create_entities.push_back(&ifcs);
+
+    // Set Request
+    auto reply = crud.update(provider, create_entities);
+    REQUIRE(reply);
+
+    openconfig_bgp::Bgp bgp_filter{};
+    openconfig_interfaces::Interfaces int_filter{};
+    vector<Entity*> filter;
+    filter.push_back(&bgp_filter);
+    filter.push_back(&int_filter);
+    bgp_filter.ignore_validation = true;
+    int_filter.ignore_validation = true;
+
+    auto read_entities = crud.read(provider, filter);
+    REQUIRE(read_entities.size() == 2);
+
+    reply = crud.delete_(provider, create_entities);
+    REQUIRE(reply);
+}
+

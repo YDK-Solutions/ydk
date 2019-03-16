@@ -1,0 +1,13 @@
+{
+    "name": "ydktest-oc-nis",
+    "version": "0.1.0",
+    "ydk_version":"0.8.1",
+    "author": "Cisco",
+    "copyright": "Cisco",
+    "description": "YDK openconfig-network-instance test profile",
+    "models": {
+    "dir": [
+        "/yang/openconfig-nis"
+        ]
+    }
+}

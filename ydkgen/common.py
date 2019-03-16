@@ -136,7 +136,7 @@ def iscppkeyword(word):
                     'const', 'continue', 'double', 'else', 'value', 'namespace',
                     'operation', 'volatile', 'register', 'short', 'extern',
                     'mutable', 'unsigned', 'struct', 'switch', 'void', 'typedef', 'typename',
-                    'typeid', 'using', 'char', 'goto', 'not','clock', 'major')
+                    'typeid', 'using', 'char', 'goto', 'not','clock', 'major', 'INFINITY')
 
 def isgokeyword(word):
     return word in (
@@ -484,4 +484,3 @@ def snake_case(input_text):
     s = input_text.replace('-', '_')
     s = s.replace('.', '_')
     return s.lower()
-

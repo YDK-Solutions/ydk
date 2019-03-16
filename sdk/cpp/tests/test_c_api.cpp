@@ -24,6 +24,8 @@
 //
 //////////////////////////////////////////////////////////////////
 
+#include <iostream>
+
 #include <ydk/ydk.h>
 #include "catch.hpp"
 
@@ -37,6 +39,7 @@ TEST_CASE( "codec_encode"  )
     Codec c = CodecInit();
     Repository repo = RepositoryInitWithPath(state, "/usr/local/share/ydktest@0.1.0");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(state, repo, "localhost", "admin", "admin", 12022, "ssh");
+    REQUIRE(provider!=NULL);
 
     RootSchemaNode root_schema = ServiceProviderGetRootSchema(state, provider);
 
@@ -59,6 +62,7 @@ TEST_CASE( "codec_decode"  )
     Codec c = CodecInit();
     Repository repo = RepositoryInitWithPath(state, "/usr/local/share/ydktest@0.1.0");
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(state, repo, "localhost", "admin", "admin", 12022, "ssh");
+    REQUIRE(provider!=NULL);
 
     RootSchemaNode root_schema = ServiceProviderGetRootSchema(state, provider);
 
@@ -111,6 +115,8 @@ TEST_CASE( "rpc" )
     Repository repo = RepositoryInitWithPath(state, "/usr/local/share/ydktest@0.1.0");
 
     ServiceProvider provider = NetconfServiceProviderInitWithRepo(state, repo, "localhost", "admin", "admin", 12022, "ssh");
+    REQUIRE(provider!=NULL);
+
     RootSchemaNode root_schema = ServiceProviderGetRootSchema(state, provider);
 
     DataNode runner = RootSchemaNodeCreate(state, root_schema, "ydktest-sanity:runner");

@@ -20,7 +20,7 @@ YANG Development Kit (Generator)
   - [MacOS](#macos)
   - [Windows](#windows)
 - [Installation](#installation)
-  - [Setting up your environment](#setting-up-your-environment)
+  - [Setting up Python virtual environment](#setting-up-python-virtual-environment)
   - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
 - [Generate YDK components](#generate-ydk-components)
   - [First step: choose model bundle profile](#first-step-choose-model-bundle-profile)
@@ -61,7 +61,7 @@ The output of ydk-gen is either a core package, that defines services and provid
 
 # Backward compatibility
 
-The YDK-0.8.1 core is bacward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
+The YDK-0.8.2 core is backward compatible with generated in YDK-0.7.3 model bundle code. It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
 
 # Docker
 
@@ -100,15 +100,15 @@ You can install the latest `libydk` core library using prebuilt binaries for Xen
 For Xenial (Ubuntu 16.04.4):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
+   sudo gdebi libydk-0.8.2-1.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_0.8.1-1_amd64.deb
-   sudo gdebi libydk_0.8.1-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
+   sudo gdebi libydk-0.8.2-1.amd64.deb
 ```
 
 ### Centos (Fedora-based)
@@ -129,7 +129,7 @@ For Bionic (Ubuntu 18.04.1):
 #### Install prebuilt libydk binary
 
 ```  
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk-0.8.1-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
 ```
 
 ### Build from source
@@ -154,20 +154,18 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Py/YDK-Cpp/YDK-Go.
 
-You can download the latest Python package from [here](https://www.python.org/downloads/). Please do not use the homebrew version of Python as it causes issues with installation of YDK packages. Please execute `brew rm python python3` to remove any homebrew Python packages.
-
-#### Install prebuilt libydk and optionally libydk_gnmi libraries
+### Install prebuilt libydk and optionally libydk_gnmi libraries
 
 ```
    xcode-select --install
    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
    brew install pkg-config libssh xml2 curl pcre cmake libxml2 pybind11
    
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk-0.8.1-Darwin.pkg
-   sudo installer -pkg libydk-0.8.1-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
+   sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -241,28 +239,28 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial (Ubuntu 16.04.4):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/xenial/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1)
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.1/bionic/libydk_gnmi_0.4.0-1_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-1_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 ```
 
 #### CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.1/libydk_gnmi_0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
 ```
 
 #### MacOS:
 
 ```
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.1/libydk_gnmi-0.4.0-1_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-1_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 ```
 
 ### Run-time environment
@@ -277,7 +275,7 @@ As a workaround, the YDK based application runtime environment must include sett
 ```
 
 # Installation
-## Setting up your environment
+## Setting up Python virtual environment
 
 We recommend that you run ydk-gen under Python virtual environment (``virtualenv``/``virtualenvwrapper``).  To install Python virtual environment in your system, execute:
 
@@ -288,10 +286,22 @@ We recommend that you run ydk-gen under Python virtual environment (``virtualenv
 
 In some systems (e.g. Debian-based Linux), you may need to install support for Python virtual environments as root
 
-Create new virtual environment:
+Create and activate new virtual environment:
 
 ```
    mkvirtualenv -p python2.7 py2
+```
+
+Activate previously created virtusl environment:
+
+```
+   source ~/.virtualenvs/py2/bin/activate
+```
+
+Exit virtual environment:
+
+```
+   deactivate
 ```
 
 ## Clone ydk-gen and install the requirements
@@ -359,7 +369,7 @@ A sample bundle profile file is described below. The file is in a JSON format. S
 {
     "name":"cisco-ios-xr",
     "version": "0.1.0",
-    "ydk_version": "0.8.1",
+    "ydk_version": "0.8.2",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
@@ -458,7 +468,7 @@ Now, the `pip list | grep ydk` should show the `ydk` (referring to the core pack
 $ pip list | grep ydk
 ...
 
-ydk (0.8.1)
+ydk (0.8.2)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
@@ -535,6 +545,12 @@ It is also required for Python installation to include corresponding shared libr
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
 Please follow [System requirements](#system-requirements) to assure presence of shared Python libraries.
+
+### Mac OS
+
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
+This is well known and documented issue. Each developer might have different approaches for its resolution. 
+One of them is to use Python2 virtual environment. See [Setting up Python virtual environment](#setting-up-python-virtual-environment) for details.
 
 ## Directory structure
 
@@ -618,10 +634,10 @@ $ cmake .. && make all test
 
 Please refer [here](https://github.com/CiscoDevNet/ydk-gen/blob/master/sdk/go/core/README.md).
 
-Support
-=======
+#### Support
+
 Join the [YDK community](https://communities.cisco.com/community/developer/ydk) to connect with other users and with the makers of YDK.
 
-Release Notes
-===============
-The current YDK release version is 0.8.1. The version of the latest YDK-Gen master branch is 0.8.1. YDK-Gen is licensed under the Apache 2.0 License.
+#### Release Notes
+
+The current YDK release version is 0.8.2. The version of the latest YDK-Gen master branch is 0.8.2. YDK-Gen is licensed under the Apache 2.0 License.

@@ -1,3 +1,24 @@
+### 2019-03-15 version 0.8.2
+
+#### New features and enhancements
+  * Expanded disabling of data validation to read operations with NetconfServiceProvider. 
+  * Expanded disabling of data validation to gNMIServiceProvider.
+
+#### Resolved GitHub issues
+  * ydk-py and ydk-gen Travis tests fail on Mac ([#834](https://github.com/CiscoDevNet/ydk-gen/issues/834))
+  * When MacOS is updated from Homebrew any Python2 YDK application fails ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837))
+  * ImportError: dynamic module does not define module export function (PyInit_ydk_) ([#840](https://github.com/CiscoDevNet/ydk-gen/issues/840))
+  * Libyang error: Reached limit (65535) for storing typedefs ([#874](https://github.com/CiscoDevNet/ydk-gen/issues/874))
+  * AttributeError: 'Config' object has no attribute 'logger' ([#876](https://github.com/CiscoDevNet/ydk-gen/issues/876))
+  * gNMI provider requires 'port' argument ([#880](https://github.com/CiscoDevNet/ydk-gen/issues/880))
+  * 'delete' and 'replace' filters doesn't work properly with gNMI and CRUD service ([#881](https://github.com/CiscoDevNet/ydk-gen/issues/881))
+
+#### Model bundle additions
+  * Released cisco-ios-xr bundle to support Cisco IOS XR 6.5.2
+  * Released cisco-ios-xe bundle to support Cisco IOS XE 16.9.3
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.2.3
+
+
 ### 2019-02-11 version 0.8.1
 
 #### CRUD / Netconf / gNMI/ Codec / Path API

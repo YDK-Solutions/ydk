@@ -107,8 +107,8 @@ class SanityTest(unittest.TestCase):
     # test edit config, get config, and get rpcs
     def test_edit_config_rpc(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
+        runner.one.number = 1
+        runner.one.name = 'runner:one:name'
 
         runner_xml = self.cs.encode(self.csp, runner)
         filter_xml = self.cs.encode(self.csp, ysanity.Runner())
@@ -180,8 +180,8 @@ class SanityTest(unittest.TestCase):
 
     def test_validate_rpc_2(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
+        runner.one.number = 1
+        runner.one.name = 'runner:one:name'
 
         runner_xml = self.cs.encode(self.csp, runner)
 

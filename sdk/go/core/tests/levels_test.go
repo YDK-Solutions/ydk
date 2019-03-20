@@ -40,16 +40,38 @@ func (suite *SanityLevelsTestSuite) TearDownSuite() {
 func (suite *SanityLevelsTestSuite) TestOneLevelPos() {
 	// READ
 	runner := ysanity.Runner{}
-	runner.YdktestSanityOne.Number = 1
-	runner.YdktestSanityOne.Name = "runner:one:name"
+	runner.One.Number = 1
+	runner.One.Name = "runner:one:name"
 	suite.CRUD.Create(&suite.Provider, &runner)
 	runnerRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
 
 	// UPDATE
 	runner = ysanity.Runner{}
-	runner.YdktestSanityOne.Number = 10
-	runner.YdktestSanityOne.Name = "runner/one/name"
+	runner.One.Number = 10
+	runner.One.Name = "runner/one/name"
+	suite.CRUD.Update(&suite.Provider, &runner)
+	runnerRead = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+
+	// // DELETE
+	runner = ysanity.Runner{}
+	suite.CRUD.Delete(&suite.Provider, &runner)
+	entity := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Nil(entity)
+}
+
+func (suite *SanityLevelsTestSuite) TestOneLevelAugPos() {
+	// READ
+	runner := ysanity.Runner{}
+	runner.YdktestSanityAugmOne.TwinNumber = 1000
+	suite.CRUD.Create(&suite.Provider, &runner)
+	runnerRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
+
+	// UPDATE
+	runner = ysanity.Runner{}
+	runner.YdktestSanityAugmOne.TwinNumber = 100
 	suite.CRUD.Update(&suite.Provider, &runner)
 	runnerRead = suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(&runner, runnerRead), true)
@@ -331,13 +353,13 @@ func (suite *SanityLevelsTestSuite) TestLeafrefSimplePos() {
 }
 
 func (suite *SanityLevelsTestSuite) TestAugOnePos() {
-	oneAug := ysanity.Runner_YdktestSanityOne_OneAug{}
+	oneAug := ysanity.Runner_One{}
 	oneAug.Number = 1
 	oneAug.Name = "runner:one:one_aug"
 
 	suite.CRUD.Create(&suite.Provider, &oneAug)
 
-	oneRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner_YdktestSanityOne_OneAug{})
+	oneRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner_One{})
 	suite.Equal(types.EntityEqual(&oneAug, oneRead), true)
 }
 

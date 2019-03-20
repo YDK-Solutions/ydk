@@ -47,8 +47,8 @@ func (suite *NetconfServiceTestSuite) BeforeTest(suiteName, testName string) {
 
 func (suite *NetconfServiceTestSuite) TestEditCommitGet() {
 	runner := ysanity.Runner{}
-	runner.YdktestSanityOne.Number = 1
-	runner.YdktestSanityOne.Name = "runner:one:name"
+	runner.One.Number = 1
+	runner.One.Name = "runner:one:name"
 
 	// Edit Config
 	op := suite.NS.EditConfig(&suite.Provider, datastore.Candidate, &runner, "", "", "")
@@ -95,8 +95,8 @@ func (suite *NetconfServiceTestSuite) TestValidate() {
 	suite.Equal(op, true)
 
 	runner := ysanity.Runner{}
-	runner.YdktestSanityOne.Number = 1
-	runner.YdktestSanityOne.Name = "runner:one:name"
+	runner.One.Number = 1
+	runner.One.Name = "runner:one:name"
 	op = suite.NS.Validate(&suite.Provider, datastore.NotSet, &runner, "")
 	suite.Equal(op, true)
 }

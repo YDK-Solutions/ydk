@@ -74,32 +74,32 @@ class SanityYang(unittest.TestCase):
     @assert_with_error(test_invalid_class_assignment_int_pattern, YModelError)
     def test_invalid_class_assignment_int(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one = 1
+        runner.one = 1
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_str_pattern, YModelError)
     def test_invalid_class_assignment_str(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one = "haha"
+        runner.one = "haha"
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_identity_pattern, YModelError)
     def test_invalid_class_assignment_identity(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one = ytypes.AnotherOne()
+        runner.one = ytypes.AnotherOne()
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_enum_pattern, YModelError)
     def test_invalid_class_assignment_enum(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one = ysanity.YdkEnumTest.none
+        runner.one = ysanity.YdkEnumTest.none
         self.crud.create(self.ncc, runner)
 
     @assert_with_error(test_invalid_class_assignment_yleaflist_pattern, YModelError)
     def test_invalid_class_assignment_yleaflist(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.llstring.extend([str(i) for i in range(5)])
-        runner.ydktest_sanity_one = runner.ytypes.built_in_t.llstring
+        runner.one = runner.ytypes.built_in_t.llstring
 
     @assert_with_error(test_invalid_list_assignment_int_pattern, YModelError)
     def test_invalid_list_assignment_int(self):
@@ -110,7 +110,7 @@ class SanityYang(unittest.TestCase):
     @assert_with_error(test_invalid_list_assignment_entity_pattern, YModelError)
     def test_invalid_list_assignment_entity(self):
         runner = ysanity.Runner()
-        runner.one_list.ldata = runner.ydktest_sanity_one
+        runner.one_list.ldata = runner.one
         self.crud.crud(self.ncc, runner)
 
     @assert_with_error(test_invalid_list_assignment_llist_pattern, YModelError)

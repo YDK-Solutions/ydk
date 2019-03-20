@@ -298,6 +298,11 @@ class ApiModelBuilder(object):
                 for e in parent_element.owned_elements:
                     if e.name == clazz.name:
                         clazz.name = clazz.name + '_'
+                        if hasattr(stmt, 'unclashed_arg'):
+                            stmt.unclashed_arg += '_'
+                        else:
+                            stmt.unclashed_arg = '%s_' % stmt.arg
+
 
                 parent_element.owned_elements.append(clazz)
                 clazz.set_owner(parent_element, self.language)
@@ -316,7 +321,8 @@ class ApiModelBuilder(object):
                     for e in parent_element.owned_elements:
                         if isinstance(e, Property):
                             s = snake_case(e.stmt.arg)
-                            if snake_case(prop.stmt.arg) == s:
+                            stmt_arg = (prop.stmt.unclashed_arg if hasattr(prop.stmt, 'unclashed_arg') else prop.stmt.arg)
+                            if snake_case(stmt_arg) == s:
                                 prop.name = prop.name + '_'
 
                     parent_element.owned_elements.append(prop)
@@ -329,7 +335,7 @@ class ApiModelBuilder(object):
             self._add_to_deviation_package(stmt, parent_element, deviation_packages)
 
         # walk the children
-        _keywords = statements.data_definition_keywords + ['case', 'rpc', 'input', 'output']
+        _keywords = statements.data_definition_keywords + ['case', 'rpc', 'input', 'output', 'choice']
         if hasattr(stmt, 'i_children'):
             self._sanitize_namespace(stmt)
 
@@ -375,28 +381,37 @@ class ApiModelBuilder(object):
             :param `pyang.statements.Statement` The stmt to sanitize.
         """
         def _get_num_clashes(i_children):
-            stmts = [stmt for stmt in i_children]
+            stmts = []
+            for stmt in i_children:
+                if stmt.keyword in ['container', 'list', 'leaf', 'leaf-list']:
+                    stmts.append(stmt)
+                elif stmt.keyword == 'choice':
+                    for choice_child in stmt.i_children:
+                        if choice_child.keyword == 'case':
+                            choice_child = choice_child.i_children[0]
+                        if choice_child.keyword in ['container', 'list', 'leaf', 'leaf-list']:
+                            stmts.append(choice_child)
+            all_stmts = [stmt for stmt in stmts]
             clashes = []
-
             while len(stmts) > 0:
                 ss = stmts.pop()
-                if ss.arg in [s.arg for s in stmts] and ss.arg not in clashes:
+                sargs = [s.arg for s in stmts]
+                if ss.arg in sargs and ss.arg not in clashes:
                     clashes.append(ss.arg)
-
-            return clashes
+            return clashes, all_stmts
 
         def _kill_clash(clash, i_children):
             for stmt in i_children:
                 if clash == stmt.arg:
-                    old_arg = stmt.arg
-                    new_arg = '%s_%s' % (stmt.top.arg, old_arg)
-                    stmt.unclashed_arg = new_arg #stmt.arg = new_arg
+                    if hasattr(stmt, 'i_augment'):
+                        stmt.unclashed_arg = '%s_%s' % (stmt.top.arg, stmt.arg)
+                    elif stmt.parent.keyword == 'case' and hasattr(stmt.parent.parent, 'i_augment'):
+                        stmt.unclashed_arg = '%s_%s' % (stmt.parent.parent.top.arg, stmt.arg)
 
-        clashes = _get_num_clashes(stmt.i_children)
-
+        clashes, stmts = _get_num_clashes(stmt.i_children)
         if len(clashes) > 0:
             for clash in clashes:
-                _kill_clash(clash, stmt.i_children)
+                _kill_clash(clash, stmts)
 
 
 class SubModuleBuilder(object):

@@ -205,9 +205,9 @@ static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchema
     return std::shared_ptr<ydk::path::DataNode>(rd);
 }
 
-static const struct lyd_node* create_lyd_node_for_rpc(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
+static struct lyd_node* create_lyd_node_for_rpc(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
 {
-    const struct lyd_node* rpc = lyd_new_path(NULL, rs_impl.m_ctx, rpc_path.c_str(), NULL, LYD_ANYDATA_SXML, 0);
+    struct lyd_node* rpc = lyd_new_path(NULL, rs_impl.m_ctx, rpc_path.c_str(), NULL, LYD_ANYDATA_SXML, 0);
     if( rpc == nullptr || ly_errno )
     {
         ydk::YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
@@ -301,7 +301,7 @@ ydk::path::Codec::decode_rpc_output(RootSchemaNode & root_schema, const std::str
 
     RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
     rs_impl.populate_new_schemas_from_payload(buffer, format);
-    const struct lyd_node* rpc = create_lyd_node_for_rpc(rs_impl, rpc_path);
+    struct lyd_node* rpc = create_lyd_node_for_rpc(rs_impl, rpc_path);
 
     struct lyd_node* root = lyd_parse_mem(rs_impl.m_ctx, buffer.c_str(),
                 get_ly_format(format), LYD_OPT_TRUSTED |  LYD_OPT_RPCREPLY, rpc, NULL);
@@ -310,7 +310,7 @@ ydk::path::Codec::decode_rpc_output(RootSchemaNode & root_schema, const std::str
         YLOG_ERROR( "Parsing failed with message {}", ly_errmsg());
         throw(YCodecError{YCodecError::Error::XML_INVAL});
     }
-
+    if (rpc) lyd_free(rpc);
     return perform_decode(rs_impl, root);
 }
 

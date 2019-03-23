@@ -169,14 +169,22 @@ nc_rpc* NetconfSSHClient::build_rpc_request(const string & payload)
     return rpc;
 }
 
+static string nc_rpc_dump_to_string(const nc_rpc* reply)
+{
+    char * nc_reply = nc_rpc_dump(reply);
+    string nc_reply_str {nc_reply};
+    free(nc_reply);
+    return nc_reply_str;
+}
+
 string NetconfSSHClient::process_rpc_reply(int msg_type, const nc_rpc* reply)
 {
     switch (msg_type)
     {
         case NC_MSG_REPLY:
-            return nc_rpc_dump(reply);
+            return nc_rpc_dump_to_string(reply);
         case NC_MSG_HELLO:
-            return nc_rpc_dump(reply);
+            return nc_rpc_dump_to_string(reply);
 
         default:
         case NC_MSG_WOULDBLOCK:

@@ -80,7 +80,7 @@ function pip_check_install {
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
     else
-        ${PIP_BIN} install $@ -U
+        ${PIP_BIN} install --no-deps $@ -U
     fi
 }
 
@@ -171,8 +171,11 @@ function init_go_env {
     print_msg "Initializing Go environment"
 
     if [[ $(uname) == "Darwin" ]]; then
-        source /Users/travis/.gvm/scripts/gvm
-        gvm use go1.9.2
+        #source /Users/travis/.gvm/scripts/gvm
+        #gvm use go1.9.2
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$(pwd)/golang"
+        fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
    else
@@ -259,7 +262,7 @@ function install_py_core {
     print_msg "Installing Python YDK core"
 
     if [[ $run_with_coverage ]] ; then
-      print_msg "Building python with coverage"
+      print_msg "Building Python with coverage"
       export YDK_COVERAGE=
     fi
     cd $YDKGEN_HOME/sdk/python/core
@@ -291,7 +294,7 @@ function generate_install_specified_cpp_bundle {
    run_test generate.py --bundle ${bundle_profile} --cpp &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
    run_exec_test make &> /dev/null
-   sudo make install
+   run_exec_test sudo make install
    cd -
 }
 
@@ -359,7 +362,7 @@ function cpp_test_gen {
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
     run_exec_test make &> /dev/null
-    sudo make install
+    run_exec_test sudo make install
 
     # cpp_test_gen_test
 }

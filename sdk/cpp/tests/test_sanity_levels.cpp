@@ -89,7 +89,7 @@ TEST_CASE("one_level_aug_pos")
     bool reply = crud.delete_(provider, *r_1);
     REQUIRE(reply);
 
-    r_1->ydktest_sanity_augm_one_->twin_number = 1;
+    r_1->ydktest_sanity_augm_one->twin_number = 1;
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
 
@@ -99,11 +99,11 @@ TEST_CASE("one_level_aug_pos")
     ydktest_sanity::Runner * r_2_ptr = dynamic_cast<ydktest_sanity::Runner*>(r_2.get());
     REQUIRE(r_2_ptr!=nullptr);
 
-    REQUIRE(r_1->ydktest_sanity_augm_one_->twin_number == r_2_ptr->ydktest_sanity_augm_one_->twin_number);
+    REQUIRE(r_1->ydktest_sanity_augm_one->twin_number == r_2_ptr->ydktest_sanity_augm_one->twin_number);
 
     //UPDATE
     r_1 = make_unique<ydktest_sanity::Runner>();
-    r_1->ydktest_sanity_augm_one_->twin_number = 10;
+    r_1->ydktest_sanity_augm_one->twin_number = 10;
 
     filter = make_unique<ydktest_sanity::Runner>();
     reply = crud.update(provider, *r_1);
@@ -114,7 +114,7 @@ TEST_CASE("one_level_aug_pos")
     r_2_ptr = dynamic_cast<ydktest_sanity::Runner*>(r_2.get());
     REQUIRE(r_2_ptr!=nullptr);
 
-    REQUIRE(r_1->ydktest_sanity_augm_one_->twin_number == r_2_ptr->ydktest_sanity_augm_one_->twin_number);
+    REQUIRE(r_1->ydktest_sanity_augm_one->twin_number == r_2_ptr->ydktest_sanity_augm_one->twin_number);
 
     // DELETE
     filter = make_unique<ydktest_sanity::Runner>();

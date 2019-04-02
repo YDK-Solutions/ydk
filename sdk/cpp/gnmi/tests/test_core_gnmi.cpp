@@ -64,6 +64,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE( "test_gnmi_entity_leaf_to_path" )
@@ -97,6 +100,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE( "test_gnmi_entity_key_and_leaf_to_path" )
@@ -130,6 +136,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE( "test_gnmi_entity_key_and_leaf_to_path2" )
@@ -175,6 +184,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE( "test_gnmi_datanode_to_path" )
@@ -213,6 +225,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE( "test_gnmi_datanode_to_path_2" )
@@ -244,6 +259,9 @@ elem {
 }
 )";
     REQUIRE(path->DebugString() == expected);
+
+    path->Clear();
+    delete path;
 }
 
 TEST_CASE("gnmi_test_json_payload"  )

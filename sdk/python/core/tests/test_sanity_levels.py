@@ -96,7 +96,7 @@ class SanityYang(unittest.TestCase):
     def test_one_aug_level_pos(self):
         # READ
         r_1 = Runner()
-        r_1.ydktest_sanity_augm_one_.twin_number = 1
+        r_1.ydktest_sanity_augm_one.twin_number = 1
         self.crud.create(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, Runner())
 
@@ -104,7 +104,7 @@ class SanityYang(unittest.TestCase):
 
         # UPDATE
         r_1= Runner()
-        r_1.ydktest_sanity_augm_one_.twin_number = 10
+        r_1.ydktest_sanity_augm_one.twin_number = 10
         self.crud.update(self.ncc, r_1)
         r_2 = self.crud.read(self.ncc, Runner())
 

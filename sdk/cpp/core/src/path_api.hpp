@@ -37,7 +37,6 @@
 #include "errors.hpp"
 #include "types.hpp"
 #include "validation_service.hpp"
-#include "path_api.hpp"
 
 namespace ydk {
 
@@ -1084,6 +1083,9 @@ public:
     std::shared_ptr<DataNode> invoke(DataNode& rpc) const;
     std::vector<std::string> get_capabilities() const;
     std::string execute_netconf_operation(Rpc& netconf_rpc) const;
+
+    // This function is for YDK internal tests only
+    std::shared_ptr<path::DataNode> handle_action_rpc_output(const std::string & rpc_reply, path::DataNode& action_dn);
 
   private:
     std::vector<std::string> get_yang_1_1_capabilities() const;

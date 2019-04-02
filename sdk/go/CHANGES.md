@@ -1,6 +1,7 @@
 ### 2019-05-15 version 0.8.3
 
 #### Resolved GitHub issues
+  * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))
   * Duplicate code in generated cisco-ios-xe Go bundle ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891))
 
 ##### Note

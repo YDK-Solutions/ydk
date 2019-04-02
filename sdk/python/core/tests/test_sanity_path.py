@@ -228,6 +228,14 @@ class SanityTest(unittest.TestCase):
         xml_decode = self.codec.encode(node_decode, EncodingFormat.XML, True)
         self.assertEqual(xml_encode, xml_decode)
 
+    def test_rpc_get_schema_no_decode(self):
+        rpc = self.root_schema.create_rpc("ietf-netconf-monitoring:get-schema")
+        rpc.get_input_node().create_datanode("identifier", "ydktest-sanity-action")
+
+        reply = self.nc_session.execute_netconf_operation(rpc)
+        self.assertTrue(len(reply)>0)
+        #print(reply)
+
 def enable_logging(level):
     log = logging.getLogger('ydk')
     log.setLevel(level)

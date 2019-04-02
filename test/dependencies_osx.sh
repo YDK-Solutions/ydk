@@ -114,7 +114,7 @@ MSG_COLOR=$YELLOW
 
 install_libssh
 install_confd
-install_golang
+#install_golang
 
 brew install pybind11
 check_python_installation

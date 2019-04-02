@@ -9,6 +9,9 @@
 ##### Note
   The solution for GitHub issue ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891)) changed model API. However all model bundles generated with YDK-Gen version 0.7.3 and later are still compatible with core YDK components.
 
+#### Documentation improvements
+  Addressed multiple documentation issues:
+    * README file for YDK-Py repo is not rendering correctly ([#907](https://github.com/CiscoDevNet/ydk-gen/issues/907))
 
 ### 2019-03-15 version 0.8.2
 

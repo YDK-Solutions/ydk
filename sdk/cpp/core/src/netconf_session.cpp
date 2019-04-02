@@ -71,10 +71,12 @@ const char* CANDIDATE = "urn:ietf:params:netconf:capability:candidate:1.0";
 const string PROTOCOL_SSH = "ssh";
 const string PROTOCOL_TCP = "tcp";
 
+string get_netconf_output(const string & reply);
+
 static bool is_netconf_get_rpc(path::Rpc & rpc);
 static shared_ptr<path::DataNode> netconf_output_to_datanode(const string & data, path::RootSchemaNode & root_schema);
-static string get_netconf_output(const string & reply);
 static string extract_rpc_output(const string & reply);
+static string extract_rpc_data(const string & reply, const string & start_tag, const string & end_tag, bool is_first_tag=false);
 
 NetconfSession::NetconfSession(path::Repository & repo,
                                const string& address,
@@ -579,30 +581,26 @@ static bool is_netconf_get_rpc(path::Rpc & rpc)
             or rpc.get_schema_node().get_path() == "/ietf-netconf:get-config");
 }
 
-static std::string get_netconf_output(const string & reply)
+std::string get_netconf_output(const string & reply)
 {
-    auto empty_data = reply.find("<data/>");
-    if(empty_data != string::npos)
+    if (reply.find("<data/>") != string::npos || reply.find("<nc:data/>") != string::npos)
     {
-        YLOG_INFO( "Found empty data tag");
+        YLOG_INFO( "Found empty data tag, meaning requested data are not found on Netconf server");
         return {};
     }
 
-    auto data_start = reply.find("<data>");
-    if(data_start == string::npos)
-    {
-        YLOG_ERROR( "Can't find data tag in reply sent by device {}", reply);
-        throw(YServiceProviderError{reply});
-    }
-    data_start += sizeof("<data>") - 1;
-    auto data_end = reply.rfind("</data>");
-    if(data_end == string::npos)
-    {
-        YLOG_ERROR( "No end data tag found in reply sent by device {}", reply);
-        throw(YError{"No end data tag found"});
+    string rpc_output = extract_rpc_data(reply, "<data>", "</data>");
+    if (rpc_output.length() == reply.length()) {
+        rpc_output = extract_rpc_data(reply, "<nc:data>", "</nc:data>");
     }
 
-    return reply.substr(data_start, data_end-data_start);
+    if (rpc_output.length() == reply.length())
+    {
+        YLOG_ERROR( "Cannot find 'data' tag in RPC from device\n{}", reply);
+        throw(YServiceProviderError{reply});
+    }
+
+    return rpc_output;
 }
 
 static shared_ptr<path::DataNode> netconf_output_to_datanode(const string & data, path::RootSchemaNode & root_schema)
@@ -618,11 +616,11 @@ static shared_ptr<path::DataNode> netconf_output_to_datanode(const string & data
 }
 
 static string
-extract_rpc_data(const string & reply, const string & start_tag, const string & end_tag, bool first_tag=false)
+extract_rpc_data(const string & reply, const string & start_tag, const string & end_tag, bool is_first)
 {
     auto data_start = reply.find(start_tag);
     auto data_end = reply.rfind(end_tag);
-    if (data_start == string::npos || data_end == string::npos || (first_tag && data_start > 0)) {
+    if (data_start == string::npos || data_end == string::npos || (is_first && data_start > 0)) {
         return reply;
     }
     if (start_tag.find("<") == 0 && start_tag.find("<!") != 0) {

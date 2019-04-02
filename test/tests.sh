@@ -436,6 +436,7 @@ function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
     if [[ ${os_type} != "Darwin" ]] ; then
+        # GitHub issue #909
         py_sanity_deviation
     fi
     py_sanity_augmentation
@@ -683,8 +684,11 @@ function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
     rm -rf $HOME/.ydk/*
+  if [[ ${os_type} != "Darwin" ]] ; then
+    # GitHub issue #909
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
+  fi
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
     run_test sdk/python/core/tests/test_sanity_augmentation.py --common-cache
 

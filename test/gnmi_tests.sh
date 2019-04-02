@@ -80,7 +80,7 @@ function pip_check_install {
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
     else
-        ${PIP_BIN} install $@
+        ${PIP_BIN} install --no-deps $@
     fi
 }
 
@@ -137,8 +137,11 @@ function init_go_env {
     print_msg "Initializing Go environment"
 
     if [[ $(uname) == "Darwin" ]]; then
-        source /Users/travis/.gvm/scripts/gvm
-        gvm use go1.9.2
+        #source /Users/travis/.gvm/scripts/gvm
+        #gvm use go1.9.2
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$(pwd)/golang"
+        fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
     else

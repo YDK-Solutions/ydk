@@ -220,7 +220,8 @@ bool gNMISession::handle_set(Rpc& ydk_rpc) const
         }
     }
 
-    return client->execute_set_operation(setRequest);
+    bool result = client->execute_set_operation(setRequest);
+    return result;
 }
 
 shared_ptr<DataNode>
@@ -271,7 +272,6 @@ gNMISession::handle_get(Rpc& rpc) const
     for (auto response : reply) {
         YLOG_DEBUG("\n{}", response);
     }
-
     return handle_get_reply(reply);
 }
 

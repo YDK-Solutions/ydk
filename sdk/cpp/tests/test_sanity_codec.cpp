@@ -547,3 +547,28 @@ TEST_CASE("json_encode_decode")
     openconfig_interfaces::Interfaces * entity_ptr = dynamic_cast<openconfig_interfaces::Interfaces*>(ifcs_d.get());
     REQUIRE(ifcs == *entity_ptr);
 }
+
+TEST_CASE( "test_codec_action_rpc" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto & data = schema.create_datanode("ydktest-sanity-action:data");
+    auto & actn = data.create_action("action-node");
+    actn.create_datanode("test", "status");
+
+    string rpc_reply = R"(<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <data>
+    <t xmlns="http://cisco.com/ns/yang/ydktest-action">ok</t>
+  </data>
+</rpc-reply>
+)";
+
+    auto reply_dn = session.handle_action_rpc_output(rpc_reply, data);
+    REQUIRE(reply_dn != nullptr);
+
+    ydk::path::Codec s{};
+    auto xml_reply = s.encode(*reply_dn, EncodingFormat::XML, false);
+    REQUIRE(xml_reply==R"(<data xmlns="http://cisco.com/ns/yang/ydktest-action"><action-node><t>ok</t></action-node></data>)");
+}

@@ -200,6 +200,7 @@ function install_test_cpp_core {
     print_msg "Installing / testing C++ core"
     install_cpp_core
     run_cpp_core_test
+    run_memcheck_test
 
     if [[ $(uname) == "Linux" ]]; then
         generate_libydk
@@ -247,6 +248,28 @@ function run_cpp_core_test {
         #./tests/ydk_core_test -d yes
         MSG_COLOR=$RED
         print_msg "Exiting 'run_cpp_core_test' with status=$status"
+        exit $status
+    fi
+    cd $YDKGEN_HOME
+}
+
+function run_memcheck_test {
+    print_msg "Running C++ memcheck test"
+    which valgrind
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Valgrind is not installed. Skipping memcheck test"
+        MSG_COLOR=$YELLOW
+        return 0
+    fi
+
+    cd $YDKGEN_HOME/sdk/cpp/core/build/samples
+    run_exec_test valgrind --leak-check=yes ./bgp
+    status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting 'run_memcheck_test' with status=$status"
         exit $status
     fi
     cd $YDKGEN_HOME

@@ -116,7 +116,7 @@ install_libssh
 install_confd
 #install_golang
 
-brew install pybind11
+brew install pybind11 valgrind
 check_python_installation
 
 #install_fpm

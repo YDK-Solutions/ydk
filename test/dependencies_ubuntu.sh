@@ -63,6 +63,7 @@ function install_dependencies {
                             openjdk-8-jre \
                             gdebi-core\
                             lcov > /dev/null
+    sudo apt-get install -y valgrind
 }
 
 function check_install_gcc {

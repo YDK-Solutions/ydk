@@ -28,13 +28,12 @@
 #include "catch.hpp"
 #include "test_utils.hpp"
 
-#include "path_api.hpp"
+#include <ydk/path_api.hpp>
 #include <ydk/entity_data_node_walker.hpp>
+#include <ydk/netconf_provider.hpp>
+#include <ydk/crud_service.hpp>
 
-#include "ydk/netconf_provider.hpp"
-#include "ydk/crud_service.hpp"
-
-#include "ydk_ydktest/openconfig_interfaces.hpp"
+#include <ydk_ydktest/openconfig_interfaces.hpp>
 
 using namespace std;
 

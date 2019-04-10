@@ -717,10 +717,10 @@ TEST_CASE("oc_pattern")
     REQUIRE(reply);
 
     oc_pattern::OcA o_f{};
+    o_f.a = "xyz";
     auto d = crud.read(provider, o_f);
     REQUIRE((*d)==o);
 
-    o_f.a = "xyz";
     reply = crud.delete_(provider, o_f);
     REQUIRE(reply);
 }

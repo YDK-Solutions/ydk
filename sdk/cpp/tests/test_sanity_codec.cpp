@@ -548,7 +548,13 @@ TEST_CASE("json_encode_decode")
     REQUIRE(ifcs == *entity_ptr);
 }
 
-TEST_CASE( "test_codec_action_rpc" )
+namespace ydk {
+  namespace path {
+    std::shared_ptr<DataNode> handle_action_output(const std::string & reply, RootSchemaNode & root_schema, const string& action_node_path);
+  }
+}
+
+TEST_CASE( "test_codec_action_node" )
 {
     ydk::path::Repository repo{TEST_HOME};
     ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
@@ -565,7 +571,7 @@ TEST_CASE( "test_codec_action_rpc" )
 </rpc-reply>
 )";
 
-    auto reply_dn = session.handle_action_rpc_output(rpc_reply, data);
+    auto reply_dn = ydk::path::handle_action_output(rpc_reply, schema, data.get_action_node_path());
     REQUIRE(reply_dn != nullptr);
 
     ydk::path::Codec s{};

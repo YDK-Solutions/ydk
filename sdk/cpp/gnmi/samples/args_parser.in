@@ -20,10 +20,7 @@
 #include <string>
 #include <vector>
 
-
-#ifndef _UTILITY_MODULE_
-const char* TEST_HOME = "/home/yan/ydk-workspace/ydk-gen/sdk/cpp/gnmi/samples/../../core/tests/models";
-#endif
+const char* TEST_HOME = "@CMAKE_SOURCE_DIR@/../../core/tests/models";
 
 void show_usage(std::string name);
 std::vector<std::string> parse_args(int argc, char* argv[]);

@@ -61,7 +61,7 @@ function install_dependencies {
     yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
     yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
-    yum install python-devel python-pip python36u-devel python36u-pip  rpm-build redhat-lsb lcov -y > /dev/null
+    yum install python-devel python-pip python36-devel python36-pip  rpm-build redhat-lsb lcov -y > /dev/null
     yum install valgrind -y
 }
     

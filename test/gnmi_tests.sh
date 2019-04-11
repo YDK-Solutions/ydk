@@ -234,12 +234,8 @@ function build_and_run_cpp_gnmi_tests {
     fi
     run_exec_test make &> /dev/null
 
-    start_gnmi_server
-
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests/build
     run_exec_test ./ydk_gnmi_test -d yes
-
-    stop_gnmi_server
 
     collect_cpp_coverage
 }
@@ -251,7 +247,13 @@ function run_cpp_gnmi_tests {
     fi
 
     build_gnmi_cpp_core_library
+
+    start_gnmi_server
+
     build_and_run_cpp_gnmi_tests
+    run_cpp_gnmi_memcheck_tests
+
+    stop_gnmi_server
 }
 
 function collect_cpp_coverage {
@@ -263,6 +265,17 @@ function collect_cpp_coverage {
     lcov --list coverage.info #debug info
     cp coverage.info ${YDKGEN_HOME}
   fi
+}
+
+function run_cpp_gnmi_memcheck_tests {
+    print_msg "Building gnmi sample tests"
+    cd $YDKGEN_HOME/sdk/cpp/gnmi/samples
+    mkdir -p build
+    cd build
+    run_exec_test cmake .. && make &> /dev/null
+
+    print_msg "Running gnmi sample tests with memcheck"
+    valgrind --leak-check=summary ./bgp_gnmi_subscribe ssh://admin:admin@127.0.0.1:50051
 }
 
 function start_gnmi_server {

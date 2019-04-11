@@ -174,10 +174,10 @@ Python Requirements
 
 YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system. 
 
-It is also required for Python installation to include corresponding shared library. As example: 
+It is also required for Python installation to include corresponding shared library. As example::
 
- - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
- - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
+  python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
+  python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
  
 Please follow `System Requirements` to assure presence of shared Python libraries.
 

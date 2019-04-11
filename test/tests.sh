@@ -265,7 +265,7 @@ function run_memcheck_test {
     fi
 
     cd $YDKGEN_HOME/sdk/cpp/core/build/samples
-    run_exec_test valgrind --leak-check=yes ./bgp
+    run_exec_test valgrind --leak-check=summary ./bgp
     status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED

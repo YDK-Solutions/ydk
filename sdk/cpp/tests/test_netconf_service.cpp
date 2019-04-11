@@ -121,6 +121,23 @@ TEST_CASE("get_edit_copy_config")
     DataStore target = DataStore::candidate;
     DataStore source = DataStore::running;
 
+    // Buils some configuration
+    auto bgp = openconfig_bgp::Bgp();
+    bgp.global->config->as = 6500;
+    bgp.global->config->router_id = "10.20.30.40";
+    auto ifcs = openconfig_interfaces::Interfaces();
+    auto ifc  = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description = "Test Loopback10 config";
+    ifcs.interface.append(ifc);
+
+    vector<ydk::Entity*> config_list;
+    config_list.push_back(&bgp);
+    config_list.push_back(&ifcs);
+    if (ns.edit_config(provider, target, config_list))
+        ns.commit(provider);
+
     // Build filter
     openconfig_interfaces::Interfaces interfaces_filter{};
     openconfig_bgp::Bgp bgp_filter{};

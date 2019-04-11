@@ -191,18 +191,17 @@ static ydk::path::RootSchemaNodeImpl & get_root_schema_impl(ydk::path::RootSchem
 static std::shared_ptr<ydk::path::DataNode> perform_decode(ydk::path::RootSchemaNodeImpl & rs_impl, struct lyd_node *lnode)
 {
     ydk::YLOG_DEBUG("Performing decode operation");
-    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+    std::shared_ptr<ydk::path::RootDataImpl> rd = std::make_shared<ydk::path::RootDataImpl> (rs_impl, rs_impl.m_ctx, "/");
     rd->m_node = lnode;
 
     struct lyd_node* first_dnode = lyd_first_sibling(lnode);
     struct lyd_node* dnode = first_dnode;
-    do
-    {
-        rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd, dnode, nullptr)));
+    do {
+        rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd.get(), dnode, nullptr)));
         dnode = dnode->next;
     } while(dnode && dnode != first_dnode);
 
-    return std::shared_ptr<ydk::path::DataNode>(rd);
+    return rd;
 }
 
 static struct lyd_node* create_lyd_node_for_rpc(ydk::path::RootSchemaNodeImpl & rs_impl, const std::string & rpc_path)
@@ -320,7 +319,7 @@ ydk::path::Codec::decode_json_output(RootSchemaNode & root_schema, const std::ve
 
     RootSchemaNodeImpl & rs_impl = get_root_schema_impl(root_schema);
 
-    ydk::path::RootDataImpl* rd = new ydk::path::RootDataImpl{rs_impl, rs_impl.m_ctx, "/"};
+    std::shared_ptr<ydk::path::RootDataImpl> rd = std::make_shared<ydk::path::RootDataImpl> (rs_impl, rs_impl.m_ctx, "/");
     lyd_node* prev_sibling = nullptr;
     lyd_node* first_sibling = nullptr;
 
@@ -340,7 +339,7 @@ ydk::path::Codec::decode_json_output(RootSchemaNode & root_schema, const std::ve
         }
 
         // Populate children map and connect siblings
-        rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd, dnode, nullptr)));
+        rd->child_map.insert(std::make_pair(dnode, std::make_shared<ydk::path::DataNodeImpl>(rd.get(), dnode, nullptr)));
 
         if (prev_sibling) {
             prev_sibling->next = dnode;
@@ -350,7 +349,7 @@ ydk::path::Codec::decode_json_output(RootSchemaNode & root_schema, const std::ve
         first_sibling->prev = dnode;
     }
 
-    return std::shared_ptr<ydk::path::DataNode>(rd);
+    return rd;
 }
 
 #undef SLASH_CHAR

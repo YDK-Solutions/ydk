@@ -221,6 +221,8 @@ bool gNMISession::handle_set(Rpc& ydk_rpc) const
     }
 
     bool result = client->execute_set_operation(setRequest);
+
+    release_allocated_memory(setRequest);
     return result;
 }
 
@@ -272,7 +274,10 @@ gNMISession::handle_get(Rpc& rpc) const
     for (auto response : reply) {
         YLOG_DEBUG("\n{}", response);
     }
-    return handle_get_reply(reply);
+    shared_ptr<DataNode> rnd = handle_get_reply(reply);
+
+    release_allocated_memory(getRequest);
+    return rnd;
 }
 
 shared_ptr<DataNode>
@@ -399,6 +404,11 @@ gNMISession::handle_subscribe(Rpc& rpc,
     }
 
     client->execute_subscribe_operation(sub_list, qos, mode, encoding, out_func, poll_func);
+
+    // Release allocated memory
+    for (auto sub : sub_list) {
+        delete sub.path;
+    }
 }
 
 gNMIClient & gNMISession::get_client() const

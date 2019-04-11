@@ -67,6 +67,8 @@ struct GnmiClientRequest {
 	std::string operation;
 };
 
+void release_allocated_memory(std::vector<GnmiClientRequest> & request_list);
+
 struct GnmiClientModelData {
 	std::string name;
 	std::string organization;

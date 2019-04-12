@@ -200,9 +200,9 @@ function install_test_cpp_core {
     print_msg "Installing / testing C++ core"
     install_cpp_core
     run_cpp_core_test
-    run_memcheck_test
 
     if [[ $(uname) == "Linux" ]]; then
+        run_memcheck_test
         generate_libydk
     fi
 }
@@ -536,7 +536,9 @@ function py_sanity_ydktest_test {
 
     cd sdk/python/core/
     rm -f *.so
+
     print_msg "Restore ydk py core to pip"
+    ${PYTHON_BIN} setup.py sdist
     ${PIP_BIN} install dist/ydk*.tar.gz
 
     cd $YDKGEN_HOME

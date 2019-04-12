@@ -251,7 +251,10 @@ function run_cpp_gnmi_tests {
     start_gnmi_server
 
     build_and_run_cpp_gnmi_tests
-    run_cpp_gnmi_memcheck_tests
+
+    if [[ $(uname) == "Linux" ]]; then
+       run_cpp_gnmi_memcheck_tests
+    fi
 
     stop_gnmi_server
 }
@@ -272,7 +275,8 @@ function run_cpp_gnmi_memcheck_tests {
     cd $YDKGEN_HOME/sdk/cpp/gnmi/samples
     mkdir -p build
     cd build
-    run_exec_test cmake .. && make &> /dev/null
+    run_exec_test ${CMAKE_BIN} ..
+    run_exec_test make &> /dev/null
 
     print_msg "Running gnmi sample tests with memcheck"
     valgrind --leak-check=summary ./bgp_gnmi_subscribe ssh://admin:admin@127.0.0.1:50051
@@ -284,7 +288,7 @@ function start_gnmi_server {
     if [ ! -x ./build/gnmi_server ]; then
         print_msg "Building YDK gNMI server"
         mkdir -p build && cd build
-        ${CMAKE_BIN} ..
+        run_exec_test ${CMAKE_BIN} ..
         run_exec_test make &> /dev/null
     fi
 

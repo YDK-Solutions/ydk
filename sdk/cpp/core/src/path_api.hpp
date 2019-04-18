@@ -1086,11 +1086,11 @@ public:
 
     // This function is for YDK internal tests only
     std::shared_ptr<path::DataNode> handle_action_rpc_output(const std::string & rpc_reply, path::DataNode& action_dn);
+    void check_session_state();		// throws YClientError exception when state is other than connected
 
   private:
     std::vector<std::string> get_yang_1_1_capabilities() const;
-    std::shared_ptr<DataNode> handle_crud_edit(
-        Rpc& rpc, Annotation ann) const;
+    std::shared_ptr<DataNode> handle_crud_edit(Rpc& rpc, Annotation ann) const;
     std::shared_ptr<DataNode> handle_crud_read(Rpc& rpc) const;
     std::shared_ptr<DataNode> handle_netconf_operation(Rpc& ydk_rpc) const;
     void initialize_client_with_key(const std::string& address,

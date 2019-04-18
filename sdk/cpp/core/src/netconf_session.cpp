@@ -241,6 +241,11 @@ NetconfSession::~NetconfSession()
     YLOG_INFO("Disconnected from device");
 }
 
+void NetconfSession::check_session_state()
+{
+    client->perform_session_check("Netconf session is not connected");
+}
+
 vector<string> NetconfSession::get_capabilities() const
 {
     return server_capabilities;

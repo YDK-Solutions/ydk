@@ -135,6 +135,8 @@ class gNMIClient : public NetconfClient
     std::vector<std::string> get_capabilities();
     std::string get_hostname_port();
 
+    void perform_session_check(const std::string & message);
+
   private:
 
     void parse_capabilities_modeldata(::gnmi::CapabilityResponse* response);

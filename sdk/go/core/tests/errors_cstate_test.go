@@ -69,7 +69,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongPort() {
 		Password: "admin",
 		Port:     12000}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YClientError: Could not connect to %s", provider.Address)
+	errMsg := fmt.Sprintf("YClientError: Could not connect to %s: Session status: Undefined", provider.Address)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 
@@ -80,7 +80,7 @@ func (suite *CStateErrorsTestSuite) TestNetconfWrongCredentials() {
 		Password: "admin",
 		Port:     12022}
 	defer provider.Disconnect()
-	errMsg := fmt.Sprintf("YClientError: Could not connect to %s", provider.Address)
+	errMsg := fmt.Sprintf("YClientError: Could not connect to %s: Session status: Undefined", provider.Address)
 	assert.PanicsWithValue(suite.T(), errMsg, func() { provider.Connect() })
 }
 

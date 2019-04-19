@@ -227,7 +227,7 @@ TEST_CASE("DeviceNotConnectedExecute")
     }
     catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YClientError: Could not execute payload. Not connected to 127.0.0.1");
+        REQUIRE(e.err_msg.find("YClientError: Cannot not execute payload.") != string::npos);
     }
 
 }
@@ -255,7 +255,7 @@ TEST_CASE("RpcInvalid")
     }
     catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YClientError: Could not build RPC payload");
     }
 
 
@@ -279,7 +279,7 @@ TEST_CASE("WrongXml")
     }
     catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YClientError: Could not build RPC payload");
     }
 
 
@@ -326,7 +326,7 @@ TEST_CASE("EmptyRpc")
     }
     catch (YError & e)
     {
-        REQUIRE(e.err_msg=="YClientError: Could not build payload");
+        REQUIRE(e.err_msg=="YClientError: Could not build RPC payload");
     }
 
 

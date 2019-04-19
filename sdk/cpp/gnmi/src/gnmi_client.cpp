@@ -189,6 +189,12 @@ int gNMIClient::connect()
     return EXIT_SUCCESS;
 }
 
+void gNMIClient::perform_session_check(const std::string & message)
+{
+    // TBD
+    return;
+}
+
 string gNMIClient::get_hostname_port()
 {
     ostringstream os;

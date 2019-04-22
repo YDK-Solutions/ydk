@@ -404,7 +404,7 @@ function build_python_gnmi_package {
 
     cd $YDKGEN_HOME
     run_test generate.py --service profiles/services/gnmi-0.4.0_post2.json
-    run_test ${PIP_BIN} install --no-deps gen-api/python/ydk-service-gnmi/dist/ydk*.tar.gz
+    run_exec_test ${PIP_BIN} install --no-deps gen-api/python/ydk-service-gnmi/dist/ydk*.tar.gz
 
     print_msg "Verifying Python gNMI package installation"
     ${PYTHON_BIN} -c "from ydk.gnmi.path import gNMISession"

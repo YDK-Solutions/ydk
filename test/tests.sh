@@ -61,7 +61,6 @@ function run_test {
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
-        print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
             MSG_COLOR=$RED
             print_msg "Exiting 'coverage run $@' with status=$status"
@@ -499,8 +498,7 @@ function py_sanity_ydktest_gen {
 }
 
 function py_sanity_ydktest_install {
-    print_msg "py_sanity_ydktest_install"
-    print_msg "Installing"
+    print_msg "Running py_sanity_ydktest_install"
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
@@ -538,12 +536,12 @@ function py_sanity_ydktest_test {
         print_msg "Restored PYTHONPATH to $PYTHONPATH"
     fi
 
-    cd sdk/python/core/
+    cd $YDKGEN_HOME/sdk/python/core/
     rm -f *.so
 
-    print_msg "Restore ydk py core to pip"
+    print_msg "Restoring YDK core installation"
     ${PYTHON_BIN} setup.py sdist
-    ${PIP_BIN} install dist/ydk*.tar.gz
+    run_exec_test ${PIP_BIN} install -U dist/ydk*.tar.gz
 
     cd $YDKGEN_HOME
 }
@@ -611,8 +609,6 @@ function py_sanity_ydktest_test_tcp {
 #--------------------------
 
 function py_sanity_deviation {
-    print_msg "py_sanity_deviation"
-
     rm -rf $HOME/.ydk/*
     py_sanity_deviation_ydktest_gen
     py_sanity_deviation_ydktest_install
@@ -627,8 +623,8 @@ function py_sanity_deviation {
 function py_sanity_deviation_ydktest_gen {
     print_msg "Running py_sanity_deviation_ydktest_gen"
 
-    rm -rf gen-api/python/*
     cd $YDKGEN_HOME
+    rm -rf gen-api/python/*
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --python
 }
 

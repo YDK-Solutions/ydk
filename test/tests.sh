@@ -169,9 +169,6 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
-    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
-    print_msg "Current Go version is $go_version"
-
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
             export GOPATH="$(pwd)/golang"
@@ -179,15 +176,24 @@ function init_go_env {
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
     else
-        cd $YDKGEN_HOME
-        print_msg "GOROOT: $GOROOT"
+        if [[ $GOROOT. == "." ]]; then
+            export GOROOT=/usr/local/go
+            print_msg "Setting GOROOT to $GOROOT"
+        else
+            print_msg "GOROOT: $GOROOT"
+        fi
+        export PATH=$GOROOT/bin:$PATH
+
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH="$(pwd)/golang"
+            export GOPATH="$HOME/golang"
+            mkdir -p $GOPATH
             print_msg "Setting GOPATH to $GOPATH"
         else
             print_msg "GOPATH: $GOPATH"
         fi
     fi
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
 
     go get github.com/stretchr/testify
 

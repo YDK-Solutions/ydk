@@ -442,18 +442,14 @@ os_type=$(uname)
 if [[ ${os_type} == "Linux" ]] ; then
     os_info=$(cat /etc/*-release)
 else
-    os_info=$(sw_vers)
-fi
-print_msg "Running OS type: $os_type"
-print_msg "OS info: $os_info"
-if [[ $run_with_coverage ]] ; then
-    run_with_coverage=1
+    os_info="darwin"
 fi
 
-if [[ ${os_type} == "Linux" ]] ; then
-    os_info=$(cat /etc/*-release)
-else
-    os_info="darwin"
+print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
+    run_with_coverage=1
 fi
 
 export YDKGEN_HOME="$(pwd)"

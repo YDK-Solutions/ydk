@@ -136,9 +136,10 @@ function init_py_env {
 function init_go_env {
     print_msg "Initializing Go environment"
 
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
+
     if [[ $(uname) == "Darwin" ]]; then
-        #source /Users/travis/.gvm/scripts/gvm
-        #gvm use go1.9.2
         if [[ $GOPATH. == "." ]]; then
             export GOPATH="$(pwd)/golang"
         fi
@@ -146,16 +147,19 @@ function init_go_env {
         print_msg "GOPATH: $GOPATH"
     else
         cd $YDKGEN_HOME
-        export GOPATH="$(pwd)/golang"
-        export GOROOT=/usr/local/go
-        export PATH=$GOROOT/bin:$PATH
-        print_msg "Setting GOROOT to $GOROOT"
-        print_msg "Setting GOPATH to $GOPATH"
+        print_msg "GOROOT: $GOROOT"
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$(pwd)/golang"
+            print_msg "Setting GOPATH to $GOPATH"
+        else
+            print_msg "GOPATH: $GOPATH"
+        fi
     fi
-    print_msg "Running $(go version)"
 
     go get github.com/stretchr/testify
+
     export CGO_ENABLED=1
+    export CGO_LDFLAGS_ALLOW="-fprofile-arcs|-ftest-coverage|--coverage"
 }
 
 ######################################################################

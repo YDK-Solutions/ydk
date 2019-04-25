@@ -195,12 +195,7 @@ Follow these steps to find and set correct library path.
 
 .. code-block:: sh
 
-  $ locate libpython2.7.dylib
-
-Example:
-
-.. code-block:: sh
-
+  # Example:
   $ locate libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib

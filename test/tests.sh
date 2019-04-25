@@ -870,7 +870,7 @@ else
 fi
 print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* ]] ; then
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
     run_with_coverage=1
 fi
 

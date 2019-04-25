@@ -1,6 +1,7 @@
 ### 2019-05-15 version 0.8.3
 
 #### Resolved GitHub issues
+  * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))
   * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))
   * Duplicate code in generated cisco-ios-xe Go bundle ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891))

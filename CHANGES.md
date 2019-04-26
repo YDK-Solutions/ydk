@@ -9,6 +9,7 @@
   * Memory leaks in YDK C++ gNMI Service component ([#902](https://github.com/CiscoDevNet/ydk-gen/issues/902))
   * RPC execution stuck when NETCONF server closes session unexpectedly ([#914](https://github.com/CiscoDevNet/ydk-gen/issues/914))
   * YDK attempting to send Commit command when 'writable-running' in capabilities ([#915](https://github.com/CiscoDevNet/ydk-gen/issues/915))
+  * Max value of range is set to None when not specified in the Yang model ([#916](https://github.com/CiscoDevNet/ydk-gen/issues/916))
 
 ##### Note
   The solution for GitHub issue ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891)) changed model API. However all model bundles generated with YDK-Gen version 0.7.3 and later are still compatible with core YDK components.

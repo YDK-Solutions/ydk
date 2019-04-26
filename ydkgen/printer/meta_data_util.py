@@ -333,8 +333,13 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.doc_link += get_primitive_type_tag('bool', language)
         elif isinstance(type_spec, Decimal64TypeSpec):
             meta_info_data.ptype = 'Decimal64'
+            lower = str(type_spec.min.s)
+            if type_spec.max is not None:
+                upper = str(type_spec.max.s)
+            else:
+                upper = lower
             meta_info_data.prange.append(
-                ('%s' % str(type_spec.min.s), '%s' % str(type_spec.max.s)))
+                ('%s' % lower, '%s' % upper))
             meta_info_data.doc_link += get_primitive_type_tag('Decimal64', language)
         elif isinstance(type_spec, EmptyTypeSpec):
             meta_info_data.ptype = 'Empty'
@@ -347,7 +352,10 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             meta_info_data.ptype = 'int'
             meta_info_data.doc_link += meta_info_data.ptype
             lower = str(type_spec.min)
-            upper = str(type_spec.max)
+            if type_spec.max is not None:
+                upper = str(type_spec.max)
+            else:
+                upper = lower
             meta_info_data.prange.append((lower, upper))
         elif isinstance(type_spec, LengthTypeSpec):
             meta_info_data.ptype = 'str'
@@ -429,20 +437,22 @@ def _get_identity_docstring(identity_subclasses, property_type, language):
 
 
 def get_length_limits(length_type):
+    assert isinstance(length_type, LengthTypeSpec)
     prange = []
-    if isinstance(length_type, LengthTypeSpec):
-        for m_min, m_max in length_type.lengths:
-            pmin = None
-            pmax = None
-            if m_min == 'min':
-                pmin = '0'
-            else:
-                pmin = m_min
-            if m_max == 'max':
-                pmax = '18446744073709551615'
-            else:
-                pmax = m_max
-            prange.append((pmin, pmax))
+    for m_min, m_max in length_type.lengths:
+        pmin = None
+        pmax = None
+        if m_min == 'min':
+            pmin = '0'
+        else:
+            pmin = m_min
+        if m_max == 'max':
+            pmax = '18446744073709551615'
+        elif m_max is not None:
+            pmax = m_max
+        else:
+            pmax = pmin
+        prange.append((pmin, pmax))
     return prange
 
 
@@ -461,9 +471,10 @@ def get_range_limits(range_type):
 
             if m_max == 'max':
                 pmax = range_type.base.max
+            elif m_max is not None:
+                pmax = m_max
             else:
-                if m_max is not None:
-                    pmax = m_max
+                pmax = pmin
             if types.yang_type_specs['uint64'].max == pmax:
                 prange.append((str(pmin), str(pmax)))
             prange.append((str(pmin), str(pmax)))
@@ -478,9 +489,10 @@ def get_range_limits(range_type):
                     pmin = str(m_min)
             if m_max == 'max':
                 pmax = range_type.base.max.s
+            elif m_max is not None:
+                pmax = str(m_max)
             else:
-                if m_max is not None:
-                    pmax = str(m_max)
+                pmax = pmin
             prange.append(('%s' % str(pmin), '%s' % str(pmax)))
     return prange
 

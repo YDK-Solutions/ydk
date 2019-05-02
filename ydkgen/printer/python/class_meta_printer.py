@@ -167,6 +167,8 @@ class ClassMetaPrinter(object):
             ctx.str(", is_config=False")
         if meta_info_data.is_presence:
             ctx.str(", is_presence=True")
+        if meta_info_data.mandatory:
+            ctx.str(", is_mandatory=True")
         ctx.str('),\n')
 
         ctx.lvl_dec()

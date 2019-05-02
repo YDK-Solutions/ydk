@@ -81,6 +81,12 @@ class MetaSanityTest(unittest.TestCase):
             self.assertTrue(len(peer_type_meta_enum_dict) > 0)
             print("\nEnum dictionary:\n    %s" % peer_type_meta_enum_dict)
 
+    def test_mandatory_leaf(self):
+        mand = Runner.Mtus.Mtu()
+        mand.owner = 'test'
+        mand.mtu = 1500
+        mand_meta = mand._meta_info()
+        self.assertTrue(mand_meta.member('mtu').is_mandatory)
 
 if __name__ == '__main__':
     import sys

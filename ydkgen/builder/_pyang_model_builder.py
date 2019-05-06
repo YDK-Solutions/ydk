@@ -260,5 +260,6 @@ class PyangModelBuilder(object):
 
         if len(error_messages) > 0:
             err_msg = '\n'.join(error_messages)
-            raise YdkGenException('Error occured: "%s". Verify that all the models pass pyang compilation. Run "pyang *" on all the models.'%err_msg)
+            raise YdkGenException('Error occured: "%s". The models supplied to the YDK generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the YDK bindings for.
+'%err_msg)
 

@@ -46,7 +46,7 @@ function run_exec_test {
 }
 
 function run_test_no_coverage {
-    print_msg "Executing: $@"
+    print_msg "Executing: ${PYTHON_BIN} $@"
     ${PYTHON_BIN} $@
     local status=$?
     if [ $status -ne 0 ]; then
@@ -80,7 +80,7 @@ function pip_check_install {
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
     else
-        ${PIP_BIN} install $@
+        ${PIP_BIN} install --no-deps $@
     fi
 }
 
@@ -137,22 +137,35 @@ function init_go_env {
     print_msg "Initializing Go environment"
 
     if [[ $(uname) == "Darwin" ]]; then
-        source /Users/travis/.gvm/scripts/gvm
-        gvm use go1.9.2
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$(pwd)/golang"
+        fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
     else
-        cd $YDKGEN_HOME
-        export GOPATH="$(pwd)/golang"
-        export GOROOT=/usr/local/go
+        if [[ $GOROOT. == "." ]]; then
+            export GOROOT=/usr/local/go
+            print_msg "Setting GOROOT to $GOROOT"
+        else
+            print_msg "GOROOT: $GOROOT"
+        fi
         export PATH=$GOROOT/bin:$PATH
-        print_msg "Setting GOROOT to $GOROOT"
-        print_msg "Setting GOPATH to $GOPATH"
+
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$HOME/golang"
+            mkdir -p $GOPATH
+            print_msg "Setting GOPATH to $GOPATH"
+        else
+            print_msg "GOPATH: $GOPATH"
+        fi
     fi
-    print_msg "Running $(go version)"
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
 
     go get github.com/stretchr/testify
+
     export CGO_ENABLED=1
+    export CGO_LDFLAGS_ALLOW="-fprofile-arcs|-ftest-coverage|--coverage"
 }
 
 ######################################################################
@@ -231,12 +244,8 @@ function build_and_run_cpp_gnmi_tests {
     fi
     run_exec_test make &> /dev/null
 
-    start_gnmi_server
-
     cd $YDKGEN_HOME/sdk/cpp/gnmi/tests/build
     run_exec_test ./ydk_gnmi_test -d yes
-
-    stop_gnmi_server
 
     collect_cpp_coverage
 }
@@ -248,7 +257,16 @@ function run_cpp_gnmi_tests {
     fi
 
     build_gnmi_cpp_core_library
+
+    start_gnmi_server
+
     build_and_run_cpp_gnmi_tests
+
+    if [[ $(uname) == "Linux" ]]; then
+       run_cpp_gnmi_memcheck_tests
+    fi
+
+    stop_gnmi_server
 }
 
 function collect_cpp_coverage {
@@ -262,13 +280,25 @@ function collect_cpp_coverage {
   fi
 }
 
+function run_cpp_gnmi_memcheck_tests {
+    print_msg "Building gnmi sample tests"
+    cd $YDKGEN_HOME/sdk/cpp/gnmi/samples
+    mkdir -p build
+    cd build
+    run_exec_test ${CMAKE_BIN} ..
+    run_exec_test make &> /dev/null
+
+    print_msg "Running gnmi sample tests with memcheck"
+    valgrind --leak-check=summary ./bgp_gnmi_subscribe ssh://admin:admin@127.0.0.1:50051
+}
+
 function start_gnmi_server {
     current_dir="$(pwd)"
     cd $YDKGEN_HOME/test/gnmi_server
     if [ ! -x ./build/gnmi_server ]; then
         print_msg "Building YDK gNMI server"
         mkdir -p build && cd build
-        ${CMAKE_BIN} ..
+        run_exec_test ${CMAKE_BIN} ..
         run_exec_test make &> /dev/null
     fi
 
@@ -384,7 +414,7 @@ function build_python_gnmi_package {
 
     cd $YDKGEN_HOME
     run_test generate.py --service profiles/services/gnmi-0.4.0_post2.json
-    ${PIP_BIN} install gen-api/python/ydk-service-gnmi/dist/ydk*.tar.gz
+    run_exec_test ${PIP_BIN} install --no-deps gen-api/python/ydk-service-gnmi/dist/ydk*.tar.gz
 
     print_msg "Verifying Python gNMI package installation"
     ${PYTHON_BIN} -c "from ydk.gnmi.path import gNMISession"
@@ -422,18 +452,14 @@ os_type=$(uname)
 if [[ ${os_type} == "Linux" ]] ; then
     os_info=$(cat /etc/*-release)
 else
-    os_info=$(sw_vers)
-fi
-print_msg "Running OS type: $os_type"
-print_msg "OS info: $os_info"
-if [[ $run_with_coverage ]] ; then
-    run_with_coverage=1
+    os_info="darwin"
 fi
 
-if [[ ${os_type} == "Linux" ]] ; then
-    os_info=$(cat /etc/*-release)
-else
-    os_info="darwin"
+print_msg "Running OS type: $os_type"
+print_msg "OS info: $os_info"
+
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
+    run_with_coverage=1
 fi
 
 export YDKGEN_HOME="$(pwd)"

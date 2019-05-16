@@ -1,3 +1,20 @@
+### 2019-05-15 version 0.8.3
+
+#### Resolved GitHub issues
+  * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))
+  * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))
+  * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))
+  * Duplicate code in generated cisco-ios-xe Go bundle ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891))
+  * YDK-Py docker container does not support Python3 ([#905](https://github.com/CiscoDevNet/ydk-gen/issues/905))
+  * Installation documentation for YDK-Py needs an update ([#906](https://github.com/CiscoDevNet/ydk-gen/issues/906))
+  * README file for YDK-Py repo is not rendering correctly ([#907](https://github.com/CiscoDevNet/ydk-gen/issues/907))
+  * Max value of range is set to None when not specified in the Yang model ([#916](https://github.com/CiscoDevNet/ydk-gen/issues/916))
+  * YDK MetaInfo should have a field for mandatory leaf ([#918](https://github.com/CiscoDevNet/ydk-gen/issues/918))
+
+##### Note
+  The solution for GitHub issue ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891)) changed model API. However all model bundles generated with YDK-Gen version 0.7.3 and later are still compatible with core YDK components.
+
+
 ### 2019-03-15 version 0.8.2
 
 #### New features and enhancements

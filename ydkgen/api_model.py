@@ -231,12 +231,12 @@ class NamedElement(Element):
         if hasattr(self, 'goName'):
             return self.goName
 
-        name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
-        name = camel_case(name)
+        stmt_name = escape_name(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
+        name = camel_case(stmt_name)
+        if stmt_name[-1] == '_':
+            name = '%s_' % name
         if self.iskeyword(name):
-            name = '%s%s' % ('Y', name)
-        # suffix = '_' if self.name[-1] == '_' else ''
-        # name = '%s%s' % (name, suffix)
+            name = 'Y%s' % name
 
         self.goName = name
         return self.goName

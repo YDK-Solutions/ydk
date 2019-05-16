@@ -1,5 +1,5 @@
-.. image::  https://travis-ci.org/CiscoDevNet/ydk-py.svg?branch=master
-    :target: https://travis-ci.org/CiscoDevNet/ydk-py
+.. image::  https://travis-ci.com/CiscoDevNet/ydk-py.svg?branch=master
+    :target: https://travis-ci.com/CiscoDevNet/ydk-py
 
 .. image:: https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg
     :alt: Docker Automated build
@@ -12,20 +12,20 @@ YANG Development Kit (Python)
 .. contents:: Table of Contents
 
 Overview
---------
+========
 
 The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. 
 The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  
 YDK is composed of a core package that defines services and providers, plus one or more module bundles that are based on YANG models.
 
 Backward Compatibility
-----------------------
+======================
 
-The Python YDK-0.8.2 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
-Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.2>`_ for details. 
+The Python YDK-0.8.3 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
+Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.3>`_ for details. 
 
 Docker
-------
+======
 
 A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed. 
 This be used to run ydk-py without installing anything natively on your machine.
@@ -37,10 +37,10 @@ See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ 
 
 
 System Requirements
--------------------
+===================
 
 Linux
-~~~~~
+-----
 
 **Ubuntu (Debian-based)**
 
@@ -60,13 +60,13 @@ For Xenial (Ubuntu 16.04.4)::
   sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
-  sudo gdebi libydk-0.8.2-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk-0.8.3-1.amd64.deb
+  sudo gdebi libydk-0.8.3-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
-  sudo gdebi libydk-0.8.2-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk-0.8.3-1.amd64.deb
+  sudo gdebi libydk-0.8.3-1.amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -83,10 +83,10 @@ The following packages must be present in your system before installing YDK-Py. 
   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
   # Install YDK core library
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk-0.8.3-1.x86_64.rpm
 
 MacOS
-~~~~~
+-----
 
 It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_ and the following homebrew packages on your system before installing YDK-Py::
 
@@ -94,8 +94,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
-  sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3/libydk-0.8.3-Darwin.pkg
+  sudo installer -pkg libydk-0.8.3-Darwin.pkg -target /
 
 Libssh Installation
 -------------------
@@ -142,21 +142,21 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk_gnmi_0.4.0-2_amd64.deb
   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk_gnmi_0.4.0-2_amd64.deb
   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk_gnmi_0.4.0-2.x86_64.rpm
 
 **MacOS**::
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3/libydk_gnmi-0.4.0-2_Darwin.pkg
   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 
 Runtime environment
@@ -174,15 +174,15 @@ Python Requirements
 
 YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system. 
 
-It is also required for Python installation to include corresponding shared library. As example: 
+It is also required for Python installation to include corresponding shared library. As example::
 
- - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
- - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
+  python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
+  python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
  
 Please follow `System Requirements` to assure presence of shared Python libraries.
 
 Mac OS
-======
+~~~~~~
 
 The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
 This is well known and documented issue. Each developer might have different approaches for its resolution.
@@ -191,12 +191,11 @@ One of them is to use Python2 virtual environment. See section below for details
 In addition it is required properly set CMAKE_LIBRARY_PATH environment variable to assure that `cmake` uses correct Python library.
 Follow these steps to find and set correct library path.
 
-1. Find installations of `libpython2.7` library::
+1. Find installations of `libpython2.7` library:
 
-  locate libpython2.7.dylib
+.. code-block:: sh
 
-Example::
-
+  # Example:
   $ locate libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
@@ -204,29 +203,37 @@ Example::
   /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
   /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
 
-2. Choose non-system Python library installation and set CMAKE_LIBRARY_PATH before any YDK component installation. Example::
+2. Choose non-system Python library installation and set CMAKE_LIBRARY_PATH before any YDK component installation. Example:
+
+.. code-block:: sh
 
   export CMAKE_LIBRARY_PATH=/usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib
 
-3. Run YDK core package installation with '-v' flag to check that `PythonLibs` points to correct library path. Example::
+3. Run YDK core package installation with '-v' flag to check that `PythonLibs` points to correct library path. Example:
+
+.. code-block:: sh
 
   $ ./generate.py --core
   $ pip install -v gen-api/python/ydk/dist/ydk*.tar.gz
   
-  # In 'cmake' log look for 'PythonLibs' and 'found version' settings line:
+4. In 'cmake' log look for 'PythonLibs' and 'found version' settings line:
   
+.. code-block:: sh
+
   -- Found PythonLibs: /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib (found version "2.7.15")
 
-4. Finally test you YDK core library installation from CLI, making sure there are no errors::
+5. Finally test you YDK core library installation from CLI, making sure there are no errors:
+
+.. code-block:: sh
 
   $ python -c "import ydk.types"
 
 
 How to install
---------------
+==============
 
 Using Python virtual environment
-================================
+--------------------------------
 
 You may want to perform the installation under Python virtual environment (`virtualenv <https://pypi.python.org/pypi/virtualenv/>`_/`virtualenvwrapper  <https://pypi.python.org/pypi/virtualenvwrapper>`_).  
 The virtual environment allows you to install multiple versions of YDK if needed.  In addition, it prevents any potential conflicts between package dependencies in your system.
@@ -252,7 +259,7 @@ Once Python virtual environment is activated, you can perform quick installation
 Take into consideration that you must not attempt to install YDK as root user under virtual environment.
 
 Quick Install
-~~~~~~~~~~~~~
+-------------
 
 You can install the latest model packages from the Python package index.  Note that, in some systems, you need to install the new package as root.  
 You get a fully operational YDK environment by installing the ``cisco-ios-xr`` and/or ``cisco-ios-xe`` bundle(s) (depending on whether you're developing for an IOS XR or IOS XE platform), 
@@ -296,7 +303,7 @@ To installation of model bundles on CentOS/RedHat platforms require special hand
   pip install --install-option="--install-purelib=/usr/lib64/python3.6/site-packages" --no-deps ydk-models-cisco-ios-xe
 
 Installing from Source
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 If you prefer not to use the YDK packages in the Python package index, you need to install manually the ``ydk`` core package and then the model bundles you plan to use.  
 To install the ``ydk`` core package, execute::
@@ -326,7 +333,8 @@ To install the ``cisco-ios-xr`` bundle, execute::
   cisco-ios-xr$ cd ..
 
 Documentation and Support
---------------------------
+=========================
+
 - Read the `API documentation <http://ydk.cisco.com/py/docs>`_ for details on how to use the API and specific models
 - Samples can be found under the `samples directory <https://github.com/CiscoDevNet/ydk-py/tree/master/core/samples>`_
 - Hundreds of additional samples can be found in the `YDK-PY samples repository <https://github.com/CiscoDevNet/ydk-py-samples>`_
@@ -334,6 +342,6 @@ Documentation and Support
 - Additional YDK information can be found at `ydk.io <http://ydk.io>`_
 
 Release Notes
---------------
+=============
 
-The current YDK release version is 0.8.2. YDK-Py is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.3. YDK-Py is licensed under the Apache 2.0 License.

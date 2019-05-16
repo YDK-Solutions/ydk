@@ -57,22 +57,22 @@ class SanityYang(unittest.TestCase):
         self.crud.delete(self.ncc, runner)
 
     def test_read_on_ref_class(self):
-        one = ysanity.Runner.YdktestSanityOne()
+        one = ysanity.Runner.One()
         one.number, one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, one)
 
-        one_filter = ysanity.Runner.YdktestSanityOne()
+        one_filter = ysanity.Runner.One()
         one_read = self.crud.read(self.ncc, one_filter)
         self.assertIsNotNone(one_read)
         self.assertEqual(one, one_read)
 
     def test_read_on_leaf(self):
-        one = ysanity.Runner.YdktestSanityOne()
+        one = ysanity.Runner.One()
         one.number, one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, one)
 
         r = ysanity.Runner()
-        one_filter = r.ydktest_sanity_one
+        one_filter = r.one
         one_filter.name = YFilter.read
         one_filter.number = YFilter.read
         one_read = self.crud.read(self.ncc, one_filter)
@@ -80,7 +80,7 @@ class SanityYang(unittest.TestCase):
         self.assertEqual(one, one_read)
 
         # no such value, will return empty data
-        one_filter = ysanity.Runner.YdktestSanityOne()
+        one_filter = ysanity.Runner.One()
         one_filter.number = 2
         one_read = self.crud.read(self.ncc, one_filter)
         self.assertIsNone(one_read)
@@ -159,17 +159,17 @@ class SanityYang(unittest.TestCase):
 
     def test_read_only_config(self):
         r_1 = ysanity.Runner()
-        r_1.ydktest_sanity_one.number, r_1.ydktest_sanity_one.name = 1, 'runner:one:name'
+        r_1.one.number, r_1.one.name = 1, 'runner:one:name'
         self.crud.create(self.ncc, r_1)
         r_2, r_3 = ysanity.Runner(), ysanity.Runner()
-        r_2.ydktest_sanity_one.number = YFilter.read
-        r_3.ydktest_sanity_one.number = YFilter.read
+        r_2.one.number = YFilter.read
+        r_3.one.number = YFilter.read
 
         r_2 = self.crud.read_config(self.ncc, r_2)
         r_3 = self.crud.read(self.ncc, r_3)
         # ysanity only have config data, ok to compare
-        self.assertEqual(r_2.ydktest_sanity_one.number, r_3.ydktest_sanity_one.number)
-        self.assertEqual(r_2.ydktest_sanity_one.name, r_3.ydktest_sanity_one.name)
+        self.assertEqual(r_2.one.number, r_3.one.number)
+        self.assertEqual(r_2.one.name, r_3.one.name)
 
     def test_decoder(self):
         # send payload to device

@@ -61,13 +61,31 @@ function install_dependencies {
     yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
     yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
-    yum install python-devel python-pip python36u-devel python36u-pip  rpm-build redhat-lsb lcov -y > /dev/null
+    yum install python-devel python-pip python36-devel python36-pip  rpm-build redhat-lsb lcov -y > /dev/null
+    yum install valgrind -y
 }
     
 function check_install_go {
+  which go
+  local status=$?
+  if [[ $status == 0 ]]
+  then
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
+    minor=$(echo $go_version | cut -d '.' -f 2)
+  else
+    print_msg "The Go is not installed"
+    minor=0
+  fi
+  if (( $minor < 9 )); then
+    if (( $minor > 0 )); then
+      print_msg "Removing pre-installed Golang"
+      sudo apt-get remove golang -y
+    fi
     print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+  fi
 }
 
 ########################## EXECUTION STARTS HERE #############################

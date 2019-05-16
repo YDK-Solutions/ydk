@@ -231,8 +231,8 @@ class SanityExecutor(unittest.TestCase):
 
     def test_execute_rpc_invalid_1(self):
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner:one:name'
+        runner.one.number = 1
+        runner.one.name = 'runner:one:name'
 
         edit_rpc = ietf_netconf.EditConfig()
         edit_rpc.input.target.candidate = Empty()
@@ -266,8 +266,8 @@ class SanityExecutor(unittest.TestCase):
 
 def _create_runner():
     runner = ysanity.Runner()
-    runner.ydktest_sanity_one.number = 1
-    runner.ydktest_sanity_one.name = 'runner:one:name'
+    runner.one.number = 1
+    runner.one.name = 'runner:one:name'
     return runner
 
 class SanityNetconf(unittest.TestCase):

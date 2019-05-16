@@ -392,9 +392,9 @@ TEST_CASE("encode_decode")
 
      ydktest_sanity::Runner * entity_ptr = dynamic_cast<ydktest_sanity::Runner*>(redecode.get());
      auto runner = std::make_unique<ydktest_sanity::Runner>();
-     runner->ydktest_sanity_one->name = "test";
+     runner->one->name = "test";
 
-     CHECK(entity_ptr->ydktest_sanity_one->name == runner->ydktest_sanity_one->name);
+     CHECK(entity_ptr->one->name == runner->one->name);
 }
 
 TEST_CASE("multiple_bundles_codec")
@@ -546,4 +546,35 @@ TEST_CASE("json_encode_decode")
     auto ifcs_d = codec_service.decode(codec_provider, payload, make_shared<openconfig_interfaces::Interfaces>());
     openconfig_interfaces::Interfaces * entity_ptr = dynamic_cast<openconfig_interfaces::Interfaces*>(ifcs_d.get());
     REQUIRE(ifcs == *entity_ptr);
+}
+
+namespace ydk {
+  namespace path {
+    std::shared_ptr<DataNode> handle_action_output(const std::string & reply, RootSchemaNode & root_schema, const string& action_node_path);
+  }
+}
+
+TEST_CASE( "test_codec_action_node" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto & data = schema.create_datanode("ydktest-sanity-action:data");
+    auto & actn = data.create_action("action-node");
+    actn.create_datanode("test", "status");
+
+    string rpc_reply = R"(<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="2">
+  <data>
+    <t xmlns="http://cisco.com/ns/yang/ydktest-action">ok</t>
+  </data>
+</rpc-reply>
+)";
+
+    auto reply_dn = ydk::path::handle_action_output(rpc_reply, schema, data.get_action_node_path());
+    REQUIRE(reply_dn != nullptr);
+
+    ydk::path::Codec s{};
+    auto xml_reply = s.encode(*reply_dn, EncodingFormat::XML, false);
+    REQUIRE(xml_reply==R"(<data xmlns="http://cisco.com/ns/yang/ydktest-action"><action-node><t>ok</t></action-node></data>)");
 }

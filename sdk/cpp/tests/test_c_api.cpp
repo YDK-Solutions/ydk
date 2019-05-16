@@ -47,7 +47,9 @@ TEST_CASE( "codec_encode"  )
 
     DataNodeCreate(state, runner, "ytypes/built-in-t/number8", "2");
 
-    string s { CodecEncode(state, c, runner, XML, 0)};
+    const char* encode_xml = CodecEncode(state, c, runner, XML, 0);
+    string s { encode_xml };
+    free((void*)encode_xml);
     REQUIRE(s == test_string);
 
     NetconfServiceProviderFree(provider);
@@ -70,7 +72,9 @@ TEST_CASE( "codec_decode"  )
 
     REQUIRE(runner!=NULL);
 
-    string s { CodecEncode(state, c, runner, XML, 0)};
+    const char* encode_xml = CodecEncode(state, c, runner, XML, 0);
+    string s { encode_xml };
+    free((void*)encode_xml);
     REQUIRE(s == test_string);
 
     NetconfServiceProviderFree(provider);
@@ -137,8 +141,8 @@ TEST_CASE( "rpc" )
     DataNodeCreate(state, input, "filter", read_xml);
     DataNode read_data = RpcExecute(state, read_rpc, provider);
 
-    delete create_xml;
-    delete read_xml;
+    free ((void*)create_xml);
+    free ((void*)read_xml);
     NetconfServiceProviderFree(provider);
     RepositoryFree(repo);
     CodecFree(c);

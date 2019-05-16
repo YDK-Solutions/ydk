@@ -105,13 +105,13 @@ func (suite *CrudTestSuite) BeforeTest(suiteName, testName string) {
 
 func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 	runnerCreate := ysanity.Runner{}
-	runnerCreate.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+	runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
 	runnerCreate.Two.Name = "runner.Two.Name"
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
 	// Use YFilter Delete and CRUD update to remove leaf
 	runnerUpdate := ysanity.Runner{}
-	runnerUpdate.YdktestSanityOne.Name = yfilter.Delete
+	runnerUpdate.One.Name = yfilter.Delete
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
@@ -124,7 +124,7 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 // TODO: leaf-list encoding error
 // func (suite *CrudTestSuite) TestDeleteOnLeafListSlice() {
 //     runnerCreate := ysanity.Runner{}
-//     runnerCreate.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+//     runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
 //     // TODO: leaf-list encoding error
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "1")
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "2")
@@ -142,7 +142,7 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 //     entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 
 //     runnerCmp := ysanity.Runner{}
-//     runnerCmp.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+//     runnerCmp.One.Name = "runner.One.Name"
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "2")
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "4")
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "5")
@@ -152,7 +152,7 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 // TODO: delete leaf from leaf-list
 // func (suite *CrudTestSuite) TestDeleteOnLeafList() {
 //     runnerCreate := ysanity.Runner{}
-//     runnerCreate.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+//     runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "0")
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "1")
 //     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "2")
@@ -170,7 +170,7 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 //     entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 
 //     runnerCmp := ysanity.Runner{}
-//     runnerCmp.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+//     runnerCmp.One.Name = "runner.YdktestSanityOne.Name"
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "0")
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "1")
 //     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "2")
@@ -195,7 +195,7 @@ func (suite *CrudTestSuite) TestDeleteOnListWithIdentitykey() {
 
 func (suite *CrudTestSuite) TestDeleteOnContainer() {
 	runnerCreate := ysanity.Runner{}
-	runnerCreate.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+	runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
 	runnerCreate.Two.Name = "runner.Two.Name"
 	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
@@ -204,7 +204,7 @@ func (suite *CrudTestSuite) TestDeleteOnContainer() {
 	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
 	runnerCmp := ysanity.Runner{}
-	runnerCmp.YdktestSanityOne.Name = "runner.YdktestSanityOne.Name"
+	runnerCmp.One.Name = "runner.YdktestSanityOne.Name"
 
 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
 
@@ -249,7 +249,7 @@ func (suite *CrudTestSuite) TestDeleteOnListElement() {
 
 func (suite *CrudTestSuite) TestDeleteOnListElements() {
 	runnerCreate := ysanity.Runner{}
-	runnerCreate.YdktestSanityOne.Name = "one"
+	runnerCreate.One.Name = "one"
 	foo := ysanity.Runner_OneList_Ldata{}
 	bar := ysanity.Runner_OneList_Ldata{}
 	baz := ysanity.Runner_OneList_Ldata{}
@@ -340,7 +340,7 @@ func (suite *CrudTestSuite) TestSanityReadConfig() {
 // TODO: Delete list using YFilter
 // func (suite *CrudTestSuite) TestDeleteOnList() {
 //     runnerCreate := ysanity.Runner{}
-//     runnerCreate.YdktestSanityOne.Name = "one"
+//     runnerCreate.One.Name = "one"
 //     foo := ysanity.Runner_OneList_Ldata{}
 //     bar := ysanity.Runner_OneList_Ldata{}
 //     foo.Number = 1

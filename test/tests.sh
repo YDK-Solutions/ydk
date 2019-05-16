@@ -61,7 +61,6 @@ function run_test {
         print_msg "Executing with coverage: $@"
         coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
         local status=$?
-        print_msg "Returned status is ${status}"
         if [ $status -ne 0 ]; then
             MSG_COLOR=$RED
             print_msg "Exiting 'coverage run $@' with status=$status"
@@ -80,7 +79,7 @@ function pip_check_install {
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
     else
-        ${PIP_BIN} install $@ -U
+        ${PIP_BIN} install --no-deps $@ -U
     fi
 }
 
@@ -171,22 +170,35 @@ function init_go_env {
     print_msg "Initializing Go environment"
 
     if [[ $(uname) == "Darwin" ]]; then
-        source /Users/travis/.gvm/scripts/gvm
-        gvm use go1.9.2
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$(pwd)/golang"
+        fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
-   else
-        cd $YDKGEN_HOME
-        export GOPATH="$(pwd)/golang"
-        export GOROOT=/usr/local/go
+    else
+        if [[ $GOROOT. == "." ]]; then
+            export GOROOT=/usr/local/go
+            print_msg "Setting GOROOT to $GOROOT"
+        else
+            print_msg "GOROOT: $GOROOT"
+        fi
         export PATH=$GOROOT/bin:$PATH
-        print_msg "Setting GOROOT to $GOROOT"
-        print_msg "Setting GOPATH to $GOPATH"
+
+        if [[ $GOPATH. == "." ]]; then
+            export GOPATH="$HOME/golang"
+            mkdir -p $GOPATH
+            print_msg "Setting GOPATH to $GOPATH"
+        else
+            print_msg "GOPATH: $GOPATH"
+        fi
     fi
-    print_msg "Running $(go version)"
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
 
     go get github.com/stretchr/testify
+
     export CGO_ENABLED=1
+    export CGO_LDFLAGS_ALLOW="-fprofile-arcs|-ftest-coverage|--coverage"
 }
 
 ######################################################################
@@ -199,6 +211,7 @@ function install_test_cpp_core {
     run_cpp_core_test
 
     if [[ $(uname) == "Linux" ]]; then
+        run_memcheck_test
         generate_libydk
     fi
 }
@@ -249,6 +262,28 @@ function run_cpp_core_test {
     cd $YDKGEN_HOME
 }
 
+function run_memcheck_test {
+    print_msg "Running C++ memcheck test"
+    which valgrind
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Valgrind is not installed. Skipping memcheck test"
+        MSG_COLOR=$YELLOW
+        return 0
+    fi
+
+    cd $YDKGEN_HOME/sdk/cpp/core/build/samples
+    run_exec_test valgrind --leak-check=summary ./bgp
+    status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting 'run_memcheck_test' with status=$status"
+        exit $status
+    fi
+    cd $YDKGEN_HOME
+}
+
 function install_go_core {
     print_msg "Installing Go YDK core"
     cd $YDKGEN_HOME
@@ -259,7 +294,7 @@ function install_py_core {
     print_msg "Installing Python YDK core"
 
     if [[ $run_with_coverage ]] ; then
-      print_msg "Building python with coverage"
+      print_msg "Building Python with coverage"
       export YDK_COVERAGE=
     fi
     cd $YDKGEN_HOME/sdk/python/core
@@ -291,7 +326,7 @@ function generate_install_specified_cpp_bundle {
    run_test generate.py --bundle ${bundle_profile} --cpp &> /dev/null
    cd gen-api/cpp/${bundle_name}/build
    run_exec_test make &> /dev/null
-   sudo make install
+   run_exec_test sudo make install
    cd -
 }
 
@@ -359,7 +394,7 @@ function cpp_test_gen {
     run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
     cd gen-api/cpp/models_test-bundle/build/
     run_exec_test make &> /dev/null
-    sudo make install
+    run_exec_test sudo make install
 
     # cpp_test_gen_test
 }
@@ -433,10 +468,11 @@ function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
     if [[ ${os_type} != "Darwin" ]] ; then
+        # GitHub issue #909
         py_sanity_deviation
-        py_sanity_common_cache
     fi
     py_sanity_augmentation
+    py_sanity_common_cache
     py_sanity_one_class_per_module
     py_sanity_backward_compatibility
 }
@@ -472,14 +508,12 @@ function py_sanity_ydktest_gen {
 }
 
 function py_sanity_ydktest_install {
-    print_msg "py_sanity_ydktest_install"
-    print_msg "Installing"
+    print_msg "Running py_sanity_ydktest_install"
     cd $YDKGEN_HOME
     pip_check_install gen-api/python/ydktest-bundle/dist/ydk*.tar.gz
 
     print_msg "Running import tests on generated bundle"
     run_test gen-api/python/ydktest-bundle/ydk/models/ydktest/test/import_tests.py
-
 }
 
 function py_sanity_ydktest_test {
@@ -504,13 +538,20 @@ function py_sanity_ydktest_test {
 
     run_py_sanity_ydktest_tests
 
-    export PYTHONPATH=$OLDPYTHONPATH
-    print_msg "Restored PYTHONPATH to $PYTHONPATH"
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
+        unset PYTHONPATH
+        print_msg "Unsetting PYTHONPATH"
+    else
+        export PYTHONPATH=$OLDPYTHONPATH
+        print_msg "Restored PYTHONPATH to $PYTHONPATH"
+    fi
 
-    cd sdk/python/core/
+    cd $YDKGEN_HOME/sdk/python/core/
     rm -f *.so
-    print_msg "Restore ydk py core to pip"
-    ${PIP_BIN} install dist/ydk*.tar.gz
+
+    print_msg "Restoring YDK core installation"
+    ${PYTHON_BIN} setup.py sdist
+    run_exec_test ${PIP_BIN} install -U dist/ydk*.tar.gz
 
     cd $YDKGEN_HOME
 }
@@ -578,8 +619,6 @@ function py_sanity_ydktest_test_tcp {
 #--------------------------
 
 function py_sanity_deviation {
-    print_msg "py_sanity_deviation"
-
     rm -rf $HOME/.ydk/*
     py_sanity_deviation_ydktest_gen
     py_sanity_deviation_ydktest_install
@@ -594,8 +633,8 @@ function py_sanity_deviation {
 function py_sanity_deviation_ydktest_gen {
     print_msg "Running py_sanity_deviation_ydktest_gen"
 
-    rm -rf gen-api/python/*
     cd $YDKGEN_HOME
+    rm -rf gen-api/python/*
     run_test generate.py --bundle profiles/test/ydktest-cpp.json --python
 }
 
@@ -680,8 +719,11 @@ function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
     rm -rf $HOME/.ydk/*
+  if [[ ${os_type} != "Darwin" ]] ; then
+    # GitHub issue #909
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
+  fi
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
     run_test sdk/python/core/tests/test_sanity_augmentation.py --common-cache
 
@@ -838,7 +880,7 @@ else
 fi
 print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* ]] ; then
+if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
     run_with_coverage=1
 fi
 

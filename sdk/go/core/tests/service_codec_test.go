@@ -474,13 +474,13 @@ func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
 
 func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
 	runner := ysanity.Runner{}
-	ospf := ysanity.Runner_YdktestSanityOne_Ospf{}
+	ospf := ysanity.Runner_One_Ospf{}
 	ospf.Id = 22
 	ospf.PassiveInterface.Interface = "xyz"
-	test := ysanity.Runner_YdktestSanityOne_Ospf_Test{}
+	test := ysanity.Runner_One_Ospf_Test{}
 	test.Name = "abc"
 	ospf.Test = append(ospf.Test, &test)
-	runner.YdktestSanityOne.Ospf = append(runner.YdktestSanityOne.Ospf, &ospf)
+	runner.One.Ospf = append(runner.One.Ospf, &ospf)
 	suite.Provider.Encoding = encoding.XML
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
 	suite.Equal(payload, 

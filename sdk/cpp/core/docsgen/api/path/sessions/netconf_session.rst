@@ -90,25 +90,32 @@ NetconfSession
         :param on_demand: Enable on demand downloading by default.
         :param timeout: The timeout in microseconds, -1 for infinite timeout, 0 for non-blocking
 
-    .. cpp:function:: virtual path::RootSchemaNode& get_root_schema() const
+    .. cpp:function:: path::RootSchemaNode& get_root_schema() const
 
         Returns the :cpp:class:`RootSchemaNode<path::RootSchemaNode>` tree supported by this instance of the ``NetconfSession``.
 
         :return: Pointer to the :cpp:class:`RootSchemaNode<path::RootSchemaNode>` or ``nullptr`` if one could not be created.
 
-    .. cpp:function:: virtual std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const
+    .. cpp:function:: std::shared_ptr<path::DataNode> invoke(path::Rpc& rpc) const
 
-        Invokes or executes the given rpc and returns a :cpp:class:`DataNode<DataNode>` pointer if the Rpc has an output modelled in YANG.
+        Invokes or executes the given RPC and returns a :cpp:class:`DataNode<DataNode>` pointer if the Rpc has an output modelled in YANG.
 
         :param rpc: Reference to the :cpp:class:`Rpc<Rpc>` node.
         :return: Shared pointer to the :cpp:class:`DataNode<DataNode>` representing the output.
 
-   .. cpp:function:: virtual std::shared_ptr<path::DataNode> invoke(path::DataNode& datanode) const
+   .. cpp:function:: std::shared_ptr<path::DataNode> invoke(path::DataNode& datanode) const
 
         Invokes or executes the given DataNode containing a YANG 1.1 action and returns a :cpp:class:`DataNode<DataNode>` pointer if the action has an output modeled in YANG.
 
         :param datanode: Reference to the :cpp:class:`DataNode<DataNode>` node.
         :return: Pointer to the :cpp:class:`DataNode<DataNode>` representing the output.
+
+    .. cpp:function:: std::string execute_netconf_operation(path::Rpc& rpc) const
+
+        Sends the specified RPC to device (similar to `invoke` function) and returns device response in XML encoded string.
+
+        :param rpc: Reference to the :cpp:class:`Rpc<Rpc>` node.
+        :return: std::string, which represents the RPC output.
 
     .. cpp:function:: std::vector<std::string> get_capabilities() const
 

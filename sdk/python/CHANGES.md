@@ -2,6 +2,7 @@
 
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
+  * Updated openconfig bundle to introduce support for additional models.
   
 #### Resolved GitHub issues
   * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))

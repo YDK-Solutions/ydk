@@ -388,7 +388,8 @@ class ApiModelBuilder(object):
                 elif stmt.keyword == 'choice':
                     for choice_child in stmt.i_children:
                         if choice_child.keyword == 'case':
-                            choice_child = choice_child.i_children[0]
+                            if len(choice_child.i_children) > 0:
+                              choice_child = choice_child.i_children[0]
                         if choice_child.keyword in ['container', 'list', 'leaf', 'leaf-list']:
                             stmts.append(choice_child)
             all_stmts = [stmt for stmt in stmts]

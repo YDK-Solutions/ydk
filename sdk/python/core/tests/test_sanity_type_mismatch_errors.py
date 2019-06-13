@@ -166,6 +166,11 @@ class SanityYang(unittest.TestCase):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.bool_value = 1
 
+    @assert_with_error("Invalid value 123 for 'llstring'. Got type: 'int'. Expected types: 'str'", YModelError)
+    def test_llstring_int(self):
+        runner = ysanity.Runner()
+        runner.ytypes.built_in_t.llstring.append(123)
+        self.crud.create(self.ncc, runner)
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

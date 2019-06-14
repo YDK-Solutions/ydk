@@ -90,7 +90,7 @@ def test_enum_union_meta():
     nbr_ipv6.neighbor_address = '2001:db8:fff1::1'
     nbr_ipv6.config.neighbor_address = '2001:db8:fff1::1'
     nbr_ipv6.config.peer_as = 65002
-    nbr_ipv6.config.peer_type = openconfig_bgp_types.PeerTypeEnum.INTERNAL
+    nbr_ipv6.config.peer_type = openconfig_bgp_types.PeerType.INTERNAL
 
     # Print neighbor address Union
     config_meta = nbr_ipv6.config._meta_info()
@@ -102,7 +102,7 @@ def test_enum_union_meta():
                 print("    {}".format(item))
 
     # Print PeerType enum
-    peer_type_meta = openconfig_bgp_types.PeerTypeEnum._meta_info()
+    peer_type_meta = openconfig_bgp_types.PeerType._meta_info()
     if isinstance(peer_type_meta, _MetaInfoEnum):
         peer_type_enum_dict = peer_type_meta.enum_dict()
         print("\nEnum dictionary:")

@@ -122,6 +122,10 @@ class _MetaInfoClassMember(object):
     def is_presence(self):
         return self._is_presence
 
+    @property
+    def is_config(self):
+        return self._is_config
+
     def union_list(self):
         _list = []
         if self._mtype == REFERENCE_UNION:

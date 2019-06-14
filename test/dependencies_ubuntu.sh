@@ -29,7 +29,7 @@ function install_dependencies {
 
     apt update -y > /dev/null
     apt install sudo -y > /dev/null
-    sudo apt-get update > /dev/null
+    sudo apt-get update -y > /dev/null
     sudo apt-get install libtool-bin -y > /dev/null
     local status=$?
     if [[ ${status} != 0 ]]; then
@@ -63,6 +63,7 @@ function install_dependencies {
                             openjdk-8-jre \
                             gdebi-core\
                             lcov > /dev/null
+    sudo apt-get install -y valgrind
 }
 
 function check_install_gcc {
@@ -91,12 +92,27 @@ function check_install_gcc {
   fi
 }
 
-function install_go {
-    print_msg "Removing pre-installed Golang"
-    sudo apt-get remove golang -y
+function check_install_go {
+  which go
+  local status=$?
+  if [[ $status == 0 ]]
+  then
+    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
+    minor=$(echo $go_version | cut -d '.' -f 2)
+  else
+    print_msg "The Go is not installed"
+    minor=0
+  fi
+  if (( $minor < 9 )); then
+    if (( $minor > 0 )); then
+      print_msg "Removing pre-installed Golang"
+      sudo apt-get remove golang -y
+    fi
     print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+  fi
 }
 
 function install_confd {
@@ -122,7 +138,7 @@ MSG_COLOR=$YELLOW
 
 install_dependencies
 check_install_gcc
-install_go
+check_install_go
 
 install_confd
 

@@ -40,8 +40,6 @@ function install_openssl {
     ./config shared  > /dev/null && make all > /dev/null
     cp libcrypto.so.1.0.0 ../../confd/lib
     cd -
-
-    print_msg "Done Installing openssl 0.1.0u"
 }
 
 function install_fpm {

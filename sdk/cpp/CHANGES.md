@@ -1,3 +1,22 @@
+### 2019-05-15 version 0.8.3
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
+  * Updated openconfig bundle to introduce support for additional models.  
+  
+#### Resolved GitHub issues
+  * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))
+  * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))
+  * Duplicate code in generated cisco-ios-xe Go bundle ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891))
+  * Memory leaks in YDK C++ core ([#899](https://github.com/CiscoDevNet/ydk-gen/issues/899))
+  * Memory leaks in YDK C++ gNMI Service component ([#902](https://github.com/CiscoDevNet/ydk-gen/issues/902))
+  * RPC execution stuck when NETCONF server closes session unexpectedly ([#914](https://github.com/CiscoDevNet/ydk-gen/issues/914))
+  * YDK attempting to send Commit command when 'writable-running' in capabilities ([#915](https://github.com/CiscoDevNet/ydk-gen/issues/915))
+
+##### Note
+  The solution for GitHub issue ([#891](https://github.com/CiscoDevNet/ydk-gen/issues/891)) changed model API. However all model bundles generated with YDK-Gen version 0.7.3 and later are still compatible with core YDK components.
+
+
 ### 2019-03-15 version 0.8.2
 
 #### New features and enhancements

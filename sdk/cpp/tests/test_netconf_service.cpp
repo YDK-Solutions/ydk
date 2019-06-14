@@ -23,8 +23,6 @@
 #include <ydk/filters.hpp>
 #include <ydk/common_utilities.hpp>
 
-#include <spdlog/spdlog.h>
-
 #include "config.hpp"
 #include "catch.hpp"
 #include "test_utils.hpp"
@@ -113,7 +111,7 @@ TEST_CASE("discard_changes")
     auto reply = ns.discard_changes(provider);
     REQUIRE(reply);
 }
-/* Needs more work
+
 TEST_CASE("get_edit_copy_config")
 {
     path::Repository repo{TEST_HOME};
@@ -130,6 +128,8 @@ TEST_CASE("get_edit_copy_config")
     auto ifcs = openconfig_interfaces::Interfaces();
     auto ifc  = make_shared<openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "Loopback10";
+    ifc->config->name = "Loopback10";
+    ifc->config->description = "Test Loopback10 config";
     ifcs.interface.append(ifc);
 
     vector<ydk::Entity*> config_list;
@@ -150,10 +150,8 @@ TEST_CASE("get_edit_copy_config")
 
     vector<Entity*> copy_config_list{};
     for (auto ent : get_config_list) {
-        if (ent) {
-            //print_entity(ent, provider.get_session().get_root_schema());
-            copy_config_list.push_back(ent.get());
-        }
+    	//print_entity(ent, provider.get_session().get_root_schema());
+        copy_config_list.push_back(ent.get());
     }
 
     // Copy config to candidate
@@ -163,7 +161,7 @@ TEST_CASE("get_edit_copy_config")
     // Discard changes
     result = ns.discard_changes(provider);
     REQUIRE(result);
-} */
+}
 
 TEST_CASE("iana_if_type_filter")
 {
@@ -486,4 +484,41 @@ TEST_CASE("get_openconfig_interfaces_and_bgp")
     for (auto dn : data_nodes) {
         print_data_node(dn);
     }
+}
+
+namespace ydk {
+  namespace path {
+     std::shared_ptr<DataNode> handle_rpc_output(const std::string & reply, RootSchemaNode & root_schema, const string& rpc_path);
+  }
+}
+
+TEST_CASE( "decode_transaction_rpc" )
+{
+    path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin",  12022};
+    ydk::path::RootSchemaNode& schema = session.get_root_schema();
+
+    auto rpc = schema.create_rpc("ydktest-sanity-action:transaction");
+    rpc->get_input_node().create_datanode("run-request/out-format", "xml");
+
+    auto rpc_reply = R"(<?xml version="1.0" encoding="UTF-8"?>
+<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="5">
+  <run-result xmlns="http://cisco.com/ns/yang/ydktest-action">
+    <out-result><![CDATA[
+      <device>
+        <name>192.168.123.11</name>
+        <data>router bgp 7922
+ vrf green
+  rd 65010:0
+ exit
+exit
+</data>
+      </device>]]>
+    </out-result>
+  </run-result>
+</rpc-reply>
+)";
+    auto reply_dn = ydk::path::handle_rpc_output(rpc_reply, schema, rpc->get_input_node().get_path());
+    REQUIRE(reply_dn != nullptr);
+    print_data_node(reply_dn->get_children()[0]);
 }

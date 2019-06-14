@@ -70,14 +70,14 @@ class SanityNetconf(ParametrizedTestCase):
         pass
 
     def test_edit_commit_get(self):
-        one = ysanity.Runner.YdktestSanityOne()
+        one = ysanity.Runner.One()
         one.number = 1
         one.name = 'runner-one-name'
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, one)
         self.assertEqual(True, op)
 
-        get_filter = ysanity.Runner().YdktestSanityOne()
+        get_filter = ysanity.Runner().One()
         one_result = self.netconf_service.get_config(self.ncc, Datastore.candidate, get_filter)
         self.assertEqual(one, one_result)
 
@@ -111,8 +111,8 @@ class SanityNetconf(ParametrizedTestCase):
         self.assertEqual(True, op)
 
         runner = ysanity.Runner()
-        runner.ydktest_sanity_one.number = 1
-        runner.ydktest_sanity_one.name = 'runner-one-name'
+        runner.one.number = 1
+        runner.one.name = 'runner-one-name'
         op = self.netconf_service.validate(self.ncc, source=runner)
         self.assertEqual(True, op)
 
@@ -430,17 +430,17 @@ class SanityNetconf(ParametrizedTestCase):
             self.logger.error("Failed to get device state due to error: {}".format(err.message))
 
     def test_passive_interface(self):
-        ospf = ysanity.Runner.YdktestSanityOne.Ospf()
+        ospf = ysanity.Runner.One.Ospf()
         ospf.id = 22
         ospf.passive_interface.interface = "xyz"
-        test = ysanity.Runner.YdktestSanityOne.Ospf.Test()
+        test = ysanity.Runner.One.Ospf.Test()
         test.name = "abc"
         ospf.test.append(test)
 
         op = self.netconf_service.edit_config(self.ncc, Datastore.candidate, ospf)
         self.assertEqual(True, op)
 
-        ospf_filter = ysanity.Runner().YdktestSanityOne().Ospf()
+        ospf_filter = ysanity.Runner.One.Ospf()
         ospf_filter.id = 22
         ospf_result = self.netconf_service.get_config(self.ncc, Datastore.candidate, ospf_filter)
         self.assertIsNotNone(ospf_result)

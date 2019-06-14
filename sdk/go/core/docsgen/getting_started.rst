@@ -30,41 +30,41 @@ The following packages must be present in your system before installing YDK-Go:
 
 Install Third-party software dependencies::
 
-    $ sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
-    $ sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
+  sudo apt-get install gdebi-core python3-dev python-dev libtool-bin
+  sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
 
 For Xenial (Ubuntu 16.04.4)::
 
     # Upgrade compiler to gcc 5.*
-    $ sudo apt-get install gcc-5 g++-5 -y > /dev/null
-    $ sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
-    $ sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
+  sudo apt-get install gcc-5 g++-5 -y > /dev/null
+  sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
+  sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
     # Install YDK core library
-    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk-0.8.2-1.amd64.deb
-    $ sudo gdebi libydk-0.8.2-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk-0.8.3-1.amd64.deb
+  sudo gdebi libydk-0.8.3-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
     # Install YDK core library
-    $ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk-0.8.2-1.amd64.deb
-    $ sudo gdebi libydk-0.8.2-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk-0.8.3-1.amd64.deb
+  sudo gdebi libydk-0.8.3-1.amd64.deb
 
 **Centos (Fedora-based)**
 
 The following packages must be present in your system before installing YDK-Go::
 
-    $ sudo yum install epel-release
-    $ sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
+  sudo yum install epel-release
+  sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake
 
     # Upgrade compiler to gcc 5.*
-    $ yum install centos-release-scl -y > /dev/null
-    $ yum install devtoolset-4-gcc* -y > /dev/null
-    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-    $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+  yum install centos-release-scl -y > /dev/null
+  yum install devtoolset-4-gcc* -y > /dev/null
+  ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+  ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
     # Install YDK core library
-    $ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk-0.8.2-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk-0.8.3-1.x86_64.rpm
 
 **Golang**
 
@@ -72,10 +72,20 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 
 .. code-block:: sh
 
-    $ sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
-    $ sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
-    $ export GOROOT="/usr/local/go"
-    $ export PATH=$GOROOT/bin:$PATH
+  sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
+  sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+  export GOROOT="/usr/local/go"
+  export PATH=$GOROOT/bin:$PATH
+
+For security reasons starting from Go version 1.10 only a limited set of flags is allowed in the CGO code, notably -D, -I, and -l.
+Current ydk-go code includes few additional CGO LDFLAGS flags in order to allow coverage testing; they are:
+"-fprofile-arcs -ftest-coverage --coverage". In order to allow these additional flags to be used, it is necessary
+to set environment variable CGO_LDFLAGS_ALLOW before running ydk-go based application:
+
+.. code-block:: sh
+
+  export CGO_LDFLAGS_ALLOW="-fprofile-arcs|-ftest-coverage|--coverage"
+
 
 Mac
 ---
@@ -84,21 +94,21 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 
 .. code-block:: sh
 
-	$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-	$ brew install pkg-config libssh libxml2 xml2 curl pcre cmake
-	$ xcode-select --install
+  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  brew install pkg-config libssh libxml2 xml2 curl pcre cmake
+  xcode-select --install
 
-    # Install YDK core library
-	$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk-0.8.2-Darwin.pkg
-	$ sudo installer -pkg libydk-0.8.2-Darwin.pkg -target /
+  # Install YDK core library
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3/libydk-0.8.3-Darwin.pkg
+  sudo installer -pkg libydk-0.8.3-Darwin.pkg -target /
 	
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
 
 .. code-block:: sh
 
-	$ export CGO_ENABLED=0
-	$ export GOROOT_BOOTSTRAP=$GOROOT
-	$ gvm install go1.9.2
+  export CGO_ENABLED=0
+  export GOROOT_BOOTSTRAP=$GOROOT
+  gvm install go1.9.2
 
 Libssh Installation
 -------------------
@@ -118,27 +128,27 @@ Install protobuf
 
 .. code-block:: sh
 
-    wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-    unzip protobuf-cpp-3.5.0.zip
-    cd protobuf-3.5.0
-    ./configure
-    make
-    sudo make install
-    sudo ldconfig
-    cd -
+  wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
+  unzip protobuf-cpp-3.5.0.zip
+  cd protobuf-3.5.0
+  ./configure
+  make
+  sudo make install
+  sudo ldconfig
+  cd -
 
 Install gRPC
 ------------
 
 .. code-block:: sh
 
-    git clone -b v1.9.1 https://github.com/grpc/grpc
-    cd grpc
-    git submodule update --init
-    sudo ldconfig
-    make
-    sudo make install
-    cd -
+  git clone -b v1.9.1 https://github.com/grpc/grpc
+  cd grpc
+  git submodule update --init
+  sudo ldconfig
+  make
+  sudo make install
+  cd -
 
 Instal YDK gNMI library
 -----------------------
@@ -148,28 +158,28 @@ Ubuntu
 
 For Xenial (Ubuntu 16.04.4)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk_gnmi_0.4.0-2_amd64.deb
+  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.2/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk_gnmi_0.4.0-2_amd64.deb
+  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
 
 CentOS
 ~~~~~~
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.2/libydk_gnmi_0.4.0-2.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk_gnmi_0.4.0-2.x86_64.rpm
 
 MacOS
 ~~~~~
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.2/libydk_gnmi-0.4.0-2_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3/libydk_gnmi-0.4.0-2_Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
 
 Set runtime environment
 -----------------------
@@ -178,8 +188,8 @@ The YDK based application runtime environment must include setting of **LD_LIBRA
 
 .. code-block:: sh
 
-   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+  PROTO="/Your-Protobuf-and-Grpc-installation-directory"
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
 
 .. _howto-install:
 
@@ -192,8 +202,8 @@ To check out the version of ydk-gen used to generate this ydk-go, use the below 
 
 .. code-block:: sh
 
-    $ git clone repo-url
-    $ git checkout commit-id
+  git clone repo-url
+  git checkout commit-id
 
 
 Documentation and Support
@@ -208,4 +218,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.2. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.3. YDK-Go is licensed under the Apache 2.0 License.

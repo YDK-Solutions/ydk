@@ -29,19 +29,27 @@ NetconfSession
 
     .. py:method:: invoke(rpc)
 
-        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) Given RPC to be executed.
-
         Invokes or executes the given RPC and returns a :py:class:`DataNode<DataNode>` pointer, if the RPC has an output modeled in YANG.
+
+        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) Given RPC to be executed.
 
         :returns: :py:class:`DataNode<DataNode>`.
 
     .. py:method:: invoke(datanode)
 
-        :param datanode: (:py:class:`Rpc<ydk.path.DataNode>`) Given DataNode containing YANG 1.1 action to be executed.
-
         Invokes or executes the given DataNode and returns a :py:class:`DataNode<DataNode>` pointer if the action has an output modeled in YANG.
 
+        :param datanode: (:py:class:`Rpc<ydk.path.DataNode>`) Given DataNode containing YANG 1.1 action to be executed.
+
         :returns: :py:class:`DataNode<DataNode>`.
+
+    .. py:method:: execute_netconf_operation(rpc)
+
+        Sends specified RPC to device (similar to `invoke` function) and returns device response as XML encoded string.
+
+        :param rpc: (:py:class:`Rpc<ydk.path.Rpc>`) The RPC to be executed.
+
+        :returns: ``str`` - reply from device in XML encoded string.
 
     .. py:method:: get_capabilities()
 

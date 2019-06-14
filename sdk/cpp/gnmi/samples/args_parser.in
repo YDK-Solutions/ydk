@@ -20,6 +20,11 @@
 #include <string>
 #include <vector>
 
+
+#ifndef _UTILITY_MODULE_
+const char* TEST_HOME = "@CMAKE_SOURCE_DIR@/../../core/tests/models";
+#endif
+
 void show_usage(std::string name);
 std::vector<std::string> parse_args(int argc, char* argv[]);
 

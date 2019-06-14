@@ -1,3 +1,9 @@
+### 2019-08-15 version 0.8.4
+
+#### New features and enhancements
+  * Expanded meta data in Python bundles by adding flags `has_must` and `has_when`.
+  
+
 ### 2019-05-15 version 0.8.3
 
 #### Bundle improvements

@@ -49,6 +49,7 @@ def init_verbose_logger():
     # add the handlers to the logger
     logger.addHandler(ch)
 
+
 def print_about_page(ydk_root, docs_rst_directory, release):
     repo = Repo(ydk_root)
     url = repo.remote().url.split('://')[-1].split('.git')[0]
@@ -194,9 +195,10 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
         print(msg)
 
 
-def create_pip_packages(output_directory):
-    py_sdk_root = output_directory
+def create_pip_packages(out_dir):
+    py_sdk_root = out_dir
     os.chdir(py_sdk_root)
+    shutil.rmtree('dist', ignore_errors=True)
     args = [sys.executable, 'setup.py', 'sdist']
     exit_code = subprocess.call(args, env=os.environ.copy())
 

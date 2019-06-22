@@ -139,7 +139,7 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 ```
    # Generate and install libydk library
-   ./generate --cpp --core
+   ./generate.py --cpp --core
    cd gen-api/cpp/ydk/build/
    make
    sudo make install
@@ -175,7 +175,7 @@ Install dependencies OS dependencies then generate and install YDK C++ libraries
 
 ```
    # Generate and install libydk library
-   ./generate --cpp --core
+   ./generate.py --cpp --core
    cd gen-api/cpp/ydk/build/
    make
    sudo make install

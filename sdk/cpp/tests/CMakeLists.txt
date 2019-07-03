@@ -10,6 +10,7 @@ set(bundle_tests_src
         main.cpp
         test_c_api.cpp
         test_crud.cpp
+        test_entity_diff.cpp
         test_errors.cpp
         test_executor_service.cpp
         test_netconf_operations.cpp

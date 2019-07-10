@@ -868,3 +868,126 @@ func SetYListKey(ent Entity, index int) {
 		v.Set(reflect.ValueOf(key))
 	}
 }
+
+func GetAbsolutePath(entity Entity) string {
+	entityData := entity.GetEntityData()
+	path := entityData.SegmentPath
+	parent := entityData.Parent
+	if parent != nil {
+		path = fmt.Sprintf("%s/%s", GetAbsolutePath(parent), path)
+	}
+	return path
+}
+
+func EntityToDict(entity Entity) map[string]string {
+	edict := make(map[string]string)
+	absPath := GetAbsolutePath(entity)
+	if IsPresenceContainer(entity) || strings.LastIndex(absPath, "]") == len(absPath)-1 {
+		edict[absPath] = ""
+	}
+
+	entityPath := GetEntityPath(entity)
+	for _, leafData := range entityPath.ValuePaths {
+		if leafData.Data.IsSet {
+			leafName := leafData.Name
+			leafValue := leafData.Data.Value
+			keyPath := fmt.Sprintf("[%s=", leafName)
+			if strings.Index(absPath, keyPath) == -1 {
+				path := fmt.Sprintf("%s/%s", absPath, leafName)
+				edict[path] = leafValue
+			}
+		}
+	}
+	children := GetYChildren(entity.GetEntityData())
+	for _, child := range children {
+		if child.Value == nil || (IsPresenceContainer(child.Value) && !GetPresenceFlag(child.Value)) {
+			continue
+		}
+		childDict := EntityToDict(child.Value);
+		for k, v := range childDict {
+			edict[k] = v
+		}
+	}
+	return edict
+}
+
+func keyInSlice(k string, v []string) bool {
+	for _, e := range v {
+		if e == k {
+			return true
+		}
+	}
+	return false
+}
+
+func removeKeyFromSlice(k string, v []string) []string {
+	for i, key := range v {
+		if (k == key) {
+			return append(v[:i], v[i+1:]...)
+		}
+	}
+	return v
+}
+
+func getMapKeys(m map[string]string) []string {
+	keys := make([]string, len(m))
+	i := 0
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+	sort.Strings(keys)
+	return keys	
+}
+
+type DiffPair struct {
+	Left	string
+	Right   string
+}
+
+func EntityDiff(ent1 Entity, ent2 Entity) map[string]interface{} {
+	diffs := make(map[string]interface{})
+	if reflect.TypeOf(ent1) != reflect.TypeOf(ent2) {
+		panic("EntityDiff: Incompatible arguments provided.")
+	}
+
+	entDict1 := EntityToDict(ent1)
+	entDict2 := EntityToDict(ent2)
+	entKeys1 := getMapKeys(entDict1)
+	entKeys2 := getMapKeys(entDict2)
+	var skipKeys1 []string
+	for _, key := range entKeys1 {
+		if keyInSlice(key, skipKeys1) {
+			continue
+		}
+		if keyInSlice(key, entKeys2) {
+			if entDict1[key] != entDict2[key] {
+				pair := DiffPair{Left: entDict1[key], Right: entDict2[key]}
+				diffs[key] = &pair
+			}
+			entKeys2 = removeKeyFromSlice(key, entKeys2)
+		} else {
+			pair := DiffPair{Left: entDict1[key], Right: "None"}
+			diffs[key] = &pair
+			for _, dupkey := range entKeys1 {
+				if strings.Index(dupkey, key) >= 0 {
+					skipKeys1 = append(skipKeys1, dupkey)
+				}
+			}
+		}
+	}
+	var skipKeys2 []string
+	for _, key := range entKeys2 {
+		if keyInSlice(key, skipKeys2) {
+			continue
+		}
+		pair := DiffPair{Left: "None", Right: entDict2[key]}
+		diffs[key] = &pair
+		for _, dupkey := range entKeys2 {
+			if (strings.Index(dupkey, key) >= 0) {
+				skipKeys2 = append(skipKeys2, dupkey)
+			}
+		}
+	}
+	return diffs
+}

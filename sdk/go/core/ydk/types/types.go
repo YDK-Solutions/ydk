@@ -430,6 +430,19 @@ func SetParent(entity, parent Entity) {
 	entity.GetEntityData().Parent = parent
 }
 
+// Set Parent values in all children recursively
+func SetAllParents(entity Entity) {
+	children := GetYChildren(entity.GetEntityData())
+	for _, child := range children {
+		childEntity := child.Value
+		if childEntity == nil || (IsPresenceContainer(childEntity) && !GetPresenceFlag(childEntity)) {
+			continue
+		}
+		SetParent(childEntity, entity)
+		SetAllParents(childEntity)
+	}
+}
+
 // HasDataOrFilter returns a bool representing whether the entity
 // or any of its children have their data/filter set
 func HasDataOrFilter(entity Entity) bool {
@@ -940,13 +953,13 @@ func getMapKeys(m map[string]string) []string {
 	return keys	
 }
 
-type DiffPair struct {
+type StringPair struct {
 	Left	string
 	Right   string
 }
 
-func EntityDiff(ent1 Entity, ent2 Entity) map[string]interface{} {
-	diffs := make(map[string]interface{})
+func EntityDiff(ent1 Entity, ent2 Entity) map[string]StringPair {
+	diffs := make(map[string]StringPair)
 	if reflect.TypeOf(ent1) != reflect.TypeOf(ent2) {
 		panic("EntityDiff: Incompatible arguments provided.")
 	}
@@ -962,13 +975,11 @@ func EntityDiff(ent1 Entity, ent2 Entity) map[string]interface{} {
 		}
 		if keyInSlice(key, entKeys2) {
 			if entDict1[key] != entDict2[key] {
-				pair := DiffPair{Left: entDict1[key], Right: entDict2[key]}
-				diffs[key] = &pair
+				diffs[key] = StringPair{Left: entDict1[key], Right: entDict2[key]}
 			}
 			entKeys2 = removeKeyFromSlice(key, entKeys2)
 		} else {
-			pair := DiffPair{Left: entDict1[key], Right: "None"}
-			diffs[key] = &pair
+			diffs[key] = StringPair{Left: entDict1[key], Right: "None"}
 			for _, dupkey := range entKeys1 {
 				if strings.Index(dupkey, key) >= 0 {
 					skipKeys1 = append(skipKeys1, dupkey)
@@ -981,8 +992,7 @@ func EntityDiff(ent1 Entity, ent2 Entity) map[string]interface{} {
 		if keyInSlice(key, skipKeys2) {
 			continue
 		}
-		pair := DiffPair{Left: "None", Right: entDict2[key]}
-		diffs[key] = &pair
+		diffs[key] = StringPair{Left: "None", Right: entDict2[key]}
 		for _, dupkey := range entKeys2 {
 			if (strings.Index(dupkey, key) >= 0) {
 				skipKeys2 = append(skipKeys2, dupkey)

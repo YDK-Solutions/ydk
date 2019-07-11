@@ -3,6 +3,9 @@
 #### New features and enhancements
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   
+#### Resolved GitHub issues
+  * Go: When entity having children is built from model API the child entities parent is nil ([#938](https://github.com/CiscoDevNet/ydk-gen/issues/938))
+
 
 ### 2019-05-15 version 0.8.3
 

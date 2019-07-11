@@ -593,7 +593,7 @@ func printDictionary(legend string, entdict map[string]string) {
 	}
 }
 
-func printDiff(diff map[string]interface{}) {
+func printDiff(diff map[string]types.StringPair) {
 	fmt.Printf("\n------> DIFFS:\n")
 	var keys []string
 	for k := range diff {
@@ -601,7 +601,7 @@ func printDiff(diff map[string]interface{}) {
 	}
 	sort.Strings(keys)
 	for _, key := range keys {
-		valuePair := diff[key].(*types.DiffPair)
+		valuePair := diff[key]
 		fmt.Printf("%s: %s vs %s\n", key,
 			checkEmptyStringValue(valuePair.Left),
 			checkEmptyStringValue(valuePair.Right))
@@ -613,6 +613,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoKeys() {
 	l1 := ysanity.Runner_TwoKeyList{First: "f1", Second: 11, Property: 82}
 	l2 := ysanity.Runner_TwoKeyList{First: "f2", Second: 22, Property: 83}
 	runner1.TwoKeyList = []*ysanity.Runner_TwoKeyList {&l1, &l2}
+	types.SetAllParents(&runner1)
 
 	entDict1 := types.EntityToDict(&runner1)
 	suite.Equal(len(entDict1), 4)
@@ -622,6 +623,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoKeys() {
 	ll1 := ysanity.Runner_TwoKeyList{First: "f1", Second: 11, Property: 82}
 	ll2 := ysanity.Runner_TwoKeyList{First: "f2", Second: 22, Property: 83}
 	runner2.TwoKeyList = []*ysanity.Runner_TwoKeyList {&ll1, &ll2}
+	types.SetAllParents(&runner2)
 
 	diff := types.EntityDiff(&runner1, &runner2)
 	suite.Equal(0, len(diff))
@@ -647,12 +649,14 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_Presence() {
 	runner := ysanity.Runner{}
 	runner.Runner2.SomeLeaf = "some-leaf"
 	types.SetPresenceFlag(&runner.Runner2)
+	types.SetAllParents(&runner)
 
 	entDict1 := types.EntityToDict(&runner)
 	suite.Equal(len(entDict1), 2)
 	printDictionary("-LEFT", entDict1)
 
 	emptyRunner := ysanity.Runner{}
+	types.SetAllParents(&emptyRunner)
 	entDict2 := types.EntityToDict(&emptyRunner)
 	suite.Equal(len(entDict2), 0)
 	printDictionary("-RIGHT", entDict2);
@@ -679,9 +683,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
 	elem12.Name = "runner:twolist:ldata:1:subl1:12"
 
 	elem1.Subl1 = append(elem1.Subl1, &elem11)
-	types.SetParent(&elem11, &elem1)
 	elem1.Subl1 = append(elem1.Subl1, &elem12)
-	types.SetParent(&elem12, &elem1)
 
 	elem21 := ysanity.Runner_TwoList_Ldata_Subl1{}
 	elem22 := ysanity.Runner_TwoList_Ldata_Subl1{}
@@ -691,14 +693,11 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
 	elem22.Name = "runner:twolist:ldata:2:subl1:22"
 
 	elem2.Subl1 = append(elem2.Subl1, &elem21)
-	types.SetParent(&elem21, &elem2)
 	elem2.Subl1 = append(elem2.Subl1, &elem22)
-	types.SetParent(&elem22, &elem2)
 
 	runner1.TwoList.Ldata = append(runner1.TwoList.Ldata, &elem1)
-	types.SetParent(&elem1, &runner1.TwoList)
 	runner1.TwoList.Ldata = append(runner1.TwoList.Ldata, &elem2)
-	types.SetParent(&elem2, &runner1.TwoList)
+	types.SetAllParents(&runner1)
 
 	entDict := types.EntityToDict(&runner1)
 	suite.Equal(12, len(entDict))
@@ -716,12 +715,10 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
 	elem12.Name = "runner:twolist:ldata:1:subl1:12"
 
 	elem1.Subl1 = append(elem1.Subl1, &elem11)
-	types.SetParent(&elem11, &elem1)
 	elem1.Subl1 = append(elem1.Subl1, &elem12)
-	types.SetParent(&elem12, &elem1)
 
 	runner2.TwoList.Ldata = append(runner2.TwoList.Ldata, &elem1)
-	types.SetParent(&elem1, &runner2.TwoList)
+	types.SetAllParents(&runner2)
 	
 	entDict = types.EntityToDict(&runner2)
 	suite.Equal(6, len(entDict))
@@ -730,6 +727,26 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
 	diff := types.EntityDiff(&runner1, &runner2)
 	suite.Equal(1, len(diff))
 	printDiff(diff)
+}
+
+func (suite *SanityTypesTestSuite) TestEntityDiff_OneAugList() {
+	oneAugList := ysanity.Runner_OneList_OneAugList{}
+	oneAugList.Enabled = true
+
+	elem1 := ysanity.Runner_OneList_OneAugList_Ldata{}
+	elem1.Number = 1
+	elem1.Name = "elem1"
+
+	elem2 := ysanity.Runner_OneList_OneAugList_Ldata{}
+	elem2.Number = 2
+	elem2.Name = "elem2"
+
+	oneAugList.Ldata = []*ysanity.Runner_OneList_OneAugList_Ldata {&elem1, &elem2}
+	types.SetAllParents(&oneAugList)
+
+	entDict := types.EntityToDict(&oneAugList)
+	suite.Equal(5, len(entDict))
+	printDictionary("", entDict)
 }
 
 func testParams(testName string, entity types.Entity) types.Entity {

@@ -111,7 +111,7 @@ func (suite *ExecutorServiceTestSuite) TestLockUnlockFail() {
 		suite.ExecutorService.ExecuteRpc(&suite.NetconfProvider, &lockRpc, nil) })
 	suite.Equal(funcDidPanic, true)
 	suite.Regexp("YServiceProviderError:", panicValue)
-	suite.Regexp("<error-tag>lock-denied</error-tag>", panicValue)
+	suite.Regexp("the configuration database is locked", panicValue)
 }
 
 func (suite *ExecutorServiceTestSuite) TestValidate() {

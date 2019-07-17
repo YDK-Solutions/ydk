@@ -324,12 +324,12 @@ These are how YANG types are represented in Go.
 .. function:: GetSegmentPath(entity Entity) string
 
     :param entity: An instance of :ref:`Entity <types-entity>`
-    :return: The entity's `SegmentPath` value
+    :return: The entity's segment path value
 
 .. function:: GetAbsolutePath(entity Entity) string
 
     :param entity: An instance of :ref:`Entity <types-entity>`
-    :return: The entity's `AbsolutePath` value
+    :return: The entity's absolute path value
 
     **Note:** The parent-child relations must be set before calling this function.
               As an advice the `SetAllParents` on the top level entity must be called to set the references.
@@ -406,10 +406,11 @@ These are how YANG types are represented in Go.
 
 .. function:: EntityToDict(entity Entity) map[string]string
 
-    Utility function to get dictionary of all leaves recursively in this entity and its children.
+    Utility function to get dictionary of all leaves and presence containers recursively in this entity and its children.
 
     :param entity: An instance of :ref:`Entity <types-entity>`
-    :return: A `map[string]string`, where key represent leaf absolute path and value represents string value of the leaf
+    :return: A `map[string]string`, where key represents leaf absolute path and value represents string value of the leaf;
+             In case of presence container the key represents the container absolute path and value is empty string.
 
 .. _string-pair:
 
@@ -427,14 +428,17 @@ These are how YANG types are represented in Go.
     Compared are presence containers and all leaves recursively.
 
     :param entity: An instance of :ref:`Entity <types-entity>`
-    :return: A `map[string]StringPair`, map of differences between two entities, where key represents leaf or presence container absolute path and value represents string value of the leaf.
+    :return: A `map[string]StringPair`, map of differences between two entities, where key represents leaf or presence
+             container absolute path and value :ref:`StringPair <string-pair>` represents difference in string values of the leaves.
 
 
 .. _entity-collection:
 
 .. go:struct:: EntityCollection
 
-    Type `EntityCollection` along with its methods implements ordered map collection of entities. The string value of entity `SegmentPath` serves as a map key for the entity. Ordered means, the collection retains order of entities, in which they were added to collection. 
+    Type `EntityCollection` along with its methods implements ordered map collection of entities. The string value of
+    entity `SegmentPath` serves as a map key for the entity. Ordered means, the collection retains order of entities,
+    in which they were added to collection.
     
     The `EntityCollection` type has two aliases - `Config` and `Filter`.
 

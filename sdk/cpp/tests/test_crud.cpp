@@ -264,12 +264,7 @@ TEST_CASE("bgp_read_non_top")
     REQUIRE(bgp_read!=nullptr);
     openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
     REQUIRE(bgp_read_ptr!=nullptr);
-
-    //cout<<*bgp_set<<endl<<endl;
-    //cout<<*bgp_read_ptr<<endl;
-
     REQUIRE(*(bgp_read_ptr) == *(bgp_set));
-
 }
 
 TEST_CASE("oc_platform")
@@ -346,4 +341,29 @@ TEST_CASE( "crud_entity_list_bgp" )
     // Delete configuration
     result = crud.delete_(provider, filter_list);
     REQUIRE(result == true);
+}
+
+TEST_CASE( "crud_delete_container" )
+{
+	ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // Create presence container
+    auto runner = ydktest_sanity::Runner();
+    runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
+    runner.runner_2->some_leaf = "some-leaf";
+    auto res = crud.create(provider, runner);
+    REQUIRE(res);
+
+    // Delete presence container
+    runner = ydktest_sanity::Runner();
+    runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
+    res = crud.delete_(provider, *runner.runner_2);
+    REQUIRE(res);
+
+    // Delete top container (cleanup)
+    runner = ydktest_sanity::Runner();
+    res = crud.delete_(provider, runner);
+    REQUIRE(res);
 }

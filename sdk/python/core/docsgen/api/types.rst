@@ -391,6 +391,35 @@ YDK types
         uint8 type.
 
 
+Utility functions
+-----------------
+
+.. function:: absolute_path(entity)
+
+    Utility function to get absolute path of the entity.
+
+    :param entity: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :return: A ``str`` representing entity's absolute path.
+
+.. function:: entity_to_dict(entity)
+
+    Utility function to get dictionary of all leaves and presence containers recursively in this entity and its children.
+
+    :param entity: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :return: A dictionary, where key represents leaf absolute path and value represents string value of the leaf;
+             In case of presence container the key represents the container's absolute path and value is empty string.
+
+.. function:: entity_diff(entity1, entity2)
+
+    Utility function to compare two entities of the same underlying type.
+    Compared are presence containers and all leaves recursively.
+
+    :param entity1: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :param entity2: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :return: A dictionary of differences between two entities, where key of type `str` represents leaf or presence
+             container absolute path and value of type `tuple` represents difference in `str` values of the leaves.
+    :raises: Exception :py:exc:`YInvalidArgumentError<ydk.error.YInvalidArgumentError>`, if supplied entities are None or have different types.
+
 Examples
 --------
 

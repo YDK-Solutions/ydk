@@ -329,11 +329,11 @@ class Entity(_Entity):
         return self.get_segment_path()
 
     def get_absolute_path(self):
-        path = self.get_segment_path()
-        if not self.is_top_level_class:
-            path = self.parent.get_absolute_path() + '/' + path
-        # elif '[' in path:
-        #     path = path.split('[')[0]
+        path = self._absolute_path()
+        if len(path) == 0 and self.is_top_level_class:
+            path = self.get_segment_path()
+            if '[' in path:
+                path = path.split('[')[0]
         return path
 
     def _get_child_by_seg_name(self, segs):
@@ -404,9 +404,16 @@ class Entity(_Entity):
         return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
     
 
+def absolute_path(entity):
+    path = entity.get_segment_path()
+    if not entity.is_top_level_class and entity.parent is not None:
+        path = absolute_path(entity.parent) + '/' + path
+    return path
+
+
 def entity_to_dict(entity):
     edict = {}
-    abs_path = entity.get_absolute_path()
+    abs_path = absolute_path(entity)
     if (hasattr(entity, 'is_presence_container') and entity.is_presence_container) or \
             abs_path.endswith(']'):
         edict[abs_path] = ''

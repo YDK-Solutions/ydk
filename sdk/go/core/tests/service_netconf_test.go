@@ -82,11 +82,11 @@ func (suite *NetconfServiceTestSuite) TestLockUnlockFail() {
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Unlock(&suite.Provider, datastore.Running) })
 	suite.Equal(funcDidPanic, true)
 	suite.Regexp("YServiceProviderError:", panicValue)
-	errMsg := `<rpc-error>
-    <error-type>application</error-type>
-    <error-tag>operation-failed</error-tag>
-    <error-severity>error</error-severity>
-  </rpc-error>`
+	errMsg := "RPC error occurred; check log file for details"
+//	`<rpc-error>
+//    <error-type>application</error-type>
+//    <error-tag>operation-failed</error-tag>
+//  </rpc-error>`
 	suite.Regexp(errMsg, panicValue)
 }
 

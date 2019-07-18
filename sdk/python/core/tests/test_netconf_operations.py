@@ -32,63 +32,64 @@ from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
+netconf_default_error_pattern = "RPC error occurred; check log file for details"
 
-test_create_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
-  <rpc-error>
-    <error-type>application</error-type>
-    <error-tag>data-exists</error-tag>
-    <error-severity>error</error-severity>
-    <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='1'\]
-  </error-path>
-    <error-info>
-      <bad-element>ldata</bad-element>
-    </error-info>
-  </rpc-error>
-</rpc-reply>"""
-test_delete_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
-  <rpc-error>
-    <error-type>application</error-type>
-    <error-tag>data-missing</error-tag>
-    <error-severity>error</error-severity>
-    <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='1'\]
-  </error-path>
-    <error-info>
-      <bad-element>ldata</bad-element>
-    </error-info>
-  </rpc-error>
-</rpc-reply>"""
-test_delete_leaf_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
-  <rpc-error>
-    <error-type>application</error-type>
-    <error-tag>data-missing</error-tag>
-    <error-severity>error</error-severity>
-    <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:ytypes/ydkut:built-in-t/ydkut:number8
-  </error-path>
-    <error-info>
-      <bad-element>number8</bad-element>
-    </error-info>
-  </rpc-error>
-</rpc-reply>"""
-test_delete_leaflist_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
-<rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
-  <rpc-error>
-    <error-type>application</error-type>
-    <error-tag>data-missing</error-tag>
-    <error-severity>error</error-severity>
-    <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
-    /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:ytypes/ydkut:built-in-t/ydkut:enum-llist\[.="local"\]
-  </error-path>
-    <error-info>
-      <bad-element>enum-llist</bad-element>
-    </error-info>
-  </rpc-error>
-</rpc-reply>"""
+# test_create_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
+# <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
+#   <rpc-error>
+#     <error-type>application</error-type>
+#     <error-tag>data-exists</error-tag>
+#     <error-severity>error</error-severity>
+#     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+#     /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='1'\]
+#   </error-path>
+#     <error-info>
+#       <bad-element>ldata</bad-element>
+#     </error-info>
+#   </rpc-error>
+# </rpc-reply>"""
+# test_delete_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
+# <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
+#   <rpc-error>
+#     <error-type>application</error-type>
+#     <error-tag>data-missing</error-tag>
+#     <error-severity>error</error-severity>
+#     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+#     /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:one-list/ydkut:ldata\[ydkut:number='1'\]
+#   </error-path>
+#     <error-info>
+#       <bad-element>ldata</bad-element>
+#     </error-info>
+#   </rpc-error>
+# </rpc-reply>"""
+# test_delete_leaf_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
+# <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
+#   <rpc-error>
+#     <error-type>application</error-type>
+#     <error-tag>data-missing</error-tag>
+#     <error-severity>error</error-severity>
+#     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+#     /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:ytypes/ydkut:built-in-t/ydkut:number8
+#   </error-path>
+#     <error-info>
+#       <bad-element>number8</bad-element>
+#     </error-info>
+#   </rpc-error>
+# </rpc-reply>"""
+# test_delete_leaflist_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
+# <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
+#   <rpc-error>
+#     <error-type>application</error-type>
+#     <error-tag>data-missing</error-tag>
+#     <error-severity>error</error-severity>
+#     <error-path xmlns:ydkut="http://cisco.com/ns/yang/ydktest-sanity" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+#     /nc:rpc/nc:edit-config/nc:config/ydkut:runner/ydkut:ytypes/ydkut:built-in-t/ydkut:enum-llist\[.="local"\]
+#   </error-path>
+#     <error-info>
+#       <bad-element>enum-llist</bad-element>
+#     </error-info>
+#   </rpc-error>
+# </rpc-reply>"""
 
 
 class SanityTest(unittest.TestCase):
@@ -130,7 +131,7 @@ class SanityTest(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_empty)
         self.assertEqual(runner, runner_read)
 
-    @assert_with_error(test_create_pattern, YServiceProviderError)
+    @assert_with_error(netconf_default_error_pattern, YServiceProviderError)
     def test_create(self):
         runner = ysanity.Runner()
         e_1 = ysanity.Runner.OneList.Ldata()
@@ -147,7 +148,7 @@ class SanityTest(unittest.TestCase):
         # CREATE AGAIN WITH ERROR
         self.crud.update(self.ncc, runner)
 
-    @assert_with_error(test_delete_pattern, YServiceProviderError)
+    @assert_with_error(netconf_default_error_pattern, YServiceProviderError)
     def test_delete(self):
         runner = ysanity.Runner()
         e_1 = ysanity.Runner.OneList.Ldata()
@@ -200,7 +201,7 @@ class SanityTest(unittest.TestCase):
         runner_read = self.crud.read(self.ncc, runner_empty)
         self.assertEqual(runner, runner_read)
 
-    @assert_with_error(test_delete_leaf_pattern, YServiceProviderError)
+    @assert_with_error(netconf_default_error_pattern, YServiceProviderError)
     def test_delete_leaf(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.number8 = 10
@@ -213,7 +214,7 @@ class SanityTest(unittest.TestCase):
         # DELETE AGAIN WITH ERROR
         self.crud.update(self.ncc, runner)
 
-    @assert_with_error(test_delete_leaflist_pattern, YServiceProviderError)
+    @assert_with_error(netconf_default_error_pattern, YServiceProviderError)
     def test_delete_leaflist(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.local)

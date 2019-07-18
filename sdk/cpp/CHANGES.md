@@ -1,3 +1,12 @@
+### 2019-08-15 version 0.8.4
+
+#### New features and enhancements
+  * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
+  
+#### Resolved GitHub issues
+  * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+
+
 ### 2019-05-15 version 0.8.3
 
 #### Bundle improvements

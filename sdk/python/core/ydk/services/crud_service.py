@@ -20,6 +20,7 @@ from ydk.errors import YServiceError
 from ydk.types import EntityCollection, Config
 from ydk.entity_utils import _read_entities, _get_top_level_entity, _get_child_entity_from_top
 
+
 class CRUDService(_CrudService):
     """
     Python wrapper for CrudService

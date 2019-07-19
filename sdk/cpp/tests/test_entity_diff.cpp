@@ -46,7 +46,7 @@ string check_empty_str_value(string & v)
 void print_dictionary(const string & legend, map<string,string> & ent_dict)
 {
     cout << "\n------> DICTIONARY" << legend << endl;
-    for (map<string,string>::iterator it = ent_dict.begin(); it != ent_dict.end(); it++)
+    for (map<string,string>::iterator it = ent_dict.begin(); it != ent_dict.end(); ++it)
     {
         cout << it->first << ": " << check_empty_str_value(it->second) << endl;
     }

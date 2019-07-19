@@ -584,7 +584,7 @@ func checkEmptyStringValue(v string) string {
 func printDictionary(legend string, entdict map[string]string) {
 	fmt.Printf("\n------> DICTIONARY%s\n", legend)
 	var keys []string
-	for k, _ := range entdict {
+	for k := range entdict {
 	        keys = append(keys, k)
 	}
 	sort.Strings(keys)

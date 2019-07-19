@@ -243,7 +243,7 @@ bool NetconfService::edit_config(NetconfServiceProvider& provider, DataStore tar
     auto top_entity = get_top_entity(&config);
     std::string payload = (config.ignore_validation && top_entity->is_top_level_class) ?
             get_xml_subtree_filter_payload(*top_entity, provider) :
-            get_data_payload(config, provider);
+            get_data_payload(*top_entity, provider);
 
     return edit_payload(provider, target, payload, default_operation, test_option, error_option);
 }
@@ -262,7 +262,7 @@ bool NetconfService::edit_config(NetconfServiceProvider& provider, DataStore tar
         auto top_entity = get_top_entity(entity);
         payload += (entity->ignore_validation && top_entity->is_top_level_class) ?
                 get_xml_subtree_filter_payload(*top_entity, provider) :
-                get_data_payload(*entity, provider);
+                get_data_payload(*top_entity, provider);
     }
 
     return edit_payload(provider, target, payload, default_operation, test_option, error_option);

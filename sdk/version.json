@@ -1,5 +1,5 @@
 {
-    "core": "0.8.3",
+    "core": "0.8.4",
     "ietf": "0.1.5-post2",
     "openconfig": "0.1.6-post1",
     "cisco_ios_xr": "6.6.2",

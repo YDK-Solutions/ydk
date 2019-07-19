@@ -1,9 +1,19 @@
+### 2019-08-15 version 0.8.4
+
+#### New features and enhancements
+  * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
+  * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
+  
+#### Resolved GitHub issues
+  * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+
+
 ### 2019-05-15 version 0.8.3
 
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
   * Updated openconfig bundle to introduce support for additional models.
-  
+
 #### Resolved GitHub issues
   * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))

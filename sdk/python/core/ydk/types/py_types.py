@@ -20,14 +20,15 @@
         - YList
         - YLeafList
         - Entity
+        - EntityCollection
 """
 from collections import OrderedDict
 from functools import reduce
 
 import importlib
 import logging
-
 import sys
+
 if sys.version_info > (3,):
     long = int
     unicode = str
@@ -43,10 +44,12 @@ from ydk.ext.types import Empty
 from ydk.ext.types import Decimal64 # Do not remove. Used in eval()
 from ydk.ext.types import Entity as _Entity
 from ydk.ext.types import LeafDataList
+
 from ydk.filters import YFilter as _YFilter
 from ydk.errors import YModelError as _YModelError
 from ydk.errors import YInvalidArgumentError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
+
 
 class YLeafList(_YLeafList):
     """ Wrapper class for YLeafList, add __repr__ and get list slice
@@ -345,8 +348,8 @@ class Entity(_Entity):
             if name != 'yfilter' and name != 'parent' and name != 'ignore_validation' \
                                  and hasattr(self, '_is_frozen') and self._is_frozen \
                                  and name not in self.__dict__:
-                raise _YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".format(name,
-                                                                                            self.__class__.__name__))
+                raise _YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".
+                                   format(name, self.__class__.__name__))
             if name in self.__dict__ and isinstance(self.__dict__[name], YList):
                 raise _YModelError("Attempt to assign value of '{}' to YList ldata. "
                                     "Please use list append or extend method."
@@ -399,6 +402,67 @@ class Entity(_Entity):
 
     def __str__(self):
         return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
+
+
+def absolute_path(entity):
+    path = entity.get_segment_path()
+    if not entity.is_top_level_class and entity.parent is not None:
+        path = absolute_path(entity.parent) + '/' + path
+    return path
+
+
+def entity_to_dict(entity):
+    edict = {}
+    abs_path = absolute_path(entity)
+    if (hasattr(entity, 'is_presence_container') and entity.is_presence_container) or \
+            abs_path.endswith(']'):
+        edict[abs_path] = ''
+    leaf_name_data = entity.get_name_leaf_data()
+    for l in leaf_name_data:
+        leaf_name = l[0]
+        leaf_value = l[1].value
+        if leaf_name not in entity.ylist_key_names:
+            edict["%s/%s" % (abs_path, leaf_name)] = leaf_value
+    for _, child in entity.get_children().items():
+        child_dict = entity_to_dict(child)
+        for n, v in child_dict.items():
+            edict[n] = v
+    return edict
+
+
+def entity_diff(ent1, ent2):
+    if ent1 is None or ent2 is None or ent1.__class__.__name__ != ent2.__class__.__name__:
+        logger = logging.getLogger("ydk.types.Entity")
+        logger.error("entity_diff: Incompatible arguments provided.")
+        raise YInvalidArgumentError("entity_diff: Incompatible arguments provided.")
+
+    diffs = {}
+    ent1_dict = entity_to_dict(ent1)
+    ent2_dict = entity_to_dict(ent2)
+    ent1_keys = sorted(ent1_dict.keys())
+    ent2_keys = sorted(ent2_dict.keys())
+    ent1_skip_keys = []
+    for key in ent1_keys:
+        if key in ent1_skip_keys:
+            continue
+        if key in ent2_keys:
+            if ent1_dict[key] != ent2_dict[key]:
+                diffs[key] = (ent1_dict[key], ent2_dict[key])
+            ent2_keys.remove(key)
+        else:
+            diffs[key] = (ent1_dict[key], None)
+            for dup_key in ent1_keys:
+                if dup_key.startswith(key):
+                    ent1_skip_keys.append(dup_key)
+    ent2_skip_keys = []
+    for key in ent2_keys:
+        if key in ent2_skip_keys:
+            continue
+        diffs[key] = (None, ent2_dict[key])
+        for dup_key in ent2_keys:
+            if dup_key.startswith(key):
+                ent2_skip_keys.append(dup_key)
+    return diffs
 
 
 def _name_matches_yang_name(name, yang_name):

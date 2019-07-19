@@ -24,17 +24,17 @@ from __future__ import print_function
 
 import unittest
 
-from ydk.errors    import YModelError, YServiceError
 from ydk.providers import NetconfServiceProvider
-from ydk.services  import NetconfService
 from ydk.services  import CRUDService
 from ydk.filters import YFilter
 
 try:
-    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity
+    from ydk.models.ydktest.ydktest_sanity import Runner, ChildIdentity, Native
 except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
+    from ydk.models.ydktest.ydktest_sanity.native.native import Native
     from ydk.models.ydktest.ydktest_sanity.ydktest_sanity import ChildIdentity
+
 
 class SanityTest(unittest.TestCase):
 
@@ -55,7 +55,7 @@ class SanityTest(unittest.TestCase):
     def test_delete_on_list_with_identitykey(self):
         a1 = Runner.OneList.IdentityList()
         a1.config.id = ChildIdentity()
-        a1.id_ref =  a1.config.id
+        a1.id_ref = a1.config.id
         self.crud.create(self.ncc, a1)
 
         k = Runner.OneList.IdentityList()
@@ -88,6 +88,37 @@ class SanityTest(unittest.TestCase):
         self.crud.delete(self.ncc, il)
         runner_read = self.crud.read(self.ncc, Runner())
         self.assertIsNone(runner_read)
+
+    def test_delete_container(self):
+        # Build loopback configuration
+        address = Native.Interface.Loopback.Ipv4.Address()
+        address.ip = "2.2.2.2"
+        address.netmask = "255.255.255.255"
+
+        loopback = Native.Interface.Loopback()
+        loopback.name = 2222
+        loopback.ipv4.address.append(address)
+
+        native = Native()
+        native.interface.loopback.append(loopback)
+
+        crud = CRUDService()
+        result = crud.create(self.ncc, native)
+        self.assertTrue(result)
+
+        # Remove ipv4 configuration
+        native = Native()
+        loopback = Native.Interface.Loopback()
+        loopback.name = 2222
+        native.interface.loopback.append(loopback)
+        result = crud.delete(self.ncc, loopback.ipv4)
+        self.assertTrue(result)
+
+        # Delete configuration
+        native = Native()
+        result = crud.delete(self.ncc, native)
+        self.assertEqual(result, True)
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

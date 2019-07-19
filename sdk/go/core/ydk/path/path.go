@@ -1169,7 +1169,7 @@ func GetRootSchemaNode(provider types.CServiceProvider) types.RootSchemaNode {
 	rootSchema := C.ServiceProviderGetRootSchemaNode(*cstate, realProvider)
 	PanicOnCStateError(cstate)
 	if rootSchema == nil {
-        ydk.YLogError("Root schema is nil!")
+	        ydk.YLogError("Root schema is nil!")
 		panic(1)
 	}
 

@@ -90,6 +90,9 @@ class SanityTest(unittest.TestCase):
         self.assertIsNone(runner_read)
 
     def test_delete_container(self):
+        import logging
+        from test_utils import enable_logging
+        enable_logging(logging.DEBUG)
         # Build loopback configuration
         address = Native.Interface.Loopback.Ipv4.Address()
         address.ip = "2.2.2.2"
@@ -106,6 +109,15 @@ class SanityTest(unittest.TestCase):
         result = crud.create(self.ncc, native)
         self.assertTrue(result)
 
+        # Read ipv4 configuration
+        native = Native()
+        loopback = Native.Interface.Loopback()
+        loopback.name = 2222
+        native.interface.loopback.append(loopback)
+        ipv4_config = crud.read(self.ncc, loopback.ipv4)
+        self.assertIsNotNone(ipv4_config)
+        self.assertEqual(ipv4_config.address['2.2.2.2'].netmask, "255.255.255.255")
+
         # Remove ipv4 configuration
         native = Native()
         loopback = Native.Interface.Loopback()
@@ -118,6 +130,7 @@ class SanityTest(unittest.TestCase):
         native = Native()
         result = crud.delete(self.ncc, native)
         self.assertEqual(result, True)
+        enable_logging(logging.ERROR)
 
 
 if __name__ == '__main__':

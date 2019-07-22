@@ -5,6 +5,7 @@
   
 #### Resolved GitHub issues
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+  * YList test fails when list entity added before keys are initialized ([#800](https://github.com/CiscoDevNet/ydk-gen/issues/800))
 
 
 ### 2019-05-15 version 0.8.3

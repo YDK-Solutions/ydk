@@ -13,12 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-from ydk.ext.services import CRUDService as _CrudService
+from ydk_.services import CRUDService as _CrudService
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
 from ydk.errors import YServiceError
 from ydk.types import EntityCollection, Config
 from ydk.entity_utils import _read_entities, _get_top_level_entity, _get_child_entity_from_top
+from ydk.entity_utils import _set_nontop_entity_filter
+from ydk.filters import YFilter
 
 
 class CRUDService(_CrudService):
@@ -61,6 +63,7 @@ class CRUDService(_CrudService):
         if isinstance(read_filter, EntityCollection):
             filters = read_filter.entities()
 
+        _set_nontop_entity_filter(filters, YFilter.read)
         top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
         with _handle_error():
             read_top_entity = self._crud.read(provider, top_filters)
@@ -82,6 +85,7 @@ class CRUDService(_CrudService):
         if isinstance(read_filter, EntityCollection):
             filters = read_filter.entities()
 
+        _set_nontop_entity_filter(filters, YFilter.read)
         top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
         with _handle_error():
             read_top_entity = self._crud.read_config(provider, top_filters)

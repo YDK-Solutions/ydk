@@ -515,8 +515,15 @@ TEST_CASE("test_types_enum_leaflist")
     auto r_read = crud.read(provider, *filter);
     REQUIRE(r_read!=nullptr);
     ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
-    REQUIRE(r_1->ytypes->built_in_t->enum_llist.values.size() == 2);
-    //REQUIRE(r_1->ytypes->built_in_t->enum_llist == r_2->ytypes->built_in_t->enum_llist);
+    REQUIRE(r_2->ytypes->built_in_t->enum_llist.values.size() == 2);
+
+// TODO. Issue #944 (No way to retrieve numeric value of enums in cpp generated code)
+//    for (auto test : r_2->ytypes->built_in_t->enum_llist.values) {
+//    	if (test.name == ydktest_sanity::YdkEnumTest::local.name)
+//            cout << "Name: " << test.name << ", Int value: " << ydktest_sanity::YdkEnumTest::local.value << endl;
+//    	else
+//    	    cout << "Name: " << test.name << ", Int value: " << ydktest_sanity::YdkEnumTest::remote.value << endl;
+//    }
 }
 
 TEST_CASE("test_types_identity_leaflist")

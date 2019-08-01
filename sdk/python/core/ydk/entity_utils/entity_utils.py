@@ -24,12 +24,13 @@ import xml.etree.ElementTree as _ET
 from ydk.ext.entity_utils import get_entity_from_data_node, get_data_node_from_entity
 from ydk.ext.services import Datastore
 
-from ydk.types import Config, EncodingFormat, YList, Entity
+from ydk.types import Config, EncodingFormat, YList, Entity, absolute_path
 
 from ydk.errors import YModelError, YServiceError
 
 _ENTITY_ERROR_MSG = "No YDK bundle installed for node path '{}'"
 _PATH_ERROR_MSG   = "A string value '{}' does not represent valid node path"
+
 
 def _read_entities(provider, get_config=True, source=Datastore.running):
     session = provider.get_session()
@@ -59,6 +60,7 @@ def _read_entities(provider, get_config=True, source=Datastore.running):
             log.error(err.message)
     return config
 
+
 def _datanode_to_entity(data_node):
     node_path = data_node.get_path()
     if ':' not in node_path:
@@ -83,7 +85,7 @@ def _datanode_to_entity(data_node):
                     raise YModelError("Failed instantiate class '{}' from module '{}'".format(class_name, module_name))
 
                 top_entity = entity.clone_ptr()
-                get_entity_from_data_node(data_node, top_entity);
+                get_entity_from_data_node(data_node, top_entity)
                 return top_entity
 
     raise YModelError(_ENTITY_ERROR_MSG.format(node_path))
@@ -159,7 +161,7 @@ def _get_ns_ename(payload, encoding):
         ns = _to_utf8(ns)
         ename = _to_utf8(ename)
 
-    return (ns, ename)
+    return ns, ename
 
 
 def _to_utf8(string):
@@ -182,10 +184,12 @@ def _get_bundle_name(entity):
     m = importlib.import_module('.'.join([m, '_yang_ns']))
     return m.__dict__['BUNDLE_NAME']
 
+
 def _traverse_to_top_entity(entity):
     while entity.parent is not None:
         entity = entity.parent
     return entity
+
 
 def _get_top_level_entity(read_filter, root_schema):
     if read_filter is None:
@@ -211,6 +215,7 @@ def _get_top_level_entity(read_filter, root_schema):
         return top_entity;
 
     if read_filter.ignore_validation:
+        log = logging.getLogger('ydk')
         log.error("Cannot disable validation for non-top-level entity '%s'" % top_entity.yang_name)
 
     data_node = get_data_node_from_entity(top_entity, root_schema)
@@ -222,8 +227,9 @@ def _get_top_level_entity(read_filter, root_schema):
 
     return None    # should never get here
 
+
 def _find_child_entity(parent_entity, filter_abs_path):
-    parent_abs_path = parent_entity.get_absolute_path()
+    parent_abs_path = absolute_path(parent_entity)
     if len(parent_abs_path) == 0:
         parent_abs_path = parent_entity.get_segment_path()
     if filter_abs_path == parent_abs_path:
@@ -235,12 +241,13 @@ def _find_child_entity(parent_entity, filter_abs_path):
 
     for child_path in children:
         child_entity = children[child_path]
-        if child_entity.get_absolute_path() in filter_abs_path:
+        if absolute_path(child_entity) in filter_abs_path:
             child_entity = _find_child_entity(child_entity, filter_abs_path)
             if child_entity is not None:
                 return child_entity
     return None
     
+
 def _get_child_entity_from_top(top_entity, filter_entity):
     """Searches for 'filter_entity' in the hierarchy of given top-level entity.
 
@@ -263,24 +270,26 @@ def _get_child_entity_from_top(top_entity, filter_entity):
     if isinstance(top_entity, list) and isinstance(filter_entity, list):
         entities = []
         for filter in filter_entity:
-            filter_abs_path = filter.get_absolute_path()
+            filter_abs_path = absolute_path(filter)
             entity = None
             for ent in top_entity:
                 if ent.get_segment_path() in filter_abs_path:
                     entity = _get_child_entity_from_top(ent, filter)
-                    break;
+                    break
             entities.append(entity)
         return entities
     elif isinstance(top_entity, Entity) and isinstance(filter_entity, Entity):
         if filter_entity.is_top_level_class:
-            if filter_entity.get_absolute_path() == top_entity.get_absolute_path():
+            if absolute_path(filter_entity) == absolute_path(top_entity):
                 return top_entity
             else:
-                raise YServiceError("_get_child_entity_from_top: The filter '%s' points to different top-entity" % filter_entity.get_absolute_path())
+                raise YServiceError("_get_child_entity_from_top: The filter '%s' points to different top-entity" %
+                                    absolute_path(filter_entity))
         else:
             if not top_entity.is_top_level_class:
-                raise YServiceError("_get_child_entity_from_top: The '%s' is not a top-level entity" % top_entity.get_absolute_path())
-            filter_abs_path = filter_entity.get_absolute_path()
+                raise YServiceError("_get_child_entity_from_top: The '%s' is not a top-level entity" %
+                                    absolute_path(top_entity))
+            filter_abs_path = absolute_path(filter_entity)
             entity = _find_child_entity(top_entity, filter_abs_path)
             if entity is not None:
                 entity.parent = None
@@ -290,3 +299,10 @@ def _get_child_entity_from_top(top_entity, filter_entity):
     else:
         raise YServiceError('_get_child_entity_from_top: Invalid arguments. Expected Entity or [Entity ...] for both arguments')
 
+
+def _set_nontop_entity_filter(entity, yfilter):
+    if isinstance(entity, list):
+        for e in entity:
+            _set_nontop_entity_filter(e, yfilter)
+    elif entity is not None and not entity.is_top_level_class:
+        entity.yfilter = yfilter

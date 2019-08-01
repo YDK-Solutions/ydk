@@ -406,8 +406,11 @@ class Entity(_Entity):
 
 def absolute_path(entity):
     path = entity.get_segment_path()
-    if not entity.is_top_level_class and entity.parent is not None:
+    if entity.parent is not None:
         path = absolute_path(entity.parent) + '/' + path
+    elif not entity.is_top_level_class:
+        # it is the best available approximation
+        path = entity.get_absolute_path()
     return path
 
 

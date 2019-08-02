@@ -10,7 +10,6 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
-	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 )
 

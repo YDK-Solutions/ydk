@@ -314,7 +314,7 @@ func ExecuteGnmiRPC(
 				entityTag = "update[alias='" + aliasKey + "']/entity"
 			case "delete":
 				entityTag = "delete[alias='" + aliasKey + "']/entity"
-			case "get:
+			case "get":
 				entityTag = "request[alias='" + aliasKey + "']/entity"
 			default:
 				continue

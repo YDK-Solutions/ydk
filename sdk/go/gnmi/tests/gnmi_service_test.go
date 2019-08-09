@@ -5,13 +5,14 @@ import (
 	"runtime"
 	"time"
 	"path/filepath"
-//	"strings"
+	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
 	ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
 	ysanity_int "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_interfaces"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/stretchr/testify/suite"
 	"testing"
@@ -58,7 +59,6 @@ func (suite *GnmiServiceTestSuite) TestGetSetDeleteMultiple() {
     ifc.Config.Name = "Loopback10"
     ifcs := ysanity_int.Interfaces{}
     ifcs.Interface = append(ifcs.Interface, &ifc)
-    ifcs.YFilter = yfilter.Replace
     
     // Build BGP configuration
     bgp := ysanity_bgp.Bgp{}
@@ -67,19 +67,16 @@ func (suite *GnmiServiceTestSuite) TestGetSetDeleteMultiple() {
     neighbor.NeighborAddress = "172.16.255.2"
     neighbor.Config.NeighborAddress = "172.16.255.2"
     bgp.Neighbors.Neighbor = append(bgp.Neighbors.Neighbor, &neighbor)
-    bgp.YFilter = yfilter.Replace
 
     // Create congfiguration on device
     configEC := types.NewConfig(&ifcs, &bgp)
-    reply := suite.Service.Set(&suite.Provider, configEC)
+    reply := suite.Service.Set(&suite.Provider, configEC, "replace")
     suite.Equal(reply, true)
 
     // Change and update configuration
     ifc.Config.Description = "Test"
-    ifcs.YFilter = yfilter.Update
     neighbor.Config.PeerAs = 65172
-    bgp.YFilter = yfilter.Update
-    reply = suite.Service.Set(&suite.Provider, configEC)
+    reply = suite.Service.Set(&suite.Provider, configEC, "update")
     suite.Equal(reply, true)
 
     // Read all
@@ -107,11 +104,9 @@ func (suite *GnmiServiceTestSuite) TestGetSetDeleteMultiple() {
 
     // Delete configuration
     filterInt = ysanity_int.Interfaces{}
-    filterInt.YFilter = yfilter.Delete
     filterBgp = ysanity_bgp.Bgp{}
-    filterBgp.YFilter = yfilter.Delete
     filterEc  = types.NewFilter(&filterInt, &filterBgp)
-    reply = suite.Service.Set(&suite.Provider, filterEc)
+    reply = suite.Service.Set(&suite.Provider, filterEc, "delete")
     suite.Equal(reply, true)
 }
 
@@ -295,6 +290,7 @@ func (suite *GnmiServiceTestSuite) TestCrudSingle() {
     // Read all
     ifcFilter := ysanity_int.Interfaces_Interface{}
     ifcFilter.Name = "Loopback10"
+
     readIfc := crud.Read(&suite.Provider, &ifcFilter)
     suite.NotNil(readIfc)
     suite.Equal(types.IsEntityCollection(readIfc), false)
@@ -353,6 +349,56 @@ func (suite *GnmiServiceTestSuite) TestCrudTwoLeafs() {
     // Delete configuration
     deleteInt(&suite.Provider)
     deleteBgp(&suite.Provider)
+}
+
+func (suite *GnmiServiceTestSuite) TestDeleteContainer() {
+	var crud services.CrudService
+
+	// Build loopback configuration
+	address := ysanity.Native_Interface_Loopback_Ipv4_Address{}
+	address.Ip = "2.2.2.2"
+	address.PrefixLength = 32
+
+	loopback := ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	loopback.Ipv4.Address = append(loopback.Ipv4.Address, &address)
+
+	native := ysanity.Native{}
+        native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+
+	result := crud.Create(&suite.Provider, &native)
+	suite.True(result)
+
+	// Read ipv4 configuration
+	native = ysanity.Native{}
+	loopback = ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+	types.SetAllParents(&native)
+
+	ipv4ConfigEnt := crud.Read(&suite.Provider, &loopback.Ipv4)
+	suite.NotNil(ipv4ConfigEnt)
+	ipv4Config := ipv4ConfigEnt.(*ysanity.Native_Interface_Loopback_Ipv4)
+	_, addressEnt := ylist.Get(ipv4Config.Address, "2.2.2.2")
+	suite.NotNil(addressEnt)
+	addressPtr := addressEnt.(*ysanity.Native_Interface_Loopback_Ipv4_Address)
+	suite.Equal("32", addressPtr.PrefixLength)
+
+	// Remove ipv4 configuration
+	native = ysanity.Native{}
+	loopback = ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+	types.SetAllParents(&native)
+
+	loopback.Ipv4.YFilter = yfilter.Delete
+	result = crud.Delete(&suite.Provider, &loopback.Ipv4)
+        suite.True(result)
+
+	// Delete configuration
+	native = ysanity.Native{}
+	result = crud.Delete(&suite.Provider, &native)
+	suite.True(result)
 }
 
 func TestGnmiServiceTestSuite(t *testing.T) {

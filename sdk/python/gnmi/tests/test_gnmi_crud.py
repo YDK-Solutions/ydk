@@ -88,6 +88,7 @@ class SanityGnmiCrud(unittest.TestCase):
         lo10.name = 'Loopback10'
         lo10.config = YFilter.read
         ifc_config = self.crud.read(self.provider, lo10)
+        self.assertIsNotNone(ifc_config)
         #print_entity(ifc_config, self.schema)
         expected = '''<interface>
   <name>Loopback10</name>

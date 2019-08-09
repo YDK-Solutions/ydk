@@ -402,12 +402,15 @@ class Entity(_Entity):
 
     def __str__(self):
         return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
-    
+
 
 def absolute_path(entity):
     path = entity.get_segment_path()
-    if not entity.is_top_level_class and entity.parent is not None:
+    if entity.parent is not None:
         path = absolute_path(entity.parent) + '/' + path
+    elif not entity.is_top_level_class:
+        # it is the best available approximation
+        path = entity.get_absolute_path()
     return path
 
 
@@ -423,7 +426,7 @@ def entity_to_dict(entity):
         leaf_value = l[1].value
         if leaf_name not in entity.ylist_key_names:
             edict["%s/%s" % (abs_path, leaf_name)] = leaf_value
-    for name, child in entity.get_children().items():
+    for _, child in entity.get_children().items():
         child_dict = entity_to_dict(child)
         for n, v in child_dict.items():
             edict[n] = v
@@ -431,7 +434,7 @@ def entity_to_dict(entity):
 
 
 def entity_diff(ent1, ent2):
-    if ent1 is None or ent2 is None or type(ent1) != type(ent2):
+    if ent1 is None or ent2 is None or ent1.__class__.__name__ != ent2.__class__.__name__:
         logger = logging.getLogger("ydk.types.Entity")
         logger.error("entity_diff: Incompatible arguments provided.")
         raise YInvalidArgumentError("entity_diff: Incompatible arguments provided.")

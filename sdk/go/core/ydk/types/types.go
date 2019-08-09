@@ -135,6 +135,27 @@ func SetEntityFilter(ent Entity, filter yfilter.YFilter) {
 	}
 }
 
+func IsTopLevelEntity(entity Entity) bool {
+	entData := entity.GetEntityData()
+	if entData != nil && entData.AbsolutePath == entData.SegmentPath {
+		return true
+	}
+	return false
+}
+
+func SetNontopEntityFilter(entity Entity, filter yfilter.YFilter) {
+	if IsEntityCollection(entity) {
+		entCollection := EntityToCollection(entity)
+	        for _, ent := range entCollection.Entities() {
+	        	SetNontopEntityFilter(ent, filter)
+	        }
+	} else {
+	        if !IsTopLevelEntity(entity) {
+	        	SetEntityFilter(entity, filter)
+	        }
+	}
+}
+
 // Bits is a basic type that represents the YANG bits type
 type Bits map[string]bool
 
@@ -888,6 +909,11 @@ func GetAbsolutePath(entity Entity) string {
 	parent := entityData.Parent
 	if parent != nil {
 		path = fmt.Sprintf("%s/%s", GetAbsolutePath(parent), path)
+	} else {
+		if !IsTopLevelEntity(entity) {
+			// This is the best available approximation
+			path = entityData.AbsolutePath
+		}
 	}
 	return path
 }

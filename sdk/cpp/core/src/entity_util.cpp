@@ -184,7 +184,7 @@ static bool key_in_vector(string & k, vector<string> v)
 
 static void remove_key_from_vector(string & k, vector<string> & v)
 {
-    for (vector<string>::iterator it=v.begin(); it!=v.end(); it++)
+    for (vector<string>::iterator it=v.begin(); it!=v.end(); ++it)
     {
         if (k == *it)
         {

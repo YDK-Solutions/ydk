@@ -115,9 +115,14 @@ gNMIService::get(gNMIServiceProvider& provider, Entity& filter, const string & o
 
     shared_ptr<Entity> response = nullptr;
 
+    YFilter original_yfilter = filter.yfilter;
+    if (!filter.is_top_level_class && original_yfilter == YFilter::not_set) {
+    	filter.yfilter = YFilter::read;
+    }
     auto top_entity = get_top_entity(&filter);
     gnmi::Path* path = new gnmi::Path;
     parse_entity_to_path(*top_entity, path);
+    filter.yfilter = original_yfilter;
     vector<gnmi::Path*> path_list;
     path_list.push_back(path);
 
@@ -151,9 +156,14 @@ gNMIService::get(gNMIServiceProvider & provider, vector<Entity*> & filter_list, 
     size_t bypass_validation = 0;
     vector<gnmi::Path*> path_list;
     for (auto filter : filter_list) {
+        YFilter original_yfilter = filter->yfilter;
+        if (!filter->is_top_level_class && original_yfilter == YFilter::not_set) {
+        	filter->yfilter = YFilter::read;
+        }
         auto top_entity = get_top_entity(filter);
         gnmi::Path* path = new gnmi::Path;
         parse_entity_to_path(*top_entity, path);
+        filter->yfilter = original_yfilter;
         path_list.push_back(path);
         if (top_entity->is_top_level_class && filter->ignore_validation)
             bypass_validation++;

@@ -157,7 +157,7 @@ static string format_notification_response(pair<string,string> prefix_suffix, co
 //    else if ((flag.prefix_has_value) && (flag.path_has_value))
 //        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
 //    else {
-        string val = (value == "{\"value\":\"null\"}") ? "{}" : value;
+        string val = (value.empty() || value == "{\"value\":\"null\"}") ? "{}" : value;
         if (path_to_prepend.length()==0 && val.find("{")==0)
             reply_val = val;
         else

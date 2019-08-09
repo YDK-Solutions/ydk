@@ -1,7 +1,21 @@
-""" 
+#  ----------------------------------------------------------------
+# Copyright 2019 Cisco Systems
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ------------------------------------------------------------------
+
+"""test_entity_diff.py
 Test cases for YDK entity_diff.
-
-
 """
 
 from __future__ import print_function
@@ -43,7 +57,7 @@ class EntityDiffTest(unittest.TestCase):
         l_1.second, l_2.second = 11, 22
         l_1.property, l_2.property = '82', '83'
         runner.two_key_list.extend([l_1, l_2])
-        
+
         ent_dict = entity_to_dict(runner)
         self.assertEqual(len(ent_dict), 4)
         print_dictionary('-LEFT', ent_dict)

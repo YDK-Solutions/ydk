@@ -5,6 +5,7 @@
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   
 #### Resolved GitHub issues
+  * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
 
 

@@ -264,12 +264,7 @@ TEST_CASE("bgp_read_non_top")
     REQUIRE(bgp_read!=nullptr);
     openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
     REQUIRE(bgp_read_ptr!=nullptr);
-
-    //cout<<*bgp_set<<endl<<endl;
-    //cout<<*bgp_read_ptr<<endl;
-
     REQUIRE(*(bgp_read_ptr) == *(bgp_set));
-
 }
 
 TEST_CASE("oc_platform")
@@ -346,4 +341,78 @@ TEST_CASE( "crud_entity_list_bgp" )
     // Delete configuration
     result = crud.delete_(provider, filter_list);
     REQUIRE(result == true);
+}
+
+TEST_CASE( "crud_delete_container" )
+{
+	ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // Create presence container
+    auto runner = ydktest_sanity::Runner();
+    runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
+    runner.runner_2->parent = &runner;
+    runner.runner_2->some_leaf = "some-leaf";
+    auto res = crud.create(provider, runner);
+    REQUIRE(res);
+
+    // Read presence container
+    runner = ydktest_sanity::Runner();
+    runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
+    runner.runner_2->parent = &runner;
+    auto r2_ent = crud.read(provider, *runner.runner_2);
+    REQUIRE(r2_ent != nullptr);
+    auto r2 = dynamic_cast<ydktest_sanity::Runner::Runner2*>(r2_ent.get());
+    REQUIRE(r2->some_leaf.value == "some-leaf");
+
+    runner = ydktest_sanity::Runner();
+    runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
+    runner.runner_2->parent = &runner;
+    res = crud.delete_(provider, *runner.runner_2);
+    REQUIRE(res);
+
+    // Delete top container (cleanup)
+    runner = ydktest_sanity::Runner();
+    res = crud.delete_(provider, runner);
+    REQUIRE(res);
+}
+
+TEST_CASE( "crud_read_non_top_container" )
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // CLEANUP
+    auto native = ydktest_sanity::Native();
+    bool reply = crud.delete_(provider, native);
+    REQUIRE(reply);
+
+    // CREATE
+    auto loopback = make_shared<ydktest_sanity::Native::Interface::Loopback>();
+    loopback->name = "2222";
+    native.interface->loopback.append(loopback);
+    auto address = make_shared<ydktest_sanity::Native::Interface::Loopback::Ipv4::Address>();
+    address->ip = "2.2.2.2";
+    address->netmask = "255.255.255.255";
+    loopback->ipv4->address.append(address);
+    reply = crud.create(provider, native);
+    REQUIRE(reply);
+
+    // READ
+    auto rnative = ydktest_sanity::Native();
+    loopback = make_shared<ydktest_sanity::Native::Interface::Loopback>();
+    loopback->name = "2222";
+    rnative.interface->loopback.append(loopback);
+    auto read_entity_wrapper = crud.read(provider, *loopback->ipv4);
+    REQUIRE(read_entity_wrapper != nullptr);
+    auto ipv4 = dynamic_cast<ydktest_sanity::Native::Interface::Loopback::Ipv4*>(read_entity_wrapper.get());
+    auto ip_address = dynamic_cast<ydktest_sanity::Native::Interface::Loopback::Ipv4::Address*>(ipv4->address["2.2.2.2"].get());
+    REQUIRE(ip_address->netmask.value == "255.255.255.255");
+
+    // CLEANUP
+    auto dnative = ydktest_sanity::Native();
+    reply = crud.delete_(provider, dnative);
+    REQUIRE(reply);
 }

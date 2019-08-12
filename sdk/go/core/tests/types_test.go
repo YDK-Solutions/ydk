@@ -593,7 +593,7 @@ func printDictionary(legend string, entdict map[string]string) {
 	}
 }
 
-func printDiff(diff map[string]types.StringPair) {
+func printDiff(suite *SanityTypesTestSuite, diff map[string]types.StringPair, entLeft, entRight types.Entity ) {
 	fmt.Printf("\n------> DIFFS:\n")
 	var keys []string
 	for k := range diff {
@@ -605,6 +605,11 @@ func printDiff(diff map[string]types.StringPair) {
 		fmt.Printf("%s: %s vs %s\n", key,
 			checkEmptyStringValue(valuePair.Left),
 			checkEmptyStringValue(valuePair.Right))
+		ent := entLeft
+		if valuePair.Left == "None" {
+			ent = entRight
+		}
+		suite.NotNil(types.PathToEntity(ent, key))
 	}
 }
 
@@ -634,7 +639,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoKeys() {
 
 	diff = types.EntityDiff(&runner1, &runner2)
 	suite.Equal(1, len(diff))
-	printDiff(diff)
+	printDiff(suite, diff, &runner1, &runner2)
 
 	ll1.First = "f2"
 	entDict3 := types.EntityToDict(&runner2)
@@ -642,7 +647,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoKeys() {
 
 	diff = types.EntityDiff(&runner1, &runner2)
 	suite.Equal(2, len(diff))
-	printDiff(diff)
+	printDiff(suite, diff, &runner1, &runner2)
 }
 
 func (suite *SanityTypesTestSuite) TestEntityDiff_Presence() {
@@ -663,7 +668,7 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_Presence() {
 
 	diff := types.EntityDiff(&runner, &emptyRunner)
 	suite.Equal(1, len(diff))
-	printDiff(diff)
+	printDiff(suite, diff, &runner, &emptyRunner)
 }
 
 func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
@@ -726,7 +731,36 @@ func (suite *SanityTypesTestSuite) TestEntityDiff_TwoListPos() {
 
 	diff := types.EntityDiff(&runner1, &runner2)
 	suite.Equal(1, len(diff))
-	printDiff(diff)
+	printDiff(suite, diff, &runner1, &runner2)
+}
+
+func (suite *SanityTypesTestSuite) TestEntityDiff_ListNoKeys() {
+	t1 := ysanity.Runner_NoKeyList{Test: "t1"}
+	t2 := ysanity.Runner_NoKeyList{Test: "tt"}
+	t3 := ysanity.Runner_NoKeyList{Test: "t3"}
+	runner1 := ysanity.Runner{}
+	runner1.NoKeyList = []*ysanity.Runner_NoKeyList {&t1, &t2, &t3}
+
+	entDict := types.EntityToDict(&runner1)
+	suite.Equal(6, len(entDict))
+	printDictionary("-LEFT", entDict)
+
+	t11 := ysanity.Runner_NoKeyList{Test: "t1"}
+	t22 := ysanity.Runner_NoKeyList{Test: "t2"}
+	runner2 := ysanity.Runner{}
+	runner2.NoKeyList = []*ysanity.Runner_NoKeyList {&t11, &t22}
+
+	entDict = types.EntityToDict(&runner2)
+	suite.Equal(4, len(entDict))
+	printDictionary("-RIGHT", entDict)
+
+	diff := types.EntityDiff(&runner1, &runner2)
+	suite.Equal(2, len(diff))
+	printDiff(suite, diff, &runner1, &runner2)
+
+	diff = types.EntityDiff(&runner2, &runner1)
+	suite.Equal(2, len(diff))
+	printDiff(suite, diff, &runner2, &runner1)
 }
 
 func (suite *SanityTypesTestSuite) TestEntityDiff_OneAugList() {

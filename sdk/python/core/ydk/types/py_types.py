@@ -468,6 +468,29 @@ def entity_diff(ent1, ent2):
     return diffs
 
 
+def path_to_entity(entity, abs_path):
+    top_abs_path = absolute_path(entity)
+    if top_abs_path == abs_path:
+        return entity
+
+    if top_abs_path in abs_path:
+        leaf_name_data = entity.get_name_leaf_data()
+        for l in leaf_name_data:
+            leaf_name = l[0]
+            if leaf_name not in entity.ylist_key_names:
+                leaf_path = "%s/%s" % (top_abs_path, leaf_name)
+                if leaf_path == abs_path:
+                    return entity
+        for _, child in entity.get_children().items():
+            child_abs_path = absolute_path(child)
+            if child_abs_path == abs_path:
+                return child
+            matching_entity = path_to_entity(child, abs_path)
+            if matching_entity:
+                return matching_entity
+    return None
+
+
 def _name_matches_yang_name(name, yang_name):
     return name == yang_name or yang_name.endswith(':'+name)
 

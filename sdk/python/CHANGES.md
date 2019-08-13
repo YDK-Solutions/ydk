@@ -7,6 +7,8 @@
 #### Resolved GitHub issues
   * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+  * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
+  * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
 
 
 ### 2019-05-15 version 0.8.3

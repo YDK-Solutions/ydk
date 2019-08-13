@@ -17,7 +17,6 @@
 from ydk_.entity_utils import get_data_node_from_entity
 from ydk_.entity_utils import get_entity_from_data_node
 from ydk_.entity_utils import XmlSubtreeCodec
-from ydk_.entity_utils import get_entity_from_data_node, get_data_node_from_entity
 
 
 from .entity_utils import _datanode_to_entity, _read_entities, _payload_to_top_entity, _get_bundle_name

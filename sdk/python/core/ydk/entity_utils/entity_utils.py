@@ -29,7 +29,7 @@ from ydk.types import Config, EncodingFormat, YList, Entity, absolute_path
 from ydk.errors import YModelError, YServiceError
 
 _ENTITY_ERROR_MSG = "No YDK bundle installed for node path '{}'"
-_PATH_ERROR_MSG   = "A string value '{}' does not represent valid node path"
+_PATH_ERROR_MSG = "A string value '{}' does not represent valid node path"
 
 
 def _read_entities(provider, get_config=True, source=Datastore.running):
@@ -45,7 +45,7 @@ def _read_entities(provider, get_config=True, source=Datastore.running):
             source_str = "startup"
         elif source != Datastore.running:
             raise YServiceError("Wrong datastore source value '{}'".format(source))
-        read_rpc.get_input_node().create_datanode("source/"+source_str);
+        read_rpc.get_input_node().create_datanode("source/"+source_str)
     else:
         read_rpc = root_schema.create_rpc("ietf-netconf:get")
 
@@ -197,8 +197,8 @@ def _get_top_level_entity(read_filter, root_schema):
 
     if isinstance(read_filter, list):
         entities = []
-        for i in range(len(read_filter)):
-            entity = _get_top_level_entity(read_filter[i], root_schema)
+        for rf in read_filter:
+            entity = _get_top_level_entity(rf, root_schema)
             entities.append(entity)
         return entities
 
@@ -212,7 +212,7 @@ def _get_top_level_entity(read_filter, root_schema):
     if top_entity.is_top_level_class:
         if read_filter.ignore_validation:
             top_entity.ignore_validation = True
-        return top_entity;
+        return top_entity
 
     if read_filter.ignore_validation:
         log = logging.getLogger('ydk')
@@ -246,7 +246,7 @@ def _find_child_entity(parent_entity, filter_abs_path):
             if child_entity is not None:
                 return child_entity
     return None
-    
+
 
 def _get_child_entity_from_top(top_entity, filter_entity):
     """Searches for 'filter_entity' in the hierarchy of given top-level entity.
@@ -269,12 +269,12 @@ def _get_child_entity_from_top(top_entity, filter_entity):
 
     if isinstance(top_entity, list) and isinstance(filter_entity, list):
         entities = []
-        for filter in filter_entity:
-            filter_abs_path = absolute_path(filter)
+        for f in filter_entity:
+            filter_abs_path = absolute_path(f)
             entity = None
             for ent in top_entity:
                 if ent.get_segment_path() in filter_abs_path:
-                    entity = _get_child_entity_from_top(ent, filter)
+                    entity = _get_child_entity_from_top(ent, f)
                     break
             entities.append(entity)
         return entities

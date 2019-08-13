@@ -259,6 +259,8 @@ func createFromChildren(
 	}
 }
 
+// Traverses the entity hierarchy up to the top-level entity.
+// Develops error if Parent for non-top-level entity is not set.
 func GetTopEntity(entity types.Entity) types.Entity {
 	if types.IsEntityCollection(entity) {
 		entCollection := types.EntityToCollection(entity)

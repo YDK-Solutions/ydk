@@ -255,7 +255,7 @@ Entity* path_to_entity(Entity & entity, string & abs_path)
     if (top_abs_path == abs_path)
         return &entity;
 
-    if (abs_path.find(top_abs_path) == 0)
+    if (!abs_path.compare(0, top_abs_path.length(), top_abs_path))
     {
         auto name_leaf_data_vector = entity.get_name_leaf_data();
         for (auto name_leaf_data : name_leaf_data_vector)
@@ -277,7 +277,7 @@ Entity* path_to_entity(Entity & entity, string & abs_path)
             auto child_abs_path = absolute_path(child);
             if (abs_path == child_abs_path)
                 return &child;
-            if (abs_path.find(child_abs_path) != 0)
+            if (abs_path.compare(0, child_abs_path.length(), child_abs_path))
                 continue;
             auto matching_entity = path_to_entity(child, abs_path);
             if (matching_entity)

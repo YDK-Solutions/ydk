@@ -134,7 +134,7 @@ class SanityGnmiService(unittest.TestCase):
         ifc.yfilter = YFilter.replace
         reply = self.gs.set(self.provider, ifc)
         self.assertTrue(reply)
-  
+
         # Get interface configuration
         ifc_filter = openconfig_interfaces.Interfaces.Interface()
         ifc_filter.name = 'Loopback10'

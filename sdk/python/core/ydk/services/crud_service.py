@@ -57,10 +57,10 @@ class CRUDService(_CrudService):
         return _crud_update(provider, entity, self._crud.update)
 
     def read(self, provider, read_filter=None):
-        return _crud_read(provider, read_filter, self._crud.read)
+        return _crud_read(provider, read_filter, False, self._crud.read)
 
     def read_config(self, provider, read_filter=None):
-        return _crud_read(provider, read_filter, self._crud.read_config)
+        return _crud_read(provider, read_filter, True, self._crud.read_config)
 
 
 def _crud_update(provider, entity, crud_call):
@@ -70,13 +70,13 @@ def _crud_update(provider, entity, crud_call):
         return crud_call(provider, entity)
 
 
-def _crud_read(provider, read_filter, crud_call):
+def _crud_read(provider, read_filter, is_config, crud_call):
     if provider is None:
         raise YServiceError("provider cannot be None")
 
     if read_filter is None:
         with _handle_error():
-            return _read_entities(provider, get_config=False)
+            return _read_entities(provider, get_config=is_config)
 
     filters = read_filter
     if isinstance(read_filter, EntityCollection):

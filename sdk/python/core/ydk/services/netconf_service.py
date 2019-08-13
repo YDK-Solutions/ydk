@@ -103,9 +103,13 @@ class NetconfService(_NetconfService):
                                         default_operation, test_option, error_option)
 
     def get_config(self, provider, source=Datastore.running, read_filter=None):
+        if None in (provider, source):
+            raise _YServiceError("provider and source cannot be None")
         return _ns_get(provider, source, read_filter, self._ns.get_config)
 
     def get(self, provider, read_filter=None):
+        if provider is None:
+            raise _YServiceError("provider cannot be None")
         return _ns_get(provider, None, read_filter, self._ns.get)
 
     def kill_session(self, provider, session_id):
@@ -143,12 +147,10 @@ class NetconfService(_NetconfService):
 
 
 def _ns_get(provider, source, read_filter, ns_call):
-    if provider is None:
-        raise _YServiceError("provider cannot be None")
-
+    is_config = (source is not None)
     if read_filter is None:
         with _handle_error():
-            return _read_entities(provider, get_config=False)
+            return _read_entities(provider, get_config=is_config)
 
     filters = read_filter
     if isinstance(read_filter, EntityCollection):
@@ -157,7 +159,7 @@ def _ns_get(provider, source, read_filter, ns_call):
     _set_nontop_entity_filter(filters, YFilter.read)
     top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
     with _handle_error():
-        if source:
+        if is_config:
             top_result = ns_call(provider, source, top_filters)
         else:
             top_result = ns_call(provider, top_filters)

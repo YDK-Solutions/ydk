@@ -249,6 +249,42 @@ std::map<std::string, std::pair<std::string,std::string>> entity_diff(Entity & e
     return diffs;
 }
 
+Entity* path_to_entity(Entity & entity, string & abs_path)
+{
+    auto top_abs_path = absolute_path(entity);
+    if (top_abs_path == abs_path)
+        return &entity;
 
+    if (!abs_path.compare(0, top_abs_path.length(), top_abs_path))
+    {
+        auto name_leaf_data_vector = entity.get_name_leaf_data();
+        for (auto name_leaf_data : name_leaf_data_vector)
+        {
+            auto leaf_name = name_leaf_data.first;
+            std::ostringstream key_buffer;
+            key_buffer << "[" << leaf_name << "=";
+            if (abs_path.find(key_buffer.str()) == string::npos)
+            {
+                std::string path = top_abs_path + "/" + leaf_name;
+                if (path == abs_path)
+                    return &entity;
+            }
+        }
+
+        for (auto const & entry : entity.get_children())
+        {
+            auto & child = *entry.second;
+            auto child_abs_path = absolute_path(child);
+            if (abs_path == child_abs_path)
+                return &child;
+            if (abs_path.compare(0, child_abs_path.length(), child_abs_path))
+                continue;
+            auto matching_entity = path_to_entity(child, abs_path);
+            if (matching_entity)
+                return matching_entity;
+        }
+    }
+    return nullptr;
+}
 
 }

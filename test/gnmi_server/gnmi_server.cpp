@@ -87,6 +87,8 @@ static std::string cap_array[] =
      "OpenConfig working group?module=openconfig-transport-types&revision=2016-06-17"
     };
 
+static std::string native_payload =
+		"{\"ydktest-sanity:native\":{\"interface\":{\"Loopback\":[{\"name\":2222,\"ipv4\":{\"address\":[{\"ip\":\"2.2.2.2\",\"prefix-length\":32}]}}]}}}";
 static std::string bgp_payload =
 		"{\"global\":{\"config\":{\"as\":65172} },\"neighbors\":{\"neighbor\":[{\"neighbor-address\":\"172.16.255.2\",\"config\":{\"neighbor-address\":\"172.16.255.2\",\"peer-as\":65172}}]}}";
 static std::string int_payload =
@@ -99,6 +101,7 @@ class gNMIImpl final : public gNMI::Service
 {    
     bool int_set = false;
     bool bgp_set = false;
+    bool native_set = false;
 
     Status Capabilities(ServerContext* context, const CapabilityRequest* request, CapabilityResponse* response) override 
     {
@@ -173,6 +176,22 @@ class gNMIImpl final : public gNMI::Service
             else if (last_elem == "description")
                 response_payload = "\"Test\"";
         }
+        else if (origin == "ydktest-sanity" && native_set) {
+            if (last_elem == "native")
+                response_payload = native_payload;
+            else if (last_elem == "interface")
+                response_payload = "{\"Loopback\":[{\"name\":2222,\"ipv4\":{\"address\":[{\"ip\":\"2.2.2.2\",\"prefix-length\":32}]}}]}";
+            else if (last_elem == "Loopback")
+                response_payload = "[{\"name\":2222,\"ipv4\":{\"address\":[{\"ip\":\"2.2.2.2\",\"prefix-length\":32}]}}]";
+            else if (last_elem == "ipv4")
+                response_payload = "{\"address\":[{\"ip\":\"2.2.2.2\",\"prefix-length\":32}]}";
+            else if (last_elem == "address")
+                response_payload = "[{\"ip\":\"2.2.2.2\",\"prefix-length\":32}]";
+            else if (last_elem == "ip")
+                response_payload = "\"2.2.2.2\"";
+            else if (last_elem == "prefix-length")
+                response_payload = "32";
+        }
         return response_payload;
     }
 
@@ -242,6 +261,9 @@ class gNMIImpl final : public gNMI::Service
                 else if (origin == "openconfig-interfaces" && int_set) {
                     int_set = false;
                 }
+                else if (origin == "ydktest-sanity" && native_set) {
+                	native_set = false;
+                }
             }
             for(int j = 0; j < delete_path.elem_size(); ++j)
             {
@@ -268,6 +290,9 @@ class gNMIImpl final : public gNMI::Service
                 else if (origin == "openconfig-interfaces") {
                     int_set = true;
                 }
+                else if (origin == "ydktest-sanity") {
+                	native_set = true;
+                }
             }
             for(int j = 0; j < replace_path.elem_size(); ++j)
             {
@@ -293,6 +318,9 @@ class gNMIImpl final : public gNMI::Service
                 }
                 else if (origin == "openconfig-interfaces") {
                     int_set = true;
+                }
+                else if (origin == "ydktest-sanity") {
+                	native_set = true;
                 }
             }
             for(int j = 0; j < replace_path.elem_size(); ++j)

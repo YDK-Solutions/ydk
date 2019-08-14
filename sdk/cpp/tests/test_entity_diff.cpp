@@ -52,7 +52,7 @@ void print_dictionary(const string & legend, map<string,string> & ent_dict)
     }
 }
 
-void print_diffs(map<string, pair<string,string>> & diff)
+void print_diffs(map<string, pair<string,string>> & diff, Entity& ent_left, Entity& ent_right)
 {
 	cout << "\n------> DIFFS:" << endl;
     for (auto const & entry : diff)
@@ -60,6 +60,9 @@ void print_diffs(map<string, pair<string,string>> & diff)
         auto value_pair = entry.second;
         cout << entry.first << ": " << check_empty_str_value(value_pair.first) << " vs "
                                     << check_empty_str_value(value_pair.second) << endl;
+        auto & ent = (value_pair.first == "None") ? ent_right : ent_left;
+        string path = entry.first;
+        REQUIRE(path_to_entity(ent, path) != nullptr);
     }
 }
 
@@ -92,14 +95,14 @@ TEST_CASE( "test_entity_diff_two_key" )
     runner2.two_key_list.extend({l_1, l_2});
 
     auto diff = entity_diff(runner1, runner2);
-	REQUIRE(diff.size() == 0);
+    REQUIRE(diff.size() == 0);
 
     l_1->property = "83";
     auto ent_dict2 = entity_to_dict(runner2);
     print_dictionary("-RIGHT", ent_dict2);
     diff = entity_diff(runner1, runner2);
     REQUIRE(diff.size() == 1);
-    print_diffs(diff);
+    print_diffs(diff, runner1, runner2);
 }
 
 TEST_CASE( "test_entity_diff_two_key_not_equal" )
@@ -135,7 +138,7 @@ TEST_CASE( "test_entity_diff_two_key_not_equal" )
 
     auto diff = entity_diff(runner1, runner2);
     REQUIRE(diff.size() == 2);
-    print_diffs(diff);
+    print_diffs(diff, runner1, runner2);
 }
 
 TEST_CASE( "test_entity_to_dict_aug_onelist" )
@@ -157,7 +160,7 @@ TEST_CASE( "test_entity_to_dict_aug_onelist" )
 
 TEST_CASE( "test_entity_to_dict_enum_leaflist" )
 {
-	auto runner = ydktest_sanity::Runner{};
+    auto runner = ydktest_sanity::Runner{};
     runner.ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::local);
     runner.ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::remote);
 
@@ -168,9 +171,10 @@ TEST_CASE( "test_entity_to_dict_enum_leaflist" )
 
 TEST_CASE( "test_entity_diff_presence" )
 {
-	auto runner = ydktest_sanity::Runner();
+    auto runner = ydktest_sanity::Runner();
     runner.runner_2 = make_shared<ydktest_sanity::Runner::Runner2>();
     runner.runner_2->some_leaf = "some-leaf";
+    runner.runner_2->parent = &runner;
 
     auto ent_dict = entity_to_dict(runner);
     REQUIRE(ent_dict.size() == 2);
@@ -182,8 +186,8 @@ TEST_CASE( "test_entity_diff_presence" )
     print_dictionary("-RIGHT", ent_dict);
 
     auto diff = entity_diff(runner, empty_runner);
-	REQUIRE(diff.size() == 1);
-    print_diffs(diff);
+    REQUIRE(diff.size() == 1);
+    print_diffs(diff, runner, empty_runner);
 }
 
 TEST_CASE( "test_entity_diff_two_list_pos" )
@@ -212,7 +216,7 @@ TEST_CASE( "test_entity_diff_two_list_pos" )
     r_1.two_list->ldata.extend({e_1, e_2});
 
     auto ent_dict = entity_to_dict(r_1);
-	REQUIRE(ent_dict.size() == 12);
+    REQUIRE(ent_dict.size() == 12);
     print_dictionary("-LEFT", ent_dict);
 
     auto r_2 = ydktest_sanity::Runner();
@@ -230,10 +234,35 @@ TEST_CASE( "test_entity_diff_two_list_pos" )
     r_2.two_list->ldata.append(e_1);
 
     ent_dict = entity_to_dict(r_2);
-	REQUIRE(ent_dict.size() == 6);
+    REQUIRE(ent_dict.size() == 6);
     print_dictionary("-RIGHT", ent_dict);
 
     auto diff = entity_diff(r_1, r_2);
-	REQUIRE(diff.size() == 1);
-    print_diffs(diff);
+    REQUIRE(diff.size() == 1);
+    print_diffs(diff, r_1, r_2);
+}
+
+TEST_CASE("test_entity_diff_no_keys") {
+    auto r_1 = ydktest_sanity::Runner();
+    auto t1 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t1->test = "t1";
+    auto t2 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t2->test = "t2";
+    r_1.no_key_list.extend({t1, t2});
+
+    auto ent_dict = entity_to_dict(r_1);
+    REQUIRE(ent_dict.size() == 4);
+    print_dictionary("-LEFT", ent_dict);
+
+    auto r_2 = ydktest_sanity::Runner();
+    t1 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t1->test = "t1";
+    t2 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t2->test = "tt";
+    auto t3 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t3->test = "t3";
+    r_2.no_key_list.extend({t1, t2, t3});
+
+    ent_dict = entity_to_dict(r_2);
+    REQUIRE(ent_dict.size() == 6);
+    print_dictionary("-RIGHT", ent_dict);
+
+    auto diff = entity_diff(r_1, r_2);
+    REQUIRE(diff.size() == 2);
+    print_diffs(diff, r_1, r_2);
 }

@@ -559,6 +559,25 @@ func (suite *CodecTestSuite) TestListNoKeys() {
 	suite.Equal(types.EntityEqual(&runner, runnerDecode), true)
 }
 
+func (suite *CodecTestSuite) TestNative() {
+	// Build loopback configuration
+	address := ysanity.Native_Interface_Loopback_Ipv4_Address{}
+	address.Ip = "2.2.2.2"
+	address.PrefixLength = 32
+
+	loopback := ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	loopback.Ipv4.Address = append(loopback.Ipv4.Address, &address)
+
+	native := ysanity.Native{}
+        native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+	
+	suite.Provider.Encoding = encoding.JSON
+	payload := suite.Codec.Encode(&suite.Provider, &native)
+	fmt.Printf("%s\n", payload)
+	runnerDecode := suite.Codec.Decode(&suite.Provider, payload)
+	suite.Equal(types.EntityEqual(&native, runnerDecode), true)}
+
 func TestCodecTestSuite(t *testing.T) {
 	if testing.Verbose() {
 		ydk.EnableLogging(ydk.Debug)

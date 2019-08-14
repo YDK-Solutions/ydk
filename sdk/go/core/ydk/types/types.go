@@ -135,6 +135,27 @@ func SetEntityFilter(ent Entity, filter yfilter.YFilter) {
 	}
 }
 
+func IsTopLevelEntity(entity Entity) bool {
+	entData := entity.GetEntityData()
+	if entData != nil && entData.AbsolutePath == entData.SegmentPath {
+		return true
+	}
+	return false
+}
+
+func SetNontopEntityFilter(entity Entity, filter yfilter.YFilter) {
+	if IsEntityCollection(entity) {
+		entCollection := EntityToCollection(entity)
+	        for _, ent := range entCollection.Entities() {
+	        	SetNontopEntityFilter(ent, filter)
+	        }
+	} else {
+	        if !IsTopLevelEntity(entity) {
+	        	SetEntityFilter(entity, filter)
+	        }
+	}
+}
+
 // Bits is a basic type that represents the YANG bits type
 type Bits map[string]bool
 
@@ -888,6 +909,11 @@ func GetAbsolutePath(entity Entity) string {
 	parent := entityData.Parent
 	if parent != nil {
 		path = fmt.Sprintf("%s/%s", GetAbsolutePath(parent), path)
+	} else {
+		if !IsTopLevelEntity(entity) {
+			// This is the best available approximation
+			path = entityData.AbsolutePath
+		}
 	}
 	return path
 }
@@ -923,6 +949,48 @@ func EntityToDict(entity Entity) map[string]string {
 	}
 	return edict
 }
+
+func PathToEntity(entity Entity, absPath string) Entity {
+	topAbsPath := GetAbsolutePath(entity)
+	if topAbsPath == absPath {
+		return entity
+	}
+
+	if strings.Index(absPath, topAbsPath) == 0 {
+		entityPath := GetEntityPath(entity)
+		for _, leafData := range entityPath.ValuePaths {
+			if leafData.Data.IsSet {
+				leafName := leafData.Name
+				keyPath := fmt.Sprintf("[%s=", leafName)
+				if strings.Index(absPath, keyPath) == -1 {
+					path := fmt.Sprintf("%s/%s", topAbsPath, leafName)
+					if path == absPath {
+						return entity
+					}
+				}
+			}
+		}
+		children := GetYChildren(entity.GetEntityData())
+		for _, child := range children {
+			if child.Value == nil || (IsPresenceContainer(child.Value) && !GetPresenceFlag(child.Value)) {
+				continue
+			}
+			childAbsPath := GetAbsolutePath(child.Value)
+			if childAbsPath == absPath {
+				return child.Value
+			}
+			if strings.Index(absPath, childAbsPath) != 0 {
+				continue
+			}
+			matchingEntity := PathToEntity(child.Value, absPath)
+			if matchingEntity != nil {
+				return matchingEntity
+			}
+		}
+	}
+	return nil
+}
+
 
 func keyInSlice(k string, v []string) bool {
 	for _, e := range v {

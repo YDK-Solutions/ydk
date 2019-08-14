@@ -13,7 +13,7 @@ gNMI Service API
 
         Create, update, or delete single entity or multiple entities in the server configuration.
 
-        :param provider: (:py:class:`gNMIServiceProvider<ydk.providers.gNMIServiceProvider>`) Provider instance.
+        :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
         :param entity: (:py:class:`Entity<ydk.types.Entity>`) instance, which represents single container in device supported model. 
                          Each **Entity** instance must be annotated with :py:class:`YFilter<ydk.filters.YFilter>`, which defines set operation:
 
@@ -31,7 +31,7 @@ gNMI Service API
 
         Read the entity.
 
-        :param provider: (:py:class:`gNMIServiceProvider<ydk.providers.gNMIServiceProvider>`) Provider instance.
+        :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
         :param read_filter: (:py:class:`Entity<ydk.types.Entity>`) instance, which represents single container in device supported model.
 
                               For multiple containers the :py:class:`Entity<ydk.types.Entity>` instances must be encapsulated into Python ``list`` or YDK ``EntityCollection`` :py:class:`Filter<ydk.types.Filter>`.
@@ -45,7 +45,7 @@ gNMI Service API
 
         Subscribe to telemetry updates.
 
-        :param provider: (:py:class:`gNMIServiceProvider<ydk.providers.gNMIServiceProvider>`) Provider instance.
+        :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
         :param subscription: (:py:class:`gNMISubscription<ydk.gnmi.services.gNMISubscription>`) Single instance or Python ``list`` of instances of objects, which represent the subscription.
         :param qos: (``long``) QOS indicating the packet marking.
         :param mode: (``str``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
@@ -59,7 +59,7 @@ gNMI Service API
     
         Get gNMI server capabilities
         
-        :param provider: (:py:class:`gNMIServiceProvider<ydk.providers.gNMIServiceProvider>`) Provider instance.
+        :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
         :return: (``str``) JSON encoded string, which represents gNMI server capabilities.
 
 .. py:class:: ydk.gnmi.services.gNMISubscription
@@ -172,37 +172,41 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
     from ydk.models.openconfig import openconfig_interfaces
     from ydk.path import Repository
     from ydk.gnmi.providers import gNMIServiceProvider
-    from ydk.gnmi.services import gNMIService
-    from ydk.filters import YFilter
-
-    # Import the Pool class from multiprocessing module
-    from multiprocessing import Pool
-
+    from ydk.gnmi.services import gNMIService, gNMISubscription
+    
+    import datetime
+    
     # Callback function to handle telemetry data
     def print_telemetry_data(s):
-        print(s)
-
+        if 'update' in s:
+            current_dt = datetime.datetime.now()
+            print("\n===> Received subscribe response at %s: \n%s" %
+                  (current_dt.strftime("%Y-%m-%d %H:%M:%S"), s))
+    
     # Function to subscribe to telemetry data
     def subscribe(func):
+        # Initialize gNMI Service and Provider
         gnmi = gNMIService()
-        repository = Repository('/Users/test/yang_models_location')
-        provider = gNMIServiceProvider(repo=repository, address='10.0.0.1', port=57400, username='admin', password='admin')
-
-        # The below will create a telemetry subscription path 'openconfig-interfaces:interfaces/interface'
+        repository = Repository('/home/yan/ydk-workspace/ydk-gen/scripts/repository/10.30.110.84')
+        provider = gNMIServiceProvider(repo=repository, address='10.30.110.85', port=57400,
+                                       username='admin', password='admin')
+    
+        # Create telemetry subscription entity
         interfaces = openconfig_interfaces.Interfaces()
         interface = openconfig_interfaces.Interfaces.Interface()
+        interface.name = '"MgmtEth0/RP0/CPU0/0"'
         interfaces.interface.append(interface)
-
+    
         # Build subscription
         subscription = gNMISubscription()
         subscription.entity = interfaces
-        subscription.subscription_mode = "ON_CHANGE";
-        subscription.sample_interval = 10 * 1000000000;
-        subscription.suppress_redundant = True;
-        subscription.heartbeat_interval = 100 * 1000000000;
-        
+        subscription.subscription_mode = 'SAMPLE'
+        subscription.sample_interval = 10 * 1000000000
+        subscription.suppress_redundant = False
+        subscription.heartbeat_interval = 100 * 1000000000
+    
         # Subscribe for updates in STREAM mode.
-        gnmi.subscribe(provider, subscription, 10, "STREAM", "PROTO", func)
-
-    pool = Pool()
-    pool.map(subscribe, print_telemetry_data)
+        gnmi.subscribe(provider, subscription, 10, 'STREAM', "PROTO", func)
+    
+    if __name__ == "__main__":
+        subscribe(print_telemetry_data)

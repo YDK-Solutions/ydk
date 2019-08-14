@@ -378,3 +378,25 @@ TEST_CASE("gnmi_service_get_leaf")
 )";
     REQUIRE(entity2string(get_reply, provider.get_session().get_root_schema()) == expected);
 }
+
+TEST_CASE("gnmi_service_get_container")
+{
+    path::Repository repo{TEST_HOME};
+    string address = "127.0.0.1"; int port = 50051;
+    string username = "admin"; string password = "admin";
+
+    gNMIServiceProvider provider{repo, address, port, username, password};
+    gNMIService gs{};
+
+    build_int_config(provider);
+
+    auto ifc = make_shared<openconfig_interfaces::Interfaces::Interface>();
+    ifc->name = "Loopback10";
+    openconfig_interfaces::Interfaces ifcs{};
+    ifcs.interface.append(ifc);
+
+    auto get_reply = gs.get(provider, *ifc->config, "CONFIG");
+    REQUIRE(get_reply != nullptr);
+    auto ifc_config = dynamic_cast<openconfig_interfaces::Interfaces::Interface::Config*>(get_reply.get());
+    REQUIRE(ifc_config->name.value == "Loopback10");
+}

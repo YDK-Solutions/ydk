@@ -15,28 +15,28 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk.providers import RestconfServiceProvider
 from ydk.path import RestconfSession
 from ydk.path import Codec, Repository
 from ydk.types import EncodingFormat
 
+from session_mgr import init_logging
 
-def execute_path(session, codec):
+
+def execute_path(session):
+    codec = Codec()
     schema = session.get_root_schema()
-    bgp = schema.create_datanode("openconfig-bgp:bgp")
-    bgp.create_datanode("global/config/as", "65321")
 
     runner = schema.create_datanode('ydktest-sanity:runner')
     runner.create_datanode('ytypes/built-in-t/number8', '12')
-    xml = codec.encode(runner, EncodingFormat.JSON, True)
-    print(xml)
+    payload = codec.encode(runner, EncodingFormat.JSON, True)
+
     create_rpc = schema.create_rpc("ydk:create")
     create_rpc.get_input_node().create_datanode("entity", xml)
     create_rpc(session)
 
 
 if __name__ == "__main__":
+    init_logging()
     repo = Repository("/usr/local/share/ydktest@0.1.0")
     session = RestconfSession(repo, '127.0.0.1', 'admin', 'admin', 12306, EncodingFormat.JSON)
-    codec = Codec()
-    execute_path(session, codec)
+    execute_path(session)

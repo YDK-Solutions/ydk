@@ -309,6 +309,7 @@ class YLeaf
 
     std::string name;
     std::string value;
+    int enum_value;
     YType type;
     Bits bits_value;
 };

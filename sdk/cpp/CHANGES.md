@@ -10,6 +10,7 @@
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * gNMISession fails to decode GetRequest response when returned values is empty string ([#943](https://github.com/CiscoDevNet/ydk-gen/issues/943))
+  * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
 
 
 ### 2019-05-15 version 0.8.3

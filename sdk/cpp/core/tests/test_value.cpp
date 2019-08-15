@@ -113,6 +113,7 @@ TEST_CASE("test_enum_")
     test_value = TestEnum1::one;
     INFO(test_value.get());
     REQUIRE(test_value.get()=="one");
+    REQUIRE(test_value.enum_value==1);
 }
 
 TEST_CASE("test_str")

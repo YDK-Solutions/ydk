@@ -172,23 +172,41 @@ As a workaround, the YDK based application runtime environment must include sett
 Python Requirements
 -------------------
 
-YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system. 
+YDK supports both Python2 and Python3 versions. At least Python2.7 or Python3.4 must be installed on your system.
 
 It is also required for Python installation to include corresponding shared library. As example::
 
   python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
   python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
- 
-Please follow `System Requirements` to assure presence of shared Python libraries.
+
+Please follow `System Requirements`_ to assure presence of shared Python libraries.
+
+If you choose to install Python from source (need specific version), please include `--enable-shared` flag in `configure`
+command to include build of shared library::
+
+  cd Python3.4.1
+  ./configure --prefix=/opt/python --enable-shared
+  make
+  make install
+
+Here the `/opt/python` is your Python installation directory. If installation directory is different from the system path,
+you need to configure `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library::
+
+  export CMAKE_LIBRARY_PATH=/opt/python/lib
+
+Run `pip install ydk` command with `-v` option and in the console output note location of found `PythonLibs`.
+Make sure it matches with your installed Pyton dynamic library location::
+
+  -- Found PythonLibs: /opt/python/lib/libpython3.4m.so
 
 Mac OS
 ~~~~~~
 
-The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
+The developers of Python2 on Mac OS might face an `installation issue <https://github.com/CiscoDevNet/ydk-gen/issues/837>`_.
 This is well known and documented issue. Each developer might have different approaches for its resolution.
-One of them is to use Python2 virtual environment. See section below for details.
+One of them is to use Python2 virtual environment. See section `Using Python virtual environment`_ for details.
 
-In addition it is required properly set CMAKE_LIBRARY_PATH environment variable to assure that `cmake` uses correct Python library.
+In addition it is required properly set `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library.
 Follow these steps to find and set correct library path.
 
 1. Find installations of `libpython2.7` library:
@@ -203,7 +221,7 @@ Follow these steps to find and set correct library path.
   /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
   /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
 
-2. Choose non-system Python library installation and set CMAKE_LIBRARY_PATH before any YDK component installation. Example:
+2. Choose non-system Python library installation and set `CMAKE_LIBRARY_PATH` before any YDK component installation. Example:
 
 .. code-block:: sh
 

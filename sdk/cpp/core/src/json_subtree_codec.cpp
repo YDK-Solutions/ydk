@@ -146,7 +146,7 @@ static void walk_children(Entity & entity, const path::SchemaNode & schema, json
             continue;
         if (child.second->has_operation() || child.second->has_data() || child.second->is_presence_container)
         {
-            YLOG_DEBUG("JsonCodec: Populating child entity node '{}': {}", child.first, get_entity_path(*(child.second), child.second->parent).path);
+            YLOG_DEBUG("JsonCodec: Populating child entity node '{}'", child.first);
             json_node_t child_json_node = populate_json_node(*(child.second), schema, parent_module_name);
             auto bracket_pos = child.first.find("[");
             if (bracket_pos != string::npos) {
@@ -175,10 +175,9 @@ static const path::SchemaNode* find_child_by_name(const path::SchemaNode & paren
 static json_node_t create_json_node(std::string & parent_module_name, const path::SchemaNode & schema)
 {
     auto st = schema.get_statement();
-    auto child_module_name = parent_module_name;
     std::string child_key = st.arg;
-    if (st.module_name != child_module_name) {
-        child_key.insert(0, child_module_name + ":");
+    if (st.module_name != parent_module_name) {
+        child_key.insert(0, st.module_name + ":");
     }
     json_node_t child(child_key);
     return child;
@@ -191,8 +190,10 @@ static json_node_t populate_json_node(Entity & entity, const path::SchemaNode & 
 
     auto child = create_json_node(parent_module_name, *schema);
 
-    populate_json_node_contents(entity, *schema, path, child, parent_module_name);
-    walk_children(entity, *schema, child, parent_module_name);
+    auto st = schema->get_statement();
+    auto child_module_name = st.module_name;
+    populate_json_node_contents(entity, *schema, path, child, child_module_name);
+    walk_children(entity, *schema, child, child_module_name);
     return child;
 }
 

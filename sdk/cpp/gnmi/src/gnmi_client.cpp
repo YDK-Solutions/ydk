@@ -157,8 +157,8 @@ static string format_notification_response(pair<string,string> prefix_suffix, co
 //    else if ((flag.prefix_has_value) && (flag.path_has_value))
 //        reply_to_parse.append("\"data\":{" + prefix_to_prepend + ":[" + path_to_prepend + "[" + value + "]]" + "}}");
 //    else {
-        string val = (value.empty() || value == "{\"value\":\"null\"}") ? "{}" : value;
-        if (path_to_prepend.length()==0 && val.find("{")==0)
+        string val = (value == "{\"value\":\"null\"}") ? "{}" : value;
+        if (path_to_prepend.length()==0 && val[0] == '{')
             reply_val = val;
         else
             reply_val = "{" + path_to_prepend + val + path_to_append + "}";
@@ -332,11 +332,24 @@ GnmiClientCapabilityResponse gNMIClient::execute_get_capabilities()
     return reply;
 }
 
+static string get_value_from_update(gnmi::Update update)
+{
+    gnmi::TypedValue value;
+    string value_for_payload;
+
+    if (update.has_val()) {
+        value = update.val();
+        value_for_payload.append(value.json_ietf_val());
+    }
+    return value_for_payload;
+}
+
 static pair<string,string> get_path_from_update(gnmi::Update update)
 {
     string path_to_prepend;
     string path_to_append;
     string path_element_to_add;
+    string value = get_value_from_update(update);
 
     if(update.has_path())
     {
@@ -348,12 +361,15 @@ static pair<string,string> get_path_from_update(gnmi::Update update)
                 path_to_prepend.append("\"" + origin + ":");
             }
             int l;
-            for (l = 0; l < elem_size - 1; l++)
+            for (l = 0; l < elem_size; l++)
             {
-                path_element_to_add = path.elem(l).name();	//check_if_path_has_key_values(path.elem(l));
+                path_element_to_add = path.elem(l).name();
                 if (l>0 || path_to_prepend.length()==0)
                     path_to_prepend.append("\"");
                 path_to_prepend.append(path_element_to_add + "\":");
+
+                if (l == elem_size-1 && value.length() > 0)
+                    break;
 
                 // Check if the path element has keys
                 if (path.elem(l).key_size() == 0) {
@@ -380,28 +396,17 @@ static pair<string,string> get_path_from_update(gnmi::Update update)
                     path_to_prepend.append(keys_to_append);
                 }
             }
-            path_element_to_add = path.elem(l).name();
-            if (elem_size>1 || path_to_prepend.length()==0)
-                path_to_prepend.append("\"");
-            path_to_prepend.append(path_element_to_add + "\":");
+            if (value.length() == 0) {
+                if (path_to_prepend[path_to_prepend.length()-1] == ',') {
+                    path_to_prepend = path_to_prepend.substr(0, path_to_prepend.length()-1);
+                }
+            }
         }
     }
     else {
         path_to_prepend.clear();
     }
     return make_pair(path_to_prepend, path_to_append);
-}
-
-static string get_value_from_update(gnmi::Update update)
-{
-    gnmi::TypedValue value;
-    string value_for_payload;
-
-    if (update.has_val()) {
-        value = update.val();
-        value_for_payload.append(value.json_ietf_val());
-    }
-    return value_for_payload;
 }
 
 static vector<string> parse_get_response(gnmi::GetResponse* response)

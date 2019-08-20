@@ -439,6 +439,21 @@ TEST_CASE("user_provided_repo")
     CHECK(XML_RUNNER_PAYLOAD_1 == xml);
 }
 
+TEST_CASE("user_provided_repo_decode")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    CodecServiceProvider codec_provider{repo, EncodingFormat::XML};
+    CodecService codec_service{};
+
+    auto runner = std::make_shared<ydktest_sanity::Runner>();
+    config_runner_2(runner.get());
+
+    auto ent_2 = codec_service.decode(codec_provider, XML_RUNNER_PAYLOAD_2,
+                                      std::make_shared<ydktest_sanity::Runner>());
+    std::string xml = codec_service.encode(codec_provider, *ent_2, true);
+    CHECK(xml == XML_RUNNER_PAYLOAD_2);
+}
+
 TEST_CASE("invalid_decode")
 {
     std::string invalid_xml = R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">

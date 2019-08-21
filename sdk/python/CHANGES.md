@@ -1,4 +1,4 @@
-### 2019-08-15 version 0.8.4
+### 2019-09-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
@@ -9,6 +9,9 @@
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
+  
+#### Documentation improvements
+  Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
 
 
 ### 2019-05-15 version 0.8.3

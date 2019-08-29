@@ -8,6 +8,7 @@
   * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
   * YList test fails when list entity added before keys are initialized ([#800](https://github.com/CiscoDevNet/ydk-gen/issues/800))
+  * Inherited classes not initialized properly in Python3 when constructor uses super() ([#921](https://github.com/CiscoDevNet/ydk-gen/issues/921))
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * Go: When entity having children is built from model API the child entities parent is nil ([#938](https://github.com/CiscoDevNet/ydk-gen/issues/938))

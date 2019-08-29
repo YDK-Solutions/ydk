@@ -20,6 +20,7 @@ entity_lookup_printer.py
  Prints top entity lookup map
 
 """
+import sys
 from ydkgen.api_model import snake_case, Class
 from ydkgen.common import get_include_guard_name, get_module_name
 from ydkgen.printer.file_printer import FilePrinter
@@ -27,7 +28,10 @@ from ydkgen.printer.file_printer import FilePrinter
 
 class EntityLookUpPrinter(FilePrinter):
     def __init__(self, ctx, module_namespace_lookup):
-        super(EntityLookUpPrinter, self).__init__(ctx)
+        if sys.version_info > (3,):
+            super().__init__(ctx)
+        else:
+            super(EntityLookUpPrinter, self).__init__(ctx)
         self.headers = None
         self.entity_lookup = None
         self.capability_lookup = None
@@ -92,7 +96,7 @@ class EntityLookUpPrinter(FilePrinter):
 
         module_name = package.stmt.arg
 
-        return (module_name, revision, namespace)
+        return module_name, revision, namespace
 
     def _print_headers(self):
         for header in self.headers:
@@ -162,4 +166,3 @@ class EntityLookUpPrinter(FilePrinter):
                 identities.add(child)
             identities = identities.union(self._get_identities(child))
         return identities
-

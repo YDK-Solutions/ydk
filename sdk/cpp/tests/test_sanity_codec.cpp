@@ -339,7 +339,9 @@ TEST_CASE("enum_2")
 
     auto entity = codec_service.decode(codec_provider, XML_ENUM_PAYLOAD_2, make_shared<ydktest_sanity::Runner>());
     ydktest_sanity::Runner * entity_ptr = dynamic_cast<ydktest_sanity::Runner*>(entity.get());
-    CHECK(entity_ptr->ytypes->built_in_t->enum_value.get() == "local");
+    auto enum_name = entity_ptr->ytypes->built_in_t->enum_value.get();
+    CHECK(enum_name == "local");
+    CHECK(ydktest_sanity::YdkEnumTest::get_enum_value(enum_name) == 2);
 }
 
 TEST_CASE("single_decode")

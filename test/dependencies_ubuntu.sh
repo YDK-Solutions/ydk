@@ -27,7 +27,7 @@ function print_msg {
 function install_dependencies {
     print_msg "Installing dependencies"
 
-    # apt-get update -y > /dev/null
+    apt update -y > /dev/null
     apt install sudo -y > /dev/null
     sudo apt-get install -y --no-install-recommends apt-utils
     sudo apt-get update -y > /dev/null

@@ -611,10 +611,8 @@ function py_sanity_ydktest_test_netconf_ssh {
 function py_sanity_ydktest_test_tcp {
     print_msg "py_sanity_ydktest_test_tcp"
     run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307
-    stop_tcp_server
     init_confd_ydktest
-    init_tcp_server
-    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
+    # run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
 }
 
 #--------------------------

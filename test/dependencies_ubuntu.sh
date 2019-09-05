@@ -27,9 +27,10 @@ function print_msg {
 function install_dependencies {
     print_msg "Installing dependencies"
 
-    apt-get update -y > /dev/null
+    # apt-get update -y > /dev/null
     apt-get install sudo -y > /dev/null
-    sudo apt-get update -y > /dev/null
+    sudo apt-get install -y --no-install-recommends apt-utils
+    # sudo apt-get update -y > /dev/null
     sudo apt-get install libtool-bin -y > /dev/null
     local status=$?
     if [[ ${status} != 0 ]]; then

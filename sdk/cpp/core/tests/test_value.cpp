@@ -24,7 +24,7 @@ class TestEnum1 : public Enum
     static const Enum::YLeaf one;
     static const Enum::YLeaf two;
 
-    static int get_enum_value(const std::string name) {
+    static int get_enum_value(const std::string & name) {
         if (name == "one") return 1;
         if (name == "two") return 2;
         return -1;

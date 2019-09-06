@@ -79,7 +79,7 @@ class EnumPrinter(object):
     def _print_enum_body(self, enum_class):
         self._print_enum_literals(enum_class)
         self.ctx.bline()
-        self.ctx.writeln('static int get_enum_value(const std::string name) {')
+        self.ctx.writeln('static int get_enum_value(const std::string & name) {')
         self.ctx.lvl_inc()
         for enum_literal in enum_class.literals:
             self.ctx.writeln('if (name == "%s") return %d;' % (enum_literal.stmt.arg, enum_literal.value))

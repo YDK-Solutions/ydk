@@ -60,7 +60,7 @@ void release_allocated_memory(vector<GnmiClientRequest> & request_list)
     }
 }
 
-static void check_status(grpc::Status status, string message)
+static void check_status(grpc::Status status, const string & message)
 {
     if (!status.ok()) {
         ostringstream s;
@@ -434,7 +434,7 @@ static vector<string> parse_get_response(gnmi::GetResponse* response)
 }
 
 vector<string>
-gNMIClient::execute_get_operation(const std::vector<GnmiClientRequest> get_request_list, const std::string& operation)
+gNMIClient::execute_get_operation(const std::vector<GnmiClientRequest> & get_request_list, const std::string & operation)
 {
     gnmi::GetRequest gnmi_get_request;
     gnmi::GetResponse gnmi_get_response;
@@ -463,7 +463,7 @@ gNMIClient::execute_get_operation(const std::vector<GnmiClientRequest> get_reque
 }
 
 bool
-gNMIClient::execute_set_operation(const std::vector<ydk::GnmiClientRequest> set_request_list)
+gNMIClient::execute_set_operation(const std::vector<ydk::GnmiClientRequest> & set_request_list)
 {
     gnmi::SetRequest gnmi_set_request;
     gnmi::SetResponse gnmi_set_response;
@@ -662,7 +662,7 @@ void poll_thread_cin_control(gNMIClient* client, const std::string & list_mode)
 }
 
 void
-gNMIClient::execute_subscribe_operation(std::vector<GnmiClientSubscription> subscription_list,
+gNMIClient::execute_subscribe_operation(const std::vector<GnmiClientSubscription> & subscription_list,
                                         uint32 qos, const std::string & list_mode,
 										const std::string & encoding,
                                         std::function<void(const char * response)> out_func,

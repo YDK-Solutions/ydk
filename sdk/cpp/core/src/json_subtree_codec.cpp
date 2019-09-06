@@ -37,33 +37,31 @@ struct json_node_t
 {
     string key;
     json value;
-    json_node_t(json & node);
-    json_node_t(string node_key);
-    json_node_t(string node_key, const json & jvalue);
-    void add(const json_node_t& node);
-    void put(const json_node_t& node);
+    json_node_t(const json & node);
+    json_node_t(const string & node_key);
+    json_node_t(const string & node_key, const json & jvalue);
+    void add(const json_node_t & node);
+    void put(const json_node_t & node);
 };
 
-json_node_t::json_node_t(json & node)
+json_node_t::json_node_t(const json & node)
 {
     auto it = node.begin();
 	key = it.key();
     value = node[key];
 }
 
-json_node_t::json_node_t(string node_key)
+json_node_t::json_node_t(const string & node_key):
+		key(node_key), value({})
 {
-    key = node_key;
-    value = {};
 }
 
-json_node_t::json_node_t(string node_key, const json & jvalue)
+json_node_t::json_node_t(const string & node_key, const json & jvalue):
+		key(node_key), value(jvalue)
 {
-    key = node_key;
-    value = jvalue;
 }
 
-void json_node_t::add(const json_node_t& node)
+void json_node_t::add(const json_node_t & node)
 {
     auto it = value.find(node.key);
     if (it == value.end())
@@ -80,12 +78,12 @@ void json_node_t::add(const json_node_t& node)
     }
 }
 
-void json_node_t::put(const json_node_t& node)
+void json_node_t::put(const json_node_t & node)
 {
     value[node.key] += node.value;
 }
 
-void to_json(json& j, const json_node_t& node)
+void to_json(json & j, const json_node_t & node)
 {
     j.emplace(node.key, node.value);
 }
@@ -197,7 +195,7 @@ static json_node_t populate_json_node(Entity & entity, const path::SchemaNode & 
     return child;
 }
 
-static std::string get_leafdata_prefix(Entity & entity, string & leaf_name, LeafData & leaf_data)
+static std::string get_leafdata_prefix(Entity & entity, const string & leaf_name, LeafData & leaf_data)
 {
     std::string module_name;
 	if (leaf_data.name_space.size() > 0 && leaf_data.name_space_prefix.size() > 0)
@@ -214,7 +212,7 @@ static std::string get_leafdata_prefix(Entity & entity, string & leaf_name, Leaf
     return module_name;
 }
 
-static string get_content_from_leafdata(Entity & entity, string leaf_name, LeafData & leaf_data)
+static string get_content_from_leafdata(Entity & entity, const string & leaf_name, LeafData & leaf_data)
 {
     string content;
     if (leaf_data.is_set)
@@ -305,7 +303,7 @@ std::shared_ptr<Entity> JsonSubtreeCodec::decode(const std::string & payload, st
             throw exception();
         }
     }
-    catch (exception e) {
+    catch (exception & e) {
         throw YInvalidArgumentError{"Invalid JSON string"};
     }
     json_node_t root(root_json_node);

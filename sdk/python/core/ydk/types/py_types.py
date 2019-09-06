@@ -246,7 +246,7 @@ class Entity(_Entity):
                     isYLeafList = isinstance(leaf, _YLeafList)
                     isBits = isinstance(value, Bits)
 
-                    if type(value) is _YFilter:
+                    if isinstance(value, _YFilter):
                         return True
                     if isYLeaf and (not isBits or len(value.get_bitmap()) > 0):
                         return True

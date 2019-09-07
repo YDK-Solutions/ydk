@@ -37,24 +37,10 @@ struct json_node_t
 {
     string key;
     json value;
-    json_node_t(const json & node);
-    json_node_t(const string & node_key);
     json_node_t(const string & node_key, const json & jvalue);
     void add(const json_node_t & node);
     void put(const json_node_t & node);
 };
-
-json_node_t::json_node_t(const json & node)
-{
-    auto it = node.begin();
-	key = it.key();
-    value = node[key];
-}
-
-json_node_t::json_node_t(const string & node_key):
-		key(node_key), value({})
-{
-}
 
 json_node_t::json_node_t(const string & node_key, const json & jvalue):
 		key(node_key), value(jvalue)
@@ -121,7 +107,7 @@ std::string JsonSubtreeCodec::encode(Entity & entity, path::RootSchemaNode & roo
     std::string root_node_name = root_module_name;
     root_node_name += ":" + st.arg;
 
-    json_node_t root_json_node(root_node_name);
+    json_node_t root_json_node(root_node_name, json{});
 
     populate_json_node_contents(entity, schema, root_path, root_json_node, root_module_name);
     walk_children(entity, schema, root_json_node, root_module_name);
@@ -177,7 +163,7 @@ static json_node_t create_json_node(std::string & parent_module_name, const path
     if (st.module_name != parent_module_name) {
         child_key.insert(0, st.module_name + ":");
     }
-    json_node_t child(child_key);
+    json_node_t child(child_key, json{});
     return child;
 }
 
@@ -306,7 +292,8 @@ std::shared_ptr<Entity> JsonSubtreeCodec::decode(const std::string & payload, st
     catch (exception & e) {
         throw YInvalidArgumentError{"Invalid JSON string"};
     }
-    json_node_t root(root_json_node);
+    auto it = root_json_node.begin();
+    json_node_t root(it.key(), root_json_node[it.key()]);
     auto prefix_key = split_key(root.key);
     if (entity->yang_name != prefix_key.second) {
         throw YInvalidArgumentError{"Wrong entity provided"};

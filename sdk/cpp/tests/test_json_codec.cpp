@@ -55,7 +55,7 @@ TEST_CASE("json_codec_leaf")
 
     auto runner = ydktest_sanity::Runner();
     auto json = jcodec.encode(runner, session.get_root_schema(), false);
-    REQUIRE(json == "{\"ydktest-sanity:runner\":{}}");
+    REQUIRE(json == "{\"ydktest-sanity:runner\":null}");
 
     runner.ytypes->built_in_t->number8 = 10;
     runner.ytypes->built_in_t->number16 = 102;

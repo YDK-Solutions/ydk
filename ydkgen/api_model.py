@@ -21,6 +21,8 @@
  Translation process converts the YANG model to classes defined in this module.
 """
 from __future__ import absolute_import
+
+import sys
 from pyang.types import UnionTypeSpec
 
 
@@ -124,20 +126,21 @@ class Deviation(Element):
 
 class NamedElement(Element):
 
-    '''
-
+    """
         An abstract element that may have a name
         The name is used for identification of the named element
         within the namespace that is defined or accessible
 
        :attribute:: name
                    The name of the Element
-
-    '''
+    """
 
     def __init__(self):
-        ''' The name of the named element'''
-        super(NamedElement, self).__init__()
+        """ The name of the named element """
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(NamedElement, self).__init__()
         self.name = None
 
     def get_py_mod_name(self):
@@ -267,7 +270,10 @@ class Package(NamedElement):
     """
 
     def __init__(self, iskeyword):
-        super(Package, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(Package, self).__init__()
         self._stmt = None
         self._sub_name = ''
         self._bundle_name = ''
@@ -371,7 +377,10 @@ class DataType(NamedElement):
     """
 
     def __init__(self):
-        super(DataType, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(DataType, self).__init__()
 
 
 class Class(NamedElement):
@@ -381,7 +390,10 @@ class Class(NamedElement):
     """
 
     def __init__(self, iskeyword):
-        super(Class, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(Class, self).__init__()
         self._stmt = None
         self._extends = []
         self._module = None
@@ -596,7 +608,10 @@ class AnyXml(NamedElement):
     """
 
     def __init__(self):
-        super(AnyXml, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(AnyXml, self).__init__()
         self._stmt = None
 
     @property
@@ -623,7 +638,10 @@ class Bits(DataType):
     """
 
     def __init__(self, iskeyword):
-        super(DataType, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(Bits, self).__init__()
         self._stmt = None
         self._dictionary = None
         self._pos_map = None
@@ -686,7 +704,10 @@ class Property(NamedElement):
     """
 
     def __init__(self, iskeyword):
-        super(Property, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(Property, self).__init__()
         self._stmt = None
         self.is_static = False
         self.featuring_classifiers = []
@@ -711,7 +732,7 @@ class Property(NamedElement):
     @stmt.setter
     def stmt(self, stmt):
         self._stmt = stmt
-        #name = snake_case(stmt.arg)
+        # name = snake_case(stmt.arg)
         name = snake_case(stmt.unclashed_arg if hasattr(stmt, 'unclashed_arg') else stmt.arg)
 
         if self.iskeyword(name) or self.iskeyword(name.lower()):
@@ -758,7 +779,10 @@ class Enum(DataType):
     """ Represents an enumeration. """
 
     def __init__(self, iskeyword):
-        super(Enum, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(Enum, self).__init__()
         self._stmt = None
         self.literals = []
         self.iskeyword = iskeyword
@@ -829,12 +853,16 @@ class Enum(DataType):
             literal.stmt = enum_stmt
             self.literals.append(literal)
 
+
 class EnumLiteral(NamedElement):
 
     """ Represents an enumeration literal. """
 
     def __init__(self, iskeyword):
-        super(EnumLiteral, self).__init__()
+        if sys.version_info > (3,):
+            super().__init__()
+        else:
+            super(EnumLiteral, self).__init__()
         self._stmt = None
         self.value = None
         self.iskeyword = iskeyword
@@ -897,6 +925,7 @@ def get_top_pkg(pkg):
 
     return pkg
 
+
 def get_properties(owned_elements):
     """ get all properties from the owned_elements. """
     props = []
@@ -912,11 +941,13 @@ def get_properties(owned_elements):
 
     return props
 
+
 def _modify_nested_container_with_same_name(named_element):
     if named_element.owner.name.rstrip('_') == named_element.name:
         return '%s_' % named_element.owner.name
     else:
         return named_element.name
+
 
 def snake_case(input_text):
     s = input_text.replace('-', '_')
@@ -947,8 +978,10 @@ def camel_case(input_text):
         result = '_'+result;
     return result
 
+
 def camel_snake(input_text):
     return '_'.join([word.title() for word in input_text.split('-')])
+
 
 def escape_name(name):
     name = name.replace('+', '__PLUS__')

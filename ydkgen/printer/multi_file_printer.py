@@ -22,6 +22,7 @@
 """
 import abc
 import os
+import sys
 from ydkgen.printer import FilePrinter
 from ydkgen.builder import MultiFile
 import logging
@@ -31,7 +32,10 @@ logger = logging.getLogger('ydkgen')
 
 class MultiFilePrinter(FilePrinter):
     def __init__(self, ctx):
-        super(MultiFilePrinter, self).__init__(ctx)
+        if sys.version_info > (3,):
+            super().__init__(ctx)
+        else:
+            super(MultiFilePrinter, self).__init__(ctx)
 
     def print_output(self, package, multi_file, path_prefix):
         assert isinstance(multi_file, MultiFile)

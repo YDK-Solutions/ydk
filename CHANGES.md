@@ -1,4 +1,4 @@
-### 2019-08-15 version 0.8.4
+### 2019-09-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
@@ -8,10 +8,16 @@
   * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
   * YList test fails when list entity added before keys are initialized ([#800](https://github.com/CiscoDevNet/ydk-gen/issues/800))
+  * Inherited classes not initialized properly in Python3 when constructor uses super() ([#921](https://github.com/CiscoDevNet/ydk-gen/issues/921))
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * Go: When entity having children is built from model API the child entities parent is nil ([#938](https://github.com/CiscoDevNet/ydk-gen/issues/938))
   * gNMISession fails to decode GetRequest response when returned values is empty string ([#943](https://github.com/CiscoDevNet/ydk-gen/issues/943))
+  * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
+  
+#### Documentation improvements
+  Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+
 
 ### 2019-05-15 version 0.8.3
 

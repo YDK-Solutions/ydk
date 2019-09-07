@@ -70,7 +70,7 @@ Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
 **Note:** Currently, only Centos7 and RHEL7 are known to work with YDK.
-Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
+Please see this issue on `YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
 
 The following packages must be present in your system before installing YDK-Py::
 
@@ -186,16 +186,34 @@ It is also required for Python installation to include corresponding shared libr
   python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
   python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
-Please follow `System Requirements` to assure presence of shared Python libraries.
+Please follow `System Requirements`_ to assure presence of shared Python libraries.
+
+If you choose to install Python from source (need specific version), please include `--enable-shared` flag in `configure`
+command to include build of shared library::
+
+  cd Python3.4.1
+  ./configure --prefix=/opt/python --enable-shared
+  make
+  make install
+
+Here the `/opt/python` is your Python installation directory. If installation directory is different from the system path,
+you need to configure `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library::
+
+  export CMAKE_LIBRARY_PATH=/opt/python/lib
+
+Run `pip install ydk` command with `-v` option and in the console output note location of found `PythonLibs`.
+Make sure it matches with your installed Pyton dynamic library location::
+
+  -- Found PythonLibs: /opt/python/lib/libpython3.4m.so
 
 Mac OS
 ~~~~~~
 
-The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
-This is well known and documented issue. Each developer might have different approaches for its resolution.
-One of them is to use Python2 virtual environment. See section Using Python Virtual Environment for details.
+The developers of Python2 on Mac OS might face an `installation issue <https://github.com/CiscoDevNet/ydk-gen/issues/837>`_.
+This is well known and documented issue. Each developer might have different approach for its resolution.
+One of them is to use Python2 virtual environment. See section `Using Python Virtual Environment`_ for details.
 
-In addition it is required properly set CMAKE_LIBRARY_PATH environment variable to assure that `cmake` uses correct Python library.
+In addition it is required properly set `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library.
 Follow these steps to find and set correct library path.
 
 1. Find installations of `libpython2.7` library:

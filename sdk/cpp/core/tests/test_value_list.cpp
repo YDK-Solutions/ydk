@@ -126,9 +126,14 @@ TEST_CASE("test_value_list_enum_")
 {
     YLeafList test_value{YType::enumeration, "enumval"};
     test_value.append(TestEnum::one);
-    REQUIRE(test_value[0].get()=="one");
     test_value.append(TestEnum::two);
+
+    auto & leaf = test_value[0];
+    REQUIRE(leaf.get()=="one");
+    REQUIRE(leaf.enum_value==1);
+
     REQUIRE(test_value[1].get()=="two");
+    REQUIRE(test_value[1].enum_value==2);
 
     auto nv = test_value.get_name_leafdata();
     REQUIRE(nv[0].first=="enumval[.=\"one\"]");

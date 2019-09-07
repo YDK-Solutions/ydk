@@ -19,6 +19,7 @@
 """
 import re
 import os
+import sys
 import json
 import logging
 import tempfile
@@ -68,7 +69,7 @@ class BundleDefinition(object):
     """ Base class for Bundle and BundleDependency, with following attributes
 
         Attributes:
-            name (str): bundle name.
+            _name (str): bundle name.
             _version (Version): bundle version.
             _core_version (Version): ydk core library version.
             _description (str): description for bundle package
@@ -137,7 +138,10 @@ class BundleDependency(BundleDefinition):
     """
 
     def __init__(self, data):
-        super(BundleDependency, self).__init__(data)
+        if sys.version_info > (3,):
+            super().__init__(data)
+        else:
+            super(BundleDependency, self).__init__(data)
         self.uri = parse_uri(data['uri'])
 
 
@@ -192,7 +196,7 @@ class Model(object):
 
     @property
     def revision(self):
-        '''Return model revision.'''
+        """Return model revision."""
         return self._revision
 
 
@@ -224,7 +228,10 @@ class Bundle(BundleDefinition):
             raise YdkGenException('Cannot open bundle file %s.' % uri)
 
         try:
-            super(Bundle, self).__init__(data['bundle'])
+            if sys.version_info > (3,):
+                super().__init__(data['bundle'])
+            else:
+                super(Bundle, self).__init__(data['bundle'])
             if 'modules' in data:
                 for m in data['modules']:
                     self.models.append(Model(m, self.iskeyword))
@@ -361,7 +368,7 @@ class Resolver(object):
         """
         if isinstance(uri, Local):
             src = uri.url
-        elif isinstance(uri, Remote):
+        else:
             repo, tmp_dir = self._clone_repo(uri.url, suffix='.bundle')
             repo.git.checkout(uri.commitid)
             src = os.path.join(tmp_dir, uri.path)

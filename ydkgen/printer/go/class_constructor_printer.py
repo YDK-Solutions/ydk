@@ -20,18 +20,21 @@ source_printer.py
  prints Go class constructor
 
 """
+import sys
 from functools import reduce
-
 from ydkgen.api_model import Bits, Class, DataType, Enum
-from ydkgen.builder import TypesExtractor
-from pyang.types import Decimal64TypeSpec, PathTypeSpec, UnionTypeSpec
-from ydkgen.printer.meta_data_util import get_class_docstring, get_meta_info_data, format_range_string
+from pyang.types import PathTypeSpec, UnionTypeSpec
+from ydkgen.printer.meta_data_util import get_meta_info_data, format_range_string
 from .function_printer import FunctionPrinter
 from ydkgen.common import is_list_element
 
+
 class ClassConstructorPrinter(FunctionPrinter):
     def __init__(self, ctx, clazz, leafs, identity_subclasses):
-        super(ClassConstructorPrinter, self).__init__(ctx, clazz, leafs)
+        if sys.version_info > (3,):
+            super().__init__(ctx, clazz, leafs)
+        else:
+            super(ClassConstructorPrinter, self).__init__(ctx, clazz, leafs)
         self.identity_subclasses = identity_subclasses
 
     def print_function_header(self):
@@ -96,7 +99,7 @@ class ClassConstructorPrinter(FunctionPrinter):
 
     def _print_child_inits_unique(self, prop):
         if (isinstance(prop.property_type, Class)
-            and not prop.property_type.is_identity()):
+                and not prop.property_type.is_identity()):
             self.ctx.bline()
 
             comments = []
@@ -109,7 +112,7 @@ class ClassConstructorPrinter(FunctionPrinter):
 
     def _print_child_inits_many(self, prop):
         if (prop.is_many and isinstance(prop.property_type, Class)
-            and not prop.property_type.is_identity()):
+                and not prop.property_type.is_identity()):
             self.ctx.bline()
 
             comments = self._get_attribute_comment(prop)
@@ -156,7 +159,7 @@ class ClassConstructorPrinter(FunctionPrinter):
         type_stmt = prop.stmt.search_one('type')
 
         id_subclasses = None
-        if (hasattr(property_type, 'is_identity') and property_type.is_identity()):
+        if hasattr(property_type, 'is_identity') and property_type.is_identity():
             id_subclasses = self.identity_subclasses
 
         meta_info_data = get_meta_info_data(
@@ -191,7 +194,7 @@ class ClassConstructorPrinter(FunctionPrinter):
                 pairs = zip(meta_info_data.children, type_spec.types)
                 for child, ptype in pairs:
                     if child.mtype == 'REFERENCE_ENUM_CLASS':
-                        child.doc_link = 'enumeration %s' % (child.ptype)
+                        child.doc_link = 'enumeration %s' % child.ptype
         return meta_info_data
 
     def _get_many_docstring(self, id_subclasses, property_type):
@@ -310,7 +313,8 @@ class ClassConstructorPrinter(FunctionPrinter):
     def _add_comment_on_status(self, description, meta_info_data):
         pass
         # if len(meta_info_data.status) > 0:
-            # properties_description.append('The status is %s' % meta_info_data.status)
+        #     properties_description.append('The status is %s' % meta_info_data.status)
+
 
 def get_type_name(prop_type):
     if prop_type.name in ('str', 'string'):
@@ -338,4 +342,3 @@ def get_type_name(prop_type):
     elif isinstance(prop_type, DataType):
         return 'string'
     return 'interface{}'
-

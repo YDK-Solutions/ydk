@@ -18,6 +18,9 @@
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
 
+#### Bundle improvements
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.3.1
+
 
 ### 2019-05-15 version 0.8.3
 

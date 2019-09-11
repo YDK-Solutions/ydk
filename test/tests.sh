@@ -334,9 +334,6 @@ function cpp_sanity_ydktest_gen_install {
     print_msg "Generating and installing C++ ydktest bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-cpp.json ydktest-bundle
 
-    print_msg "Generating and installing new C++ ydktest bundle"
-    generate_install_specified_cpp_bundle profiles/test/ydktest-cpp-new.json ydktest_new-bundle
-
     print_msg "Generating and installing C++ ydktest-oc-nis bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-oc-nis.json ydktest_oc_nis-bundle
 }

@@ -59,17 +59,15 @@ bool replace(string& subject, const string& search, const string& replace)
     return replace_count>0;
 }
 
-bool has_xml_escape_sequences(const string& xml)
+size_t has_xml_escape_sequences(const string& xml)
 {
-    if (xml.find("&lt;") != string::npos  ||
-        xml.find("&gt;") != string::npos  ||
-        xml.find("&amp;") != string::npos ||
-        xml.find("&quot;")!= string::npos ||
-        xml.find("&#13;") != string::npos)
-    {
-        return true;
-    }
-    return false;
+    size_t pos;
+    if ((pos = xml.find("&lt;"))  != string::npos ||
+        (pos = xml.find("&gt;"))  != string::npos ||
+        (pos = xml.find("&amp;")) != string::npos ||
+        (pos = xml.find("&quot;"))!= string::npos ||
+        (pos = xml.find("&#13;")) != string::npos) {;}
+    return pos;
 }
 
 string replace_xml_escape_sequences(const string& xml)

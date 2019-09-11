@@ -325,8 +325,6 @@ std::string payload=R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 ydk::path::Repository repo{TEST_HOME};
 ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
-CodecService c{};
-CodecServiceProvider cp{EncodingFormat::XML};
 XmlSubtreeCodec xml_codec{};
 
 auto no_key = xml_codec.decode(payload, make_shared<ydktest_sanity::Runner>());

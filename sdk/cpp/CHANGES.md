@@ -5,6 +5,7 @@
   
 #### Resolved GitHub issues
   * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
+  * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
   * YList test fails when list entity added before keys are initialized ([#800](https://github.com/CiscoDevNet/ydk-gen/issues/800))
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))

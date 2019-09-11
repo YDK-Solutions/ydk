@@ -178,8 +178,8 @@ MacOS
 
 .. code-block:: sh
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-2_Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
 
 Set runtime environment
 -----------------------

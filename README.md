@@ -165,8 +165,8 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
    curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
    sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-2_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -260,8 +260,8 @@ For Bionic (Ubuntu 18.04.1)
 #### MacOS:
 
 ```
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-2_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
 ```
 
 ### Run-time environment

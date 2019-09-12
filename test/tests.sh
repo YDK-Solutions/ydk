@@ -922,14 +922,14 @@ init_tcp_server
 # Install and run C++ core tests
 ######################################
 install_test_cpp_core
-#run_cpp_bundle_tests
+run_cpp_bundle_tests
 
 ######################################
 # Install and run Go tests
 ######################################
-#init_go_env
-#install_go_core
-#run_go_bundle_tests
+init_go_env
+install_go_core
+run_go_bundle_tests
 
 ######################################
 # Install and run Python tests

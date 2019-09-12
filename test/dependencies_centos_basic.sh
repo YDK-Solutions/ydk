@@ -62,14 +62,9 @@ function install_dependencies {
     yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
 #    yum install python-devel python-pip python3-devel python3-pip -y
-    yum install python3-pip -y
     yum install rpm-build redhat-lsb lcov -y > /dev/null
     yum install valgrind -y
-  print_msg "Python location: $(which python)"
-  print_msg "Python3 location: $(which python3)"
   print_msg "Python3.6 location: $(which python3.6)"
-  print_msg "Pip location: $(which pip)"
-  print_msg "Pip3 location: $(which pip3)"
   print_msg "Pip3.6 location: $(which pip3.6)"
 }
     
@@ -93,6 +88,9 @@ function check_install_go {
     print_msg "Installing Golang version 1.9.2"
     sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+    cd /usr/local/bin 
+    sudo ln -sf /usr/local/go/bin/go
+    cd -
   fi
 }
 

@@ -892,15 +892,20 @@ if [[ ${status} == 0 ]] ; then
     CMAKE_BIN=cmake3
 fi
 
+if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64:/usr/local/lib64:/usr/local/lib
+   print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
+fi
+
 init_py_env
-init_confd_ydktest
-init_rest_server
-init_tcp_server
 
 ######################################
 # Install and run C++ core tests
 ######################################
 install_test_cpp_core
+init_confd_ydktest
+init_rest_server
+init_tcp_server
 run_cpp_bundle_tests
 
 ######################################

@@ -301,7 +301,7 @@ vector<string> gNMIClient::get_capabilities()
 
 GnmiClientCapabilityResponse gNMIClient::execute_get_capabilities()
 {
-    GnmiClientCapabilityResponse reply{};
+    GnmiClientCapabilityResponse reply;
 
     CapabilityRequest request;
     CapabilityResponse response;
@@ -316,7 +316,7 @@ GnmiClientCapabilityResponse gNMIClient::execute_get_capabilities()
     {
         auto model = response.supported_models(i);
 
-        GnmiClientModelData model_data{};
+        GnmiClientModelData model_data;
         model_data.name = model.name();
         model_data.organization = model.organization();
         model_data.version = model.version();

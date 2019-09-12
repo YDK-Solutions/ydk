@@ -226,7 +226,7 @@ TEST_CASE("validation_string")
 
 TEST_CASE("validation_empty")
 {
-    ydk::Empty empty{};
+    ydk::Empty empty;
     ydk::path::Repository repo{TEST_HOME};
 
     ydk::path::NetconfSession session{repo,"127.0.0.1", "admin", "admin",  12022};

@@ -76,7 +76,7 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* ]] ; then
+    if [[ $(uname) == "Linux" ]] && [[ ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "2"* ]] ; then
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@
     else
@@ -104,6 +104,13 @@ function check_python_installation {
       PIP_BIN=pip${PYTHON_VERSION}
     fi
   fi
+
+  if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
+    print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
+    run_exec_test ${PYTHON_BIN} -m venv $YDKGEN_HOME/venv
+    run_exec_test source $YDKGEN_HOME/venv/bin/activate
+  fi
+
   print_msg "Checking installation of ${PYTHON_BIN}"
   ${PYTHON_BIN} -V
   status=$?
@@ -251,11 +258,6 @@ function build_and_run_cpp_gnmi_tests {
 }
 
 function run_cpp_gnmi_tests {
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
-        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
-    fi
-
     build_gnmi_cpp_core_library
 
     start_gnmi_server
@@ -469,6 +471,11 @@ which cmake3
 status=$?
 if [[ ${status} == 0 ]] ; then
     CMAKE_BIN=cmake3
+fi
+
+if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
+    print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
 fi
 
 init_py_env

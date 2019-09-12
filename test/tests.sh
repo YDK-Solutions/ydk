@@ -898,14 +898,14 @@ if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
 fi
 
 init_py_env
+init_confd_ydktest
+init_rest_server
+init_tcp_server
 
 ######################################
 # Install and run C++ core tests
 ######################################
 install_test_cpp_core
-init_confd_ydktest
-init_rest_server
-init_tcp_server
 run_cpp_bundle_tests
 
 ######################################

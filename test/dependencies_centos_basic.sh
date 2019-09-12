@@ -32,24 +32,29 @@ function check_install_gcc {
     print_msg "Current gcc/g++ version is $gcc_version"
   else
     print_msg "The gcc/g++ not installed"
-    gcc_version="4.0"
+    gcc_version="4.0.0"
   fi
-  if [[ $(echo $gcc_version | cut -d '.' -f 1) < 5 ]]
+  if [[ $gcc_version < "4.8.1" ]]
   then
     print_msg "Upgrading gcc/g++ to version 5"
     yum install centos-release-scl -y > /dev/null
     yum install devtoolset-4-gcc* -y > /dev/null
+    local status2=$?
+    if [[ $status2 != 0 ]]; then
+      MSG_COLOR=$RED
+      print_msg "Failed to install gcc; exiting"
+      exit 1
+    else
+      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
+      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
-    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-    ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
+      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
-    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
-    ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
-
-    ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
-
-    gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
-    print_msg "Installed gcc/g++ version is $gcc_version"
+      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
+      gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
+      print_msg "Installed gcc/g++ version is $gcc_version"
+    fi
   fi
 }
 

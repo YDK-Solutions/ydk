@@ -74,7 +74,7 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} < "3" ]]
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "2"* ]]
     then
         print_msg "Custom pip install of $@ for CentOS"
         ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps -U $@
@@ -138,7 +138,7 @@ function check_python_installation {
     fi
   fi
 
-  if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} >= "3" ]]; then
+  if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
     print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
     run_exec_test ${PYTHON_BIN} -m venv $YDKGEN_HOME/venv
     run_exec_test source $YDKGEN_HOME/venv/bin/activate

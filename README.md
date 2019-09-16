@@ -165,8 +165,8 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
    curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
    sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 ```
 
 ### Build from source
@@ -240,28 +240,28 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Xenial (Ubuntu 16.04.4):
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-4.amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1)
 
 ```
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-4.amd64.deb
+   sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
 ```
 
 #### CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-2.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-4.x86_64.rpm
 ```
 
 #### MacOS:
 
 ```
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 ```
 
 ### Run-time environment

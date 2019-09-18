@@ -71,14 +71,16 @@ function check_install_python3 {
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing dev package for Python3"
-    yum install python36-devel python36-pip
+    yum install python3-devel python3-pip -y
+    print_msg "Python3 location: $(which python3)"
   fi
   print_msg "Checking installation of pip3"
   pip3 -V &> /dev/null
   status=$?
   if [ $status -ne 0 ]; then
     print_msg "Installing missing pip3"
-    yum install python36-pip
+    yum install python3-pip -y
+    print_msg "Pip location: $(which pip3)"
   fi
 }
 

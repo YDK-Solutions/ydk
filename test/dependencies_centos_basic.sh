@@ -61,10 +61,27 @@ function install_dependencies {
     yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
     yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
-    yum install python-devel python-pip python36-devel python36-pip  rpm-build redhat-lsb lcov -y > /dev/null
+    yum install python-devel python-pip rpm-build redhat-lsb lcov -y > /dev/null
     yum install valgrind -y
 }
-    
+
+function check_install_python3 {
+  print_msg "Checking installation of Python3"
+  python3 --version &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing dev package for Python3"
+    yum install python36-devel python36-pip
+  fi
+  print_msg "Checking installation of pip3"
+  pip3 -V &> /dev/null
+  status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing missing pip3"
+    yum install python36-pip
+  fi
+}
+
 function check_install_go {
   which go
   local status=$?
@@ -95,5 +112,6 @@ YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
 install_dependencies
+check_install_python3
 check_install_gcc
 check_install_go

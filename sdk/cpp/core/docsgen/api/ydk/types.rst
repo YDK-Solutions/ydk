@@ -43,9 +43,58 @@ YANG container and list
 
     Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
 
-    .. cpp:member:: YFilter filter
+    .. cpp:member:: Entity* parent
+    
+        Pointer to parent entity
 
-        Optional attribute of the Entity class which can be set to perform various :cpp:class:`filtering<YFilter>`
+    .. cpp:member:: std::string yang_name
+    
+        YANG name of container or list that this entity represents
+
+    .. cpp:member:: std::string yang_parent_name;
+    
+        YANG name of container or list of parent entity
+
+    .. cpp:member:: YFilter yfilter
+    
+        Optional attribute of the `Entity` class, which can be set to perform various :cpp:class:`filtering<YFilter>`
+
+    .. cpp:member:: bool is_presence_container
+    
+        Boolean flag set to `true` if this entity represents presence container
+
+    .. cpp:member:: bool is_top_level_class
+
+        Boolean flag set to `true` if this entity represents top-level container (does not have parent entity)
+
+    .. cpp:member::     bool has_list_ancestor;
+
+        Boolean flag set to `true` if this entity is member of a list
+
+    .. cpp:member::     bool ignore_validation;
+
+        Boolean flag for user to control validation of entity data (leaf and leaf-list data values); default setting is `false`, meaning the validation is on
+
+    .. cpp:member:: std::vector<std::string> ylist_key_names
+
+        If this entity is member of a list, the vector specifies leaf names, which represents list keys 
+
+    .. cpp:member::     std::string ylist_key
+
+        If this entity is member of a list, the `ylist_key` is set to composite list key of this entity
+
+    .. cpp:member::     YList* ylist;
+
+        If this entity is member of a list, the `ylist` is set to a pointer of corresponding `YList` class
+
+    .. cpp:function:: std::string get_segment_path() const
+
+        Returns relative path of this entity in terms of XPath
+
+    .. cpp:function:: std::string get_absolute_path() const
+
+        Returns absolute path of this entity in terms of XPath
+
 
 YANG leaf, list and leaf-list
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

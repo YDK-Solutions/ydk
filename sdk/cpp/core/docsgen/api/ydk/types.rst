@@ -1,7 +1,7 @@
 .. _ref-types:
 
 Types
-=====
+-----
 
 .. contents::
 .. toctree::
@@ -36,72 +36,83 @@ The C++ types present in ydk namespace corresponding to YANG types. See below fo
         Restconf protocol
 
 
-YANG container and list
-~~~~~~~~~~~~~~~~~~~~~~~~
+YANG types
+==========
 
-.. cpp:class:: ydk::Entity
+.. cpp:class:: ydk::Bits
 
-    Super class of all classes that represents containers in YANG. YANG lists are represented as ``std::vector`` of Entity objects, with support for hanging a parent
+    Concrete class representing a bits data type.
 
-    .. cpp:member:: Entity* parent
-    
-        Pointer to parent entity
+.. cpp:class:: ydk::Decimal64
 
-    .. cpp:member:: std::string yang_name
-    
-        YANG name of container or list that this entity represents
+    Concrete class representing a decimal64 data type.
 
-    .. cpp:member:: std::string yang_parent_name;
-    
-        YANG name of container or list of parent entity
+.. cpp:class:: ydk::Empty
 
-    .. cpp:member:: YFilter yfilter
-    
-        Optional attribute of the `Entity` class, which can be set to perform various :cpp:class:`filtering<YFilter>`
+    Represents the empty type in YANG. The empty built-in type represents a leaf that does not have any value, it conveys information by its presence or absence.
 
-    .. cpp:member:: bool is_presence_container
-    
-        Boolean flag set to `true` if this entity represents presence container
+.. cpp:class:: ydk::Enum
 
-    .. cpp:member:: bool is_top_level_class
+    Super class of all classes that represents the enumeration type in YANG.
 
-        Boolean flag set to `true` if this entity represents top-level container (does not have parent entity)
+.. cpp:class:: ydk::Identity
 
-    .. cpp:member::     bool has_list_ancestor;
-
-        Boolean flag set to `true` if this entity is member of a list
-
-    .. cpp:member::     bool ignore_validation;
-
-        Boolean flag for user to control validation of entity data (leaf and leaf-list data values); default setting is `false`, meaning the validation is on
-
-    .. cpp:member:: std::vector<std::string> ylist_key_names
-
-        If this entity is member of a list, the vector specifies leaf names, which represents list keys 
-
-    .. cpp:member::     std::string ylist_key
-
-        If this entity is member of a list, the `ylist_key` is set to composite list key of this entity
-
-    .. cpp:member::     YList* ylist;
-
-        If this entity is member of a list, the `ylist` is set to a pointer of corresponding `YList` class
-
-    .. cpp:function:: std::string get_segment_path() const
-
-        Returns relative path of this entity in terms of XPath
-
-    .. cpp:function:: std::string get_absolute_path() const
-
-        Returns absolute path of this entity in terms of XPath
+    Super class of all classes that represents the identity type in YANG. Instances of this type of classes are assigned as data to leafs of ``identityref`` type.
 
 
-YANG leaf, list and leaf-list
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+YANG leaf, leaf-list, and list
+==============================
+
+.. cpp:enum:: ydk::YType
+
+    Enum class to represent various types of leaf value
+
+.. code-block:: c++
+
+    enum class YType {
+        uint8,
+        uint16,
+        uint32,
+        uint64,
+        int8,
+        int16,
+        int32,
+        int64,
+        empty,
+        identityref,
+        str,
+        boolean,
+        enumeration,
+        bits,
+        decimal64
+    };
 
 .. cpp:class:: ydk::YLeaf
 
-    Concrete class that represents a YANG leaf, to which data can be assigned.
+    Concrete class that represents a YANG leaf
+
+    .. cpp:function:: YLeaf(YType type, std::string name)
+
+        Constructs an instance of the `YLeaf`.
+
+        :param type: :cpp:enum:`YType<ydk::YType>`, type of the leaf 
+        :param name: YANG name of the leaf
+
+    .. cpp:member:: std::string name
+
+        Leaf YANG name
+
+    .. cpp:member:: std::string value
+
+        String representation of the leaf value
+
+    .. cpp:member:: int enum_value
+
+        Enum member value for `enumeration` type of a leaf
+
+    .. cpp:member:: YType type
+
+        Leaf type from :cpp:enum:`YType<ydk::YType>`
 
     .. cpp:member:: YFilter filter
 
@@ -183,33 +194,138 @@ YANG leaf, list and leaf-list
 
         Optional attribute of the YLeafList class which can be set to perform various :cpp:class:`filtering<YFilter>`
 
-YANG type
-~~~~~~~~~~
 
-.. cpp:class:: ydk::Bits
+YANG container and list
+=======================
 
-    Concrete class representing a bits data type.
+.. cpp:class:: ydk::Entity
 
-.. cpp:class:: ydk::Decimal64
+    Super class of all classes that represents containers in YANG. YANG lists are represented as `YList` instance
 
-    Concrete class representing a decimal64 data type.
+    .. cpp:member:: Entity* parent
+    
+        Pointer to parent entity; the parent is set automatically during entity initialization except for presence container, which must be set manually after presence container is initialized
 
-.. cpp:class:: ydk::Empty
+    .. cpp:member:: std::string yang_name
+    
+        YANG name of container or list that this entity represents
 
-    Represents the empty type in YANG. The empty built-in type represents a leaf that does not have any value, it conveys information by its presence or absence.
+    .. cpp:member:: std::string yang_parent_name
+    
+        YANG name of container or list of parent entity
 
-.. cpp:class:: ydk::Enum
+    .. cpp:member:: YFilter yfilter
+    
+        Optional attribute of the `Entity` class, which can be set to perform various :cpp:class:`filtering<YFilter>`
 
-    Super class of all classes that represents the enumeration type in YANG.
+    .. cpp:member:: bool is_presence_container
+    
+        Boolean flag set to `true` if this entity represents presence container
 
-.. cpp:class:: ydk::Identity
+    .. cpp:member:: bool is_top_level_class
 
-    Super class of all classes that represents the identity type in YANG. Instances of this type of classes are assigned as data to leafs of ``identityref`` type.
+        Boolean flag set to `true` if this entity represents top-level container (does not have parent entity)
 
-Example usage
-~~~~~~~~~~~~~~~
+    .. cpp:member::     bool has_list_ancestor
 
-Examples of how to instantiate and use objects of :cpp:class:`Entity<Entity>` type:
+        Boolean flag set to `true` if this entity is member of a list
+
+    .. cpp:member::     bool ignore_validation
+
+        Boolean flag for user to control validation of entity data (leaf and leaf-list data values); default setting is `false`, meaning the validation is on
+
+    .. cpp:member:: std::vector<std::string> ylist_key_names
+
+        If this entity is member of a list, the vector specifies leaf names, which represents list keys 
+
+    .. cpp:member::     std::string ylist_key
+
+        If this entity is member of a list, the `ylist_key` is set to composite list key of this entity
+
+    .. cpp:member::     YList* ylist
+
+        If this entity is member of a list, the `ylist` is set to a pointer of corresponding `YList` class
+
+    .. cpp:function:: std::string get_segment_path() const
+
+        Returns relative path of this entity in terms of XPath
+
+    .. cpp:function:: std::string get_absolute_path() const
+
+        Returns absolute path of this entity in terms of XPath
+
+    .. cpp:function:: bool has_data() const
+
+        Returns `true` if any leaf in this entity or its child entity is assigned value; `false` otherwise
+
+    .. cpp:function:: bool has_operation() const
+
+        Returns `true` if any leaf or container in this entity or its child entity has setting of `yfilter`; `false` otherwise
+
+    .. cpp:function:: void set_value(const std::string & path, const std::string & value, const std::string & name_space="", const std::string & name_space_prefix="")
+    
+        Sets leaf value
+
+        :param path: YANG name of the leaf
+        :param value: std::string representation of the leaf value
+        :param name_space: optional parameter for enumeration and identity types of leaf, which is name space of a module where the enum or identity is defined
+        :param name_space_prefix: optional parameter for enumeration and identity types of leaf, which is name space prefix of a module where the enum or identity is defined
+
+    .. cpp:function:: void set_filter(const std::string & path, YFilter filter)
+
+        Sets `yfilter` value in leaf
+
+        :param path: YANG name of the leaf
+        :param filter: :cpp:class:`filtering<YFilter>`, filter value
+
+    .. cpp:function:: std::vector<std::pair<std::string, LeafData> > get_name_leaf_data() const
+
+        Gets set of leaves, which have data or operation
+
+    .. cpp:function:: std::map<std::string, std::shared_ptr<Entity>> get_children() const
+
+        Gets map of child entities, where map key is a segment path of child entity
+
+    .. cpp:function:: bool operator == (Entity & other) const
+    .. cpp:function:: bool operator == (const Entity & other) const
+
+        Operator to compare two entities
+
+Utility functions
+~~~~~~~~~~~~~~~~~
+
+.. cpp:function:: std::string absolute_path(Entity & entity)
+
+    Utility function to get absolute path of the entity.
+
+    :param entity: An instance of :cpp:class:`Entity<ydk::Entity>`.
+    :return: A `string` representing entity's absolute path.
+
+.. cpp:function:: std::map<std::string,std::string> entity_to_dict(Entity & entity)
+
+    Utility function to get map of all leaves and presence containers recursively in this entity and its children.
+
+    :param entity: An instance of :cpp:class:`Entity<ydk::Entity>`.
+    :return: A map, where key represents leaf absolute path and value represents string value of the leaf;
+             In case of presence container the key represents the container's absolute path and value is empty string.
+
+.. cpp:function:: std::map<std::string, std::pair<std::string,std::string>> entity_diff(Entity & ent1, Entity & ent2)
+
+    Utility function to compare two entities of the same underlying type.
+    Compared are presence containers and all leaves recursively.
+
+    :param ent1: An instance of :cpp:class:`Entity<ydk::Entity>`.
+    :param ent2: An instance of :cpp:class:`Entity<ydk::Entity>`.
+    :return: A map of differences between two entities, where key of type `std::string` represents leaf or presence
+             container absolute path and value of type `std::pair` represents difference in string values of the leaves.
+    :raises: :cpp:class:`YInvalidArgumentError<ydk::YInvalidArgumentError>` exception, if supplied entities have different types.
+
+
+Usage examples
+==============
+
+How to instantiate and use objects of Entity type
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c++
   :linenos:
@@ -223,16 +339,18 @@ Examples of how to instantiate and use objects of :cpp:class:`Entity<Entity>` ty
   // Append the afi-safi to the YList instance
   bgp->global->afi_safis->afi_safi.append(afi_safi);
 
-Examples of how to assign values to leafs:
+
+How to assign values to leaves
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c++
   :linenos:
 
   // Assign values to leafs of various types
   bgp->global->config->as = 65172; // uint32
-  bgp->global->config->router_id = "1.2.3.4"; //ip-address
+  bgp->global->config->router_id = "1.2.3.4"; // ip-address
   
-  afi_safi->afi_safi_name = L3VpnIpv4Unicast(); //identityref
+  afi_safi->afi_safi_name = L3VpnIpv4Unicast(); // identityref
   afi_safi->config->enabled = false; //boolean
   
   neighbor->config->peer_type = PeerType::INTERNAL // enum
@@ -245,7 +363,9 @@ Examples of how to assign values to leafs:
   node->bits_value["first-position"] = true // bits
   node->bits_value["second-position"] = false // bits
 
-Examples of how to append values to leaf-lists:
+
+How to append values to leaf-lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c++
   :linenos:
@@ -265,7 +385,9 @@ Examples of how to append values to leaf-lists:
   bits_value["first-position"] = false; // bits
   node->bits_values.append(bits_value); // bits
   
-Examples of how to access YList entities
+
+How to access YList entities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: c++
   :linenos:

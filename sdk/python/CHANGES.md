@@ -10,9 +10,12 @@
   * Inherited classes not initialized properly in Python3 when constructor uses super() ([#921](https://github.com/CiscoDevNet/ydk-gen/issues/921))
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
+  * Get entity path methods should be consistent ([#953](https://github.com/CiscoDevNet/ydk-gen/issues/953))
   
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  Resolved GitHub issues:
+    * Public API for entity has documentation gaps ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952))
 
 
 ### 2019-05-15 version 0.8.3

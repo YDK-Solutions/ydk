@@ -14,6 +14,8 @@
   
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  Resolved GitHub issues:
+    * Public API for entity has documentation gaps ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952))
 
 
 ### 2019-05-15 version 0.8.3

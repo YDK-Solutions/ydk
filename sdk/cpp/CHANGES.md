@@ -11,11 +11,10 @@
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * gNMISession fails to decode GetRequest response when returned values is empty string ([#943](https://github.com/CiscoDevNet/ydk-gen/issues/943))
   * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
+  * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
   
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
-  Resolved GitHub issues:
-    * Public API for entity has documentation gaps ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952))
 
 
 ### 2019-05-15 version 0.8.3

@@ -182,3 +182,34 @@ TEST_CASE("json_codec_no_key_list")
     auto runner_d = dynamic_cast<ydktest_sanity::Runner*>(entity.get());
     REQUIRE(*runner_d == runner);
 }
+
+TEST_CASE("json_codec_augment_presence")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+
+    auto i = make_shared<ydktest_sanity::Runner::Passive::Interfac>();
+    i->test = "abc";
+
+    auto passive = make_shared<ydktest_sanity::Runner::Passive>();
+    passive->name = "xyz";
+    passive->interfac.append(i);
+
+    auto r_1 = make_shared<ydktest_sanity::Runner>();
+    r_1->passive.append(passive);
+
+    passive->testc->xyz = make_shared<ydktest_sanity::Runner::Passive::Testc::Xyz>();
+    passive->testc->xyz->parent = passive.get();
+    passive->testc->xyz->xyz = 25;
+
+    CodecServiceProvider codec_provider{EncodingFormat::JSON};
+    CodecService codec_service{};
+    auto jsonC = codec_service.encode(codec_provider, *r_1, false);
+    auto cs_runner = codec_service.decode(codec_provider, jsonC, make_shared<ydktest_sanity::Runner>());
+    REQUIRE(*r_1 == *cs_runner);
+
+    JsonSubtreeCodec json_codec{};
+    auto jsonJ = json_codec.encode(*r_1, session.get_root_schema(), false);
+    auto runner = json_codec.decode(jsonC, make_shared<ydktest_sanity::Runner>());
+    REQUIRE(*r_1 == *runner);
+}

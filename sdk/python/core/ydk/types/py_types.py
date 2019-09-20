@@ -298,7 +298,8 @@ class Entity(_Entity):
                     leaf_name_data.append(leaf.get_name_leafdata())
                 elif isinstance(leaf, _YLeafList):
                     leaf_name_data.extend(leaf.get_name_leafdata())
-            elif type(value) not in (list, type(None), Bits) or (isinstance(value, Bits) and len(value.get_bitmap()) > 0):
+            elif (value is not None and not isinstance(value, list) and not isinstance(value, Bits)) or \
+                 (isinstance(value, Bits) and len(value.get_bitmap()) > 0):
                 leaf.set(value)
                 leaf_name_data.append(leaf.get_name_leafdata())
             elif isinstance(value, list) and len(value) > 0:
@@ -562,10 +563,10 @@ class EntityCollection(object):
                 elif entity is None:
                     self.logger.debug("Cannot add None object to the EntityCollection")
                 else:
-                    msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(entity)
+                    msg = "Argument %s is not supported by EntityCollection class; data ignored" % type(entity)
                     self._log_error_and_raise_exception(msg, YInvalidArgumentError)
         else:
-            msg = "Argument %s is not supported by EntityCollection class; data ignored"%type(entities)
+            msg = "Argument %s is not supported by EntityCollection class; data ignored" % type(entities)
             self._log_error_and_raise_exception(msg, YInvalidArgumentError)
 
     def _log_error_and_raise_exception(self, msg, exception_class):

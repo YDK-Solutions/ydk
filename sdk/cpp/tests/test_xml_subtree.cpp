@@ -29,13 +29,15 @@
 #include "ydk/crud_service.hpp"
 #include "ydk/codec_service.hpp"
 #include "ydk/codec_provider.hpp"
+#include "ydk/xml_subtree_codec.hpp"
 #include "ydk/filters.hpp"
+#include "ydk/common_utilities.hpp"
+
 #include "ydk_ydktest/openconfig_bgp.hpp"
 #include "ydk_ydktest/openconfig_bgp_types.hpp"
 #include "ydk_ydktest/openconfig_routing_policy.hpp"
 #include "ydk_ydktest/ydktest_sanity.hpp"
 #include "ydk_ydktest/ydktest_sanity_types.hpp"
-#include "../core/src/xml_subtree_codec.hpp"
 
 #include "config.hpp"
 #include "catch.hpp"
@@ -325,11 +327,43 @@ std::string payload=R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
 ydk::path::Repository repo{TEST_HOME};
 ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
 
-CodecService c{};
-CodecServiceProvider cp{EncodingFormat::XML};
 XmlSubtreeCodec xml_codec{};
 
 auto no_key = xml_codec.decode(payload, make_shared<ydktest_sanity::Runner>());
 auto no_key_payload = xml_codec.encode(*no_key, session.get_root_schema());
 REQUIRE(payload==no_key_payload);
+}
+
+TEST_CASE("xml_codec_augment_presence")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    ydk::path::NetconfSession session{repo, "127.0.0.1", "admin", "admin", 12022};
+
+    auto i = make_shared<ydktest_sanity::Runner::Passive::Interfac>();
+    i->test = "abc";
+
+    auto passive = make_shared<ydktest_sanity::Runner::Passive>();
+    passive->name = "xyz";
+    passive->interfac.append(i);
+
+    auto r_1 = make_shared<ydktest_sanity::Runner>();
+    r_1->passive.append(passive);
+
+    passive->testc->xyz = make_shared<ydktest_sanity::Runner::Passive::Testc::Xyz>();
+    passive->testc->xyz->parent = passive.get();
+    passive->testc->xyz->xyz = 25;
+
+    CodecServiceProvider codec_provider{EncodingFormat::XML};
+    CodecService codec_service{};
+    auto xmlC = codec_service.encode(codec_provider, *r_1, true);
+    auto cs_runner = codec_service.decode(codec_provider, xmlC, make_shared<ydktest_sanity::Runner>());
+    REQUIRE(*r_1 == *cs_runner);
+
+    XmlSubtreeCodec xml_codec{};
+    auto xmlX = xml_codec.encode(*r_1, session.get_root_schema());
+    REQUIRE(trim(xmlC) == xmlX);
+
+    auto runner = xml_codec.decode(xmlC, make_shared<ydktest_sanity::Runner>());
+    auto xml_runner = xml_codec.encode(*runner, session.get_root_schema());
+    REQUIRE(xmlX == xml_runner);
 }

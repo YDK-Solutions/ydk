@@ -349,10 +349,16 @@ static void check_and_set_leaf(Entity & entity, Entity * parent, const string & 
 
 static void check_and_set_node(Entity & entity, Entity * parent, const string & node_name, json & node_jvalue)
 {
-    if (!entity.has_leaf_or_child_of_name(node_name))
+    YLOG_DEBUG("JsonCodec: Looking for child '{}' in '{}'", node_name, entity.yang_name);
+    auto child_name = node_name;
+    auto pos = child_name.find(":");
+    if (pos != string::npos) {
+        child_name = child_name.substr(pos+1);
+    }
+    if (!entity.has_leaf_or_child_of_name(child_name))
     {
         ostringstream os;
-        os << "JsonCodec: Wrong payload! No element '" << node_name << "' found in '" << entity.yang_name << "'";
+        os << "JsonCodec: Wrong payload! No element '" << child_name << "' found in '" << entity.yang_name << "'";
         YLOG_ERROR(os.str().c_str());
         throw YInvalidArgumentError{os.str()};
     }
@@ -360,6 +366,9 @@ static void check_and_set_node(Entity & entity, Entity * parent, const string & 
     auto child = entity.get_child_by_name(node_name);
     if (child != nullptr) {
         YLOG_DEBUG("JsonCodec: Creating child entity '{}' in '{}'", node_name, entity.yang_name);
+        if (!child->parent) {
+            child->parent = parent;
+        }
         decode_json(node_jvalue, *child, &entity);
     }
     else {

@@ -24,8 +24,7 @@
 #include <ydk_ydktest/ydktest_sanity_types.hpp>
 #include <ydk_ydktest/ydktest_sanity_typedefs.hpp>
 #include <ydk_ydktest/oc_pattern.hpp>
-
-#include <ydk_ydktest_new/ietf_system.hpp>
+#include <ydk_ydktest/ietf_system.hpp>
 
 #include <ydk_ydktest/openconfig_routing_policy.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
@@ -35,7 +34,6 @@
 
 using namespace std;
 using namespace ydktest;
-using namespace ydktest_new;
 using namespace ydk;
 
 std::string XML_OC_PATTERN_PAYLOAD = R"(<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">

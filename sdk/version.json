@@ -4,5 +4,5 @@
     "openconfig": "0.1.6-post1",
     "cisco_ios_xr": "6.6.2",
     "cisco_ios_xe": "16.9.1-post",
-    "cisco_nx_os": "9.2.2"
+    "cisco_nx_os": "9.3.1"
 }

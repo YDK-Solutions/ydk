@@ -108,7 +108,7 @@ TEST_CASE("test_value_list_int64")
 TEST_CASE("test_value_list_empty")
 {
     YLeafList test_value{YType::empty, "name"};
-    test_value.append(Empty{});
+    test_value.append(Empty());
     REQUIRE(test_value[0].get()=="");
 }
 

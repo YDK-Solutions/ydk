@@ -67,6 +67,7 @@ function install_dependencies {
     yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
 #    yum install python-devel python-pip python3-devel python3-pip -y
+    yum install python3-devel -y
     yum install rpm-build redhat-lsb lcov -y > /dev/null
     yum install valgrind -y
   print_msg "Python3.6 location: $(which python3.6)"

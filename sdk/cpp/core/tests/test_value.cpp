@@ -99,7 +99,7 @@ TEST_CASE("test_int64")
 TEST_CASE("test_empty")
 {
     YLeaf test_value{YType::empty, "name"};
-    test_value = Empty{};
+    test_value = Empty();
     REQUIRE(test_value.get()=="");
 }
 

@@ -13,9 +13,9 @@
   * Get entity path methods should be consistent ([#953](https://github.com/CiscoDevNet/ydk-gen/issues/953))
   
 #### Documentation improvements
-  Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
-  Resolved GitHub issues:
-    * Public API for entity has documentation gaps ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952))
+  * Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  * Improved documentation for System Requirements and Python Requirements
+  * Resolved GitHub issue ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952)): Public API for entity has documentation gaps 
 
 
 ### 2019-05-15 version 0.8.3

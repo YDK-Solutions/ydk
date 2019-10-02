@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 
-
 import sys
 import unittest
 
@@ -29,7 +28,7 @@ try:
     from ydk.models.ydktest.ydktest_sanity import Runner, CascadingTypes, SubTest, ChildIdentity, ChildChildIdentity, Native
     from ydk.models.ydktest.ydktest_sanity_types import YdktestType
     from ydk.models.ydktest.ydktest_sanity import YdkEnumTest, YdkEnumIntTest, CompInstType, CompInstType_
-except:
+except ImportError:
     from ydk.models.ydktest.ydktest_sanity.runner.runner import Runner
     from ydk.models.ydktest.ydktest_sanity.native.native import Native
     from ydk.models.ydktest.ydktest_sanity.cascading_types.cascading_types import CascadingTypes
@@ -67,14 +66,6 @@ class SanityTest(unittest.TestCase):
 
         ctypes = CascadingTypes()
         self.crud.delete(self.ncc, ctypes)
-
-    def _create_runner(self):
-        # runner = Runner()
-        # runner.ytypes = runner.Ytypes()
-        # runner.ytypes.built_in_t = runner.ytypes.BuiltInT()
-
-        # return runner
-        pass
 
     def test_int8(self):
         # Create Runner
@@ -349,10 +340,10 @@ class SanityTest(unittest.TestCase):
         self.assertEqual(runner, runner1)
         self.assertEqual(runner.ytypes.built_in_t.younion_recursive, runner1.ytypes.built_in_t.younion_recursive)
 
-    def test_union_list(self):
+    def test_union_leaflist(self):
         runner = Runner()
         runner.ytypes.built_in_t.llunion.append(1)
-        runner.ytypes.built_in_t.llunion.append(3)
+        runner.ytypes.built_in_t.llunion.append('3.3')
         self.crud.create(self.ncc, runner)
 
         # Read into Runner1
@@ -361,7 +352,6 @@ class SanityTest(unittest.TestCase):
 
         # Compare runners
         self.assertEqual(runner, runner1)
-        self.assertEqual(runner.ytypes.built_in_t.llunion, runner1.ytypes.built_in_t.llunion)
 
     @unittest.skip('ConfD internal error.')
     def test_bits_leaflist(self):
@@ -464,10 +454,10 @@ class SanityTest(unittest.TestCase):
         elems = []
         n = 10
         for i in range(n):
-            l = Runner.OneList.Ldata()
-            l.number = i
-            l.name = str(i)
-            elems.append(l)
+            ldata = Runner.OneList.Ldata()
+            ldata.number = i
+            ldata.name = str(i)
+            elems.append(ldata)
         runner.one_list.ldata.extend(elems)
         with self.assertRaises(YServiceProviderError):
             self.crud.create(self.ncc, runner)
@@ -557,6 +547,7 @@ class SanityTest(unittest.TestCase):
 
         self.assertEqual(read_entity, native)
 
+
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()
 
@@ -569,4 +560,3 @@ if __name__ == '__main__':
         timeout=timeout))
     ret = not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful()
     sys.exit(ret)
-

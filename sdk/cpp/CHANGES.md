@@ -2,6 +2,7 @@
 
 #### New features and enhancements
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
+  * Adjusted C++ code to work with gcc compiler version 4.8.5 (default for CentOS-7.x)
   
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
@@ -14,7 +15,12 @@
   * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
   
 #### Documentation improvements
-  Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  * Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  * Improved documentation for System Requirements and Python Requirements
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 5.2.3
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.3.1
 
 
 ### 2019-05-15 version 0.8.3

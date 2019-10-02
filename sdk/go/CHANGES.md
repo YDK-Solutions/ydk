@@ -10,6 +10,10 @@
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * Go: When entity having children is built from model API the child entities parent is nil ([#938](https://github.com/CiscoDevNet/ydk-gen/issues/938))
 
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 5.2.3
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.3.1
+
 
 ### 2019-05-15 version 0.8.3
 

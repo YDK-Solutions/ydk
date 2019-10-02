@@ -3,6 +3,7 @@
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
+  * Adjusted C++ code to work with gcc compiler version 4.8.5 (default for CentOS-7.x)
   
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
@@ -21,6 +22,7 @@
 
 #### Bundle improvements
   * Released cisco-nx-os bundle to support Cisco NX OS 9.3.1
+  * Released cisco-ios-xr bundle to support Cisco IOS XR OS 6.5.3
 
 
 ### 2019-05-15 version 0.8.3

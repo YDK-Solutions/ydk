@@ -92,7 +92,7 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 
   xcode-select --install
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11
+  brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11 doxygen libgcrypt
 
   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
   sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
@@ -104,6 +104,19 @@ The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_th
 which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
 or upgrade to libssh-0.8.1 or higher.
 
+**Note for MacOS** 
+Before installing `libssh` make sure the environment for `openssl` is setup::
+
+  brew reinstall openssl
+  export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+
+Download libssh-0.7.6 source code, compile it and install::
+
+  wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+  tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+  mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+  cmake ..
+  sudo make install
 
 gNMI Requirements
 -----------------
@@ -199,6 +212,12 @@ Make sure it matches with your installed Pyton dynamic library location::
 
   -- Found PythonLibs: /opt/python/lib/libpython3.4m.so
 
+In some OS configurations during YDK package installation the cmake fails to find C/C++ headers for previously installed YDK libraries.
+In this case the header location must be specified explicitly (in below commands the default location is shown)::
+
+  export C_INCLUDE_PATH=/usr/local/include
+  export CPLUS_INCLUDE_PATH=/usr/local/include
+
 Mac OS
 ~~~~~~
 
@@ -213,8 +232,7 @@ Follow these steps to find and set correct library path.
 
 .. code-block:: sh
 
-  # Example:
-  $ locate libpython2.7.dylib
+  locate libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib
   /System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config/libpython2.7.dylib
   /usr/lib/libpython2.7.dylib
@@ -239,7 +257,7 @@ Follow these steps to find and set correct library path.
 .. code-block:: sh
 
   -- Found PythonLibs: /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib (found version "2.7.15")
-
+  
 5. Finally test you YDK core library installation from CLI, making sure there are no errors:
 
 .. code-block:: sh

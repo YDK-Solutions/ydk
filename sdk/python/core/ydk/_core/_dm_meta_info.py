@@ -129,13 +129,23 @@ class _MetaInfoClassMember(object):
     def union_list(self):
         _list = []
         if self._mtype == REFERENCE_UNION:
-            for union_member in self._members:
-                if (union_member._ptype == 'str'):
+            for union_member in self.get_all_union_members():
+                if union_member._ptype == 'str':
                     pattern = union_member._pattern
                 else:
                     pattern = union_member._range
                 _list.append((union_member._ptype, union_member._ytype, pattern))
         return _list
+
+    def get_all_union_members(self):
+        union_members = []
+        if self._mtype == REFERENCE_UNION:
+            for meta in self.members:
+                if meta.mtype == REFERENCE_UNION:
+                    union_members.extend(meta.get_all_union_members())
+                else:
+                    union_members.append(meta)
+        return union_members
 
     def ydk_class(self):
         if (self.mtype != REFERENCE_ENUM_CLASS and self.mtype != REFERENCE_CLASS and

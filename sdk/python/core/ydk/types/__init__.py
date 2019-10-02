@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------
 
 from .py_types import Entity, EntityCollection, Config, Filter, YList, YLeafList
-from .py_types import entity_to_dict, entity_diff, absolute_path, path_to_entity
+from .py_types import entity_to_dict, entity_diff, path_to_entity
 
 from ydk.ext.types import Bits
 from ydk.ext.types import ChildrenMap
@@ -52,6 +52,5 @@ __all__ = [ "YList",
             "YType",
             "entity_to_dict",
             "entity_diff",
-            "absolute_path",
             "path_to_entity",
             ]

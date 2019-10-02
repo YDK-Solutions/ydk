@@ -88,7 +88,7 @@ JsonSubtreeCodec
         :raises YServiceProviderError: If an error has occurred; usually appears when payload does not correspond to `Entity` model.
 
 Example of JsonSubtreeCodec usage
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this example we use :py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>` and
 :py:class:`CRUDService<ydk.services.CRUDService>` to get interface configuration from IOS XR device and

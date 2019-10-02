@@ -32,12 +32,12 @@ function run_cmd {
     print_msg "Running command: $@"
     $@
     local status=$?
-    if [ $status -ne 0 ]; then
+    if [[ ${status} -ne 0 ]]; then
         MSG_COLOR=$RED
-        print_msg "Exiting '$@' with status=$status"
-        exit $status
+        print_msg "Exiting '$@' with status=${status}"
+        exit ${status}
     fi
-    return $status
+    return ${status}
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -47,7 +47,7 @@ function run_cmd {
 RED="\033[0;31m"
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
-MSG_COLOR=$YELLOW
+MSG_COLOR=${YELLOW}
 
 ######################################
 # Set up env
@@ -73,16 +73,16 @@ fi
 print_msg "Checking installation of ${PYTHON_BIN}"
 ${PYTHON_BIN} -V
 status=$?
-if [ $status -ne 0 ]; then
+if [[ ${status} -ne 0 ]]; then
     print_msg "Could not locate ${PYTHON_BIN}"
-    exit $status
+    exit ${status}
 fi
 print_msg "Checking installation of ${PIP_BIN}"
 ${PIP_BIN} -V
 status=$?
-if [ $status -ne 0 ]; then
+if [[ ${status} -ne 0 ]]; then
     print_msg "Could not locate ${PIP_BIN}"
-    exit $status
+    exit ${status}
 fi
 print_msg "Python location: $(which ${PYTHON_BIN})"
 print_msg "Pip location: $(which ${PIP_BIN})"
@@ -95,28 +95,31 @@ if [[ ${status} == 0 ]] ; then
 fi
 
 print_msg "Generating Python core and bundles"
-run_cmd ./generate.py --core
-run_cmd ./generate.py --service profiles/services/gnmi-0.4.0_post1.json
+run_cmd rm -rf gen-api/python
+run_cmd ./generate.py --core --generate-doc
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_3.json
-run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_6_2.json
+run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_3.json
 run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_3_1.json
 
 print_msg "Generating C++ core and bundles"
-run_cmd ./generate.py --core --cpp
-run_cmd ./generate.py --service profiles/services/gnmi-0.4.0_post1.json --cpp
+run_cmd rm -rf gen-api/cpp
+run_cmd ./generate.py --core --cpp --generate-doc
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json --cpp
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_3.json --cpp
-run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_6_2.json  --cpp
+run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_3.json  --cpp
 run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_3_1.json  --cpp
 
 print_msg "Generating Go core and bundles"
-run_cmd ./generate.py --core --go
-run_cmd ./generate.py --service profiles/services/gnmi-0.4.0_post1.json --go
+run_cmd rm -rf gen-api/go
+run_cmd ./generate.py --core --go --generate-doc
+run_cmd ./generate.py --service profiles/services/gnmi-0.4.0.json --go
 run_cmd ./generate.py --bundle profiles/bundles/ietf_0_1_5_post2.json --go
 run_cmd ./generate.py --bundle profiles/bundles/openconfig_0_1_6_post1.json --go
 run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xe_16_9_3.json --go
-run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_6_2.json  --go
+run_cmd ./generate.py --bundle profiles/bundles/cisco-ios-xr_6_5_3.json  --go
 run_cmd ./generate.py --bundle profiles/bundles/cisco-nx-os-9_3_1.json --go

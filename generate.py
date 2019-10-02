@@ -21,7 +21,6 @@ from distutils import dir_util, file_util
 from argparse import ArgumentParser
 
 import filecmp
-import fileinput
 import json
 import logging
 import os
@@ -29,7 +28,6 @@ import shutil
 import subprocess
 import sys
 import time
-import re
 
 from git import Repo
 from ydkgen import YdkGenerator
@@ -65,7 +63,6 @@ def print_about_page(ydk_root, docs_rst_directory, release):
         raise Exception('Language {0} not yet supported'.format(language))
 
     # modify about_ydk.rst page
-    lines = ''
     with open(os.path.join(ydk_root, 'sdk/_docsgen_common/about_ydk.rst'), 'r+') as fd:
         lines = fd.read()
     if 'git clone repo-url' in lines:
@@ -88,7 +85,7 @@ def get_release(ydk_root):
     release = versions['core']
     dev = '-dev' if release[-4:] == '-dev' else ''
     release = release.replace('-dev', '')
-    return (release, dev)
+    return release, dev
 
 
 def copy_docs_from_bundles(output_directory, destination_dir):
@@ -130,7 +127,7 @@ def copy_files_to_cache(output_root_directory, language, docs_rst_directory):
             cache_file = os.path.join(cache_dir, basename)
             fp = os.path.join(docs_rst_directory, f)
             logger.debug("Comparing files '%s', '%s'" % (fp, cache_file))
-            if os.path.isfile(fp) == False:
+            if not os.path.isfile(fp):
                 if os.path.isfile(cache_file):
                     os.remove(cache_file)
                     logger.debug("Deleting orphan %s from cache" % (cache_file))
@@ -142,7 +139,8 @@ def copy_files_to_cache(output_root_directory, language, docs_rst_directory):
     logger.debug("\n%s files copied\n" % file_count)
     docs_rst_directory = cache_dir
     docs_expanded_directory = os.path.join(output_root_directory, 'cache', language, 'ydk', 'docs_expanded')
-    return (docs_rst_directory, docs_expanded_directory)
+    return docs_rst_directory, docs_expanded_directory
+
 
 def generate_documentations(output_directory, ydk_root, language, is_bundle, is_core,
                             output_directory_contains_cache, output_root_directory):
@@ -166,11 +164,9 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
 
     # build docs
     if is_core:
-        logger.debug("Invoking '%s'"%(' '.join(['sphinx-build',
-                              '-D', release,
-                              '-D', version,
-                              '-vvv',
-                              docs_rst_directory, docs_expanded_directory])))
+        logger.debug("Invoking '%s'" %
+                     (' '.join(['sphinx-build', '-D', release, '-D', version, '-vvv',
+                                docs_rst_directory, docs_expanded_directory])))
         p = subprocess.Popen(['sphinx-build',
                               '-D', release,
                               '-D', version, '-vvv',
@@ -178,9 +174,7 @@ def generate_documentations(output_directory, ydk_root, language, is_bundle, is_
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
     else:
-        logger.debug("Invoking '%s'" % (['sphinx-build',
-                              '-vvv',
-                              docs_rst_directory, docs_expanded_directory]))
+        logger.debug("Invoking '%s'" % (['sphinx-build', '-vvv', docs_rst_directory, docs_expanded_directory]))
         p = subprocess.Popen(['sphinx-build',
                               '-vvv',
                               docs_rst_directory, docs_expanded_directory],
@@ -235,6 +229,7 @@ def install_go_package(gen_api_dir, generator):
     print('Successfully generated and installed Go YDK %s package at %s' % 
           (package, target_dir))
 
+
 def generate_adhoc_bundle(adhoc_bundle_name, adhoc_bundle_files):
     adhoc_bundle = {
         "name": adhoc_bundle_name,
@@ -266,7 +261,6 @@ def generate_adhoc_bundle(adhoc_bundle_name, adhoc_bundle_files):
 
 
 def preconfigure_generated_cpp_code(output_directory, generate_libydk):
-    cpp_sdk_root = os.path.join(output_directory)
     cmake_build_dir = os.path.join(output_directory, 'build')
     if os.path.exists(cmake_build_dir):
         shutil.rmtree(cmake_build_dir)
@@ -292,6 +286,7 @@ def _get_time_taken(start_time):
     minutes_str = str(minutes) + ' minutes' if int(uptime) > 60 else ''
     seconds_str = str(seconds) + ' seconds'
     return minutes_str, seconds_str
+
 
 def get_python_version():
     import sysconfig
@@ -482,7 +477,7 @@ if __name__ == '__main__':
                 'core',
                 options.one_class_per_module)
 
-            output_directory = (generator.generate(options.core))
+            output_directory = generator.generate(options.core)
 
         if options.bundle:
             generator = YdkGenerator(
@@ -561,7 +556,7 @@ if __name__ == '__main__':
                 python_version = get_python_version()
                 if python_version.startswith('3.'):
                     pip_command = 'pip3'
-                #print('\nExecuting command: %s%s install %s/%s -U\n' % (sudo, pip_command, dist_dir, dest))
+                # print('\nExecuting command: %s%s install %s/%s -U\n' % (sudo, pip_command, dist_dir, dest))
                 os.system('%s%s install %s/%s -U' % (sudo, pip_command, dist_dir, dest))
 
             elif len(file_list) == 0:

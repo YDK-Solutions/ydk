@@ -111,6 +111,24 @@ The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_th
 which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
 or upgrade to libssh-0.8.1 or higher.
 
+**Note for MacOS** 
+Before installing `libssh` make sure the environment for `openssl` is setup:
+
+.. code-block:: sh
+
+  brew reinstall openssl
+  export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+
+Download libssh-0.7.6 source code, compile it and install:
+
+.. code-block:: sh
+
+  wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+  tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+  mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+  cmake ..
+  sudo make install
+
 gNMI Requirements
 -----------------
 
@@ -148,22 +166,22 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-2.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-4.x86_64.rpm
    
 **MacOS**::
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4_Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-4_Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 
 Runtime environment
@@ -205,6 +223,12 @@ Run `pip install ydk` command with `-v` option and in the console output note lo
 Make sure it matches with your installed Pyton dynamic library location::
 
   -- Found PythonLibs: /opt/python/lib/libpython3.4m.so
+
+In some OS configurations during YDK package installation the `cmake` fails to find C/C++ headers for previously installed YDK libraries.
+In this case the header location must be specified explicitly (in below commands the default location is shown)::
+
+  export C_INCLUDE_PATH=/usr/local/include
+  export CPLUS_INCLUDE_PATH=/usr/local/include
 
 Mac OS
 ~~~~~~

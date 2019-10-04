@@ -166,17 +166,17 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
    
 **MacOS**::
 

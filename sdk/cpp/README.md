@@ -71,7 +71,7 @@ $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
 $ ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 ```
 
-#### Mac OS
+#### Mac OSX
 
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK-Cpp:
 
@@ -185,21 +185,21 @@ $ sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 For Ubuntu/Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-4.amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+$ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-4.amd64.deb
-$ sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+$ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 For CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-4.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
 ```
 
 ##### MacOS

@@ -154,7 +154,7 @@ while true; do
 done
 
 printf "\nDeleting docs directories..\n\n"
-rm -rf ${GEN_API_PATH}/*/docsgen ${GEN_API_PATH}/*/docs_expanded
+rm -rf ${GEN_API_PATH}/*/docsgen # ${GEN_API_PATH}/*/docs_expanded
 
 echo "${LANGUAGE} being copied to ${SDK_PATH}"
 

@@ -17,7 +17,7 @@ YANG Development Kit (Generator)
 - [Docker](#docker)
 - [System requirements](#system-requirements)
   - [Linux](#linux)
-  - [MacOS](#mac-os)
+  - [MacOSX](#mac-osx)
   - [Windows](#windows)
 - [YDK Python Installation](#ydk-python-installation)
   - [Setting up Python virtual environment](#setting-up-python-virtual-environment)
@@ -154,7 +154,7 @@ The C++ code was compiled with default gcc compiler version, which is 4.8.5. For
 sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
 ```
 
-## MacOS
+## Mac OSX
 
 It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK software.
 
@@ -241,15 +241,15 @@ cd -
 ##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-4.amd64.deb
-sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 ##### Bionic (Ubuntu 18.04.1, gcc-7.4.0))
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-4.amd64.deb
-sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 #### CentOS
@@ -257,7 +257,7 @@ sudo gdebi libydk_gnmi_0.4.0-4.amd64.deb
 The `libydk_gnmi` package was compiled with gcc-4.8.5.
 
 ```
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-4.x86_64.rpm
+sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
 ```
 
 #### MacOS:

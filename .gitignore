@@ -16,11 +16,9 @@ debug.log
 netconf.log
 protocol.log
 myenv
-mypython
-mypython3
 py2env
 py3env
-v/
+venv/
 gittmp*/
 .DS_Store
 gen-api/

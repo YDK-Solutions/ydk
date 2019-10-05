@@ -1,7 +1,7 @@
 {
   "name": "cisco-nx-os",
   "version": "9.3.1",
-  "core_version": "0.8.4",
+  "core_version": "0.8.3",
   "author": "Cisco",
   "copyright": "Cisco",
   "description": "YDK bundle for Cisco NX-OS models",

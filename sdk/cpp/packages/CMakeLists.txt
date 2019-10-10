@@ -20,7 +20,7 @@ bundle profile and the ydk-gen tool.")
 
 set (CPACK_PACKAGE_CONTACT "ydk-admin@cisco.com")
 set (CPACK_PACKAGE_VENDOR "Cisco")
-set (CPACK_PACKAGE_INSTALL_DIRECTORY "/usr/local")
+set (CPACK_SET_DESTDIR true)
 
 # MAC OS -- not working
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

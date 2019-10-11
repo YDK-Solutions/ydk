@@ -1,4 +1,4 @@
-### 2019-09-15 version 0.8.4
+### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
@@ -17,6 +17,7 @@
   * gNMISession fails to decode GetRequest response when returned values is empty string ([#943](https://github.com/CiscoDevNet/ydk-gen/issues/943))
   * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
   * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
+  * Debian package for C++ bundles getting installed to wrong location ([#962](https://github.com/CiscoDevNet/ydk-gen/issues/962))
   
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.

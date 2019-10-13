@@ -1,4 +1,4 @@
-### 2019-09-15 version 0.8.4
+### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))

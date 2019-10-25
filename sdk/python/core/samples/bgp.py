@@ -22,8 +22,6 @@
 #  open-config bgp yang module.
 #
 
-
-
 from __future__ import print_function
 from __future__ import absolute_import
 from ydk.types import Empty
@@ -35,8 +33,6 @@ from ydk.models.openconfig import openconfig_bgp
 from ydk.models.openconfig import openconfig_bgp_types
 from ydk.models.openconfig.openconfig_routing_policy import RoutingPolicy
 from ydk.errors import YError
-
-
 
 
 #<bgp xmlns="http://openconfig.net/yang/bgp">
@@ -100,8 +96,6 @@ def bgp_run(crud_service, session):
 
 
     routing_policy.policy_definitions.policy_definition.append(pass_all_policy_defn)
-    pass_all_policy_defn.parent = routing_policy.policy_definitions
-
 
     bgp_cfg.global_.config.as_ = 65001
 
@@ -140,8 +134,6 @@ def bgp_run(crud_service, session):
 
 
     bgp_cfg.neighbors.neighbor.append(nbr_ipv4)
-    nbr_ipv4.parent = bgp_cfg.neighbors
-
     # IPv4 Neighbor instance config done
 
     crud_service.create(session, bgp_cfg)
@@ -155,7 +147,6 @@ def bgp_run(crud_service, session):
 
     # IPv6 Neighbor instance config
     nbr_ipv6 = bgp.Bgp.Neighbors.Neighbor()
-    #nbr_ipv6.parent = bgp_cfg.neighbors
     nbr_ipv6.neighbor_address = '2001:db8:fff1::1'
     nbr_ipv6.config.neighbor_address = '2001:db8:fff1::1'
     nbr_ipv6.config.peer_as = 65002

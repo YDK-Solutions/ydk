@@ -67,7 +67,9 @@ class SanityNetconf(ParametrizedTestCase):
         crud.delete(self.ncc, runner)
 
     def tearDown(self):
-        pass
+        crud = CRUDService()
+        runner = ysanity.Runner()
+        crud.delete(self.ncc, runner)
 
     def test_edit_commit_get(self):
         one = ysanity.Runner.One()

@@ -74,12 +74,12 @@ function run_test {
 }
 
 function pip_check_install {
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "2"* ]]
     then
         print_msg "Custom pip install of $@ for CentOS"
-        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps $@ -U
+        ${PIP_BIN} install --install-option="--install-purelib=/usr/lib64/python${PYTHON_VERSION}/site-packages" --no-deps -U $@
     else
-        ${PIP_BIN} install --no-deps $@ -U
+        ${PIP_BIN} install --no-deps -U $@
     fi
 }
 
@@ -137,6 +137,13 @@ function check_python_installation {
       PIP_BIN=pip${PYTHON_VERSION}
     fi
   fi
+
+  if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
+    print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
+    run_exec_test ${PYTHON_BIN} -m venv $YDKGEN_HOME/venv
+    run_exec_test source $YDKGEN_HOME/venv/bin/activate
+  fi
+
   print_msg "Checking installation of ${PYTHON_BIN}"
   ${PYTHON_BIN} --version &> /dev/null
   status=$?
@@ -299,7 +306,16 @@ function install_py_core {
     fi
     cd $YDKGEN_HOME/sdk/python/core
     ${PYTHON_BIN} setup.py sdist
-    ${PIP_BIN} install dist/ydk*.tar.gz
+    ${PIP_BIN} install -v dist/ydk*.tar.gz
+
+    print_msg "Testing core package installation"
+    ${PYTHON_BIN} -c "import ydk.types"
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Failed core package installation test. Exiting"
+        exit 2
+    fi
 
 #    print_msg "Generating py binaries"
 #    sudo ./generate_python_binary.sh
@@ -333,9 +349,6 @@ function generate_install_specified_cpp_bundle {
 function cpp_sanity_ydktest_gen_install {
     print_msg "Generating and installing C++ ydktest bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-cpp.json ydktest-bundle
-
-    print_msg "Generating and installing new C++ ydktest bundle"
-    generate_install_specified_cpp_bundle profiles/test/ydktest-cpp-new.json ydktest_new-bundle
 
     print_msg "Generating and installing C++ ydktest-oc-nis bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-oc-nis.json ydktest_oc_nis-bundle
@@ -612,7 +625,7 @@ function py_sanity_ydktest_test_tcp {
     print_msg "py_sanity_ydktest_test_tcp"
     run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307
     init_confd_ydktest
-    run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
+    # run_test sdk/python/core/tests/test_sanity_netconf.py tcp://admin:admin@127.0.0.1:12307 --non-demand
 }
 
 #--------------------------
@@ -893,6 +906,11 @@ which cmake3
 status=$?
 if [[ ${status} == 0 ]] ; then
     CMAKE_BIN=cmake3
+fi
+
+if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64:/usr/local/lib64:/usr/local/lib
+   print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
 fi
 
 init_py_env

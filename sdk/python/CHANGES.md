@@ -1,12 +1,21 @@
-### 2019-08-15 version 0.8.4
+### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   
 #### Resolved GitHub issues
-  * Incorrect subtree filter using NETCONF service ([#441](https://github.com/CiscoDevNet/ydk-gen/issues/441))
+  * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+  * Inherited classes not initialized properly in Python3 when constructor uses super() ([#921](https://github.com/CiscoDevNet/ydk-gen/issues/921))
+  * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
+  * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
+  * Get entity path methods should be consistent ([#953](https://github.com/CiscoDevNet/ydk-gen/issues/953))
+  
+#### Documentation improvements
+  * Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
+  * Improved documentation for System Requirements and Python Requirements
+  * Resolved GitHub issue ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952)): Public API for entity has documentation gaps 
 
 
 ### 2019-05-15 version 0.8.3

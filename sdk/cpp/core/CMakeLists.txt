@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.8.3 LANGUAGES C CXX)
+project(ydk VERSION 0.8.4 LANGUAGES C CXX)
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The library for  YDK API.")
 
@@ -22,7 +22,7 @@ bundle profile and the ydk-gen tool.")
 
 set (CPACK_PACKAGE_CONTACT "ydk-admin@cisco.com")
 set (CPACK_PACKAGE_VENDOR "Cisco")
-set(CPACK_SET_DESTDIR true)
+set (CPACK_SET_DESTDIR true)
 
 # MAC OS -- not working
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

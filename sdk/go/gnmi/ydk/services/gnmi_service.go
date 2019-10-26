@@ -41,6 +41,7 @@ type GnmiSubscription struct {
 	HeartbeatInterval uint64
 }
 
+// Set method
 func (gs *GnmiService) Set(provider *providers.GnmiServiceProvider, entity types.Entity, operation string) bool {
 	data := map[string]string {}
 	data["mode"] = operation
@@ -54,6 +55,7 @@ func (gs *GnmiService) Set(provider *providers.GnmiServiceProvider, entity types
 	return operationSucceeded(readDataNode)
 }
 
+// Get method
 func (gs *GnmiService) Get(provider *providers.GnmiServiceProvider, filter types.Entity, operation string) types.Entity {
 	data := map[string]string {}
 	data["mode"] = operation
@@ -65,11 +67,13 @@ func (gs *GnmiService) Get(provider *providers.GnmiServiceProvider, filter types
 	return path.ReadDatanode(filter, readDataNode)
 }
 
+// Capabilities method
 func (gs *GnmiService) Capabilities(provider *providers.GnmiServiceProvider) string {
 	var caps string = path.GnmiServiceGetCapabilities(provider.Private)
 	return caps
 }
 
+// Subscribe method
 func (gs *GnmiService) Subscribe(provider *providers.GnmiServiceProvider, subscriptionList []GnmiSubscription, qos uint32, mode string, encode string) {
 
 	session := provider.GetSession()

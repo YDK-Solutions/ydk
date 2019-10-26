@@ -16,28 +16,32 @@
 
 """test_utils.py
 
-Utility function for test cases.
+Utility functions for test cases.
 """
+
+import sys
 import re
 import unittest
 import logging
 
 from argparse import ArgumentParser
+from ydk.entity_utils import get_data_node_from_entity
+from ydk.errors import YCoreError
 
-import sys
 if sys.version_info > (3,):
     from urllib.parse import urlparse
 else:
     from urlparse import urlparse
 
-from ydk.entity_utils import get_data_node_from_entity
 
 class EmptyTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         pass
+
     def runTest(self):
         pass
+
 
 def assert_with_error(pattern, ErrorClass):
     def assert_with_pattern(func):
@@ -50,15 +54,17 @@ def assert_with_error(pattern, ErrorClass):
         return helper
     return assert_with_pattern
 
+
 def enable_logging(level):
     log = logging.getLogger('ydk')
     log.setLevel(level)
     handler = logging.StreamHandler()
-    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     log.addHandler(handler)
 
-def datanode_to_str(dn, indent = ''):
+
+def datanode_to_str(dn, indent=''):
     try:
         s = dn.get_schema_node().get_statement()
         if s.keyword == "leaf" or s.keyword == "leaf-list" or s.keyword == "anyxml":
@@ -73,27 +79,34 @@ def datanode_to_str(dn, indent = ''):
     except YCoreError as ex:
         print(ex.message)
 
+
 def print_data_node(dn):
     try:
         print("\n=====>  Printing DataNode: '{}'".format(dn.get_path()))
         print(datanode_to_str(dn))
-    except YPYCoreError as ex:
+    except YCoreError as ex:
         print(ex.message)
 
+
 def print_entity(entity, root_schema):
-    dn = get_data_node_from_entity( entity, root_schema);
+    dn = get_data_node_from_entity(entity, root_schema)
     print_data_node(dn)
 
+
 def entity_to_string(entity, root_schema):
-    dn = get_data_node_from_entity( entity, root_schema);
+    dn = get_data_node_from_entity(entity, root_schema)
     return datanode_to_str(dn)
+
 
 class ParametrizedTestCase(unittest.TestCase):
     """ TestCase classes that want to be parametrized should
         inherit from this class.
     """
-    def __init__(self, methodName='runTest'):
-        super(ParametrizedTestCase, self).__init__(methodName)
+    def __init__(self, method_name='runTest'):
+        if sys.version_info > (3,):
+            super().__init__(method_name)
+        else:
+            super(ParametrizedTestCase, self).__init__(method_name)
 
     @staticmethod
     def parametrize(testcase_klass, device):
@@ -111,6 +124,7 @@ class ParametrizedTestCase(unittest.TestCase):
             suite.addTest(testcase_klass(name))
         return suite
 
+
 def get_device_info():
     parser = ArgumentParser()
     parser.add_argument("-v", "--verbose", help="print debugging messages", action="store_true")
@@ -122,6 +136,7 @@ def get_device_info():
         args.device = "ssh://admin:admin@127.0.0.1:50051"
     device = urlparse(args.device)
     return device
+
 
 def get_local_repo_dir():
     import os

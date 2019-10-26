@@ -357,7 +357,7 @@ TEST_CASE("test_types_embeded_enum")
     REQUIRE(reply);
 
     //CREATE
-    r_1->ytypes->built_in_t->embeded_enum = ydktest_sanity::Runner::Ytypes::BuiltInT::EmbededEnum::zero;
+    r_1->ytypes->built_in_t->embeded_enum = ydktest_sanity::Runner::Ytypes::BuiltInT::EmbededEnum::seven;
     reply = crud.create(provider, *r_1);
     REQUIRE(reply);
 
@@ -367,6 +367,10 @@ TEST_CASE("test_types_embeded_enum")
     REQUIRE(r_read!=nullptr);
     ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
     REQUIRE(r_1->ytypes->built_in_t->embeded_enum == r_2->ytypes->built_in_t->embeded_enum);
+    auto embeded_enum_name = r_2->ytypes->built_in_t->embeded_enum;
+    auto embeded_enum_value = ydktest_sanity::Runner::Ytypes::BuiltInT::EmbededEnum::get_enum_value(embeded_enum_name);
+    REQUIRE(r_1->ytypes->built_in_t->embeded_enum.enum_value == embeded_enum_value);
+    r_2->ytypes->built_in_t->embeded_enum.enum_value = embeded_enum_value;
 }
 
 TEST_CASE("test_types_enum")

@@ -950,6 +950,48 @@ func EntityToDict(entity Entity) map[string]string {
 	return edict
 }
 
+func PathToEntity(entity Entity, absPath string) Entity {
+	topAbsPath := GetAbsolutePath(entity)
+	if topAbsPath == absPath {
+		return entity
+	}
+
+	if strings.Index(absPath, topAbsPath) == 0 {
+		entityPath := GetEntityPath(entity)
+		for _, leafData := range entityPath.ValuePaths {
+			if leafData.Data.IsSet {
+				leafName := leafData.Name
+				keyPath := fmt.Sprintf("[%s=", leafName)
+				if strings.Index(absPath, keyPath) == -1 {
+					path := fmt.Sprintf("%s/%s", topAbsPath, leafName)
+					if path == absPath {
+						return entity
+					}
+				}
+			}
+		}
+		children := GetYChildren(entity.GetEntityData())
+		for _, child := range children {
+			if child.Value == nil || (IsPresenceContainer(child.Value) && !GetPresenceFlag(child.Value)) {
+				continue
+			}
+			childAbsPath := GetAbsolutePath(child.Value)
+			if childAbsPath == absPath {
+				return child.Value
+			}
+			if strings.Index(absPath, childAbsPath) != 0 {
+				continue
+			}
+			matchingEntity := PathToEntity(child.Value, absPath)
+			if matchingEntity != nil {
+				return matchingEntity
+			}
+		}
+	}
+	return nil
+}
+
+
 func keyInSlice(k string, v []string) bool {
 	for _, e := range v {
 		if e == k {

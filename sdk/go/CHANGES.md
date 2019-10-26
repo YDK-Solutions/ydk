@@ -1,18 +1,25 @@
-### 2019-08-15 version 0.8.4
+### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   
 #### Resolved GitHub issues
+  * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
+  * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
+  * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * Go: When entity having children is built from model API the child entities parent is nil ([#938](https://github.com/CiscoDevNet/ydk-gen/issues/938))
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 5.2.3
+  * Released cisco-nx-os bundle to support Cisco NX OS 9.3.1
 
 
 ### 2019-05-15 version 0.8.3
 
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
-  * Updated openconfig bundle to introduce support for additional models.  
+  * Updated openconfig bundle to introduce support for additional models.
   
 #### Resolved GitHub issues
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))

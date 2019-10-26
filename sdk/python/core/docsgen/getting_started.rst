@@ -70,7 +70,7 @@ Centos (Fedora-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
 **Note:** Currently, only Centos7 and RHEL7 are known to work with YDK.
-Please see `this issue on YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
+Please see this issue on `YDK GitHub <https://github.com/CiscoDevNet/ydk-gen/issues/518>`_ for any potential/usage installation on CentOS.
 
 The following packages must be present in your system before installing YDK-Py::
 
@@ -111,6 +111,24 @@ The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_th
 which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
 or upgrade to libssh-0.8.1 or higher.
 
+**Note for MacOS** 
+Before installing `libssh` make sure the environment for `openssl` is setup:
+
+.. code-block:: sh
+
+  brew reinstall openssl
+  export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
+
+Download libssh-0.7.6 source code, compile it and install:
+
+.. code-block:: sh
+
+  wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+  tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+  mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+  cmake ..
+  sudo make install
+
 gNMI Requirements
 -----------------
 
@@ -148,22 +166,22 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-  sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi_0.4.0-2.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
    
 **MacOS**::
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-2_Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 
 Runtime environment
@@ -186,16 +204,40 @@ It is also required for Python installation to include corresponding shared libr
   python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
   python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
-Please follow `System Requirements` to assure presence of shared Python libraries.
+Please follow `System Requirements`_ to assure presence of shared Python libraries.
+
+If you choose to install Python from source (need specific version), please include `--enable-shared` flag in `configure`
+command to include build of shared library::
+
+  cd Python3.4.1
+  ./configure --prefix=/opt/python --enable-shared
+  make
+  make install
+
+Here the `/opt/python` is your Python installation directory. If installation directory is different from the system path,
+you need to configure `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library::
+
+  export CMAKE_LIBRARY_PATH=/opt/python/lib
+
+Run `pip install ydk` command with `-v` option and in the console output note location of found `PythonLibs`.
+Make sure it matches with your installed Pyton dynamic library location::
+
+  -- Found PythonLibs: /opt/python/lib/libpython3.4m.so
+
+In some OS configurations during YDK package installation the `cmake` fails to find C/C++ headers for previously installed YDK libraries.
+In this case the header location must be specified explicitly (in below commands the default location is shown)::
+
+  export C_INCLUDE_PATH=/usr/local/include
+  export CPLUS_INCLUDE_PATH=/usr/local/include
 
 Mac OS
 ~~~~~~
 
-The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
-This is well known and documented issue. Each developer might have different approaches for its resolution.
-One of them is to use Python2 virtual environment. See section Using Python Virtual Environment for details.
+The developers of Python2 on Mac OS might face an `installation issue <https://github.com/CiscoDevNet/ydk-gen/issues/837>`_.
+This is well known and documented issue. Each developer might have different approach for its resolution.
+One of them is to use Python2 virtual environment. See section `Using Python Virtual Environment`_ for details.
 
-In addition it is required properly set CMAKE_LIBRARY_PATH environment variable to assure that `cmake` uses correct Python library.
+In addition it is required properly set `CMAKE_LIBRARY_PATH` environment variable to assure that `cmake` uses correct Python library.
 Follow these steps to find and set correct library path.
 
 1. Find installations of `libpython2.7` library:

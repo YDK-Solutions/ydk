@@ -29,6 +29,7 @@ function install_dependencies {
 
     apt update -y > /dev/null
     apt install sudo -y > /dev/null
+    sudo apt-get install -y --no-install-recommends apt-utils
     sudo apt-get update -y > /dev/null
     sudo apt-get install libtool-bin -y > /dev/null
     local status=$?

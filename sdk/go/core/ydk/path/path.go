@@ -23,8 +23,8 @@
 package path
 
 // #cgo CXXFLAGS: -g -std=c++11
-// #cgo darwin LDFLAGS: -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lpython -lc++
-// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lpython2.7 -lm -ldl
+// #cgo darwin LDFLAGS: -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lc++
+// #cgo linux LDFLAGS:  -fprofile-arcs -ftest-coverage --coverage -lydk -lxml2 -lxslt -lpcre -lssh -lssh_threads -lcurl -lstdc++ -lm -ldl
 // #include <ydk/ydk.h>
 // #include <stdlib.h>
 import "C"
@@ -259,6 +259,8 @@ func createFromChildren(
 	}
 }
 
+// GetTopEntity traverses the entity hierarchy up to the top-level entity.
+// Develops error if Parent for non-top-level entity is not set.
 func GetTopEntity(entity types.Entity) types.Entity {
 	if types.IsEntityCollection(entity) {
 		entCollection := types.EntityToCollection(entity)

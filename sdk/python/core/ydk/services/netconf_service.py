@@ -105,46 +105,12 @@ class NetconfService(_NetconfService):
     def get_config(self, provider, source=Datastore.running, read_filter=None):
         if None in (provider, source):
             raise _YServiceError("provider and source cannot be None")
-
-        if read_filter is None:
-            with _handle_error():
-                return _read_entities(provider, True, source)
-
-        filters = read_filter
-        if isinstance(read_filter, EntityCollection):
-            filters = read_filter.entities()
-
-        _set_nontop_entity_filter(filters, YFilter.read)
-        top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
-        with _handle_error():
-            top_result = self._ns.get_config(provider, source, top_filters)
-        result = _get_child_entity_from_top(top_result, filters)
-
-        if isinstance(read_filter, EntityCollection):
-            result = Config(result)
-        return result
+        return _ns_get(provider, source, read_filter, self._ns.get_config)
 
     def get(self, provider, read_filter=None):
         if provider is None:
             raise _YServiceError("provider cannot be None")
-
-        if read_filter is None:
-            with _handle_error():
-                return _read_entities(provider, get_config=False)
-
-        filters = read_filter
-        if isinstance(read_filter, EntityCollection):
-            filters = read_filter.entities()
-
-        _set_nontop_entity_filter(filters, YFilter.read)
-        top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
-        with _handle_error():
-            top_result = self._ns.get(provider, top_filters)
-        result = _get_child_entity_from_top(top_result, filters)
-
-        if isinstance(read_filter, EntityCollection):
-            result = Config(result)
-        return result
+        return _ns_get(provider, None, read_filter, self._ns.get)
 
     def kill_session(self, provider, session_id):
         if None in (provider, session_id):
@@ -178,3 +144,27 @@ class NetconfService(_NetconfService):
                 return self._ns.validate(provider, source_config)
             else:
                 return self._ns.validate(provider, source)
+
+
+def _ns_get(provider, source, read_filter, ns_call):
+    is_config = (source is not None)
+    if read_filter is None:
+        with _handle_error():
+            return _read_entities(provider, get_config=is_config)
+
+    filters = read_filter
+    if isinstance(read_filter, EntityCollection):
+        filters = read_filter.entities()
+
+    _set_nontop_entity_filter(filters, YFilter.read)
+    top_filters = _get_top_level_entity(filters, provider.get_session().get_root_schema())
+    with _handle_error():
+        if is_config:
+            top_result = ns_call(provider, source, top_filters)
+        else:
+            top_result = ns_call(provider, top_filters)
+    result = _get_child_entity_from_top(top_result, filters)
+
+    if isinstance(read_filter, EntityCollection):
+        result = Config(result)
+    return result

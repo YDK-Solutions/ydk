@@ -14,17 +14,18 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-'''
+"""
    YDK PY converter
-
-'''
+"""
 from __future__ import print_function
 
 
-import os, shutil
+import os
+import sys
+import shutil
 from distutils import dir_util
 
-from ydkgen.api_model import Bits, Class, Enum, Package, snake_case, get_property_name
+from ydkgen.api_model import Bits, Class, Enum, Package, get_property_name
 from ydkgen.common import get_rst_file_name
 
 from .import_test_printer import ImportTestPrinter
@@ -40,7 +41,10 @@ from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _E
 class PythonBindingsPrinter(LanguageBindingsPrinter):
 
     def __init__(self, ydk_root_dir, bundle, generate_tests, one_class_per_module):
-        super(PythonBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        if sys.version_info > (3,):
+            super().__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        else:
+            super(PythonBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
         self.bundle = bundle
         self.bundle_name = bundle.name
         self.bundle_version = bundle.str_version
@@ -79,10 +83,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
             return
 
         sub = package.sub_name
-
         test_output_dir = self.initialize_output_directory(self.test_dir)
-        if self.generate_meta:
-            meta_dir = self.initialize_output_directory(self.models_dir + '/_meta')
 
         if self.one_class_per_module:
             path = os.path.join(self.models_dir, package.name)
@@ -103,6 +104,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
             self._print_python_module(package, index, self.models_dir, size, sub)
 
         if self.generate_meta:
+            meta_dir = self.initialize_output_directory(self.models_dir + '/_meta')
             self._print_meta_module(package, meta_dir)
         if self.generate_tests:
             self._print_tests(package, test_output_dir)
@@ -282,9 +284,11 @@ def emit_module(ctx, package, extra_args):
 def emit_test_module(ctx, package, identity_subclasses):
     TestPrinter(ctx, 'py').print_tests(package, identity_subclasses)
 
+
 def emit_meta(ctx, package, extra_args):
     ModuleMetaPrinter(ctx, extra_args['one_class_per_module'],
                       extra_args['identity_subclasses']).print_output(package)
+
 
 def emit_nmsp_declare_init(ctx, package):
     InitPrinter(ctx).print_nmsp_declare_init(package)

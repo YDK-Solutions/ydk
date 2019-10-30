@@ -9,6 +9,7 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	"github.com/stretchr/testify/suite"
 	"strconv"
 	"testing"
@@ -293,28 +294,28 @@ func (suite *CrudTestSuite) TestSanityMultipleEntities() {
 	
 	configEC := types.NewConfig(&runner, &native)
 
-    // Create configuration
+	// Create configuration
 	result := suite.CRUD.Create(&suite.Provider, configEC)
 	suite.Equal(result, true)
 	
-    // Build filter
+	// Build filter
 	runnerFilter := ysanity.Runner{}
 	nativeFilter := ysanity.Native{}
-    filterEC := types.NewFilter(&runnerFilter, &nativeFilter)
+	filterEC := types.NewFilter(&runnerFilter, &nativeFilter)
 
-    // Read running config
-    readEntity := suite.CRUD.Read(&suite.Provider, filterEC);
-    suite.Equal( types.IsEntityCollection(readEntity), true)
+	// Read running config
+	readEntity := suite.CRUD.Read(&suite.Provider, filterEC);
+	suite.Equal( types.IsEntityCollection(readEntity), true)
 
-    // Get results
-    readEC := types.EntityToCollection(readEntity)
-    for _, entity := range readEC.Entities() {
-    	ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
-    }
+	// Get results
+	readEC := types.EntityToCollection(readEntity)
+	for _, entity := range readEC.Entities() {
+		ydk.YLogDebug(fmt.Sprintf("Printing %s", GetEntityXMLString(entity)))
+	}
 
-    // Delete configuration
-    result = suite.CRUD.Delete(&suite.Provider, configEC);
-    suite.Equal(result, true)
+	// Delete configuration
+	result = suite.CRUD.Delete(&suite.Provider, configEC);
+	suite.Equal(result, true)
 }
 
 func (suite *CrudTestSuite) TestSanityReadConfig() {
@@ -365,6 +366,51 @@ func (suite *CrudTestSuite) TestSanityReadConfig() {
 
 //     suite.Equal(types.EntityEqual(entity, &runnerCmp), true)
 // }
+
+func (suite *CrudTestSuite) TestDeleteContainer() {
+	// Build loopback configuration
+	address := ysanity.Native_Interface_Loopback_Ipv4_Address{}
+	address.Ip = "2.2.2.2"
+	address.PrefixLength = 32
+
+	loopback := ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	loopback.Ipv4.Address = append(loopback.Ipv4.Address, &address)
+
+	native := ysanity.Native{}
+        native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+
+	result := suite.CRUD.Create(&suite.Provider, &native)
+	suite.True(result)
+
+	// Read ipv4 configuration
+	native = ysanity.Native{}
+	loopback = ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+	types.SetAllParents(&native)
+	ipv4ConfigEnt := suite.CRUD.Read(&suite.Provider, &loopback.Ipv4)
+	suite.NotNil(ipv4ConfigEnt)
+	ipv4Config := ipv4ConfigEnt.(*ysanity.Native_Interface_Loopback_Ipv4)
+	_, addressEnt := ylist.Get(ipv4Config.Address, "2.2.2.2")
+	suite.NotNil(addressEnt)
+	addressPtr := addressEnt.(*ysanity.Native_Interface_Loopback_Ipv4_Address)
+	suite.Equal("32", addressPtr.PrefixLength)
+
+	// Remove ipv4 configuration
+	native = ysanity.Native{}
+	loopback = ysanity.Native_Interface_Loopback{}
+	loopback.Name = 2222
+	native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
+	types.SetAllParents(&native)
+	result = suite.CRUD.Delete(&suite.Provider, &loopback.Ipv4)
+        suite.True(result)
+
+	// Delete configuration
+	native = ysanity.Native{}
+	result = suite.CRUD.Delete(&suite.Provider, &native)
+	suite.True(result)
+}
 
 func TestCrudTestSuite(t *testing.T) {
 	suite.Run(t, new(CrudTestSuite))

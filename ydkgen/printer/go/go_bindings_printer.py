@@ -22,6 +22,7 @@
 from __future__ import print_function
 
 import os
+import sys
 from distutils.file_util import copy_file
 from distutils.dir_util import mkpath
 
@@ -32,12 +33,15 @@ from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _E
 from .module_printer import ModulePrinter
 from .generated_package_methods_printer import GeneratedPackageMethodsPrinter
 from ..doc import DocPrinter
-# from ..tests import TestPrinter
+
 
 class GoBindingsPrinter(LanguageBindingsPrinter):
 
     def __init__(self, ydk_root_dir, bundle, generate_tests, one_class_per_module):
-        super(GoBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        if sys.version_info > (3,):
+            super().__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        else:
+            super(GoBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
 
     def print_files(self):
         only_modules = [package.stmt for package in self.packages]

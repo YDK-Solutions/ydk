@@ -24,8 +24,7 @@
 #include <ydk_ydktest/ydktest_sanity_types.hpp>
 #include <ydk_ydktest/ydktest_sanity_typedefs.hpp>
 #include <ydk_ydktest/oc_pattern.hpp>
-
-#include <ydk_ydktest_new/ietf_system.hpp>
+#include <ydk_ydktest/ietf_system.hpp>
 
 #include <ydk_ydktest/openconfig_routing_policy.hpp>
 #include <ydk_ydktest/openconfig_interfaces.hpp>
@@ -35,7 +34,6 @@
 
 using namespace std;
 using namespace ydktest;
-using namespace ydktest_new;
 using namespace ydk;
 
 std::string XML_OC_PATTERN_PAYLOAD = R"(<oc-A xmlns="http://cisco.com/ns/yang/oc-pattern">
@@ -339,7 +337,9 @@ TEST_CASE("enum_2")
 
     auto entity = codec_service.decode(codec_provider, XML_ENUM_PAYLOAD_2, make_shared<ydktest_sanity::Runner>());
     ydktest_sanity::Runner * entity_ptr = dynamic_cast<ydktest_sanity::Runner*>(entity.get());
-    CHECK(entity_ptr->ytypes->built_in_t->enum_value.get() == "local");
+    auto enum_name = entity_ptr->ytypes->built_in_t->enum_value.get();
+    CHECK(enum_name == "local");
+    CHECK(ydktest_sanity::YdkEnumTest::get_enum_value(enum_name) == 2);
 }
 
 TEST_CASE("single_decode")
@@ -437,6 +437,21 @@ TEST_CASE("user_provided_repo")
 
     std::string xml = codec_service.encode(codec_provider, *runner, true);
     CHECK(XML_RUNNER_PAYLOAD_1 == xml);
+}
+
+TEST_CASE("user_provided_repo_decode")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    CodecServiceProvider codec_provider{repo, EncodingFormat::XML};
+    CodecService codec_service{};
+
+    auto runner = std::make_shared<ydktest_sanity::Runner>();
+    config_runner_2(runner.get());
+
+    auto ent_2 = codec_service.decode(codec_provider, XML_RUNNER_PAYLOAD_2,
+                                      std::make_shared<ydktest_sanity::Runner>());
+    std::string xml = codec_service.encode(codec_provider, *ent_2, true);
+    CHECK(xml == XML_RUNNER_PAYLOAD_2);
 }
 
 TEST_CASE("invalid_decode")

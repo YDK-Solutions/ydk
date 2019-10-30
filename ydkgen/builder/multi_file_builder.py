@@ -16,9 +16,8 @@
 
 """
  multi_file_builder.py
-
-
 """
+import sys
 from ydkgen.api_model import Class, Package
 from ydkgen.common import sort_classes_at_same_level, get_include_guard_name
 
@@ -33,14 +32,20 @@ class MultiFile(object):
 
 class MultiFileHeader(MultiFile):
     def __init__(self, package, file_index, fragmented):
-        super(MultiFileHeader, self).__init__(fragmented)
+        if sys.version_info > (3,):
+            super().__init__(fragmented)
+        else:
+            super(MultiFileHeader, self).__init__(fragmented)
         self.file_name = _get_header_name(package, file_index)
         self.include_guard = get_include_guard_name(package.name, file_index)
 
 
 class MultiFileSource(MultiFile):
     def __init__(self, package, file_index, fragmented):
-        super(MultiFileSource, self).__init__(fragmented)
+        if sys.version_info > (3,):
+            super().__init__(fragmented)
+        else:
+            super(MultiFileSource, self).__init__(fragmented)
         self.file_name = _get_source_name(package, file_index)
 
 
@@ -96,6 +101,7 @@ class MultiFileBuilder(object):
                 self.is_all_identities = False
             self.class_list.append(clazz)
             self._populate_class_list(clazz)
+
     def _populate_multi_file_data(self, package):
         file_index = -1
         self._create_and_append_multi_file(MultiFileHeader, package, file_index, False, self.class_list)
@@ -179,4 +185,3 @@ def _get_source_name(package, file_index=-1):
     if file_index > -1:
         return '{0}_{1}.cpp'.format(package.name, file_index)
     return '{0}.cpp'.format(package.name)
-

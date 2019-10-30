@@ -21,6 +21,7 @@
 from __future__ import print_function
 
 import os
+import sys
 
 from ydkgen.api_model import Class, Enum
 from ydkgen.builder import MultiFileBuilder, MultiFileHeader, MultiFileSource
@@ -38,7 +39,10 @@ from ..tests import TestPrinter
 class CppBindingsPrinter(LanguageBindingsPrinter):
 
     def __init__(self, ydk_root_dir, bundle, generate_tests, one_class_per_module):
-        super(CppBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        if sys.version_info > (3,):
+            super().__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
+        else:
+            super(CppBindingsPrinter, self).__init__(ydk_root_dir, bundle, generate_tests, one_class_per_module)
         self.source_files = []
         self.header_files = []
 

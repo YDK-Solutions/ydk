@@ -14,10 +14,11 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-""" capabilities_printer.py
+""" namespace_printer.py
 
 Print capabilities for bundle package.
 """
+import sys
 from ydkgen.printer.file_printer import FilePrinter
 from ydkgen.api_model import get_property_name, Class
 from ydkgen.common import get_module_name
@@ -25,7 +26,10 @@ from ydkgen.common import get_module_name
 
 class NamespacePrinter(FilePrinter):
     def __init__(self, ctx, one_class_per_module):
-        super(NamespacePrinter, self).__init__(ctx)
+        if sys.version_info > (3,):
+            super().__init__(ctx)
+        else:
+            super(NamespacePrinter, self).__init__(ctx)
         self.bundle_name = ''
         self.packages = None
         self.one_class_per_module = one_class_per_module
@@ -102,7 +106,7 @@ class NamespacePrinter(FilePrinter):
         self.ctx.bline()
 
     def _print_identity_lookup(self, packages):
-        packages = sorted(packages, key=lambda p:p.name)
+        packages = sorted(packages, key=lambda p: p.name)
 
         self.ctx.writeln('IDENTITY_LOOKUP = {')
         self.ctx.lvl_inc()
@@ -115,7 +119,7 @@ class NamespacePrinter(FilePrinter):
                     pkg_name = identity_clazz.get_package().name
                     self.ctx.writeln(
                         "'%s:%s':('%s.%s', '%s')," % (get_module_name(identity_clazz.stmt), identity_clazz.stmt.arg,
-                                                   identity_clazz.get_py_mod_name(), pkg_name, identity_clazz.qn()))
+                                                      identity_clazz.get_py_mod_name(), pkg_name, identity_clazz.qn()))
                 else:
                     self.ctx.writeln(
                         "'%s:%s':('%s', '%s')," % (get_module_name(identity_clazz.stmt), identity_clazz.stmt.arg,

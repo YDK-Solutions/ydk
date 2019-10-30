@@ -212,7 +212,9 @@ class SanityYang(unittest.TestCase):
         obj_A.b.b = obj_A.a # 'world' --> YServiceProviderError: illegal reference
         self.crud.create(self.ncc, obj_A)
 
-        obj_A_read = self.crud.read(self.ncc, oc_pattern.OcA())
+        oc_filter = oc_pattern.OcA()
+        oc_filter.b.b = 'hello'
+        obj_A_read = self.crud.read(self.ncc, oc_filter)
         self.assertIsNotNone(obj_A_read)
 
         obj_A = oc_pattern.OcA()

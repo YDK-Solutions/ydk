@@ -20,6 +20,7 @@ source_printer.py
  prints C++ classes
 
 """
+import sys
 from ydkgen.builder import MultiFileSource
 from ydkgen.printer import MultiFilePrinter
 
@@ -29,7 +30,10 @@ from .class_enum_printer import EnumPrinter
 
 class SourcePrinter(MultiFilePrinter):
     def __init__(self, ctx, bundle_name, module_namespace_lookup):
-        super(SourcePrinter, self).__init__(ctx)
+        if sys.version_info > (3,):
+            super().__init__(ctx)
+        else:
+            super(SourcePrinter, self).__init__(ctx)
         self.enum_printer = EnumPrinter(self.ctx)
         self.bundle_name = bundle_name
         self.module_namespace_lookup = module_namespace_lookup

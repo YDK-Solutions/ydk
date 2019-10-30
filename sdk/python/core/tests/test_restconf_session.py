@@ -36,7 +36,8 @@ class SanityTest(unittest.TestCase):
         repo_path = os.path.dirname(__file__)
         repo_path = os.path.join(repo_path, '..', '..', '..', 'cpp', 'core', 'tests', 'models')
         self.repo = Repository(repo_path)
-        self.restconf_session = RestconfSession(self.repo, 'localhost', 'admin', 'admin', 12306, EncodingFormat.JSON, "/data", "/data")
+        self.restconf_session = RestconfSession(self.repo, 'localhost', 'admin', 'admin', 12306,
+                                                EncodingFormat.JSON, "/data", "/data")
 
     def test_create_del_read(self):
         root_schema = self.restconf_session.get_root_schema()
@@ -75,7 +76,6 @@ class SanityTest(unittest.TestCase):
         update_rpc.get_input_node().create_datanode('entity', json)
         update_rpc(self.restconf_session)
 
-
     def test_json_payload_list(self):
         codec = Codec()
         schema = self.restconf_session.get_root_schema()
@@ -108,6 +108,7 @@ class SanityTest(unittest.TestCase):
 
         json_str = codec.encode(rdn, EncodingFormat.JSON, True)
         self.assertEquals(json_str, json_int_payload + json_bgp_payload)
+
 
 if __name__ == '__main__':
     import sys

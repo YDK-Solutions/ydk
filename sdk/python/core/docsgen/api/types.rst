@@ -112,11 +112,75 @@ YDK types
 
 .. class:: Entity
 
-    Super class of all classes that represent containers in YANG. YANG lists are represented as :py:class:`YList` of **Entity** objects, with support for hanging a parent.
+    Super class of all classes that represent containers and list elements in YANG.
 
-    .. py:attribute:: operation
+    .. py:attribute:: parent
+    
+        Pointer to parent entity; the `parent` is set automatically during entity initialization except for presence container, which must be set manually after presence container is initialized
 
-        Optional attribute of the **Entity** class, which can be set to perform various :py:class:`operations<ydk.filters.YFilter>`, see :ref:`netconf-operations`.
+    .. py:attribute:: yang_name
+    
+        YANG name of container or list that this entity represents
+
+    .. py:attribute:: yang_parent_name
+    
+        YANG name of container or list of parent entity
+
+    .. py:attribute:: yfilter
+    
+        The attribute of type :class:`YFilter<ydk.filters.YFilter>` can be set to perform various operations
+
+    .. py:attribute:: is_presence_container
+    
+        Boolean flag set to `True` if this entity represents presence container
+
+    .. py:attribute:: is_top_level_class
+
+        Boolean flag set to `True` if this entity represents top-level container (does not have parent entity)
+
+    .. py:attribute:: has_list_ancestor
+
+        Boolean flag set to `True` if this entity is member of a list
+
+    .. py:attribute:: ignore_validation
+
+        Boolean flag for user to control validation of entity data (leaf and leaf-list data values); default setting is `False`, meaning the validation is on
+
+    .. py:attribute:: ylist_key_names
+
+        If this entity is member of a list, the attribute specifies ``list`` of leaf names, which represent list keys 
+
+    .. py:attribute::     ylist_key
+
+        If this entity is member of a `YList`, the `ylist_key` is set to composite key of this entity
+
+    .. py:method:: get_segment_path()
+
+        Returns relative path of this entity in terms of XPath
+
+    .. py:method:: get_absolute_path()
+
+        Returns absolute path of this entity in terms of XPath
+
+    .. py:method:: has_data()
+
+        Returns `True` if any leaf in this entity or its child entity is assigned value; `False` otherwise
+
+    .. py:method:: has_operation()
+
+        Returns `True` if any leaf or container in this entity or its child entity has setting of `yfilter`; `False` otherwise
+
+    .. py:method:: void set_filter(path, filter)
+
+        Sets `yfilter` value in leaf
+
+        :param path: YANG name of the leaf
+        :param filter: :class:`YFilter<ydk.filters.YFilter>`, filter value
+
+    .. py:method:: children()
+
+        Gets dictionary of child entities, where child key is a segment path of child entity
+
 
 .. class:: EntityCollection
 
@@ -391,10 +455,35 @@ YDK types
         uint8 type.
 
 
+Utility functions
+-----------------
+
+.. function:: entity_to_dict(entity)
+
+    Utility function to get dictionary of all leaves and presence containers recursively in this entity and its children.
+
+    :param entity: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :return: A dictionary, where key represents leaf absolute path and value represents string value of the leaf;
+             In case of presence container the key represents the container's absolute path and value is empty string.
+
+.. function:: entity_diff(entity1, entity2)
+
+    Utility function to compare two entities of the same underlying type.
+    Compared are presence containers and all leaves recursively.
+
+    :param entity1: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :param entity2: An instance of :py:class:`Entity<ydk.types.Entity>`.
+    :return: A dictionary of differences between two entities, where key of type `str` represents leaf or presence
+             container absolute path and value of type `tuple` represents difference in `str` values of the leaves.
+    :raises: Exception :py:exc:`YInvalidArgumentError<ydk.error.YInvalidArgumentError>`, if supplied entities are None or have different types.
+
 Examples
 --------
 
-Examples of instantiating and using objects of Entity type are shown below(assuming you have ``openconfig`` bundle installed, see :ref:`howto-install`):
+In examples below we assume that you have `openconfig` bundle installed, see :ref:`howto-install`
+
+How instantiate and use Entity objects
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
     :linenos:
@@ -406,7 +495,8 @@ Examples of instantiating and using objects of Entity type are shown below(assum
     afi_safi = bgp.Global_.AfiSafis.AfiSafi()
     bgp.global_.afi_safis.afi_safi.append(afi_safi)
 
-Examples of assigning values to leafs:
+How to assign values to leaves
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
     :linenos:
@@ -427,7 +517,8 @@ Examples of assigning values to leafs:
     node.bits_type['first-option'] = True                                   # bits, node is a dummy container
     node.bits_type['second-option'] = False
 
-Examples of appending values to leaf-lists:
+How to append values to leaf-list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
     :linenos:
@@ -449,7 +540,10 @@ Examples of appending values to leaf-lists:
 
 .. _read-filter:
 
-An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifically, the `as number` leaf) under :py:class:`openconfig BGP<ydk.openconfig_bgp.Bgp>` is shown below
+How to setting the read leaf values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here we use filter for a :cpp:class:`leaf<YLeaf>` (specifically, the `as number` leaf) under :py:class:`openconfig BGP<ydk.openconfig_bgp.Bgp>`
 
 .. code-block:: python
   :linenos:

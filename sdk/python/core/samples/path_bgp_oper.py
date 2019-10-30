@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 #  ----------------------------------------------------------------
-# Copyright 2016 Cisco Systems
+# Copyright 2019 Cisco Systems
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +15,24 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-from ydk_.services import Datastore
-from .codec_service import CodecService
-from .crud_service import CRUDService
-from .netconf_service import NetconfService
-from .executor_service import ExecutorService
+from ydk.path import Codec, Repository, NetconfSession
+from ydk.types import EncodingFormat
+
+from session_mgr import init_logging
 
 
-__all__ = [ "CodecService",
-            "CRUDService",
-            "ExecutorService",
-            "NetconfService",
-            "Datastore",
-          ]
+def execute_path(session):
+    codec = Codec()
+    schema = session.get_root_schema()
+    bgp = schema.create_datanode("Cisco-IOS-XR-ipv4-bgp-oper:bgp")
+
+    xml = codec.encode(bgp, EncodingFormat.XML, True)
+    create_rpc = schema.create_rpc("ydk:read")
+    create_rpc.get_input_node().create_datanode("filter", xml)
+    create_rpc(session)
+
+
+if __name__ == "__main__":
+    init_logging()
+    session = NetconfSession('172.29.2.67', 'lab', 'lab', 830)
+    execute_path(session)

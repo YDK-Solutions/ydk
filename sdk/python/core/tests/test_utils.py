@@ -33,6 +33,7 @@ else:
 from ydk.entity_utils import get_data_node_from_entity
 from ydk.errors       import YCoreError
 
+
 def assert_with_error(pattern, ErrorClass):
     def assert_with_pattern(func):
         def helper(self, *args, **kwargs):
@@ -49,8 +50,11 @@ class ParametrizedTestCase(unittest.TestCase):
     """ TestCase classes that want to be parametrized should
         inherit from this class.
     """
-    def __init__(self, methodName='runTest'):
-        super(ParametrizedTestCase, self).__init__(methodName)
+    def __init__(self, method_name='runTest'):
+        if sys.version_info > (3,):
+            super().__init__(method_name)
+        else:
+            super(ParametrizedTestCase, self).__init__(method_name)
 
     @staticmethod
     def parametrize(testcase_klass, device, non_demand, common_cache, timeout):
@@ -92,6 +96,7 @@ def get_device_info():
     device = urlparse(args.device)
     return device, args.non_demand, args.common_cache, args.timeout
 
+
 def datanode_to_str(dn, indent = ''):
     try:
         s = dn.get_schema_node().get_statement()
@@ -107,6 +112,7 @@ def datanode_to_str(dn, indent = ''):
     except YCoreError as ex:
         print(ex.message)
 
+
 def print_data_node(dn):
     try:
         print("\n=====>  Printing DataNode: '{}'".format(dn.get_path()))
@@ -114,9 +120,11 @@ def print_data_node(dn):
     except YCoreError as ex:
         print(ex.message)
 
+
 def print_entity(entity, root_schema):
     dn = get_data_node_from_entity( entity, root_schema);
     print_data_node(dn)
+
 
 def enable_logging(level):
     log = logging.getLogger('ydk')

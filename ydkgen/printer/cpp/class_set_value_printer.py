@@ -50,15 +50,15 @@ class ClassSetYLeafPrinter(object):
         self.ctx.writeln('if(value_path == "%s")' % (get_qualified_yang_name(leaf)))
         self.ctx.writeln('{')
         self.ctx.lvl_inc()
-        if(isinstance(leaf.property_type, Bits)):
+        if isinstance(leaf.property_type, Bits):
             if leaf.is_many:
                 self.ctx.writeln('Bits bits_value{};')
                 self.ctx.writeln('bits_value[value] = true;')
                 self.ctx.writeln('%s.append(bits_value);' % leaf.name)
             else:
                 self.ctx.writeln('%s[value] = true;' % leaf.name)
-        elif(leaf.is_many):
-            if (isinstance(leaf.property_type, Class) and leaf.property_type.is_identity()):
+        elif leaf.is_many:
+            if isinstance(leaf.property_type, Class) and leaf.property_type.is_identity():
                 self.ctx.writeln('Identity identity{name_space, name_space_prefix, value};')
                 self.ctx.writeln('%s.append(identity);' % leaf.name)
             else:

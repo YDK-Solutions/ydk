@@ -27,13 +27,14 @@ The following packages must be present in your system before installing YDK-Cpp:
 
    # Linux dependencies
    sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev libtool-bin cmake
+   sudo apt-get install python3-dev
 
    # gcc-5 and g++5 for modern c++
    sudo apt-get install gcc-5 g++-5 -y > /dev/null
    sudo ln -f -s /usr/bin/g++-5 /usr/bin/g++
    sudo ln -f -s /usr/bin/gcc-5 /usr/bin/gcc
 
-**Centos (Fedora-based)**
+**CentOS-7 (Fedora-based)**
 
 The following packages must be present in your system before installing YDK-Cpp:
 
@@ -41,7 +42,12 @@ The following packages must be present in your system before installing YDK-Cpp:
 
    # Linux dependencies
    sudo yum install epel-release
-   sudo yum install libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel cmake3 wget
+   sudo yum install libxml2-devel libxslt-devel libssh-devel libtool pcre-devel cmake3 wget
+   sudo yum install gcc-g++ python36-devel
+
+If installed gcc compiler version is lowers than 4.8.1, upgrade the compiler to gcc-5
+
+.. code-block:: sh
 
    # gcc-5 and g++5 for modern c++
    sudo yum install centos-release-scl -y > /dev/null
@@ -70,11 +76,12 @@ which is required for YDK. If after installation of libssh package the `libssh_t
 or upgrade to libssh-0.8.1 or higher.
 
 gNMI Requirements
-~~~~~~~~~~~~~~~~~
+-----------------
 
 In order to enable YDK support for gNMI protocol, which is optional, the following third party software must be installed prior to gNMI YDK component installation.
 
-**Install protobuf and protoc**
+Install Protobuf and Protoc
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: sh
 
@@ -109,61 +116,45 @@ Install prebuilt libraries
 
 Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
 For other Ubuntu distributions it is recommended to build core library from source.
+The prebuilt libraries compiled with specific C/C++ compilers versions, which corresponds to default one for the Linux disribution.
+If your compiler is different from specified one, it is recommended to build the packages from source.
 
-For Xenial (Ubuntu 16.04.4):
-
-.. code-block:: sh
-
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk-0.8.3-1.amd64.deb
-   sudo gdebi libydk-0.8.3-1.amd64.deb
-
-For Bionic (Ubuntu 18.04.1):
+For Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk-0.8.3-1.amd64.deb
-   sudo gdebi libydk-0.8.3-1.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
+   sudo gdebi libydk-0.8.4-1.amd64.deb
+
+For Bionic (Ubuntu 18.04.1, gcc-7.4.0):
+
+.. code-block:: sh
+
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
+   sudo gdebi libydk-0.8.4-1.amd64.deb
 
 **CentOS**
 
-Install YDK core library:
+The prebuilt package compiled with default version - gcc-4.8.5.
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk-0.8.3-1.x86_64.rpm
-
-Install YDK gNMI library (optional):
-
-.. code-block:: sh
-
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk_gnmi-0.4.0-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
 
 **MacOS**
 
-You get a fully operational YDK environment by installing the ``cisco-ios-xr`` bundle, which automatically installs all other YDK-related packages (``ydk``, ``cisco-ios-xr``, ``openconfig`` and ``ietf`` packages):
+The prebuilt packages compiled with C++ compiler Clang-8.0.0, which is default version for MacOS 10.12.
 
 .. code-block:: sh
 
-   brew install ydk-models-cisco-ios-xr
-
-Alternatively, you can perform partial installation.  If you only want to install the ``openconfig`` bundle and its dependencies (``ydk`` and ``ietf`` packages), execute:
-
-.. code-block:: sh
-
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3-beta/libydk-0.8.3-Darwin.pkg
-   sudo installer -pkg libydk-0.8.3-Darwin.pkg -target /
-
-If you want to install only the ``ietf`` bundle and its dependencies (``ydk`` package), execute:
-
-.. code-block:: sh
-
-   brew install ydk-ietf
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4-beta/libydk-0.8.4-Darwin.pkg
+   sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 
 gNMI Service Installation
 -------------------------
 
-Instal YDK gNMI library
-~~~~~~~~~~~~~~~~~~~~~~~
+Installing YDK gNMI library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Ubuntu**
 
@@ -171,28 +162,32 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/xenial/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.3/bionic/libydk_gnmi_0.4.0-2_amd64.deb
-   sudo gdebi libydk_gnmi_0.4.0-2_amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 **CentOS**
 
+The prebuilt package compiled with default version - gcc-4.8.5.
+
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.3/libydk_gnmi_0.4.0-2.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
 
 **MacOS**
 
+The prebuilt packages compiled with C++ compiler Clang-8.0.0.
+
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.3/libydk_gnmi-0.4.0-2_Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-2_Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -253,10 +248,10 @@ To install the ``cisco-ios-xr`` bundle, execute:
   build$ cmake .. && make
   build$ sudo make install
 
-Instaling YDK gNMI library
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing YDK gNMI library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Optionaly the YDK gNMI Service library can be installed. Prior to this installation the YDK core library must be installed (see above).
+Optionally the YDK gNMI Service library can be installed. Prior to this installation the YDK core library must be installed (see above).
 
 .. code-block:: sh
 

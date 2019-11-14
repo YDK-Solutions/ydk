@@ -2,6 +2,7 @@
 
 #### New features and enhancements
   * Added Entity class member function to clone entity object
+  * Added shortcut operator to set `yfilter` value in YLeaf and YLeafList class instances
 
 #### Resolved GitHub issues
   * Fix jsonSubtreeCodec only serializing up to 4B numbers

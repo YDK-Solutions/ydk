@@ -299,11 +299,14 @@ class YLeaf
 
     bool & operator [] (std::string key);
 
-  public:
     bool is_set;
-    YFilter yfilter;
     std::string value_namespace;
     std::string value_namespace_prefix;
+
+    YFilter yfilter;
+    void operator = (YFilter filter) {
+        yfilter = filter;
+    };
 
   public:
     void store_value(std::string && val);
@@ -352,8 +355,10 @@ class YLeafList {
     virtual std::vector<YLeaf> getYLeafs() const;
     virtual void clear();
 
-  public:
     YFilter yfilter;
+    void operator = (YFilter filter) {
+        yfilter = filter;
+    };
 
   public:
     std::vector<YLeaf> values;

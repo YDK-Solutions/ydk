@@ -183,7 +183,7 @@ TEST_CASE("iana_if_type_filter")
     auto ifcs = openconfig_interfaces::Interfaces();
     auto ifc  = make_shared<openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "GigabitEthernet0/0/0/2";
-    ifc->config->type.yfilter = YFilter::read;
+    ifc->config->type = YFilter::read;
     ifcs.interface.append(ifc);
     auto ifc_ent = ns.get(provider, *ifc);
     REQUIRE(ifc_ent != nullptr);

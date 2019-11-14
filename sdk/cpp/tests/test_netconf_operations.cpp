@@ -242,7 +242,7 @@ TEST_CASE("delete_leaf")
     ydktest_sanity::Runner r_2{};
     // need to specify a value to construct correct NETCONF payload
     r_2.ytypes->built_in_t->number8 = 10;
-    r_2.ytypes->built_in_t->number8.yfilter = YFilter::delete_;
+    r_2.ytypes->built_in_t->number8 = YFilter::delete_;
     reply = crud.update(provider, r_2);
     REQUIRE(reply);
 
@@ -268,7 +268,7 @@ TEST_CASE("delete_leaflist")
     REQUIRE(reply);
 
     //DELETE
-    r_1->ytypes->built_in_t->enum_llist.yfilter = YFilter::delete_;
+    r_1->ytypes->built_in_t->enum_llist = YFilter::delete_;
     reply = crud.update(provider, *r_1);
     REQUIRE(reply);
 

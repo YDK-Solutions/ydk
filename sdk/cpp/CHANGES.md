@@ -1,7 +1,11 @@
-### 2020-02-15 version 0.8.5
+### 2019-11-14 version 0.8.4.post1
 
 #### New features and enhancements
   * Added Entity class member function to clone entity object
+
+#### Resolved GitHub issues
+  * Fix jsonSubtreeCodec only serializing up to 4B numbers
+  * Fixed bug in extracting module name from namespace
 
 
 ### 2019-10-15 version 0.8.4

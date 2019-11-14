@@ -45,8 +45,8 @@ from ydk.ext.types import Decimal64 # Do not remove. Used in eval()
 from ydk.ext.types import Entity as _Entity
 from ydk.ext.types import LeafDataList
 
-from ydk.filters import YFilter as _YFilter
-from ydk.errors import YModelError as _YModelError
+from ydk.filters import YFilter
+from ydk.errors import YModelError, YError
 from ydk.errors import YInvalidArgumentError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
 
@@ -77,7 +77,7 @@ class YLeafList(_YLeafList):
 
     def set(self, other):
         if not isinstance(other, YLeafList):
-            raise _YModelError("Invalid value '{}' in '{}'".format(other, self.leaf_name))
+            raise YModelError("Invalid value '{}' in '{}'".format(other, self.leaf_name))
         else:
             if sys.version_info > (3,):
                 super().clear()
@@ -215,7 +215,7 @@ class Entity(_Entity):
             return True
 
         for name, value in vars(self).items():
-            if isinstance(value, _YFilter):
+            if isinstance(value, YFilter):
                 return True
             if name in self._leafs:
                 leaf = _get_leaf_object(self._leafs[name])
@@ -245,7 +245,7 @@ class Entity(_Entity):
                     isYLeafList = isinstance(leaf, _YLeafList)
                     isBits = isinstance(value, Bits)
 
-                    if isinstance(value, _YFilter):
+                    if isinstance(value, YFilter):
                         return True
                     if isYLeaf and (not isBits or len(value.get_bitmap()) > 0):
                         return True
@@ -256,8 +256,7 @@ class Entity(_Entity):
                         return True
                 elif isinstance(value, YList):
                     for v in value:
-                        isEntity = isinstance(v, Entity)
-                        if isEntity and (is_set(v.yfilter) or v.has_operation()):
+                        if isinstance(v, Entity) and (is_set(v.yfilter) or v.has_operation()):
                             return True
         return False
 
@@ -291,7 +290,7 @@ class Entity(_Entity):
             value = self.__dict__[name]
             leaf = _get_leaf_object(self._leafs[name])
 
-            if isinstance(value, _YFilter):
+            if isinstance(value, YFilter):
                 self.logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
                 leaf.yfilter = value
                 if isinstance(leaf, _YLeaf):
@@ -379,12 +378,12 @@ class Entity(_Entity):
             if name != 'yfilter' and name != 'parent' and name != 'ignore_validation' \
                                  and hasattr(self, '_is_frozen') and self._is_frozen \
                                  and name not in self.__dict__:
-                raise _YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".
-                                   format(name, self.__class__.__name__))
+                raise YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".
+                                  format(name, self.__class__.__name__))
             if name in self.__dict__ and isinstance(self.__dict__[name], YList):
-                raise _YModelError("Attempt to assign value of '{}' to YList ldata. "
-                                   "Please use list append or extend method."
-                                   .format(value))
+                raise YModelError("Attempt to assign value of '{}' to YList ldata. "
+                                  "Please use list append or extend method."
+                                  .format(value))
             if name in leaf_names and name in self.__dict__:
                 if self._python_type_validation_enabled:
                     _validate_value(self._leafs[name], name, value, self.logger)
@@ -392,7 +391,7 @@ class Entity(_Entity):
                 prev_value = self.__dict__[name]
                 self.__dict__[name] = value
 
-                if not isinstance(value, _YFilter):
+                if not isinstance(value, YFilter):
                     if isinstance(leaf, _YLeaf):
                         leaf.set(value)
                     elif isinstance(leaf, _YLeafList):
@@ -436,6 +435,52 @@ class Entity(_Entity):
 
     def __str__(self):
         return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
+
+    def clone(self):
+        cloned_entity = self.__class__()
+        _copy_leaves(self, cloned_entity)
+        _copy_children(self, cloned_entity)
+        return cloned_entity
+
+
+def _copy_leaves(original_entity, cloned_entity):
+    logger = logging.getLogger("ydk.types.Entity")
+    for name_value in original_entity.get_name_leaf_data():
+        leaf_name = name_value[0]
+        leaf_value = name_value[1].value
+        logger.debug("Creating leaf '%s' in entity '%s' with value '%s'" %
+                     (leaf_name, original_entity.yang_name, leaf_value))
+        if '[.="' in leaf_name:
+            # Here we have leaf-list
+            split_strs = leaf_name.split('[.="')
+            leaf_name = split_strs[0]
+            leaf_value = split_strs[1].split('"]')[0]
+        cloned_entity.set_value(leaf_name, leaf_value,
+                                name_value[1].name_space, name_value[1].name_space_prefix)
+
+
+def _copy_children(original_entity, cloned_entity):
+    logger = logging.getLogger("ydk.types.Entity")
+    for _, child in original_entity.get_children().items():
+        logger.debug("==================")
+        child_path = child.get_segment_path()
+        logger.debug("Looking at child entity '%s' in parent '%s'" % (child_path, original_entity.yang_name))
+        if child.has_data():
+            child_name = child_path.split('[')[0]
+            child_entity = cloned_entity.get_child_by_name(child_name, child_path)
+            if child_entity:
+                logger.debug("Created child entity '%s' in parent '%s'" %
+                             (child_entity.get_segment_path(), cloned_entity.yang_name))
+            else:
+                logger.error("Could not fetch child entity '%s' in parent '%s'!" %
+                             (child_name, cloned_entity.yang_name))
+                raise YError("Could not fetch child entity '%s' in parent '%s'!" %
+                             (child_name, cloned_entity.yang_name))
+            child_entity.parent = cloned_entity
+            _copy_leaves(child, child_entity)
+            _copy_children(child, child_entity)
+        else:
+            logger.debug("Child has no data")
 
 
 def entity_to_dict(entity):
@@ -695,7 +740,7 @@ class YList(EntityCollection):
         self._cache_dict = OrderedDict()
 
     def __setattr__(self, name, value):
-        if name == 'yfilter' and isinstance(value, _YFilter):
+        if name == 'yfilter' and isinstance(value, YFilter):
             for e in self:
                 e.yfilter = value
         if sys.version_info > (3,):
@@ -827,7 +872,7 @@ def _get_decoded_value_object(leaf_tuple, entity, value):
 def _validate_value(leaf_tuple, name, value, logger):
     if not isinstance(leaf_tuple, tuple):
         return
-    if isinstance(value, _YFilter):
+    if isinstance(value, YFilter):
         return
     typs = leaf_tuple[1]
     for typ in typs:
@@ -844,7 +889,7 @@ def _validate_value(leaf_tuple, name, value, logger):
                                                                                          type(value).__name__,
                                                                                          _get_types_string(typs))
     logger.error(err_msg)
-    raise _YModelError(err_msg)
+    raise YModelError(err_msg)
 
 
 def _get_types_string(typs):
@@ -888,7 +933,7 @@ def _decode_identity_value_object(entity, value):
 
 def _get_enum_class(module_name, class_name, nested_class_name):
     mod = importlib.import_module(module_name)
-    clazz_name = '%s%s' % (class_name, '' if len(nested_class_name) == 0 else '.%s' % (nested_class_name))
+    clazz_name = '%s%s' % (class_name, '' if len(nested_class_name) == 0 else '.%s' % nested_class_name)
     enum_clazz = None
     for c in clazz_name.split('.'):
         if enum_clazz is None:

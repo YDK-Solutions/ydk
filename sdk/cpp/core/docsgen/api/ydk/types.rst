@@ -246,6 +246,14 @@ YANG container and list
 
         If this entity is member of a list, the `ylist` is set to a pointer of corresponding `YList` class
 
+    .. cpp:function:: std::shared_ptr<Entity> clone() const
+
+        Returns copy of this entity
+
+    .. cpp:function:: std::shared_ptr<Entity> clone_ptr() const
+
+        Returns new instance of the entity class
+
     .. cpp:function:: std::string get_segment_path() const
 
         Returns relative path of this entity in terms of XPath

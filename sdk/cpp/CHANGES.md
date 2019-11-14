@@ -1,3 +1,9 @@
+### 2020-02-15 version 0.8.5
+
+#### New features and enhancements
+  * Added Entity class member function to clone entity object
+
+
 ### 2019-10-15 version 0.8.4
 
 #### New features and enhancements

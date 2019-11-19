@@ -13,7 +13,7 @@ set(samples
      bgp_gnmi_service
      bgp_gnmi_subscribe
 #     gnmi_ifc_read
-#     xr_int_oper_gnmi_subscribe
+     xr_int_oper_gnmi_subscribe
      )
 
 # set default build type if not specified by user

@@ -13,7 +13,7 @@ set(samples
      bgp_gnmi_service
      bgp_gnmi_subscribe
 #     gnmi_ifc_read
-     xr_int_oper_gnmi_subscribe
+#     xr_int_oper_gnmi_subscribe
      )
 
 # set default build type if not specified by user
@@ -73,4 +73,3 @@ foreach(sample IN LISTS samples)
 endforeach(sample)
 
 configure_file("${CMAKE_SOURCE_DIR}/args_parser.in" "${CMAKE_SOURCE_DIR}/args_parser.h" ESCAPE_QUOTES @ONLY)
-

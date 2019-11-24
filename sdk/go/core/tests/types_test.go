@@ -200,15 +200,14 @@ func (suite *SanityTypesTestSuite) TestUnion() {
 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
 }
 
-// TODO: Missing YdkEnumIntTest_any in generated APIs
-// func (suite *SanityTypesTestSuite) TestUnionEnum() {
-// 	runner := ysanity.Runner{}
-// 	runner.Ytypes.BuiltInT.Younion = ysanity.YdkEnumIntTest_any
-// 	suite.CRUD.Create(&suite.Provider, &runner)
+func (suite *SanityTypesTestSuite) TestUnionEnum() {
+	runner := ysanity.Runner{}
+	runner.Ytypes.BuiltInT.Younion = ysanity.YdkEnumTest_local
+	suite.CRUD.Create(&suite.Provider, &runner)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-// 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
-// }
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(entityRead, &runner), true)
+}
 
 func (suite *SanityTypesTestSuite) TestUnionInt() {
 	runner := ysanity.Runner{}
@@ -228,38 +227,35 @@ func (suite *SanityTypesTestSuite) TestUnionRecursive() {
 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
 }
 
-// TODO: leaf-list encoding error
-// func (suite *SanityTypesTestSuite) TestUnionLeafList() {
-// 	runner := ysanity.Runner{}
-// 	runner.Ytypes.BuiltInT.Llunion = append(runner.Ytypes.BuiltInT.Llunion, 1)
-// 	runner.Ytypes.BuiltInT.Llunion = append(runner.Ytypes.BuiltInT.Llunion, 3)
-// 	suite.CRUD.Create(&suite.Provider, &runner)
+func (suite *SanityTypesTestSuite) TestUnionLeafList() {
+	runner := ysanity.Runner{}
+	runner.Ytypes.BuiltInT.Llunion = append(runner.Ytypes.BuiltInT.Llunion, 1)
+	runner.Ytypes.BuiltInT.Llunion = append(runner.Ytypes.BuiltInT.Llunion, 3)
+	suite.CRUD.Create(&suite.Provider, &runner)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-// 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
-// }
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.Equal(types.EntityEqual(entityRead, &runner), true)
+}
 
-// TODO: leaf-list encoding error
-// func (suite *SanityTypesTestSuite) TestEnumLeafList() {
-// 	runner := ysanity.Runner{}
-// 	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
-// 	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_remote)
-// 	suite.CRUD.Create(&suite.Provider, &runner)
+func (suite *SanityTypesTestSuite) TestEnumLeafList() {
+	runner := ysanity.Runner{}
+	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
+	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_remote)
+	suite.CRUD.Create(&suite.Provider, &runner)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-// 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
-// }
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.True(types.EntityEqual(entityRead, &runner))
+}
 
-// TODO: leaf-list encoding error
-// func (suite *SanityTypesTestSuite) TestIdentityLeafList() {
-// 	runner := ysanity.Runner{}
-// 	runner.Ytypes.BuiltInT.IdentityLlist = append(runner.Ytypes.BuiltInT.IdentityLlist, ysanity.Child_Identity{})
-// 	runner.Ytypes.BuiltInT.IdentityLlist = append(runner.Ytypes.BuiltInT.IdentityLlist, ysanity.Child_Child_Identity{})
-// 	suite.CRUD.Create(&suite.Provider, &runner)
+func (suite *SanityTypesTestSuite) TestIdentityLeafList() {
+	runner := ysanity.Runner{}
+	runner.Ytypes.BuiltInT.IdentityLlist = append(runner.Ytypes.BuiltInT.IdentityLlist, ysanity.ChildIdentity{})
+	runner.Ytypes.BuiltInT.IdentityLlist = append(runner.Ytypes.BuiltInT.IdentityLlist, ysanity.ChildChildIdentity{})
+	suite.CRUD.Create(&suite.Provider, &runner)
 
-// 	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-// 	suite.Equal(types.EntityEqual(entityRead, &runner), true)
-// }
+	entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+	suite.True(types.EntityEqual(entityRead, &runner))
+}
 
 func (suite *SanityTypesTestSuite) TestIdentityRef() {
 	runner := ysanity.Runner{}

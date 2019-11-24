@@ -491,8 +491,7 @@ func HasDataOrFilter(entity Entity) bool {
 	children := GetYChildren(entityData)
 	for _, child := range children {
 		if child.Value != nil {
-			yf := child.Value.GetEntityData().YFilter
-			if (yf != yfilter.NotSet || HasDataOrFilter(child.Value)) {
+			if HasDataOrFilter(child.Value) {
 				return true
 			}
 		}
@@ -533,6 +532,31 @@ func HasData(entity Entity) bool {
 	return false
 }
 
+func getLeafValue(value interface{}) LeafData {
+	var leafData LeafData
+	switch value.(type) {
+	case yfilter.YFilter:
+		leafData = LeafData{IsSet: true, Filter: value.(yfilter.YFilter)}
+	case map[string]bool:
+		// bits
+		var used_bits []string
+		for bit, enabled := range(value.(map[string]bool)) {
+			if enabled {
+				used_bits = append(used_bits, bit)
+			}
+		}
+		v := strings.Join(used_bits, " ")
+		leafData = LeafData{IsSet: true, Value: v}
+	default:
+		var v string
+		if reflect.TypeOf(value) != reflect.TypeOf(Empty{}) {
+			v = fmt.Sprintf("%v", value)
+		}
+		leafData = LeafData{IsSet: true, Value: v}
+	}
+	return leafData
+}
+
 // GetEntityPath returns an EntityPath struct for the given entity
 func GetEntityPath(entity Entity) EntityPath {
 	entityData := entity.GetEntityData()
@@ -545,37 +569,33 @@ func GetEntityPath(entity Entity) EntityPath {
 	for name, ileaf := range leafs {
 		leaf := ileaf.(YLeaf)
 		field := v.FieldByName(leaf.GoName)
-
-		if leaf.Value != nil && field.Kind() != reflect.Slice {
-			switch leaf.Value.(type) {
-			case yfilter.YFilter:
-				// yfilter
-				leafData = LeafData{
-					IsSet: true, Filter: leaf.Value.(yfilter.YFilter)}
-			case map[string]bool:
-				// bits
-				var used_bits []string
-				for bit, enabled := range(leaf.Value.(map[string]bool)) {
-					if enabled {
-						used_bits = append(used_bits, bit)
-					}
-				}
-				v := strings.Join(used_bits, " ")
-				leafData = LeafData{IsSet: true, Value: v}
-			default:
-				var v string
-				if reflect.TypeOf(leaf.Value) != reflect.TypeOf(Empty{}) {
-					v = fmt.Sprintf("%v", leaf.Value)
-				}
-				leafData = LeafData{
-					IsSet: true, Value: v}
-			}
+	    if !field.IsValid() || leaf.Value == nil  {
+			continue
+		}
+		if field.Kind() != reflect.Slice {
+			leafData = getLeafValue(leaf.Value)
+            //fmt.Printf("Adding leaf: name: %s, data: %v\n", name, leafData)
 			entityPath.ValuePaths = append(
 				entityPath.ValuePaths,
 				NameLeafData{Name: name, Data: leafData})
+		} else {
+		    // leaf-list
+		    sliceInt := leaf.Value.([]interface{})
+			for i := range sliceInt {
+				leafData = getLeafValue(sliceInt[i])
+				path := name
+				if len(leafData.Value) > 0 {
+				    path = fmt.Sprintf("%s[.=\"%v\"]", name, leafData.Value)
+				    leafData.Value = ""
+				}
+				//fmt.Printf("Adding leaf-list: path: %s, data: %v\n", path, leafData)
+				entityPath.ValuePaths = append(
+					entityPath.ValuePaths,
+					NameLeafData{Name: path, Data: leafData})
+				if leafData.Filter != yfilter.NotSet { break }
+			}
 		}
 	}
-
 	return entityPath
 }
 
@@ -1142,13 +1162,18 @@ func copyChildren(originalEntity, clonedEntity Entity) {
 	}
 }
 
-// Function to clone an Entity
-func EntityClone(ent Entity) Entity {
-	//fmt.Printf("Cloning entity of type %s\n", reflect.TypeOf(ent).Elem())
+// NewEntityOfType: Function to create new instance of given Entity
+func NewEntityOfType(ent Entity) Entity {
 	entType := reflect.TypeOf(ent).Elem()
 	entPtr := reflect.New(entType)
 	entInt := entPtr.Interface()
 	entClone := entInt.(Entity)
+	return entClone
+}
+
+// EntityClone - Function to clone an Entity
+func EntityClone(ent Entity) Entity {
+    entClone := NewEntityOfType(ent)
 	copyLeaves(ent, entClone);
 	copyChildren(ent, entClone);
 	entClone.GetEntityData()

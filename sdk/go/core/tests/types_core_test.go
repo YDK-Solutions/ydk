@@ -435,19 +435,18 @@ func (suite *CoreTypesTestSuite) TestEntityDiff_OneAugList() {
 	suite.Equal(0, len(diff))
 }
 
-// TODO: leaf-list encoding error
 func (suite *CoreTypesTestSuite) TestEntityDiff_EnumLeafList() {
 	runner := ysanity.Runner{}
 	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
 	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_remote)
 	entDict := types.EntityToDict(&runner)
-	// suite.Equal(4, len(entDict))
-	printDictionary("-LEFT", entDict)
-	// suite.Equal(types.EntityEqual(entityRead, &runner), true)
+	suite.Equal(2, len(entDict))
+	printDictionary("", entDict)
 
 	clone := types.EntityClone(&runner)
 	diff := types.EntityDiff(&runner, clone)
 	suite.Equal(0, len(diff))
+	suite.True(types.EntityEqual(&runner, clone))
 }
 
 func testParams(testName string, entity types.Entity) types.Entity {

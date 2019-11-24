@@ -1,7 +1,8 @@
-### 2020-02-15 version 0.8.5
+### 2020-02-15 version 0.8.4.post1
 
 #### New features and enhancements
-  * Added Entity class member function to clone entity object
+  * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
+  * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
 
 
 ### 2019-10-15 version 0.8.4

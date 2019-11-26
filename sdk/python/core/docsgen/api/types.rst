@@ -154,6 +154,10 @@ YDK types
 
         If this entity is member of a `YList`, the `ylist_key` is set to composite key of this entity
 
+    .. py:method:: clone()
+
+        Returns complete copy of this entity
+
     .. py:method:: get_segment_path()
 
         Returns relative path of this entity in terms of XPath

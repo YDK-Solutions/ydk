@@ -30,7 +30,7 @@ class _Stack:
         self.items = []
 
     def isEmpty(self):
-        return self.items == []
+        return not self.items
 
     def push(self, item):
         self.items.append(item)

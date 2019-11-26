@@ -132,6 +132,7 @@ class Entity {
     virtual std::vector<std::string> get_order_of_children() const ;
 
     virtual std::shared_ptr<Entity> clone_ptr() const;
+    std::shared_ptr<Entity> clone() const;
 
     virtual void set_parent(Entity* p);
     virtual Entity* get_parent() const;
@@ -298,11 +299,14 @@ class YLeaf
 
     bool & operator [] (std::string key);
 
-  public:
     bool is_set;
-    YFilter yfilter;
     std::string value_namespace;
     std::string value_namespace_prefix;
+
+    YFilter yfilter;
+    void operator = (YFilter filter) {
+        yfilter = filter;
+    };
 
   public:
     void store_value(std::string && val);
@@ -351,8 +355,10 @@ class YLeafList {
     virtual std::vector<YLeaf> getYLeafs() const;
     virtual void clear();
 
-  public:
     YFilter yfilter;
+    void operator = (YFilter filter) {
+        yfilter = filter;
+    };
 
   public:
     std::vector<YLeaf> values;

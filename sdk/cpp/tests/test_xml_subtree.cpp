@@ -98,8 +98,8 @@ bool result = crud.delete_(provider, *r_1);
 REQUIRE(result);
 
 auto ld = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
-ld->name="xyz";
-ld->number.yfilter = YFilter::delete_;
+ld->name = "xyz";
+ld->number = YFilter::delete_;
 r_1->one_list->ldata.append(ld);
 
 auto s = codec.encode(*r_1, session.get_root_schema());
@@ -122,7 +122,7 @@ const path::Session& session = provider.get_session();
 
 XmlSubtreeCodec codec{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
-r_1->ytypes->built_in_t->number16.yfilter = YFilter::read;
+r_1->ytypes->built_in_t->number16 = YFilter::read;
 
 auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">

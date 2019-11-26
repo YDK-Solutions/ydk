@@ -73,16 +73,16 @@ void read_sub(const char * subscribe_response)
 
 void gnmi_service_subscribe_callback(const char * subscribe_response)
 {
-	//read_sub(subscribe_response);
-	string response = subscribe_response;
-	REQUIRE(response.find(int_update) != string::npos);
+    //read_sub(subscribe_response);
+    string response = subscribe_response;
+    REQUIRE(response.find(int_update) != string::npos);
 }
 
 void gnmi_service_subscribe_multiples_callback(const char * subscribe_response)
 {
-	//read_sub(subscribe_response);
-	string response = subscribe_response;
-	REQUIRE(response.find(int_update) != string::npos);
+    //read_sub(subscribe_response);
+    string response = subscribe_response;
+    REQUIRE(response.find(int_update) != string::npos);
     REQUIRE(response.find(bgp_update) != string::npos);
 }
 

@@ -73,4 +73,3 @@ foreach(sample IN LISTS samples)
 endforeach(sample)
 
 configure_file("${CMAKE_SOURCE_DIR}/args_parser.in" "${CMAKE_SOURCE_DIR}/args_parser.h" ESCAPE_QUOTES @ONLY)
-

@@ -58,6 +58,7 @@ add_executable(gnmi_server "gnmi_server.cpp" ${libgnmi_sources})
 
 set(IS_SECURE True)
 if(${IS_SECURE})
+#    target_link_directories(gnmi_server PUBLIC /usr/local/lib)
     target_link_libraries(gnmi_server ${PROTOBUF_LIBRARY} grpc++)
 else(NOT ${IS_SECURE})
     target_link_libraries(gnmi_server ${PROTOBUF_LIBRARY} grpc++_unsecure)

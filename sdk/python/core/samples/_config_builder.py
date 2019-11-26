@@ -54,8 +54,8 @@ def _get_routing_cfg():
 
 #    RoutingPolicy.DefinedSets.BgpDefinedSets.CommunitySets.CommunitySet()
 #    comm_set.community_set_name = 'testing'
-#comm_set.config.community_member.append("65172:16001")
-#comm_set.config.community_member.append("65172:16032")
+#    comm_set.config.community_member.append("65172:16001")
+#    comm_set.config.community_member.append("65172:16032")
 #    routing_policy.defined_sets.bgp_defined_sets.community_sets.community_set.append(comm_set)
     return routing_policy
 
@@ -63,5 +63,4 @@ def _get_routing_cfg():
 def _get_bgp_routing_multiple_object():
     bgp_cfg = _get_bgp_config()
     routing_policy = _get_routing_cfg()
-    return {'bgp':bgp_cfg, 'routing-policy':routing_policy}
-
+    return {'bgp': bgp_cfg, 'routing-policy': routing_policy}

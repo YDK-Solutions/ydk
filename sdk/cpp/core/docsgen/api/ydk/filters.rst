@@ -88,7 +88,7 @@ An example of setting the filter for an :cpp:class:`entity<Entity>` (address fam
   afi_safi->afi_safi_name = L3VpnIpv4Unicast();
 
   // Set the filter to delete, which will delete this instance of the address family
-  afi_safi->filter = YFilter::delete_;
+  afi_safi->yfilter = YFilter::delete_;
 
   //Append the list instance to afi-safis's afi-safi field
   bgp.global->afi_safis->afi_safi.append(afi_safi);
@@ -110,7 +110,7 @@ An example of setting the read filter for an :cpp:class:`leaf<YLeaf>` (specifica
   ydk::openconfig_bgp::Bgp bgp{};
 
   // Indicate that the `as number` is desired to be read
-  bgp.config->as->filter = YFilter::read;
+  bgp.config->as = YFilter::read;
 
 
   // Instantiate the CRUD service and Netconf provider to connect to a device with address 10.0.0.1

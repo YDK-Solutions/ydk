@@ -37,56 +37,56 @@ def print_interface(interface):
 
     if interface.config is not None:
         print ('  config')
-        print('     name:-%s'% interface.config.name)
+        print('     name: %s'% interface.config.name)
         if interface.config.type is not None:
-            print('     type:-%s'%interface.config.type.__class__)
-        print('    enabled:-%s'%interface.config.enabled)
+            print('     type: %s'%interface.config.type.__class__)
+        print('    enabled: %s'%interface.config.enabled)
 
     if interface.state is not None:
         print ('  state')
-        print('     name:-%s'% interface.state.name)
+        print('     name: %s'% interface.state.name)
         if interface.state.type is not None:
-            print('     type:-%s'%interface.state.type.__class__)
-        print('     enabled:-%s'%interface.state.enabled)
+            print('     type: %s'%interface.state.type.__class__)
+        print('     enabled: %s'%interface.state.enabled)
         if interface.state.admin_status is not None:
             enum_str = 'DOWN'
-            if interface.state.admin_status == interface.state.AdminStatusEnum.UP:
+            if interface.state.admin_status == interface.state.AdminStatus.UP:
                 enum_str = 'UP'
-            print('     admin_status:-%s'%enum_str)
+            print('     admin_status: %s'%enum_str)
         if interface.state.oper_status is not None:
-            oper_status_map = { interface.state.OperStatusEnum.UP : 'UP',
-                                interface.state.OperStatusEnum.DOWN : 'DOWN',
-                                interface.state.OperStatusEnum.TESTING : 'TESTING',
-                                interface.state.OperStatusEnum.UNKNOWN: 'UNKNOWN',
-                                interface.state.OperStatusEnum.DORMANT : 'DORMANT',
-                                interface.state.OperStatusEnum.NOT_PRESENT : 'NOT_PRESENT',
+            oper_status_map = { interface.state.OperStatus.UP : 'UP',
+                                interface.state.OperStatus.DOWN : 'DOWN',
+                                interface.state.OperStatus.TESTING : 'TESTING',
+                                interface.state.OperStatus.UNKNOWN: 'UNKNOWN',
+                                interface.state.OperStatus.DORMANT : 'DORMANT',
+                                interface.state.OperStatus.NOT_PRESENT : 'NOT_PRESENT',
                                 }
-            print('     oper_status:-%s'%oper_status_map[interface.state.oper_status])
+            print('     oper_status: %s'%oper_status_map[interface.state.oper_status])
 
         if interface.state.mtu is not None:
-            print('      mtu:-%s'%interface.state.mtu)
+            print('      mtu: %s'%interface.state.mtu)
         if interface.state.last_change is not None:
-            print('      last_change:-%s'%interface.state.last_change)
+            print('      last_change: %s'%interface.state.last_change)
 
         if interface.state.counters is not None:
             print('     counters')
-            print('        in_unicast_pkts:-%s'%interface.state.counters.in_unicast_pkts)
-            print('        in_octets:-%s'%interface.state.counters.in_octets)
-            print('        out_unicast_pkts:-%s'%interface.state.counters.out_unicast_pkts)
-            print('        out_octets:-%s'%interface.state.counters.out_octets)
-            print('        in_multicast_pkts:-%s'%interface.state.counters.in_multicast_pkts)
-            print('        in_broadcast_pkts:-%s'%interface.state.counters.in_broadcast_pkts)
-            print('        out_multicast_pkts:-%s'%interface.state.counters.out_multicast_pkts)
-            print('        out_broadcast_pkts:-%s'%interface.state.counters.out_broadcast_pkts)
-            print('        out_discards:-%s'%interface.state.counters.out_discards)
-            print('        in_discards:-%s'%interface.state.counters.in_discards)
-            print('        in_unknown_protos:-%s'%interface.state.counters.in_unknown_protos)
-            print('        in_errors:-%s'%interface.state.counters.in_errors)
-            print('        out_errors:-%s'%interface.state.counters.out_errors)
-            print('        last_clear:-%s'%interface.state.counters.last_clear)
+            print('        in_unicast_pkts: %s'%interface.state.counters.in_unicast_pkts)
+            print('        in_octets: %s'%interface.state.counters.in_octets)
+            print('        out_unicast_pkts: %s'%interface.state.counters.out_unicast_pkts)
+            print('        out_octets: %s'%interface.state.counters.out_octets)
+            print('        in_multicast_pkts: %s'%interface.state.counters.in_multicast_pkts)
+            print('        in_broadcast_pkts: %s'%interface.state.counters.in_broadcast_pkts)
+            print('        out_multicast_pkts: %s'%interface.state.counters.out_multicast_pkts)
+            print('        out_broadcast_pkts: %s'%interface.state.counters.out_broadcast_pkts)
+            print('        out_discards: %s'%interface.state.counters.out_discards)
+            print('        in_discards: %s'%interface.state.counters.in_discards)
+            print('        in_unknown_protos: %s'%interface.state.counters.in_unknown_protos)
+            print('        in_errors: %s'%interface.state.counters.in_errors)
+            print('        out_errors: %s'%interface.state.counters.out_errors)
+            print('        last_clear: %s'%interface.state.counters.last_clear)
 
         if interface.state.ifindex is not None:
-            print('     ifindex:-%s'%interface.state.ifindex)
+            print('     ifindex: %s'%interface.state.ifindex)
 
     print('*' * 28)
 
@@ -97,8 +97,11 @@ def read_interfaces(crud_service, provider):
 
     try:
         interfaces = crud_service.read(provider, interfaces_filter)
-        for interface in interfaces.interface:
-            print_interface(interface)
+        if interfaces:
+            for interface in interfaces.interface:
+                print_interface(interface)
+        else:
+            print('There are no interfaces in the configuration.')
     except YError:
         print('An error occurred reading interfaces.')
 
@@ -119,5 +122,6 @@ if __name__ == "__main__":
     init_logging()
     provider = establish_session()
     crud_service = CRUDService()
+    # create_interfaces_config(crud_service, provider)
     read_interfaces(crud_service, provider)
     exit()

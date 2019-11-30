@@ -369,7 +369,8 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 		for _, key := range filterEC.Keys() {
 			filterEntity, _ := filterEC.Get(key)
 			filterAbsPath := types.GetAbsolutePath(filterEntity)
-			topEntity := filterEntity
+			// Make fresh copy of entity to drop all data and filters
+			topEntity := types.NewEntityOfType(filterEntity)
 			for _, dn := range children {
 				path := C.GoString(C.DataNodeGetPath(dn))[1:]
 				bracketPos := strings.Index(path, "[")

@@ -3,10 +3,12 @@ package test
 import (
 	"fmt"
 	ysanity "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/sanity"
+	"github.com/CiscoDevNet/ydk-go/ydk"
 	"github.com/CiscoDevNet/ydk-go/ydk/providers"
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+	"github.com/CiscoDevNet/ydk-go/ydk/types/ylist"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -77,35 +79,38 @@ func (suite *FiltersTestSuite) TestReadOnRefClass() {
 //     suite.Equal(types.EntityEqual(entity, &r2), true)
 // }
 
-// TODO: Encoding error if using YFilter for enum class
-// func (suite *FiltersTestSuite) TestReadOnRefEnumClass() {
-//     r1 := ysanity.Runner{}
-//     r1.Ytypes.BuiltInT.EnumValue = ysanity.YdkEnumTest_local
-//     suite.CRUD.Create(&suite.Provider, &r1)
+func (suite *FiltersTestSuite) TestReadOnRefEnumClass() {
+    r1 := ysanity.Runner{}
+    r1.Ytypes.BuiltInT.EnumValue = ysanity.YdkEnumTest_local
+    suite.CRUD.Create(&suite.Provider, &r1)
 
-//     r2 := ysanity.Runner{}
-//     r2.Ytypes.BuiltInT.EnumValue = yfilter.Read
-//     entity := suite.CRUD.Read(&suite.Provider, &r1)
-//     suite.Equal(types.EntityEqual(entity, &r1), true)
-// }
+    r2 := ysanity.Runner{}
+    r2.Ytypes.BuiltInT.EnumValue = yfilter.Read
+    entity := suite.CRUD.Read(&suite.Provider, &r1)
+    suite.True(types.EntityEqual(entity, &r1))
+}
 
-// TODO: r2.OneList.Ldata is declared as []Runner_OneList_Ldata
-// not able to assign YFilter object to r2.OneList.Ldata
-// func (suite *FiltersTestSuite) TestReadOnRefList() {
-//     r1 := ysanity.Runner{}
-//     l1 := ysanity.Runner_OneList_Ldata{}
-//     l2 := ysanity.Runner_OneList_Ldata{}
-//     r1.OneList.Ldata = append(r1.OneList.Ldata, l1)
-//     r1.OneList.Ldata = append(r1.OneList.Ldata, l2)
-//     suite.CRUD.Create(&suite.Provider, &r1)
+func (suite *FiltersTestSuite) TestReadOnRefList() {
+    r1 := ysanity.Runner{}
+    l1 := ysanity.Runner_OneList_Ldata{}
+    l2 := ysanity.Runner_OneList_Ldata{}
+    l1.Number = 1
+    l2.Number = 2
+    r1.OneList.Ldata = append(r1.OneList.Ldata, &l1)
+    r1.OneList.Ldata = append(r1.OneList.Ldata, &l2)
+    suite.CRUD.Create(&suite.Provider, &r1)
 
-//     r2 := ysanity.Runner{}
+    r2 := ysanity.Runner{}
+    ll := ysanity.Runner_OneList_Ldata{}
+    ll.Number = 2
+    types.SetEntityFilter(&ll, yfilter.Read)
+    r2.OneList.Ldata = append(r2.OneList.Ldata, &ll)
 
-//     // r2.OneList.Ldata = yfilter.Read
-//     entity := suite.CRUD.Read(&suite.Provider, r2)
-
-//     suite.Equal(types.EntityEqual(entity, &r1), true)
-// }
+    entity := suite.CRUD.Read(&suite.Provider, &r2)
+    runner := entity.(*ysanity.Runner)
+    _, ldata := ylist.Get(runner.OneList.Ldata, 2)
+    suite.True(types.EntityEqual(&l2, ldata))
+}
 
 func (suite *FiltersTestSuite) TestReadOnListWithKey() {
 	r1 := ysanity.Runner{}
@@ -130,28 +135,22 @@ func (suite *FiltersTestSuite) TestReadOnListWithKey() {
 func (suite *FiltersTestSuite) TestReadOnLeaflist() {
 	r1 := ysanity.Runner{}
 	r1.Ytypes.BuiltInT.Llstring = append(r1.Ytypes.BuiltInT.Llstring, "1")
-	// TODO: leaf-list encoding error for old API using `GetEntityPath` method
-	// r1.Ytypes.BuiltInT.Llstring = append(r1.Ytypes.BuiltInT.Llstring, "2")
-	// r1.Ytypes.BuiltInT.Llstring = append(r1.Ytypes.BuiltInT.Llstring, "3")
+	r1.Ytypes.BuiltInT.Llstring = append(r1.Ytypes.BuiltInT.Llstring, "2")
+	r1.Ytypes.BuiltInT.Llstring = append(r1.Ytypes.BuiltInT.Llstring, "3")
 	suite.CRUD.Create(&suite.Provider, &r1)
 
 	r2 := ysanity.Runner{}
-	// TODO: r2.Ytypes.BuiltInT.Llstring is declared as []interface,
-	// how to use YFilter for leaf-list?
 	r2.Ytypes.BuiltInT.Llstring = append(r2.Ytypes.BuiltInT.Llstring, yfilter.Read)
-	// r2.Ytypes.BuiltInT.Llstring = append(r2.Ytypes.BuiltInT.Llstring, "1")
 	entity := suite.CRUD.Read(&suite.Provider, &r2)
-	// TODO: YG. Test is not passing
-	suite.Nil(entity)
-//	suite.Equal(types.EntityEqual(entity, &r2), true)
+	suite.True(types.EntityEqual(entity, &r1))
 }
 
 // TODO: Encoding error if using YFilter for identity ref
 // func (suite *FiltersTestSuite) TestReadOnIdentityRef() {
 //     r1 := ysanity.Runner{}
-//     r1.Ytypes.BuiltInT.IdentityRefValue = ysanity.Child_Identity{}
+//     r1.Ytypes.BuiltInT.IdentityRefValue = ysanity.ChildIdentity{}
 //     suite.CRUD.Create(&suite.Provider, &r1)
-
+//
 //     r2 := ysanity.Runner{}
 //     r2.Ytypes.BuiltInT.IdentityRefValue = yfilter.Read
 //     entity := suite.CRUD.Read(&suite.Provider, &r2)
@@ -164,21 +163,12 @@ func (suite *FiltersTestSuite) TestReadOnLeaflist() {
 //     r1.One.Number = 1
 //     r1.One.Name = "r1.One.Name"
 //     suite.CRUD.Create(&suite.Provider, &r1)
-
+//
 //     r2 := ysanity.Runner{}
-//     r3 := ysanity.Runner{}
-
 //     r2.One.Number = yfilter.Read
-//     r3.One.Number = yfilter.Read
-
 //     entity2 := suite.CRUD.ReadConfig(&suite.Provider, &r2)
-//     entity3 := suite.CRUD.Read(&suite.Provider, &r3)
-
 //     r2Read := entity2.(*ysanity.Runner)
-//     r3Read := entity3.(*ysanity.Runner)
-
-//     suite.Equal(r2Read.One.Number, r3Read.One.Number)
-//     suite.Equal(r2Read.One.Name, r3Read.One.Name)
+//     suite.Equal(r1.One.Number, r2Read.One.Number)
 // }
 
 func (suite *FiltersTestSuite) TestDecoder() {
@@ -196,5 +186,8 @@ func (suite *FiltersTestSuite) TestDecoder() {
 }
 
 func TestFiltersTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(FiltersTestSuite))
 }

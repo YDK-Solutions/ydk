@@ -49,7 +49,8 @@ class HeaderPrinter(MultiFilePrinter):
         self._print_enums(package, multi_file.class_list, multi_file.file_name, (not multi_file.fragmented))
 
     def print_header(self, package, multi_file):
-        assert isinstance(multi_file, MultiFileHeader)
+        if not isinstance(multi_file, MultiFileHeader):
+            raise AssertionError()
         self.p = package
         self._print_include_guard_header(multi_file.include_guard)
         self._print_imports(package, multi_file.imports)
@@ -58,7 +59,8 @@ class HeaderPrinter(MultiFilePrinter):
         self.ctx.bline()
 
     def print_trailer(self, package, multi_file):
-        assert isinstance(multi_file, MultiFileHeader)
+        if not isinstance(multi_file, MultiFileHeader):
+            raise AssertionError()
         self.ctx.bline()
         self.ctx.writeln('}')
         self.ctx.writeln('}')
@@ -96,7 +98,6 @@ class HeaderPrinter(MultiFilePrinter):
         self._print_class_trailer(clazz)
 
     def _print_class_header(self, clazz):
-        parents = 'Entity'
         if isinstance(clazz.owner, Class):
             self.ctx.bline()
         class_name = clazz.qualified_cpp_name()

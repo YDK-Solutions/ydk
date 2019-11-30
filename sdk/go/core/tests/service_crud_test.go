@@ -122,33 +122,19 @@ func (suite *CrudTestSuite) TestDeleteObjectOnLeaf() {
 	suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
 }
 
-// TODO: leaf-list encoding error
-// func (suite *CrudTestSuite) TestDeleteOnLeafListSlice() {
-//     runnerCreate := ysanity.Runner{}
-//     runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
-//     // TODO: leaf-list encoding error
-//     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "1")
-//     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "2")
-//     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "3")
-//     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "4")
-//     runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "5")
-//     suite.CRUD.Create(&suite.Provider, &runnerCreate)
+func (suite *CrudTestSuite) TestDeleteOnLeafListSlice() {
+    runnerCreate := ysanity.Runner{}
+    runnerCreate.One.Name = "runner.YdktestSanityOne.Name"
+    runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "1")
+    runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "2")
+    runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "3")
+    runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "4")
+    runnerCreate.Ytypes.BuiltInT.Llstring = append(runnerCreate.Ytypes.BuiltInT.Llstring, "5")
+    suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
-//     runnerUpdate := ysanity.Runner{}
-//     runnerUpdate.Ytypes.BuiltInT.Llstring = append(runnerUpdate.Ytypes.BuiltInT.Llstring, "1")
-//     runnerUpdate.Ytypes.BuiltInT.Llstring = append(runnerUpdate.Ytypes.BuiltInT.Llstring, "3")
-//     // TODO: leaf-list is declared as []interface, how to assign YFilter to them?
-//     runnerUpdate.Ytypes.BuiltInT.Llstring = yfilter.Delete
-//     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
-//     entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
-
-//     runnerCmp := ysanity.Runner{}
-//     runnerCmp.One.Name = "runner.One.Name"
-//     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "2")
-//     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "4")
-//     runnerCmp.Ytypes.BuiltInT.Llstring = append(runnerCmp.Ytypes.BuiltInT.Llstring, "5")
-//     suite.Equal(types.EntityEqual(entityRead, &runnerCmp), true)
-// }
+    entityRead := suite.CRUD.Read(&suite.Provider, &ysanity.Runner{})
+    suite.True(types.EntityEqual(&runnerCreate, entityRead))
+}
 
 // TODO: delete leaf from leaf-list
 // func (suite *CrudTestSuite) TestDeleteOnLeafList() {
@@ -413,5 +399,8 @@ func (suite *CrudTestSuite) TestDeleteContainer() {
 }
 
 func TestCrudTestSuite(t *testing.T) {
+	if testing.Verbose() {
+		ydk.EnableLogging(ydk.Debug)
+	}
 	suite.Run(t, new(CrudTestSuite))
 }

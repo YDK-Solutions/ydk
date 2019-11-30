@@ -97,6 +97,10 @@ TEST_CASE( "test_entity_diff_two_key" )
     auto diff = entity_diff(runner1, runner2);
     REQUIRE(diff.size() == 0);
 
+    auto runner_clone = runner1.clone();
+    diff = entity_diff(runner1, *runner_clone);
+    REQUIRE(diff.size() == 0);
+
     l_1->property = "83";
     auto ent_dict2 = entity_to_dict(runner2);
     print_dictionary("-RIGHT", ent_dict2);
@@ -156,6 +160,10 @@ TEST_CASE( "test_entity_to_dict_aug_onelist" )
     auto ent_dict = entity_to_dict(runner);
     REQUIRE(ent_dict.size() == 5);
     print_dictionary("", ent_dict);
+
+    auto runner_clone = runner.clone();
+    auto diff = entity_diff(runner, *runner_clone);
+    REQUIRE(diff.size() == 0);
 }
 
 TEST_CASE( "test_entity_to_dict_enum_leaflist" )
@@ -163,10 +171,16 @@ TEST_CASE( "test_entity_to_dict_enum_leaflist" )
     auto runner = ydktest_sanity::Runner{};
     runner.ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::local);
     runner.ytypes->built_in_t->enum_llist.append(ydktest_sanity::YdkEnumTest::remote);
+    runner.ytypes->built_in_t->identity_llist.append(ydktest_sanity::ChildIdentity());
+    runner.ytypes->built_in_t->identity_llist.append(ydktest_sanity::ChildChildIdentity());
 
     auto ent_dict = entity_to_dict(runner);
-    REQUIRE(ent_dict.size() == 2);
+    REQUIRE(ent_dict.size() == 4);
     print_dictionary("", ent_dict);
+
+    auto runner_clone = runner.clone();
+    auto diff = entity_diff(runner, *runner_clone);
+    REQUIRE(diff.size() == 0);
 }
 
 TEST_CASE( "test_entity_diff_presence" )
@@ -188,6 +202,10 @@ TEST_CASE( "test_entity_diff_presence" )
     auto diff = entity_diff(runner, empty_runner);
     REQUIRE(diff.size() == 1);
     print_diffs(diff, runner, empty_runner);
+
+    auto runner_clone = runner.clone();
+    diff = entity_diff(runner, *runner_clone);
+    REQUIRE(diff.size() == 0);
 }
 
 TEST_CASE( "test_entity_diff_two_list_pos" )
@@ -240,6 +258,10 @@ TEST_CASE( "test_entity_diff_two_list_pos" )
     auto diff = entity_diff(r_1, r_2);
     REQUIRE(diff.size() == 1);
     print_diffs(diff, r_1, r_2);
+
+    auto runner_clone = r_1.clone();
+    diff = entity_diff(r_1, *runner_clone);
+    REQUIRE(diff.size() == 0);
 }
 
 TEST_CASE("test_entity_diff_no_keys") {
@@ -265,4 +287,8 @@ TEST_CASE("test_entity_diff_no_keys") {
     auto diff = entity_diff(r_1, r_2);
     REQUIRE(diff.size() == 2);
     print_diffs(diff, r_1, r_2);
+
+    auto runner_clone = r_2.clone();
+    diff = entity_diff(r_2, *runner_clone);
+    REQUIRE(diff.size() == 0);
 }

@@ -253,7 +253,7 @@ func EntityToCollection (e Entity) *EntityCollection {
 		ec := NewEntityCollection()
 		return &ec
 	}
-	
+
 	ec, ok := e.(EntityCollection)
 	if ok {
 		return &ec
@@ -271,7 +271,7 @@ func IsEntityCollection (e Entity) bool {
 	if e == nil {
 		return false
 	}
-	
+
 	_, ok := e.(EntityCollection)
 	if ok {
 		return true
@@ -280,7 +280,7 @@ func IsEntityCollection (e Entity) bool {
 		if ok {
 			return true
 		}
-	} 
+	}
 	return false
 }
 
@@ -372,7 +372,7 @@ func (ec *EntityCollection) SetFilter(filter yfilter.YFilter) {
 	for i:=0; i<ec.Len(); i++ {
 		ent := iEntities[i].(Entity)
 		SetEntityFilter(ent, filter)
-	}	
+	}
 }
 
 type Config = EntityCollection
@@ -473,16 +473,39 @@ func HasDataOrFilter(entity Entity) bool {
 	entityData := entity.GetEntityData()
 	if (entityData.YFilter != yfilter.NotSet) { return true }
 
-	// children
+	// checking leaves
+	leafs := GetYLeafs(entityData)
+	v := reflect.ValueOf(entity).Elem()
+	for _, leaf := range leafs {
+		field := v.FieldByName(leaf.GoName)
+		if field.Kind() != reflect.Slice {
+			if leaf.Value != nil { return true }
+		} else {
+			for _, l := range field.Interface().([]interface{}) {
+				if l != nil { return true }
+			}
+		}
+	}
+
+	// checking children
 	children := GetYChildren(entityData)
 	for _, child := range children {
 		if child.Value != nil {
-			yf := child.Value.GetEntityData().YFilter
-			if (yf != yfilter.NotSet || HasDataOrFilter(child.Value)) {
+			if HasDataOrFilter(child.Value) {
 				return true
 			}
 		}
 	}
+	return false
+}
+
+// HasData returns a bool representing whether the entity
+// or any of its children have data set
+func HasData(entity Entity) bool {
+	if entity == nil { return false }
+	if GetPresenceFlag(entity) { return true }
+
+	entityData := entity.GetEntityData()
 
 	// checking leafs
 	leafs := GetYLeafs(entityData)
@@ -499,7 +522,39 @@ func HasDataOrFilter(entity Entity) bool {
 		}
 	}
 
+	// children
+	children := GetYChildren(entityData)
+	for _, child := range children {
+		if HasData(child.Value) {
+			return true
+		}
+	}
 	return false
+}
+
+func getLeafValue(value interface{}) LeafData {
+	var leafData LeafData
+	switch value.(type) {
+	case yfilter.YFilter:
+		leafData = LeafData{IsSet: true, Filter: value.(yfilter.YFilter)}
+	case map[string]bool:
+		// bits
+		var used_bits []string
+		for bit, enabled := range(value.(map[string]bool)) {
+			if enabled {
+				used_bits = append(used_bits, bit)
+			}
+		}
+		v := strings.Join(used_bits, " ")
+		leafData = LeafData{IsSet: true, Value: v}
+	default:
+		var v string
+		if reflect.TypeOf(value) != reflect.TypeOf(Empty{}) {
+			v = fmt.Sprintf("%v", value)
+		}
+		leafData = LeafData{IsSet: true, Value: v}
+	}
+	return leafData
 }
 
 // GetEntityPath returns an EntityPath struct for the given entity
@@ -514,37 +569,33 @@ func GetEntityPath(entity Entity) EntityPath {
 	for name, ileaf := range leafs {
 		leaf := ileaf.(YLeaf)
 		field := v.FieldByName(leaf.GoName)
-
-		if leaf.Value != nil && field.Kind() != reflect.Slice {
-			switch leaf.Value.(type) {
-			case yfilter.YFilter:
-				// yfilter
-				leafData = LeafData{
-					IsSet: true, Filter: leaf.Value.(yfilter.YFilter)}
-			case map[string]bool:
-				// bits
-				var used_bits []string
-				for bit, enabled := range(leaf.Value.(map[string]bool)) {
-					if enabled {
-						used_bits = append(used_bits, bit)
-					}
-				}
-				v := strings.Join(used_bits, " ")
-				leafData = LeafData{IsSet: true, Value: v}
-			default:
-				var v string
-				if reflect.TypeOf(leaf.Value) != reflect.TypeOf(Empty{}) {
-					v = fmt.Sprintf("%v", leaf.Value)
-				}
-				leafData = LeafData{
-					IsSet: true, Value: v}
-			}
+	    if !field.IsValid() || leaf.Value == nil  {
+			continue
+		}
+		if field.Kind() != reflect.Slice {
+			leafData = getLeafValue(leaf.Value)
+            //fmt.Printf("Adding leaf: name: %s, data: %v\n", name, leafData)
 			entityPath.ValuePaths = append(
 				entityPath.ValuePaths,
 				NameLeafData{Name: name, Data: leafData})
+		} else {
+		    // leaf-list
+		    sliceInt := leaf.Value.([]interface{})
+			for i := range sliceInt {
+				leafData = getLeafValue(sliceInt[i])
+				path := name
+				if len(leafData.Value) > 0 {
+				    path = fmt.Sprintf("%s[.=\"%v\"]", name, leafData.Value)
+				    leafData.Value = ""
+				}
+				//fmt.Printf("Adding leaf-list: path: %s, data: %v\n", path, leafData)
+				entityPath.ValuePaths = append(
+					entityPath.ValuePaths,
+					NameLeafData{Name: path, Data: leafData})
+				if leafData.Filter != yfilter.NotSet { break }
+			}
 		}
 	}
-
 	return entityPath
 }
 
@@ -614,7 +665,7 @@ func SetValue(entity Entity, valuePath string, value interface{}) {
 		} else if v.Type() == reflect.TypeOf(BitsList{}) {
 			bitsValue := make(map[string]bool)
 			bitsValue[value.(string)] = true
-			
+
 			bitslist := v.Interface().(BitsList)
 			bitslist.Value = append(bitslist.Value, bitsValue)
 
@@ -689,8 +740,8 @@ type DataNode struct {
 	Private interface{}
 }
 
-// RootSchemaNode represents the root of the SchemaTree. 
-// It can be used to instantiate a DataNode tree or an Rpc object. 
+// RootSchemaNode represents the root of the SchemaTree.
+// It can be used to instantiate a DataNode tree or an Rpc object.
 // The children of the RootSchemaNode represent the top level SchemaNode in the YANG module submodules.
 type RootSchemaNode struct {
 	Private interface{}
@@ -717,7 +768,7 @@ type COpenDaylightServiceProvider struct {
 
 // Repository represents the Repository of YANG models.
 // A instance of the Repository will be used to create a RootSchemaNode given a set of ©pabilities.
-// Behind the scenes the repository is responsible for loading and parsing the YANG modules and creating the SchemaNode tree. 
+// Behind the scenes the repository is responsible for loading and parsing the YANG modules and creating the SchemaNode tree.
 type Repository struct {
 	Path    string
 	Private interface{}
@@ -991,7 +1042,6 @@ func PathToEntity(entity Entity, absPath string) Entity {
 	return nil
 }
 
-
 func keyInSlice(k string, v []string) bool {
 	for _, e := range v {
 		if e == k {
@@ -1018,7 +1068,7 @@ func getMapKeys(m map[string]string) []string {
 		i++
 	}
 	sort.Strings(keys)
-	return keys	
+	return keys
 }
 
 type StringPair struct {
@@ -1068,4 +1118,64 @@ func EntityDiff(ent1 Entity, ent2 Entity) map[string]StringPair {
 		}
 	}
 	return diffs
+}
+
+func copyLeaves(originalEntity, clonedEntity Entity) {
+	entityPath := GetEntityPath(originalEntity)
+	for _, leafData := range entityPath.ValuePaths {
+		if leafData.Data.IsSet {
+			leafName := leafData.Name
+			leafValue := leafData.Data.Value
+			// fmt.Printf("Setting leaf '%s' value '%s'\n", leafName, leafValue)
+			bracketPos := strings.Index(leafName, "[.=")
+			if bracketPos != -1 {
+				// Here we have leaf-list
+				leafValue = leafName[bracketPos+4 : len(leafName)-2]
+				leafName = leafName[0 : bracketPos]
+			}
+			SetValue(clonedEntity, leafName, leafValue)
+		}
+	}
+}
+
+func copyChildren(originalEntity, clonedEntity Entity) {
+	children := GetYChildren(originalEntity.GetEntityData())
+	for _, child := range children {
+		childEntity := child.Value
+		if HasData(childEntity) {
+			childEntityData := childEntity.GetEntityData()
+			childYangName := childEntityData.YangName
+			// fmt.Printf("Cloning child '%s' with path '%s'\n",
+			// 		childYangName, childEntityData.SegmentPath)
+			clonedChild := GetChildByName(clonedEntity, childYangName, childEntityData.SegmentPath)
+			if clonedChild == nil {
+				panic("copyChildren: Failed to get entity child by YANG name")
+			}
+			SetParent(clonedChild, clonedEntity)
+			if IsPresenceContainer(clonedChild) {
+				SetPresenceFlag(clonedChild)
+			}
+			copyLeaves(childEntity, clonedChild);
+			copyChildren(childEntity, clonedChild);
+			clonedChild.GetEntityData()
+		}
+	}
+}
+
+// NewEntityOfType: Function to create new instance of given Entity
+func NewEntityOfType(ent Entity) Entity {
+	entType := reflect.TypeOf(ent).Elem()
+	entPtr := reflect.New(entType)
+	entInt := entPtr.Interface()
+	entClone := entInt.(Entity)
+	return entClone
+}
+
+// EntityClone - Function to clone an Entity
+func EntityClone(ent Entity) Entity {
+    entClone := NewEntityOfType(ent)
+	copyLeaves(ent, entClone);
+	copyChildren(ent, entClone);
+	entClone.GetEntityData()
+	return entClone
 }

@@ -626,7 +626,7 @@ TEST_CASE( "decode_encode_interfaces_with_filters" )
     auto ifc = make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "Loopback10";
     ifc->config->name = "Loopback10";
-    ifc->config->description.yfilter = ydk::YFilter::read;
+    ifc->config->description = ydk::YFilter::read;
     ifc->config->yfilter = ydk::YFilter::read;
     ifcs.interface.append(ifc);
 

@@ -83,6 +83,9 @@ class EntityDiffTest(unittest.TestCase):
         self.assertEqual(len(diff), 1)
         self.print_diffs(diff, runner, runner2)
 
+        cloned_entity = runner.clone()
+        self.assertTrue(runner == cloned_entity)
+
     def test_entity_diff_two_key_not_equal(self):
         runner = ysanity.Runner()
         l_1, l_2 = ysanity.Runner.TwoKeyList(), ysanity.Runner.TwoKeyList()
@@ -125,6 +128,9 @@ class EntityDiffTest(unittest.TestCase):
         self.assertEqual(len(ent_dict), 5)
         print_dictionary('', ent_dict, 60)
 
+        cloned_entity = runner.clone()
+        self.assertTrue(runner == cloned_entity)
+
     def test_entity_to_dict_enum_leaflist(self):
         runner = ysanity.Runner()
         runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.local)
@@ -133,6 +139,9 @@ class EntityDiffTest(unittest.TestCase):
         ent_dict = entity_to_dict(runner)
         self.assertEqual(len(ent_dict), 2)
         print_dictionary('', ent_dict, 50)
+
+        cloned_entity = runner.clone()
+        self.assertTrue(runner == cloned_entity)
 
     def test_entity_diff_number_leaf(self):
         runner1 = ysanity.Runner()
@@ -169,6 +178,9 @@ class EntityDiffTest(unittest.TestCase):
         diff = entity_diff(runner, runner_)
         self.assertEqual(len(diff), 1)
         self.print_diffs(diff, runner, runner_, 40)
+
+        cloned_entity = runner.clone()
+        self.assertTrue(runner == cloned_entity)
 
     def test_entity_diff_twolist_pos(self):
         r_1 = ysanity.Runner()
@@ -219,6 +231,9 @@ class EntityDiffTest(unittest.TestCase):
         self.assertEqual(len(diff), 1)
         self.print_diffs(diff, r_1, r_2, 50)
 
+        cloned_entity = r_1.clone()
+        self.assertTrue(r_1 == cloned_entity)
+
     def test_entity_to_dict_no_key_list(self):
         r_1 = ysanity.Runner()
         test1 = ysanity.Runner.NoKeyList()
@@ -245,6 +260,9 @@ class EntityDiffTest(unittest.TestCase):
         diff = entity_diff(r_1, r_2)
         self.assertEqual(len(diff), 2)
         self.print_diffs(diff, r_1, r_2, 30)
+
+        cloned_entity = r_1.clone()
+        self.assertTrue(r_1 == cloned_entity)
 
 
 if __name__ == '__main__':

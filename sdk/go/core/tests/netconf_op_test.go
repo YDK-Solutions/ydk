@@ -186,16 +186,18 @@ func (suite *NETCONFOperationsTestSuite) TestMerge() {
 //     runnerCreate := ysanity.Runner{}
 //     runnerCreate.Ytypes.BuiltInT.EnumLlist = append(runnerCreate.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
 //     suite.CRUD.Create(&suite.Provider, &runnerCreate)
-
+//
 //     runnerUpdate := ysanity.Runner{}
-//     // TODO: verify that appending YFilter.Delete to leaf-list delete whole leaf list or a particular leaf
 //     runnerUpdate.Ytypes.BuiltInT.EnumLlist = append(runnerUpdate.Ytypes.BuiltInT.EnumLlist, yfilter.Delete)
 //     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
-
+//
 //     // delete again with error
 //     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 // }
 
 func TestNETCONFOperationsTestSuite(t *testing.T) {
+// 	if testing.Verbose() {
+// 		ydk.EnableLogging(ydk.Debug)
+// 	}
 	suite.Run(t, new(NETCONFOperationsTestSuite))
 }

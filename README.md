@@ -438,52 +438,60 @@ The first step in using ydk-gen is either using one of the already built [bundle
 
 Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies.
 
-A sample bundle profile file is described below. The file is in a JSON format. Specify the `name` of your bundle, the `version` of the bundle and the `ydk_version`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `name` of the bundle here is especially important as this will form part of the installation path of the bundle.
+A sample bundle profile file is described below. The file is in a JSON format. Specify the `"name"` of your bundle, the `"version"` of the bundle and the `"ydk_version"`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `"name"` of the bundle here is especially important as this will form part of the installation path of the bundle.
 
 ```
 {
     "name":"cisco-ios-xr",
-    "version": "0.1.0",
+    "version": "6.5.3",
     "ydk_version": "0.8.4",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
 ```
 
-The "models" section of the file describes where to source models from. There are 3 sources:
+The `"models"` section of the profile describes sources of YANG models. It could contain combination of elements:
 
-- Directories
-- Specific files
-- Git, within which specific relative directories and files may be referenced
+- `"dir"` - list of **relative** directory paths containing YANG files
+- `"file"` - list of **relative** YANG file paths
+- `"git"` - git repository, where YANG files are located
 
-The sample below shows the use of git sources only.
+The sample below shows the use of git sources only. Other examples can be found in `profiles` directory README.md.
+
+Each `"git"` source must specify `"url"` - git repository URL, and `"commits"` list. The specified URL must allow the repository
+to be cloned without user intervention. Each element in `"commits"` list can specify:
+
+- `"commitid"` - optional specification of a commit ID in string format. If not specified the HEAD revision is assumed. 
+The further specified directories and files will be copied from the context of this commit.
+- `"dir"` - optional list of **relative** directory paths within the git repository.
+All `*.yang` files in specified directory **and any sub-directories** will be pulled into the generated bundle.
+- `"file"` - optional list of **relative** `*.yang` file paths within the git repository.
+
+Only directory examples are shown in this example.
 
 ```
     "models": {
         "git": [
-```
-
-We have a list of git sources. Each source must specify a URL. This URL should be one that allows the repository to be cloned without requiring user intervention, so please use a public URL such as the example below. There are three further options that can be specified:
-
-- `commitid` - Optional specification of a commit in string form. The files identified will be copied from the context of this commit.
-- `dir` - List of **relative** directory paths within git repository. All .yang files in this directory **and any sub-directories** will be pulled into the generated bundle.
-- `file`- List of **relative** file paths within the git repository.
-
-Only directories are shown in below example.
-
-```
             {
                 "url": "https://github.com/YangModels/yang.git",
-                "dir": [
-                    "vendor/cisco/xr/532"
+                "commits": [
+                  {
+                    "dir": [
+                        "vendor/cisco/xr/653"
+                    ]
+                  }
                 ]
             },
             {
                 "url": "https://github.com/YangModels/yang.git",
-                "commitid": "f6b4e2d59d4eedf31ae8b2fa3119468e4c38259c",
-                "dir": [
-                    "experimental/openconfig/bgp",
-                    "experimental/openconfig/policy"
+                "commits": [
+                  {
+                    "commitid": "f6b4e2d59d4eedf31ae8b2fa3119468e4c38259c",
+                    "dir": [
+                        "experimental/openconfig/bgp",
+                        "experimental/openconfig/policy"
+                    ]
+                  }
                 ]
             }
         ]

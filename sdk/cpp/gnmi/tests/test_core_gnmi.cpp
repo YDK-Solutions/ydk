@@ -405,8 +405,8 @@ TEST_CASE("gnmi_rpc_set_get_bgp")
 
     // Add data-nodes to RPC
     ydk::path::Codec s{};
-    auto bgp_json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-    auto int_json = s.encode(ifc, ydk::EncodingFormat::JSON, false);
+    auto bgp_json = s.encode(bgp, ydk::EncodingFormat::JSON, true);
+    auto int_json = s.encode(ifc, ydk::EncodingFormat::JSON, true);
 
     std::shared_ptr<ydk::path::Rpc> set_rpc { schema.create_rpc("ydk:gnmi-set") };
     set_rpc->get_input_node().create_datanode("replace[alias='bgp']/entity", bgp_json);

@@ -28,6 +28,7 @@
 #include <ydk/logger.hpp>
 #include <ydk/netconf_model_provider.hpp>
 #include <ydk/common_utilities.hpp>
+#include <ydk/json.hpp>
 
 #include "gnmi_provider.hpp"
 #include "gnmi_path_api.hpp"
@@ -39,7 +40,7 @@ using grpc::ChannelCredentials;
 using grpc::SslCredentialsOptions;
 
 using namespace std;
-using namespace ydk;
+using json = nlohmann::json;
 
 namespace ydk
 {
@@ -175,7 +176,20 @@ static GnmiClientRequest build_set_request(RootSchemaNode & root_schema, DataNod
         throw(YInvalidArgumentError{"Failed to get 'entity' node from set RPC"});
     }
     DataNode* entity_node = entity[0].get();
-    one_request.payload = entity_node->get_value();
+    auto payload = entity_node->get_value();
+
+    // Remove possible formatting of JSON payload string
+    try {
+        auto jpayload = json::parse(payload);
+        if (!jpayload.is_object()) {
+            throw exception();
+        }
+        one_request.payload = jpayload.dump();
+    }
+    catch (exception & e) {
+        YLOG_ERROR("Invalid JSON string in gnmi-set RPC:\n{}", payload);
+        throw YInvalidArgumentError{"Invalid JSON string in gnmi-set RPC"};
+    }
 
     one_request.path = new gnmi::Path();
     if (operation == "delete") {

@@ -18,13 +18,12 @@ Generate YDK core library, bundle packages.
 """
 from __future__ import print_function
 from distutils import dir_util
-from subprocess import call
 
 import fileinput
-import glob
 import json
 import logging
-import os, sys, shutil
+import os
+import shutil
 import tarfile
 import tempfile
 import re
@@ -115,15 +114,17 @@ class YdkGenerator(object):
             self.version = profile.get('version')
             if self.package_name is None or self.version is None:
                 raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
-        
+
         tmp_file = tempfile.mkstemp(suffix='.bundle')[-1]
         bundle_translator.translate(profile_file, tmp_file, self.ydk_root)
 
         resolver = bundle_resolver.Resolver(self.output_dir, self.ydk_root, self.iskeyword)
         curr_bundle, all_bundles = resolver.resolve(tmp_file)
-        assert isinstance(curr_bundle, bundle_resolver.Bundle)
+        if not isinstance(curr_bundle, bundle_resolver.Bundle):
+            raise AssertionError()
         for x in all_bundles:
-            assert isinstance(x, bundle_resolver.Bundle)
+            if not isinstance(x, bundle_resolver.Bundle):
+                raise AssertionError()
 
         packages = self._get_packages(curr_bundle)
         if len(packages) == 0:
@@ -143,7 +144,7 @@ class YdkGenerator(object):
 
         if self.language == 'cpp':
             _modify_cpp_cmake(gen_api_root, curr_bundle.name, cpp_version, cpp_build, 
-                    curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
+                              curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
 
         os.remove(tmp_file)
 
@@ -163,7 +164,7 @@ class YdkGenerator(object):
             self.version = profile.get('version')
             if self.package_name is None or self.version is None:
                 raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
-            dependency = profile.get('dependency')
+            # dependency = profile.get('dependency')
 
         package_name = 'ydk-service-%s' % self.package_name
         gen_api_root = self._initialize_gen_api_directories(package_name, self.package_type)
@@ -189,7 +190,7 @@ class YdkGenerator(object):
             represented as an api package.
 
         Args:
-            resolved_model_dir (str): Path to resolved YANG modules.
+            bundle (Bundle): Bundle package.
 
         Returns:
             packages (List[.api_model.Package]): List of api packages.
@@ -211,14 +212,15 @@ class YdkGenerator(object):
 
         Args:
             pkgs (List[.api_model.Package]): List of api packages to print.
-            package_name (str): Package name for generated APIs.
-                            For example 'ydk_bgp', 'ydk_ietf'.
+            output_dir (str): Output directory.
+            bundle (Bundle): Bundle package
         """
         global classes_per_source_file
         factory = printer_factory.PrinterFactory()
         bundle_packages = _filter_bundle_from_packages(pkgs, bundle)
-        ydk_printer = factory.get_printer(self.language)(output_dir, bundle, self.generate_tests, self.one_class_per_module)
-        if self.language =='python':
+        ydk_printer = factory.get_printer(self.language)(output_dir, bundle, self.generate_tests,
+                                                         self.one_class_per_module)
+        if self.language == 'python':
             ydk_printer.generate_meta = self.generate_meta
         generated_files = ydk_printer.emit(bundle_packages, classes_per_source_file)
         return generated_files
@@ -342,15 +344,16 @@ def _create_tar(resolved_models_dir, tar_file_path):
 
 
 def _create_models_archive(bundle, target_dir, bundle_name):
-    '''
+    """
     Creates yang models archive as part of bundle package.
     Args:
-        source_dir (str): Directory where models are located
-        bundle_qualified_name (st): Bundle name with version
+        bundle (Bundle): Bundle package
         target_dir (str): Directory where archive is to be created
-    '''
+        bundle_name (st): Bundle name with version
+    """
     global YDK_YANG_MODEL
-    assert isinstance(bundle, bundle_resolver.Bundle)
+    if not isinstance(bundle, bundle_resolver.Bundle):
+        raise AssertionError()
     tar_file = '{}.tar.gz'.format(bundle_name)
     tar_file_path = os.path.join(target_dir, tar_file)
     ydk_yang = os.path.join(target_dir, YDK_YANG_MODEL)
@@ -378,6 +381,7 @@ def _set_original_bundle_name_for_packages(bundles, packages, curr_bundle):
                 if pkg.name == module.pkg_name:
                     pkg.bundle_name = bundle.name
 
+
 def get_cpp_version_and_build(version):
     m = re.match('(\d+).(\d+).(\d+)', version)
     if m:
@@ -392,10 +396,12 @@ def get_cpp_version_and_build(version):
     else:
         raise YdkGenException('Invalid version format %s\n\nExpected format: <major>.<minor>.<patch>[[.|-|_\w]+<build>]' % version)
 
+
 def normalize_version(version):
     version = version.replace('_', '.')
     version = version.replace('-', '.')
     return version
+
 
 def _modify_python_setup(gen_api_root, package_name, version, core_version, dependencies, description, long_description):
     """ Modify setup.py template for python packages. Replace package name
@@ -413,7 +419,7 @@ def _modify_python_setup(gen_api_root, package_name, version, core_version, depe
         long_description (str): long description for bundle package
     """
     setup_file = os.path.join(gen_api_root, 'setup.py')
-    replaced_package = False
+    # replaced_package = False
     replaced_version = False
     replaced_core_version = False
     replaced_dependencies = False
@@ -458,28 +464,28 @@ def _modify_python_manifest(gen_api_root, bundle_name):
 
 def update_setup_file_version(language, gen_api_root, name, package_name, version):
     cpp_version, cpp_build = get_cpp_version_and_build(version)
-    replacer_table = {}     # KEY is file name; VALUE is dictionary: substr match: replacement template
+    # replacer_table = {}     # KEY is file name; VALUE is dictionary: substr match: replacement template
     if language == 'python':
         replacer_table = {
             'setup.py': {'NAME =': "NAME = '%s'\n" % package_name,
                          'VERSION =': "VERSION = '%s'\n" % normalize_version(version),
-                        },
+                         },
             'CMakeLists.txt': {'project(path VERSION': 'project(path VERSION %s LANGUAGES C CXX)\n' % cpp_version,
                                'set (CPACK_PACKAGE_RELEASE': 'set (CPACK_PACKAGE_RELEASE "%s")\n' % cpp_build,
-                              }
+                               }
         }
     elif language == 'cpp':
         replacer_table = {
             'CMakeLists.txt': {'project(ydk_%s VERSION' % name: 'project(ydk_%s VERSION %s LANGUAGES C CXX)\n' % (name, cpp_version),
                                'set (CPACK_PACKAGE_RELEASE': 'set (CPACK_PACKAGE_RELEASE "%s")\n' % cpp_build,
-                              }
+                               }
         }
     else:
         raise Exception('Language {0} has no setup file'.format(language))
 
     for file_name, keyword_replacer_table in replacer_table.items():
         setup_file = os.path.join(gen_api_root, file_name)
-        lines = []
+        # lines = []
         with open(setup_file, 'r+') as fd:
             lines = fd.readlines()
         for i, line in enumerate(lines):
@@ -496,7 +502,7 @@ def _modify_cpp_cmake(gen_api_root, bundle_name, cpp_version, cpp_build, core_ve
     Args:
         gen_api_root (str): Root directory for generated APIs.
         bundle_name (str): Package name for generated APIs.
-        version (str): Package version for generated APIs.
+        cpp_version (str): Package version for generated APIs.
         core_version (str): YDK core library version for generated APIs.
     """
     cmake_file = os.path.join(gen_api_root, 'CMakeLists.txt')
@@ -541,8 +547,7 @@ def _check_generator_args(output_dir, ydk_root, language, package_type):
         ydk_root (str): The ydk root directory.
         language (str): Language for generated APIs.
         package_type (str): Package type for generated APIs.
-                        Valid options for bundle approach are: 'core',
-                                                               'packages'.
+                        Valid options for bundle approach are: 'core', 'packages'.
     Raises:
         YdkGenException: If invalid arguments are passed in.
     """

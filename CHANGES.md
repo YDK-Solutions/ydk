@@ -4,6 +4,12 @@
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
 
+#### Resolved GitHub issues
+  * gNMI set RPC fails when JSON payload is formatted string
+
+#### Documentation improvements
+  * Bundle profile description is not accurate ([#971](https://github.com/CiscoDevNet/ydk-gen/issues/971))
+
 
 ### 2019-10-15 version 0.8.4
 

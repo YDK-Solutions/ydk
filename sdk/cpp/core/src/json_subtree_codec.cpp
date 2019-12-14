@@ -151,7 +151,7 @@ static const path::SchemaNode* find_child_by_name(const path::SchemaNode & paren
     vector<path::SchemaNode*> s = p->find(name);
     if (s.size() == 0) {
         YLOG_ERROR("Could not find node '{}'", name);
-        throw YServiceProviderError{"Could not find node " + name};
+        throw YServiceError{"Could not find node " + name};
     }
     return s[0];
 }

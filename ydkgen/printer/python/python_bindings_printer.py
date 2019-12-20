@@ -37,6 +37,10 @@ from ..doc import DocPrinter
 from ..tests import TestPrinter
 from ydkgen.printer.language_bindings_printer import LanguageBindingsPrinter, _EmitArgs
 
+import logging
+
+logger = logging.getLogger('ydkgen')
+
 
 class PythonBindingsPrinter(LanguageBindingsPrinter):
 
@@ -80,6 +84,7 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
 
         # Skip generating module for empty modules
         if len(package.owned_elements) == 0:
+            logger.debug("    Skipping module, because it does not contain top level containers")
             return
 
         sub = package.sub_name
@@ -155,7 +160,9 @@ class PythonBindingsPrinter(LanguageBindingsPrinter):
                       'generate_meta': self.generate_meta,
                       'identity_subclasses': self.identity_subclasses,
                       'module_namespace_lookup' : self.module_namespace_lookup}
-        self.print_file(get_python_module_file_name(path, package),
+        python_module_file_name = get_python_module_file_name(path, package)
+        logger.debug("    Printing python module %s" % python_module_file_name)
+        self.print_file(python_module_file_name,
                         emit_module,
                         _EmitArgs(self.ypy_ctx, package, extra_args))
 

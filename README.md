@@ -438,13 +438,13 @@ The first step in using ydk-gen is either using one of the already built [bundle
 
 Construct a bundle profile file, such as [```ietf_0_1_1.json```](profiles/bundles/ietf_0_1_1.json) and specify its dependencies.
 
-A sample bundle profile file is described below. The file is in a JSON format. Specify the `"name"` of your bundle, the `"version"` of the bundle and the `"ydk_version"`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `"name"` of the bundle here is especially important as this will form part of the installation path of the bundle.
+A sample bundle profile file is described below. The file is in a JSON format. Specify the `"name"` of your bundle, the `"version"` of the bundle and the `"core_version"`, which refers to [the version](https://github.com/CiscoDevNet/ydk-gen/releases) of the ydk core package you want to use with this bundle. The `"name"` of the bundle here is especially important as this will form part of the installation path of the bundle.
 
 ```
 {
     "name":"cisco-ios-xr",
     "version": "6.5.3",
-    "ydk_version": "0.8.4",
+    "core_version": "0.8.4",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",

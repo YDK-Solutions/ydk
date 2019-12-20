@@ -122,8 +122,8 @@ def merge_file_path_segments(segs):
     return return_seg
 
 def ispythonkeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'operation', 'exec', 'entity')
-    # return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'yfilter', 'exec', 'entity')
+    return keyword.iskeyword(word) or \
+        word in ['False', 'None', 'True', 'async', 'await', 'nonlocal', 'parent', 'print', 'children', 'operation', 'exec', 'entity', 'yfilter']
 
 def iscppkeyword(word):
     return word in ('parent', 'operator', 'inline', 'default', 'virtual',

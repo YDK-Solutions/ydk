@@ -8,6 +8,7 @@
   * gNMI set RPC fails when JSON payload is formatted string
   * Enhance generator to indicate how a YANG modules was processed ([#894](https://github.com/CiscoDevNet/ydk-gen/issues/894))
   * YDK fails create bundle package when package name contains '.' ([#978](https://github.com/CiscoDevNet/ydk-gen/issues/978))
+  * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
 
 #### Documentation improvements
   * Bundle profile description is not accurate ([#971](https://github.com/CiscoDevNet/ydk-gen/issues/971))

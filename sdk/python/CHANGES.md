@@ -3,6 +3,9 @@
 #### New features and enhancements
   * Added Entity class member function to clone entity object
 
+#### Resolved GitHub issues
+  * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
+
 
 ### 2019-10-15 version 0.8.4
 

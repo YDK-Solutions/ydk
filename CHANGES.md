@@ -10,6 +10,9 @@
   * YDK fails create bundle package when package name contains '.' ([#978](https://github.com/CiscoDevNet/ydk-gen/issues/978))
   * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
 
+#### Bundle improvements
+  * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code
+
 #### Documentation improvements
   * Bundle profile description is not accurate ([#971](https://github.com/CiscoDevNet/ydk-gen/issues/971))
 

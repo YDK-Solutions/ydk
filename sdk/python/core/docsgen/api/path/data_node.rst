@@ -26,7 +26,7 @@ DataNode
         This method adds the annotation to this Datanode.
 
         :param annotation: (:py:class:`Annotation<ydk.path.Annotation>`) Annotation to be added.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: annotations()
 
@@ -49,8 +49,8 @@ DataNode
         :param path: (``str``) The XPath expression identifying the node.
         :param value: (``str``) The value to be set.
 
-        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YPathError in case the path is invalid;
+                 YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: create_action(path)
 
@@ -58,8 +58,8 @@ DataNode
 
         :param path: (``str``) The XPath expression identifying the node.
 
-        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YPathError in case the path is invalid.
+        :raises: YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: __call__(service_provider)
 
@@ -69,7 +69,7 @@ DataNode
         :return: :py:class:`DataNode` instance if succeed.
         :rtype: None or :py:class:`DataNode`
 
-        :raises RuntimeError: With ``YError`` prefix in case the path is invalid or DataNode contains no action nodes.
+        :raises: YError in case the path is invalid or DataNode contains no action nodes.
 
     .. py:method:: find(path)
 
@@ -121,4 +121,4 @@ DataNode
             * This method does not validate the value being set.
 
         :param value: (``str``) The value to set. This should be the string representation of the YANG type.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).
+        :raises: YInvalidArgumentError if the its value cannot be set (for example it represents a container).

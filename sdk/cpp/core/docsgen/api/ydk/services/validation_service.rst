@@ -32,9 +32,7 @@ ValidationService
 
         Validates an entity based on the option.
 
-        :param provider: An instance of :cpp:class:`ServiceProvider<ydk::path::ServiceProvider>`
-        :param entity: An instance of :cpp:class:`Entity<Entity>` class defined under a bundle
-        :param option: An instance of type :cpp:class:`Option<Option>`
-        :raises YError: If validation errors were detected
-
-    .. cpp:function:: virtual ~ValidationService()
+        :param provider: An instance of :cpp:class:`ServiceProvider<ydk::path::ServiceProvider>`.
+        :param entity: An instance of :cpp:class:`Entity<Entity>` class defined under a bundle.
+        :param option: An instance of type :cpp:class:`Option<Option>`.
+        :raises: :cpp:class:`YModelError<YModelError>`, if validation error was detected.

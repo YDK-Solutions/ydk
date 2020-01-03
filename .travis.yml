@@ -8,12 +8,12 @@ matrix:
 #     dist: trusty
 #     group: edge
    - os: osx
-     osx_image: xcode8.3
+     osx_image: xcode9.2
      language: generic
      go: 1.9
    - os: osx
      env: GNMI=true
-     osx_image: xcode8.3
+     osx_image: xcode9.2
      language: generic
      go: 1.9
 #   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7

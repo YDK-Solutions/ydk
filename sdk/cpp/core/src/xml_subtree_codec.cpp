@@ -93,7 +93,7 @@ static const path::SchemaNode* find_child_by_name(const path::SchemaNode & paren
     if(s.size()==0)
     {
         YLOG_ERROR("XMLCodec: Could not find node '{}'", name);
-        throw YServiceProviderError{"Could not find node " + name};
+        throw YServiceError{"Could not find node " + name};
     }
     return s[0];
 }
@@ -199,7 +199,7 @@ std::shared_ptr<Entity> XmlSubtreeCodec::decode(const std::string & payload, std
     if(entity->yang_name != to_string(root->name))
     {
         YLOG_ERROR("XMLCodec: Top entity '{}' does not match the payload", entity->yang_name);
-    	throw YServiceProviderError{"Top entity does not match the payload"};
+        throw YInvalidArgumentError{"Top entity does not match the payload"};
     }
     decode_xml(doc, root->children, *entity, nullptr, "");
     xmlFreeDoc(doc);
@@ -278,7 +278,7 @@ static void check_payload_to_raise_exception(Entity & entity, const xmlChar * na
         ostringstream os;
         os << "XMLCodec: Wrong payload! No element '" << current_node_name << "' found in '" << entity.yang_name << "'";
         YLOG_ERROR(os.str().c_str());
-        throw YServiceProviderError{os.str()};
+        throw YInvalidArgumentError{os.str()};
     }
 }
 

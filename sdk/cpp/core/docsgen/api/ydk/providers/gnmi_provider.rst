@@ -24,7 +24,7 @@ gNMIServiceProvider
         :param password: Password to log in to the device.
         :param server_certificate: Full path to a file, which contains server certificate of authorization (public key). If not specified, it is assumed non-secure connection to gNMI server.
         :param private_key: Full path to a file, which contains private key of the application host. If not specified and **server_certificate** is defined (secure connection), the GRPC internally defined private key is used.
-        :raises: YServiceError, if connection error occured.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if connection error occurred.
 
     .. cpp:function:: EncodingFormat get_encoding() const
 

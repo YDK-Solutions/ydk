@@ -31,7 +31,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param persist_id: Cancels a persistent confirmed commit with **persist_id**.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool close_provider(NetconfServiceProvider & provider)
 
@@ -39,7 +39,7 @@ Netconf Service
 
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool commit(NetconfServiceProvider & provider, std::string confirmed = "", std::string confirm_timeout = "", std::string persist = "", std::string persist_id = "")
 
@@ -51,7 +51,7 @@ Netconf Service
         :param persist: An optional argument.
         :param persist_id: An optional argument.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool copy_config(NetconfServiceProvider & provider, DataStore target, DataStore source)
 
@@ -61,7 +61,7 @@ Netconf Service
         :param target: The configuration being used as the destination of type :cpp:class:`DataStore`
         :param source: The configuration being used as the source of type :cpp:class:`DataStore`
         :return: **true**, if the operation succeeds, **false** - otherwise
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool copy_config(NetconfServiceProvider & provider, DataStore target, Entity& source)
 
@@ -71,7 +71,7 @@ Netconf Service
         :param target: The configuration being used as the destination of type :cpp:class:`DataStore`.
         :param source: The configuration being used as the source of type :cpp:class:`Entity<ydk::Entity>`.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool copy_config(NetconfServiceProvider & provider, DataStore target, std::vector<Entity*>& source)
 
@@ -81,7 +81,7 @@ Netconf Service
         :param target: The configuration being used as the destination of type :cpp:class:`DataStore`.
         :param source: The configuration being used as the source of type **std::vector<Entity*>** for multiple entities.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool delete_config(NetconfServiceProvider & provider, DataStore target, std::string url = "")
 
@@ -91,7 +91,7 @@ Netconf Service
         :param target: The configuration of type :cpp:class:`DataStore` to be deleted.
         :param url: Required only when target is set to :cpp:enumerator:`url<DataStore::url>`.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool discard_changes(NetconfServiceProvider & provider)
 
@@ -99,7 +99,7 @@ Netconf Service
 
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool edit_config(NetconfServiceProvider & provider, DataStore target, Entity& config, std::string default_operation = "", std::string test_option = "", std::string error_option = "")
 
@@ -112,7 +112,7 @@ Netconf Service
         :param test_option: Optionally set to "test-then-set", "set", or "test-only" if the device advertises the :validate:1.1 capability.
         :param error_option: Optionally set to "stop-on-error", "continue-on-error", or "rollback-on-error".
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool edit_config(NetconfServiceProvider & provider, DataStore target, std::vector<Entity\*>& config, std::string default_operation = "", std::string test_option = "", std::string error_option = "")
 
@@ -125,7 +125,7 @@ Netconf Service
         :param test_option: Optionally set to "test-then-set", "set", or "test-only" if the device advertises the :validate:1.1 capability.
         :param error_option: Optionally set to "stop-on-error", "continue-on-error", or "rollback-on-error".
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: std::shared_ptr<Entity> get_config(NetconfServiceProvider & provider, DataStore source, Entity& filter)
 
@@ -134,7 +134,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param source: The configuration being queried of type :cpp:class:`DataStore`.
         :return: The requested data as :cpp:class:`Entity<ydk::Entity>`.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: std::vector<std::shared_ptr<Entity>> get_config(NetconfServiceProvider & provider, DataStore source, std::vector<Entity\*>& filter)
 
@@ -143,7 +143,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param source: The configuration being queried of type **std::vector<Entity\*>**.
         :return: The requested data as **std::vector<std::shared_ptr<Entity>>** instance; if request fails - empty **std::vector**.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: std::shared_ptr<Entity> get(NetconfServiceProvider & provider, Entity& filter)
 
@@ -152,7 +152,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param filter: An instance of :cpp:class:`Entity<ydk::Entity>` that contains requested part of the device configuration and state data to be retrieved as defined by one of the device’s data models.
         :return: The requested data as :cpp:class:`Entity<ydk::Entity>`.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: std::vector<std::shared_ptr<Entity>> get(NetconfServiceProvider & provider, std::vector<Entity\*>& filter)
 
@@ -161,7 +161,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param filter: An instance of **std::vector<Entity\*>** that contains requested part of device configuration and state data; if request fails - empty **std::vector**.
         :return: The requested data as :cpp:class:`Entity<ydk::Entity>`.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool kill_provider(NetconfServiceProvider & provider, int provider_id)
 
@@ -170,7 +170,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param provider_id: An instance of int that is the provider identifier of the NETCONF provider to be terminated.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool lock(NetconfServiceProvider & provider, DataStore target)
 
@@ -179,7 +179,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param target: The configuration of type :cpp:class:`DataStore` to lock.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool unlock(NetconfServiceProvider & provider, DataStore target)
 
@@ -188,7 +188,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param target: The configuration of type :cpp:class:`DataStore` to unlock.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool validate(NetconfServiceProvider & provider, DataStore source)
 
@@ -197,7 +197,7 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param source: An instance of :cpp:class:`DataStore`.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.
 
     .. cpp:function:: bool validate(NetconfServiceProvider & provider, Entity& source_config)
 
@@ -206,4 +206,4 @@ Netconf Service
         :param provider: An instance of :cpp:class:`NetconfServiceProvider<NetconfServiceProvider>`.
         :param source: An instance of :cpp:class:`Entity<ydk::Entity>`.
         :return: **true**, if the operation succeeds, **false** - otherwise.
-        :raises: YError, if an error has occurred.
+        :raises: :cpp:class:`YServiceProviderError<YServiceProviderError>`, if an error has occurred.

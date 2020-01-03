@@ -14,7 +14,7 @@ gNMI Service API
         Create, update, or delete single entity or multiple entities in the server configuration.
 
         :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
-        :param entity: (:py:class:`Entity<ydk.types.Entity>`) instance, which represents single container in device supported model. 
+        :param entity: (:py:class:`Entity<ydk.types.Entity>`) instance, which represents single container in device supported model.
                          Each **Entity** instance must be annotated with :py:class:`YFilter<ydk.filters.YFilter>`, which defines set operation:
 
                          * YFilter.replace - add new configuration or replace the whole configuration tree
@@ -25,7 +25,7 @@ gNMI Service API
 
                          For multiple containers the :py:class:`Entity<ydk.types.Entity>` instances must be encapsulated into Python ``list`` or YDK ``EntityCollection`` :py:class:`Config<ydk.types.Config>`.
         :return: ``True`` if successful, ``False`` if not.
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
+        :raises: :py:exc:`YServiceProviderError<ydk.errors.YServiceProviderError>` if an error has occurred.
 
     .. py:method:: get(provider, read_filter, read_mode='CONFIG')
 
@@ -39,7 +39,7 @@ gNMI Service API
         :return: For single entity filter - an instance of :py:class:`Entity<ydk.types.Entity>` as identified by the **read_filter** or ``None``, if operation fails.
 
                  For multiple filters - collection of :py:class:`Entity<ydk.types.Entity>` instances encapsulated into Python ``list`` or YDK ``EntityCollection`` :py:class:`Config<ydk.types.Config>` accordingly to the type of **read_filter**.
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
+        :raises: :py:exc:`YServiceProviderError<ydk.errors.YServiceProviderError>` if an error has occurred.
 
     .. py:method:: subscribe(provider, subscription, qos=0, mode='ONCE, encoding='PROTO', callback_function=None)
 
@@ -53,19 +53,19 @@ gNMI Service API
         :param callback_function: (``func(str)``) Callback function, which is used to process the subscription data.
                                   The subscription data returned to the user as a string representation of protobuf **SubscribeResponse** message.
                                   If not specified, the response is printed to system stdout.
-        :raises: :py:exc:`YPYError<ydk.errors.YPYError>` if an error has occurred.
+        :raises: :py:exc:`YServiceProviderError<ydk.errors.YServiceProviderError>` if an error has occurred.
 
     .. py:method:: capabilities(provider)
-    
+
         Get gNMI server capabilities
-        
+
         :param provider: (:py:class:`gNMIServiceProvider<ydk.gnmi.providers.gNMIServiceProvider>`) Provider instance.
         :return: (``str``) JSON encoded string, which represents gNMI server capabilities.
 
 .. py:class:: ydk.gnmi.services.gNMISubscription
 
         Instance of this class defines subscription for a single entity. Members of the class are:
-        
+
         * entity: (:py:class:`Entity<ydk.types.Entity>`) Instance of the subscription entity. This parameter must be set by the user.
         * subscription_mode: (``str``) Expected one of the following string values: ``TARGET_DEFINED``, ``ON_CHANGE``, or ``SAMPLE``; default value is ``ON_CHANGE``.
         * sample_interval: (``long``) Time interval in nanoseconds between samples in ``STREAM`` mode; default value is 60000000000 (1 minute).
@@ -121,18 +121,18 @@ Example of instantiating and using objects of ``gNMIServiceProvider`` with ``gNM
     neighbor.config.neighbor_address = '172.16.255.2'
     neighbor.config.peer_as = 65172
     bgp.neighbors.neighbor.append(neighbor)
-    
-    bgp.yfilter = YFilter.replace	# Define set/create operation    
+
+    bgp.yfilter = YFilter.replace	# Define set/create operation
 
     ok = gnmi_service.set(provider, bgp) # Perform create operation
-    
+
     # Delete one neighbor
     bgp = openconfig_bgp.Bgp()
     neighbor = bgp.Neighbors.Neighbor()
     neighbor.neighbor_address = '172.16.255.2'
     bgp.neighbors.neighbor.append(neighbor)
-    
-    bgp.yfilter = YFilter.delete	# Define set/delete operation    
+
+    bgp.yfilter = YFilter.delete	# Define set/delete operation
 
     ok = gnmi_service.set(provider, bgp) # Perform delete operation
 
@@ -173,16 +173,16 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
     from ydk.path import Repository
     from ydk.gnmi.providers import gNMIServiceProvider
     from ydk.gnmi.services import gNMIService, gNMISubscription
-    
+
     import datetime
-    
+
     # Callback function to handle telemetry data
     def print_telemetry_data(s):
         if 'update' in s:
             current_dt = datetime.datetime.now()
             print("\n===> Received subscribe response at %s: \n%s" %
                   (current_dt.strftime("%Y-%m-%d %H:%M:%S"), s))
-    
+
     # Function to subscribe to telemetry data
     def subscribe(func):
         # Initialize gNMI Service and Provider
@@ -190,13 +190,13 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
         repository = Repository('/home/yan/ydk-workspace/ydk-gen/scripts/repository/10.30.110.84')
         provider = gNMIServiceProvider(repo=repository, address='10.30.110.85', port=57400,
                                        username='admin', password='admin')
-    
+
         # Create telemetry subscription entity
         interfaces = openconfig_interfaces.Interfaces()
         interface = openconfig_interfaces.Interfaces.Interface()
         interface.name = '"MgmtEth0/RP0/CPU0/0"'
         interfaces.interface.append(interface)
-    
+
         # Build subscription
         subscription = gNMISubscription()
         subscription.entity = interfaces
@@ -204,9 +204,9 @@ Example of subscribing to telemetry using ``gNMIServiceProvider`` with ``gNMISer
         subscription.sample_interval = 10 * 1000000000
         subscription.suppress_redundant = False
         subscription.heartbeat_interval = 100 * 1000000000
-    
+
         # Subscribe for updates in STREAM mode.
         gnmi.subscribe(provider, subscription, 10, 'STREAM', "PROTO", func)
-    
+
     if __name__ == "__main__":
         subscribe(print_telemetry_data)

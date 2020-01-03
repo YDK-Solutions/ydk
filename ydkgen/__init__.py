@@ -115,6 +115,11 @@ class YdkGenerator(object):
             if self.package_name is None or self.version is None:
                 raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
 
+        if '.' in self.package_name:
+            self.package_name = self.package_name.replace('.', '_')
+            print("WARNING. Replacing package name from '%s' to '%s'" % (profile['name'], self.package_name))
+            profile['name'] = self.package_name
+
         tmp_file = tempfile.mkstemp(suffix='.bundle')[-1]
         bundle_translator.translate(profile_file, tmp_file, self.ydk_root)
 

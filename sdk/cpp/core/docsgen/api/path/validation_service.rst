@@ -8,6 +8,8 @@ ValidationService
 
     .. cpp:function:: validate(const ydk::path::DataNode& dn, ydk::ValidationService::Option option)
 
-        Validates data node based on the option
+        Validates data node based on the option.
 
-    .. cpp:function:: ~ValidaitonService()
+        :param provider: An instance of :cpp:class:`DataNode<ydk::path::DataNode>`.
+        :param option: An instance of type :cpp:class:`Option<Option>`.
+        :raises: :cpp:class:`YModelError<YModelError>`, if validation error was detected.

@@ -26,7 +26,7 @@ gNMI Service
                        * YFilter::delete\_ - delete part or entire configuration tree
 
         :return: (``bool``) ``true`` if operation is successful, ``false`` otherwise.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: bool set(gNMIServiceProvider & provider, std::vector<Entity\*> entities)
 
@@ -43,7 +43,7 @@ gNMI Service
                        * YFilter::delete\_ - delete part or entire configuration tree
 
         :return: (``bool``) ``true``, if operation is successful, ``false`` otherwise.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::shared_ptr<Entity> get(gNMIServiceProvider & provider, Entity & read_filter, const std::string & read_mode)
 
@@ -53,7 +53,7 @@ gNMI Service
         :param read_filter: (:cpp:class:`Entity<ydk::Entity>`) instance, which represents single container in device supported model.
         :param read_mode: (``std::string``) One of the values: ``CONFIG``, ``STATE``, ``OPERATIONAL``, or ``ALL``.
         :return: (std::shared_ptr<ydk::Entity>) An instance of :cpp:class:`Entity<ydk::Entity>` as identified by the **read_filter** or ``nullptr``, if operation fails.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::vector<std::shared_ptr<Entity>> get(gNMIServiceProvider & provider, std::vector<Entity\*> read_filters, const std::string & read_mode)
 
@@ -63,7 +63,7 @@ gNMI Service
         :param read_filters: (std::vector<ydk::Entity\*>) multiple containers of the :cpp:class:`Entity<ydk::Entity>` instances encapsulated into ``std::vector<ydk::Entity*>``.
         :param read_mode: (``std::string``) One of the values: ``CONFIG``, ``STATE``, ``OPERATIONAL``, or ``ALL``.
         :return: The requested data encapsulated into **std::vector<std::shared_ptr<Entity>>** instance; if request fails - empty **std::vector**.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: subscribe(gNMIServiceProvider & provider, gNMISubscription & subscription, uint qos, std::string & mode, std::string & encoding, callback)
 
@@ -75,7 +75,7 @@ gNMI Service
         :param mode: (``std::string``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
         :param encoding: (``std::string``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
         :param callback: (``void*(const char*)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf ``SubscribeResponse`` message.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: subscribe(gNMIServiceProvider & provider, std::vector<ydk::gNMISubscription\*> & subscription, uint qos, std::string & mode, std::string & encoding, callback)
 
@@ -87,20 +87,20 @@ gNMI Service
         :param mode: (``std::string``) Subscription mode: one of ``STREAM``, ``ONCE`` or ``POLL``.
         :param encoding: (``std::string``) Encoding method for the output: one of ``JSON``, ``BYTES``, ``PROTO``, ``ASCII``, or ``JSON_IETF``.
         :param callback: (``void*(const char*)``) Callback function, which is used to process the subscription data. The subscription data returned to the user as a string representation of protobuf ``SubscribeResponse`` message.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::string capabilities(ydk::gNMIServiceProvider & provider)
-    
+
         Get gNMI server capabilities
-        
+
         :param provider: (:cpp:class:`gNMIServiceProvider<ydk::gNMIServiceProvider>`) gNMI service provider instance.
         :return: (``std::string``) JSON encoded string, which represents gNMI server capabilities.
-        :raises: YServiceError if an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
 .. cpp:class:: ydk::gNMISubscription
 
         Instance of this structure defines subscription for a single entity. Members of the structure are:
-        
+
         * entity: (:cpp:class:`Entity<ydk::Entity>`) Instance of the subscription entity. This parameter must be set by the user.
         * subscription_mode: (``std::string``) Expected one of the following string values: ``TARGET_DEFINED``, ``ON_CHANGE``, or ``SAMPLE``; default value is ``ON_CHANGE``.
         * sample_interval: (``longlong``) Time interval in nanoseconds between samples in ``STREAM`` mode; default value is 60000000000 (1 minute).

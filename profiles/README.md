@@ -7,7 +7,7 @@ In order to generate model bundle, as it is described in the root directory READ
 This part must include:
 - `"name"` of the bundle; the name also used to form part of the installation path of the bundle
 - `"version"` of the bundle
-- `"ydk_version"`, which refers to the [version](https://github.com/CiscoDevNet/ydk-gen/releases) of the YDK core package.
+- `"core_version"`, which refers to the [version](https://github.com/CiscoDevNet/ydk-gen/releases) of the YDK core package.
 
 Other components of description part are optional. Here is simple example of description part:
 
@@ -15,7 +15,7 @@ Other components of description part are optional. Here is simple example of des
 {
     "name":"cisco-ios-xr",
     "version": "6.5.3",
-    "ydk_version": "0.8.4",
+    "core_version": "0.8.4",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",

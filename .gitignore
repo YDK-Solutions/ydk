@@ -18,7 +18,6 @@ protocol.log
 myenv
 py2env
 py3env
-venv/
 gittmp*/
 .DS_Store
 gen-api/
@@ -38,3 +37,4 @@ sdk/python/gnmi/build
 sdk/python/gnmi/dist
 sdk/python/gnmi/ydk_service_gnmi.egg-info
 venv
+temp

@@ -102,7 +102,7 @@ class ClassPrinter(FilePrinter):
     def _print_class_declaration(self, clazz):
         self.ctx.bline()
 
-        parents = 'Entity'
+        parents = '_Entity_'
         if clazz.is_identity():
             if len(clazz.extends) > 0:
                 parents = ' ,'.join([sup.qn() for sup in clazz.extends])

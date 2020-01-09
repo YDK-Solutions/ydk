@@ -81,8 +81,8 @@ def _datanode_to_entity(data_node):
                 try:
                     imported_module = importlib.import_module('ydk.models.{}.{}'.format(name, module_name))
                     entity = getattr(imported_module, class_name)()
-                except:
-                    raise YModelError("Failed instantiate class '{}' from module '{}'".format(class_name, module_name))
+                except Exception as err:
+                    raise YModelError("Failed instantiate class '{}' from module '{}': {}".format(class_name, module_name, err))
 
                 top_entity = entity.clone_ptr()
                 get_entity_from_data_node(data_node, top_entity)

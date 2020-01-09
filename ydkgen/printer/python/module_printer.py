@@ -77,6 +77,8 @@ class ModulePrinter(FilePrinter):
         self.ctx.writeln("import sys")
         self.ctx.writeln("from collections import OrderedDict")
         self.ctx.bline()
+        self.ctx.writeln("from ydk.types import Entity as _Entity_")
+        self.ctx.writeln("from ydk.types import EntityPath, Identity, Enum, YType, YLeaf, YLeafList, YList, LeafDataList, Bits, Empty, Decimal64")
         self.ctx.writeln(
             "from ydk.types import Entity, EntityPath, Identity, Enum, YType, YLeaf, YLeafList, YList, LeafDataList, Bits, Empty, Decimal64")
         self.ctx.writeln("from ydk.filters import YFilter")

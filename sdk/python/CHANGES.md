@@ -5,9 +5,11 @@
 
 #### Resolved GitHub issues
   * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
+  * YDK fails instantiate some of the generated bundle classes ([#983](https://github.com/CiscoDevNet/ydk-gen/issues/983))
 
 #### Bundle improvements
   * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
 
 
 ### 2019-10-15 version 0.8.4

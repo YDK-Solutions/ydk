@@ -555,7 +555,7 @@ static string get_netconf_payload(path::DataNode & input, const string &  data_t
 
 static string extract_rpc_error(const string & reply)
 {
-    string msg = "RPC error occurred; check log file for details";
+    string msg = "RPC error occurred; check log for details";
     auto error_tag_pos = reply.find("<error-message");
     auto error_tag_close_pos = reply.find("</error-message>");
     if (error_tag_pos != string::npos && error_tag_close_pos != string::npos)

@@ -116,7 +116,7 @@ class Entity(_Entity):
         self._is_frozen = False
         self.parent = None
         self.ylist_key = None
-        self.logger = logging.getLogger("ydk.types.Entity")
+        self._logger = logging.getLogger("ydk.types.Entity")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
         self._children_yang_names = set()
@@ -188,11 +188,11 @@ class Entity(_Entity):
             return child
 
         found = False
-        self.logger.debug("Looking for '%s'" % child_yang_name)
+        self._logger.debug("Looking for '%s'" % child_yang_name)
         if child_yang_name in self._child_classes:
             found = True
         else:
-            self.logger.debug("Could not find child '%s' in '%s'" % (child_yang_name, self._child_classes))
+            self._logger.debug("Could not find child '%s' in '%s'" % (child_yang_name, self._child_classes))
         if found:
             attr, clazz = self._child_classes[child_yang_name]
             is_list = isinstance(getattr(self, attr), YList)
@@ -291,7 +291,7 @@ class Entity(_Entity):
             leaf = _get_leaf_object(self._leafs[name])
 
             if isinstance(value, YFilter):
-                self.logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
+                self._logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
                 leaf.yfilter = value
                 if isinstance(leaf, _YLeaf):
                     leaf_name_data.append(leaf.get_name_leafdata())
@@ -310,15 +310,15 @@ class Entity(_Entity):
                 #     No resolvents found for leafref "../config/id"..
                 #     Path: /ydktest-sanity:runner/one-list/identity-list/id-ref
                 for item in value:
-                    _validate_value(self._leafs[name], name, item, self.logger)
+                    _validate_value(self._leafs[name], name, item, self._logger)
                     leaf_list.append(item)
                 leaf_name_data.extend(leaf_list.get_name_leafdata())
-        self.logger.debug('Get name leaf data for "%s". Count: %s' % (self.yang_name, len(leaf_name_data)))
+        self._logger.debug('Get name leaf data for "%s". Count: %s' % (self.yang_name, len(leaf_name_data)))
         for l in leaf_name_data:
             leaf_value = l[1].value
             if "'" in leaf_value:
                 leaf_value.replace("'", "\'")
-            self.logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' %
+            self._logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' %
                               (l[0], leaf_value, l[1].yfilter, l[1].is_set))
         return leaf_name_data
 
@@ -386,7 +386,7 @@ class Entity(_Entity):
                                   .format(value))
             if name in leaf_names and name in self.__dict__:
                 if self._python_type_validation_enabled:
-                    _validate_value(self._leafs[name], name, value, self.logger)
+                    _validate_value(self._leafs[name], name, value, self._logger)
                 leaf = _get_leaf_object(self._leafs[name])
                 prev_value = self.__dict__[name]
                 self.__dict__[name] = value
@@ -398,10 +398,10 @@ class Entity(_Entity):
                         for item in value:
                             leaf.append(item)
                 else:
-                    self.logger.debug('Setting "%s" to "%s"' % (value, name))
+                    self._logger.debug('Setting "%s" to "%s"' % (value, name))
                     leaf.yfilter = value
                     if prev_value is not None:
-                        self.logger.debug('Storing previous value "%s" to "%s"' % (prev_value, name))
+                        self._logger.debug('Storing previous value "%s" to "%s"' % (prev_value, name))
                         if isinstance(leaf, _YLeaf):
                             leaf.set(prev_value)
                         elif isinstance(leaf, _YLeafList):
@@ -570,7 +570,7 @@ class EntityCollection(object):
     Each Entity instance has unique segment path value, which is used as a key in the dictionary.
     """
     def __init__(self, *entities):
-        self.logger = logging.getLogger("ydk.types.EntityCollection")
+        self._logger = logging.getLogger("ydk.types.EntityCollection")
         self._entity_map = OrderedDict()
         for entity in entities:
             self.append(entity)
@@ -596,7 +596,7 @@ class EntityCollection(object):
           - list of Entity class instances
         """
         if entities is None:
-            self.logger.debug("Cannot add None object to the EntityCollection")
+            self._logger.debug("Cannot add None object to the EntityCollection")
         elif isinstance(entities, Entity):
             key = self._key(entities)
             self._entity_map[key] = entities
@@ -606,7 +606,7 @@ class EntityCollection(object):
                     key = self._key(entity)
                     self._entity_map[key] = entity
                 elif entity is None:
-                    self.logger.debug("Cannot add None object to the EntityCollection")
+                    self._logger.debug("Cannot add None object to the EntityCollection")
                 else:
                     msg = "Argument %s is not supported by EntityCollection class; data ignored" % type(entity)
                     self._log_error_and_raise_exception(msg, YInvalidArgumentError)
@@ -615,7 +615,7 @@ class EntityCollection(object):
             self._log_error_and_raise_exception(msg, YInvalidArgumentError)
 
     def _log_error_and_raise_exception(self, msg, exception_class):
-        self.logger.error(msg)
+        self._logger.error(msg)
         raise exception_class(msg)
 
     def entities(self):

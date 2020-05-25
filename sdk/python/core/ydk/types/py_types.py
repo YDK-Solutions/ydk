@@ -77,7 +77,7 @@ class YLeafList(_YLeafList):
 
     def set(self, other):
         if not isinstance(other, YLeafList):
-            raise YModelError("Invalid value '{}' in '{}'".format(other, self.leaf_name))
+            raise YModelError("Invalid value '{}' assigned to YLeafList '{}'".format(other, self.leaf_name))
         else:
             if sys.version_info > (3,):
                 super().clear()
@@ -228,8 +228,8 @@ class Entity(_Entity):
             if isinstance(value, Entity) and value.has_data():
                 return True
             elif isinstance(value, YList):
-                for l in value:
-                    if l.has_data():
+                for v in value:
+                    if v.has_data():
                         return True
         return False
 
@@ -241,15 +241,11 @@ class Entity(_Entity):
             if value is not None:
                 if name in self._leafs:
                     leaf = _get_leaf_object(self._leafs[name])
-                    isYLeaf = isinstance(leaf, _YLeaf)
-                    isYLeafList = isinstance(leaf, _YLeafList)
-                    isBits = isinstance(value, Bits)
-
                     if isinstance(value, YFilter):
                         return True
-                    if isYLeaf and (not isBits or len(value.get_bitmap()) > 0):
+                    if isinstance(leaf, _YLeaf) and (not isinstance(value, Bits) or len(value.get_bitmap()) > 0):
                         return True
-                    if isYLeafList and len(value) > 0:
+                    if isinstance(leaf, _YLeafList) and len(value) > 0:
                         return True
                 elif isinstance(value, Entity):
                     if is_set(value.yfilter) or value.has_operation():
@@ -314,12 +310,12 @@ class Entity(_Entity):
                     leaf_list.append(item)
                 leaf_name_data.extend(leaf_list.get_name_leafdata())
         self._logger.debug('Get name leaf data for "%s". Count: %s' % (self.yang_name, len(leaf_name_data)))
-        for l in leaf_name_data:
-            leaf_value = l[1].value
+        for leaf in leaf_name_data:
+            leaf_value = leaf[1].value
             if "'" in leaf_value:
                 leaf_value.replace("'", "\'")
             self._logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' %
-                              (l[0], leaf_value, l[1].yfilter, l[1].is_set))
+                               (leaf[0], leaf_value, leaf[1].yfilter, leaf[1].is_set))
         return leaf_name_data
 
     def get_segment_path(self):
@@ -490,9 +486,9 @@ def entity_to_dict(entity):
             abs_path.endswith(']'):
         edict[abs_path] = ''
     leaf_name_data = entity.get_name_leaf_data()
-    for l in leaf_name_data:
-        leaf_name = l[0]
-        leaf_value = l[1].value
+    for leaf in leaf_name_data:
+        leaf_name = leaf[0]
+        leaf_value = leaf[1].value
         if leaf_name not in entity.ylist_key_names:
             edict["%s/%s" % (abs_path, leaf_name)] = leaf_value
     for _, child in entity.get_children().items():
@@ -544,8 +540,8 @@ def path_to_entity(entity, abs_path):
 
     if top_abs_path in abs_path:
         leaf_name_data = entity.get_name_leaf_data()
-        for l in leaf_name_data:
-            leaf_name = l[0]
+        for leaf in leaf_name_data:
+            leaf_name = leaf[0]
             if leaf_name not in entity.ylist_key_names:
                 leaf_path = "%s/%s" % (top_abs_path, leaf_name)
                 if leaf_path == abs_path:
@@ -865,8 +861,7 @@ def _get_decoded_value_object(leaf_tuple, entity, value):
             value_object = _decode_enum_value_object(typ, value)
         else:
             value_object = _decode_other_type_value_object(typ, value)
-        if value_object is not None:
-            return value_object
+    return value_object
 
 
 def _validate_value(leaf_tuple, name, value, logger):

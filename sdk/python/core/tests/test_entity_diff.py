@@ -133,8 +133,7 @@ class EntityDiffTest(unittest.TestCase):
 
     def test_entity_to_dict_enum_leaflist(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.local)
-        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.remote)
+        runner.ytypes.built_in_t.enum_llist.extend([ysanity.YdkEnumTest.local, ysanity.YdkEnumTest.remote])
 
         ent_dict = entity_to_dict(runner)
         self.assertEqual(len(ent_dict), 2)

@@ -861,6 +861,8 @@ def _get_decoded_value_object(leaf_tuple, entity, value):
             value_object = _decode_enum_value_object(typ, value)
         else:
             value_object = _decode_other_type_value_object(typ, value)
+        if value_object is not None:
+            break
     return value_object
 
 

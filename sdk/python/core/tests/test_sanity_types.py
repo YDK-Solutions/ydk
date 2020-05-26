@@ -288,6 +288,22 @@ class SanityTest(unittest.TestCase):
         self.assertEqual(runner, runner1)
         self.assertEqual(runner.ytypes.built_in_t.enum_value, runner1.ytypes.built_in_t.enum_value)
 
+    def test_enum_list(self):
+        runner = Runner()
+        el1 = Runner.EnumList()
+        el1.key_name = YdkEnumTest.local
+        el2 = Runner.EnumList()
+        el2.key_name = YdkEnumTest.remote
+        runner.enum_list.extend([el1, el2])
+        print(runner.enum_list.keys())
+        self.crud.create(self.ncc, runner)
+
+        # Read into Runner1
+        runner1 = self.crud.read(self.ncc, Runner())
+
+        # Compare runners
+        self.assertEqual(runner, runner1)
+
     def test_union(self):
         runner = Runner()
         runner.ytypes.built_in_t.younion = YdkEnumTest.none

@@ -1,4 +1,4 @@
-### 2020-05-31 version 0.8.5
+### 2020-06-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
@@ -10,7 +10,8 @@
   * YDK fails create bundle package when package name contains '.' ([#978](https://github.com/CiscoDevNet/ydk-gen/issues/978))
   * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
   * YDK fails instantiate some of the generated bundle classes ([#983](https://github.com/CiscoDevNet/ydk-gen/issues/983))
-  * python generated bundle class fails instantiate when model contains leaf 'logger' ([#996](https://github.com/CiscoDevNet/ydk-gen/issues/996))
+  * Python generated bundle class fails instantiate when model contains leaf 'logger' ([#996](https://github.com/CiscoDevNet/ydk-gen/issues/996))
+  * C++ YList class fails to process key values when its name contains '-' character ([#997](https://github.com/CiscoDevNet/ydk-gen/issues/997))
 
 #### Bundle improvements
   * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code

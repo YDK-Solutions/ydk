@@ -779,6 +779,65 @@ TEST_CASE("test_ylist_two_keys") {
 	REQUIRE("f2" == count);
 }
 
+TEST_CASE("test_types_enum_list")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    //DELETE
+    auto r_1 = make_unique<ydktest_sanity::Runner>();
+    bool reply = crud.delete_(provider, *r_1);
+    REQUIRE(reply);
+
+    //CREATE
+    auto enum_list_elem1 = make_shared<ydktest_sanity::Runner::EnumList>();
+    auto enum_list_elem2 = make_shared<ydktest_sanity::Runner::EnumList>();
+    enum_list_elem1->key_name = ydktest_sanity::YdkEnumTest::local;
+    enum_list_elem2->key_name = ydktest_sanity::YdkEnumTest::remote;
+    r_1->enum_list.append(enum_list_elem1);
+    r_1->enum_list.append(enum_list_elem2);
+
+    auto keys = r_1->enum_list.keys();
+    REQUIRE(vector_to_string(keys) == "\"local\", \"remote\"");
+
+    reply = crud.create(provider, *r_1);
+    REQUIRE(reply);
+
+    //READ
+    auto filter = make_unique<ydktest_sanity::Runner>();
+    auto r_read = crud.read(provider, *filter);
+    REQUIRE(r_read!=nullptr);
+    ydktest_sanity::Runner * r_2 = dynamic_cast<ydktest_sanity::Runner*>(r_read.get());
+    auto read_keys = r_2->enum_list.keys();
+    REQUIRE(read_keys == keys);
+}
+
+TEST_CASE("test_ylist_two_keys_read") {
+    NetconfServiceProvider provider{"127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+
+    // CREATE
+    auto runner = make_unique<ydktest_sanity::Runner>();
+    auto l1 = make_shared<ydktest_sanity::Runner::TwoKeyList> (); l1->first = "act"; l1->second = 11;
+    auto l2 = make_shared<ydktest_sanity::Runner::TwoKeyList> (); l2->first = "act"; l2->second = 22;
+    runner->two_key_list.extend({l1, l2});
+    crud.create(provider, *runner);
+
+    // READ
+    auto filter = ydktest_sanity::Runner();
+    auto read_entity = crud.read(provider, filter);
+    REQUIRE(read_entity != nullptr);
+
+    auto read_runner = dynamic_cast<ydktest_sanity::Runner*>(read_entity.get());
+    REQUIRE(read_runner->two_key_list.len() == 2);
+
+    //DELETE
+    auto r_1 = make_unique<ydktest_sanity::Runner>();
+    bool reply = crud.delete_(provider, *r_1);
+    REQUIRE(reply);
+}
+
 TEST_CASE("test_ylist_no_keys") {
 	auto runner = ydktest_sanity::Runner();
 	auto t1 = make_shared<ydktest_sanity::Runner::NoKeyList> (); t1->test = "t1";

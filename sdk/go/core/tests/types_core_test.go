@@ -172,9 +172,9 @@ func (suite *CoreTypesTestSuite) TestIdentityList() {
 
 func (suite *CoreTypesTestSuite) TestEnumList() {
 	runner := ysanity.Runner{}
-	i1 := ysanity.Runner_EnumList{Name: ysanity.YdkEnumTest_none}
-	i2 := ysanity.Runner_EnumList{Name: ysanity.YdkEnumTest_local}
-	i3 := ysanity.Runner_EnumList{Name: ysanity.YdkEnumTest_remote}
+	i1 := ysanity.Runner_EnumList{KeyName: ysanity.YdkEnumTest_none}
+	i2 := ysanity.Runner_EnumList{KeyName: ysanity.YdkEnumTest_local}
+	i3 := ysanity.Runner_EnumList{KeyName: ysanity.YdkEnumTest_remote}
 	runner.EnumList = []*ysanity.Runner_EnumList{&i1, &i2, &i3}
 
 	ldataKeys := ylist.Keys(runner.EnumList)

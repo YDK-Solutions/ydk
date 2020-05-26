@@ -125,7 +125,7 @@ class ClassConstructorPrinter(object):
                     for key in key_props:
                         if key_str.__len__() > 0:
                             key_str += ', '
-                        key_str += '"%s"' % key.name
+                        key_str += '"%s"' % key.stmt.arg   # key.name
                     init_stmts.append('%s(this, {%s})' % (child.name,  key_str))
             else:
                 if (child.stmt.search_one('presence') is None):

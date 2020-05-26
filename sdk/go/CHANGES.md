@@ -1,4 +1,4 @@
-### 2019-11-20 version 0.8.4.post1
+### 2020-06-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))

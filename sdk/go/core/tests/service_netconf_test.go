@@ -157,9 +157,33 @@ func (suite *NetconfServiceTestSuite) TestCancelCommit() {
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 }
 
-// TODO: Problems found with path functions:
-//			readEntity changes with getFilter
-//			EntityEqual(readEntity, &runner) returns true, even after the above
+func (suite *NetconfServiceTestSuite) TestCopyConfigIssue() {
+	runner := ysanity.Runner{}
+	runner.Two.Number = 2
+	runner.Two.Name = "runner-two-name"
+
+	var op bool
+	var readEntity types.Entity
+
+	op = suite.NS.CopyConfig(&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
+	suite.True(op)
+
+	getFilter := ysanity.Runner{}
+	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &getFilter)
+
+	getFilterCopy := ysanity.Runner{}
+	suite.True(types.EntityEqual(&getFilter, &getFilterCopy))
+	// When this assertion is passed,
+	// that proves that filter was not used in the path.ReadDatanode() function
+
+	suite.True(types.EntityEqual(readEntity, &runner))
+	suite.False(types.EntityEqual(readEntity, &getFilter))
+
+	// Delete configuration
+	op = suite.NS.DiscardChanges(&suite.Provider)
+	suite.True(op)
+}
+
 func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
@@ -171,31 +195,31 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	// Modify Candidate via CopyConfig from runner
 	op = suite.NS.CopyConfig(
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+	suite.True(types.EntityEqual(readEntity, &runner))
 
 	// Modify Candidate via CopyConfig from runner
 	runner.Two.Name = fmt.Sprintf("%s_modified", runner.Two.Name)
 
 	op = suite.NS.CopyConfig(
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 
 	// Modify Candidate via CopyConfig from Running. That will remove config.
 	op = suite.NS.CopyConfig(&suite.Provider, datastore.Candidate, datastore.Running, nil, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Nil(readEntity)
 
 	// DiscardChanges
 	op = suite.NS.DiscardChanges(&suite.Provider)
-	suite.Equal(op, true)
+	suite.True(op)
 }
 
 // skip
@@ -367,6 +391,9 @@ func (suite *NetconfServiceTestSuite) TestDeleteContainer() {
 }
 
 func TestNetconfServiceTestSuite(t *testing.T) {
+// 	if testing.Verbose() {
+// 		ydk.EnableLogging(ydk.Debug)
+// 	}
 	suite.Run(t, new(NetconfServiceTestSuite))
 }
 

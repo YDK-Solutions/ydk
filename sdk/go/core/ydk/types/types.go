@@ -536,7 +536,10 @@ func getLeafValue(value interface{}) LeafData {
 	var leafData LeafData
 	switch value.(type) {
 	case yfilter.YFilter:
-		leafData = LeafData{IsSet: true, Filter: value.(yfilter.YFilter)}
+		leafData = LeafData{IsSet: false, Filter: value.(yfilter.YFilter)}
+	case LeafData:
+	    leafData = value.(LeafData)
+	    leafData.IsSet = true
 	case map[string]bool:
 		// bits
 		var used_bits []string
@@ -592,7 +595,6 @@ func GetEntityPath(entity Entity) EntityPath {
 				entityPath.ValuePaths = append(
 					entityPath.ValuePaths,
 					NameLeafData{Name: path, Data: leafData})
-				if leafData.Filter != yfilter.NotSet { break }
 			}
 		}
 	}
@@ -833,8 +835,8 @@ func GetRelativeEntityPath(current_node Entity, ancestor Entity, path string) st
 
 }
 
-// IsSet returns whether the given filter is set or not
-func IsSet(Filter yfilter.YFilter) bool {
+// IsFilterSet returns whether the given filter is set or not
+func IsFilterSet(Filter yfilter.YFilter) bool {
 	return Filter != yfilter.NotSet
 }
 

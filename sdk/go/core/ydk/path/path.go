@@ -953,10 +953,13 @@ func populateNameValues(
 		leafData := nameValue.Data
 		p := C.CString(nameValue.Name)
 		ydk.YLogDebug(fmt.Sprintf(
-			"path.populateNameValues: Got leaf {%s: %s}", nameValue.Name, nameValue.Data.Value))
+			"path.populateNameValues: Got leaf: %v", nameValue))
 
-		if leafData.IsSet {
-			p1 := C.CString(leafData.Value)
+		if leafData.IsSet || types.IsFilterSet(leafData.Filter) {
+			p1 := C.CString("")
+			if leafData.IsSet {
+				p1 = C.CString(leafData.Value)
+			}
 			result = C.DataNodeCreate(*GetCState(state), dataNode, p, p1)
 			PanicOnCStateError(GetCState(state))
 			C.free(unsafe.Pointer(p1))
@@ -1028,7 +1031,7 @@ func dataNodeIsList(dataNode C.DataNode) bool {
 }
 
 func addDataNodeFilterAnnotation(dataNode *C.DataNode, yf yfilter.YFilter) {
-	if types.IsSet(yf) && yf != yfilter.Read {
+	if types.IsFilterSet(yf) && yf != yfilter.Read {
 		p := C.CString(fmt.Sprintf("%s", yf))
 		defer C.free(unsafe.Pointer(p))
 		C.DataNodeAddAnnotation(*dataNode, p)

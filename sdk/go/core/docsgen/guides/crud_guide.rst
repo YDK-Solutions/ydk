@@ -270,9 +270,9 @@ For example, to delete a Go ``slice`` called :go:struct:`Instance <ydk/models/ci
         isis.Instances = clns_isis_cfg.Isis.Instances{}
         isis.Instances.Instance = append(isis.Instances.Instance, &ins)
 
-        // Call the CRUD read on the top-level isis object
+        // Call the CRUD update on the isis object
         // (assuming you have already instantiated the service and provider)
-        result := crud.Read(&provider, &isis)
+        result := crud.Update(&provider, &isis)
     }
 
 
@@ -300,18 +300,123 @@ For example, to delete a ``YLeaf`` called ``Running`` in the :go:struct:`Instanc
         ins := clns_isis_cfg.Isis.Instances.Instance{}
         ins.InstanceName = "default"
 
-        // Not setting the Running leaf
+        // Set the filter on leaf called 'running'
+        ins.Running = yfilter.Delete
+
         // Create list and Append the instance
         isis.Instances = clns_isis_cfg.Isis.Instances{}
         isis.Instances.Instance = append(isis.Instances.Instance, &ins)
 
-        // Call the CRUD read on the top-level isis object
+        // Call the CRUD update on the isis object
         // (assuming you have already instantiated the service and provider)
-        result := crud.Read(&provider, &isis)
+        result := crud.Update(&provider, &isis)
     }
 
+Deleting leaf-list element
+--------------------------
+
+When a specific leaf-list element should be deleted, the application must specify together leaf value and
+delete operation filter to avoid Libyang error on emty value. For this purpose the YDK type types.LeafData is used.
+
+.. code-block:: c
+    :linenos:
+
+	package main
+
+	import (
+		"github.com/CiscoDevNet/ydk-go/ydk/types"
+		"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+		ysanity_bgp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp"
+		ysanity_bgp_types "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_bgp_types"
+		ysanity_rp "github.com/CiscoDevNet/ydk-go/ydk/models/ydktest/openconfig_routing_policy"
+		"github.com/CiscoDevNet/ydk-go/ydk/providers"
+		"github.com/CiscoDevNet/ydk-go/ydk/services"
+	)
+
+	func configBgp(bgp *ysanity_bgp.Bgp) {
+		bgp.Global.Config.As = 65001
+
+		ipv6_afisafi := ysanity_bgp.Bgp_Global_AfiSafis_AfiSafi{}
+		ipv6_afisafi.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
+		ipv6_afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
+		ipv6_afisafi.Config.Enabled = true
+		bgp.Global.AfiSafis.AfiSafi = append(bgp.Global.AfiSafis.AfiSafi, &ipv6_afisafi)
+
+		peer_group := ysanity_bgp.Bgp_PeerGroups_PeerGroup{}
+		peer_group.PeerGroupName = "EBGP"
+		peer_group.Config.PeerGroupName = "EBGP"
+		peer_group.Config.PeerAs = 65002
+		peer_group.Transport.Config.LocalAddress = "Lookpback0"
+
+		peer_group_afisafi := ysanity_bgp.Bgp_PeerGroups_PeerGroup_AfiSafis_AfiSafi{}
+		peer_group_afisafi.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
+		peer_group_afisafi.Config.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
+		peer_group_afisafi.Config.Enabled = true
+
+		// Add import policies to the leaf-list
+		peer_group_afisafi.ApplyPolicy.Config.ImportPolicy = append(peer_group_afisafi.ApplyPolicy.Config.ImportPolicy, "POLICY1")
+		peer_group_afisafi.ApplyPolicy.Config.ImportPolicy = append(peer_group_afisafi.ApplyPolicy.Config.ImportPolicy, "POLICY3")
+
+		peer_group.AfiSafis.AfiSafi = append(peer_group.AfiSafis.AfiSafi, &peer_group_afisafi)
+		bgp.PeerGroups.PeerGroup = append(bgp.PeerGroups.PeerGroup, &peer_group)
+	}
+
+	func deletePolicy(bgp *ysanity_bgp.Bgp, policy string) {
+		peer_group := ysanity_bgp.Bgp_PeerGroups_PeerGroup{}
+		peer_group.PeerGroupName = "EBGP"
+
+		peer_group_afisafi := ysanity_bgp.Bgp_PeerGroups_PeerGroup_AfiSafis_AfiSafi{}
+		peer_group_afisafi.AfiSafiName = &ysanity_bgp_types.IPV6UNICAST{}
+
+		// Delete import policy in the leaf-list
+		peer_group_afisafi.ApplyPolicy.Config.ImportPolicy =
+			append(peer_group_afisafi.ApplyPolicy.Config.ImportPolicy,
+			       types.LeafData{Value: policy, Filter: yfilter.Delete})
+
+		peer_group.AfiSafis.AfiSafi = append(peer_group.AfiSafis.AfiSafi, &peer_group_afisafi)
+		bgp.PeerGroups.PeerGroup = append(bgp.PeerGroups.PeerGroup, &peer_group)
+	}
+
+	func configRoutingPolicies(routingPolicy *ysanity_rp.RoutingPolicy) {
+		policy_def1 := ysanity_rp.RoutingPolicy_PolicyDefinitions_PolicyDefinition{Name: "POLICY1"}
+		policy_def3 := ysanity_rp.RoutingPolicy_PolicyDefinitions_PolicyDefinition{Name: "POLICY3"}
+		policy_def1.Config.Name = "POLICY1"
+		policy_def3.Config.Name = "POLICY3"
+		routingPolicy.PolicyDefinitions.PolicyDefinition =
+			append(routingPolicy.PolicyDefinitions.PolicyDefinition, &policy_def1)
+		routingPolicy.PolicyDefinitions.PolicyDefinition =
+			append(routingPolicy.PolicyDefinitions.PolicyDefinition, &policy_def3)	
+	}
+
+	func main() {
+		// Connect to the device
+		var provider = providers.NetconfServiceProvider{
+					Address:  "127.0.0.1",
+					Username: "admin",
+					Password: "admin",
+					Port:     12022}
+		var CRUD = services.CrudService{}
+
+		// Build routing policies list
+		routingPolicy := ysanity_rp.RoutingPolicy{}
+		configRoutingPolicies(&routingPolicy)
+		CRUD.Create(&provider, &routingPolicy)
+
+		// Build BGP configuration
+		bgp := ysanity_bgp.Bgp{}
+		configBgp(&bgp)
+		CRUD.Create(&provider, &bgp)
+
+		// Delete POLICY1 from import policies leaf-list
+		bgpDelete := ysanity_bgp.Bgp{}
+		deletePolicy(&bgpDelete, "POLICY1")
+		CRUD.Update(&provider, &bgpDelete)
+
+		provider.Disconnect()
+	}
+
 Reading multiple configurations
---------------------------------------
+-------------------------------
 
 In this example we read interfaces and BGP configuration as defined by openconfig Yang model.
 

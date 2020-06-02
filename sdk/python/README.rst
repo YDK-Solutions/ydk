@@ -21,8 +21,8 @@ YDK is composed of a core package that defines services and providers, plus one 
 Backward Compatibility
 ======================
 
-The Python YDK-0.8.4 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
-Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.4>`_ for details. 
+The Python YDK-0.8.5 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
+Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details.
 
 Docker
 ======
@@ -60,13 +60,13 @@ For Xenial (Ubuntu 16.04.4)::
   sudo ln -sf /usr/bin/gcc-5 /usr/bin/cc
   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -83,7 +83,7 @@ The following packages must be present in your system before installing YDK-Py. 
   sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
   # Install YDK core library
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 
 MacOS
 -----
@@ -94,8 +94,8 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
   /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   brew install pkg-config libssh xml2 libxml2 curl pcre cmake pybind11 doxygen libgcrypt
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-  sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+  sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 
 Libssh Installation
 -------------------
@@ -155,21 +155,21 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
 
 **MacOS**::
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 Runtime environment
@@ -380,4 +380,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.4. YDK-Py is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Py is licensed under the Apache 2.0 License.

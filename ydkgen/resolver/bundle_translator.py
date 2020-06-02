@@ -130,7 +130,11 @@ def get_file_attrs(files, root, remote=None):
     for f in files:
         if f.endswith('.yang'):
             # logger.debug('Getting attrs from file: %s' % f)
-            yield get_module_attrs(os.path.join(root, f), root, remote)
+            file_path = os.path.join(root, f)
+            if os.path.exists(file_path):
+                yield get_module_attrs(file_path, root, remote)
+            else:
+                logger.warning('File %s is not present in the directory %s; skipping' % (f, root))
 
 
 def get_dir_attrs(dirs, root, remote=None):

@@ -144,15 +144,15 @@ For other Ubuntu distributions it is recommended to build core libraries from so
 For Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-$ sudo gdebi libydk-0.8.4-1.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+$ sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1, gcc-7.4.0):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-$ sudo gdebi libydk-0.8.4-1.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+$ sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 ##### CentOS-7.x (Fedora-based)
@@ -162,7 +162,7 @@ The C++ code was compiled with default gcc compiler version, which is 4.8.5. For
 it is recommended to build `libydk` library [from source](#installing-from-source).
 
 ```
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 ```
 
 #### MacOS  
@@ -172,8 +172,8 @@ The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 com
 For other C++ compilers it is recommended to build `libydk` [from source](#installing-from-source).
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-$ sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+$ sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 ```
 
 ### gNMI Service Installation
@@ -185,27 +185,27 @@ $ sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 For Ubuntu/Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
 $ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
 $ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 For CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
 ```
 
 ##### MacOS
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
 $ sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 ```
 
@@ -265,4 +265,4 @@ build$ sudo make install
 - Additional YDK information can be found at [ydk.io](http://ydk.io)
 
 ## Release Notes
-The current YDK release version is 0.8.4. YDK-Cpp is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Cpp is licensed under the Apache 2.0 License.

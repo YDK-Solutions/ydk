@@ -123,15 +123,15 @@ For Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-   sudo gdebi libydk-0.8.4-1.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+   sudo gdebi libydk-0.8.5-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1, gcc-7.4.0):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-   sudo gdebi libydk-0.8.4-1.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+   sudo gdebi libydk-0.8.5-1.amd64.deb
 
 **CentOS**
 
@@ -139,7 +139,7 @@ The prebuilt package compiled with default version - gcc-4.8.5.
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 
 **MacOS**
 
@@ -147,8 +147,8 @@ The prebuilt packages compiled with C++ compiler Clang-8.0.0, which is default v
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4-beta/libydk-0.8.4-Darwin.pkg
-   sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5-beta/libydk-0.8.5-Darwin.pkg
+   sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 
 gNMI Service Installation
 -------------------------
@@ -162,14 +162,14 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
    sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
    sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 **CentOS**
@@ -178,7 +178,7 @@ The prebuilt package compiled with default version - gcc-4.8.5.
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
 
 **MacOS**
 
@@ -186,7 +186,7 @@ The prebuilt packages compiled with C++ compiler Clang-8.0.0.
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
    sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 Set runtime environment

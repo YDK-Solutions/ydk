@@ -41,14 +41,14 @@ For Xenial (Ubuntu 16.04.4)::
   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
     # Install YDK core library
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
     # Install YDK core library
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -64,7 +64,7 @@ The following packages must be present in your system before installing YDK-Go::
   ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
     # Install YDK core library
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 
 **Golang**
 
@@ -99,8 +99,8 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
   xcode-select --install
 
   # Install YDK core library
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-  sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+  sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 	
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
 
@@ -158,12 +158,12 @@ Ubuntu
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 
 CentOS
@@ -171,14 +171,14 @@ CentOS
 
 .. code-block:: sh
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
 
 MacOS
 ~~~~~
 
 .. code-block:: sh
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 Set runtime environment
@@ -218,4 +218,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.4. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Go is licensed under the Apache 2.0 License.

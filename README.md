@@ -70,7 +70,7 @@ This gives the developer an ability to customize scope of their bundle based on 
 
 # Backward compatibility
 
-The YDK-0.8.4 core is backward compatible with all previously generated model bundles starting from release of YDK-0.7.3.
+The YDK-0.8.5 core is backward compatible with all previously generated model bundles starting from release of YDK-0.7.3.
 It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
 
 # Docker
@@ -117,15 +117,15 @@ For other Ubuntu distributions and/or gcc compiler versions it is recommended to
 ##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-sudo gdebi libydk-0.8.4-1.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 ##### Bionic (Ubuntu 18.04.1, gcc-7.4.0):
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-sudo gdebi libydk-0.8.4-1.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 ### CentOS-7 (Fedora-based)
@@ -151,7 +151,7 @@ sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 The C++ code was compiled with default gcc compiler version, which is 4.8.5. For other gcc compiler versions it is recommended to build `libydk` library [from source](#build-from-source).
 
 ```  
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 ```
 
 ## Mac OSX
@@ -173,8 +173,8 @@ The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 com
 For other C++ compilers it is recommended to build `libydk` [from source](#build-from-source).
 
 ```
-curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 ```
 
 ## Libssh installation
@@ -241,14 +241,14 @@ cd -
 ##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
 sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
 ##### Bionic (Ubuntu 18.04.1, gcc-7.4.0))
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
 sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 ```
 
@@ -257,7 +257,7 @@ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 The `libydk_gnmi` package was compiled with gcc-4.8.5.
 
 ```
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
 ```
 
 #### MacOS:
@@ -266,7 +266,7 @@ The prebuilt `libydk_gnmi` package was compiled in MacOS-10.11.6 with clang-8.0.
 For other C++ compilers it is recommended to build `libydk` library [from source](#build-from-source)
 
 ```
-curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
+curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
 sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 ```
 
@@ -288,7 +288,7 @@ sudo access to install the libraries in default locations, which are `/usr/local
 
 ```
 # Clone ydk-gen from GitHub
-git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.8.4
+git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.8.5
 cd ydk-gen
 pip install -r requirements.txt
 
@@ -444,7 +444,7 @@ A sample bundle profile file is described below. The file is in a JSON format. S
 {
     "name":"cisco-ios-xr",
     "version": "6.5.3",
-    "core_version": "0.8.4",
+    "core_version": "0.8.5",
     "Author": "Cisco",
     "Copyright": "Cisco",
     "Description": "Cisco IOS-XR Native Models From Git",
@@ -521,7 +521,7 @@ Now, the `pip list | grep ydk` should show the `ydk` (referring to the core pack
 pip list | grep ydk
 ...
 
-ydk (0.8.4)
+ydk (0.8.5)
 ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
@@ -745,5 +745,5 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 #### Release Notes
 
-The current YDK release version is 0.8.4. The version of the latest YDK-Gen master branch is 0.8.4. 
+The current YDK release version is 0.8.5. The version of the latest YDK-Gen master branch is 0.8.5. 
 YDK-Gen is licensed under the Apache 2.0 License.

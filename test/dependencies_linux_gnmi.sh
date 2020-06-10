@@ -26,9 +26,13 @@ function print_msg {
 }
 
 function install_protobuf {
+  if [[ ! -d protobuf-3.5.0 ]]; then
     print_msg "Downloading protobuf and protoc"
     wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
     unzip protobuf-cpp-3.5.0.zip > /dev/null
+    rm -f protobuf-cpp-3.5.0.zip
+  fi
+  if [[ ! -x /usr/local/lib/libprotoc.so.15.0.0 ]]; then
     cd protobuf-3.5.0
     print_msg "Configuring protobuf and protoc"
     ./configure > /dev/null
@@ -38,18 +42,22 @@ function install_protobuf {
     sudo make install
     sudo ldconfig
     cd -
+  fi
 }
 
 function install_grpc {
+  if [[ ! -d grpc ]]; then
     print_msg "Installing grpc"
-
     git clone -b v1.9.1 https://github.com/grpc/grpc
+  fi
+  if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
     cd grpc
     git submodule update --init
     make > /dev/null
     sudo make install
     sudo ldconfig
     cd -
+  fi
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -58,6 +66,13 @@ function install_grpc {
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
+
+if [[ -z ${C_INCLUDE_PATH} ]]; then
+    export C_INCLUDE_PATH=/usr/local/include
+fi
+if [[ -z ${CPLUS_INCLUDE_PATH} ]]; then
+    export CPLUS_INCLUDE_PATH=/usr/local/include
+fi
 
 install_protobuf
 install_grpc

@@ -17,54 +17,44 @@
 #
 # Script for running ydk CI on docker via travis-ci.org
 #
-# dependencies_ubuntu (Ubuntu 16.04)
+# dependencies_ubuntu (Ubuntu 16.04, 18.04)
 # ------------------------------------------------------------------
 
 function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_ubuntu.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function install_dependencies {
     print_msg "Installing dependencies"
 
-    apt update -y > /dev/null
-    apt install sudo -y > /dev/null
-    sudo apt-get install -y --no-install-recommends apt-utils
-    sudo apt-get update -y > /dev/null
-    sudo apt-get install libtool-bin -y > /dev/null
+    apt update -y
+    apt install sudo -y
+    run_cmd sudo apt-get install -y --no-install-recommends apt-utils
+    run_cmd sudo apt-get update -y > /dev/null
+    run_cmd sudo apt-get install libtool-bin -y > /dev/null
     local status=$?
     if [[ ${status} != 0 ]]; then
-        sudo apt-get install libtool -y > /dev/null
+        run_cmd sudo apt-get install libtool -y > /dev/null
     fi
-    sudo apt-get install -y bison \
-                            curl \
-                            doxygen \
-                            flex \
-                            git \
-                            libcmocka0 \
-                            libcurl4-openssl-dev \
-                            libpcre3-dev \
-                            libpcre++-dev \
-                            libssh-dev \
-                            libxml2-dev \
-                            libxslt1-dev \
-                            pkg-config \
-                            python-dev \
-                            python-pip \
-                            python3-dev \
-                            python-lxml \
-                            python3-lxml \
-                            python3-pip \
-                            python-virtualenv \
-                            software-properties-common \
-                            unzip \
-                            wget \
-                            zlib1g-dev\
-                            cmake \
-                            openjdk-8-jre \
-                            gdebi-core\
-                            lcov > /dev/null
-    sudo apt-get install -y valgrind
+    run_cmd sudo apt-get install -y bison curl doxygen flex git unzip wget cmake gdebi-core lcov vim > /dev/null
+    run_cmd sudo apt-get install -y libcmocka0 libcurl4-openssl-dev libpcre3-dev libpcre++-dev > /dev/null
+    run_cmd sudo apt-get install -y libssh-dev libxml2-dev libxslt1-dev > /dev/null
+    run_cmd sudo apt-get install -y python3-dev python3-lxml python3-pip python3-venv > /dev/null
+    run_cmd sudo apt-get install -y pkg-config software-properties-common zlib1g-dev openjdk-8-jre > /dev/null
+    run_cmd sudo apt-get install -y valgrind > /dev/null
 }
 
 function check_install_gcc {
@@ -94,11 +84,13 @@ function check_install_gcc {
 }
 
 function check_install_go {
-  which go
-  local status=$?
-  if [[ $status == 0 ]]
+  go_exec=$(which go)
+  if [[ -z ${go_exec} && -d /usr/local/go ]]; then
+    go_exec=/usr/local/go/bin/go
+  fi
+  if [[ -x ${go_exec} ]]
   then
-    go_version=$(echo `go version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    go_version=$(echo `${go_exec} version` | awk '{ print $3 }' | cut -d 'o' -f 2)
     print_msg "Current Go version is $go_version"
     minor=$(echo $go_version | cut -d '.' -f 2)
   else
@@ -106,22 +98,25 @@ function check_install_go {
     minor=0
   fi
   if (( $minor < 9 )); then
-    if (( $minor > 0 )); then
-      print_msg "Removing pre-installed Golang"
-      sudo apt-get remove golang -y
-    fi
-    print_msg "Installing Golang version 1.9.2"
-    sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
+#    if (( $minor > 0 )); then
+#      print_msg "Removing pre-installed Golang"
+#      sudo apt-get remove golang -y
+#    fi
+    print_msg "Installing Golang version 1.9.2 in /usr/local/go"
+    run_cmd sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
+    rm -f go1.9.2.linux-amd64.tar.gz
   fi
 }
 
 function install_confd {
+  if [[ ! -s ../confd/bin/confd ]]; then
     print_msg "Installing confd"
-
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
+    run_cmd wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.linux.x86_64.zip
-    ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
+    run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
+    rm -f confd-basic-6.2.* ConfD*
+  fi
 }
 
 function install_fpm {

@@ -110,11 +110,11 @@ function check_install_go {
 }
 
 function install_confd {
-  if [[ ! -s ../confd/bin/confd ]]; then
+  if [[ ! -s $HOME/confd/bin/confd ]]; then
     print_msg "Installing confd"
     run_cmd wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.linux.x86_64.zip
-    run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin ../confd
+    run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
     rm -f confd-basic-6.2.* ConfD*
   fi
 }

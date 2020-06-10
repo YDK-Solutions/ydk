@@ -575,7 +575,7 @@ function run_py_sanity_ydktest_tests {
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_netconf_ssh
-    if [[ ${os_type} != "Darwin" ]] ; then
+    if [[ ${os_info} == *"xenial"* ]]; then
       py_sanity_ydktest_test_tcp
     fi
 
@@ -616,8 +616,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
-#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
-#    --non-demand
+#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py --non-demand
   fi
 }
 

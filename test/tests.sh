@@ -90,7 +90,7 @@ function pip_check_install {
 function init_confd {
     cd $1
     print_msg "Initializing confd in $(pwd)"
-    source $YDKGEN_HOME/../confd/confdrc
+    source $HOME/confd/confdrc
     run_exec_test make stop > /dev/null
     run_exec_test make clean > /dev/null
     run_exec_test make all > /dev/null
@@ -140,8 +140,8 @@ function check_python_installation {
 
   if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
     print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
-    run_exec_test ${PYTHON_BIN} -m venv $YDKGEN_HOME/venv
-    run_exec_test source $YDKGEN_HOME/venv/bin/activate
+    run_exec_test ${PYTHON_BIN} -m venv $HOME/venv
+    run_exec_test source $HOME/venv/bin/activate
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"

@@ -98,14 +98,13 @@ function check_install_go {
     minor=0
   fi
   if (( $minor < 9 )); then
-#    if (( $minor > 0 )); then
-#      print_msg "Removing pre-installed Golang"
-#      sudo apt-get remove golang -y
-#    fi
     print_msg "Installing Golang version 1.9.2 in /usr/local/go"
     run_cmd sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
     rm -f go1.9.2.linux-amd64.tar.gz
+    cd /usr/local/bin
+    sudo ln -sf /usr/local/go/bin/go
+    cd -
   fi
 }
 

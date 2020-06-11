@@ -23,6 +23,19 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date) *** dependencies_centos.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    local cmd=$@
+    print_msg "Running: $cmd"
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting '$@' with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function check_install_gcc {
   which gcc
   local status=$?
@@ -37,21 +50,21 @@ function check_install_gcc {
   if [[ $gcc_version < "4.8.1" ]]
   then
     print_msg "Upgrading gcc/g++ to version 5"
-    yum install centos-release-scl -y > /dev/null
-    yum install devtoolset-4-gcc* -y > /dev/null
+    sudo yum install centos-release-scl -y > /dev/null
+    sudo yum install devtoolset-7-gcc* -y > /dev/null
     local status2=$?
     if [[ $status2 != 0 ]]; then
       MSG_COLOR=$RED
       print_msg "Failed to install gcc; exiting"
       exit 1
     else
-      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/cc
-      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
+      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/cc
+      ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/c++
 
-      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
-      ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/gcc
+      ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/g++
 
-      ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcov /usr/bin/gcov
+      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcov /usr/bin/gcov
       gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
       print_msg "Installed gcc/g++ version is $gcc_version"
     fi
@@ -61,17 +74,15 @@ function check_install_gcc {
 function install_dependencies {
     print_msg "Installing dependencies"
 
-    sudo yum update -y > /dev/null
-    sudo yum install epel-release -y > /dev/null
-    sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
-    sudo yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
-    sudo yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
+    run_cmd sudo yum update -y > /dev/null
+    run_cmd sudo yum install epel-release -y > /dev/null
+    run_cmd sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
+    run_cmd sudo yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
+    run_cmd sudo yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
 #     sudo yum install python-devel python-pip -y
-    sudo yum install python3-devel python3-venv -y
-    sudo yum install rpm-build redhat-lsb lcov -y > /dev/null
-    sudo yum install valgrind -y
-    print_msg "Python3.6 location: $(which python3.6)"
-    print_msg "Pip3.6 location: $(which pip3.6)"
+    run_cmd sudo yum install python3-devel python3-venv -y
+    run_cmd sudo yum install rpm-build redhat-lsb lcov -y > /dev/null
+    run_cmd sudo yum install valgrind -y
 }
 
 function check_install_go {
@@ -90,7 +101,7 @@ function check_install_go {
   fi
   if (( $minor < 9 )); then
     print_msg "Installing Golang version 1.9.2"
-    sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
+    run_cmd sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
     sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
     rm -f go1.9.2.linux-amd64.tar.gz
     cd /usr/local/bin
@@ -102,28 +113,26 @@ function check_install_go {
 function install_confd {
   if [[ ! -s $HOME/confd/bin/confd ]]; then
     print_msg "Installing confd"
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
+    run_cmd wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.linux.x86_64.zip
-    ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
+    run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
     rm -f confd-basic-6.2.* ConfD*
   fi
 }
 
 function install_openssl {
+  if [[ ! -s $HOME/confd/lib/libcrypto.so.1.0.0 ]]; then
     print_msg "Installing openssl 0.1.0u for confd"
-
-    wget https://www.openssl.org/source/openssl-1.0.1u.tar.gz &> /dev/null
+    run_cmd wget https://www.openssl.org/source/openssl-1.0.1u.tar.gz &> /dev/null
     tar -xvzf openssl-1.0.1u.tar.gz > /dev/null
+    rm -rf openssl-1.0.1u.tar.gz
     cd openssl-1.0.1u
-    ./config shared  > /dev/null && make all > /dev/null
+    run_cmd ./config shared  > /dev/null
+    run_cmd make all > /dev/null
     cp libcrypto.so.1.0.0 $HOME/confd/lib
     cd -
-}
-
-function install_fpm {
-    print_msg "Installing fpm"
-    yum install ruby-devel gcc make rpm-build rubygems -y > /dev/null
-    gem install --no-ri --no-rdoc fpm
+    rm -rf openssl-1.0.1u
+  fi
 }
 
 ########################## EXECUTION STARTS HERE #############################
@@ -138,4 +147,4 @@ check_install_go
 
 install_confd
 install_openssl
-#install_fpm
+

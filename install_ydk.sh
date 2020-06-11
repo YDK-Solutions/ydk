@@ -176,6 +176,11 @@ function install_py_gnmi {
     run_cmd ./generate.py -i --service profiles/services/gnmi-0.4.0.json
 
     print_msg "Verifying Python gNMI package installation"
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
+        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
+    fi
+
     python -c "from ydk.gnmi.path import gNMISession"
     local status=$?
     if [ $status -ne 0 ]; then
@@ -290,7 +295,7 @@ if [[ -z ${YDKGEN_HOME} || ! -d ${YDKGEN_HOME} ]]; then
 fi
 
 CMAKE_BIN=cmake
-which cmake3
+which cmake3 > /dev/null
 status=$?
 if [[ ${status} == 0 ]]; then
     CMAKE_BIN=cmake3

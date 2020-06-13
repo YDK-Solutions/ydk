@@ -49,10 +49,15 @@ function install_grpc {
   if [[ ! -d grpc ]]; then
     print_msg "Installing grpc"
     git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    cd -
+    if [[ $(lsb_release -cs) == "focal" ]]; then
+	cp ./third-party/grpc/log_linux.cc ./grpc/src/core/lib/gpr
+    fi
   fi
   if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
     cd grpc
-    git submodule update --init
     make > /dev/null
     sudo make install
     sudo ldconfig
@@ -73,6 +78,7 @@ fi
 if [[ -z ${CPLUS_INCLUDE_PATH} ]]; then
     export CPLUS_INCLUDE_PATH=/usr/local/include
 fi
+
 
 install_protobuf
 install_grpc

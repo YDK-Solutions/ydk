@@ -193,17 +193,17 @@ function install_py_gnmi {
 function instal_dependencies {
     if [ ${os_type} == "Linux" ]; then
       if [[ ${os_info} == *"Ubuntu"* ]]; then
-        ${YDKGEN_HOME}/test/dependencies_ubuntu.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_ubuntu.sh
       else
-        ${YDKGEN_HOME}/test/dependencies_centos.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_centos.sh
       fi
       if [ ${service_pkg} == "gnmi" ]; then
-        ${YDKGEN_HOME}/test/dependencies_linux_gnmi.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_linux_gnmi.sh
       fi
     else    # Darwin
-      ${YDKGEN_HOME}/test/dependencies_osx.sh
+      run_cmd ${YDKGEN_HOME}/test/dependencies_osx.sh
       if [ ${service_pkg} == "gnmi" ]; then
-        ${YDKGEN_HOME}/test/dependencies_osx_gnmi.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_osx_gnmi.sh
       fi
     fi
 }
@@ -279,7 +279,7 @@ print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
 if [[ ${os_type} == "Linux" ]]; then
   if [[ ${os_info} == *"Ubuntu"* ]]; then
-    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* ]]; then
+    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* && ${os_info} != *"focal"* ]]; then
         print_msg "WARNING! Unsupported Ubuntu distribution found. Will try the best efforts."
     fi
   elif [[ ${os_info} != *"fedora"* ]]; then

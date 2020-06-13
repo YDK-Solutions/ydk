@@ -52,7 +52,7 @@ function install_dependencies {
     run_cmd sudo apt-get install -y bison curl doxygen flex git unzip wget cmake gdebi-core lcov vim locate > /dev/null
     run_cmd sudo apt-get install -y libcmocka0 libcurl4-openssl-dev libpcre3-dev libpcre++-dev > /dev/null
     run_cmd sudo apt-get install -y libssh-dev libxml2-dev libxslt1-dev > /dev/null
-    run_cmd sudo apt-get install -y python3-dev python3-lxml python3-pip python3-venv python3-pybind11 > /dev/null
+    run_cmd sudo apt-get install -y python3-dev python3-lxml python3-pip python3-venv > /dev/null
     run_cmd sudo apt-get install -y pkg-config software-properties-common zlib1g-dev openjdk-8-jre > /dev/null
     run_cmd sudo apt-get install -y valgrind > /dev/null
     if [[ $(cat /etc/lsb-release) == *"focal"* ]]; then

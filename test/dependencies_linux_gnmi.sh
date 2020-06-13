@@ -52,9 +52,6 @@ function install_grpc {
     cd grpc
     git submodule update --init
     cd -
-    if [[ $(lsb_release -cs) == "focal" ]]; then
-	cp ./third-party/grpc/log_linux.cc ./grpc/src/core/lib/gpr
-    fi
   fi
   if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
     cd grpc

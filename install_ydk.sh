@@ -208,6 +208,32 @@ function instal_dependencies {
     fi
 }
 
+function install_ydk_cpp {
+    install_cpp_core
+    if [[ ${service_pkg} == "gnmi" ]]; then
+        install_cpp_gnmi
+    fi
+}
+
+function install_ydk_py {
+    if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
+        install_py_core
+        if [[ ${service_pkg} == "gnmi" ]]; then
+            install_py_gnmi
+        fi
+    fi
+}
+
+function install_ydk_go {
+    if [[ ${ydk_lang} == "go" || ${ydk_lang} == "all" ]]; then
+        init_go_env
+        install_go_core
+        if [[ ${service_pkg} == "gnmi" ]]; then
+            install_go_gnmi
+        fi
+    fi
+}
+
 ########################## EXECUTION STARTS HERE #############################
 
 # Terminal colors
@@ -279,7 +305,7 @@ print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
 if [[ ${os_type} == "Linux" ]]; then
   if [[ ${os_info} == *"Ubuntu"* ]]; then
-    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* && ${os_info} != *"focal"* ]]; then
+    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* ]]; then
         print_msg "WARNING! Unsupported Ubuntu distribution found. Will try the best efforts."
     fi
   elif [[ ${os_info} != *"fedora"* ]]; then
@@ -320,23 +346,11 @@ instal_dependencies
 
 init_py_env
 
-install_cpp_core
-if [[ ${service_pkg} == "gnmi" ]]; then
-    install_cpp_gnmi
-fi
-if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
-    install_py_core
-    if [[ ${service_pkg} == "gnmi" ]]; then
-        install_py_gnmi
-    fi
-fi
-if [[ ${ydk_lang} == "go" || ${ydk_lang} == "all" ]]; then
-    init_go_env
-    install_go_core
-    if [[ ${service_pkg} == "gnmi" ]]; then
-        install_go_gnmi
-    fi
-fi
+install_ydk-cpp
+
+install_ydk_py
+
+install_ydk_go
 
 deactivate
 cd ${curr_dir}

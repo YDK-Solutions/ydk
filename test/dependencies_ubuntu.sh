@@ -55,6 +55,9 @@ function install_dependencies {
     run_cmd sudo apt-get install -y python3-dev python3-lxml python3-pip python3-venv python3-pybind11 > /dev/null
     run_cmd sudo apt-get install -y pkg-config software-properties-common zlib1g-dev openjdk-8-jre > /dev/null
     run_cmd sudo apt-get install -y valgrind > /dev/null
+    if [[ $(cat /etc/lsb-release) == *"focal"* ]]; then
+        run_cmd sudo apt-get install -y python3-pybind11 > /dev/null
+    fi
 }
 
 function check_install_gcc {
@@ -85,6 +88,7 @@ function check_install_gcc {
 }
 
 function check_install_libssh {
+  sudo updatedb
   if [[ -z $(locate libssh_threads.so) ]]; then
     print_msg "Installing libssh-0.7.7"
     run_cmd wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.7.tar.gz

@@ -63,9 +63,9 @@ function usage {
 function check_python_installation {
   if [[ ! -d ${YDKGEN_HOME}/venv ]]; then 
     print_msg "Creating Python3 virtual environment in ${YDKGEN_HOME}/venv"
-    run_cmd python3 -m venv $YDKGEN_HOME/venv
+    run_cmd python3 -m venv ${HOME}/venv
   fi
-  run_cmd source $YDKGEN_HOME/venv/bin/activate
+  run_cmd source ${HOME}/venv/bin/activate
 
   print_msg "Checking python version and installation"
   python --version
@@ -176,6 +176,11 @@ function install_py_gnmi {
     run_cmd ./generate.py -i --service profiles/services/gnmi-0.4.0.json
 
     print_msg "Verifying Python gNMI package installation"
+    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
+        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
+    fi
+
     python -c "from ydk.gnmi.path import gNMISession"
     local status=$?
     if [ $status -ne 0 ]; then
@@ -188,18 +193,44 @@ function install_py_gnmi {
 function instal_dependencies {
     if [ ${os_type} == "Linux" ]; then
       if [[ ${os_info} == *"Ubuntu"* ]]; then
-        ${YDKGEN_HOME}/test/dependencies_ubuntu.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_ubuntu.sh
       else
-        ${YDKGEN_HOME}/test/dependencies_centos.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_centos.sh
       fi
       if [ ${service_pkg} == "gnmi" ]; then
-        ${YDKGEN_HOME}/test/dependencies_linux_gnmi.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_linux_gnmi.sh
       fi
     else    # Darwin
-      ${YDKGEN_HOME}/test/dependencies_osx.sh
+      run_cmd ${YDKGEN_HOME}/test/dependencies_osx.sh
       if [ ${service_pkg} == "gnmi" ]; then
-        ${YDKGEN_HOME}/test/dependencies_osx_gnmi.sh
+        run_cmd ${YDKGEN_HOME}/test/dependencies_osx_gnmi.sh
       fi
+    fi
+}
+
+function install_ydk_cpp {
+    install_cpp_core
+    if [[ ${service_pkg} == "gnmi" ]]; then
+        install_cpp_gnmi
+    fi
+}
+
+function install_ydk_py {
+    if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
+        install_py_core
+        if [[ ${service_pkg} == "gnmi" ]]; then
+            install_py_gnmi
+        fi
+    fi
+}
+
+function install_ydk_go {
+    if [[ ${ydk_lang} == "go" || ${ydk_lang} == "all" ]]; then
+        init_go_env
+        install_go_core
+        if [[ ${service_pkg} == "gnmi" ]]; then
+            install_go_gnmi
+        fi
     fi
 }
 
@@ -290,7 +321,7 @@ if [[ -z ${YDKGEN_HOME} || ! -d ${YDKGEN_HOME} ]]; then
 fi
 
 CMAKE_BIN=cmake
-which cmake3
+which cmake3 > /dev/null
 status=$?
 if [[ ${status} == 0 ]]; then
     CMAKE_BIN=cmake3
@@ -308,30 +339,18 @@ script_dir=$(cd $(dirname ${BASH_SOURCE}) && pwd)
 
 cd ${YDKGEN_HOME}
 
-#instal_dependencies
+instal_dependencies
 
 ######################################
 # Start installation
 
 init_py_env
 
-install_cpp_core
-if [[ ${service_pkg} == "gnmi" ]]; then
-    install_cpp_gnmi
-fi
-if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
-    install_py_core
-    if [[ ${service_pkg} == "gnmi" ]]; then
-        install_py_gnmi
-    fi
-fi
-if [[ ${ydk_lang} == "go" || ${ydk_lang} == "all" ]]; then
-    init_go_env
-    install_go_core
-    if [[ ${service_pkg} == "gnmi" ]]; then
-        install_go_gnmi
-    fi
-fi
+install_ydk-cpp
+
+install_ydk_py
+
+install_ydk_go
 
 deactivate
 cd ${curr_dir}

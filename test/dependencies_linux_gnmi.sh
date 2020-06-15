@@ -49,10 +49,12 @@ function install_grpc {
   if [[ ! -d grpc ]]; then
     print_msg "Installing grpc"
     git clone -b v1.9.1 https://github.com/grpc/grpc
+    cd grpc
+    git submodule update --init
+    cd -
   fi
   if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
     cd grpc
-    git submodule update --init
     make > /dev/null
     sudo make install
     sudo ldconfig
@@ -73,6 +75,7 @@ fi
 if [[ -z ${CPLUS_INCLUDE_PATH} ]]; then
     export CPLUS_INCLUDE_PATH=/usr/local/include
 fi
+
 
 install_protobuf
 install_grpc

@@ -61,7 +61,7 @@ function usage {
 }
 
 function check_python_installation {
-  if [[ ! -d ${YDKGEN_HOME}/venv ]]; then 
+  if [[ ! -d ${YDKGEN_HOME}/venv ]]; then
     print_msg "Creating Python3 virtual environment in ${YDKGEN_HOME}/venv"
     run_cmd python3 -m venv ${HOME}/venv
   fi
@@ -92,7 +92,7 @@ function init_py_env {
   print_msg "Initializing Python requirements"
   pip install -r requirements.txt
   if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
-    pip install pybind11==2.2.2
+    pip install pybind11
   fi
 }
 
@@ -101,7 +101,7 @@ function init_go_env {
 
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH="$(pwd)/golang"
+            export GOPATH=$HOME/golang"
         fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
@@ -134,7 +134,7 @@ function init_go_env {
 function install_cpp_core {
     print_msg "Installing C++ core library"
     cd $YDKGEN_HOME
-    run_cmd ./generate.py -is --core --cpp -v
+    run_cmd ./generate.py -is --core --cpp
 }
 
 function install_cpp_gnmi {

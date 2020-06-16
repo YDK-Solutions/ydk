@@ -134,14 +134,6 @@ function check_install_confd {
     unzip confd-basic-6.2.linux.x86_64.zip
     run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
     rm -f confd-basic-6.2.* ConfD*
-    if [[ $(lsb_release -cs) == "focal" ]]; then
-        cd /usr/local/lib
-        sudo cp -p /snap/core18/1705/lib/x86_64-linux-gnu/libncurses.so.5.9 .
-        sudo ln -sf libncurses.so.5.9 libncurses.so.5
-        sudo cp -p /snap/core18/1705/lib/x86_64-linux-gnu/libtinfo.so.5.9 .
-        sudo ln -sf libtinfo.so.5.9 libtinfo.so.5
-        cd -
-    fi
   fi
 }
 
@@ -161,4 +153,3 @@ check_install_libssh
 check_install_go
 
 check_install_confd
-

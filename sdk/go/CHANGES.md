@@ -9,6 +9,10 @@
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
   * Updated openconfig bundle to support YANG models of revision "2019-06-21"
 
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
+
 
 ### 2019-10-15 version 0.8.4
 

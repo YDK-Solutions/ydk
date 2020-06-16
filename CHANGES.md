@@ -3,6 +3,7 @@
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
+  * Developed script install_ydk, which allows to install YDK from source in one CLI command
 
 #### Resolved GitHub issues
   * gNMI set RPC fails when JSON payload is formatted string
@@ -29,7 +30,7 @@
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   * Adjusted C++ code to work with gcc compiler version 4.8.5 (default for CentOS-7.x)
-  
+
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
@@ -43,7 +44,7 @@
   * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
   * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
   * Debian package for C++ bundles getting installed to wrong location ([#962](https://github.com/CiscoDevNet/ydk-gen/issues/962))
-  
+
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
 
@@ -57,7 +58,7 @@
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
   * Updated openconfig bundle to introduce support for additional models.
-  
+
 #### Resolved GitHub issues
   * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))

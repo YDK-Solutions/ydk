@@ -73,12 +73,12 @@ function check_install_gcc {
 
 function install_dependencies {
     print_msg "Installing dependencies"
-
+    yum install sudo -y
     run_cmd sudo yum update -y > /dev/null
     run_cmd sudo yum install epel-release -y > /dev/null
-    run_cmd sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
+#    run_cmd sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
     run_cmd sudo yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
-    run_cmd sudo yum install cmake3 wget curl-devel unzip make java sudo -y > /dev/null
+    run_cmd sudo yum install cmake3 wget curl-devel unzip make java doxygen -y > /dev/null
 #     sudo yum install python-devel python-pip -y
     run_cmd sudo yum install python3-devel python3-venv -y
     run_cmd sudo yum install rpm-build redhat-lsb lcov -y > /dev/null

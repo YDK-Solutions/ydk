@@ -39,12 +39,13 @@ function run_cmd {
 
 function usage {
     MSG_COLOR=$NOCOLOR
-    echo "usage: install_ydk [-l [cpp, py, go]] [-s gnmi] [-h]"
+    echo "usage: install_ydk [-l [cpp, py, go]] [-s gnmi] [-h] [-n]"
     echo "Options and arguments:"
     echo "  -l [cpp, py, go, all] installation language; if not specified Python is assumed"
     echo "                        'all' corresponds to all available languages"
     echo "  -s gnmi               install gNMI service package;"
     echo "                        if not specified, only core packages are installed"
+    echo "  -n|--no-deps          skip installation of dependencies"
     echo "  -h|--help             print this help message and exit"
     echo " "
     echo "Environment variables:"
@@ -101,7 +102,7 @@ function init_go_env {
 
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH=$HOME/golang"
+            export GOPATH=$HOME/golang
         fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
@@ -176,11 +177,6 @@ function install_py_gnmi {
     run_cmd ./generate.py -i --service profiles/services/gnmi-0.4.0.json
 
     print_msg "Verifying Python gNMI package installation"
-    if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
-        print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
-    fi
-
     python -c "from ydk.gnmi.path import gNMISession"
     local status=$?
     if [ $status -ne 0 ]; then
@@ -262,6 +258,9 @@ while [[ $# -gt 0 ]]; do
             exit 1
         fi
         ;;
+        -n|--no-deps)
+        no_deps=1
+        ;;
         -h|--help)
         usage
         exit 1
@@ -320,13 +319,6 @@ if [[ -z ${YDKGEN_HOME} || ! -d ${YDKGEN_HOME} ]]; then
     print_msg "YDKGEN_HOME is set to ${YDKGEN_HOME}"
 fi
 
-CMAKE_BIN=cmake
-which cmake3 > /dev/null
-status=$?
-if [[ ${status} == 0 ]]; then
-    CMAKE_BIN=cmake3
-fi
-
 if [[ -z ${C_INCLUDE_PATH} ]]; then
     export C_INCLUDE_PATH=/usr/local/include
 fi
@@ -334,19 +326,36 @@ if [[ -z ${CPLUS_INCLUDE_PATH} ]]; then
     export CPLUS_INCLUDE_PATH=/usr/local/include
 fi
 
+if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib64:/usr/lib64
+    if [ ${service_pkg} == "gnmi" ]; then
+        export LD_LIBRARY_PATH=$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:$LD_LIBRARY_PATH
+    fi
+    print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
+fi
+
 curr_dir=$(pwd)
 script_dir=$(cd $(dirname ${BASH_SOURCE}) && pwd)
 
 cd ${YDKGEN_HOME}
 
-instal_dependencies
+if [ -z ${no_deps} ]; then
+    instal_dependencies
+fi
+
+CMAKE_BIN=cmake
+which cmake3 > /dev/null
+status=$?
+if [[ ${status} == 0 ]]; then
+    CMAKE_BIN=cmake3
+fi
 
 ######################################
 # Start installation
 
 init_py_env
 
-install_ydk-cpp
+install_ydk_cpp
 
 install_ydk_py
 

@@ -13,7 +13,14 @@ Codec Service Provider
 
     .. py:method:: get_root_schema(bundle_name)
 
-        Return root_schema for bundle_name.
+        Return root schema node for bundle_name defined in the 'initialize' method.
 
         :param bundle_name: (``str``) Bundle name.
         :return: :py:class:`RootSchemaNode<ydk.path.RootSchemaNode>` for this bundle.
+
+    .. py:method:: initialize(bundle_name, models_path)
+
+        Initializes root schema in the user defined location of YANG models.
+
+        :param bundle_name: (``str``): user defined bundle name.
+        :param models_path: (``str``): location (directory) for local YANG models.

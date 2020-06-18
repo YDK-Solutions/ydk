@@ -30,11 +30,15 @@
 namespace ydk
 {
 
-#define USER_PROVIDED_REPO "ydk-user-provider-repo"
-
 CodecServiceProvider::CodecServiceProvider(path::Repository & repo, EncodingFormat encoding)
     : m_encoding{encoding}, user_provided_repo(true), capabilities_augmented(false), m_repo(repo)
 {
+  if (user_provided_repo)
+  {
+      YLOG_DEBUG("Initializing root schema in user provided repo");
+      initialize_root_schema(USER_PROVIDED_REPO, m_repo);
+      return;
+  }
 }
 
 CodecServiceProvider::CodecServiceProvider(EncodingFormat encoding)
@@ -49,13 +53,13 @@ CodecServiceProvider::~CodecServiceProvider()
 void CodecServiceProvider::initialize(const std::string & bundle_name,
         const std::string & models_path, augment_capabilities_function augment_caps_function)
 {
-    if(!capabilities_augmented)
+    if (!capabilities_augmented)
     {
         YLOG_DEBUG("Augmenting global YDK capabilities for bundle {}", bundle_name);
         augment_caps_function();
     }
 
-    if(user_provided_repo)
+    if (user_provided_repo)
     {
         YLOG_DEBUG("Using user provided repo");
         initialize_root_schema(USER_PROVIDED_REPO, m_repo);
@@ -67,8 +71,11 @@ void CodecServiceProvider::initialize(const std::string & bundle_name,
         return;
     }
 
-    augment_caps_function();
-    capabilities_augmented = true;
+    if (augment_caps_function)
+    {
+        augment_caps_function();
+        capabilities_augmented = true;
+    }
     YLOG_DEBUG("Creating repo in path {}", models_path);
     path::Repository repo{models_path};
     initialize_root_schema(bundle_name, repo);

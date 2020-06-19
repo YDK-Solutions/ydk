@@ -1,3 +1,29 @@
+<!---
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+-->
 ## Bundle Profiles
 
 In order to generate model bundle, as it is described in the root directory README.md section `Generate and install model bundle`, it is necessary to create a bundle profile, which is JSON formatted file. The profile defines name, version, dependencies and YANG files included into the bundle. The profile must contain bundle description and bundle components parts. It optionally can contain dependency part.
@@ -63,7 +89,7 @@ In this example the bundle includes only selected YANG files
 Each `"git"` source must specify `"url"` - git repository URL, and `"commits"` list. The specified URL must allow the repository
 to be cloned without user intervention. Each element in `"commits"` list can specify:
 
-- `"commitid"` - optional specification of a commit ID in string format. If not specified the HEAD revision is assumed. 
+- `"commitid"` - optional specification of a commit ID in string format. If not specified the HEAD revision is assumed.
 The further specified directories and files will be copied from the context of this commit.
 - `"dir"` - optional list of **relative** directory paths within the git repository.
 All `*.yang` files in specified directory **and any sub-directories** will be pulled into the generated bundle.
@@ -113,4 +139,3 @@ Sometimes the bundle can have dependency on other bundles. In this case the prof
     ]
 }
 ```
-

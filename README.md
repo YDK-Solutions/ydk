@@ -1,3 +1,30 @@
+<!---
+#  YDK-YANG Development Kit
+#  Copyright 2016 Cisco Systems. All rights reserved
+# *************************************************************
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http:#www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# *************************************************************
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# *************************************************************
+-->
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6e111527081b48e1b2252c3562e08a3b)](https://www.codacy.com/app/ydk/ydk-gen?utm_source=github.com&utm_medium=referral&utm_content=CiscoDevNet/ydk-gen&utm_campaign=badger)
 [![License](https://cloud.githubusercontent.com/assets/17089095/19458582/dd626d2c-9481-11e6-8019-8227c5c66a06.png)](https://github.com/CiscoDevNet/ydk-gen/blob/master/LICENSE) [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-gen.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-gen)
 [![codecov](https://codecov.io/gh/CiscoDevNet/ydk-gen/branch/master/graph/badge.svg)](https://codecov.io/gh/CiscoDevNet/ydk-gen)
@@ -87,7 +114,7 @@ docker run -it ydkdev/ydk-gen
 
 # System requirements
 
-Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp/YDK-Go. 
+Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp/YDK-Go.
 
 **Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages.
 In this case you need to build all the components [from source](#build-from-source) after installing the below requirements:
@@ -111,7 +138,7 @@ sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 #### Install libydk library
 
 You can install the latest `libydk` core library using prebuilt binaries for Xenial and Bionic distributions.
-The C++ code was compiled with default gcc compiler version for these distributions. 
+The C++ code was compiled with default gcc compiler version for these distributions.
 For other Ubuntu distributions and/or gcc compiler versions it is recommended to build `libydk` library [from source](#build-from-source).
 
 ##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
@@ -169,7 +196,7 @@ brew install python pybind11
 
 #### Install libydk package
 
-The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler. 
+The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler.
 For other C++ compilers it is recommended to build `libydk` [from source](#build-from-source).
 
 ```
@@ -179,11 +206,11 @@ sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 
 ## Libssh installation
 
-Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required by YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required by YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing,
 please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher.
 
-**Note for MacOS** 
+**Note for MacOS**
 Before installing `libssh` make sure the environment for `openssl` is setup:
 
 ```
@@ -207,7 +234,7 @@ From release ``0.6.0`` the YDK is not supported on Windows.
 
 ## gNMI Requirements
 
-In order to enable YDK support for gNMI protocol, which is optional, the following third party software 
+In order to enable YDK support for gNMI protocol, which is optional, the following third party software
 must be installed prior to gNMI YDK component installation.
 
 ### Install protobuf and protoc
@@ -262,7 +289,7 @@ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-
 
 #### MacOS:
 
-The prebuilt `libydk_gnmi` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler. 
+The prebuilt `libydk_gnmi` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler.
 For other C++ compilers it is recommended to build `libydk` library [from source](#build-from-source)
 
 ```
@@ -272,8 +299,8 @@ sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
 
 ### Runtime environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details. 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application.
+See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details.
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
@@ -283,7 +310,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5
 
 ## Build from source
 
-Install dependencies OS dependencies then generate and install YDK C++ libraries; you might need 
+Install dependencies OS dependencies then generate and install YDK C++ libraries; you might need
 sudo access to install the libraries in default locations, which are `/usr/local/lib` and `/usr/local/include`.
 
 ```
@@ -294,7 +321,7 @@ pip install -r requirements.txt
 
 # Generate and install libydk library
 ./generate -is --cpp --core
-   
+
 # Generate and install libydk_gnmi library (optional)
 ./generate -is --cpp --service profiles/services/gnmi-0.4.0.json
 ```
@@ -392,7 +419,7 @@ optional arguments:
                         Generate separate modules for each python class
                         corresponding to yang containers or lists.
 ```
-The below steps specify how to use `generate.py` to generate YDK core, model bundle, and service packages. All these packages are available for Python, Go and C++ in corresponding github repositories: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp). 
+The below steps specify how to use `generate.py` to generate YDK core, model bundle, and service packages. All these packages are available for Python, Go and C++ in corresponding github repositories: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
 
 The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
@@ -400,7 +427,7 @@ The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be u
 
 Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-models-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
 
-**Note:** 
+**Note:**
 There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.
 
 First generate and install `libydk`
@@ -461,7 +488,7 @@ The sample below shows the use of git sources only. Other examples can be found 
 Each `"git"` source must specify `"url"` - git repository URL, and `"commits"` list. The specified URL must allow the repository
 to be cloned without user intervention. Each element in `"commits"` list can specify:
 
-- `"commitid"` - optional specification of a commit ID in string format. If not specified the HEAD revision is assumed. 
+- `"commitid"` - optional specification of a commit ID in string format. If not specified the HEAD revision is assumed.
 The further specified directories and files will be copied from the context of this commit.
 - `"dir"` - optional list of **relative** directory paths within the git repository.
 All `*.yang` files in specified directory **and any sub-directories** will be pulled into the generated bundle.
@@ -550,20 +577,20 @@ or using installation options:
 
 ## Writing your first app
 
-Now, you can start creating apps based on the models in your bundle. 
-Assuming you generated a python bundle, the models will be available for importing in your app under 
-`ydk.models.<name-of-your-bundle>`. 
-For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and 
-[C++ samples](sdk/cpp/samples). 
-Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html), 
-[Go](http://ydk.cisco.com/go/docs/developer_guide.html) and 
+Now, you can start creating apps based on the models in your bundle.
+Assuming you generated a python bundle, the models will be available for importing in your app under
+`ydk.models.<name-of-your-bundle>`.
+For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and
+[C++ samples](sdk/cpp/samples).
+Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html),
+[Go](http://ydk.cisco.com/go/docs/developer_guide.html) and
 [for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
 
 ## Documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option. 
-After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option. 
-For example, the below sequence of commands will generate the documentation for the three python bundles and the python core 
+When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option.
+After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option.
+For example, the below sequence of commands will generate the documentation for the three python bundles and the python core
 (for C++, use `--cpp`; for Go, use `--go`).
 
 Note that the below process could take few hours due to the size of the `cisco_ios_xr` bundle.
@@ -606,9 +633,9 @@ When run in this way, we will generate a bundle that only contains the files spe
 
 ## Python Requirements
 
-YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 along with corresponding utilities pip and pip3 must be installed on your system. 
+YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 along with corresponding utilities pip and pip3 must be installed on your system.
 
-It is also required for Python installation to include corresponding shared library. As example: 
+It is also required for Python installation to include corresponding shared library. As example:
 
  - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
@@ -625,8 +652,8 @@ export CPLUS_INCLUDE_PATH=/usr/local/include
 
 ### Mac OS
 
-The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)). 
-This is well known and documented issue. Each developer might have different approaches for its resolution. 
+The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
+This is well known and documented issue. Each developer might have different approaches for its resolution.
 One of them is to use Python2 virtual environment. See [Setting up Python virtual environment](#setting-up-python-virtual-environment) for details.
 
 ## Directory structure
@@ -745,5 +772,5 @@ Join the [YDK community](https://communities.cisco.com/community/developer/ydk) 
 
 #### Release Notes
 
-The current YDK release version is 0.8.5. The version of the latest YDK-Gen master branch is 0.8.5. 
+The current YDK release version is 0.8.5. The version of the latest YDK-Gen master branch is 0.8.5.
 YDK-Gen is licensed under the Apache 2.0 License.

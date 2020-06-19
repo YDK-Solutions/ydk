@@ -1,3 +1,30 @@
+..
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 ===============
 Getting Started
 ===============
@@ -6,24 +33,24 @@ Getting Started
 Overview
 ========
 
-The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. 
-The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API 
-and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, 
+The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG.
+The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API
+and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers,
 plus one or more module bundles that are based on YANG models.
 
 Backward Compatibility
 ======================
 
 The Python YDK-0.8.5 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
-Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details. 
+Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details.
 
 Docker
 ======
 
-A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed. 
+A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed.
 This be used to run ydk-py without installing anything natively on your machine.
 
-To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command. 
+To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command.
 See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
 
   docker run -it ydkdev/ydk-py
@@ -40,8 +67,8 @@ Linux
 Ubuntu (Debian-based)
 ~~~~~~~~~~~~~~~~~~~~~
 
-Download and install third party dependency packages and then YDK core library `libydk`. 
-You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
+Download and install third party dependency packages and then YDK core library `libydk`.
+You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions.
 For other Ubuntu distributions it is recommended to build core library from source.
 
 Install Third-party software dependencies::
@@ -107,11 +134,11 @@ It is required to install Xcode command line tools, `homebrew <http://brew.sh>`_
 Libssh Installation
 -------------------
 
-The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6,
 or upgrade to libssh-0.8.1 or higher.
 
-**Note for MacOS** 
+**Note for MacOS**
 Before installing `libssh` make sure the environment for `openssl` is setup:
 
 .. code-block:: sh
@@ -177,7 +204,7 @@ For Bionic (Ubuntu 18.04.1)::
 **CentOS**::
 
   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
-   
+
 **MacOS**::
 
   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
@@ -187,8 +214,8 @@ For Bionic (Ubuntu 18.04.1)::
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details. 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application.
+See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ for details.
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable::
 
   PROTO="/Your-Protobuf-and-Grpc-installation-directory"
@@ -197,7 +224,7 @@ As a workaround, the YDK based application runtime environment must include sett
 Python Requirements
 -------------------
 
-YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system. 
+YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 must be installed on your system.
 
 It is also required for Python installation to include corresponding shared library. As example::
 
@@ -271,7 +298,7 @@ Example:
   pip install -v gen-api/python/ydk/dist/ydk*.tar.gz
 
 4. In 'cmake' log look for 'PythonLibs' and 'found version' settings line:
-  
+
 .. code-block:: sh
 
   -- Found PythonLibs: /usr/local/Cellar/python@2/2.7.15_1/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib (found version "2.7.15")
@@ -281,7 +308,7 @@ Example:
 .. code-block:: sh
 
   python -c "import ydk.types"
-  
+
 
 .. _howto-install:
 
@@ -291,7 +318,7 @@ Quick install
 Centos (Fedora-based)
 ---------------------
 
-You can install the latest model packages from the DevHub artifactory and Python package index.  
+You can install the latest model packages from the DevHub artifactory and Python package index.
 Note that, in some systems, you need to install the new package as root.
 
 To install the core and model bundles on Centos, please follow the below steps.
@@ -324,16 +351,16 @@ To install the core and model bundles on Centos, please follow the below steps.
 Other platforms
 ---------------
 
-You can install the latest model packages from the DevHub artifactory and Python package index.  
-Note that, in some systems, you need to install the new package as root.  
-You get fully operational YDK environment by installing the ``ydk-models-cisco-ios-xr`` and/or ``ydk-models-cisco-ios-xe`` bundle(s) 
-(depending on whether you're developing application for IOS XR or IOS XE platform), which automatically installs all other 
+You can install the latest model packages from the DevHub artifactory and Python package index.
+Note that, in some systems, you need to install the new package as root.
+You get fully operational YDK environment by installing the ``ydk-models-cisco-ios-xr`` and/or ``ydk-models-cisco-ios-xe`` bundle(s)
+(depending on whether you're developing application for IOS XR or IOS XE platform), which automatically installs all other
 YDK-related packages (``YDK``, ``openconfig`` and ``ietf`` packages)::
 
   pip install ydk-models-cisco-ios-xr
   pip install ydk-models-cisco-ios-xe
 
-Alternatively, you can perform a partial installation.  
+Alternatively, you can perform a partial installation.
 If you prefer to install only the ``openconfig`` bundle and its dependencies (``YDK`` and ``ietf`` packages), execute::
 
   pip install ydk
@@ -355,7 +382,7 @@ Installing from Source
 Installing core package
 -----------------------
 
-If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``YDK`` core package and then the model bundles that you plan to use.  
+If you prefer not to use the YDK packages in the DevHub artifactory or Python package index, you need to install manually the ``YDK`` core package and then the model bundles that you plan to use.
 The Python core package is dependent on C++ core library `libydk`, which must be installed prior to Python package installation:
 
 .. code-block:: sh
@@ -413,7 +440,7 @@ To install the ``cisco-ios-xr`` bundle, execute:
 Installing gNMI package
 -----------------------
 
-Optionaly the gNMI package for Python can be installed. The Python gNMI package is dependent on C++ core library `libydk` 
+Optionaly the gNMI package for Python can be installed. The Python gNMI package is dependent on C++ core library `libydk`
 (see installation of Python core package above) and C++ gNMI library `libydk_gnmi`, which must be installed prior to Python package installation:
 
 .. code-block:: sh

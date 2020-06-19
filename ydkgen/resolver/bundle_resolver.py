@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
+
 """ bundle_resolver.py
     Resolve bundle description file.
     Returns current bundle being processed and list of dependency bundles.

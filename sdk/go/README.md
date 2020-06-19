@@ -1,3 +1,30 @@
+<!---
+#  YDK-YANG Development Kit
+#  Copyright 2016 Cisco Systems. All rights reserved
+# *************************************************************
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http:#www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# *************************************************************
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# *************************************************************
+-->
 [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-go.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-go)
 [![GoDoc](https://godoc.org/github.com/CiscoDevNet/ydk-go?status.svg)](https://godoc.org/github.com/CiscoDevNet/ydk-go)
 [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/ydkdev/ydk-go/)
@@ -105,8 +132,8 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
 
 #### Libssh installation
 
-Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing,
 please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher. Example:
 
 ```
@@ -207,8 +234,8 @@ For CentOS
 
 #### Runtime environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details. 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application.
+See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details.
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```

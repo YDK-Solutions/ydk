@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 """
  module_printer.py
@@ -128,4 +133,3 @@ class ModulePrinter(FilePrinter):
 
     def _print_enum(self, enum_class):
         EnumPrinter(self.ctx).print_enum(enum_class, self.generate_meta)
-

@@ -1,3 +1,30 @@
+..
+  #  YDK - YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 .. _netconf-operations:
 
 How do I create, update, read and delete?
@@ -145,16 +172,16 @@ For example, to read the instances of a deeply nested ``slice`` called :go:struc
         // Append each of the list instances to their respective parents
         tableName.Routes = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames_IpRibRouteTableName_Routes{}
         tableName.Routes.Route = append(table_name.Routes.Route, &route)
-        
+
         saf.IpRibRouteTableNames = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs_Saf_IpRibRouteTableNames{}
         saf.IpRibRouteTableNames.IpRibRouteTableName = append(saf.IpRibRouteTableNames.IpRibRouteTableName, &tableName)
-        
+
         af.Safs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs_Af_Safs{}
         af.Safs.Saf = append(af.Safs.Saf, &saf)
-        
+
         vrf.Afs = ip_rib_ipv4_oper.Rib_Vrfs_Vrf_Afs{}
         vrf.Afs.Af = append(vrf.Afs.Af, &af)
-        
+
         rib.Vrfs = ip_rib_ipv4_oper.Rib_Vrf{}
         rib.Vrfs.Vrf = append(rib.Vrfs.Vrf, &vrf)
 
@@ -177,7 +204,7 @@ Lets continue previous example to demonstrate, how user can access `rib.Vrfs.Vrf
               eVrf := iVrf.(*ip_rib_ipv4_oper.Rib_Vrfs_Vrf)
               fmt.Printf("Key: %v, VRF name: %v\n", key, eVrf.VrfName)
         }
-        
+
         // Access specific VRF configuration directly when VRF name is known
         iVrf := ylist.Get(rib.Vrfs.Vrf, "default")
         if iVrf != nil {
@@ -187,7 +214,7 @@ Lets continue previous example to demonstrate, how user can access `rib.Vrfs.Vrf
 
         // Get all VRF names present in BGP configuration
         allVrfNames := ylist.Keys(rib.Vrfs.Vrf)
-        
+
         // Iterate over the VRF names
         for _, name := range allVrfNames {
                 _, iVrf := ylist.Get(rib.Vrfs.Vrf, name)
@@ -196,7 +223,7 @@ Lets continue previous example to demonstrate, how user can access `rib.Vrfs.Vrf
                         fmt.Printf("VRF name: %v\n", eVrf.VrfName)
                 }
         }
-        
+
         // Remove specific VRF from the configuration
         i, rVrf = ylist.Get(rib.Vrfs.Vrf, "vrf-to-remove")
         if rVrf != nil {
@@ -385,7 +412,7 @@ delete operation filter to avoid Libyang error on emty value. For this purpose t
 		routingPolicy.PolicyDefinitions.PolicyDefinition =
 			append(routingPolicy.PolicyDefinitions.PolicyDefinition, &policy_def1)
 		routingPolicy.PolicyDefinitions.PolicyDefinition =
-			append(routingPolicy.PolicyDefinitions.PolicyDefinition, &policy_def3)	
+			append(routingPolicy.PolicyDefinitions.PolicyDefinition, &policy_def3)
 	}
 
 	func main() {
@@ -437,10 +464,10 @@ In this example we read interfaces and BGP configuration as defined by openconfi
         interfacesFilter := ocInterfaces.Interfaces{};
         bgpFilter := ocBgp.Bgp{};
         filterList := types.NewFilter(&interfacesFilter, &bgpFilter)
-        
+
         // Read running config
         getConfigEntity := crud.Read(&provider, filterList)
-        
+
         // Get results
         getConfigEC := types.EntityToCollection(getConfigEntity)
         for _, entity := range getConfigEC.Entities() {
@@ -452,7 +479,7 @@ Reading entire device configuration
 --------------------------------------
 
 When filters are not specified, the YDK attempts to get configuration data based on IETF Yang model. It is user responsibility to import corresponding entities to the application. If retrieved entity was not included in the import statement, an error message is developed and logged (the logger must be enabled); example:
-        
+
     `[ydk] [error] [Go] Entity 'ietf-netconf-acm:nacm' is not registered. Please import corresponding package to your application.`
 
 
@@ -470,10 +497,10 @@ When filters are not specified, the YDK attempts to get configuration data based
     func main() {
         // Build filter
         filterList := types.NewFilter()
-        
+
         // Read running config
         getConfigEntity := crud.ReadConfig(&provider, filterList)
-        
+
         // Get results
         getConfigEC := types.EntityToCollection(getConfigEntity)
         for _, entity := range getConfigEC.Entities() {

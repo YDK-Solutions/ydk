@@ -28,7 +28,7 @@
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/filters.hpp>
 
-# include "test_utils.hpp"
+#include "test_utils.hpp"
 
 #include "../../core/src/path/path_private.hpp"
 #include "../../core/src/catch.hpp"

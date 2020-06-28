@@ -129,7 +129,7 @@ static void walk_children(Entity & entity, const path::SchemaNode & schema, json
             continue;
         if (child.second->has_operation() || child.second->has_data() || child.second->is_presence_container)
         {
-            YLOG_DEBUG("JsonCodec: Populating child entity node '{}'", child.first);
+            YLOG_DEBUG("JsonCodec: Populating child entity node '{}'", child.second->yang_name);
             json_node_t child_json_node = populate_json_node(*(child.second), schema, parent_module_name);
             auto bracket_pos = child.first.find("[");
             if (bracket_pos != string::npos) {

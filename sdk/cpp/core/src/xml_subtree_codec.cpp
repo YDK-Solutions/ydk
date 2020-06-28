@@ -77,7 +77,7 @@ static void walk_children(Entity & entity, const path::SchemaNode & schema, xmlN
         if(child.second == nullptr)
             continue;
         YLOG_DEBUG("==================");
-        YLOG_DEBUG("XMLCodec: Looking at child '{}'", child.first);
+        YLOG_DEBUG("XMLCodec: Looking at child '{}'", child.second->yang_name);
         if(child.second->has_operation() || child.second->has_data() || child.second->is_presence_container)
             populate_xml_node(*(child.second), schema, xml_node);
         else

@@ -694,3 +694,17 @@ TEST_CASE( "rpc_get_schema_no_decode" )
     REQUIRE(!reply.empty());
     //cout << reply << endl;
 }
+
+TEST_CASE( "test_create_datanode" )
+{
+    auto repo = ydk::path::Repository{TEST_HOME};
+    std::vector<ydk::path::Capability> empty_caps;
+    auto root_schema = repo.create_root_schema(empty_caps);
+
+    std::string datanode_path = "/ydktest-sanity:runner/two-key-list[first='first-key'][second='2']/property";
+    std::string datanode_value = "TWO-KEY-LIST PROPERTY";
+    auto & datanode = root_schema->create_datanode(datanode_path, datanode_value);
+
+    REQUIRE(datanode_path == datanode.get_path());
+    REQUIRE(datanode_value == datanode.get_value());
+}

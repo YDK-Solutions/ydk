@@ -1,4 +1,4 @@
-### 2020-06-30 version 0.8.5
+### 2020-07-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
@@ -14,6 +14,9 @@
   * YDK fails instantiate some of the generated bundle classes ([#983](https://github.com/CiscoDevNet/ydk-gen/issues/983))
   * Python generated bundle class fails instantiate when model contains leaf 'logger' ([#996](https://github.com/CiscoDevNet/ydk-gen/issues/996))
   * C++ YList class fails to process key values when its name contains '-' character ([#997](https://github.com/CiscoDevNet/ydk-gen/issues/997))
+  * create_datanode in Path API returns incorrect object and sets incorrect value ([#1003](https://github.com/CiscoDevNet/ydk-gen/issues/1003))
+  * create_datanode rejects absolute paths with a leading "/" as defined in RFC 7950 ([#1005](https://github.com/CiscoDevNet/ydk-gen/issues/1005))
+  * Path API create_datanode rejects valid value ([#1006](https://github.com/CiscoDevNet/ydk-gen/issues/1006))
 
 #### Bundle improvements
   * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code

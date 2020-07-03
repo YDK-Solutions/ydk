@@ -1,4 +1,4 @@
-### 2020-06-30 version 0.8.5
+### 2020-07-30 version 0.8.5
 
 #### New features and enhancements
   * Added Entity class member function to clone entity object
@@ -10,15 +10,14 @@
   * Fixed bug in extracting module name from namespace
   * gNMI set RPC fails when JSON payload is formatted string
   * C++ YList class fails to process key values when its name contains '-' character ([#997](https://github.com/CiscoDevNet/ydk-gen/issues/997))
+  * create_datanode in Path API returns incorrect object and sets incorrect value ([#1003](https://github.com/CiscoDevNet/ydk-gen/issues/1003))
+  * create_datanode rejects absolute paths with a leading "/" as defined in RFC 7950 ([#1005](https://github.com/CiscoDevNet/ydk-gen/issues/1005))
+  * Path API create_datanode rejects valid value ([#1006](https://github.com/CiscoDevNet/ydk-gen/issues/1006))
 
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
   * Updated openconfig bundle to support YANG models of revision "2019-06-21"
 
-
-#### Bundle improvements
-  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
-  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
 
 ### 2019-10-15 version 0.8.4
 

@@ -227,6 +227,30 @@ class SanityTest(unittest.TestCase):
         # DELETE AGAIN WITH ERROR
         self.crud.update(self.ncc, runner)
 
+    def test_create_gre_tunnel_on_demand(self):
+        #enable_logging(logging.ERROR)
+        try:
+            from ydk.models.ydktest.ydktest_sanity import Native
+        except ImportError:
+            # bundle is generated with 'one_class_per_module' flag
+            from ydk.models.ydktest.ydktest_sanity.native.native import Native
+
+        native = Native()
+
+        tunnel = native.interface.Tunnel()
+        tunnel.name = 521
+        tunnel.description = "test tunnel"
+
+        # Configure protocol-over-protocol tunneling
+        tunnel.tunnel.source = "1.2.3.4"
+        tunnel.tunnel.destination = "4.3.2.1"
+        tunnel.tunnel.bandwidth.receive = 100000
+        tunnel.tunnel.bandwidth.transmit = 100000
+
+        native.interface.tunnel.append(tunnel)
+
+        self.crud.create(self.ncc, native)
+
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

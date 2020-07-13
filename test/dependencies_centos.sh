@@ -54,7 +54,7 @@ function check_install_gcc {
   fi
   if [[ $gcc_version < "4.8.1" ]]
   then
-    print_msg "Upgrading gcc/g++ to version 5"
+    print_msg "Upgrading gcc/g++ to version 7"
     sudo yum install centos-release-scl -y > /dev/null
     sudo yum install devtoolset-7-gcc* -y > /dev/null
     local status2=$?
@@ -63,13 +63,16 @@ function check_install_gcc {
       print_msg "Failed to install gcc; exiting"
       exit 1
     else
-      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/cc
-      ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/c++
+      sudo ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/cc
+      sudo ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/c++
 
-      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/gcc
-      ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/g++
+      sudo ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcc /usr/bin/gcc
+      sudo ln -sf /opt/rh/devtoolset-7/root/usr/bin/g++ /usr/bin/g++
 
-      ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcov /usr/bin/gcov
+#      sudo rm -rf /usr/lib64/libstdc++.so.6
+#      sudo ln -sf /opt/rh/devtoolset-7/root/usr/lib/gcc/x86_64-redhat-linux/7/libstdc++.so /usr/lib64/libstdc++.so.6
+
+      sudo ln -sf /opt/rh/devtoolset-7/root/usr/bin/gcov /usr/bin/gcov
       gcc_version=$(echo $(gcc --version) | awk '{ print $3 }')
       print_msg "Installed gcc/g++ version is $gcc_version"
     fi
@@ -83,7 +86,7 @@ function install_dependencies {
     run_cmd sudo yum install epel-release -y > /dev/null
 #    run_cmd sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
     run_cmd sudo yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
-    run_cmd sudo yum install cmake3 wget curl-devel unzip make java doxygen -y > /dev/null
+    run_cmd sudo yum install cmake3 wget curl-devel unzip make java doxygen mlocate -y > /dev/null
 #     sudo yum install python-devel python-pip -y
     run_cmd sudo yum install python3-devel python3-venv -y
     run_cmd sudo yum install rpm-build redhat-lsb lcov -y > /dev/null
@@ -152,3 +155,5 @@ check_install_go
 
 install_confd
 install_openssl
+
+updatedb

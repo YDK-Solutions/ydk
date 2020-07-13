@@ -43,8 +43,8 @@ function usage {
     echo "Options and arguments:"
     echo "  -l [cpp, py, go, all] installation language; if not specified Python is assumed"
     echo "                        'all' corresponds to all available languages"
-    echo "  -s gnmi               install gNMI service package;"
-    echo "                        if not specified, only core packages are installed"
+    echo "  -c|--core             install YDK core package"
+    echo "  -s|--service gnmi     install gNMI service package"
     echo "  -n|--no-deps          skip installation of dependencies"
     echo "  -h|--help             print this help message and exit"
     echo " "
@@ -205,7 +205,9 @@ function instal_dependencies {
 }
 
 function install_ydk_cpp {
-    install_cpp_core
+    if [[ ${core_package} == "yes" ]]; then
+        install_cpp_core
+    fi
     if [[ ${service_pkg} == "gnmi" ]]; then
         install_cpp_gnmi
     fi
@@ -213,7 +215,9 @@ function install_ydk_cpp {
 
 function install_ydk_py {
     if [[ ${ydk_lang} == "py" || ${ydk_lang} == "all" ]]; then
-        install_py_core
+        if [[ ${core_package} == "yes" ]]; then
+            install_py_core
+        fi
         if [[ ${service_pkg} == "gnmi" ]]; then
             install_py_gnmi
         fi
@@ -223,7 +227,9 @@ function install_ydk_py {
 function install_ydk_go {
     if [[ ${ydk_lang} == "go" || ${ydk_lang} == "all" ]]; then
         init_go_env
-        install_go_core
+        if [[ ${core_package} == "yes" ]]; then
+            install_go_core
+        fi
         if [[ ${service_pkg} == "gnmi" ]]; then
             install_go_gnmi
         fi
@@ -242,7 +248,9 @@ MSG_COLOR=${YELLOW}
 # Parse script options
 
 ydk_lang="py"
-service_pkg="none"
+service_pkg="no"
+core_package="no"
+dependencies="yes"
 
 # As long as there is at least one more argument, keep looping
 while [[ $# -gt 0 ]]; do
@@ -250,42 +258,47 @@ while [[ $# -gt 0 ]]; do
     case "$key" in
         # This is a flag type option. Will catch either -f or --foo
         -l|--lang)
-        shift # past the key to the value
-        ydk_lang="$1"
-        if [[ ${ydk_lang} != "cpp" && ${ydk_lang} != "py" && ${ydk_lang} != "go" && ${ydk_lang} != "all"  ]]; then
-            echo "Unknown language ${ydk_lang}"
+            shift # past the key to the value
+            ydk_lang="$1"
+            if [[ ${ydk_lang} != "cpp" && ${ydk_lang} != "py" && ${ydk_lang} != "go" && ${ydk_lang} != "all"  ]]; then
+                echo "Unknown language ${ydk_lang}"
+                usage
+                exit 1
+            fi
+            ;;
+        -n|--no-deps)
+            dependencies="no"
+            ;;
+        -h|--help)
             usage
             exit 1
-        fi
-        ;;
-        -n|--no-deps)
-        no_deps=1
-        ;;
-        -h|--help)
-        usage
-        exit 1
-        ;;
-        # This is an arg value type option. Will catch -o value or --output-file value
+            ;;
+        -c|--core)
+            core_package="yes"
+            ;;
         -s|--service)
-        shift # past the key and to the value
-        service_pkg="$1"
-        if  [[ ${service_pkg} != "gnmi" ]]; then
-            echo "Unknown service package specified; gnmi assumed"
-            service_pkg="gnmi"
-        fi
-        ;;
+            shift # past the key and to the value
+            service_pkg="$1"
+            if  [[ ${service_pkg} != "gnmi" ]]; then
+                echo "Unknown service package specified; gnmi assumed"
+                service_pkg="gnmi"
+            fi
+            ;;
         *)
-        # Do whatever you want with extra options
-        echo "Unknown option '$key'"
-        usage
-        exit 1
-        ;;
+            echo "Unknown option '$key'"
+            usage
+            exit 1
+            ;;
     esac
     # Shift after checking all the cases to get the next option
     shift
 done
 
-print_msg "YDK installation options: language=${ydk_lang}, service_package=${service_pkg}"
+echo "YDK installation options: language=${ydk_lang}, core_package=${core_package}, service_package=${service_pkg}, dependencies=${dependencies}"
+if [[ ${core_package} == "no" && ${service_pkg} == "no" && ${dependencies} == "no" ]]; then
+    echo "There are no components to install"
+    exit 0
+fi
 
 ######################################
 # Set up installation environment
@@ -339,7 +352,7 @@ script_dir=$(cd $(dirname ${BASH_SOURCE}) && pwd)
 
 cd ${YDKGEN_HOME}
 
-if [ -z ${no_deps} ]; then
+if [ ${dependencies} == "yes" ]; then
     instal_dependencies
 fi
 

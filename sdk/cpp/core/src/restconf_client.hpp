@@ -12,13 +12,17 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
 ------------------------------------------------------------------*/
 
 #ifndef _RESTCONF_CLIENT_H_
 #define _RESTCONF_CLIENT_H_
 
 #include <string>
-
 
 typedef void CURL;
 struct curl_slist;
@@ -45,6 +49,7 @@ class RestconfClient
         curl_slist *header_options_list;
         std::string base_url;
         std::string encoding;
+        std::string protocol;
 };
 }
 

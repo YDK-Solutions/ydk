@@ -12,6 +12,11 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
 ------------------------------------------------------------------*/
 
 #include <curl/curl.h>
@@ -22,7 +27,6 @@
 #include "restconf_client.hpp"
 #include "types.hpp"
 #include "logger.hpp"
-
 
 using namespace std;
 
@@ -42,7 +46,8 @@ RestconfClient::RestconfClient(const string & address, const string & username, 
     : curl(NULL), header_options_list(NULL), encoding(encoding)
 {
     initialize(address, username, password, port);
-    YLOG_INFO("Ready to communicate with {} using http", base_url);
+    protocol = (address.find("https://") == 0) ? "HTTPS" : "HTTP";
+    YLOG_INFO("Ready to communicate with {} using {}", base_url, protocol);
 }
 
 RestconfClient::~RestconfClient()
@@ -63,8 +68,7 @@ string RestconfClient::get_capabilities(const string & url, const std::string & 
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, capabilities_option);
 
-    string output{};
-    output = execute("GET", url, "");
+    string output = execute("GET", url, "");
 
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header_options_list);
@@ -103,7 +107,8 @@ string RestconfClient::execute(const string & yfilter, const string & url, const
         YLOG_ERROR(os.str().c_str());
         throw(YServiceProviderError{os.str()});
     }
-    YLOG_DEBUG( "Got response code: {}, data: {}", response_code, response);
+    string response_to_print = response.length()==0 ? "NONE" : "\n"+response;
+    YLOG_INFO( "Got response code: {}, data: {}", response_code, response_to_print);
     return response;
 }
 
@@ -113,9 +118,10 @@ void RestconfClient::initialize(const string & address, const string & username,
     initialize_curl(username, password);
 
     string base;
-    if(address.find("http") == string::npos)
+    if (address.find("http://") == string::npos &&
+        address.find("https://") == string::npos)
     {
-        base = "http://" +address + ":" + std::to_string(port);
+        base = "http://" + address + ":" + std::to_string(port);
     }
     else
     {
@@ -135,11 +141,41 @@ void RestconfClient::initialize_curl(const string & username, const string & pas
         throw(YClientError{"Unable to create curl environment"});
     }
 
-    //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); //optionally uncomment for debug
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); //optionally uncomment for debug
 
     curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_BASIC);
     curl_easy_setopt(curl, CURLOPT_USERPWD, (username+":"+password).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+
+    if (protocol == "HTTPS")
+    {
+        curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
+//#ifdef SKIP_PEER_VERIFICATION
+        /*
+         * If you want to connect to a site who isn't using a certificate that is
+         * signed by one of the certs in the CA bundle you have, you can skip the
+         * verification of the server's certificate. This makes the connection
+         * A LOT LESS SECURE.
+         *
+         * If you have a CA cert for the server stored someplace else than in the
+         * default bundle, then the CURLOPT_CAPATH option might come handy for
+         * you.
+         */
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+//#else
+        // curl_easy_setopt(curl, CURLOPT_CAPATH, "/Users/ygorelik/ydk-gen/scripts/community/openssl");
+//#endif
+//#ifdef SKIP_HOSTNAME_VERIFICATION
+        /*
+         * If the site you're connecting to uses a different host name that what
+         * they have mentioned in their server certificate's commonName (or
+         * subjectAltName) fields, libcurl will refuse to connect. You can skip
+         * this check, but this will make the connection less secure.
+         */
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+//#endif
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    }
 
     header_options_list = curl_slist_append(header_options_list, ("Content-Type: " + encoding).c_str());
     header_options_list = curl_slist_append(header_options_list, ("Accept: " + encoding).c_str());

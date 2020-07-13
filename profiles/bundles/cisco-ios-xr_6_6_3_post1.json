@@ -1,7 +1,7 @@
 {
   "name": "cisco-ios-xr",
   "version": "6.6.3_post1",
-  "core_version": "0.8.4",
+  "core_version": "0.8.5",
   "author": "Cisco",
   "copyright": "Cisco",
   "description": "YDK bundle for Cisco IOS XR models",

@@ -49,18 +49,26 @@ Backward Compatibility
 ======================
 
 The Python YDK-0.8.5 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
-Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details.
+However the YDK-0.8.5 generates slightly different code and model API comparing to YDK-0.8.4.
+The generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
+
+..
+  Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details.
 
 Docker
 ======
 
-A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py installed.
-This be used to run ydk-py without installing anything natively on your machine.
+Currently the `docker image <https://docs.docker.com/engine/reference/run/>`_ for ydk-py is not been generated.
+Please use `ydk-gen <https://github.com/ygorelik/ydk-gen/tree/0.8.5#docker>`_ docker image, which has complete environment for ydk-py based development.
 
-To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command.
-See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
+..
+  A `docker image <https://docs.docker.com/engine/reference/run/>`_ is automatically built with the latest ydk-py commit to the GitHub.
+  The docker image is used to run ydk-py without installing anything natively on your machine.
 
-  docker run -it ydkdev/ydk-py
+  To use the docker image, `install docker <https://docs.docker.com/install/>`_ on your system and run the below command.
+  See the `docker documentation <https://docs.docker.com/engine/reference/run/>`_ for more details::
+
+    docker run -it ydkdev/ydk-py
 
 
 System Requirements

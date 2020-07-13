@@ -38,8 +38,8 @@ To enable GRPC trace set environment variables as followed:
     export GRPC_VERBOSITY=debug
     export GRPC_TRACE=transport_security
 
-To get server certificate, you need to retrive the **ems.pem** file from the IOS XR device (after enabling gRPC/TLS)
-and put it to YDK application host in a folder, which is specific to the device. 
+To get server certificate, you need to retrieve the **ems.pem** file from the IOS XR device (after enabling gRPC/TLS)
+and put it to YDK application host in a folder, which is specific to the device.
 You can find the **ems.pem** file on the router in either **/misc/config/grpc/** or **/var/xr/config/grpc** folder.
 
 Example of instantiating and using objects of ``gNMIServiceProvider`` is shown below (assuming you have ``openconfig`` bundle installed).

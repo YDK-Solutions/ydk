@@ -98,7 +98,9 @@ This gives the developer an ability to customize scope of their bundle based on 
 # Backward compatibility
 
 The YDK-0.8.5 core is backward compatible with all previously generated model bundles starting from release of YDK-0.7.3.
-It is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling of YList objects.
+However the YDK-0.8.5 generates different code and model API comparing to YDK-0.8.4.
+The generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
+
 
 # Docker
 
@@ -109,7 +111,7 @@ To use the docker image, [install docker](https://docs.docker.com/install/) on y
 See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
 
 ```
-docker run -it ydkdev/ydk-gen
+docker run -it ydksolutions/ydk-gen
 ```
 
 # System requirements

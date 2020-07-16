@@ -99,7 +99,7 @@ This gives the developer an ability to customize scope of their bundle based on 
 
 The YDK-0.8.5 core is backward compatible with all previously generated model bundles starting from release of YDK-0.7.3.
 However the YDK-0.8.5 generates different code and model API comparing to YDK-0.8.4.
-The generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
+The YDK-0.8.5 generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
 
 
 # Docker
@@ -270,15 +270,15 @@ cd -
 ##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 ##### Bionic (Ubuntu 18.04.1, gcc-7.4.0))
 
 ```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 #### CentOS
@@ -286,7 +286,7 @@ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
 The `libydk_gnmi` package was compiled with gcc-4.8.5.
 
 ```
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
+sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 ```
 
 #### MacOS:
@@ -295,8 +295,8 @@ The prebuilt `libydk_gnmi` package was compiled in MacOS-10.11.6 with clang-8.0.
 For other C++ compilers it is recommended to build `libydk` library [from source](#build-from-source)
 
 ```
-curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
-sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 ```
 
 ### Runtime environment

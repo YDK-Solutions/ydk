@@ -50,7 +50,7 @@ Backward Compatibility
 
 The Python YDK-0.8.5 core package is compatible with all model bundles generated previously with ydk-gen releases starting from 0.7.3.
 However the YDK-0.8.5 generates slightly different code and model API comparing to YDK-0.8.4.
-The generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
+The YDK-0.8.5 generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
 
 ..
   Please see `the release notes <https://github.com/CiscoDevNet/ydk-py/releases/tag/0.8.5>`_ for details.
@@ -190,22 +190,22 @@ Instal YDK gNMI library
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 **CentOS**::
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 
 **MacOS**::
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-4.Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 
 Runtime environment
 ~~~~~~~~~~~~~~~~~~~

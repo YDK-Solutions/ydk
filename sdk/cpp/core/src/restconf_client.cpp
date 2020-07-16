@@ -42,11 +42,11 @@ static bool token_not_found(size_t token);
 
 
 RestconfClient::RestconfClient(const string & address, const string & username, const string & password,
-                        int port, const string & encoding)
-    : curl(NULL), header_options_list(NULL), encoding(encoding)
+                        int port, const string & encoding, uint ssl_options)
+    : curl(NULL), header_options_list(NULL), encoding(encoding), ssl_options(ssl_options)
 {
-    initialize(address, username, password, port);
     protocol = (address.find("https://") == 0) ? "HTTPS" : "HTTP";
+    initialize(address, username, password, port);
     YLOG_INFO("Ready to communicate with {} using {}", base_url, protocol);
 }
 
@@ -150,31 +150,32 @@ void RestconfClient::initialize_curl(const string & username, const string & pas
     if (protocol == "HTTPS")
     {
         curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
-//#ifdef SKIP_PEER_VERIFICATION
-        /*
-         * If you want to connect to a site who isn't using a certificate that is
-         * signed by one of the certs in the CA bundle you have, you can skip the
-         * verification of the server's certificate. This makes the connection
-         * A LOT LESS SECURE.
-         *
-         * If you have a CA cert for the server stored someplace else than in the
-         * default bundle, then the CURLOPT_CAPATH option might come handy for
-         * you.
-         */
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-//#else
-        // curl_easy_setopt(curl, CURLOPT_CAPATH, "/Users/ygorelik/ydk-gen/scripts/community/openssl");
-//#endif
-//#ifdef SKIP_HOSTNAME_VERIFICATION
-        /*
-         * If the site you're connecting to uses a different host name that what
-         * they have mentioned in their server certificate's commonName (or
-         * subjectAltName) fields, libcurl will refuse to connect. You can skip
-         * this check, but this will make the connection less secure.
-         */
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-//#endif
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        if (!(ssl_options & SSL_PEER_VERIFICATION))
+        {
+            /*
+             * If you want to connect to a site who isn't using a certificate that is
+             * signed by one of the certs in the CA bundle you have, you can skip the
+             * verification of the server's certificate. This makes the connection
+             * A LOT LESS SECURE.
+             *
+             * If you have a CA cert for the server stored someplace else than in the
+             * default bundle, then the CURLOPT_CAPATH option might come handy for
+             * you.
+             */
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+            YLOG_INFO("SSL peer verification is disabled!");
+        }
+        if (!(ssl_options & SSL_HOSTNAME_VERIFICATION))
+        {
+            /*
+             * If the site you're connecting to uses a different host name that what
+             * they have mentioned in their server certificate's commonName (or
+             * subjectAltName) fields, libcurl will refuse to connect. You can skip
+             * this check, but this will make the connection less secure.
+             */
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+            YLOG_INFO("SSL host name verification is disabled!");
+        }
     }
 
     header_options_list = curl_slist_append(header_options_list, ("Content-Type: " + encoding).c_str());

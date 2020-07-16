@@ -9,6 +9,7 @@ YDK C++ provides a new interface in the form of Path API, which can be used to w
 
     introduction.rst
     howto_opendaylight.rst
+    restconf_https.rst
     howto_path.rst
     howto_rpc.rst
     presence_class.rst

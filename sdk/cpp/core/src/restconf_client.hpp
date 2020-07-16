@@ -29,11 +29,16 @@ struct curl_slist;
 
 namespace ydk
 {
+
+// Flags to control SSL verification
+#define SSL_PEER_VERIFICATION 0x01
+#define SSL_HOSTNAME_VERIFICATION 0x02
+
 class RestconfClient
 {
     public:
         RestconfClient(const std::string & address, const std::string & username, const std::string & password,
-                    int port, const std::string & encoding);
+                    int port, const std::string & encoding, uint ssl_options=0);
         ~RestconfClient();
 
         std::string execute(const std::string & yfilter, const std::string & url, const std::string & payload) const;
@@ -50,6 +55,7 @@ class RestconfClient
         std::string base_url;
         std::string encoding;
         std::string protocol;
+        uint ssl_options;
 };
 }
 

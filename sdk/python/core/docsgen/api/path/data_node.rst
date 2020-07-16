@@ -1,4 +1,5 @@
 ..
+  # *************************************************************
   #  YDK-YANG Development Kit
   #  Copyright 2016 Cisco Systems. All rights reserved
   # *************************************************************
@@ -46,7 +47,6 @@ DataNode
             >>> session = NetconfSession('127.0.0.1', 'admin', 'admin', 830)
             >>> root_schema = session.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
             >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')               # <-- bgp is an instance of DataNode
-
 
     .. py:method:: add_annotation(annotation)
 
@@ -106,7 +106,7 @@ DataNode
         :return: Data node satisfy the path expression supplied.
         :rtype: list of :py:class:`DataNode<ydk.path.DataNode>`
 
-    .. py:method:: get()
+    .. py:method:: get_value()
 
         Returns this data node's value.
 

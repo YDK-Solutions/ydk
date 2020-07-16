@@ -26,7 +26,8 @@
 
 #### Documentation improvements
   * Bundle profile description is not accurate ([#971](https://github.com/CiscoDevNet/ydk-gen/issues/971))
-
+  * Undocumented method: ydk.path.SchemaNode.get_keys() ([#1012](https://github.com/CiscoDevNet/ydk-gen/issues/1012))
+  * ydk.path.DataNode.get_value() is listed as .get() in the documentation ([#1013](https://github.com/CiscoDevNet/ydk-gen/issues/1013))
 
 ### 2019-10-15 version 0.8.4
 

@@ -1,4 +1,4 @@
-### 2020-06-30 version 0.8.5
+### 2020-07-30 version 0.8.5
 
 #### New features and enhancements
   * Added Entity class member function to clone entity object
@@ -11,6 +11,10 @@
   * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
   * Updated openconfig bundle to support YANG models of revision "2019-06-21"
+
+#### Documentation improvements
+  * Undocumented method: ydk.path.SchemaNode.get_keys() ([#1012](https://github.com/CiscoDevNet/ydk-gen/issues/1012))
+  * ydk.path.DataNode.get_value() is listed as .get() in the documentation ([#1013](https://github.com/CiscoDevNet/ydk-gen/issues/1013))
 
 
 ### 2019-10-15 version 0.8.4

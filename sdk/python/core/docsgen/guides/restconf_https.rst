@@ -72,10 +72,10 @@ The following example shows, how the RestconfServiceProvider is used to read nam
  #!/usr/bin/env python
  #
  from ydk.services import CRUDService
- from ydk.providers import RestconfServiceProvider, NetconfServiceProvider
+ from ydk.providers import RestconfServiceProvider
  from ydk.types import EncodingFormat
  from ydk.path import Repository
- from ydk.filters import YFilter
+
  from ydk.models.openconfig import openconfig_interfaces
 
  if __name__ == '__main__':

@@ -58,7 +58,13 @@ SchemaNode
         :raises: YPathError, if the path expression in invalid, see error code for details.
         :raises: YInvalidArgumentError, if the argument is invalid.
 
-    .. py:method:: get_parent()
+   .. py:method:: get_keys()
+
+        Returns vector of YANG :py:class:`Statement<Statement>`, which represents keys for the list node.
+
+        :return: List of statements of type :cpp:class:`Statement<Statement>`, which represents list node keys.
+
+   .. py:method:: get_parent()
 
         Get the parent node of this schema node in the tree.
 

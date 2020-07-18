@@ -7,23 +7,23 @@ matrix:
 #   - os: linux
 #     dist: trusty
 #     group: edge
-   - os: osx
-     osx_image: xcode8.3
-     language: generic
-     go: 1.9
-   - os: osx
-     env: GNMI=true
-     osx_image: xcode8.3
-     language: generic
-     go: 1.9
+#   - os: osx
+#     osx_image: xcode9.2
+#     language: generic
+#     go: 1.9
+#   - os: osx
+#     env: GNMI=true
+#     osx_image: xcode9.2
+#     language: generic
+#     go: 1.9
 #   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7
 #   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=2.7 GNMI=true
-   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6
-   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6 GNMI=true
+#   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6
+#   - env: DOCKER=true OS_TYPE=centos OS_VERSION=centos7 PYTHON_VERSION=3.6 GNMI=true
 #   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7
 #   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=2.7 GNMI=true
-   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5
-   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5 GNMI=true
+#   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5
+#   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=xenial  PYTHON_VERSION=3.5 GNMI=true
 #   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=bionic  PYTHON_VERSION=2.7
 #   - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=bionic  PYTHON_VERSION=2.7 GNMI=true
    - env: DOCKER=true OS_TYPE=ubuntu OS_VERSION=bionic  PYTHON_VERSION=3
@@ -36,7 +36,7 @@ services:
 
 before_install:
 #    - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
-    - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install curl doxygen xml2  ; fi
+#    - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install curl doxygen xml2  ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./test/dependencies_osx.sh ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]] && [[ "$GNMI" == "true" ]]; then ./test/dependencies_osx_gnmi.sh ; fi
     - if [[ "$DOCKER" != "true" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./test/dependencies_trusty.sh ; fi

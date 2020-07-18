@@ -14,4 +14,5 @@ Developer Guide
     guides/deviation.rst
     guides/path.rst
     guides/opendaylight.rst
+    guides/restconf_https.rst
     guides/backward_compatibility.rst

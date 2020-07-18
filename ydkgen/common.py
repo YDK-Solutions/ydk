@@ -1,4 +1,3 @@
-from __future__ import print_function
 #  ----------------------------------------------------------------
 # Copyright 2016 Cisco Systems
 #
@@ -14,6 +13,12 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
+
 import logging
 import hashlib
 import keyword
@@ -122,8 +127,8 @@ def merge_file_path_segments(segs):
     return return_seg
 
 def ispythonkeyword(word):
-    return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'operation', 'exec', 'entity')
-    # return keyword.iskeyword(word) or word in ('None', 'parent', 'children', 'yfilter', 'exec', 'entity')
+    return keyword.iskeyword(word) or \
+        word in ['False', 'None', 'True', 'async', 'await', 'nonlocal', 'parent', 'print', 'children', 'operation', 'exec', 'entity', 'yfilter']
 
 def iscppkeyword(word):
     return word in ('parent', 'operator', 'inline', 'default', 'virtual',

@@ -1,25 +1,24 @@
-/// YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
-//
-////////////////////////////////////////////////////////////////
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-//
-//////////////////////////////////////////////////////////////////
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -78,7 +77,7 @@ static void walk_children(Entity & entity, const path::SchemaNode & schema, xmlN
         if(child.second == nullptr)
             continue;
         YLOG_DEBUG("==================");
-        YLOG_DEBUG("XMLCodec: Looking at child '{}'", child.first);
+        YLOG_DEBUG("XMLCodec: Looking at child '{}'", child.second->yang_name);
         if(child.second->has_operation() || child.second->has_data() || child.second->is_presence_container)
             populate_xml_node(*(child.second), schema, xml_node);
         else
@@ -93,7 +92,7 @@ static const path::SchemaNode* find_child_by_name(const path::SchemaNode & paren
     if(s.size()==0)
     {
         YLOG_ERROR("XMLCodec: Could not find node '{}'", name);
-        throw YServiceProviderError{"Could not find node " + name};
+        throw YServiceError{"Could not find node " + name};
     }
     return s[0];
 }
@@ -199,7 +198,7 @@ std::shared_ptr<Entity> XmlSubtreeCodec::decode(const std::string & payload, std
     if(entity->yang_name != to_string(root->name))
     {
         YLOG_ERROR("XMLCodec: Top entity '{}' does not match the payload", entity->yang_name);
-    	throw YServiceProviderError{"Top entity does not match the payload"};
+        throw YInvalidArgumentError{"Top entity does not match the payload"};
     }
     decode_xml(doc, root->children, *entity, nullptr, "");
     xmlFreeDoc(doc);
@@ -278,7 +277,7 @@ static void check_payload_to_raise_exception(Entity & entity, const xmlChar * na
         ostringstream os;
         os << "XMLCodec: Wrong payload! No element '" << current_node_name << "' found in '" << entity.yang_name << "'";
         YLOG_ERROR(os.str().c_str());
-        throw YServiceProviderError{os.str()};
+        throw YInvalidArgumentError{os.str()};
     }
 }
 

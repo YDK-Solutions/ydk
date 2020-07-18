@@ -1,3 +1,31 @@
+..
+  # *************************************************************
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 DataNode
 ========
 
@@ -20,13 +48,12 @@ DataNode
             >>> root_schema = session.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
             >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')               # <-- bgp is an instance of DataNode
 
-
     .. py:method:: add_annotation(annotation)
 
         This method adds the annotation to this Datanode.
 
         :param annotation: (:py:class:`Annotation<ydk.path.Annotation>`) Annotation to be added.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: annotations()
 
@@ -49,8 +76,8 @@ DataNode
         :param path: (``str``) The XPath expression identifying the node.
         :param value: (``str``) The value to be set.
 
-        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YPathError in case the path is invalid;
+                 YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: create_action(path)
 
@@ -58,8 +85,8 @@ DataNode
 
         :param path: (``str``) The XPath expression identifying the node.
 
-        :raises RuntimeError: With ``YPathError`` prefix in case the path is invalid.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix in case the argument is invalid.
+        :raises: YPathError in case the path is invalid.
+        :raises: YInvalidArgumentError in case the argument is invalid.
 
     .. py:method:: __call__(service_provider)
 
@@ -69,7 +96,7 @@ DataNode
         :return: :py:class:`DataNode` instance if succeed.
         :rtype: None or :py:class:`DataNode`
 
-        :raises RuntimeError: With ``YError`` prefix in case the path is invalid or DataNode contains no action nodes.
+        :raises: YError in case the path is invalid or DataNode contains no action nodes.
 
     .. py:method:: find(path)
 
@@ -79,7 +106,7 @@ DataNode
         :return: Data node satisfy the path expression supplied.
         :rtype: list of :py:class:`DataNode<ydk.path.DataNode>`
 
-    .. py:method:: get()
+    .. py:method:: get_value()
 
         Returns this data node's value.
 
@@ -121,4 +148,4 @@ DataNode
             * This method does not validate the value being set.
 
         :param value: (``str``) The value to set. This should be the string representation of the YANG type.
-        :raises RuntimeError: With ``YInvalidArgumentError`` prefix if the its value cannot be set (for example it represents a container).
+        :raises: YInvalidArgumentError if the its value cannot be set (for example it represents a container).

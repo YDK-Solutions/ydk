@@ -13,12 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 """test_entity_diff.py
 Test cases for YDK entity_diff.
 """
-
-from __future__ import print_function
 
 import unittest
 
@@ -133,8 +136,7 @@ class EntityDiffTest(unittest.TestCase):
 
     def test_entity_to_dict_enum_leaflist(self):
         runner = ysanity.Runner()
-        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.local)
-        runner.ytypes.built_in_t.enum_llist.append(ysanity.YdkEnumTest.remote)
+        runner.ytypes.built_in_t.enum_llist.extend([ysanity.YdkEnumTest.local, ysanity.YdkEnumTest.remote])
 
         ent_dict = entity_to_dict(runner)
         self.assertEqual(len(ent_dict), 2)

@@ -1,3 +1,30 @@
+<!---
+#  YDK-YANG Development Kit
+#  Copyright 2016 Cisco Systems. All rights reserved
+# *************************************************************
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http:#www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# *************************************************************
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# *************************************************************
+-->
 [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-go.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-go)
 [![GoDoc](https://godoc.org/github.com/CiscoDevNet/ydk-go?status.svg)](https://godoc.org/github.com/CiscoDevNet/ydk-go)
 [![Docker Automated build](https://img.shields.io/docker/automated/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/ydkdev/ydk-go/)
@@ -25,6 +52,11 @@
 The YANG Development Kit (YDK) is a Software Development Kit that provides API's that are modeled in YANG. The main goal of YDK is to reduce the learning curve of YANG data models by expressing the model semantics in an API and abstracting protocol/encoding details.  YDK is composed of a core package that defines services and providers, plus one or more module bundles that are based on YANG models.  
 
 ## Docker
+
+Currently the [docker image](https://docs.docker.com/engine/reference/run/) for ydk-go is not been generated.
+Please use [ydk-gen](https://github.com/ygorelik/ydk-gen/tree/0.8.5#docker>) docker image, which has complete environment for ydk-go based development.
+
+<!---
 A [docker image](https://docs.docker.com/engine/reference/run/) is automatically built with the latest ydk-go installed. This be used to run ydk-go without installing anything natively on your machine.
 
 To use the docker image, [install docker](https://docs.docker.com/install/) on your system and run the below command. See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
@@ -32,6 +64,7 @@ To use the docker image, [install docker](https://docs.docker.com/install/) on y
 ```
   docker run -it ydkdev/ydk-go
 ```
+-->
 
 ## How to Install
 
@@ -60,15 +93,15 @@ For Xenial (Ubuntu 16.04.4):
   sudo ln -sf /usr/bin/g++-5 /usr/bin/g++
   sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1):
 
 ```
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 #### Centos (Fedora-based)
@@ -86,7 +119,7 @@ The following packages must be present in your system before installing YDK-Go:
   ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
 
   # Install YDK core library
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 ```
 
 #### Mac OS
@@ -99,14 +132,14 @@ It is recommended to install [homebrew](http://brew.sh) and Xcode command line t
   xcode-select --install
 
   # Install YDK core library
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-  sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+  sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 ```
 
 #### Libssh installation
 
-Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing,
 please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher. Example:
 
 ```
@@ -181,34 +214,34 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 For Ubuntu/Xenial:
 
 ```
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 For CentOS
 
 ```
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 ```
 
 ##### MacOS:
 
 ```
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 ```
 
 #### Runtime environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. 
-See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details. 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application.
+See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details.
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
@@ -233,4 +266,4 @@ You can download the latest YDK Go source code, which include core, and model bu
 
 ## Release Notes
 
-The current YDK release version is 0.8.4. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Go is licensed under the Apache 2.0 License.

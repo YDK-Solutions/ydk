@@ -13,10 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
+
 """
 Generate YDK core library, bundle packages.
 """
-from __future__ import print_function
+
 from distutils import dir_util
 
 import fileinput
@@ -115,6 +121,11 @@ class YdkGenerator(object):
             if self.package_name is None or self.version is None:
                 raise YdkGenException("Attribute 'name' and/or 'version' is not defined in the profile")
 
+        if '.' in self.package_name:
+            self.package_name = self.package_name.replace('.', '_')
+            print("WARNING. Replacing package name from '%s' to '%s'" % (profile['name'], self.package_name))
+            profile['name'] = self.package_name
+
         tmp_file = tempfile.mkstemp(suffix='.bundle')[-1]
         bundle_translator.translate(profile_file, tmp_file, self.ydk_root)
 
@@ -143,7 +154,7 @@ class YdkGenerator(object):
         generated_files = self._print_packages(packages, gen_api_root, curr_bundle)
 
         if self.language == 'cpp':
-            _modify_cpp_cmake(gen_api_root, curr_bundle.name, cpp_version, cpp_build, 
+            _modify_cpp_cmake(gen_api_root, curr_bundle.name, cpp_version, cpp_build,
                               curr_bundle.str_core_version, generated_files[0], generated_files[1], yang_models)
 
         os.remove(tmp_file)

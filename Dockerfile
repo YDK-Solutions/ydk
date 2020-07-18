@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 MAINTAINER http://ydk.io
 
@@ -10,14 +10,16 @@ WORKDIR /root/ydk-gen
 
 RUN /bin/bash -c './test/dependencies_ubuntu.sh && ./test/dependencies_linux_gnmi.sh'
 
-RUN ./generate.py -i --cpp --core
-RUN ./generate.py -i --cpp --service profiles/services/gnmi-0.4.0_post2.json
-
-RUN pip  install -r requirements.txt
 RUN pip3 install -r requirements.txt
 
-RUN python  generate.py -i --core
-RUN python3 generate.py -i --core
+RUN python3 generate.py -i --core --cpp
+RUN python3 generate.py -i --service profiles/services/gnmi-0.4.0.json --cpp
 
-RUN python  generate.py -i --service profiles/services/gnmi-0.4.0.json
+RUN python3 generate.py -i --core
 RUN python3 generate.py -i --service profiles/services/gnmi-0.4.0.json
+RUN pip3 install ydk-models-openconfig
+
+RUN export GOROOT=/usr/local/go && export PATH=$GOROOT/bin:$PATH
+RUN export GOPATH=/root/golang
+RUN python3 generate.py -i --core --go
+RUN python3 generate.py -i --service profiles/services/gnmi-0.4.0.json --go

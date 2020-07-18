@@ -1,3 +1,30 @@
+<!---
+#  YDK-YANG Development Kit
+#  Copyright 2016 Cisco Systems. All rights reserved
+# *************************************************************
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http:#www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# *************************************************************
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# *************************************************************
+-->
 [![Build Status](https://travis-ci.org/CiscoDevNet/ydk-cpp.svg?branch=master)](https://travis-ci.org/CiscoDevNet/ydk-cpp)
 
 ![ydk-logo-128](https://cloud.githubusercontent.com/assets/16885441/24175899/2010f51e-0e56-11e7-8fb7-30a9f70fbb86.png)
@@ -9,6 +36,7 @@
 **Table of Contents**
 
 - [Overview](#overview)
+- [Docker](#docker)
 - [How to Install](#how-to-install)
   - [System Requirements](#system-requirements)
   - [Quick Install](#quick-install)
@@ -27,6 +55,11 @@ Currently supported languages are: Python, Go and C++.
 Currently implemented protocols are: Netconf, Restconf, OpenDaylight and gNMI.
 YDK provides CRUD and protocol specific service over above protocols.
 YDK also provides Codec service to translate API models to/from XML and JSON encoded strings.
+
+## Docker
+
+Currently the [docker image](https://docs.docker.com/engine/reference/run/) for ydk-cpp is not been generated.
+Please use [ydk-gen](https://github.com/ygorelik/ydk-gen/tree/0.8.5#docker>) docker image, which has complete environment for ydk-cpp based development.
 
 ## How to Install
 
@@ -83,8 +116,8 @@ $ xcode-select --install
 
 #### Libssh installation
 
-Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing, 
+Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing,
 please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher. Example:
 
 ```
@@ -126,7 +159,7 @@ In order to enable YDK support for gNMI protocol, which is optional, the followi
 
 #### Run-time environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_ 
+There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application. See this issue on `GRPC GitHub <https://github.com/grpc/grpc/issues/10942#issuecomment-312565041>`_
 for details. As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
@@ -138,21 +171,21 @@ for details. As a workaround, the YDK based application runtime environment must
 #### Linux
 ##### Ubuntu (Debian-based)
 
-You can install the latest YDK core package using prebuilt binaries for Xenial and Bionic distributions. 
+You can install the latest YDK core package using prebuilt binaries for Xenial and Bionic distributions.
 For other Ubuntu distributions it is recommended to build core libraries from source.
 
 For Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-$ sudo gdebi libydk-0.8.4-1.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+$ sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 For Bionic (Ubuntu 18.04.1, gcc-7.4.0):
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-$ sudo gdebi libydk-0.8.4-1.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+$ sudo gdebi libydk-0.8.5-1.amd64.deb
 ```
 
 ##### CentOS-7.x (Fedora-based)
@@ -162,18 +195,18 @@ The C++ code was compiled with default gcc compiler version, which is 4.8.5. For
 it is recommended to build `libydk` library [from source](#installing-from-source).
 
 ```
-$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+$ sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 ```
 
 #### MacOS  
 
 You can install the latest YDK core package using prebuilt binaries.
-The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler. 
+The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler.
 For other C++ compilers it is recommended to build `libydk` [from source](#installing-from-source).
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-$ sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+$ sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 ```
 
 ### gNMI Service Installation
@@ -185,28 +218,28 @@ $ sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
 For Ubuntu/Xenial:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-$ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+$ sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 For Ubuntu/Bionic:
 
 ```
-$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-$ sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+$ wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+$ sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 ```
 
 For CentOS
 
 ```
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 ```
 
 ##### MacOS
 
 ```
-$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
-$ sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+$ curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+$ sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 ```
 
 ### Installing from source
@@ -265,4 +298,4 @@ build$ sudo make install
 - Additional YDK information can be found at [ydk.io](http://ydk.io)
 
 ## Release Notes
-The current YDK release version is 0.8.4. YDK-Cpp is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Cpp is licensed under the Apache 2.0 License.

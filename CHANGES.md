@@ -1,9 +1,33 @@
-### 2020-02-15 version 0.8.4.post1
+### 2020-07-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
+  * Developed script install_ydk, which allows to install YDK from source in one CLI command
 
+#### Resolved GitHub issues
+  * gNMI set RPC fails when JSON payload is formatted string
+  * Enhance generator to indicate how a YANG modules was processed ([#894](https://github.com/CiscoDevNet/ydk-gen/issues/894))
+  * Restconf in YDK should support HTTPS (partialy resolved) ([#917](https://github.com/CiscoDevNet/ydk-gen/issues/917))
+  * Go fails to process filters on enum and identity leaves and leaf-lists ([#969](https://github.com/CiscoDevNet/ydk-gen/issues/969))
+  * YDK fails create bundle package when package name contains '.' ([#978](https://github.com/CiscoDevNet/ydk-gen/issues/978))
+  * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
+  * YDK fails instantiate some of the generated bundle classes ([#983](https://github.com/CiscoDevNet/ydk-gen/issues/983))
+  * Python generated bundle class fails instantiate when model contains leaf 'logger' ([#996](https://github.com/CiscoDevNet/ydk-gen/issues/996))
+  * C++ YList class fails to process key values when its name contains '-' character ([#997](https://github.com/CiscoDevNet/ydk-gen/issues/997))
+  * create_datanode in Path API returns incorrect object and sets incorrect value ([#1003](https://github.com/CiscoDevNet/ydk-gen/issues/1003))
+  * create_datanode rejects absolute paths with a leading "/" as defined in RFC 7950 ([#1005](https://github.com/CiscoDevNet/ydk-gen/issues/1005))
+  * Path API create_datanode rejects valid value ([#1006](https://github.com/CiscoDevNet/ydk-gen/issues/1006))
+
+#### Bundle improvements
+  * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
+
+#### Documentation improvements
+  * Bundle profile description is not accurate ([#971](https://github.com/CiscoDevNet/ydk-gen/issues/971))
+  * Undocumented method: ydk.path.SchemaNode.get_keys() ([#1012](https://github.com/CiscoDevNet/ydk-gen/issues/1012))
+  * ydk.path.DataNode.get_value() is listed as .get() in the documentation ([#1013](https://github.com/CiscoDevNet/ydk-gen/issues/1013))
 
 ### 2019-10-15 version 0.8.4
 
@@ -11,7 +35,7 @@
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   * Adjusted C++ code to work with gcc compiler version 4.8.5 (default for CentOS-7.x)
-  
+
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
@@ -25,7 +49,7 @@
   * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
   * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
   * Debian package for C++ bundles getting installed to wrong location ([#962](https://github.com/CiscoDevNet/ydk-gen/issues/962))
-  
+
 #### Documentation improvements
   Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
 
@@ -39,7 +63,7 @@
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
   * Updated openconfig bundle to introduce support for additional models.
-  
+
 #### Resolved GitHub issues
   * cgo compile error ([#781](https://github.com/CiscoDevNet/ydk-gen/issues/781))
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))

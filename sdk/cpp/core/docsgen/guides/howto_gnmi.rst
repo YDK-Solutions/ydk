@@ -1,5 +1,5 @@
 Using gNMI with YDK
-============================
+===================
 .. contents::
 
 YDK makes it easy to interact with gNMI programmatically using the YANG model APIs.
@@ -7,7 +7,7 @@ YDK makes it easy to interact with gNMI programmatically using the YANG model AP
 Applications can be written using the C++ model API in conjunction with a service and a provider.
 
 Writing the app
-----------------
+---------------
 
 In this example, we set some BGP configuration using the Cisco IOS XR model, the :cpp:class:`CRUD (Create/Read/Update/Delete) service<ydk::CrudService>` and the :cpp:class:`gNMI service provider<ydk::gNMIServiceProvider>`. The example in this document is a simplified version of the more complete sample that is available in ``core/samples/bgp_gnmi_create.cpp``. Assuming you have performed the core and cisco-ios-xr bundle installations first, that more complete sample can be run with the below steps:
 
@@ -55,7 +55,7 @@ In our example YDK application, first, let us include the necessary header files
  using namespace Cisco_IOS_XR_ipv4_bgp_datatypes;
 
 gNMI service provider
-------------------------------
+---------------------
 
 The first step in any application is to create a service provider instance. In this case, the gNMI service provider is responsible for mapping between the CRUD service API and the underlying manageability protocol (gNMI).
 
@@ -69,7 +69,7 @@ We first instantiate a :cpp:class:`Repository<ydk::path::Repository>` using the 
 
 
 Using the model APIs
-----------------------
+--------------------
 After establishing the connection, we instantiate the entities and set some data. Now, create an :cpp:class:`Cisco IOS XR BGP<ydk::Cisco_IOS_XR_ipv4_bgp_cfg::Bgp>` configuration object and set the attributes
 
 .. code-block:: c++
@@ -100,7 +100,7 @@ After establishing the connection, we instantiate the entities and set some data
  bgp->instance.append(instance);
 
 Invoking the CRUD Service
----------------------------
+-------------------------
 The CRUD service provides methods to create, read, update and delete entities on a device making use of the session provided by a service provider.  In order to use the CRUD service, we need to instantiate the :cpp:class:`CrudService<ydk::CrudService>` class
 
 .. code-block:: c++
@@ -126,7 +126,7 @@ Finally, we invoke the create method of the :cpp:class:`CrudService<ydk::CrudSer
 Note if there were any errors the above API will raise an exception with the base type :cpp:class:`YServiceError<ydk::YServiceError>`
 
 Logging
-----------------------
+-------
 
 YDK uses the `spdlog` logging library. The logging can be enabled as follows by creating a logger called "ydk". For other options like logging the "ydk" log to a file, see the `spdlog reference <https://github.com/gabime/spdlog#usage-example>`_.
 

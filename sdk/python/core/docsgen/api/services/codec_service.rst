@@ -1,7 +1,38 @@
+..
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
+Codec Services
+--------------
+
 Codec Service
 =============
 
-YDK CodecService class provides API for encoding and decoding of payload strings in XML or JSON format to/from instances of :py:class:`Entity<ydk.types.Entity>`, which represent containers in the device supported YANG models.
+YDK CodecService class provides API for encoding and decoding of payload strings in XML or JSON format to/from instances of :py:class:`Entity<ydk.types.Entity>`,
+which represent containers in the device supported YANG models.
 
 .. py:class:: ydk.services.CodecService()
 
@@ -10,11 +41,12 @@ YDK CodecService class provides API for encoding and decoding of payload strings
         Encodes :py:class:`Entity<ydk.types.Entity>` into payload string in XML or JSON format.
 
         :param provider: :py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>` - Codec Provider instance.
-        :param entity: :py:class:`Entity<ydk.types.Entity>` instance or collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``.
+        :param entity: :py:class:`Entity<ydk.types.Entity>` instance or collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``
+                       or :py:class:`EntityCollection<ydk.types.EntityCollection>`.
         :param pretty: ``bool`` flag, which specifies if resulting string must be in human readable way with indentation.
         :param subtree: ``bool`` flag, which directs to encode entity to XML subtree.
         :return: Type of returned object corresponds to the type of **entity**: single payload ``str``, or ``list`` of ``str``, or a ``dictionary`` of ``str``.
-        :raises: :py:exc:`YError<ydk.errors.YError>`, if error has occurred.
+        :raises: :py:exc:`YServiceError<ydk.errors.YServiceError>`, if error has occurred.
 
     .. py:method:: decode(provider, payload, subtree=False)
 
@@ -23,8 +55,9 @@ YDK CodecService class provides API for encoding and decoding of payload strings
         :param provider: :py:class:`CodecServiceProvider<ydk.providers.CodecServiceProvider>` - Codec Provider instance.
         :param payload: ``str`` or collection of ``str`` Either a single encoded payload or a collection of payloads encapsulated to ``list`` or ``dict``.
         :param subtree: ``bool`` flag, which directs to encode entity to XML subtree.
-        :return: Type of returned object corresponds to the type of **payload**. It is either an instance of :py:class:`Entity<ydk.types.Entity>`, or a collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``.
-        :raises: :py:exc:`YError<ydk.errors.YError>`, if error has occurred.
+        :return: Type of returned object corresponds to the type of **payload**. It is either an instance of :py:class:`Entity<ydk.types.Entity>`,
+                 or a collection of :py:class:`Entity<ydk.types.Entity>` instances of type ``list`` or ``dict``.
+        :raises: :py:exc:`YServiceError<ydk.errors.YServiceError>`, if error has occurred.
 
 XmlSubtreeCodec
 ===============
@@ -45,7 +78,7 @@ XmlSubtreeCodec
         :param entity: An instance of :py:class:`Entity<ydk.types.Entity>` class defined under a bundle.
         :param root_schema: An instance of :py:class:`RootSchemaNode<ydk.path.RootSchemaNode>`, which includes the model bundle.
         :return: ``str``, encoded well formatted multi-line XML payload string.
-        :raises YServiceProviderError: If an error has occurred; usually appears when model is not present in the bundle.
+        :raises: :py:exc:`YServiceError<ydk.errors.YServiceError>`, if an error has occurred; usually appears when model is not present in the bundle.
 
     .. py:method:: decode(payload, entity)
 
@@ -54,7 +87,7 @@ XmlSubtreeCodec
         :param payload: ``str``, XML encoded string to be decoded.
         :param entity: :py:class:`Entity<ydk.types.Entity>`, instance of shared pointer to expected top level `Entity` class.
         :return: :py:class:`Entity<ydk.types.Entity>`, shared pointer to the decoded `Entity`.
-        :raises YServiceProviderError: If an error has occurred; usually appears when payload does not correspond to `Entity` model.
+        :raises: :py:exc:`YInvalidArgumentError<ydk.errors.YInvalidArgumentError>`, if an error has occurred; usually appears when payload does not correspond to `Entity` model.
 
 JsonSubtreeCodec
 ================
@@ -76,7 +109,7 @@ JsonSubtreeCodec
         :param root_schema: An instance of :py:class:`RootSchemaNode<path::RootSchemaNode>`, which includes the model bundle.
         :param pretty: ``bool``. If set to `True`, the function produces well formatted multi-line JSON string. If set to `False` - one line string.
         :return: ``str``, encoded JSON payload string.
-        :raises YServiceProviderError: If an error has occurred; usually appears when model is not present in the bundle.
+        :raises: :py:exc:`YServiceError<ydk.errors.YServiceError>`, if an error has occurred; usually appears when model is not present in the bundle.
 
     .. py:method:: decode(payload, entity)
 
@@ -85,7 +118,7 @@ JsonSubtreeCodec
         :param payload: ``str``, JSON encoded string to be decoded.
         :param entity: :py:class:`Entity<ydk.types.Entity>`, instance of shared pointer to expected top level `Entity` class.
         :return: :py:class:`Entity<ydk.types.Entity>`, shared pointer to the decoded `Entity`.
-        :raises YServiceProviderError: If an error has occurred; usually appears when payload does not correspond to `Entity` model.
+        :raises: :py:exc:`YInvalidArgumentError<ydk.errors.YInvalidArgumentError>`, if an error has occurred; usually appears when payload does not correspond to `Entity` model.
 
 Example of JsonSubtreeCodec usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

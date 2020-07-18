@@ -107,7 +107,7 @@ class SanityTest(unittest.TestCase):
         rdn = codec.decode_json_output(schema, payload_list)
 
         json_str = codec.encode(rdn, EncodingFormat.JSON, True)
-        self.assertEquals(json_str, json_int_payload + json_bgp_payload)
+        self.assertEqual(json_str, json_int_payload + json_bgp_payload)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,23 @@
-### 2019-11-14 version 0.8.4.post1
+### 2020-07-30 version 0.8.5
 
 #### New features and enhancements
   * Added Entity class member function to clone entity object
   * Added shortcut operator to set `yfilter` value in YLeaf and YLeafList class instances
+  * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
 
 #### Resolved GitHub issues
-  * Fix jsonSubtreeCodec only serializing up to 4B numbers
+  * Fix JsonSubtreeCodec only serializing up to 4B numbers
   * Fixed bug in extracting module name from namespace
+  * gNMI set RPC fails when JSON payload is formatted string
+  * Restconf in YDK should support HTTPS (partialy resolved) ([#917](https://github.com/CiscoDevNet/ydk-gen/issues/917))
+  * C++ YList class fails to process key values when its name contains '-' character ([#997](https://github.com/CiscoDevNet/ydk-gen/issues/997))
+  * create_datanode in Path API returns incorrect object and sets incorrect value ([#1003](https://github.com/CiscoDevNet/ydk-gen/issues/1003))
+  * create_datanode rejects absolute paths with a leading "/" as defined in RFC 7950 ([#1005](https://github.com/CiscoDevNet/ydk-gen/issues/1005))
+  * Path API create_datanode rejects valid value ([#1006](https://github.com/CiscoDevNet/ydk-gen/issues/1006))
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
 
 
 ### 2019-10-15 version 0.8.4
@@ -14,7 +25,7 @@
 #### New features and enhancements
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
   * Adjusted C++ code to work with gcc compiler version 4.8.5 (default for CentOS-7.x)
-  
+
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
@@ -26,7 +37,7 @@
   * No way to retrieve numeric value of enums in cpp generated code ([#944](https://github.com/CiscoDevNet/ydk-gen/issues/944))
   * XmlSubtreeCodec fails decode payload with augmented component ([#956](https://github.com/CiscoDevNet/ydk-gen/issues/956))
   * Debian package for C++ bundles getting installed to wrong location ([#962](https://github.com/CiscoDevNet/ydk-gen/issues/962))
-  
+
 #### Documentation improvements
   * Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
   * Improved documentation for System Requirements and Python Requirements
@@ -41,7 +52,7 @@
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
   * Updated openconfig bundle to introduce support for additional models.  
-  
+
 #### Resolved GitHub issues
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))
   * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))
@@ -58,7 +69,7 @@
 ### 2019-03-15 version 0.8.2
 
 #### New features and enhancements
-  * Expanded disabling of data validation to read operations with NetconfServiceProvider. 
+  * Expanded disabling of data validation to read operations with NetconfServiceProvider.
   * Expanded disabling of data validation to gNMIServiceProvider.
 
 #### Resolved GitHub issues
@@ -91,13 +102,13 @@
   * Decoding gNMI payload fails with ValueError exception ([#858](https://github.com/CiscoDevNet/ydk-gen/issues/858))
 
 #### Documentation improvements
-  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848), 
+  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848),
   [#850](https://github.com/CiscoDevNet/ydk-gen/issues/850), [#861](https://github.com/CiscoDevNet/ydk-gen/issues/861),
   [#862](https://github.com/CiscoDevNet/ydk-gen/issues/862)
 
 
 ### 2018-11-27 version 0.8.0
- 
+
 #### CRUD / Netconf / gNMI/ Codec / Path API
   * Introduced YDK support for gNMI protocol (protobuf version 0.4.0) including CRUD service with gNMI Service Provider.
   * Added Netconf support for certificate-based authentication for multiple servers
@@ -108,7 +119,7 @@
 
 #### ydk-gen
   * Added capability to generate YDK service packages from `generate.py` script.
-  
+
 ### 2018-10-02 version 0.7.3
 
 #### Resolved issues
@@ -209,7 +220,7 @@
 * Added support for all existing `ydk bundles` including `ietf`, `openconfig`, `cisco-ios-xr` and `cisco-ios-xe` in Go
 * [#673](https://github.com/CiscoDevNet/ydk-gen/pull/673), [#663](https://github.com/CiscoDevNet/ydk-gen/pull/), [#660](https://github.com/CiscoDevNet/ydk-gen/pull/660), [#658](https://github.com/CiscoDevNet/ydk-gen/pull/658), [#606](https://github.com/CiscoDevNet/ydk-gen/pull/606), [#605](https://github.com/CiscoDevNet/ydk-gen/pull/605)
 ##### CRUD service improvements
-* Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664)) 
+* Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664))
 * Improved formatting of payloads in logging output ([#670](https://github.com/CiscoDevNet/ydk-gen/issues/670))
 ##### Error handling improvements
 * Fixed naming of errors across C++ and Go to be consistent. Changed YCPPError, YError etc to YError ([#669](https://github.com/CiscoDevNet/ydk-gen/issues/669), [#668](https://github.com/CiscoDevNet/ydk-gen/issues/668))
@@ -258,7 +269,7 @@
    * Decoupled path API-specific details from Service Provider and created Netconf & Restconf Session to be used instead of Provider in path API ([#494](https://github.com/CiscoDevNet/ydk-gen/issues/494), [#511](https://github.com/CiscoDevNet/ydk-gen/issues/511))
    * Fixed segmentation fault with the `openconfig-platform` model ([#527](https://github.com/CiscoDevNet/ydk-gen/issues/527))
  * Improved Netconf Service's `kill_session` method ([#528](https://github.com/CiscoDevNet/ydk-gen/issues/528))
- 
+
 #### Documentation
  * Fixed documentation issues for installation ([#529](https://github.com/CiscoDevNet/ydk-gen/issues/529), [#531](https://github.com/CiscoDevNet/ydk-gen/issues/531), [#542](https://github.com/CiscoDevNet/ydk-gen/issues/542), [#541](https://github.com/CiscoDevNet/ydk-gen/issues/541))
  * Improved API documentation ([#424](https://github.com/CiscoDevNet/ydk-gen/issues/424), [#94](https://github.com/CiscoDevNet/ydk-gen/issues/94))

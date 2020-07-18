@@ -32,7 +32,7 @@ from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
-netconf_default_error_pattern = "RPC error occurred; check log file for details"
+netconf_default_error_pattern = "RPC error occurred; check log for details"
 
 # test_create_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
 # <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">

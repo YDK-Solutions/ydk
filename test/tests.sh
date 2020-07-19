@@ -771,11 +771,11 @@ function py_sanity_one_class_per_module {
 }
 
 function py_sanity_backward_compatibility {
-    print_msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print_msg "Running YDK BUNDLE BACKWARD COMPATIBILITY TESTS"
+    print_msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print_msg "Running YDK-0.7.3 BUNDLE BACKWARD COMPATIBILITY TESTS"
     cd $YDKGEN_HOME
     CURRENT_GIT_REV=$(git rev-parse HEAD)
-    git checkout 8d278d7d51765a310afe43ed88951f2fe5d8783e
+    git checkout 454ffc06ec79995832538642638e03259e622b53
     run_test generate.py --bundle profiles/test/ydktest-cpp.json > /dev/null
     py_sanity_run_limited_tests
     git checkout ${CURRENT_GIT_REV}

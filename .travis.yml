@@ -7,10 +7,10 @@ matrix:
 #   - os: linux
 #     dist: trusty
 #     group: edge
-   - os: osx
-     osx_image: xcode8.3
-     language: generic
-     go: 1.9
+#   - os: osx
+#     osx_image: xcode8.3
+#     language: generic
+#     go: 1.9
 #   - os: osx
 #     env: GNMI=true
 #     osx_image: xcode8.3

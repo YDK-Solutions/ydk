@@ -105,6 +105,7 @@ function init_confd {
 
 function init_confd_ydktest {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    rm -rf $HOME/.ydk/127.0.0.1
 }
 
 function init_rest_server {
@@ -492,7 +493,6 @@ function run_python_bundle_tests {
     py_sanity_augmentation
     py_sanity_common_cache
     py_sanity_one_class_per_module
-    py_sanity_backward_compatibility
 }
 
 #--------------------------
@@ -770,13 +770,14 @@ function py_sanity_one_class_per_module {
     py_sanity_run_limited_tests
 }
 
-function py_sanity_backward_compatibility {
+function run_py_backward_compatibility {
     print_msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     print_msg "Running YDK-0.7.3 BUNDLE BACKWARD COMPATIBILITY TESTS"
     cd $YDKGEN_HOME
     CURRENT_GIT_REV=$(git rev-parse HEAD)
     git checkout 454ffc06ec79995832538642638e03259e622b53
     run_test generate.py --bundle profiles/test/ydktest-cpp.json > /dev/null
+    init_confd_ydktest
     py_sanity_run_limited_tests
     git checkout ${CURRENT_GIT_REV}
 }
@@ -943,6 +944,7 @@ install_py_core
 run_python_bundle_tests
 run_python_oc_nis_tests
 run_py_metadata_test
+run_py_backward_compatibility
 
 # test_gen_tests
 

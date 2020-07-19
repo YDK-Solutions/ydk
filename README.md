@@ -1,4 +1,5 @@
 <!---
+# *************************************************************
 #  YDK-YANG Development Kit
 #  Copyright 2016 Cisco Systems. All rights reserved
 # *************************************************************
@@ -111,7 +112,7 @@ To use the docker image, [install docker](https://docs.docker.com/install/) on y
 See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
 
 ```
-docker run -it ydksolutions/ydk-gen
+docker run -it ydkdev/ydk-gen
 ```
 
 # System requirements

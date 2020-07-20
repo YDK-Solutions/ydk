@@ -112,7 +112,7 @@ To use the docker image, [install docker](https://docs.docker.com/install/) on y
 See the [docker documentation](https://docs.docker.com/engine/reference/run/) for more details.
 
 ```
-docker run -it ydkdev/ydk-gen
+docker run -it ydksolutions/ydk-gen
 ```
 
 # System requirements
@@ -129,13 +129,8 @@ In this case you need to build all the components [from source](#build-from-sour
 #### Install OS dependency packages
 
 ```
-sudo apt-get install gdebi-core python3-dev libtool-bin
+sudo apt-get install gdebi-core python3-dev libtool-bin gcc-g++
 sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
-
-# Upgrade compiler to gcc 5.*
-sudo apt-get install gcc-5 g++-5 -y > /dev/null
-sudo ln -sf /usr/bin/g++-5 /usr/bin/g++
-sudo ln -sf /usr/bin/gcc-5 /usr/bin/gcc
 ```
 
 #### Install libydk library

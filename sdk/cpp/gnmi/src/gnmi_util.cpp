@@ -18,7 +18,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
+// -------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
 //////////////////////////////////////////////////////////////////
 
 #include <algorithm>
@@ -326,11 +330,11 @@ void parse_datanode_to_path(DataNode* dn, gnmi::Path* path)
     YLOG_DEBUG("parse_datanode_to_path: Data node path: '{}'", full_path);
 
     // Add origin and first container to the path
-    auto s = segments[1];
+    auto s = segments[0];
     parse_prefix_to_path(s, path);
 
     // Add the rest of the segments to the path
-    for (size_t i=2; i < segments.size(); i++) {
+    for (size_t i=1; i < segments.size(); i++) {
     	add_path_elem(path, segments[i]);
     }
 }

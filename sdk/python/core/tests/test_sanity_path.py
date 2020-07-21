@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 from __future__ import absolute_import
 
@@ -157,40 +162,6 @@ class SanityTest(unittest.TestCase):
         datanode = get_rpc(self.nc_session)
         self.assertIsNotNone(datanode)
 
-    def test_create_gre_tunnel_on_demand(self):
-        enable_logging(logging.ERROR)
-
-        from ydk.providers import NetconfServiceProvider
-        from ydk.services  import CRUDService
-        try:
-            from ydk.models.ydktest.ydktest_sanity import Native
-        except ImportError:
-            # bundle is generated with 'one_class_per_module' flag
-            from ydk.models.ydktest.ydktest_sanity.native.native import Native
-
-        provider = NetconfServiceProvider(
-            "127.0.0.1",
-            "admin",
-            "admin",
-            12022)
-
-        native = Native()
-
-        tunnel = native.interface.Tunnel()
-        tunnel.name = 521
-        tunnel.description = "test tunnel"
-        
-        # Configure protocol-over-protocol tunneling
-        tunnel.tunnel.source = "1.2.3.4"
-        tunnel.tunnel.destination = "4.3.2.1"
-        tunnel.tunnel.bandwidth.receive = 100000
-        tunnel.tunnel.bandwidth.transmit = 100000
-        
-        native.interface.tunnel.append(tunnel)
-        
-        crud_service = CRUDService();
-        crud_service.create(provider, native)
-
     def test_anyxml_action(self):
         expected='''<data xmlns="http://cisco.com/ns/yang/ydktest-action">
   <action-node>
@@ -236,14 +207,15 @@ class SanityTest(unittest.TestCase):
         self.assertTrue(len(reply)>0)
         #print(reply)
 
-def enable_logging(level):
-    log = logging.getLogger('ydk')
-    log.setLevel(level)
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter(("%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
-    handler.setFormatter(formatter)
-    log.addHandler(handler)
-        
+    def test_create_datanode(self):
+        datanode_path = "/ydktest-sanity:runner/two-key-list[first='first-key'][second='2']/property"
+        datanode_value = "TWO-KEY-LIST PROPERTY"
+        datanode = self.root_schema.create_datanode(datanode_path, datanode_value)
+
+        self.assertEqual(datanode_path, datanode.get_path())
+        self.assertEqual(datanode_value, datanode.get_value())
+
+
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()
 

@@ -18,9 +18,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
-//////////////////////////////////////////////////////////////////
-
+// -------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
+////////////////////////////////////////////////////////////////
 
 #include "path_private.hpp"
 
@@ -270,9 +273,13 @@ ydk::path::DataNodeImpl::create_helper(const std::string& path, const std::strin
 
         while(!rdn->get_children().empty() && rdn->m_node != cn)
         {
-            rdn = dynamic_cast<DataNodeImpl*>(rdn->get_children()[0].get());
+            for (auto child_dn : rdn->get_children())
+            {
+                rdn = dynamic_cast<DataNodeImpl*>(child_dn.get());
+                if (!rdn->get_children().empty() || rdn->m_node == cn)
+                    break;
+            }
         }
-
         return *rdn;
     }
     else

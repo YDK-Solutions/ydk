@@ -1,3 +1,30 @@
+..
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 .. _netconf-operations:
 
 How do I create, update, read and delete?
@@ -173,7 +200,6 @@ For example, to read a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` in 
 .. code-block:: python
     :linenos:
 
-
     from ydk.models.cisco_ios_xr import Cisco_IOS_XR_clns_isis_cfg
     from ydk.types import Empty
     from ydk.filters import YFilter
@@ -196,14 +222,13 @@ For example, to read a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` in 
     result = crud.read(provider, isis)
 
 
-Deleting a list
----------------
+Deleting a list element
+-----------------------
 
 For example, to delete a :py:class:`YList<ydk.types.YList>` called :py:class:`Instance<ydk.models.cisco_ios_xr.Cisco_IOS_XR_clns_isis_cfg.Isis>` in the ``Cisco_IOS_XR_clns_isis_cfg`` module using YDK's :py:class:`CRUDService<ydk.services.CRUDService>`, the below approach can be used.
 
 .. code-block:: python
     :linenos:
-
 
     from ydk.models.cisco_ios_xr import Cisco_IOS_XR_clns_isis_cfg
     from ydk.types import Empty
@@ -227,6 +252,29 @@ For example, to delete a :py:class:`YList<ydk.types.YList>` called :py:class:`In
     result = crud.update(provider, isis)
 
 
+Deleting entire list
+--------------------
+
+In order to delete entire list, all its elements must be deleted.
+It could be done like in example above. The issue here is that user have to know all the keys of the :py:class:`YList<ydk.types.YList>` elements.
+To address this issue YDK offers a shortcut, which allows user to delete all list elements in one operation.
+
+.. code-block:: python
+    :linenos:
+
+    from ydk.models.cisco_ios_xr import Cisco_IOS_XR_clns_isis_cfg
+    from ydk.filters import YFilter
+
+    # First read configuration of top level container
+    isis = crud.read_config(provider, Cisco_IOS_XR_clns_isis_cfg.Isis()
+
+    # Then set YFilter.delete operation to the YList object
+    if len(isis.instances.instance) > 0:
+        isis.instances.instance.yfilter = YFilter.delete
+
+        # Call the CRUD update on modified 'isis' object
+        result = crud.update(provider, isis)
+
 
 Deleting a leaf
 ---------------
@@ -235,7 +283,6 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``timer`` of 
 
 .. code-block:: python
     :linenos:
-
 
     from ydk.models.cisco_ios_xr import Cisco_IOS_XR_cdp_cfg
     from ydk.filters import YFilter
@@ -256,7 +303,6 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` o
 
 .. code-block:: python
     :linenos:
-
 
     from ydk.models.cisco_ios_xr import Cisco_IOS_XR_clns_isis_cfg
     from ydk.types import Empty
@@ -279,11 +325,11 @@ For example, to delete a :py:class:`YLeaf<ydk.types.YLeaf>` called ``running`` o
     # (assuming you have already instantiated the service and provider)
     result = crud.update(provider, isis)
 
-    
-Applying CRUD to multiple entities
---------------------------------------
 
-You can apply CRUD operations on multiple entities in one Crud-service call. For example, you want to 'read' BGP and Interfaces configuration together.
+Applying CRUD to multiple entities
+----------------------------------
+
+You can apply CRUD operations on multiple entities in one CRUD service call. For example, you want to 'read' BGP and Interfaces configuration together.
 
 .. code-block:: python
     :linenos:
@@ -294,17 +340,17 @@ You can apply CRUD operations on multiple entities in one Crud-service call. For
     # First, create the top-level Bgp and Interface objects
     int_filter = openconfig_interfaces.Interfaces()
     bgp_filter = openconfig_bgp.Bgp()
-    
+
     # Create read filter
     read_filter = Filter(int_filter, bgp_filter)
 
     # Call the CRUD read-config to get configuration of entities
     result = crud.read_config(provider, read_filter)
-    
+
     # Access read results from returned Config collection
     int_config = result[int_filter]
     bgp_config = result[bgp_filter]
-    
+
     # Or print all configuration in XML format
     codec_service = CodecService()
     codec_provider = CodecServiceProvider()

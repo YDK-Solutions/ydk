@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
+
 """ bundle_resolver.py
     Resolve bundle description file.
     Returns current bundle being processed and list of dependency bundles.
@@ -161,7 +167,7 @@ class Model(object):
     __slots__ = ['_name', '_revision', '_kind', '_uri', 'iskeyword']
 
     def __init__(self, data, iskeyword):
-        self._name = data['name']
+        self._name = data['name'].replace('.', '_')
         if 'revision' in data:
             self._revision = data['revision']
         else:
@@ -228,6 +234,7 @@ class Bundle(BundleDefinition):
             raise YdkGenException('Cannot open bundle file %s.' % uri)
 
         try:
+            data['bundle']['name'] = data['bundle']['name'].replace('.', '_')
             if sys.version_info > (3,):
                 super().__init__(data['bundle'])
             else:
@@ -238,7 +245,6 @@ class Bundle(BundleDefinition):
             if 'dependencies' in data['bundle']:
                 for d in data['bundle']['dependencies']:
                     self.dependencies.append(BundleDependency(d))
-
         except KeyError:
             raise YdkGenException('Bundle file is not well formatted.')
 

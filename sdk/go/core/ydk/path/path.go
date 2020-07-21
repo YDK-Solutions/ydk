@@ -1,25 +1,25 @@
-// Package path provides a new interface in the form of Path API,
-// which can be used to write apps using a generic API,
-// using xpath-like path expressions to create and access YANG data nodes.
-// The nodes created using the YDK model API are converted to Path API data nodes
-// for validation and encoding to respective protocol payloads.
-//
-// YANG Development Kit Copyright 2017 Cisco Systems. All rights reserved.
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
+
 package path
 
 // #cgo CXXFLAGS: -g -std=c++11
@@ -111,12 +111,12 @@ func GetDataPayload(
 	retString := ""
 	config := types.EntityToCollection(entity)
 	for _, ent := range config.Entities() {
-		
+
 		datanode := getDataNodeFromEntity(state, ent, rootSchema)
 		if datanode == nil {
 			return nil
 		}
-		
+
 		topDatanode := C.DataNodeGetTopDataNode(datanode)
 		if topDatanode == nil {
 			dnPath := C.GoString(C.DataNodeGetPath(datanode))
@@ -125,7 +125,7 @@ func GetDataPayload(
 
 		var data *C.char = C.CodecEncode(*GetCState(state), codec, topDatanode, cencoding, 0)
 		PanicOnCStateError(GetCState(state))
-		
+
 		if cencoding == C.JSON {
 			// YG: So far there is no support for multiple JSON encoded entities
 			return data
@@ -369,14 +369,15 @@ func ReadDatanode(filter types.Entity, readDataNode types.DataNode) types.Entity
 		for _, key := range filterEC.Keys() {
 			filterEntity, _ := filterEC.Get(key)
 			filterAbsPath := types.GetAbsolutePath(filterEntity)
-			topEntity := filterEntity
+			// Make fresh copy of entity to drop all data and filters
+			topEntity := types.NewEntityOfType(filterEntity)
 			for _, dn := range children {
 				path := C.GoString(C.DataNodeGetPath(dn))[1:]
 				bracketPos := strings.Index(path, "[")
 				if bracketPos > 0 {
 					path = path[0:bracketPos-1]
 				}
-				if strings.Index(filterAbsPath, path) == 0 {			
+				if strings.Index(filterAbsPath, path) == 0 {
 					if dn != nil {
 						if types.IsTopLevelEntity(filterEntity) {
 							// Top level Entity
@@ -683,16 +684,16 @@ func CodecServiceEncode(
 
 	codec := C.CodecInit()
 	defer C.CodecFree(codec)
-	
+
 	retString := ""
 	config := types.EntityToCollection(entity)
 	for _, ent := range config.Entities() {
-		
+
 		dataNode := getDataNodeFromEntity(state, ent, realRootSchema)
 		if dataNode == nil {
 			return ""
 		}
-	
+
 		var payload *C.char
 		defer C.free(unsafe.Pointer(payload))
 
@@ -704,7 +705,7 @@ func CodecServiceEncode(
 		case encodingFormat.JSON:
 			payload = C.CodecEncode(*GetCState(state), codec, dataNode, C.JSON, 1)
 			PanicOnCStateError(GetCState(state))
-			
+
 			// YG: So far there is no support for multiple entities encoded with JSON format
 			return C.GoString(payload)
 		}
@@ -743,7 +744,7 @@ func CodecServiceDecode(
 
 	var dataNode = types.DataNode{Private: realDataNode}
 	cchildren := C.DataNodeGetChildren(dataNode.Private.(C.DataNode))
-	ydk.YLogDebug(fmt.Sprintf("path.CodecServiceDecode: Top entity path: '%s'; Number of children in datanode: '%v'", 
+	ydk.YLogDebug(fmt.Sprintf("path.CodecServiceDecode: Top entity path: '%s'; Number of children in datanode: '%v'",
 			topEntity.GetEntityData().SegmentPath, cchildren.count))
 	if cchildren.count == C.int(0) {
 		ydk.YLogDebug("path.CodecServiceDecode: Returning top entity")
@@ -765,7 +766,7 @@ func DatanodeToEntity(node C.DataNode) types.Entity {
     moduleName := C.GoString(C.DataNodeGetModuleName(node))
     path := fmt.Sprintf("%s:%s", moduleName, nodeName)
     ydk.YLogDebug(fmt.Sprintf("path.DatanodeToEntity: Got datanode with path: '%s'", path))
-    
+
     topEntity, ok := ydk.GetTopEntity(path)
     if ok {
 	    getEntityFromDataNode(node, topEntity)
@@ -952,10 +953,13 @@ func populateNameValues(
 		leafData := nameValue.Data
 		p := C.CString(nameValue.Name)
 		ydk.YLogDebug(fmt.Sprintf(
-			"path.populateNameValues: Got leaf {%s: %s}", nameValue.Name, nameValue.Data.Value))
+			"path.populateNameValues: Got leaf: %v", nameValue))
 
-		if leafData.IsSet {
-			p1 := C.CString(leafData.Value)
+		if leafData.IsSet || types.IsFilterSet(leafData.Filter) {
+			p1 := C.CString("")
+			if leafData.IsSet {
+				p1 = C.CString(leafData.Value)
+			}
 			result = C.DataNodeCreate(*GetCState(state), dataNode, p, p1)
 			PanicOnCStateError(GetCState(state))
 			C.free(unsafe.Pointer(p1))
@@ -1027,7 +1031,7 @@ func dataNodeIsList(dataNode C.DataNode) bool {
 }
 
 func addDataNodeFilterAnnotation(dataNode *C.DataNode, yf yfilter.YFilter) {
-	if types.IsSet(yf) && yf != yfilter.Read {
+	if types.IsFilterSet(yf) && yf != yfilter.Read {
 		p := C.CString(fmt.Sprintf("%s", yf))
 		defer C.free(unsafe.Pointer(p))
 		C.DataNodeAddAnnotation(*dataNode, p)

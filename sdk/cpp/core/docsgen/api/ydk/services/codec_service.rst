@@ -1,34 +1,65 @@
+..
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
+Codec Services
+--------------
+
 Codec Service
 =============
 
 .. cpp:class:: ydk::CodecService
 
-    Codec Service class for supporting encoding and decoding C++ model API objects of type :cpp:class:`Entity<Entity>`.
+    The `CodecService` class provides encoding and decoding of C++ model API objects of type :cpp:class:`Entity<Entity>` to/from XML and JSON encoded strings.
+    This class utilizes path API and therefore validates data against YANG model.
 
     .. cpp:function:: CodecService()
 
-        Constructs an instance of CodecService
+        Constructs an instance of CodecService.
 
     .. cpp:function:: std::string encode(CodecServiceProvider & provider, Entity & entity, bool pretty=false, bool subtree=false)
 
-        Perform encoding.
+        Perform encoding of single entity.
 
         :param provider: An instance of :cpp:class:`CodecServiceProvider<ydk::CodecServiceProvider>`.
         :param entity: An instance of :cpp:class:`Entity<ydk::Entity>` class defined under a bundle.
         :param pretty: Optionally produce formatted output.
         :param subtree: Subtree filter.
         :return: Encoded payload.
-        :raises YError: If an error has occurred
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::map<std::string, std::string> encode(CodecServiceProvider & provider, std::map<std::string, std::shared_ptr<Entity>> & entity, bool pretty=false)
 
-        Perform encoding
+        Perform encoding of multiple entities.
 
-        :param provider: An instance of :cpp:class:`CodecServiceProvider<ydk::CodecServiceProvider>`
-        :param entity: A map of `Entity` class defined under same bundle
-        :param pretty: Optionally produce formatted output
-        :return: A map of encodec payload.
-        :raises YError: If an error has occurred
+        :param provider: An instance of :cpp:class:`CodecServiceProvider<ydk::CodecServiceProvider>`.
+        :param entity: A map of `Entity` class defined under same bundle.
+        :param pretty: Optionally produce formatted output.
+        :return: A map of encoded payload.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::shared_ptr<ydk::Entity> decode(CodecServiceProvider & provider, const std::string & payload, bool subtree=false)
 
@@ -38,24 +69,24 @@ Codec Service
         :param payload: Payload to be decoded.
         :param subtree: Subtree filter.
         :return: Pointer to the decoded `Entity`.
-        :raises YError: If an error has occurred
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
     .. cpp:function:: std::map<std::string, std::shared_ptr<Entity>> decode(CodecServiceProvider & provider, std::map<std::string, std::string> & payload_map, std::map<std::string, std::shared_ptr<Entity>> entity_map)
 
-        Decode map of payload to map of `Entity`.
+        Decode map of payloads to map of `Entities`.
 
         :param provider: An instance of :cpp:class:`CodecServiceProvider<ydk::CodecServiceProvider>`.
         :param payload_map: Module name payload map.
         :param entity_map: Module name entity map.
         :return: A ``std::map`` of the decoded `Entity`.
-        :raises YError: If an error has occurred.
+        :raises: :cpp:class:`YServiceError<YServiceError>`, if an error has occurred.
 
 XmlSubtreeCodec
 ===============
 
 .. cpp:class:: ydk::XmlSubtreeCodec
 
-    XmlSubtreeCodec class designed to provide encoding and decoding C++ model API objects of type :cpp:class:`Entity<Entity>` to/from XML encoded string.
+    The `XmlSubtreeCodec` class designed to provide encoding and decoding of C++ model API objects of type :cpp:class:`Entity<Entity>` to/from XML encoded string.
     Compared to :cpp:class:`CodecService<ydk::CodecService>` the class does not validate encoded data for their types and values.
 
     .. cpp:function:: XmlSubtreeCodec()
@@ -69,7 +100,7 @@ XmlSubtreeCodec
         :param entity: An instance of :cpp:class:`Entity<ydk::Entity>` class defined under a bundle.
         :param root_schema: An instance of :cpp:class:`RootSchemaNode<path::RootSchemaNode>`, which includes the model bundle.
         :return: A `std::string`. Encoded well formatted multi-line XML payload.
-        :raises YServiceProviderError: If an error has occurred; usually appears when model is not present in the bundle.
+        :raises: :cpp:class:`YServiceError<YServiceError>`: If an error has occurred; usually appears when model is not present in the bundle.
 
     .. cpp:function:: std::shared_ptr<ydk::Entity> decode(const std::string & payload, std::shared_ptr<Entity> entity)
 
@@ -78,14 +109,15 @@ XmlSubtreeCodec
         :param payload: `std::string`, XML encoded string to be decoded.
         :param entity: `std::shared_ptr<Entity>`, instance of shared pointer to expected top level `Entity` class.
         :return: `std::shared_ptr<Entity>`, shared pointer to the decoded `Entity`.
-        :raises YServiceProviderError: If an error has occurred; usually appears when payload does not correspond to `Entity` model.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>`, if an error has occurred;
+                 usually appears when payload does not correspond to `Entity` model.
 
 JsonSubtreeCodec
 ================
 
 .. cpp:class:: ydk::JsonSubtreeCodec
 
-    JsonSubtreeCodec class designed to provide encoding and decoding C++ model API objects of type :cpp:class:`Entity<Entity>` to/from JSON encoded string.
+    The `JsonSubtreeCodec` class designed to provide encoding and decoding of C++ model API objects of type :cpp:class:`Entity<Entity>` to/from JSON encoded string.
     Compared to :cpp:class:`CodecService<ydk::CodecService>` the class does not validate encoded data for their types and values.
 
     .. cpp:function:: JsonSubtreeCodec()
@@ -100,7 +132,7 @@ JsonSubtreeCodec
         :param root_schema: An instance of :cpp:class:`RootSchemaNode<path::RootSchemaNode>`, which includes the model bundle.
         :param pretty: `bool`. If set to `true`, the function produces well formatted multi-line JSON string. If set to `false` - one line string.
         :return: A `std::string`. Encoded JSON payload.
-        :raises YServiceProviderError: If an error has occurred; usually appears when model is not present in the bundle.
+        :raises: :cpp:class:`YServiceError<YServiceError>`: If an error has occurred; usually appears when model is not present in the bundle.
 
     .. cpp:function:: std::shared_ptr<ydk::Entity> decode(const std::string & payload, std::shared_ptr<Entity> entity)
 
@@ -109,7 +141,8 @@ JsonSubtreeCodec
         :param payload: `std::string`, JSON encoded string to be decoded.
         :param entity: `std::shared_ptr<Entity>`, instance of shared pointer to expected top level `Entity` class.
         :return: `std::shared_ptr<Entity>`, shared pointer to the decoded `Entity`.
-        :raises YServiceProviderError: If an error has occurred; usually appears when payload does not correspond to `Entity` model.
+        :raises: :cpp:class:`YInvalidArgumentError<YInvalidArgumentError>`, if an error has occurred;
+                 usually appears when payload does not correspond to `Entity` model.
 
 Example of JsonSubtreeCodec usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,9 +1,28 @@
+### 2020-07-30 version 0.8.5
+
+#### New features and enhancements
+  * Added Entity class member function to clone entity object
+
+#### Resolved GitHub issues
+  * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
+  * YDK fails instantiate some of the generated bundle classes ([#983](https://github.com/CiscoDevNet/ydk-gen/issues/983))
+
+#### Bundle improvements
+  * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
+
+#### Documentation improvements
+  * Undocumented method: ydk.path.SchemaNode.get_keys() ([#1012](https://github.com/CiscoDevNet/ydk-gen/issues/1012))
+  * ydk.path.DataNode.get_value() is listed as .get() in the documentation ([#1013](https://github.com/CiscoDevNet/ydk-gen/issues/1013))
+
+
 ### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Expanded meta data in Python bundles by adding flags `has_must` and `has_when` ([#927](https://github.com/CiscoDevNet/ydk-gen/issues/927))
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
-  
+
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
@@ -11,11 +30,11 @@
   * Delete operation fails on container ([#931](https://github.com/CiscoDevNet/ydk-gen/issues/931))
   * Absolute path for generated entity of second level list child is incorrect ([#933](https://github.com/CiscoDevNet/ydk-gen/issues/933))
   * Get entity path methods should be consistent ([#953](https://github.com/CiscoDevNet/ydk-gen/issues/953))
-  
+
 #### Documentation improvements
   * Added documentation for XmlSubtreeCodec and JsonSubtreeCodec.
   * Improved documentation for System Requirements and Python Requirements
-  * Resolved GitHub issue ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952)): Public API for entity has documentation gaps 
+  * Resolved GitHub issue ([#952](https://github.com/CiscoDevNet/ydk-gen/issues/952)): Public API for entity has documentation gaps
 
 
 ### 2019-05-15 version 0.8.3
@@ -42,7 +61,7 @@
 ### 2019-03-15 version 0.8.2
 
 #### New features and enhancements
-  * Expanded disabling of data validation to read operations with NetconfServiceProvider. 
+  * Expanded disabling of data validation to read operations with NetconfServiceProvider.
   * Expanded disabling of data validation to gNMIServiceProvider.
 
 #### Resolved GitHub issues
@@ -83,7 +102,7 @@
   * gNMI missing from ydk-py docker ([#860](https://github.com/CiscoDevNet/ydk-gen/issues/860))
 
 #### Documentation improvements
-  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848), 
+  Addressed multiple documentation issues: [#848](https://github.com/CiscoDevNet/ydk-gen/issues/848),
   [#850](https://github.com/CiscoDevNet/ydk-gen/issues/850), [#861](https://github.com/CiscoDevNet/ydk-gen/issues/861),
   [#862](https://github.com/CiscoDevNet/ydk-gen/issues/862)
 
@@ -96,7 +115,7 @@
 
 #### ydk-gen
   * Added capability to generate YDK service packages from `generate.py` script.
-  
+
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to include previously missing action models in Cisco IOS XR 6.5.1 release
   * Released cisco-nx-os bundle to support Cisco NX OS 9.2.2 release
@@ -141,7 +160,7 @@
 ```
 
 ### 2018-07-02 version 0.7.2
- 
+
 #### Bundle improvements
   * Released [`cisco-nx-os`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-nx-os-0_7_4.json) bundle to support Cisco NX OS 7.0-3-I7-4 release
   * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_4_1.json) bundle to support Cisco IOS XR 6.4.1 release
@@ -235,7 +254,7 @@ tconf / Codec / Path API improvements
 * Added support for all existing `ydk bundles` including `ietf`, `openconfig`, `cisco-ios-xr` and `cisco-ios-xe` in Go
 * [#673](https://github.com/CiscoDevNet/ydk-gen/pull/673), [#663](https://github.com/CiscoDevNet/ydk-gen/pull/), [#660](https://github.com/CiscoDevNet/ydk-gen/pull/660), [#658](https://github.com/CiscoDevNet/ydk-gen/pull/658), [#606](https://github.com/CiscoDevNet/ydk-gen/pull/606), [#605](https://github.com/CiscoDevNet/ydk-gen/pull/605)
 ##### CRUD service improvements
-* Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664)) 
+* Fixed handling of reading operational data nodes ([#664](https://github.com/CiscoDevNet/ydk-gen/issues/664))
 * Improved formatting of payloads in logging output ([#670](https://github.com/CiscoDevNet/ydk-gen/issues/670))
 ##### Error handling improvements
 * Fixed naming of errors across C++ and Go to be consistent. Changed YCPPError, YError etc to YError ([#669](https://github.com/CiscoDevNet/ydk-gen/issues/669), [#668](https://github.com/CiscoDevNet/ydk-gen/issues/668))
@@ -277,14 +296,14 @@ tconf / Codec / Path API improvements
 
 #### Python
  * Updated [`cisco-ios-xr`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_3_1.json) bundle to support Cisco IOS XR 6.3.1 release
- * Updated [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_6_1_post1.json) bundle to continue to support Cisco IOS XE 16.6.1 release and make it compatible with `ydk core` version `0.6.1` 
+ * Updated [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_6_1_post1.json) bundle to continue to support Cisco IOS XE 16.6.1 release and make it compatible with `ydk core` version `0.6.1`
  * Also updated [`openconfig`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/openconfig_0_1_4.json) bundle version 0.1.4 with additional support for optical transport (channel monitor, optical amplifier, terminal device and transport line)
  * Improved Service Providers
    * Improved Netconf Service Provider to support timeout and retrieving device capabilities ([#217](https://github.com/CiscoDevNet/ydk-gen/issues/217), [#492](https://github.com/CiscoDevNet/ydk-gen/issues/492), [#557](https://github.com/CiscoDevNet/ydk-gen/issues/557))
    * Decoupled path API-specific details from Service Provider and created Netconf & Restconf Session to be used instead of Provider in path API ([#494](https://github.com/CiscoDevNet/ydk-gen/issues/494), [#511](https://github.com/CiscoDevNet/ydk-gen/issues/511))
    * Fixed segmentation fault with the `openconfig-platform` model ([#527](https://github.com/CiscoDevNet/ydk-gen/issues/527))
  * Improved Netconf Service's `kill_session` method ([#528](https://github.com/CiscoDevNet/ydk-gen/issues/528))
- 
+
 ##### Note on cisco-ios-xe bundle
  * As specified above, the [`cisco-ios-xe`](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xe_16_6_1_post1.json) bundle version was updated to `16.6.1.post1` without any of the models being changed. This is because the already released `16.6.1`  bundle is not compatible with the `ydk core` version `0.6.1`. So, when upgrading your `core` version to be `0.6.1`, please also update the XE bundle to version `16.6.1.post1`.
 
@@ -381,7 +400,7 @@ The [backward incompatible](http://ydk.cisco.com/py/docs/backward_compatibility.
   * Made generate.py executable ([#227](https://github.com/CiscoDevNet/ydk-gen/issues/227))
   * Removed auto capitalization of enum literals ([#230](https://github.com/CiscoDevNet/ydk-gen/issues/230))
   * Updated [`cisco-ios-xr` bundle](https://github.com/CiscoDevNet/ydk-gen/blob/master/profiles/bundles/cisco-ios-xr_6_1_2.json) to support Cisco IOS XR 6.1.2 release ([#316](https://github.com/CiscoDevNet/ydk-gen/pull/316))
-  
+
 * Logging improvements
   * Improved logging for services and providers ([#251](https://github.com/CiscoDevNet/ydk-gen/issues/251), [#254](https://github.com/CiscoDevNet/ydk-gen/issues/254), [#280](https://github.com/CiscoDevNet/ydk-gen/issues/280), [#283](https://github.com/CiscoDevNet/ydk-gen/issues/283), [#284](https://github.com/CiscoDevNet/ydk-gen/issues/284))
 
@@ -469,7 +488,7 @@ The [backward incompatible](http://ydk.cisco.com/py/docs/backward_compatibility.
   * Logging made more consistent
     * CRUDService outputs type of operation
     * When logging is enabled, all NETCONF messages are logged including commit
-    * Log messages at various stages (send RPC request, receive reply, commit 
+    * Log messages at various stages (send RPC request, receive reply, commit
       etc) instead of logging all at once at the end
   * Updated enums in YDK classes to use enum34
     * Improved enum documentation

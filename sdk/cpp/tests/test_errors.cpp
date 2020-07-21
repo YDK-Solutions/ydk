@@ -70,7 +70,7 @@ TEST_CASE("int8_invalid_ignore_validation")
     //CREATE
     r.ignore_validation = true;
     r.ytypes->built_in_t->number8 = "test";
-    r.ytypes->built_in_t->number8.yfilter = YFilter::create;
+    r.ytypes->built_in_t->number8 = YFilter::create;
     CHECK_THROWS_WITH(crud.update(provider, r), Catch::Contains("\"test\" is not a valid value"));
 }
 

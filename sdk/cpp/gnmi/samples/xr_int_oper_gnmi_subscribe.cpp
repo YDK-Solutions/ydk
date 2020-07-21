@@ -47,7 +47,7 @@ void config_prop(Cisco_IOS_XR_ifmgr_oper::InterfaceProperties & ifc_prop)
     auto lview = make_shared<Cisco_IOS_XR_ifmgr_oper::InterfaceProperties::DataNodes::DataNode::Locationviews::Locationview>();
     lview->locationview_name = "\"0/RP0/CPU0\"";
     dn->locationviews->locationview.append(lview);
-    
+
     auto ifc = make_shared<Cisco_IOS_XR_ifmgr_oper::InterfaceProperties::DataNodes::DataNode::Locationviews::Locationview::Interfaces::Interface>();
     ifc->interface_name = "\"Loopback10\"";
     ifc->state.yfilter = YFilter::read;
@@ -61,11 +61,11 @@ void gnmi_service_subscribe_callback(const char * subscribe_response)
     cout << response << endl;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     vector<string> args = parse_args(argc, argv);
     if(args.empty()) return 1;
-    
+
     string host, username, password, sport, address, mode;
     username = args[0]; password = args[1]; host = args[2]; sport = args[3]; mode = args[5];
 

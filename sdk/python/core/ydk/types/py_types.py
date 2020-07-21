@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 """ py_types.py
 
@@ -45,8 +50,8 @@ from ydk.ext.types import Decimal64 # Do not remove. Used in eval()
 from ydk.ext.types import Entity as _Entity
 from ydk.ext.types import LeafDataList
 
-from ydk.filters import YFilter as _YFilter
-from ydk.errors import YModelError as _YModelError
+from ydk.filters import YFilter
+from ydk.errors import YModelError, YError
 from ydk.errors import YInvalidArgumentError
 from ydk.errors.error_handler import handle_type_error as _handle_type_error
 
@@ -77,7 +82,7 @@ class YLeafList(_YLeafList):
 
     def set(self, other):
         if not isinstance(other, YLeafList):
-            raise _YModelError("Invalid value '{}' in '{}'".format(other, self.leaf_name))
+            raise YModelError("Invalid value '{}' assigned to YLeafList '{}'".format(other, self.leaf_name))
         else:
             if sys.version_info > (3,):
                 super().clear()
@@ -116,7 +121,7 @@ class Entity(_Entity):
         self._is_frozen = False
         self.parent = None
         self.ylist_key = None
-        self.logger = logging.getLogger("ydk.types.Entity")
+        self._logger = logging.getLogger("ydk.types.Entity")
         self._local_refs = {}
         self._children_name_map = OrderedDict()
         self._children_yang_names = set()
@@ -188,11 +193,11 @@ class Entity(_Entity):
             return child
 
         found = False
-        self.logger.debug("Looking for '%s'" % child_yang_name)
+        self._logger.debug("Looking for '%s'" % child_yang_name)
         if child_yang_name in self._child_classes:
             found = True
         else:
-            self.logger.debug("Could not find child '%s' in '%s'" % (child_yang_name, self._child_classes))
+            self._logger.debug("Could not find child '%s' in '%s'" % (child_yang_name, self._child_classes))
         if found:
             attr, clazz = self._child_classes[child_yang_name]
             is_list = isinstance(getattr(self, attr), YList)
@@ -215,7 +220,7 @@ class Entity(_Entity):
             return True
 
         for name, value in vars(self).items():
-            if isinstance(value, _YFilter):
+            if isinstance(value, YFilter):
                 return True
             if name in self._leafs:
                 leaf = _get_leaf_object(self._leafs[name])
@@ -228,8 +233,8 @@ class Entity(_Entity):
             if isinstance(value, Entity) and value.has_data():
                 return True
             elif isinstance(value, YList):
-                for l in value:
-                    if l.has_data():
+                for v in value:
+                    if v.has_data():
                         return True
         return False
 
@@ -241,23 +246,18 @@ class Entity(_Entity):
             if value is not None:
                 if name in self._leafs:
                     leaf = _get_leaf_object(self._leafs[name])
-                    isYLeaf = isinstance(leaf, _YLeaf)
-                    isYLeafList = isinstance(leaf, _YLeafList)
-                    isBits = isinstance(value, Bits)
-
-                    if isinstance(value, _YFilter):
+                    if isinstance(value, YFilter):
                         return True
-                    if isYLeaf and (not isBits or len(value.get_bitmap()) > 0):
+                    if isinstance(leaf, _YLeaf) and (not isinstance(value, Bits) or len(value.get_bitmap()) > 0):
                         return True
-                    if isYLeafList and len(value) > 0:
+                    if isinstance(leaf, _YLeafList) and len(value) > 0:
                         return True
                 elif isinstance(value, Entity):
                     if is_set(value.yfilter) or value.has_operation():
                         return True
                 elif isinstance(value, YList):
                     for v in value:
-                        isEntity = isinstance(v, Entity)
-                        if isEntity and (is_set(v.yfilter) or v.has_operation()):
+                        if isinstance(v, Entity) and (is_set(v.yfilter) or v.has_operation()):
                             return True
         return False
 
@@ -291,8 +291,8 @@ class Entity(_Entity):
             value = self.__dict__[name]
             leaf = _get_leaf_object(self._leafs[name])
 
-            if isinstance(value, _YFilter):
-                self.logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
+            if isinstance(value, YFilter):
+                self._logger.debug('YFilter assigned to "%s", "%s"' % (name, value))
                 leaf.yfilter = value
                 if isinstance(leaf, _YLeaf):
                     leaf_name_data.append(leaf.get_name_leafdata())
@@ -311,16 +311,16 @@ class Entity(_Entity):
                 #     No resolvents found for leafref "../config/id"..
                 #     Path: /ydktest-sanity:runner/one-list/identity-list/id-ref
                 for item in value:
-                    _validate_value(self._leafs[name], name, item, self.logger)
+                    _validate_value(self._leafs[name], name, item, self._logger)
                     leaf_list.append(item)
                 leaf_name_data.extend(leaf_list.get_name_leafdata())
-        self.logger.debug('Get name leaf data for "%s". Count: %s' % (self.yang_name, len(leaf_name_data)))
-        for l in leaf_name_data:
-            leaf_value = l[1].value
+        self._logger.debug('Get name leaf data for "%s". Count: %s' % (self.yang_name, len(leaf_name_data)))
+        for leaf in leaf_name_data:
+            leaf_value = leaf[1].value
             if "'" in leaf_value:
                 leaf_value.replace("'", "\'")
-            self.logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' %
-                              (l[0], leaf_value, l[1].yfilter, l[1].is_set))
+            self._logger.debug('Leaf data name: "%s", value: "%s", yfilter: "%s", is_set: "%s"' %
+                               (leaf[0], leaf_value, leaf[1].yfilter, leaf[1].is_set))
         return leaf_name_data
 
     def get_segment_path(self):
@@ -379,30 +379,30 @@ class Entity(_Entity):
             if name != 'yfilter' and name != 'parent' and name != 'ignore_validation' \
                                  and hasattr(self, '_is_frozen') and self._is_frozen \
                                  and name not in self.__dict__:
-                raise _YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".
-                                   format(name, self.__class__.__name__))
+                raise YModelError("Attempt to assign unknown attribute '{0}' to '{1}'.".
+                                  format(name, self.__class__.__name__))
             if name in self.__dict__ and isinstance(self.__dict__[name], YList):
-                raise _YModelError("Attempt to assign value of '{}' to YList ldata. "
-                                   "Please use list append or extend method."
-                                   .format(value))
+                raise YModelError("Attempt to assign value of '{}' to YList ldata. "
+                                  "Please use list append or extend method."
+                                  .format(value))
             if name in leaf_names and name in self.__dict__:
                 if self._python_type_validation_enabled:
-                    _validate_value(self._leafs[name], name, value, self.logger)
+                    _validate_value(self._leafs[name], name, value, self._logger)
                 leaf = _get_leaf_object(self._leafs[name])
                 prev_value = self.__dict__[name]
                 self.__dict__[name] = value
 
-                if not isinstance(value, _YFilter):
+                if not isinstance(value, YFilter):
                     if isinstance(leaf, _YLeaf):
                         leaf.set(value)
                     elif isinstance(leaf, _YLeafList):
                         for item in value:
                             leaf.append(item)
                 else:
-                    self.logger.debug('Setting "%s" to "%s"' % (value, name))
+                    self._logger.debug('Setting "%s" to "%s"' % (value, name))
                     leaf.yfilter = value
                     if prev_value is not None:
-                        self.logger.debug('Storing previous value "%s" to "%s"' % (prev_value, name))
+                        self._logger.debug('Storing previous value "%s" to "%s"' % (prev_value, name))
                         if isinstance(leaf, _YLeaf):
                             leaf.set(prev_value)
                         elif isinstance(leaf, _YLeafList):
@@ -437,6 +437,52 @@ class Entity(_Entity):
     def __str__(self):
         return "{}.{}".format(self.__class__.__module__, self.__class__.__name__)
 
+    def clone(self):
+        cloned_entity = self.__class__()
+        _copy_leaves(self, cloned_entity)
+        _copy_children(self, cloned_entity)
+        return cloned_entity
+
+
+def _copy_leaves(original_entity, cloned_entity):
+    logger = logging.getLogger("ydk.types.Entity")
+    for name_value in original_entity.get_name_leaf_data():
+        leaf_name = name_value[0]
+        leaf_value = name_value[1].value
+        logger.debug("Creating leaf '%s' in entity '%s' with value '%s'" %
+                     (leaf_name, original_entity.yang_name, leaf_value))
+        if '[.="' in leaf_name:
+            # Here we have leaf-list
+            split_strs = leaf_name.split('[.="')
+            leaf_name = split_strs[0]
+            leaf_value = split_strs[1].split('"]')[0]
+        cloned_entity.set_value(leaf_name, leaf_value,
+                                name_value[1].name_space, name_value[1].name_space_prefix)
+
+
+def _copy_children(original_entity, cloned_entity):
+    logger = logging.getLogger("ydk.types.Entity")
+    for _, child in original_entity.get_children().items():
+        logger.debug("==================")
+        child_path = child.get_segment_path()
+        logger.debug("Looking at child entity '%s' in parent '%s'" % (child_path, original_entity.yang_name))
+        if child.has_data():
+            child_name = child_path.split('[')[0]
+            child_entity = cloned_entity.get_child_by_name(child_name, child_path)
+            if child_entity:
+                logger.debug("Created child entity '%s' in parent '%s'" %
+                             (child_entity.get_segment_path(), cloned_entity.yang_name))
+            else:
+                logger.error("Could not fetch child entity '%s' in parent '%s'!" %
+                             (child_name, cloned_entity.yang_name))
+                raise YError("Could not fetch child entity '%s' in parent '%s'!" %
+                             (child_name, cloned_entity.yang_name))
+            child_entity.parent = cloned_entity
+            _copy_leaves(child, child_entity)
+            _copy_children(child, child_entity)
+        else:
+            logger.debug("Child has no data")
+
 
 def entity_to_dict(entity):
     edict = {}
@@ -445,9 +491,9 @@ def entity_to_dict(entity):
             abs_path.endswith(']'):
         edict[abs_path] = ''
     leaf_name_data = entity.get_name_leaf_data()
-    for l in leaf_name_data:
-        leaf_name = l[0]
-        leaf_value = l[1].value
+    for leaf in leaf_name_data:
+        leaf_name = leaf[0]
+        leaf_value = leaf[1].value
         if leaf_name not in entity.ylist_key_names:
             edict["%s/%s" % (abs_path, leaf_name)] = leaf_value
     for _, child in entity.get_children().items():
@@ -499,8 +545,8 @@ def path_to_entity(entity, abs_path):
 
     if top_abs_path in abs_path:
         leaf_name_data = entity.get_name_leaf_data()
-        for l in leaf_name_data:
-            leaf_name = l[0]
+        for leaf in leaf_name_data:
+            leaf_name = leaf[0]
             if leaf_name not in entity.ylist_key_names:
                 leaf_path = "%s/%s" % (top_abs_path, leaf_name)
                 if leaf_path == abs_path:
@@ -525,7 +571,7 @@ class EntityCollection(object):
     Each Entity instance has unique segment path value, which is used as a key in the dictionary.
     """
     def __init__(self, *entities):
-        self.logger = logging.getLogger("ydk.types.EntityCollection")
+        self._logger = logging.getLogger("ydk.types.EntityCollection")
         self._entity_map = OrderedDict()
         for entity in entities:
             self.append(entity)
@@ -551,7 +597,7 @@ class EntityCollection(object):
           - list of Entity class instances
         """
         if entities is None:
-            self.logger.debug("Cannot add None object to the EntityCollection")
+            self._logger.debug("Cannot add None object to the EntityCollection")
         elif isinstance(entities, Entity):
             key = self._key(entities)
             self._entity_map[key] = entities
@@ -561,7 +607,7 @@ class EntityCollection(object):
                     key = self._key(entity)
                     self._entity_map[key] = entity
                 elif entity is None:
-                    self.logger.debug("Cannot add None object to the EntityCollection")
+                    self._logger.debug("Cannot add None object to the EntityCollection")
                 else:
                     msg = "Argument %s is not supported by EntityCollection class; data ignored" % type(entity)
                     self._log_error_and_raise_exception(msg, YInvalidArgumentError)
@@ -570,7 +616,7 @@ class EntityCollection(object):
             self._log_error_and_raise_exception(msg, YInvalidArgumentError)
 
     def _log_error_and_raise_exception(self, msg, exception_class):
-        self.logger.error(msg)
+        self._logger.error(msg)
         raise exception_class(msg)
 
     def entities(self):
@@ -695,7 +741,7 @@ class YList(EntityCollection):
         self._cache_dict = OrderedDict()
 
     def __setattr__(self, name, value):
-        if name == 'yfilter' and isinstance(value, _YFilter):
+        if name == 'yfilter' and isinstance(value, YFilter):
             for e in self:
                 e.yfilter = value
         if sys.version_info > (3,):
@@ -821,13 +867,14 @@ def _get_decoded_value_object(leaf_tuple, entity, value):
         else:
             value_object = _decode_other_type_value_object(typ, value)
         if value_object is not None:
-            return value_object
+            break
+    return value_object
 
 
 def _validate_value(leaf_tuple, name, value, logger):
     if not isinstance(leaf_tuple, tuple):
         return
-    if isinstance(value, _YFilter):
+    if isinstance(value, YFilter):
         return
     typs = leaf_tuple[1]
     for typ in typs:
@@ -844,7 +891,7 @@ def _validate_value(leaf_tuple, name, value, logger):
                                                                                          type(value).__name__,
                                                                                          _get_types_string(typs))
     logger.error(err_msg)
-    raise _YModelError(err_msg)
+    raise YModelError(err_msg)
 
 
 def _get_types_string(typs):
@@ -888,7 +935,7 @@ def _decode_identity_value_object(entity, value):
 
 def _get_enum_class(module_name, class_name, nested_class_name):
     mod = importlib.import_module(module_name)
-    clazz_name = '%s%s' % (class_name, '' if len(nested_class_name) == 0 else '.%s' % (nested_class_name))
+    clazz_name = '%s%s' % (class_name, '' if len(nested_class_name) == 0 else '.%s' % nested_class_name)
     enum_clazz = None
     for c in clazz_name.split('.'):
         if enum_clazz is None:

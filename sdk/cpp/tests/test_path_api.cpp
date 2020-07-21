@@ -1,25 +1,24 @@
-/// YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
-//
-////////////////////////////////////////////////////////////////
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-//
-//////////////////////////////////////////////////////////////////
+/* ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems, All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -626,7 +625,7 @@ TEST_CASE( "decode_encode_interfaces_with_filters" )
     auto ifc = make_shared<ydktest::openconfig_interfaces::Interfaces::Interface>();
     ifc->name = "Loopback10";
     ifc->config->name = "Loopback10";
-    ifc->config->description.yfilter = ydk::YFilter::read;
+    ifc->config->description = ydk::YFilter::read;
     ifc->config->yfilter = ydk::YFilter::read;
     ifcs.interface.append(ifc);
 
@@ -656,7 +655,7 @@ const std::string ifc_payload = R"(<interfaces xmlns="http://openconfig.net/yang
 TEST_CASE("iana_if_type_decode")
 {
     // Remove iana-if-type.yang file from repository to assure correct test flow
-	if (const char* env_p = std::getenv("HOME")) {
+    if (const char* env_p = std::getenv("HOME")) {
         string path = env_p;
         path += "/.ydk/127.0.0.1/iana-if-type.yang";
         cout << "Deleting file " << path << endl;
@@ -680,6 +679,64 @@ TEST_CASE("iana_if_type_decode")
     REQUIRE(xml == ifc_payload);
 }
 
+TEST_CASE("xml_decode_encode_no_provider")
+{
+    // Build capabilities and lookup table for correct mapping of namespace to model name
+    // This can be skipped for JSON encoding as model names appear in the JSON payload
+    std::unordered_map<std::string, ydk::path::Capability> test_lookup {
+        {"http://openconfig.net/yang/interfaces", {"openconfig-interfaces", ""}}
+    };
+    std::vector<ydk::path::Capability> test_caps {
+        {"openconfig-interfaces", ""}
+    };
+    ydk::path::Repository repo{TEST_HOME};
+    auto root = repo.create_root_schema(test_lookup, test_caps);
+    ydk::path::Codec codec{};
+
+    auto root_data_node = codec.decode(*root, ifc_payload, ydk::EncodingFormat::XML);
+    REQUIRE(root_data_node != nullptr);
+
+    auto ifcs_data_node = root_data_node->get_children()[0];
+    auto xml = codec.encode( *ifcs_data_node, ydk::EncodingFormat::XML, true);
+    auto pos = xml.find("ianaift");
+    while (pos != std::string::npos) {
+        xml = xml.replace(pos, 7, "idx");
+        pos = xml.find("ianaift");
+    }
+    REQUIRE(xml == ifc_payload);
+}
+
+TEST_CASE("json_decode_encode_no_provider")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    std::vector<ydk::path::Capability> empty_caps{};
+    auto root = repo.create_root_schema(empty_caps);
+    ydk::path::Codec codec{};
+
+    string json_ifc_payload = R"({
+  "openconfig-interfaces:interfaces": {
+    "interface": [
+      {
+        "name": "Loopback0",
+        "config": {
+          "name": "Loopback0",
+          "description": "Lo0 interface description",
+          "mtu": 1500,
+          "type": "iana-if-type:ethernetCsmacd"
+        }
+      }
+    ]
+  }
+}
+)";
+    auto root_data_node = codec.decode(*root, json_ifc_payload, ydk::EncodingFormat::JSON);
+    REQUIRE(root_data_node != nullptr);
+
+    auto ifcs_data_node = root_data_node->get_children()[0];
+    auto json = codec.encode( *ifcs_data_node, ydk::EncodingFormat::JSON, true);
+    REQUIRE(json == json_ifc_payload);
+}
+
 TEST_CASE( "rpc_get_schema_no_decode" )
 {
     ydk::path::Repository repo{};
@@ -693,4 +750,18 @@ TEST_CASE( "rpc_get_schema_no_decode" )
     auto reply = session.execute_netconf_operation(*rpc);
     REQUIRE(!reply.empty());
     //cout << reply << endl;
+}
+
+TEST_CASE( "test_create_datanode" )
+{
+    auto repo = ydk::path::Repository{TEST_HOME};
+    std::vector<ydk::path::Capability> empty_caps;
+    auto root_schema = repo.create_root_schema(empty_caps);
+
+    std::string datanode_path = "/ydktest-sanity:runner/two-key-list[first='first-key'][second='2']/property";
+    std::string datanode_value = "TWO-KEY-LIST PROPERTY";
+    auto & datanode = root_schema->create_datanode(datanode_path, datanode_value);
+
+    REQUIRE(datanode_path == datanode.get_path());
+    REQUIRE(datanode_value == datanode.get_value());
 }

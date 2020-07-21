@@ -218,6 +218,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             prop: The property
             property_type : The type under consideration
             type_stmt : The type stmt currently under consideration
+            language (str): One of 'python', 'cpp', or 'go'
+            identity_subclasses (list): List of all collected identity class instances
     """
     clazz = prop.owner
     meta_info_data = MetaInfoData(prop)
@@ -409,7 +411,8 @@ def get_meta_info_data(prop, property_type, type_stmt, language, identity_subcla
             raise EmitError('Illegal path')
 
     if default_value is not None:
-        meta_info_data.default_value_object = get_default_value_object(meta_info_data.ptype, property_type,                                                                   meta_info_data.clazz_name, default_value.arg,
+        meta_info_data.default_value_object = get_default_value_object(meta_info_data.ptype, property_type,
+                                                                       meta_info_data.clazz_name, default_value.arg,
                                                                        identity_subclasses)
     return meta_info_data
 
@@ -447,7 +450,8 @@ def _get_identity_docstring(identity_subclasses, property_type, language):
 
 
 def get_length_limits(length_type):
-    assert isinstance(length_type, LengthTypeSpec)
+    if not isinstance(length_type, LengthTypeSpec):
+        raise AssertionError
     prange = []
     for m_min, m_max in length_type.lengths:
         pmin = None
@@ -525,7 +529,7 @@ def get_range_base_type_spec(range_type):
 
 
 def get_primitive_type_tag(typ, language):
-    TYPE_TAG_MAP = {
+    type_tag_map = {
         ('py', 'int'): 'int',
         ('py', 'str'): 'str',
         ('py', 'bool'): 'bool',
@@ -551,14 +555,14 @@ def get_primitive_type_tag(typ, language):
         ('go', 'Identity'): ':go:struct:`Identity<Ydk_Identity>`',
     }
     try:
-        return TYPE_TAG_MAP[(language, typ)]
+        return type_tag_map[(language, typ)]
     except KeyError:
         raise EmitError("Invalid language, type combination for rst documentation\n"
                         "language = %s, type = %s" % (language, typ))
 
 
 def get_tag_template(language, domain, crossref):
-    TEMPLATES = {
+    templates = {
         ('py', 'class', False): '.. py:class:: %s\n',
         ('py', 'class', True): ' :py:class:`%s <%s.%s>`',
         ('py', 'module', False): '.. py:module:: %s.%s\n',
@@ -573,7 +577,7 @@ def get_tag_template(language, domain, crossref):
         ('go', 'currentmodule', False): '.. go:package:: %s\n',
     }
     try:
-        return TEMPLATES[(language, domain, crossref)]
+        return templates[(language, domain, crossref)]
     except KeyError:
         raise EmitError("Invalid language, domain, crossref combination for"
                         "rst documentation\n"
@@ -593,6 +597,7 @@ def _get_list_tag(language, mtype):
     else:
         raise Exception('Language {0} not yet supported'.format(language))
 
+
 def _get_list_doc_link_tag(meta_info_data, attribute, language, mtype):
     template = '%s %%s' % _get_list_tag(language, mtype)
     return template % (getattr(meta_info_data, attribute))
@@ -608,12 +613,13 @@ def get_module_tag(named_element, language):
     template = get_tag_template(language, 'module', False)
     if language == 'py':
         return template % (named_element.get_py_mod_name(),
-            named_element.name)
+                           named_element.name)
     elif language == 'go':
         return template % (named_element.get_py_mod_name().replace('.', '/'),
-            named_element.name)
+                           named_element.name)
     else:
         raise Exception('Language {0} not yet supported'.format(language))
+
 
 def get_currentmodule_tag(named_element, language):
     template = get_tag_template(language, 'currentmodule', False)
@@ -643,12 +649,12 @@ def get_class_crossref_tag(name, named_element, language):
     if language == 'py':
         template = get_tag_template('py', 'class', True)
         return template % (name,
-            named_element.get_py_mod_name(),
-            named_element.qn())
+                           named_element.get_py_mod_name(),
+                           named_element.qn())
     elif language == 'cpp':
         template = get_tag_template('cpp', 'class', True)
         return template % (name,
-            named_element.fully_qualified_cpp_name())
+                           named_element.fully_qualified_cpp_name())
     elif language == 'go':
         template = get_tag_template('go', 'class', True)
         link = '%s/%s' % (named_element.get_py_mod_name().replace('.', '/'),
@@ -713,6 +719,7 @@ def get_class_bases(clazz, language):
         for item in clazz.extends:
             bases.append(get_class_crossref_tag(item.name, item, language))
     return bases
+
 
 def get_default_value_object(ptype, property_type, clazz_name, default_value, identity_subclasses):
     default_value_object = ''

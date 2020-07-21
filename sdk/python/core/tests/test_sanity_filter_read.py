@@ -14,10 +14,10 @@
 # limitations under the License.
 # ------------------------------------------------------------------
 
-"""test_sanity_fitler_read.py
+"""
+test_sanity_fitler_read.py
 read API according to discussion
 """
-from __future__ import absolute_import
 
 import sys
 import unittest
@@ -108,7 +108,6 @@ class SanityYang(unittest.TestCase):
         l3.number, l3.value = 3, "three"
         a.lst.extend([l1, l2, l3])
         return a
-
 
     def test_CASE1(self):
         """Use crud read with top level entity returns all data."""

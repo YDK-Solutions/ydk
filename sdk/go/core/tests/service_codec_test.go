@@ -458,7 +458,7 @@ func (suite *CodecTestSuite) TestXMLEncodeDecodeMultiple() {
 
 	config := types.NewConfig(&runnerConfig, &nativeConfig)
 
-	suite.Provider.Encoding = encoding.XML	
+	suite.Provider.Encoding = encoding.XML
 	payload := suite.Codec.Encode(&suite.Provider, &config)
 
 	entity := suite.Codec.Decode(&suite.Provider, payload)
@@ -483,7 +483,7 @@ func (suite *CodecTestSuite) TestPassiveInterfaceCodec() {
 	runner.One.Ospf = append(runner.One.Ospf, &ospf)
 	suite.Provider.Encoding = encoding.XML
 	payload := suite.Codec.Encode(&suite.Provider, &runner)
-	suite.Equal(payload, 
+	suite.Equal(payload,
 `<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
   <one>
     <ospf xmlns="http://cisco.com/ns/yang/ydktest-sanity-augm">
@@ -531,7 +531,7 @@ func (suite *CodecTestSuite) TestOneKeyList() {
 		suite.NotNil(entity)
 		ydk.YLogDebug(fmt.Sprintf("For key: %v, Found Entity: %v", key, types.EntityToString(entity)))
 	}
-	
+
 	// Remove element from the ylist
 	i, rdata := ylist.Get(runner.TwoList.Ldata, 22)
 	suite.Equal(i, 1)
@@ -559,6 +559,17 @@ func (suite *CodecTestSuite) TestListNoKeys() {
 	suite.Equal(types.EntityEqual(&runner, runnerDecode), true)
 }
 
+func (suite *CodecTestSuite) TestLeafList() {
+	runner := ysanity.Runner{}
+	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
+	runner.Ytypes.BuiltInT.EnumLlist = append(runner.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_remote)
+
+	payload := suite.Codec.Encode(&suite.Provider, &runner)
+	fmt.Printf("%s\n", payload)
+	runnerDecode := suite.Codec.Decode(&suite.Provider, payload)
+	suite.True(types.EntityEqual(&runner, runnerDecode))
+}
+
 func (suite *CodecTestSuite) TestNative() {
 	// Build loopback configuration
 	address := ysanity.Native_Interface_Loopback_Ipv4_Address{}
@@ -571,12 +582,13 @@ func (suite *CodecTestSuite) TestNative() {
 
 	native := ysanity.Native{}
         native.Interface.Loopback = append(native.Interface.Loopback, &loopback)
-	
+
 	suite.Provider.Encoding = encoding.JSON
 	payload := suite.Codec.Encode(&suite.Provider, &native)
 	fmt.Printf("%s\n", payload)
 	runnerDecode := suite.Codec.Decode(&suite.Provider, payload)
-	suite.Equal(types.EntityEqual(&native, runnerDecode), true)}
+	suite.Equal(types.EntityEqual(&native, runnerDecode), true)
+}
 
 func TestCodecTestSuite(t *testing.T) {
 	if testing.Verbose() {

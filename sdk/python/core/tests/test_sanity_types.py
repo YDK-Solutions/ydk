@@ -13,8 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
-
-from __future__ import absolute_import
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 import sys
 import unittest
@@ -287,6 +290,22 @@ class SanityTest(unittest.TestCase):
         # Compare runners
         self.assertEqual(runner, runner1)
         self.assertEqual(runner.ytypes.built_in_t.enum_value, runner1.ytypes.built_in_t.enum_value)
+
+    def test_enum_list(self):
+        runner = Runner()
+        el1 = Runner.EnumList()
+        el1.key_name = YdkEnumTest.local
+        el2 = Runner.EnumList()
+        el2.key_name = YdkEnumTest.remote
+        runner.enum_list.extend([el1, el2])
+        print(runner.enum_list.keys())
+        self.crud.create(self.ncc, runner)
+
+        # Read into Runner1
+        runner1 = self.crud.read(self.ncc, Runner())
+
+        # Compare runners
+        self.assertEqual(runner, runner1)
 
     def test_union(self):
         runner = Runner()

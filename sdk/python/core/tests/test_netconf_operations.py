@@ -32,7 +32,7 @@ from test_utils import assert_with_error
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
 
-netconf_default_error_pattern = "RPC error occurred; check log file for details"
+netconf_default_error_pattern = "RPC error occurred; check log for details"
 
 # test_create_pattern = """<\?xml version="1.0" encoding="UTF-8"\?>
 # <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="[0-9]+">
@@ -226,6 +226,30 @@ class SanityTest(unittest.TestCase):
 
         # DELETE AGAIN WITH ERROR
         self.crud.update(self.ncc, runner)
+
+    def test_create_gre_tunnel_on_demand(self):
+        #enable_logging(logging.ERROR)
+        try:
+            from ydk.models.ydktest.ydktest_sanity import Native
+        except ImportError:
+            # bundle is generated with 'one_class_per_module' flag
+            from ydk.models.ydktest.ydktest_sanity.native.native import Native
+
+        native = Native()
+
+        tunnel = native.interface.Tunnel()
+        tunnel.name = 521
+        tunnel.description = "test tunnel"
+
+        # Configure protocol-over-protocol tunneling
+        tunnel.tunnel.source = "1.2.3.4"
+        tunnel.tunnel.destination = "4.3.2.1"
+        tunnel.tunnel.bandwidth.receive = 100000
+        tunnel.tunnel.bandwidth.transmit = 100000
+
+        native.interface.tunnel.append(tunnel)
+
+        self.crud.create(self.ncc, native)
 
 
 if __name__ == '__main__':

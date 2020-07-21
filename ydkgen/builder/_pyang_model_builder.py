@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 import logging
 import os
@@ -260,5 +265,4 @@ class PyangModelBuilder(object):
 
         if len(error_messages) > 0:
             err_msg = '\n'.join(error_messages)
-            raise YdkGenException('''\nError occured: "%s". \nThe models supplied to the YDK generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the YDK bindings for.'''%err_msg)
-
+            raise YdkGenException('''\nError occured: "%s". \nThe models supplied to the YDK generator are invalid. Please make sure the models are valid by compiling the models together using pyang. Please run "pyang *.yang" in the models directory, make sure there are no errors and then try running the generator again. If there are model errors, please fix the errors by editing the model, contacting the model owner or deleting the model from the list of models to generate the YDK bindings for.''' % err_msg)

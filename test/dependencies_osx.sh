@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 #
 # dependencies_osx.sh
 # Script for running ydk CI on docker via travis-ci.org
@@ -56,20 +61,30 @@ function install_libssh {
 }
 
 function install_confd {
+  if [[ ! -s $HOME/confd/bin/confd ]]; then
     print_msg "Installing confd"
-
     wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
     unzip confd-basic-6.2.darwin.x86_64.zip
-    ./confd-basic-6.2.darwin.x86_64.installer.bin ../confd
-}
-
-function install_fpm {
-    print_msg "Installing fpm"
-    brew install gnu-tar > /dev/null
-    gem install --no-ri --no-rdoc fpm
+    ./confd-basic-6.2.darwin.x86_64.installer.bin $HOME/confd
+    rm -f confd-basic-6.2.* ConfD*
+  fi
 }
 
 function install_golang {
+  go_exec=$(which go)
+  if [[ -z ${go_exec} && -d /usr/local/go ]]; then
+    go_exec=/usr/local/go/bin/go
+  fi
+  if [[ -x ${go_exec} ]]
+  then
+    go_version=$(echo `${go_exec} version` | awk '{ print $3 }' | cut -d 'o' -f 2)
+    print_msg "Current Go version is $go_version"
+    minor=$(echo $go_version | cut -d '.' -f 2)
+  else
+    print_msg "The Go is not installed"
+    minor=0
+  fi
+  if (( $minor < 9 )); then
     print_msg "Installing Go1.9.2"
     bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
     source /Users/travis/.gvm/scripts/gvm
@@ -83,12 +98,10 @@ function install_golang {
     print_msg "GOPATH: $GOPATH"
     print_msg "GO version: $(go version)"
     print_msg " "
+  fi
 }
 
 function check_python_installation {
-  print_msg "Checking python libraries location"
-  locate libpython2.7.dylib
-
   print_msg "Checking python and pip installation"
   python3 -V
   status=$?
@@ -112,11 +125,11 @@ NOCOLOR='\033[0m'
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
+brew install curl doxygen xml2
+brew install pybind11 valgrind
+
 install_libssh
 install_confd
-#install_golang
+install_golang
 
-brew install pybind11 valgrind
 check_python_installation
-
-#install_fpm

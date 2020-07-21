@@ -1,25 +1,24 @@
-/// YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
-//
-////////////////////////////////////////////////////////////////
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-//
-//////////////////////////////////////////////////////////////////
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
 
 #include <iostream>
 #include <string>
@@ -98,8 +97,8 @@ bool result = crud.delete_(provider, *r_1);
 REQUIRE(result);
 
 auto ld = make_shared<ydktest_sanity::Runner::OneList::Ldata>();
-ld->name="xyz";
-ld->number.yfilter = YFilter::delete_;
+ld->name = "xyz";
+ld->number = YFilter::delete_;
 r_1->one_list->ldata.append(ld);
 
 auto s = codec.encode(*r_1, session.get_root_schema());
@@ -122,7 +121,7 @@ const path::Session& session = provider.get_session();
 
 XmlSubtreeCodec codec{};
 auto r_1 = make_shared<ydktest_sanity::Runner>();
-r_1->ytypes->built_in_t->number16.yfilter = YFilter::read;
+r_1->ytypes->built_in_t->number16 = YFilter::read;
 
 auto s = codec.encode(*r_1, session.get_root_schema());
 REQUIRE(s == R"(<runner xmlns="http://cisco.com/ns/yang/ydktest-sanity">
@@ -366,4 +365,52 @@ TEST_CASE("xml_codec_augment_presence")
     auto runner = xml_codec.decode(xmlC, make_shared<ydktest_sanity::Runner>());
     auto xml_runner = xml_codec.encode(*runner, session.get_root_schema());
     REQUIRE(xmlX == xml_runner);
+}
+
+static void config_bgp(openconfig_bgp::Bgp & bgp)
+{
+    bgp.global->config->as = 65172;
+    bgp.global->config->router_id = "1.2.3.4";
+
+    auto neighbor = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    neighbor->neighbor_address = "6.7.8.9";
+    neighbor->config->neighbor_address = "6.7.8.9";
+    neighbor->config->peer_as = 65001;
+    neighbor->config->local_as = 65001;
+    neighbor->config->peer_group = "IBGP";
+    bgp.neighbors->neighbor.append(neighbor);
+}
+
+TEST_CASE( "xml_codec_on_user_bundle" )
+{
+    auto repo = path::Repository{TEST_HOME};
+    std::vector<path::Capability> empty_caps;
+    auto root = repo.create_root_schema(empty_caps);
+
+    auto bgp = openconfig_bgp::Bgp{};
+    config_bgp(bgp);
+
+    XmlSubtreeCodec xml_codec{};
+    auto xml_bgp_config = xml_codec.encode(bgp, *root);
+
+    auto expected = R"(<bgp xmlns="http://openconfig.net/yang/bgp">
+  <global>
+    <config>
+      <as>65172</as>
+      <router-id>1.2.3.4</router-id>
+    </config>
+  </global>
+  <neighbors>
+    <neighbor>
+      <neighbor-address>6.7.8.9</neighbor-address>
+      <config>
+        <peer-group>IBGP</peer-group>
+        <neighbor-address>6.7.8.9</neighbor-address>
+        <peer-as>65001</peer-as>
+        <local-as>65001</local-as>
+      </config>
+    </neighbor>
+  </neighbors>
+</bgp>)";
+    REQUIRE(expected == xml_bgp_config);
 }

@@ -1,5 +1,6 @@
-/*  ----------------------------------------------------------------
- Copyright 2016 Cisco Systems
+/* ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems, All rights reserved.
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -12,6 +13,11 @@
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
  ------------------------------------------------------------------*/
 
 #include <string.h>
@@ -201,8 +207,8 @@ TEST_CASE("read_leaves")
     REQUIRE(reply);
 
     auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
-    bgp_filter->global->config->as.yfilter = YFilter::read;
-    bgp_filter->global->config->router_id.yfilter = YFilter::read;
+    bgp_filter->global->config->as = YFilter::read;
+    bgp_filter->global->config->router_id = YFilter::read;
 
     auto bgp_read = crud.read(provider, *bgp_filter);
     REQUIRE(bgp_read!=nullptr);
@@ -229,11 +235,65 @@ TEST_CASE("read_leaf")
     bgp_cfg->global->config->as = 65001;
 
     auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
-    bgp_filter->global->config->as.yfilter = YFilter::read;
+    bgp_filter->global->config->as = YFilter::read;
 
     auto bgp_read = crud.read(provider, *bgp_filter);
     REQUIRE(bgp_read!=nullptr);
     REQUIRE(*(bgp_read) == *(bgp_cfg));
+}
+
+TEST_CASE("bgp_read_container")
+{
+    ydk::path::Repository repo{TEST_HOME};
+    NetconfServiceProvider provider{repo, "127.0.0.1", "admin", "admin", 12022};
+    CrudService crud{};
+    auto bgp_set = make_unique<openconfig_bgp::Bgp>();
+    bool reply = crud.delete_(provider, *bgp_set);
+    REQUIRE(reply);
+
+    bgp_set->global->config->as = 65001;
+    bgp_set->global->config->router_id = "1.2.3.4";
+    auto d = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    d->neighbor_address = "1.2.3.4";
+    d->config->neighbor_address = "1.2.3.4";
+    bgp_set->neighbors->neighbor.append(d);
+
+    auto q = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    q->neighbor_address = "1.2.3.5";
+    q->config->neighbor_address = "1.2.3.5";
+    bgp_set->neighbors->neighbor.append(q);
+    reply = crud.create(provider, *bgp_set);
+    REQUIRE(reply);
+
+    auto bgp_filter = make_unique<openconfig_bgp::Bgp>();
+    bgp_filter->global->yfilter = YFilter::read;
+    auto bgp_read = crud.read_config(provider, *(bgp_filter));
+    REQUIRE(bgp_read!=nullptr);
+    openconfig_bgp::Bgp * bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
+    REQUIRE(bgp_read_ptr->neighbors->neighbor.len() == 0);
+    REQUIRE(bgp_read_ptr->global->config->as.value == "65001");
+
+    bgp_filter = make_unique<openconfig_bgp::Bgp>();
+    bgp_filter->neighbors->yfilter = YFilter::read;
+    bgp_read = crud.read_config(provider, *(bgp_filter));
+    REQUIRE(bgp_read!=nullptr);
+    bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
+    REQUIRE(bgp_read_ptr->neighbors->neighbor.len() == 2);
+    REQUIRE(!bgp_read_ptr->global->has_data());
+
+    bgp_filter->neighbors->yfilter = YFilter::not_set;
+    auto z = make_shared<openconfig_bgp::Bgp::Neighbors::Neighbor>();
+    z->neighbor_address = "1.2.3.4";
+    bgp_filter->neighbors->neighbor.append(z);
+    bgp_read = crud.read_config(provider, *(bgp_filter));
+    REQUIRE(bgp_read!=nullptr);
+    bgp_read_ptr = dynamic_cast<openconfig_bgp::Bgp*>(bgp_read.get());
+    REQUIRE(bgp_read_ptr->neighbors->neighbor.len() == 1);
+    REQUIRE(*bgp_read_ptr->neighbors->neighbor["1.2.3.4"] == *d);
+
+    bgp_set = make_unique<openconfig_bgp::Bgp>();
+    reply = crud.delete_(provider, *bgp_set);
+    REQUIRE(reply);
 }
 
 TEST_CASE("bgp_read_non_top")

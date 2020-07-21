@@ -1,25 +1,24 @@
-/// YANG Development Kit
-// Copyright 2016 Cisco Systems. All rights reserved
-//
-////////////////////////////////////////////////////////////////
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-//
-//////////////////////////////////////////////////////////////////
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
 
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -29,7 +28,7 @@
 #include <ydk/gnmi_provider.hpp>
 #include <ydk/filters.hpp>
 
-# include "test_utils.hpp"
+#include "test_utils.hpp"
 
 #include "../../core/src/path/path_private.hpp"
 #include "../../core/src/catch.hpp"
@@ -274,7 +273,7 @@ TEST_CASE("gnmi_test_json_payload"  )
     ydk::path::Codec s{};
 
     auto bgp = s.decode(schema, R"(
-    {"openconfig-bgp:bgp": 
+    {"openconfig-bgp:bgp":
       {
          "@": {
             "ietf-netconf:operation":"merge"
@@ -397,7 +396,7 @@ TEST_CASE("gnmi_rpc_set_get_bgp")
     auto & as = bgp.create_datanode("global/config/as", "65172");
     auto & neighbor = bgp.create_datanode("neighbors/neighbor[neighbor-address='172.16.255.2']");
     auto & neighbor_address = neighbor.create_datanode("config/neighbor-address", "172.16.255.2");
-    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");    
+    auto & peer_as = neighbor.create_datanode("config/peer-as","65172");
 
     // Configure interface
     auto & ifc = schema.create_datanode("openconfig-interfaces:interfaces");
@@ -405,8 +404,8 @@ TEST_CASE("gnmi_rpc_set_get_bgp")
 
     // Add data-nodes to RPC
     ydk::path::Codec s{};
-    auto bgp_json = s.encode(bgp, ydk::EncodingFormat::JSON, false);
-    auto int_json = s.encode(ifc, ydk::EncodingFormat::JSON, false);
+    auto bgp_json = s.encode(bgp, ydk::EncodingFormat::JSON, true);
+    auto int_json = s.encode(ifc, ydk::EncodingFormat::JSON, true);
 
     std::shared_ptr<ydk::path::Rpc> set_rpc { schema.create_rpc("ydk:gnmi-set") };
     set_rpc->get_input_node().create_datanode("replace[alias='bgp']/entity", bgp_json);

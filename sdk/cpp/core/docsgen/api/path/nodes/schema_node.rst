@@ -3,7 +3,6 @@
 SchemaNode
 ==========
 
-
 .. cpp:class:: ydk::path::SchemaNode
 
     Represents a Node in the SchemaTree.
@@ -59,6 +58,6 @@ SchemaNode
 
     .. cpp:function:: virtual std::vector<Statement> get_keys() const
 
-        Returns vector of YANG statement corresponding the the keys.
+        Returns vector of YANG :cpp:class:`Statement<Statement>`, which represents set of keys for the list node.
 
-        :return: Vector of :cpp:class:`Statement` that represent keys.
+        :return: Vector of :cpp:class:`Statement<Statement>`, which represents list node keys.

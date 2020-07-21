@@ -1,3 +1,25 @@
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
+
 package test
 
 import (
@@ -8,6 +30,7 @@ import (
 	"github.com/CiscoDevNet/ydk-go/ydk/services"
 	"github.com/CiscoDevNet/ydk-go/ydk/types"
 	"github.com/CiscoDevNet/ydk-go/ydk/types/yfilter"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -166,36 +189,74 @@ func (suite *NETCONFOperationsTestSuite) TestMerge() {
 	suite.Equal(types.EntityEqual(entity, runnerRead), true)
 }
 
-// TODO: Encoding error using YFilter for non-top level leaves
-// need to use subtree filter
-// func (suite *NETCONFOperationsTestSuite) TestDeleteLeaf() {
-//     runnerCreate := ysanity.Runner{}
-//     runnerCreate.Ytypes.BuiltInT.Number8 = 10
-//     suite.CRUD.Create(&suite.Provider, &runnerCreate)
+func (suite *NETCONFOperationsTestSuite) TestDeleteLeaf() {
+	runnerCreate := ysanity.Runner{}
+	runnerCreate.Ytypes.BuiltInT.Number8 = 10
+	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
-//     runnerUpdate := ysanity.Runner{}
-//     runnerUpdate.Ytypes.BuiltInT.Number8 = yfilter.Delete
-//     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	runnerUpdate := ysanity.Runner{}
+	// Need provide value for numbers to avoid YModelError
+	// Use LeafData type for the complex leaf data structure
+	runnerUpdate.Ytypes.BuiltInT.Number8 = types.LeafData{Value: "10", Filter: yfilter.Delete}
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
-//     // delete leaf again raises error
-//     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
-// }
+	// delete leaf again raises YServiceProviderError, meaning the leaf has been deleted in update above
+	assert.Panicsf(suite.T(), func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) },
+		"Did not receive OK reply from the device", "formatted")
+}
 
-// TODO: Encoding error using YFilter as leaf-list value
-// func (suite *NETCONFOperationsTestSuite) TestDeleteLeafList() {
-//     runnerCreate := ysanity.Runner{}
-//     runnerCreate.Ytypes.BuiltInT.EnumLlist = append(runnerCreate.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
-//     suite.CRUD.Create(&suite.Provider, &runnerCreate)
+func (suite *NETCONFOperationsTestSuite) TestDeleteEnumLeafList() {
+	runnerCreate := ysanity.Runner{}
+	runnerCreate.Ytypes.BuiltInT.EnumLlist = append(runnerCreate.Ytypes.BuiltInT.EnumLlist, ysanity.YdkEnumTest_local)
+	suite.CRUD.Create(&suite.Provider, &runnerCreate)
 
-//     runnerUpdate := ysanity.Runner{}
-//     // TODO: verify that appending YFilter.Delete to leaf-list delete whole leaf list or a particular leaf
-//     runnerUpdate.Ytypes.BuiltInT.EnumLlist = append(runnerUpdate.Ytypes.BuiltInT.EnumLlist, yfilter.Delete)
-//     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+	runnerUpdate := ysanity.Runner{}
+	// Need provide value for numbers to avoid YModelError
+	// Use LeafData type for the complex leaf data structure
+	deleteValue := types.LeafData{Value: "local", Filter: yfilter.Delete}
+	runnerUpdate.Ytypes.BuiltInT.EnumLlist = append(runnerUpdate.Ytypes.BuiltInT.EnumLlist, deleteValue)
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
 
-//     // delete again with error
-//     suite.CRUD.Update(&suite.Provider, &runnerUpdate)
-// }
+	// delete again with error
+	assert.Panicsf(suite.T(), func() { suite.CRUD.Update(&suite.Provider, &runnerUpdate) },
+		"Did not receive OK reply from the device", "formatted")
+}
+
+func (suite *NETCONFOperationsTestSuite) TestDeleteIdentityLeafList() {
+	runnerCreate := ysanity.Runner{}
+	runnerCreate.Ytypes.BuiltInT.IdentityLlist =
+		append(runnerCreate.Ytypes.BuiltInT.IdentityLlist,  ysanity.ChildIdentity{})
+	runnerCreate.Ytypes.BuiltInT.IdentityLlist =
+		append(runnerCreate.Ytypes.BuiltInT.IdentityLlist,  ysanity.ChildChildIdentity{})
+	suite.CRUD.Create(&suite.Provider, &runnerCreate)
+
+	readEntity := suite.CRUD.ReadConfig(&suite.Provider, &ysanity.Runner{})
+	suite.NotNil(readEntity)
+	readRunner := readEntity.(*ysanity.Runner)
+	suite.Equal(2, len(readRunner.Ytypes.BuiltInT.IdentityLlist))
+
+	runnerUpdate := ysanity.Runner{}
+	deleteValue := types.LeafData{Value: ysanity.ChildIdentity{}.String(), Filter: yfilter.Delete}
+	runnerUpdate.Ytypes.BuiltInT.IdentityLlist =
+		append(runnerUpdate.Ytypes.BuiltInT.IdentityLlist, deleteValue)
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+
+	readEntity = suite.CRUD.ReadConfig(&suite.Provider, &ysanity.Runner{})
+	suite.NotNil(readEntity)
+	readRunner = readEntity.(*ysanity.Runner)
+	suite.Equal(1, len(readRunner.Ytypes.BuiltInT.IdentityLlist))
+	suite.Equal(ysanity.ChildChildIdentity{}.String(), readRunner.Ytypes.BuiltInT.IdentityLlist[0].(string))
+
+	runnerUpdate = ysanity.Runner{}
+	deleteValue = types.LeafData{Value: ysanity.ChildChildIdentity{}.String(), Filter: yfilter.Delete}
+	runnerUpdate.Ytypes.BuiltInT.IdentityLlist =
+		append(runnerUpdate.Ytypes.BuiltInT.IdentityLlist, deleteValue)
+	suite.CRUD.Update(&suite.Provider, &runnerUpdate)
+}
 
 func TestNETCONFOperationsTestSuite(t *testing.T) {
+// 	if testing.Verbose() {
+// 		ydk.EnableLogging(ydk.Debug)
+// 	}
 	suite.Run(t, new(NETCONFOperationsTestSuite))
 }

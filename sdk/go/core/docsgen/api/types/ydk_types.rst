@@ -431,6 +431,13 @@ These are how YANG types are represented in Go.
     :return: A `map[string]StringPair`, map of differences between two entities, where key represents leaf or presence
              container absolute path and value :ref:`StringPair <string-pair>` represents difference in string values of the leaves.
 
+.. function:: EntityClone(entity Entity) Entity
+
+    Utility function to build deep copy of Entity structure.
+
+    :param entity: An instance of :ref:`Entity <types-entity>`
+    :return: An instance of :ref:`Entity <types-entity>`, which is a deep copy of the `entity`.
+
 
 .. _entity-collection:
 

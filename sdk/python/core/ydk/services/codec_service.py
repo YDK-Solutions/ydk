@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 import os
 import logging
@@ -24,15 +29,18 @@ from ydk.entity_utils import XmlSubtreeCodec
 from ydk.entity_utils import _payload_to_top_entity, _get_bundle_name
 
 from ydk.path import Codec as _Codec
-from ydk.errors import YServiceProviderError as _YServiceProviderError
-from ydk.errors import YServiceError as _YServiceError
+from ydk.errors import YServiceProviderError, YServiceError
 from ydk.errors.error_handler import handle_runtime_error as _handle_error
 from ydk.errors.error_handler import check_argument as _check_argument
-from ydk.types import EncodingFormat
+from ydk.types import EncodingFormat, Entity, EntityCollection
 
 
-_TRACE_LEVEL_NUM = 5
-_PAYLOAD_ERROR_MSG = "Codec service only supports one entity per payload, please split payload"
+_PAYLOAD_ERROR_MSG = "Codec Service supports only one entity per payload, please split payload"
+_ENTITY_ERROR_MSG = """Invalid 'entity_holder' type. Expected types:
+    1) ydk.types.Entity;
+    2) ydk.types.EntityCollection;
+    3) dict(str, ydk.types.Entity);
+    4) list(ydk.types.Entity)."""
 
 
 class CodecService(object):
@@ -51,8 +59,12 @@ class CodecService(object):
 
         Args:
             provider: An instance of ydk.provider.CodecServiceProvider class.
-            entity_holder: an instance or collection of ydk.types.Entity class instances. 
-                           Expected collection types - dict(str, ydk.types.Entity) or list(ydk.types.Entity).
+            entity_holder: an instance or collection of ydk.types.Entity class instances.
+                           Expected collection types:
+                            - ydk.types.Entity
+                            - ydk.types.EntityCollection
+                            - list(ydk.types.Entity)
+                            - dict(str, ydk.types.Entity)
             pretty: Pretty formatting of payload string, default - True.
             subtree: Bool flag, which specifies encode to XML subtree; default= False
 
@@ -61,7 +73,7 @@ class CodecService(object):
             The type of return corresponds to the type of the 'entity_holder'.
 
         Raises:
-            Instance of YError, if encoding fails.
+            Instance of YServiceError, if 'entity_holder' type is invalid or encoding fails.
         """
         if isinstance(entity_holder, dict):
             payload_map = {}
@@ -74,8 +86,12 @@ class CodecService(object):
                 payload = self.encode(provider, entity, pretty, subtree)
                 payload_list.append(payload)
             return payload_list
-        else:
+        elif isinstance(entity_holder, EntityCollection):
+            return self.encode(provider, entity_holder.entities(), pretty, subtree)
+        elif isinstance(entity_holder, Entity):
             return self._encode(provider, entity_holder, pretty, subtree)
+        else:
+            self._log_error_and_raise_exception(_ENTITY_ERROR_MSG, YServiceError)
 
     def _encode(self, provider, entity, pretty, subtree):
         """Encode a YDK entity to string payload.
@@ -90,7 +106,7 @@ class CodecService(object):
             Encoded payload if success.
 
         Raises:
-            Instance of YError is encoding fails.
+            Instance of YServiceError if encoding fails.
         """
         bundle_name = _get_bundle_name(entity)
         provider.initialize(bundle_name, _get_yang_path(entity))
@@ -98,7 +114,7 @@ class CodecService(object):
 
         if subtree:
             if provider.encoding != EncodingFormat.XML:
-                raise _YServiceError('Subtree option can only be used with XML encoding')
+                raise YServiceError('Subtree option can only be used with XML encoding')
             xml_codec = XmlSubtreeCodec()
             return xml_codec.encode(entity, root_schema)
 
@@ -150,16 +166,14 @@ class CodecService(object):
             A YDK entity (ydk.types.Entity) instance with children populated.
 
         Raises:
-            - YServiceProviderError with _PAYLOAD_ERROR_MSG if payload
-              contains more than one top level containers.
-            - YServiceProviderError with _ENTITY_ERROR_MSG if no such entity
-              could be found in locally installed YDK model packages.
+            YServiceProviderError with _PAYLOAD_ERROR_MSG, if payload
+            contains more than one top level containers.
         """
         entity = _payload_to_top_entity(payload, provider.encoding)
 
         if subtree:
             if provider.encoding != EncodingFormat.XML:
-                raise _YServiceError('Subtree option can only be used with XML encoding')
+                raise YServiceError('Subtree option can only be used with XML encoding')
             xml_codec = XmlSubtreeCodec()
             return xml_codec.decode(payload, entity)
 
@@ -175,7 +189,7 @@ class CodecService(object):
         data_nodes = root_data_node.get_children();
         if data_nodes is None or len(data_nodes) == 0:
             self.logger.debug(_PAYLOAD_ERROR_MSG)
-            raise _YServiceProviderError(_PAYLOAD_ERROR_MSG)
+            raise YServiceProviderError(_PAYLOAD_ERROR_MSG)
         else:
             data_node = data_nodes[0]
             _get_entity_from_data_node(data_node, entity)

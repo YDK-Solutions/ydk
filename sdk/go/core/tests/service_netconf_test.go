@@ -1,3 +1,25 @@
+/*  ----------------------------------------------------------------
+ YDK - YANG Development Kit
+ Copyright 2016 Cisco Systems. All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ -------------------------------------------------------------------
+ This file has been modified by Yan Gorelik, YDK Solutions.
+ All modifications in original under CiscoDevNet domain
+ introduced since October 2019 are copyrighted.
+ All rights reserved under Apache License, Version 2.0.
+ ------------------------------------------------------------------*/
+
 package test
 
 import (
@@ -84,7 +106,7 @@ func (suite *NetconfServiceTestSuite) TestLockUnlockFail() {
 	funcDidPanic, panicValue := didPanic(func() { suite.NS.Unlock(&suite.Provider, datastore.Running) })
 	suite.Equal(funcDidPanic, true)
 	suite.Regexp("YServiceProviderError:", panicValue)
-	errMsg := "RPC error occurred; check log file for details"
+	errMsg := "RPC error occurred; check log for details"
 //	`<rpc-error>
 //    <error-type>application</error-type>
 //    <error-tag>operation-failed</error-tag>
@@ -157,9 +179,33 @@ func (suite *NetconfServiceTestSuite) TestCancelCommit() {
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 }
 
-// TODO: Problems found with path functions:
-//			readEntity changes with getFilter
-//			EntityEqual(readEntity, &runner) returns true, even after the above
+func (suite *NetconfServiceTestSuite) TestCopyConfigIssue() {
+	runner := ysanity.Runner{}
+	runner.Two.Number = 2
+	runner.Two.Name = "runner-two-name"
+
+	var op bool
+	var readEntity types.Entity
+
+	op = suite.NS.CopyConfig(&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
+	suite.True(op)
+
+	getFilter := ysanity.Runner{}
+	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &getFilter)
+
+	getFilterCopy := ysanity.Runner{}
+	suite.True(types.EntityEqual(&getFilter, &getFilterCopy))
+	// When this assertion is passed,
+	// that proves that filter was not used in the path.ReadDatanode() function
+
+	suite.True(types.EntityEqual(readEntity, &runner))
+	suite.False(types.EntityEqual(readEntity, &getFilter))
+
+	// Delete configuration
+	op = suite.NS.DiscardChanges(&suite.Provider)
+	suite.True(op)
+}
+
 func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	runner := ysanity.Runner{}
 	runner.Two.Number = 2
@@ -171,31 +217,31 @@ func (suite *NetconfServiceTestSuite) TestCopyConfig() {
 	// Modify Candidate via CopyConfig from runner
 	op = suite.NS.CopyConfig(
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
-	suite.Equal(types.EntityEqual(readEntity, &runner), true)
+	suite.True(types.EntityEqual(readEntity, &runner))
 
 	// Modify Candidate via CopyConfig from runner
 	runner.Two.Name = fmt.Sprintf("%s_modified", runner.Two.Name)
 
 	op = suite.NS.CopyConfig(
 		&suite.Provider, datastore.Candidate, datastore.NotSet, &runner, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Equal(types.EntityEqual(readEntity, &runner), true)
 
 	// Modify Candidate via CopyConfig from Running. That will remove config.
 	op = suite.NS.CopyConfig(&suite.Provider, datastore.Candidate, datastore.Running, nil, "")
-	suite.Equal(op, true)
+	suite.True(op)
 
 	readEntity = suite.NS.GetConfig(&suite.Provider, datastore.Candidate, &ysanity.Runner{})
 	suite.Nil(readEntity)
 
 	// DiscardChanges
 	op = suite.NS.DiscardChanges(&suite.Provider)
-	suite.Equal(op, true)
+	suite.True(op)
 }
 
 // skip
@@ -367,6 +413,9 @@ func (suite *NetconfServiceTestSuite) TestDeleteContainer() {
 }
 
 func TestNetconfServiceTestSuite(t *testing.T) {
+// 	if testing.Verbose() {
+// 		ydk.EnableLogging(ydk.Debug)
+// 	}
 	suite.Run(t, new(NetconfServiceTestSuite))
 }
 

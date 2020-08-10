@@ -1,5 +1,6 @@
 #  ----------------------------------------------------------------
-# Copyright 2016 Cisco Systems
+# YDK - YANG Development Kit
+# Copyright 2016 Cisco Systems. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
-"""test_sanity_levels.py
+"""
+test_sanity_levels.py
 sanity test for ydktest-sanity.yang
 """
-from __future__ import absolute_import
 
 import sys
 import unittest
@@ -27,11 +33,12 @@ from ydk.services import CRUDService
 from ydk.filters import YFilter
 
 from ydk.models.ydktest import ydktest_sanity as ysanity
-from ydk.models.ydktest import openconfig_interfaces
+from ydk.models.ydktest import openconfig_interfaces, openconfig_bgp
 from ydk.models.ydktest import iana_if_type
 
 from test_utils import ParametrizedTestCase
 from test_utils import get_device_info
+
 
 class SanityYang(unittest.TestCase):
 
@@ -187,13 +194,13 @@ class SanityYang(unittest.TestCase):
     def test_iana_if_type_decode(self):
         # Build some configuration
         ifcs_config = openconfig_interfaces.Interfaces()
-        ifc_config  = openconfig_interfaces.Interfaces.Interface()
+        ifc_config = openconfig_interfaces.Interfaces.Interface()
         ifc_config.name = "GigabitEthernet0/0/0/2"
         ifc_config.config.name = "GigabitEthernet0/0/0/2"
         ifc_config.config.description = "Test interface"
         ifc_config.config.type = iana_if_type.EthernetCsmacd()
         ifcs_config.interface.append(ifc_config)
-        self.assertTrue( self.crud.create(self.ncc, ifc_config) )
+        self.assertTrue(self.crud.create(self.ncc, ifc_config))
 
         # Read interface type only
         ifcs = openconfig_interfaces.Interfaces()
@@ -204,6 +211,48 @@ class SanityYang(unittest.TestCase):
         ifc_read = self.crud.read(self.ncc, ifc)
         self.assertIsNotNone(ifc_read)
         self.assertEqual(ifc_read.config.type, iana_if_type.EthernetCsmacd())
+
+    def test_bgp_read_container(self):
+        # Delete BGP config
+        bgp_set = openconfig_bgp.Bgp()
+        reply = self.crud.delete(self.ncc, bgp_set)
+        self.assertIsNotNone(reply)
+
+        # Create BGP config
+        bgp_set.global_.config.as_ = 65001
+        bgp_set.global_.config.router_id = "1.2.3.4"
+        d = openconfig_bgp.Bgp.Neighbors.Neighbor()
+        d.neighbor_address = "1.2.3.4"
+        d.config.neighbor_address = "1.2.3.4"
+        q = openconfig_bgp.Bgp.Neighbors.Neighbor()
+        q.neighbor_address = "1.2.3.5"
+        q.config.neighbor_address = "1.2.3.5"
+        bgp_set.neighbors.neighbor.extend([d, q])
+
+        reply = self.crud.create(self.ncc, bgp_set)
+        self.assertIsNotNone(reply)
+
+        # Read only 'global' container
+        bgp_filter = openconfig_bgp.Bgp()
+        bgp_filter.global_.yfilter = YFilter.read
+        bgp_read = self.crud.read_config(self.ncc, bgp_filter)
+        self.assertIsNotNone(bgp_read)
+        self.assertTrue(len(bgp_read.neighbors.neighbor) == 0)
+        self.assertTrue(bgp_read.global_.config.as_ == 65001)
+
+        # Read only 'neighbors' container
+        bgp_filter = openconfig_bgp.Bgp()
+        bgp_filter.neighbors.yfilter = YFilter.read
+        bgp_read = self.crud.read_config(self.ncc, bgp_filter)
+        self.assertIsNotNone(bgp_read)
+        self.assertTrue(len(bgp_read.neighbors.neighbor) == 2)
+        self.assertFalse(bgp_read.global_.has_data())
+
+        # Delete BGP config
+        bgp_set = openconfig_bgp.Bgp()
+        reply = self.crud.delete(self.ncc, bgp_set)
+        self.assertIsNotNone(reply)
+
 
 if __name__ == '__main__':
     device, non_demand, common_cache, timeout = get_device_info()

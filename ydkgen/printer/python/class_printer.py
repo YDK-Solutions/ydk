@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 
 """
 class_printer.py
@@ -102,7 +107,7 @@ class ClassPrinter(FilePrinter):
     def _print_class_declaration(self, clazz):
         self.ctx.bline()
 
-        parents = 'Entity'
+        parents = '_Entity_'
         if clazz.is_identity():
             if len(clazz.extends) > 0:
                 parents = ' ,'.join([sup.qn() for sup in clazz.extends])

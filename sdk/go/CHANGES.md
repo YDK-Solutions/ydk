@@ -1,15 +1,24 @@
-### 2019-11-20 version 0.8.4.post1
+### 2020-06-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
+  * Go fails to process filters on enum and identity leaves and leaf-lists ([#969](https://github.com/CiscoDevNet/ydk-gen/issues/969))
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
+
+#### Bundle improvements
+  * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.3
+  * Updated openconfig bundle to support YANG models of revision "2019-06-21"
 
 
 ### 2019-10-15 version 0.8.4
 
 #### New features and enhancements
   * Added utility function to compare two entities and build diff ([#925](https://github.com/CiscoDevNet/ydk-gen/issues/925))
-  
+
 #### Resolved GitHub issues
   * 'ietf-netconf-monitoring:get-schema' returns schema with escape sequences ([#614](https://github.com/CiscoDevNet/ydk-gen/issues/614))
   * NETCONF provider should raise more appropriate exceptions ([#774](https://github.com/CiscoDevNet/ydk-gen/issues/774))
@@ -27,7 +36,7 @@
 #### Bundle improvements
   * Updated cisco-ios-xr bundle to support Cisco IOS XR 6.6.2
   * Updated openconfig bundle to introduce support for additional models.
-  
+
 #### Resolved GitHub issues
   * YDK netconf read fails when <data> tag has namespace prefix ([#799](https://github.com/CiscoDevNet/ydk-gen/issues/799))
   * YDK return value of YANG action missing some attributes ([#871](https://github.com/CiscoDevNet/ydk-gen/issues/871))

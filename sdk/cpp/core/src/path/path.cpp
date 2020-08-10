@@ -18,9 +18,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
-//////////////////////////////////////////////////////////////////
-
+// -------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
+////////////////////////////////////////////////////////////////
 
 #include <pcre.h>
 #include <fstream>
@@ -101,6 +104,11 @@ std::vector<std::string> ydk::path::segmentalize(const std::string& path)
     std::vector<std::string> output;
     size_t pos = std::string::npos; // size_t to avoid improbable overflow
     std::string data{path};
+    if (data.at(0) == '/')
+    {
+        // Remove starting '/' if present
+        data = data.substr(1);
+    }
     escape_slashes(data, "'[^\[]+'");
     escape_slashes(data, "\"[^\[]+\"");
     do

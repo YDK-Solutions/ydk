@@ -678,8 +678,8 @@ module ydktest-sanity {
 
   grouping enum-list {
     list enum-list {
-        key "name";
-        leaf name {
+        key "key-name";
+        leaf key-name {
             type Ydk-Enum-test;
         }
     }

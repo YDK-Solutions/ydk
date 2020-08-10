@@ -1,3 +1,29 @@
+..
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 ===============
 Getting Started
 ===============
@@ -71,8 +97,8 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
 Libssh Installation
 -------------------
 
-The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6,
 or upgrade to libssh-0.8.1 or higher.
 
 gNMI Requirements
@@ -114,7 +140,7 @@ Install prebuilt libraries
 
 **Ubuntu**
 
-Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions. 
+Download and install YDK core library - `libydk`. You can install the library using prebuilt debian packages for Xenial and Bionic LTS distributions.
 For other Ubuntu distributions it is recommended to build core library from source.
 The prebuilt libraries compiled with specific C/C++ compilers versions, which corresponds to default one for the Linux disribution.
 If your compiler is different from specified one, it is recommended to build the packages from source.
@@ -123,15 +149,15 @@ For Xenial (Ubuntu 16.04.4, gcc-5.5.0):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-   sudo gdebi libydk-0.8.4-1.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+   sudo gdebi libydk-0.8.5-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1, gcc-7.4.0):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-   sudo gdebi libydk-0.8.4-1.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+   sudo gdebi libydk-0.8.5-1.amd64.deb
 
 **CentOS**
 
@@ -139,7 +165,7 @@ The prebuilt package compiled with default version - gcc-4.8.5.
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 
 **MacOS**
 
@@ -147,8 +173,8 @@ The prebuilt packages compiled with C++ compiler Clang-8.0.0, which is default v
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4-beta/libydk-0.8.4-Darwin.pkg
-   sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5-beta/libydk-0.8.5-Darwin.pkg
+   sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
 
 gNMI Service Installation
 -------------------------
@@ -162,15 +188,15 @@ For Xenial (Ubuntu 16.04.4):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+   sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 For Bionic (Ubuntu 18.04.1):
 
 .. code-block:: sh
 
-   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-   sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+   wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+   sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 **CentOS**
 
@@ -178,7 +204,7 @@ The prebuilt package compiled with default version - gcc-4.8.5.
 
 .. code-block:: sh
 
-   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+   sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 
 **MacOS**
 
@@ -186,8 +212,8 @@ The prebuilt packages compiled with C++ compiler Clang-8.0.0.
 
 .. code-block:: sh
 
-   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
-   sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+   curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+   sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 
 Set runtime environment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,7 +245,7 @@ YDK uses ``cmake`` as the build system of choice. To install the ``core`` packag
 Installing model bundles
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation. 
+Once you have installed the ``core`` package, you can install one or more model bundles.  Note that some bundles have dependencies on other bundles.  Those dependencies are captured in the bundle packages used for quick installation.
 
 To install the ``ietf`` bundle, execute:
 

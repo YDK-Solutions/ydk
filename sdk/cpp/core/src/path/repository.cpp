@@ -357,7 +357,7 @@ ydk::path::RepositoryPtr::get_new_ly_modules_from_lookup(ly_ctx* ctx,
             }
             else if (k.length() > strlen("http://") && k.substr(0, strlen("http://")) == "http://")
             {
-                YLOG_ERROR("Failed to find namespace '{}' in lookup table", k);
+                YLOG_INFO("Failed to find namespace '{}' in lookup table", k);
                 continue;
             }
             else {

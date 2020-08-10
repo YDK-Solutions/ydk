@@ -1,3 +1,30 @@
+..
+  #  YDK - YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 ===============
 Getting Started
 ===============
@@ -41,14 +68,14 @@ For Xenial (Ubuntu 16.04.4)::
   sudo ln -sf /usr/bin/g++-5 /usr/bin/c++
 
     # Install YDK core library
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
     # Install YDK core library
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk-0.8.4-1.amd64.deb
-  sudo gdebi libydk-0.8.4-1.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
+  sudo gdebi libydk-0.8.5-1.amd64.deb
 
 **Centos (Fedora-based)**
 
@@ -64,7 +91,7 @@ The following packages must be present in your system before installing YDK-Go::
   ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/c++
 
     # Install YDK core library
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk-0.8.4-1.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
 
 **Golang**
 
@@ -99,9 +126,9 @@ It is recommended to install `homebrew <http://brew.sh>`_ and Xcode command line
   xcode-select --install
 
   # Install YDK core library
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk-0.8.4-Darwin.pkg
-  sudo installer -pkg libydk-0.8.4-Darwin.pkg -target /
-	
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
+  sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
+
 The YDK requires Go version 1.9 or higher. If this is not the case, follow these installation steps:
 
 .. code-block:: sh
@@ -113,8 +140,8 @@ The YDK requires Go version 1.9 or higher. If this is not the case, follow these
 Libssh Installation
 -------------------
 
-The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library, 
-which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6, 
+The libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
+which is required for YDK. If after installation of libssh package the `libssh_threads.a` is missing, please downgrade the installation to libssh-0.7.6,
 or upgrade to libssh-0.8.1 or higher.
 
 
@@ -158,28 +185,28 @@ Ubuntu
 
 For Xenial (Ubuntu 16.04.4)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/xenial/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 For Bionic (Ubuntu 18.04.1)::
 
-  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.4/bionic/libydk_gnmi-0.4.0-4.amd64.deb
-  sudo gdebi libydk_gnmi-0.4.0-4.amd64.deb
+  wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
+  sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
 
 CentOS
 ~~~~~~
 
 .. code-block:: sh
 
-  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.4/libydk_gnmi-0.4.0-4.x86_64.rpm
+  sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
 
 MacOS
 ~~~~~
 
 .. code-block:: sh
 
-  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.4/libydk_gnmi-0.4.0-4.Darwin.pkg
-  sudo installer -pkg libydk_gnmi-0.4.0-4.Darwin.pkg -target /
+  curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
+  sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
 
 Set runtime environment
 -----------------------
@@ -218,4 +245,4 @@ Documentation and Support
 Release Notes
 =============
 
-The current YDK release version is 0.8.4. YDK-Go is licensed under the Apache 2.0 License.
+The current YDK release version is 0.8.5. YDK-Go is licensed under the Apache 2.0 License.

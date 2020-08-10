@@ -1,3 +1,31 @@
+..
+  # *************************************************************
+  #  YDK-YANG Development Kit
+  #  Copyright 2016 Cisco Systems. All rights reserved
+  # *************************************************************
+  # Licensed to the Apache Software Foundation (ASF) under one
+  # or more contributor license agreements.  See the NOTICE file
+  # distributed with this work for additional information
+  # regarding copyright ownership.  The ASF licenses this file
+  # to you under the Apache License, Version 2.0 (the
+  # "License"); you may not use this file except in compliance
+  # with the License.  You may obtain a copy of the License at
+  #
+  #   http:#www.apache.org/licenses/LICENSE-2.0
+  #
+  #  Unless required by applicable law or agreed to in writing,
+  # software distributed under the License is distributed on an
+  # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  # KIND, either express or implied.  See the License for the
+  # specific language governing permissions and limitations
+  # under the License.
+  # *************************************************************
+  # This file has been modified by Yan Gorelik, YDK Solutions.
+  # All modifications in original under CiscoDevNet domain
+  # introduced since October 2019 are copyrighted.
+  # All rights reserved under Apache License, Version 2.0.
+  # *************************************************************
+
 DataNode
 ========
 
@@ -19,7 +47,6 @@ DataNode
             >>> session = NetconfSession('127.0.0.1', 'admin', 'admin', 830)
             >>> root_schema = session.get_root_schema()                               # <-- root_schema is an instance of RootSchemaNode
             >>> bgp = root_schema.create_datanode('openconfig-bgp:bgp')               # <-- bgp is an instance of DataNode
-
 
     .. py:method:: add_annotation(annotation)
 
@@ -79,7 +106,7 @@ DataNode
         :return: Data node satisfy the path expression supplied.
         :rtype: list of :py:class:`DataNode<ydk.path.DataNode>`
 
-    .. py:method:: get()
+    .. py:method:: get_value()
 
         Returns this data node's value.
 

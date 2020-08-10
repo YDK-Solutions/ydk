@@ -18,9 +18,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
-//////////////////////////////////////////////////////////////////
-
+// -------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
+////////////////////////////////////////////////////////////////
 
 #include "path_private.hpp"
 #include "../logger.hpp"
@@ -75,12 +78,6 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
         throw(YInvalidArgumentError{"Path is empty"});
     }
 
-    //path should not start with /
-    if(path.at(0) == '/')
-    {
-        YLOG_ERROR("Path '{}' should not start with /", path);
-        throw(YInvalidArgumentError{"Path should not start with /"});
-    }
     std::vector<std::string> segments = segmentalize(path);
     if(segments.size()<=0)
     {
@@ -138,13 +135,11 @@ ydk::path::RootDataImpl::create_datanode(const std::string& path, const std::str
             remaining_path+=segments[i];
         }
 
-        rdn = &(rdn->create_datanode(remaining_path));
+        rdn = &(rdn->create_datanode(remaining_path, value));
     }
 
-
     return *rdn;
-
- }
+}
 
 void
 ydk::path::RootDataImpl::set_value(const std::string& value)

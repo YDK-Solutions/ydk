@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 cmake_policy(SET CMP0048 NEW)
-project(ydk VERSION 0.8.4 LANGUAGES C CXX)
+project(ydk VERSION 0.8.5 LANGUAGES C CXX)
 
 set(YDK_DESCRIPTION "YANG Development Kit Library. The library for  YDK API.")
 
@@ -468,7 +468,7 @@ target_link_libraries(ydk
 
 set_property(TARGET ydk PROPERTY CXX_STANDARD 11)
 set_property(TARGET ydk PROPERTY CXX_STANDARD_REQUIRED ON)
-set(libyang_extension_lib 
+set(libyang_extension_lib
 	${libyang_build_location}/src/extensions/libyang_ext_test${CMAKE_SHARED_LIBRARY_SUFFIX}
 	${libyang_build_location}/src/extensions/metadata${CMAKE_SHARED_LIBRARY_SUFFIX}
 	${libyang_build_location}/src/extensions/nacm${CMAKE_SHARED_LIBRARY_SUFFIX}

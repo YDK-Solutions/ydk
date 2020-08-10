@@ -14,6 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------
+# This file has been modified by Yan Gorelik, YDK Solutions.
+# All modifications in original under CiscoDevNet domain
+# introduced since October 2019 are copyrighted.
+# All rights reserved under Apache License, Version 2.0.
+# ------------------------------------------------------------------
 #
 # Script for running ydk CI on travis-ci.org
 #
@@ -90,7 +95,7 @@ function pip_check_install {
 function init_confd {
     cd $1
     print_msg "Initializing confd in $(pwd)"
-    source $YDKGEN_HOME/../confd/confdrc
+    source $HOME/confd/confdrc
     run_exec_test make stop > /dev/null
     run_exec_test make clean > /dev/null
     run_exec_test make all > /dev/null
@@ -100,6 +105,7 @@ function init_confd {
 
 function init_confd_ydktest {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    rm -rf $HOME/.ydk/127.0.0.1
 }
 
 function init_rest_server {
@@ -140,8 +146,8 @@ function check_python_installation {
 
   if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
     print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
-    run_exec_test ${PYTHON_BIN} -m venv $YDKGEN_HOME/venv
-    run_exec_test source $YDKGEN_HOME/venv/bin/activate
+    run_exec_test ${PYTHON_BIN} -m venv $HOME/venv
+    run_exec_test source $HOME/venv/bin/activate
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -203,6 +209,9 @@ function init_go_env {
     print_msg "Current Go version is $go_version"
 
     go get github.com/stretchr/testify
+    cd $GOPATH/src/github.com/stretchr/testify
+    git checkout tags/v1.6.1
+    cd -
 
     export CGO_ENABLED=1
     export CGO_LDFLAGS_ALLOW="-fprofile-arcs|-ftest-coverage|--coverage"
@@ -487,7 +496,6 @@ function run_python_bundle_tests {
     py_sanity_augmentation
     py_sanity_common_cache
     py_sanity_one_class_per_module
-    py_sanity_backward_compatibility
 }
 
 #--------------------------
@@ -575,9 +583,10 @@ function run_py_sanity_ydktest_tests {
     run_test sdk/python/core/tests/test_sanity_codec.py
 
     py_sanity_ydktest_test_netconf_ssh
-    if [[ ${os_type} != "Darwin" ]] ; then
-      py_sanity_ydktest_test_tcp
-    fi
+
+#    if [[ ${os_info} == *"xenial"* ]]; then
+#      py_sanity_ydktest_test_tcp	# This test fails in docker
+#    fi
 
     stop_tcp_server
 }
@@ -616,8 +625,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_types.py --non-demand
-#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py
-#    --non-demand
+#    run_test_no_coverage sdk/python/core/tests/test_sanity_executor_rpc.py --non-demand
   fi
 }
 
@@ -765,13 +773,14 @@ function py_sanity_one_class_per_module {
     py_sanity_run_limited_tests
 }
 
-function py_sanity_backward_compatibility {
-    print_msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print_msg "Running YDK BUNDLE BACKWARD COMPATIBILITY TESTS"
+function run_py_backward_compatibility {
+    print_msg "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    print_msg "Running YDK-0.7.3 BUNDLE BACKWARD COMPATIBILITY TESTS"
     cd $YDKGEN_HOME
     CURRENT_GIT_REV=$(git rev-parse HEAD)
-    git checkout 8d278d7d51765a310afe43ed88951f2fe5d8783e
+    git checkout 454ffc06ec79995832538642638e03259e622b53
     run_test generate.py --bundle profiles/test/ydktest-cpp.json > /dev/null
+    init_confd_ydktest
     py_sanity_run_limited_tests
     git checkout ${CURRENT_GIT_REV}
 }
@@ -938,6 +947,7 @@ install_py_core
 run_python_bundle_tests
 run_python_oc_nis_tests
 run_py_metadata_test
+run_py_backward_compatibility
 
 # test_gen_tests
 

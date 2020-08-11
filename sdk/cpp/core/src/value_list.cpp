@@ -351,6 +351,13 @@ YList::extend(initializer_list<shared_ptr<Entity>> ep_list)
     }
 }
 
+bool
+YList::has_key(const std::string& key) const
+{
+    auto it = entity_map.find(key);
+    return it != entity_map.end();
+}
+
 shared_ptr<Entity>
 YList::operator [] (const string& key) const
 {

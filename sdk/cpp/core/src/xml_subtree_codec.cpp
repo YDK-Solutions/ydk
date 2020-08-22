@@ -312,6 +312,9 @@ static void check_and_set_node(Entity & entity, Entity * parent, xmlNodePtr xml_
             child->parent = parent;
         }
         decode_xml(doc, xml_node->children, *child, &entity, "");
+        if (child->ylist && child->ylist->ylist_key_names.size() > 0) {
+            child->ylist->review(child);
+        }
     }
     else {
         check_and_set_leaf(entity, parent, xml_node, doc);

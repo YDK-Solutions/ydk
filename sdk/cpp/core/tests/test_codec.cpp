@@ -22,7 +22,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
+// -------------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
 //////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -242,6 +246,38 @@ TEST_CASE( "decode_rpc_with_nc_prefix" )
 </interfaces>
 </nc:data>
 </nc:rpc-reply>
+)";
+    auto reply_xml = ydk::path::get_netconf_output(rpc_reply);
+    REQUIRE(!reply_xml.empty());
+
+    auto rpc_reply_extracted = R"(<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>GigabitEthernet0/0/0/2</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>GigabitEthernet0/0/0/2</name>
+    </config>
+  </interface>
+</interfaces>)";
+    REQUIRE(reply_xml == rpc_reply_extracted);
+}
+
+TEST_CASE( "decode_rpc_with_attribute" )
+{
+    auto rpc_reply = R"(
+<rpc-reply xmlns:junos="http://xml.juniper.net/junos/15.1X49/junos" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+<data attr=123>
+<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>GigabitEthernet0/0/0/2</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>GigabitEthernet0/0/0/2</name>
+    </config>
+  </interface>
+</interfaces>
+</data>
+</rpc-reply>
 )";
     auto reply_xml = ydk::path::get_netconf_output(rpc_reply);
     REQUIRE(!reply_xml.empty());

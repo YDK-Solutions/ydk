@@ -18,7 +18,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
+// -------------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
 //////////////////////////////////////////////////////////////////
 
 #include <libyang/libyang.h>
@@ -117,7 +121,7 @@ NetconfSession::NetconfSession(const string& address,
     YLOG_INFO("Connected to {} on port {} using {} with timeout of {}", address, port, protocol, timeout);
 }
 
-// todo: decide whether or not to add TWO more signatures for 
+// todo: decide whether or not to add TWO more signatures for
 //       constructor to match above or just ONE more signature (go style)
 
 NetconfSession::NetconfSession(path::Repository& repo,
@@ -609,9 +613,9 @@ std::string get_netconf_output(const string & reply)
         return {};
     }
 
-    string rpc_output = extract_rpc_data(reply, "<data>", "</data>");
+    string rpc_output = extract_rpc_data(reply, "<data", "</data>");
     if (rpc_output.length() == reply.length()) {
-        rpc_output = extract_rpc_data(reply, "<nc:data>", "</nc:data>");
+        rpc_output = extract_rpc_data(reply, "<nc:data", "</nc:data>");
     }
 
     if (rpc_output.length() == reply.length())
@@ -660,7 +664,7 @@ extract_rpc_output(const string & reply)
 	string rpc_output = extract_rpc_data(reply, "<rpc-reply ", "</rpc-reply>");
     if (rpc_output.length() == reply.length()) {
         // Try with Netconf namespace prefix
-    	rpc_output = extract_rpc_data(reply, "<nc:rpc-reply ", "</nc:rpc-reply>");
+        rpc_output = extract_rpc_data(reply, "<nc:rpc-reply ", "</nc:rpc-reply>");
     }
 
     string reply_data = rpc_output;
@@ -705,9 +709,9 @@ handle_action_output(const string & reply, path::RootSchemaNode & root_schema, c
         return nullptr;
     }
 
-    string data = extract_rpc_data(reply, "<data>", "</data>");
+    string data = extract_rpc_data(reply, "<data", "</data>");
     if (data.length() == reply.length()) {
-        data = extract_rpc_data(reply, "<nc:data>", "</nc:data>");
+        data = extract_rpc_data(reply, "<nc:data", "</nc:data>");
         if (data.length() == reply.length()) {
             YLOG_INFO( "Could not locate start and/or end 'data' tag in the RPC reply");
             return nullptr;

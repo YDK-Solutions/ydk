@@ -113,7 +113,6 @@ function check_install_go {
     ./3d_party/go/goinstall.sh --version 1.10.8 > /dev/null
     sudo ln -sf $HOME/.go /usr/local/go
     sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
-    cd -
   fi
 }
 

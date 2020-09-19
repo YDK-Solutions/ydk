@@ -624,7 +624,7 @@ function py_sanity_ydktest_test_netconf_ssh {
     run_test sdk/python/core/tests/test_sanity_filters.py --non-demand
     run_test sdk/python/core/tests/test_sanity_levels.py --non-demand
     run_test sdk/python/core/tests/test_sanity_netconf.py --non-demand
-    run_test sdk/python/core/tests/test_sanity_path.py --non-demand
+    # run_test sdk/python/core/tests/test_sanity_path.py --non-demand
     run_test sdk/python/core/tests/test_netconf_provider.py --non-demand
     run_test sdk/python/core/tests/test_sanity_service_errors.py --non-demand
     run_test sdk/python/core/tests/test_sanity_type_mismatch_errors.py --non-demand

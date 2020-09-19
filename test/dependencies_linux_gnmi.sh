@@ -65,9 +65,14 @@ function install_grpc {
     if [ $status -ne 0 ]; then
       make clean
       print_msg "Installing grpc with clang"
+      sudo yum install clang -y
       cp ../3d_party/grpc/Makefile .
       make > /dev/null
-    fi
+      local status=$?
+      if [ $status -ne 0 ]; then
+         print_msg "Failed to compile grpc code; exiting"
+         exit $status
+      fi
     sudo make install
     sudo ldconfig
     cd -

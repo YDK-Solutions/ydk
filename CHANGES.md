@@ -1,9 +1,10 @@
-### 2020-07-30 version 0.8.5
+### 2020-09-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
   * Developed script install_ydk, which allows to install YDK from source in one CLI command
+  * Added support for CentOS/RHEL-8 ([#1019](https://github.com/CiscoDevNet/ydk-gen/issues/1019))
 
 #### Resolved GitHub issues
   * gNMI set RPC fails when JSON payload is formatted string

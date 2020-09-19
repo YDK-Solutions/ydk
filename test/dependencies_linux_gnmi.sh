@@ -61,6 +61,13 @@ function install_grpc {
   if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
     cd grpc
     make > /dev/null
+    local status=$?
+    if [ $status -ne 0 ]; then
+      make clean
+      print_msg "Installing grpc with clang"
+      cp ../3d_party/grpc/Makefile .
+      make > /dev/null
+    fi
     sudo make install
     sudo ldconfig
     cd -

@@ -81,16 +81,17 @@ function check_install_gcc {
 
 function install_dependencies {
     print_msg "Installing dependencies"
-    yum install sudo -y
     run_cmd sudo yum update -y > /dev/null
     run_cmd sudo yum install epel-release -y > /dev/null
 #    run_cmd sudo yum install https://centos7.iuscommunity.org/ius-release.rpm -y > /dev/null
-    run_cmd sudo yum install git which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
-    run_cmd sudo yum install cmake3 wget curl-devel unzip make java doxygen mlocate -y > /dev/null
-#     sudo yum install python-devel python-pip -y
-    run_cmd sudo yum install python3-devel python3-venv -y
-    run_cmd sudo yum install rpm-build redhat-lsb lcov -y > /dev/null
-    run_cmd sudo yum install valgrind -y
+    run_cmd sudo yum install which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
+    run_cmd sudo yum install cmake3 wget curl-devel unzip make java mlocate -y > /dev/null
+    run_cmd sudo yum install python3-devel -y > /dev/null
+    sudo yum install python3-venv -y
+    sudo yum install valgrind -y > /dev/null
+    sudo yum install rpm-build redhat-lsb -y > /dev/null
+    sudo yum install doxygen -y
+    sudo yum install lcov -y
 }
 
 function check_install_go {
@@ -108,23 +109,40 @@ function check_install_go {
     minor=0
   fi
   if (( $minor < 9 )); then
-    print_msg "Installing Golang version 1.9.2"
-    run_cmd sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
-    sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
-    rm -f go1.9.2.linux-amd64.tar.gz
-    cd /usr/local/bin
-    sudo ln -sf /usr/local/go/bin/go
+    print_msg "Installing Golang version 1.10.8"
+    ./3d_party/go/goinstall.sh --version 1.10.8 > /dev/null
+    sudo ln -sf $HOME/.go /usr/local/go
+    sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
     cd -
+  fi
+}
+
+function check_install_libssh {
+  locate libssh_threads.so
+  local status=$?
+  if [ $status -ne 0 ]; then
+    print_msg "Installing libssh-0.7.6"
+    run_cmd wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
+    tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
+    mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
+    run_cmd cmake3 ..
+    run_cmd sudo make install
+    cd -
+  else
+    if [[ ! -L /usr/lib64/libssh_threads.so && -L /usr/lib64/libssh_threads.so.4 ]]; then
+      print_msg "Adding symbolic link /usr/lib64/libssh_threads.so"
+      sudo ln -s /usr/lib64/libssh_threads.so.4 /usr/lib64/libssh_threads.so
+    fi
   fi
 }
 
 function install_confd {
   if [[ ! -s $HOME/confd/bin/confd ]]; then
-    print_msg "Installing confd"
-    run_cmd wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
-    unzip confd-basic-6.2.linux.x86_64.zip
-    run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
-    rm -f confd-basic-6.2.* ConfD*
+    print_msg "Installing confd basic 7.3"
+    unzip ./3d_party/linux/confd-basic-7.3.linux.x86_64.zip
+    cd confd-basic-7.3.linux.x86_64
+    run_cmd ./confd-basic-7.3.linux.x86_64.installer.bin $HOME/confd
+    cd -
   fi
 }
 
@@ -153,7 +171,12 @@ install_dependencies
 check_install_gcc
 check_install_go
 
+sudo updatedb
+check_install_libssh
+
+# These components needed only for YDK unit testing
+# Confd Netconf server and dependent OpenSSL library
+#
 install_confd
 install_openssl
 
-updatedb

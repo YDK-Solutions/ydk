@@ -51,10 +51,12 @@ function usage {
     echo "Environment variables:"
     echo "YDKGEN_HOME         specifies location of ydk-gen git repository;"
     echo "                    if not set, $HOME/ydk-gen is assumed"
+    echo "PYTHON_VENV         specifies location of python virtual environment;"
+    echo "                    if not set, $HOME/venv is assumed"
     echo "GOROOT              specifies installation directory of go software;"
     echo "                    if not set, /usr/local/go is assumed"
     echo "GOPATH              specifies location of golang directory;"
-    echo "                    if not set, $HOME/golang is assumed"
+    echo "                    if not set, $HOME/go is assumed"
     echo "C_INCLUDE_PATH      location of C include files;"
     echo "                    if not set, /usr/local/include is assumed"
     echo "CPLUS_INCLUDE_PATH  location of C++ include files;"
@@ -62,11 +64,15 @@ function usage {
 }
 
 function check_python_installation {
-  if [[ ! -d ${YDKGEN_HOME}/venv ]]; then
-    print_msg "Creating Python3 virtual environment in ${YDKGEN_HOME}/venv"
-    run_cmd python3 -m venv ${HOME}/venv
+  if [[ -z ${PYTHON_VENV} ]]; then
+    PYTHON_VENV=${HOME}/venv
+    print_msg "Python virtual environment location is set to ${PYTHON_VENV}"
   fi
-  run_cmd source ${HOME}/venv/bin/activate
+  if [[ ! -d ${PYTHON_VENV} ]]; then
+    print_msg "Creating Python3 virtual environment in ${PYTHON_VENV}"
+    run_cmd python3 -m venv ${PYTHON_VENV}
+  fi
+  run_cmd source ${PYTHON_VENV}/bin/activate
 
   print_msg "Checking python version and installation"
   python --version
@@ -84,8 +90,6 @@ function check_python_installation {
     print_msg "Could not locate ${PIP_BIN}"
     exit $status
   fi
-  print_msg "Python location: $(which ${PYTHON_BIN})"
-  print_msg "Pip location: $(which ${PIP_BIN})"
 }
 
 function init_py_env {
@@ -320,7 +324,12 @@ if [[ ${os_type} == "Linux" ]]; then
     if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* ]]; then
         print_msg "WARNING! Unsupported Ubuntu distribution found. Will try the best efforts."
     fi
-  elif [[ ${os_info} != *"fedora"* ]]; then
+  elif [[ ${os_info} == *"fedora"* ]]; then
+    rhel_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
+    if [[ $rhel_version != 7 && $rhel_version != 8 ]]; then
+        print_msg "WARNING! Unsupported Centos/RHEL version. Will try the best efforts."
+    fi
+  else
     MSG_COLOR=${RED}
     print_msg "Unsupported Linux distribution detected"
     exit 1

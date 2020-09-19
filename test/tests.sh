@@ -106,6 +106,10 @@ function init_confd {
 function init_confd_ydktest {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
     rm -rf $HOME/.ydk/127.0.0.1
+
+    # Correct issue with confd 7.3
+    mkdir -p $HOME/.ydk/127.0.0.1
+    cp ${YDKGEN_HOME}/sdk/cpp/core/tests/models/ietf-interfaces.yang $HOME/.ydk/127.0.0.1/
 }
 
 function init_rest_server {
@@ -945,7 +949,7 @@ run_go_bundle_tests
 ######################################
 install_py_core
 run_python_bundle_tests
-run_python_oc_nis_tests
+#run_python_oc_nis_tests
 run_py_metadata_test
 run_py_backward_compatibility
 

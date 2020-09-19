@@ -33,8 +33,8 @@
 
 ![ydk-logo-128](https://cloud.githubusercontent.com/assets/16885441/24175899/2010f51e-0e56-11e7-8fb7-30a9f70fbb86.png)
 
-YANG Development Kit (Generator)
-================================
+YANG Development Kit
+====================
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -44,14 +44,12 @@ YANG Development Kit (Generator)
 - [Backward compatibility](#backward-compatibility)
 - [Docker](#docker)
 - [System requirements](#system-requirements)
-  - [Linux](#linux)
-  - [MacOSX](#mac-osx)
-  - [Windows](#windows)
-- [YDK Python Installation](#ydk-python-installation)
-  - [Setting up Python virtual environment](#setting-up-python-virtual-environment)
-  - [Clone ydk-gen and install the requirements](#clone-ydk-gen-and-install-the-requirements)
+- [Core Installation](#core-installation)
+  - [Installation Script](#installation-script)
+  - [Building from Source](#building-from-source)
+  - [Adding gNMI Service](#adding-gnmi-service)
 - [Generate YDK components](#generate-ydk-components)
-  - [Generate and install the core](#generate-and-install-the-core)
+  - [Generate deployment packages](#generate-deployment-packages)
   - [Build model bundle profile](#build-model-bundle-profile)
   - [Generate and install model bundle](#generate-and-install-model-bundle)
   - [Writing your first app](#writing-your-first-app)
@@ -59,6 +57,7 @@ YANG Development Kit (Generator)
 - [Generating an "Adhoc" YDK-Py Bundle](#generating-an-adhoc-ydk-py-bundle)
 - [Notes](#notes)
   - [Python Requirements](#python-requirements)
+  - [C++ Requirements](#c-requirements)
   - [Directory structure](#directory-structure)
   - [Troubleshooting](#troubleshooting)
 - [Running Unit Tests](#running-unit-tests)
@@ -76,11 +75,10 @@ YANG Development Kit (Generator)
 to apply generated API over multiple communication protocols.
 Currently supported languages are: Python, Go and C++.
 Currently implemented protocols are: Netconf, Restconf, OpenDaylight and gNMI.
-YDK provides CRUD and protocol specific service over above protocols.
-YDK also provides Codec services to translate API models to/from XML and JSON encoded strings.
+YDK provides CRUD and protocol specific services over above protocols.
+YDK also provides codec services to translate API models to/from XML and JSON encoded strings.
 
 Other tools and libraries are used to deliver `YDK` functionality:
-
 * YANG model analysis and code generation is implemented using APIs from the [pyang](https://github.com/mbj4668/pyang) library
 * Documentation is generated using [Sphinx](http://www.sphinx-doc.org/en/stable/)
 * Runtime YANG model analysis is done using [libyang](https://github.com/CESNET/libyang)
@@ -102,6 +100,7 @@ The YDK-0.8.5 core is backward compatible with all previously generated model bu
 However the YDK-0.8.5 generates different code and model API comparing to YDK-0.8.4.
 The YDK-0.8.5 generated code is not compatible with YDK-0.7.2 and earlier bundle packages due to changes in modeling and handling YList objects.
 
+**NOTE.** Starting from release 0.8.5 the YDK does not support Python2 interpreter as it was deprecated.
 
 # Docker
 
@@ -117,269 +116,136 @@ docker run -it ydksolutions/ydk-gen
 
 # System requirements
 
-Please follow the below instructions to install the system requirements before installing YDK-Py/YDK-Cpp/YDK-Go.
+The YDK is currently supported on the following platforms:
+ - Linux Ubuntu Xenial (16.04 LTS) and Bionic (18.04.LTS)
+ - Linux CentOS/RHEL versions 7 and 8
+ - MacOS up to 10.14.6 (Mojave)
 
-**Please note**. If you are using the latest ydk-gen master branch code, you may not be able to use prebuilt libraries and packages.
-In this case you need to build all the components [from source](#build-from-source) after installing the below requirements:
+On supported platforms the YDK can be installed using [installation script](#installation-script).
+On other platforms the YDK should be installed manually [from source](#building-from-source).
+For both the methods the user must install `git` package prior to  the installation procedure.
 
-## Linux
+All YDK core components are built using C and C++ compilers, which are default for the supported platform.
+Corresponding libraries and header files are installed in default locations,
+which are `/usr/local/lib`, `/usr/local/bin` and `/usr/local/include`.
+Therefore the user must have sudo access in order to install YDK core components to these locations.
 
-### Ubuntu (Debian-based)
+# Core Installation
 
-#### Install OS dependency packages
+## Installation Script
 
-```
-sudo apt-get install gdebi-core python3-dev libtool-bin gcc-g++
-sudo apt-get install libcurl4-openssl-dev libpcre3-dev libssh-dev libxml2-dev libxslt1-dev cmake
-```
+For YDK installation it is recommended to use script `install_ydk.sh` from `ydk-gen` git repository.
+The script detects platform OS, installs all the dependencies and builds complete set of YDK components for specified language.
+The user must have sudo access to these locations.
 
-#### Install libydk library
+The YDK extensively uses Python scripts for building its components and model API packages (bundles).
+In order to isolate YDK Python environment from system installation, the script builds Python3 virtual environment.
+The user must manually activate virtual environment when generating model bundles and/or running YDK based application.
+By default the Python virtual environment is installed under `$HOME/venv` directory.
+If user has different location, the PYTHON_VENV environment variable should be set to that location.
 
-You can install the latest `libydk` core library using prebuilt binaries for Xenial and Bionic distributions.
-The C++ code was compiled with default gcc compiler version for these distributions.
-For other Ubuntu distributions and/or gcc compiler versions it is recommended to build `libydk` library [from source](#build-from-source).
-
-##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
-
-```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk-0.8.5-1.amd64.deb
-sudo gdebi libydk-0.8.5-1.amd64.deb
-```
-
-##### Bionic (Ubuntu 18.04.1, gcc-7.4.0):
-
-```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk-0.8.5-1.amd64.deb
-sudo gdebi libydk-0.8.5-1.amd64.deb
-```
-
-### CentOS-7 (Fedora-based)
-
-#### Install OS dependency packages
+Here is simple example of core YDK installation for Python programming language:
 
 ```
-sudo yum install epel-release
-sudo yum install libssh-devel gcc-c++ python3-devel
+git clone https://github.com/ygorelik/ydk-gen.git -b 0.8.5
+cd ydk-gen
+export YDKGEN_HOME=`pwd`  # optional
+export PYTHON_VENV=$HOME/ydk_vne  # optional
+./install_ydk.sh --core
 ```
 
-if your gcc compiler version is below 4.8.1, install gcc-5 and g++-5
+The script also allows to install individual components like dependencies, core, and service packages
+ for specified programming language or for all supported languages.
+ Full set of script capabilities could be viewed like this:
 
 ```
-sudo yum install centos-release-scl -y > /dev/null
-sudo yum install devtoolset-4-gcc* -y > /dev/null
-sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/gcc /usr/bin/gcc
-sudo ln -sf /opt/rh/devtoolset-4/root/usr/bin/g++ /usr/bin/g++
+./install_ydk.sh --help
+usage: install_ydk [-l [cpp, py, go]] [-s gnmi] [-h] [-n]
+Options and arguments:
+  -l [cpp, py, go, all] installation language; if not specified Python is assumed
+                        'all' corresponds to all available languages
+  -c|--core             install YDK core package
+  -s|--service gnmi     install gNMI service package
+  -n|--no-deps          skip installation of dependencies
+  -h|--help             print this help message and exit
+ 
+Environment variables:
+YDKGEN_HOME         specifies location of ydk-gen git repository;
+                    if not set, $HOME/ydk-gen is assumed
+PYTHON_VENV         specifies location of python virtual environment;
+                    if not set, /home/ygorelik/venv is assumed
+GOROOT              specifies installation directory of go software;
+                    if not set, /usr/local/go is assumed
+GOPATH              specifies location of go source directory;
+                    if not set, $HOME/go is assumed
+C_INCLUDE_PATH      location of C include files;
+                    if not set, /usr/local/include is assumed
+CPLUS_INCLUDE_PATH  location of C++ include files;
+                    if not set, /usr/local/include is assumed
 ```
 
-#### Install libydk library
+If user environment is different from the default one (different Python installation or different
+ location of libraries) then building from source method should be used.
 
-The C++ code was compiled with default gcc compiler version, which is 4.8.5. For other gcc compiler versions it is recommended to build `libydk` library [from source](#build-from-source).
+## Building from Source
 
-```  
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk-0.8.5-1.x86_64.rpm
-```
-
-## Mac OSX
-
-It is recommended to install [homebrew](http://brew.sh) and Xcode command line tools on your system before installing YDK software.
-
-#### Install OS dependency packages
+If user platform is supported one, it is recommended to use `ydk-gen` script `install_ydk.sh`, 
+in order to install third party software dependencies.
 
 ```
-xcode-select --install
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install pkg-config libssh xml2 curl pcre cmake libxml2 doxygen libgcrypt
-brew install python pybind11
+# Clone ydk-gen from GitHub
+git clone https://github.com/ygorelik/ydk-gen.git -b 0.8.5
+cd ydk-gen
+
+# Define optional environment variables and install dependencies
+export YDKGEN_HOME=`pwd`  
+export PYTHON_VENV=$HOME/ydk_venv
+./install_ydk.sh   # also builds Python virtual environment
+
+# Activate Python virtual environment
+source $PYTHON_VENV/bin/activate
+
+# Generate and install YDK core library
+./generate.py -is --core --cpp
+
+# For Python programming language add
+./generate.py -i --core 
+
+# For Go programming language add
+./generate.py -i --core --go
 ```
 
-#### Install libydk package
+## Adding gNMI Service
 
-The prebuilt `libydk` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler.
-For other C++ compilers it is recommended to build `libydk` [from source](#build-from-source).
+In order to enable YDK support for gNMI protocol, which is optional, the user need install third party software
+ and YDK gNMI service package. 
 
-```
-curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk-0.8.5-Darwin.pkg
-sudo installer -pkg libydk-0.8.5-Darwin.pkg -target /
-```
+### gNMI Service installation
 
-## Libssh installation
-
-Please note that libssh-0.8.0 `does not support <http://api.libssh.org/master/libssh_tutor_threads.html>`_ separate threading library,
-which is required by YDK. Therefore, if after installation of libssh package you find that the `libssh_threads.a` library is missing,
-please downgrade the installation of libssh to version 0.7.6, or upgrade to 0.8.1 or higher.
-
-**Note for MacOS**
-Before installing `libssh` make sure the environment for `openssl` is setup:
+Here is simple example how gNMI service package for Python could be added:
 
 ```
-brew reinstall openssl
-export OPENSSL_ROOT_DIR=/usr/local/opt/openssl
-```
-
-Download libssh-0.7.6 source code, compile it and install:
-
-```
-wget https://git.libssh.org/projects/libssh.git/snapshot/libssh-0.7.6.tar.gz
-tar zxf libssh-0.7.6.tar.gz && rm -f libssh-0.7.6.tar.gz
-mkdir libssh-0.7.6/build && cd libssh-0.7.6/build
-cmake ..
-sudo make install
-```
-
-## Windows
-
-From release ``0.6.0`` the YDK is not supported on Windows.
-
-## gNMI Requirements
-
-In order to enable YDK support for gNMI protocol, which is optional, the following third party software
-must be installed prior to gNMI YDK component installation.
-
-### Install protobuf and protoc
-
-```
-wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip
-unzip protobuf-cpp-3.5.0.zip
-cd protobuf-3.5.0
-./configure
-make
-sudo make install
-sudo ldconfig
-```
-
-### Install gRPC
-
-```
-git clone -b v1.9.1 https://github.com/grpc/grpc
-cd grpc
-git submodule update --init
-make
-sudo make install
-sudo ldconfig
-cd -
-```
-
-### Install YDK gNMI library
-
-#### Ubuntu
-
-##### Xenial (Ubuntu 16.04.4, gcc-5.5.0):
-
-```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/xenial/libydk_gnmi-0.4.0-5.amd64.deb
-sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
-```
-
-##### Bionic (Ubuntu 18.04.1, gcc-7.4.0))
-
-```
-wget https://devhub.cisco.com/artifactory/debian-ydk/0.8.5/bionic/libydk_gnmi-0.4.0-5.amd64.deb
-sudo gdebi libydk_gnmi-0.4.0-5.amd64.deb
-```
-
-#### CentOS
-
-The `libydk_gnmi` package was compiled with gcc-4.8.5.
-
-```
-sudo yum install https://devhub.cisco.com/artifactory/rpm-ydk/0.8.5/libydk_gnmi-0.4.0-5.x86_64.rpm
-```
-
-#### MacOS:
-
-The prebuilt `libydk_gnmi` package was compiled in MacOS-10.11.6 with clang-8.0.0 compiler.
-For other C++ compilers it is recommended to build `libydk` library [from source](#build-from-source)
-
-```
-curl -O https://devhub.cisco.com/artifactory/osx-ydk/0.8.5/libydk_gnmi-0.4.0-5.Darwin.pkg
-sudo installer -pkg libydk_gnmi-0.4.0-5.Darwin.pkg -target /
+cd ydk-gen
+./install_ydk.sh -l py --service gnmi
 ```
 
 ### Runtime environment
 
-There is an open issue with gRPC on Centos/Fedora, which requires an extra step before running any YDK gNMI application.
+There is an open issue with gRPC on Centos/RHEL, which requires an extra step before running any YDK gNMI application.
 See this issue on [GRPC GitHub](https://github.com/grpc/grpc/issues/10942#issuecomment-312565041) for details.
 As a workaround, the YDK based application runtime environment must include setting of `LD_LIBRARY_PATH` variable:
 
 ```
-PROTO="/Your-Protobuf-and-Grpc-installation-directory"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROTO/grpc/libs/opt:$PROTO/protobuf-3.5.0/src/.libs:/usr/local/lib64
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib64
 ```
 
-## Build from source
 
-Install dependencies OS dependencies then generate and install YDK C++ libraries; you might need
-sudo access to install the libraries in default locations, which are `/usr/local/lib` and `/usr/local/include`.
+# Generate YDK components
+
+All the YDK components/packages can be generated by using Python script `generate.py`. To get all of its options run:
 
 ```
-# Clone ydk-gen from GitHub
-git clone https://github.com/CiscoDevNet/ydk-gen.git -b 0.8.5
 cd ydk-gen
-pip install -r requirements.txt
-
-# Generate and install libydk library
-./generate -is --cpp --core
-
-# Generate and install libydk_gnmi library (optional)
-./generate -is --cpp --service profiles/services/gnmi-0.4.0.json
-```
-
-# YDK Python Installation
-
-## Setting up Python virtual environment
-
-We recommend that you run `ydk-gen` under Python virtual environment.
-
-### Create Python virtual environment
-
-To install Python virtual environment in your system, execute:
-
-#### Linux OS
-
-##### Python 3.5 and up
-
-```
-python3 -m venv /your/virtualenv/directory
-```
-
-##### Python 3.4 and below
-
-```
-pip install virtualenv
-virtualenv -p python2.7 /your/virtualenv/directory
-```
-
-#### MacOS
-
-```
-pip3 install virtualenv
-virtualenv -p python3 /your/virtualenv/directory
-```
-
-### Activate just created virtual environment
-
-```
-source /your/virtualenv/directory/bin/activate
-```
-
-### Exit virtual environment
-
-```
-deactivate
-```
-
-## Clone ydk-gen and install the requirements
-
-```
-git clone https://github.com/CiscoDevNet/ydk-gen.git
-cd ydk-gen
-pip install -r requirements.txt
-```
-
-## Generate YDK components
-All the YDK components/packages can be generated by using Python script `generate.py`.
-
-```
 ./generate.py --help
 usage: generate.py [-h] [-l] [--core] [--service SERVICE] [--bundle BUNDLE]
                    [--adhoc-bundle-name ADHOC_BUNDLE_NAME]
@@ -417,44 +283,27 @@ optional arguments:
                         Generate separate modules for each python class
                         corresponding to yang containers or lists.
 ```
+
 The below steps specify how to use `generate.py` to generate YDK core, model bundle, and service packages. All these packages are available for Python, Go and C++ in corresponding github repositories: [ydk-py](https://github.com/CiscoDevNet/ydk-py),  [ydk-go](https://github.com/CiscoDevNet/ydk-go) and [ydk-cpp](https://github.com/CiscoDevNet/ydk-cpp).
 
 The script [create_ydk_sdk_for_github.sh](create_ydk_sdk_for_github.sh) can be used to generate the `ydk-py`, `ydk-cpp` and `ydk-go` repositories after having generated all the bundles and core packages using `generate.py`.
 
-## Generate and install the core
+## Generate deployment packages
 
-Some model bundles have bin packaged and published in [Pypi](https://pypi.org) repository. These bundles can be installed with `pip` utility. For example, when executing `pip install ydk-models-cisco-ios-xr`, you will install the latest released in PyPi IOS XR device package.
+First the core installation procedure must be executed. Refer to [Core Installation](#core-installation) section for details.
 
-**Note:**
-There usually would have been changes on the master branch since the last [released version](https://github.com/CiscoDevNet/ydk-py/releases). To install the latest code at your own risk, you need to follow the below steps in the exact order.
-
-First generate and install `libydk`
+To create the `libydk` binary package run the below commands:
 
 ```
-./generate.py --libydk
-cd gen-api/cpp/ydk/build
-make
-[sudo] make install
-```
-
-To create the libydk binary package to use for later installation, run the below command
-
-```
+cd ydk-gen/gen-api/cpp/ydk/build
 [sudo] make package
 ```
 
-For Python:
+To create the `libydk_gnmi` binary package run the below commands:
 
 ```
-./generate.py --python --core
-pip install gen-api/python/ydk/dist/ydk*.tar.gz
-```
-
-For Go:
-
-```
-export $GOPATH=/your-go-path-installation-directory
-./generate.py --go --core
+cd ydk-gen/gen-api/cpp/ydk-service-gnmi/build
+[sudo] make package
 ```
 
 ## Build model bundle profile
@@ -527,7 +376,9 @@ Only directory examples are shown in this example.
 
 Generate model bundle using a bundle profile and install it.
 
-For Python:
+### For Python
+
+Python virtual environment must be activated prior to these procedures
 
 ```
 ./generate.py --python --bundle profiles/bundles/<name-of-profile>.json
@@ -537,10 +388,10 @@ For Python:
 or using installation options:
 
 ```
-./generate.py --bundle profiles/bundles/<name-of-profile>.json -i [-s]
+./generate.py --bundle profiles/bundles/<name-of-profile>.json -i
 ```
 
-Now, the `pip list | grep ydk` should show the `ydk` (referring to the core package) and `ydk-<name-of-bundle>` packages installed:
+Check Python packages installed:
 
 ```
 pip list | grep ydk
@@ -551,14 +402,14 @@ ydk-models-<name-of-bundle> (0.5.1)
 ...
 ```
 
-For Go:
+### For Go
 
 ```
 export $GOPATH=/your-go-path-installation-directory
 ./generate.py --go --bundle profiles/bundles/<name-of-profile>.json -i
 ```
 
-For C++:
+### For C++
 
 ```
 ./generate.py --cpp --bundle profiles/bundles/<name-of-profile>.json
@@ -576,22 +427,21 @@ or using installation options:
 ## Writing your first app
 
 Now, you can start creating apps based on the models in your bundle.
-Assuming you generated a python bundle, the models will be available for importing in your app under
+Assuming you have generated a python bundle, the models will be available for importing in your app under
 `ydk.models.<name-of-your-bundle>`.
 For examples, see [ydk-py-samples](https://github.com/CiscoDevNet/ydk-py-samples#a-hello-world-app) and
 [C++ samples](sdk/cpp/samples).
 Also refer to the [documentation for python](http://ydk.cisco.com/py/docs/developer_guide.html),
 [Go](http://ydk.cisco.com/go/docs/developer_guide.html) and
-[for C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
+[C++](http://ydk.cisco.com/cpp/docs/developer_guide.html).
 
 ## Documentation
 
-When generating the YDK documentation for several bundles and the core, it is recommended to generate the bundles without the `--generate-doc` option.
-After generating all the bundles, the combined documentation for all the bundles and the core can be generated using the `--core --generate-doc` option.
+In order to generate YDK core and bundles documentation, the `--generate-doc` option of `generate.py` script is used, while generating core package. Therefore the user should generate all the bundles without the `--generate-doc` option prior to the documentation generation.
 For example, the below sequence of commands will generate the documentation for the three python bundles and the python core
 (for C++, use `--cpp`; for Go, use `--go`).
 
-Note that the below process could take few hours due to the size of the `cisco_ios_xr` bundle.
+**Note.** The documentation generation for bundles can take few hours due to their size.
 
 ```
 ./generate.py --python --bundle profiles/bundles/ietf_0_1_1.json
@@ -600,19 +450,18 @@ Note that the below process could take few hours due to the size of the `cisco_i
 ./generate.py --python --core --generate-doc
 ```
 
-If you have previously generated documentation, using the `--cached-output-dir --output-directory <dir>` option can be used to reduce document generation time. Taking Python as an example:
+If you have previously generated documentation using the `--cached-output-dir --output-directory <dir>` option,
+ the add-on documentation generation time can be reduced. Adding cisco-ios-xr documentation as an example:
 
 ```
 mkdir gen-api/cache
 mv gen-api/python gen-api/cache
 
-./generate.py --python --bundle profiles/bundles/ietf_0_1_5.json
-./generate.py --python --bundle profiles/bundles/openconfig_0_1_5.json
-./generate.py --python --bundle profiles/bundles/cisco_ios_xr_6_3_2.json
-./generate.py --python --core --generate-doc --output-directory gen-api --cached-output-dir -v
+./generate.py --python --bundle profiles/bundles/cisco_ios_xr_6_6_3.json
+./generate.py --python --core --generate-doc --output-directory gen-api --cached-output-dir
 ```
 
-Pre-generated documentation for [ydk-py](http://ydk.cisco.com/py/docs/) and [ydk-cpp](http://ydk.cisco.com/cpp/docs/) are available.
+Pre-generated documentation is available on the web for [Python](http://ydk.cisco.com/py/docs/), [C++](http://ydk.cisco.com/cpp/docs/) and [Go](http://ydk.cisco.com/go/docs/).
 
 # Generating an "Adhoc" YDK-Py Bundle
 
@@ -631,14 +480,13 @@ When run in this way, we will generate a bundle that only contains the files spe
 
 ## Python Requirements
 
-YDK supports both Python2 and Python3 versions.  At least Python2.7 or Python3.4 along with corresponding utilities pip and pip3 must be installed on your system.
+Starting from release 0.8.5 YDK supports only Python3 version.  At least Python3.4 along with corresponding pip3 utility must be installed on your the system. It is also required for Python installation to include corresponding shared library. As example:
 
-It is also required for Python installation to include corresponding shared library. As example:
-
- - python2.7  - /usr/lib/x86_64-linux-gnu/libpython2.7.so
  - python3.5m - /usr/lib/x86_64-linux-gnu/libpython3.5m.so
 
-Please follow [System requirements](#system-requirements) to assure presence of shared Python libraries.
+Please follow [Core Installation](#core-installation) procedures to assure presence of shared Python libraries.
+
+## C++ Requirements
 
 In some OS configurations during YDK package installation the `cmake` fails to find C/C++ headers for installed YDK libraries.
 In this case the header location must be specified explicitly:
@@ -648,27 +496,28 @@ export C_INCLUDE_PATH=/usr/local/include
 export CPLUS_INCLUDE_PATH=/usr/local/include
 ```
 
-### Mac OS
-
-The developers of Python2 on Mac OS might face an issue ([#837](https://github.com/CiscoDevNet/ydk-gen/issues/837)).
-This is well known and documented issue. Each developer might have different approaches for its resolution.
-One of them is to use Python2 virtual environment. See [Setting up Python virtual environment](#setting-up-python-virtual-environment) for details.
-
 ## Directory structure
 
 ```
-README          - install and usage notes
-gen-api         - generated bundle/core
+gen-api         - generated code and packages for core and bundles
                     - python (Python SDK)
                     - go (Go SDK)
                     - cpp (C++ SDK)
 
-generate.py     - script used to generate SDK for yang models
+3d_party        - suplemental code for third party software
 profiles        - profile files used during generation
+sdk             - sdk core and stubs for python, go and cpp
+test            - dependencies and unit test shell scripts
 yang            - some yang models used for testing
+ydkgen          - python code to extend generate.py script 
+
+create_ydk_sdk_for_github.sh - convenience script to generate language specific repositories
+generate_bundles.sh          - convinience script to generate core and bundle packages for deployment
+
+generate.py     - script used to generate SDK for yang models
+install_ydk.sh  - YDK core components installation script
 requirements.txt- python dependencies used during installation
-sdk             - sdk core and stubs for python and cpp
-test            - test code
+README          - installation and usage notes
 ```
 
 ## Troubleshooting
@@ -691,74 +540,68 @@ pyang *.yang
 
 #### Install the core and bundle packages
 
-After creating and activating [virtual environment](#setting-up-python-virtual-environment) install Python dependencies:
+After installing C++ core packages and activating Python virtual environment:
 
-```
-cd ydk-gen
-pip install -r requirements.txt
-```
-Then install core and bundle packages:
+1. Install bundle package
 
-```
-cd ydk-gen
-./generate.py -i --core
-./generate.py -i --bundle profiles/test/ydktest-cpp.json
-./generate.py -i --bundle profiles/test/ydktest-oc-nis.json
-```
+    ```
+    cd ydk-gen
+    ./generate.py -i --core
+    ./generate.py -i --bundle profiles/test/ydktest-cpp.json
+    ```
 
-#### Start confd
+2. Start confd
 
-```
-source /confd/installation/directory/confdrc
-cd ydk-gen/sdk/cpp/core/tests/confd/ydktest
-make all
-make start
-```
+    ```
+    source $HOME/confd/confdrc
+    cd ydk-gen/sdk/cpp/core/tests/confd/ydktest
+    make all
+    make start
+    ```
 
-#### Run unit tests
+3. Run unit tests
 
-```
-cd ydk-gen/sdk/python
-python test/test_sanity_types.py
-python test/test_sanity_levels.py
-python test/test_sanity_filters.py
-```
+    ```
+    cd ydk-gen/sdk/python
+    python test/test_sanity_types.py
+    python test/test_sanity_levels.py
+    python test/test_sanity_filters.py
+    ```
 
 ## C++
 
-#### Install the core and bundle packages
+1. Install the core and bundle packages
 
-```
-cd ydk-gen
-./generate.py -is --core --cpp
-./generate.py -is --bundle profiles/test/ydktest-cpp.json --cpp
-./generate.py -is --bundle profiles/test/ydktest-oc-nis.json --cpp
-```
+    ```
+    cd ydk-gen
+    ./generate.py -is --core --cpp
+    ./generate.py -is --bundle profiles/test/ydktest-cpp.json --cpp
+    ```
 
-#### Run the core tests
+2. Run the core tests
 
-```
-cd ydkgen/gen-api/cpp/ydk/build
-./test/ydk_core_test
-```
+    ```
+    cd ydkgen/gen-api/cpp/ydk/build
+    ./test/ydk_core_test
+    ```
 
-#### Start confd
+3. Start confd
 
-```
-source /confd/installation/directory/confdrc
-cd ydk-gen/sdk/cpp/core/tests/confd/ydktest
-make all
-make start
-```
+    ```
+    source $HOME/confd/confdrc
+    cd ydk-gen/sdk/cpp/core/tests/confd/ydktest
+    make all
+    make start
+    ```
 
-#### Build and run bundle tests
+4. Build and run bundle tests
 
-```
-cd ydk-gen/sdk/cpp/tests
-mkdir build && cd build
-cmake .. && make
-./ydk_bundle_test
-```
+    ```
+    cd ydk-gen/sdk/cpp/tests
+    mkdir build && cd build
+    cmake .. && make
+    ./ydk_bundle_test
+    ```
 
 ## Go
 

@@ -73,6 +73,7 @@ function install_grpc {
          print_msg "Failed to compile grpc code; exiting"
          exit $status
       fi
+    fi
     sudo make install
     sudo ldconfig
     cd -

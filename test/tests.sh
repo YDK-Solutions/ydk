@@ -103,13 +103,17 @@ function init_confd {
     cd -
 }
 
-function init_confd_ydktest {
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+function reset_yang_repository {
     rm -rf $HOME/.ydk/127.0.0.1
 
     # Correct issue with confd 7.3
     mkdir -p $HOME/.ydk/127.0.0.1
     cp ${YDKGEN_HOME}/sdk/cpp/core/tests/models/ietf-interfaces.yang $HOME/.ydk/127.0.0.1/
+}
+
+function init_confd_ydktest {
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/ydktest
+    reset_yang_repository
 }
 
 function init_rest_server {
@@ -645,7 +649,7 @@ function py_sanity_ydktest_test_tcp {
 #--------------------------
 
 function py_sanity_deviation {
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
     py_sanity_deviation_ydktest_gen
     py_sanity_deviation_ydktest_install
     py_sanity_deviation_ydktest_test
@@ -653,7 +657,7 @@ function py_sanity_deviation {
     py_sanity_deviation_bgp_gen
     py_sanity_deviation_bgp_install
     py_sanity_deviation_bgp_test
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
 }
 
 function py_sanity_deviation_ydktest_gen {
@@ -707,11 +711,11 @@ function py_sanity_deviation_bgp_test {
 function py_sanity_augmentation {
     print_msg "Running py_sanity_augmentation"
 
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
     py_sanity_augmentation_gen
     py_sanity_augmentation_install
     py_sanity_augmentation_test
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
 }
 
 function py_sanity_augmentation_gen {
@@ -744,7 +748,7 @@ function py_sanity_augmentation_test {
 function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
   if [[ ${os_type} != "Darwin" ]] ; then
     # GitHub issue #909
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
@@ -755,7 +759,7 @@ function py_sanity_common_cache {
 
     run_test sdk/python/core/tests/test_sanity_levels.py --common-cache
     run_test sdk/python/core/tests/test_sanity_types.py --common-cache
-    rm -rf $HOME/.ydk/*
+    reset_yang_repository
 }
 
 function py_sanity_run_limited_tests {

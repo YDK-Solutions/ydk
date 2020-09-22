@@ -96,6 +96,7 @@ function init_confd {
     cd $1
     print_msg "Initializing confd in $(pwd)"
     source $HOME/confd/confdrc
+    confd_version=$(confd --version)
     run_exec_test make stop > /dev/null
     run_exec_test make clean > /dev/null
     run_exec_test make all > /dev/null
@@ -107,7 +108,7 @@ function reset_yang_repository {
     rm -f $HOME/.ydk/127.0.0.1/*
 
     # Correct issue with confd 7.3
-    if [[ $centos_version > 7 ]]; then
+    if [[ $confd_version > 7.2 ]]; then
       cp ${YDKGEN_HOME}/sdk/cpp/core/tests/models/ietf-interfaces.yang $HOME/.ydk/127.0.0.1/
     fi
 }
@@ -939,6 +940,8 @@ init_confd_ydktest
 init_rest_server
 init_tcp_server
 
+print_msg "Using confd-basic-$confd_version for running unit tests"
+
 ######################################
 # Install and run C++ core tests
 ######################################
@@ -959,8 +962,9 @@ install_py_core
 run_python_bundle_tests
 #run_python_oc_nis_tests
 run_py_metadata_test
-run_py_backward_compatibility
-
+if [[ $confd_version < 7.3 ]]; then
+  run_py_backward_compatibility
+fi
 # test_gen_tests
 
 ######################################

@@ -87,11 +87,14 @@ function install_dependencies {
     run_cmd sudo yum install which libxml2-devel libxslt-devel libssh-devel libtool gcc-c++ pcre-devel -y > /dev/null
     run_cmd sudo yum install cmake3 wget curl-devel unzip make java mlocate -y > /dev/null
     run_cmd sudo yum install python3-devel -y > /dev/null
-    sudo yum install python3-venv -y
     sudo yum install valgrind -y > /dev/null
     sudo yum install rpm-build redhat-lsb -y > /dev/null
-    sudo yum install doxygen -y
-    sudo yum install lcov -y
+    sudo yum install python3-venv -y
+    if [[ $centos_version < 8 ]]; then
+      # TODO: to be resolved for Centos-8
+      sudo yum install doxygen -y
+      sudo yum install lcov -y
+    fi
 }
 
 function check_install_go {
@@ -137,11 +140,19 @@ function check_install_libssh {
 
 function install_confd {
   if [[ ! -s $HOME/confd/bin/confd ]]; then
-    print_msg "Installing confd basic 7.3"
-    unzip ./3d_party/linux/confd-basic-7.3.linux.x86_64.zip
-    cd confd-basic-7.3.linux.x86_64
-    run_cmd ./confd-basic-7.3.linux.x86_64.installer.bin $HOME/confd
-    cd -
+    if [[ $centos_version > 7 ]]; then
+      print_msg "Installing confd basic 7.3"
+      unzip ./3d_party/linux/confd-basic-7.3.linux.x86_64.zip
+      cd confd-basic-7.3.linux.x86_64
+      run_cmd ./confd-basic-7.3.linux.x86_64.installer.bin $HOME/confd
+      cd -
+    else
+      print_msg "Installing confd basic 6.2"
+      run_cmd wget https://github.com/CiscoDevNet/ydk-gen/files/562538/confd-basic-6.2.linux.x86_64.zip &> /dev/null
+      unzip confd-basic-6.2.linux.x86_64.zip
+      run_cmd ./confd-basic-6.2.linux.x86_64.installer.bin $HOME/confd
+    fi
+    rm -rf confd-basic* ConfD*
   fi
 }
 
@@ -165,6 +176,8 @@ function install_openssl {
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
+
+centos_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
 
 install_dependencies
 check_install_gcc

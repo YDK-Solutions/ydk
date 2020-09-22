@@ -107,7 +107,7 @@ function reset_yang_repository {
     rm -f $HOME/.ydk/127.0.0.1/*
 
     # Correct issue with confd 7.3
-    if [[ ! -z $centos_version && $centos_version < 8 ]]; then
+    if [[ $centos_version > 7 ]]; then
       cp ${YDKGEN_HOME}/sdk/cpp/core/tests/models/ietf-interfaces.yang $HOME/.ydk/127.0.0.1/
     fi
 }
@@ -154,7 +154,7 @@ function check_python_installation {
   fi
 
   if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
-    print_msg "Creating Python3 virtual environment in $YDKGEN_HOME/venv"
+    print_msg "Creating Python3 virtual environment in $HOME/venv"
     run_exec_test ${PYTHON_BIN} -m venv $HOME/venv
     run_exec_test source $HOME/venv/bin/activate
   fi
@@ -498,7 +498,7 @@ function run_go_sanity_tests {
 function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
-    if [[ ${os_type} != "Darwin" || $centos_version < 8 ]]; then
+    if [[ ${os_type} != "Darwin" && $centos_version. < 8. ]]; then
         # GitHub issue #909
         py_sanity_deviation
     fi
@@ -750,7 +750,7 @@ function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
     reset_yang_repository
-  if [[ ${os_type} != "Darwin" ]] ; then
+  if [[ ${os_type} != "Darwin" && $centos_version. < 8. ]]; then
     # GitHub issue #909
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
@@ -930,6 +930,7 @@ if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64:/usr/local/lib64:/usr/local/lib
    print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
    centos_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
+   mkdir -p $HOME/.ydk
    mkdir -p $HOME/.ydk/127.0.0.1
 fi
 

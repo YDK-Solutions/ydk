@@ -88,8 +88,10 @@ function install_dependencies {
     run_cmd sudo yum install cmake3 wget curl-devel unzip make java mlocate -y > /dev/null
     run_cmd sudo yum install python3-devel -y > /dev/null
     sudo yum install valgrind -y > /dev/null
-    sudo yum install rpm-build redhat-lsb -y > /dev/null
+    sudo yum install rpm-build redhat-lsb redhat-lsb-core -y > /dev/null
     sudo yum install python3-venv -y
+    centos_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
+    print_msg "Running Centos/RHEL version $centos_version"
     if [[ $centos_version < 8 ]]; then
       # TODO: to be resolved for Centos-8
       sudo yum install doxygen -y
@@ -176,8 +178,6 @@ function install_openssl {
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
-
-centos_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
 
 install_dependencies
 check_install_gcc

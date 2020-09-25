@@ -105,6 +105,10 @@ function init_confd {
 }
 
 function reset_yang_repository {
+    if [[ ! -d $HOME/.ydk/127.0.0.1 ]]; then
+      mkdir -p $HOME/.ydk
+      mkdir -p $HOME/.ydk/127.0.0.1
+    fi
     rm -f $HOME/.ydk/127.0.0.1/*
 
     # Correct issue with confd 7.3
@@ -232,7 +236,6 @@ function init_go_env {
 ######################################################################
 
 function install_test_cpp_core {
-    print_msg "Installing / testing C++ core"
     install_cpp_core
     run_cpp_core_test
 
@@ -931,8 +934,6 @@ if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64:/usr/local/lib64:/usr/local/lib
    print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
    centos_version=$(echo `lsb_release -r` | awk '{ print $2 }' | cut -d '.' -f 1)
-   mkdir -p $HOME/.ydk
-   mkdir -p $HOME/.ydk/127.0.0.1
 fi
 
 init_py_env

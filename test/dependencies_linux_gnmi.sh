@@ -68,7 +68,7 @@ function install_grpc {
     cd $HOME/grpc
     make > /dev/null
     local status=$?
-    if [ $status -ne 0 && ${os_info} == *"fedora"* ]; then
+    if [[ $status -ne 0 && ${os_info} == *"fedora"* ]]; then
       make clean
       print_msg "Installing grpc with clang"
       sudo yum install clang -y

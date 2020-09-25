@@ -321,7 +321,7 @@ print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
 if [[ ${os_type} == "Linux" ]]; then
   if [[ ${os_info} == *"Ubuntu"* ]]; then
-    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* ]]; then
+    if [[ ${os_info} != *"xenial"* && ${os_info} != *"bionic"* && ${os_info} != *"focal"* ]]; then
         print_msg "WARNING! Unsupported Ubuntu distribution found. Will try the best efforts."
     fi
   elif [[ ${os_info} == *"fedora"* ]]; then
@@ -351,7 +351,7 @@ fi
 if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]]; then
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib64:/usr/lib64
     if [ ${service_pkg} == "gnmi" ]; then
-        export LD_LIBRARY_PATH=$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:$LD_LIBRARY_PATH
+        export LD_LIBRARY_PATH=$HOME/grpc/libs/opt:$HOME/protobuf-3.5.0/src/.libs:$LD_LIBRARY_PATH
     fi
     print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
 fi
@@ -385,3 +385,4 @@ install_ydk_go
 
 deactivate
 cd ${curr_dir}
+

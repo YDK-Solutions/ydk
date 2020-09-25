@@ -21,7 +21,9 @@
 # ------------------------------------------------------------------
 #
 # Script for running ydk CI on docker via travis-ci.org
+# and installing YDK from install_ydk.sh script
 #
+# dependencies_centos (Centos/RHEL 7 and 8)
 # ------------------------------------------------------------------
 
 function print_msg {

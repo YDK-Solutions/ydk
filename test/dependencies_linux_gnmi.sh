@@ -72,7 +72,7 @@ function install_grpc {
       make clean
       print_msg "Installing grpc with clang"
       sudo yum install clang -y
-      cp ../3d_party/grpc/Makefile .
+      cp $curr_dir/3d_party/grpc/Makefile .
       make > /dev/null
       local status=$?
       if [ $status -ne 0 ]; then

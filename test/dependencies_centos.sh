@@ -116,8 +116,8 @@ function check_install_go {
     minor=0
   fi
   if (( $minor < 9 )); then
-    print_msg "Installing Golang version 1.10.8"
-    ./3d_party/go/goinstall.sh --version 1.10.8 > /dev/null
+    print_msg "Installing Golang version 1.13.1"
+    $curr_dir/3d_party/go/goinstall.sh --version 1.13.1 > /dev/null
     sudo ln -sf $HOME/.go /usr/local/go
     sudo ln -sf /usr/local/go/bin/go /usr/local/bin/go
   fi
@@ -146,7 +146,7 @@ function install_confd {
   if [[ ! -s $HOME/confd/bin/confd ]]; then
     if [[ $centos_version > 7 ]]; then
       print_msg "Installing confd basic 7.3"
-      unzip ./3d_party/linux/confd-basic-7.3.linux.x86_64.zip
+      unzip $curr_dir/3d_party/linux/confd-basic-7.3.linux.x86_64.zip
       cd confd-basic-7.3.linux.x86_64
       run_cmd ./confd-basic-7.3.linux.x86_64.installer.bin $HOME/confd
       cd -
@@ -180,6 +180,8 @@ function install_openssl {
 NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
+
+curr_dir=$(pwd)
 
 install_dependencies
 check_install_gcc

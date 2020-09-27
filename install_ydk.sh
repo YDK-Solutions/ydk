@@ -106,7 +106,7 @@ function init_go_env {
 
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH=$HOME/golang
+            export GOPATH=$HOME/go
         fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
@@ -120,7 +120,7 @@ function init_go_env {
         export PATH=$GOROOT/bin:$PATH
 
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH="$HOME/golang"
+            export GOPATH=$HOME/go
             mkdir -p $GOPATH
             print_msg "Setting GOPATH to $GOPATH"
         else

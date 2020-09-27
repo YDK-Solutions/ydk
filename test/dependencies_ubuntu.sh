@@ -159,10 +159,10 @@ function check_install_go {
     minor=0
   fi
   if (( $minor < 9 )); then
-    print_msg "Installing Golang version 1.9.2 in /usr/local/go"
-    run_cmd sudo wget https://storage.googleapis.com/golang/go1.9.2.linux-amd64.tar.gz &> /dev/null
-    sudo tar -zxf  go1.9.2.linux-amd64.tar.gz -C /usr/local/
-    rm -f go1.9.2.linux-amd64.tar.gz
+    print_msg "Installing Golang version 1.13.1 in /usr/local/go"
+    run_cmd sudo wget https://storage.googleapis.com/golang/go1.13.1.linux-amd64.tar.gz
+    sudo tar -zxf  go1.13.1.linux-amd64.tar.gz -C /usr/local/
+    rm -f go1.13.1.linux-amd64.tar.gz
     cd /usr/local/bin
     sudo ln -sf /usr/local/go/bin/go
     cd -

@@ -38,7 +38,19 @@ function print_msg {
     echo -e "${MSG_COLOR}*** $(date): tests.sh | $@ ${NOCOLOR}"
 }
 
+function run_cmd {
+    $@
+    local status=$?
+    if [ $status -ne 0 ]; then
+        MSG_COLOR=$RED
+        print_msg "Exiting with status=$status"
+        exit $status
+    fi
+    return $status
+}
+
 function run_exec_test {
+    print_msg "Executing: $@"
     $@
     local status=$?
     if [ $status -ne 0 ]; then
@@ -97,10 +109,10 @@ function init_confd {
     print_msg "Initializing confd in $(pwd)"
     source $HOME/confd/confdrc
     confd_version=$(confd --version)
-    run_exec_test make stop > /dev/null
-    run_exec_test make clean > /dev/null
-    run_exec_test make all > /dev/null
-    run_exec_test make start
+    run_cmd make stop > /dev/null
+    run_cmd make clean > /dev/null
+    run_cmd make all > /dev/null
+    run_cmd make start
     cd -
 }
 
@@ -160,8 +172,8 @@ function check_python_installation {
 
   if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* && ${PYTHON_VERSION} == "3"* ]]; then
     print_msg "Creating Python3 virtual environment in $HOME/venv"
-    run_exec_test ${PYTHON_BIN} -m venv $HOME/venv
-    run_exec_test source $HOME/venv/bin/activate
+    run_cmd ${PYTHON_BIN} -m venv $HOME/venv
+    run_cmd source $HOME/venv/bin/activate
   fi
 
   print_msg "Checking installation of ${PYTHON_BIN}"
@@ -259,7 +271,7 @@ function install_cpp_core {
       run_exec_test ${CMAKE_BIN} ..
     fi
     print_msg "Compiling C++ core library"
-    run_exec_test make &> /dev/null
+    run_cmd make &> /dev/null
     sudo make install
 }
 
@@ -361,10 +373,10 @@ function generate_install_specified_cpp_bundle {
    bundle_profile=$1
    bundle_name=$2
 
-   run_test generate.py --bundle ${bundle_profile} --cpp &> /dev/null
+   run_test generate.py --bundle ${bundle_profile} --cpp
    cd gen-api/cpp/${bundle_name}/build
-   run_exec_test make &> /dev/null
-   run_exec_test sudo make install
+   run_cmd make &> /dev/null
+   run_cmd sudo make install
    cd -
 }
 
@@ -394,7 +406,7 @@ function cpp_sanity_ydktest_test {
     else
       run_exec_test ${CMAKE_BIN} ..
     fi
-    run_exec_test make &> /dev/null
+    run_cmd make &> /dev/null
 
     #export CTEST_OUTPUT_ON_FAILURE=1
     #make test
@@ -417,8 +429,8 @@ function cpp_test_gen_test {
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/testgen/confd
     mkdir -p gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
     cd gen-api/cpp/models_test-bundle/ydk/models/models_test/test/build
-    run_exec_test ${CMAKE_BIN} ..
-    run_exec_test make &> /dev/null
+    run_cmd ${CMAKE_BIN} ..
+    run_cmd make &> /dev/null
     ctest --output-on-failure
 }
 
@@ -426,10 +438,10 @@ function cpp_test_gen {
     print_msg "cpp_test_gen"
 
     cd $YDKGEN_HOME
-    run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp &> /dev/null
+    run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --cpp
     cd gen-api/cpp/models_test-bundle/build/
-    run_exec_test make &> /dev/null
-    run_exec_test sudo make install
+    run_cmd make &> /dev/null
+    run_cmd sudo make install
 
     # cpp_test_gen_test
 }
@@ -452,7 +464,6 @@ function collect_cpp_coverage {
 
 function run_go_bundle_tests {
     print_msg "Generating/installing go sanity bundle tests"
-    # TODO: go get
     cd $YDKGEN_HOME
     run_test generate.py -i --bundle profiles/test/ydktest-cpp.json --go
 
@@ -460,20 +471,18 @@ function run_go_bundle_tests {
 }
 
 function run_go_tests {
-    print_msg "Running go tests"
-    run_go_samples
-    run_go_sanity_tests
-}
-
-function run_go_samples {
-    print_msg "Running go samples"
-
     export CXX=/usr/bin/c++
     export CC=/usr/bin/cc
 
     print_msg "CC: ${CC}"
     print_msg "CXX: ${CXX}"
 
+    run_go_samples
+    run_go_sanity_tests
+}
+
+function run_go_samples {
+    print_msg "Running go samples"
     cd $YDKGEN_HOME/sdk/go/core/samples
     run_exec_test go run cgo_path/cgo_path.go
     run_exec_test go run bgp_create/bgp_create.go -device ssh://admin:admin@localhost:12022
@@ -483,13 +492,14 @@ function run_go_samples {
 }
 
 function run_go_sanity_tests {
-    print_msg "Running go sanity tests"
     cd $YDKGEN_HOME/sdk/go/core/tests
     if [[ $run_with_coverage ]] ; then
-        run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ytype","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
+        print_msg "Running go sanity tests with coverage"
+        run_exec_test go test -race -coverpkg="github.com/CiscoDevNet/ydk-go/ydk/providers","github.com/CiscoDevNet/ydk-go/ydk/services","github.com/CiscoDevNet/ydk-go/ydk/types","github.com/CiscoDevNet/ydk-go/ydk/types/datastore","github.com/CiscoDevNet/ydk-go/ydk/types/encoding_format","github.com/CiscoDevNet/ydk-go/ydk/types/protocol","github.com/CiscoDevNet/ydk-go/ydk/types/yfilter","github.com/CiscoDevNet/ydk-go/ydk/types/ylist","github.com/CiscoDevNet/ydk-go/ydk","github.com/CiscoDevNet/ydk-go/ydk/path" -coverprofile=coverage.txt -covermode=atomic
         print_msg "Moving go coverage to ${YDKGEN_HOME}"
         mv coverage.txt ${YDKGEN_HOME}
     else
+        print_msg "Running go sanity tests"
         run_exec_test go test
     fi
     cd -
@@ -535,7 +545,7 @@ function py_sanity_ydktest_gen {
     cd $YDKGEN_HOME
 
     print_msg "py_sanity_ydktest_gen: testing bundle and documentation generation"
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json --python --generate-doc &> /dev/null
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json --python --generate-doc
 
     print_msg "py_sanity_ydktest_gen: testing core and documentation generation"
     run_test generate.py --core
@@ -782,7 +792,7 @@ function py_sanity_one_class_per_module {
     print_msg "**********************************"
     print_msg "Running ONE CLASS PER MODULE TESTS"
     cd $YDKGEN_HOME
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json -o > /dev/null
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json -o
     py_sanity_run_limited_tests
 }
 
@@ -792,7 +802,7 @@ function run_py_backward_compatibility {
     cd $YDKGEN_HOME
     CURRENT_GIT_REV=$(git rev-parse HEAD)
     git checkout 454ffc06ec79995832538642638e03259e622b53
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json > /dev/null
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json
     init_confd_ydktest
     py_sanity_run_limited_tests
     git checkout ${CURRENT_GIT_REV}
@@ -828,7 +838,7 @@ function py_test_gen {
 
     cd $YDKGEN_HOME
     run_test generate.py --core --python
-    run_test generate.py --bundle profiles/test/ydk-models-test.json  --generate-tests --python &> /dev/null
+    run_test generate.py --bundle profiles/test/ydk-models-test.json --generate-tests --python
     ${PIP_BIN} install gen-api/python/ydk/dist/ydk*.tar.gz
     pip_check_install gen-api/python/models_test-bundle/dist/ydk*.tar.gz
 

@@ -55,7 +55,7 @@ function run_exec_test {
     local status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
-        print_msg "Exiting '$@' with status=$status"
+        print_msg "Exiting with status=$status"
         exit $status
     fi
     return $status
@@ -67,7 +67,7 @@ function run_test_no_coverage {
     local status=$?
     if [ $status -ne 0 ]; then
         MSG_COLOR=$RED
-        print_msg "Exiting '${PYTHON_BIN} $@' with status=$status"
+        print_msg "Exiting with status=$status"
         exit $status
     fi
     return $status
@@ -76,7 +76,7 @@ function run_test_no_coverage {
 function run_test {
     if [[ $(command -v coverage) && $run_with_coverage ]]; then
         print_msg "Executing with coverage: $@"
-        coverage run --omit=/usr/* --branch --parallel-mode $@ > /dev/null
+        coverage run --omit=/usr/* --branch --parallel-mode $@
         local status=$?
         if [ $status -ne 0 ]; then
             MSG_COLOR=$RED
@@ -207,7 +207,7 @@ function init_py_env {
 
 function init_go_env {
     print_msg "Initializing Go environment"
-
+    cd $YDKGEN_HOME
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
             export GOPATH="$HOME/go"
@@ -280,7 +280,7 @@ function generate_libydk {
     cd $YDKGEN_HOME
     run_test generate.py --libydk
     cd gen-api/cpp/ydk/build
-    sudo make package || true
+    sudo make package &> /dev/null
     cp libydk*rpm libydk*deb /ydk-gen &> /dev/null
     cd -
 }
@@ -384,8 +384,8 @@ function cpp_sanity_ydktest_gen_install {
     print_msg "Generating and installing C++ ydktest bundle"
     generate_install_specified_cpp_bundle profiles/test/ydktest-cpp.json ydktest-bundle
 
-    print_msg "Generating and installing C++ ydktest-oc-nis bundle"
-    generate_install_specified_cpp_bundle profiles/test/ydktest-oc-nis.json ydktest_oc_nis-bundle
+#    print_msg "Generating and installing C++ ydktest-oc-nis bundle"
+#    generate_install_specified_cpp_bundle profiles/test/ydktest-oc-nis.json ydktest_oc_nis-bundle
 }
 
 function cpp_sanity_ydktest_test {
@@ -512,7 +512,7 @@ function run_go_sanity_tests {
 function run_python_bundle_tests {
     print_msg "Running python bundle tests"
     py_sanity_ydktest
-    if [[ ${os_type} != "Darwin" && $centos_version. < 8. ]]; then
+    if [[ ${os_type} != "Darwin" && $confd_version < 7.3 ]]; then
         # GitHub issue #909
         py_sanity_deviation
     fi
@@ -926,11 +926,11 @@ else
 fi
 print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"trusty"* && ${os_info} != *"fedora"* ]] ; then
+if [[ ${os_type} == "Linux" && ${os_info} != *"fedora"* && ${os_info} != *"focal"* ]] ; then
     run_with_coverage=1
 fi
 
-export YDKGEN_HOME="$(pwd)"
+export YDKGEN_HOME=$(pwd)
 print_msg "YDKGEN_HOME is set to: ${YDKGEN_HOME}"
 
 CMAKE_BIN=cmake

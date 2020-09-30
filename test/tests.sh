@@ -476,9 +476,7 @@ function run_go_tests {
 
     print_msg "CC: ${CC}"
     print_msg "CXX: ${CXX}"
-  if [[ ${os_info} != *"focal"* ]]; then
     run_go_samples
-  fi
     run_go_sanity_tests
 }
 
@@ -963,9 +961,14 @@ run_cpp_bundle_tests
 ######################################
 # Install and run Go tests
 ######################################
-init_go_env
-install_go_core
-run_go_bundle_tests
+if [[ ${os_info} != *"focal"* ]]; then
+  # TODO: issue running go tests on ubuntu:focal
+  # execution unexpectedly stalls.
+  # The tests are passing well on platform and docker
+  init_go_env
+  install_go_core
+  run_go_bundle_tests
+fi
 
 ######################################
 # Install and run Python tests

@@ -476,8 +476,9 @@ function run_go_tests {
 
     print_msg "CC: ${CC}"
     print_msg "CXX: ${CXX}"
-
+  if [[ ${os_info} == *"focal"* ]]; then
     run_go_samples
+  fi
     run_go_sanity_tests
 }
 
@@ -926,7 +927,7 @@ else
 fi
 print_msg "Running OS type: $os_type"
 print_msg "OS info: $os_info"
-if [[ ${os_type} == "Linux" && ${os_info} != *"fedora"* && ${os_info} != *"focal"* ]] ; then
+if [[ ${os_type} == "Linux" && ${os_info} != *"fedora"* ]] ; then
     run_with_coverage=1
 fi
 

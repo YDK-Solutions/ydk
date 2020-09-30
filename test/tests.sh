@@ -763,7 +763,7 @@ function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
     reset_yang_repository
-  if [[ ${os_type} != "Darwin" && $centos_version. < 8. ]]; then
+  if [[ ${os_type} != "Darwin" && $confd_version < 7.3 ]]; then
     # GitHub issue #909
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
     run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache

@@ -476,7 +476,7 @@ function run_go_tests {
 
     print_msg "CC: ${CC}"
     print_msg "CXX: ${CXX}"
-  if [[ ${os_info} == *"focal"* ]]; then
+  if [[ ${os_info} != *"focal"* ]]; then
     run_go_samples
   fi
     run_go_sanity_tests

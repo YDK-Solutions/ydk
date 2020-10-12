@@ -1,7 +1,3 @@
-//
-// @file types.hpp
-// @brief Header for ydk entity
-//
 // YANG Development Kit
 // Copyright 2016 Cisco Systems. All rights reserved
 //
@@ -45,7 +41,7 @@ TEST_CASE( "test_codec_rpc" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -63,7 +59,7 @@ TEST_CASE( "test_codec_action" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -78,7 +74,7 @@ TEST_CASE( "test_codec_action_datanode" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -103,7 +99,7 @@ TEST_CASE( "test_submodule_feature" )
         }
         test_capabilities.push_back(cap);
     }
-    mock::MockSession sp{searchdir, test_capabilities};
+    mock::MockSession sp{searchdir, test_capabilities, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -131,7 +127,7 @@ TEST_CASE( "test_submodule_feature" )
 TEST_CASE( "decode_multiple_json" )
 {
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::JSON};
     auto & schema = sp.get_root_schema();
 
     std::string json_int_payload = R"({
@@ -171,7 +167,7 @@ TEST_CASE( "decode_multiple_json" )
 
 TEST_CASE("test_no_key_list_path") {
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
     auto & schema = sp.get_root_schema();
     ydk::path::Codec codec{};
 
@@ -218,7 +214,7 @@ TEST_CASE("value_error")
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::JSON};
     auto & schema = sp.get_root_schema();
 
     CHECK_NOTHROW(s.decode(schema, value_error_json, EncodingFormat::JSON));

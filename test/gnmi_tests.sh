@@ -145,7 +145,7 @@ function init_go_env {
 
     if [[ $(uname) == "Darwin" ]]; then
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH="$(pwd)/golang"
+            export GOPATH="$HOME/go"
         fi
         print_msg "GOROOT: $GOROOT"
         print_msg "GOPATH: $GOPATH"
@@ -159,7 +159,7 @@ function init_go_env {
         export PATH=$GOROOT/bin:$PATH
 
         if [[ $GOPATH. == "." ]]; then
-            export GOPATH="$HOME/golang"
+            export GOPATH="$HOME/go"
             mkdir -p $GOPATH
             print_msg "Setting GOPATH to $GOPATH"
         else
@@ -477,7 +477,7 @@ if [[ ${status} == 0 ]] ; then
 fi
 
 if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$YDKGEN_HOME/grpc/libs/opt:$YDKGEN_HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/grpc/libs/opt:$HOME/protobuf-3.5.0/src/.libs:/usr/local/lib:/usr/local/lib64:/usr/lib64
     print_msg "LD_LIBRARY_PATH is set to: $LD_LIBRARY_PATH"
 fi
 

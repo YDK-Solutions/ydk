@@ -23,7 +23,7 @@
 # dependencies_linux_gnmi.sh
 # Script to install protobuf, protoc and grpc on Ubuntu and CentOS
 # for running YDK gNMI tests on docker
-#
+# and installing YDK from install_ydk.sh script
 # ------------------------------------------------------------------
 
 function print_msg {
@@ -31,14 +31,16 @@ function print_msg {
 }
 
 function install_protobuf {
-  if [[ ! -d protobuf-3.5.0 ]]; then
+  if [[ ! -d $HOME/protobuf-3.5.0 ]]; then
+    cd $HOME
     print_msg "Downloading protobuf and protoc"
     wget https://github.com/google/protobuf/releases/download/v3.5.0/protobuf-cpp-3.5.0.zip > /dev/null
     unzip protobuf-cpp-3.5.0.zip > /dev/null
     rm -f protobuf-cpp-3.5.0.zip
+    cd -
   fi
   if [[ ! -x /usr/local/lib/libprotoc.so.15.0.0 ]]; then
-    cd protobuf-3.5.0
+    cd $HOME/protobuf-3.5.0
     print_msg "Configuring protobuf and protoc"
     ./configure > /dev/null
     print_msg "Compiling protobuf and protoc"
@@ -51,16 +53,33 @@ function install_protobuf {
 }
 
 function install_grpc {
-  if [[ ! -d grpc ]]; then
-    print_msg "Installing grpc"
+  if [[ ! -d $HOME/grpc ]]; then
+    cd $HOME
+    print_msg "Downloading grpc"
     git clone -b v1.9.1 https://github.com/grpc/grpc
     cd grpc
     git submodule update --init
-    cd -
+    # Correcting source code, which fails in focal with gcc-7.5.0
+    cp $curr_dir/3d_party/grpc/log_linux.cc src/core/lib/gpr/
+    cd $curr_dir
   fi
   if [[ ! -x /usr/local/lib/libgrpc.a ]]; then
-    cd grpc
+    print_msg "Compiling grpc"
+    cd $HOME/grpc
     make > /dev/null
+    local status=$?
+    if [[ $status -ne 0 && ${os_info} == *"fedora"* ]]; then
+      make clean
+      print_msg "Installing grpc with clang"
+      sudo yum install clang -y
+      cp $curr_dir/3d_party/grpc/Makefile .
+      make > /dev/null
+      local status=$?
+      if [ $status -ne 0 ]; then
+         print_msg "Failed to compile grpc code; exiting"
+         exit $status
+      fi
+    fi
     sudo make install
     sudo ldconfig
     cd -
@@ -74,6 +93,10 @@ NOCOLOR="\033[0m"
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
 
+curr_dir=$(pwd)
+os_info=$(cat /etc/*-release)
+codename=$(lsb_release -c | awk '{ print $2 }')
+
 if [[ -z ${C_INCLUDE_PATH} ]]; then
     export C_INCLUDE_PATH=/usr/local/include
 fi
@@ -81,6 +104,9 @@ if [[ -z ${CPLUS_INCLUDE_PATH} ]]; then
     export CPLUS_INCLUDE_PATH=/usr/local/include
 fi
 
+#if [[ $codename == "focal" ]]; then
+#  export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib/x86_64-linux-gnu
+#fi
 
 install_protobuf
 install_grpc

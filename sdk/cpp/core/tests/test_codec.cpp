@@ -1,7 +1,3 @@
-//
-// @file types.hpp
-// @brief Header for ydk entity
-//
 // YANG Development Kit
 // Copyright 2016 Cisco Systems. All rights reserved
 //
@@ -22,7 +18,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
+// -------------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
 //////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -41,7 +41,7 @@ TEST_CASE( "test_codec_rpc" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -59,7 +59,7 @@ TEST_CASE( "test_codec_action" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -74,7 +74,7 @@ TEST_CASE( "test_codec_action_datanode" )
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -99,7 +99,7 @@ TEST_CASE( "test_submodule_feature" )
         }
         test_capabilities.push_back(cap);
     }
-    mock::MockSession sp{searchdir, test_capabilities};
+    mock::MockSession sp{searchdir, test_capabilities, EncodingFormat::XML};
 
     auto & schema = sp.get_root_schema();
 
@@ -127,7 +127,7 @@ TEST_CASE( "test_submodule_feature" )
 TEST_CASE( "decode_multiple_json" )
 {
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::JSON};
     auto & schema = sp.get_root_schema();
 
     std::string json_int_payload = R"({
@@ -167,7 +167,7 @@ TEST_CASE( "decode_multiple_json" )
 
 TEST_CASE("test_no_key_list_path") {
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::XML};
     auto & schema = sp.get_root_schema();
     ydk::path::Codec codec{};
 
@@ -214,7 +214,7 @@ TEST_CASE("value_error")
 {
     ydk::path::Codec s{};
     std::string searchdir{TEST_HOME};
-    mock::MockSession sp{searchdir, test_openconfig};
+    mock::MockSession sp{searchdir, test_openconfig, EncodingFormat::JSON};
     auto & schema = sp.get_root_schema();
 
     CHECK_NOTHROW(s.decode(schema, value_error_json, EncodingFormat::JSON));
@@ -242,6 +242,38 @@ TEST_CASE( "decode_rpc_with_nc_prefix" )
 </interfaces>
 </nc:data>
 </nc:rpc-reply>
+)";
+    auto reply_xml = ydk::path::get_netconf_output(rpc_reply);
+    REQUIRE(!reply_xml.empty());
+
+    auto rpc_reply_extracted = R"(<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>GigabitEthernet0/0/0/2</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>GigabitEthernet0/0/0/2</name>
+    </config>
+  </interface>
+</interfaces>)";
+    REQUIRE(reply_xml == rpc_reply_extracted);
+}
+
+TEST_CASE( "decode_rpc_with_attribute" )
+{
+    auto rpc_reply = R"(
+<rpc-reply xmlns:junos="http://xml.juniper.net/junos/15.1X49/junos" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="1">
+<data attr=123>
+<interfaces xmlns="http://openconfig.net/yang/interfaces">
+  <interface>
+    <name>GigabitEthernet0/0/0/2</name>
+    <config>
+      <type xmlns:ianaift="urn:ietf:params:xml:ns:yang:iana-if-type">ianaift:ethernetCsmacd</type>
+      <name>GigabitEthernet0/0/0/2</name>
+    </config>
+  </interface>
+</interfaces>
+</data>
+</rpc-reply>
 )";
     auto reply_xml = ydk::path::get_netconf_output(rpc_reply);
     REQUIRE(!reply_xml.empty());

@@ -22,7 +22,7 @@
 #
 # dependencies_osx.sh
 # Script for running ydk CI on docker via travis-ci.org
-#
+# and installing YDK from install_ydk.sh script
 # ------------------------------------------------------------------
 
 function print_msg {
@@ -62,11 +62,19 @@ function install_libssh {
 
 function install_confd {
   if [[ ! -s $HOME/confd/bin/confd ]]; then
-    print_msg "Installing confd"
-    wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
-    unzip confd-basic-6.2.darwin.x86_64.zip
-    ./confd-basic-6.2.darwin.x86_64.installer.bin $HOME/confd
-    rm -f confd-basic-6.2.* ConfD*
+    if [[ $os_version < "10.14" ]]
+      print_msg "Installing confd-basic-6.2"
+      wget https://github.com/CiscoDevNet/ydk-gen/files/562559/confd-basic-6.2.darwin.x86_64.zip &> /dev/null
+      unzip confd-basic-6.2.darwin.x86_64.zip
+      ./confd-basic-6.2.darwin.x86_64.installer.bin $HOME/confd
+    else
+      print_msg "Installing confd-basic-7.3"
+      unzip $curr_dir/3d_party/darwin/confd-basic-7.3.darwin.x86_64.zip
+      cd confd-basic-7.3.darwin.x86_64
+      run_cmd ./confd-basic-7.3.darwin.x86_64.installer.bin $HOME/confd
+      cd -
+    fi
+    rm -rf confd-basic-* ConfD*
   fi
 }
 
@@ -124,6 +132,9 @@ function check_python_installation {
 NOCOLOR='\033[0m'
 YELLOW='\033[1;33m'
 MSG_COLOR=$YELLOW
+
+os_version=$(sw_vers | grep ProductVersion | awk '{print$2}')
+curr_dir=$(pwd)
 
 brew install curl doxygen xml2
 brew install pybind11 valgrind

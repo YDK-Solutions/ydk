@@ -1,5 +1,4 @@
-
-/// YANG Development Kit
+// YANG Development Kit
 // Copyright 2016 Cisco Systems. All rights reserved
 //
 ////////////////////////////////////////////////////////////////
@@ -19,7 +18,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-//
+// -------------------------------------------------------------------
+// This file has been modified by Yan Gorelik, YDK Solutions.
+// All modifications in original under CiscoDevNet domain
+// introduced since October 2019 are copyrighted.
+// All rights reserved under Apache License, Version 2.0.
 //////////////////////////////////////////////////////////////////
 
 #include <iostream>
@@ -50,16 +53,18 @@ namespace mock {
 class MockSession : public ydk::path::Session 
 {
 public:
-    MockSession(const std::string & searchdir, const std::vector<ydk::path::Capability> capabilities) : m_searchdir{searchdir}, m_capabilities{capabilities}
+    MockSession(const std::string & searchdir, const std::vector<ydk::path::Capability> capabilities, ydk::EncodingFormat encoding)
+     : m_searchdir{searchdir}, m_capabilities{capabilities}, m_encoding{encoding}
     {
         ydk::path::Repository repo{m_searchdir};
         ydk::IetfCapabilitiesParser capabilities_parser{};
         auto lookup_table = capabilities_parser.get_lookup_table(m_capabilities);
         lookup_table.insert(test_openconfig_lookup.begin(), test_openconfig_lookup.end());
         root_schema = repo.create_root_schema(lookup_table, m_capabilities);
+        repo.set_server_capabilities(m_capabilities);
     }
 
-    virtual ~MockSession()
+    ~MockSession()
     {
     }
 
@@ -71,14 +76,14 @@ public:
 
     ydk::EncodingFormat get_encoding() const
     {
-        return ydk::EncodingFormat::XML;
+        return m_encoding;
     }
 
     std::shared_ptr<ydk::path::DataNode> invoke(ydk::path::Rpc& rpc) const
     {
         ydk::path::Codec s{};
 
-        std::cout << s.encode(rpc.get_input_node(), ydk::EncodingFormat::XML, true) << std::endl;
+        std::cout << s.encode(rpc.get_input_node(), m_encoding, true) << std::endl;
 
         return nullptr;
     }
@@ -87,7 +92,7 @@ public:
     {
         ydk::path::Codec s{};
 
-        std::cout << s.encode(rpc, ydk::EncodingFormat::XML, true) << std::endl;
+        std::cout << s.encode(rpc, m_encoding, true) << std::endl;
 
         return nullptr;
     }
@@ -95,7 +100,7 @@ private:
     std::string m_searchdir;
     std::vector<ydk::path::Capability> m_capabilities;
     std::shared_ptr<ydk::path::RootSchemaNode> root_schema;
-
+    ydk::EncodingFormat m_encoding;
 };
 }
 

@@ -148,7 +148,7 @@ class Entity {
     bool operator != (const Entity & other) const;
 
   public:
-    Entity* parent;
+    Entity* parent = nullptr;
     std::string yang_name;
     std::string yang_parent_name;
     YFilter yfilter;
@@ -158,7 +158,7 @@ class Entity {
     bool ignore_validation;
     std::vector<std::string> ylist_key_names;
     std::string ylist_key;
-    YList* ylist;
+    YList* ylist = nullptr;
 
     std::string get_ylist_key() const;
 };
@@ -376,6 +376,7 @@ class YList
     std::shared_ptr<Entity> operator [] (const std::size_t item) const;
     std::vector<std::shared_ptr<Entity>> entities() const;
     std::vector<std::string> keys() const;
+    bool has_key(const std::string& key) const;
     std::size_t len() const;
 
     void append(std::shared_ptr<Entity> ep);

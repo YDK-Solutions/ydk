@@ -1,14 +1,15 @@
-### 2020-07-30 version 0.8.5
+### 2020-09-30 version 0.8.5
 
 #### New features and enhancements
   * Develop utility function to clone Entity instance ([#967](https://github.com/CiscoDevNet/ydk-gen/issues/967))
   * Go CodecService fails to encode leaf-list data ([#968](https://github.com/CiscoDevNet/ydk-gen/issues/968))
   * Developed script install_ydk, which allows to install YDK from source in one CLI command
+  * Added support for CentOS/RHEL-8 and Ubuntu-20.04 (focal) ([#1019](https://github.com/CiscoDevNet/ydk-gen/issues/1019))
 
 #### Resolved GitHub issues
   * gNMI set RPC fails when JSON payload is formatted string
   * Enhance generator to indicate how a YANG modules was processed ([#894](https://github.com/CiscoDevNet/ydk-gen/issues/894))
-  * Restconf in YDK should support HTTPS (partialy resolved) ([#917](https://github.com/CiscoDevNet/ydk-gen/issues/917))
+  * Restconf in YDK should support HTTPS (partially resolved) ([#917](https://github.com/CiscoDevNet/ydk-gen/issues/917))
   * Go fails to process filters on enum and identity leaves and leaf-lists ([#969](https://github.com/CiscoDevNet/ydk-gen/issues/969))
   * YDK fails create bundle package when package name contains '.' ([#978](https://github.com/CiscoDevNet/ydk-gen/issues/978))
   * python bundle generator must escape 'async' as variable name ([#980](https://github.com/CiscoDevNet/ydk-gen/issues/980))
@@ -18,6 +19,10 @@
   * create_datanode in Path API returns incorrect object and sets incorrect value ([#1003](https://github.com/CiscoDevNet/ydk-gen/issues/1003))
   * create_datanode rejects absolute paths with a leading "/" as defined in RFC 7950 ([#1005](https://github.com/CiscoDevNet/ydk-gen/issues/1005))
   * Path API create_datanode rejects valid value ([#1006](https://github.com/CiscoDevNet/ydk-gen/issues/1006))
+  * data tag not recognized when attribute present ([#1021](https://github.com/CiscoDevNet/ydk-gen/issues/1021))
+  * c++ generated bundle class fails to compile in gcc when model contains leaf 'minor' ([#1024](https://github.com/CiscoDevNet/ydk-gen/issues/1024))
+  * ydk.path.codec.decode validates incorrect XML payload ([#1026](https://github.com/CiscoDevNet/ydk-gen/issues/1026))
+  * Python 3 TypeError while initializing CRUDService class ([#1032](https://github.com/CiscoDevNet/ydk-gen/issues/1032))
 
 #### Bundle improvements
   * Updated cisco-ios-xe bundle to support Cisco IOS XE 16.9.3 due to bug in Python generated code

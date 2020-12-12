@@ -20,7 +20,7 @@
 # All rights reserved under Apache License, Version 2.0.
 # ------------------------------------------------------------------
 #
-# Script for running ydk CI on travis-ci.org
+# Script for running YDK unit tests on travis-ci.com
 #
 # ------------------------------------------------------------------
 
@@ -122,11 +122,6 @@ function reset_yang_repository {
       mkdir -p $HOME/.ydk/127.0.0.1
     fi
     rm -f $HOME/.ydk/127.0.0.1/*
-
-    # Correct issue with confd 7.3
-    if [[ $confd_version > 7.2 ]]; then
-      cp ${YDKGEN_HOME}/sdk/cpp/core/tests/models/ietf-interfaces.yang $HOME/.ydk/127.0.0.1/
-    fi
 }
 
 function init_confd_ydktest {
@@ -763,11 +758,11 @@ function py_sanity_common_cache {
     print_msg "Running py_sanity_common_cache"
 
     reset_yang_repository
-  if [[ ${os_type} != "Darwin" && $confd_version < 7.3 ]]; then
-    # GitHub issue #909
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
-    run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
-  fi
+    if [[ ${os_type} != "Darwin" ]]; then
+      # GitHub issue #909
+      init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
+      run_test sdk/python/core/tests/test_sanity_deviation.py --common-cache
+    fi
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
     run_test sdk/python/core/tests/test_sanity_augmentation.py --common-cache
 

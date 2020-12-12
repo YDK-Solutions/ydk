@@ -1,3 +1,10 @@
+### Post 0.8.5
+
+#### Resolved GitHub issues
+  * The Executor Service fails to return module content to user ([#1035](https://github.com/CiscoDevNet/ydk-gen/issues/1035))
+  * Docker base image python error ([#1036](https://github.com/CiscoDevNet/ydk-gen/issues/1036))
+
+
 ### 2020-09-30 version 0.8.5
 
 #### New features and enhancements

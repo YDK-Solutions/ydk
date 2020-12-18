@@ -104,11 +104,15 @@ function pip_check_install {
 # Environment setup-teardown functions
 ######################################################################
 
+function init_confd_rc {
+    print_msg "Initializing confd resource"
+    source $HOME/confd/confdrc
+    confd_version=$(confd --version)
+}
+
 function init_confd {
     cd $1
     print_msg "Initializing confd in $(pwd)"
-    source $HOME/confd/confdrc
-    confd_version=$(confd --version)
     run_cmd make stop > /dev/null
     run_cmd make clean > /dev/null
     run_cmd make all > /dev/null
@@ -640,70 +644,51 @@ function py_sanity_ydktest_test_tcp {
 }
 
 #--------------------------
-# Python deviation bundle
+# Python deviation tests
 #--------------------------
 
 function py_sanity_deviation {
     reset_yang_repository
-    py_sanity_deviation_ydktest_gen
+    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
+
     py_sanity_deviation_ydktest_test
 
-    py_sanity_deviation_bgp_gen
     py_sanity_deviation_bgp_test
     reset_yang_repository
-}
-
-function py_sanity_deviation_ydktest_gen {
-    print_msg "Running py_sanity_deviation_ydktest_gen"
-
-    run_test generate.py --bundle profiles/test/ydktest-cpp.json --python -i
 }
 
 function py_sanity_deviation_ydktest_test {
     print_msg "Running py_sanity_deviation_ydktest_test"
 
-    init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/deviation
+    run_test generate.py --bundle profiles/test/ydktest-cpp.json -i
     run_test sdk/python/core/tests/test_sanity_deviation.py
 #    run_test sdk/python/core/tests/test_sanity_deviation.py --non-demand
-}
-
-function py_sanity_deviation_bgp_gen {
-    print_msg "Running py_sanity_deviation_bgp_gen"
-
-    run_test generate.py --bundle profiles/test/deviation.json --verbose -i
 }
 
 function py_sanity_deviation_bgp_test {
     print_msg "Running py_sanity_deviation_bgp_test"
 
+    run_test generate.py --bundle profiles/test/deviation.json --verbose -i
     run_test sdk/python/core/tests/test_sanity_deviation_bgp.py
 #    run_test sdk/python/core/tests/test_sanity_deviation_bgp.py --non-demand
 }
 
 #--------------------------
-# Python augmentation bundle
+# Python augmentation tests
 #--------------------------
 function py_sanity_augmentation {
     print_msg "Running py_sanity_augmentation"
 
     reset_yang_repository
-    py_sanity_augmentation_gen
     py_sanity_augmentation_test
     reset_yang_repository
-}
-
-function py_sanity_augmentation_gen {
-    print_msg "Running py_sanity_augmentation_gen"
-
-    cd $YDKGEN_HOME
-    run_test generate.py --bundle profiles/test/ydktest-augmentation.json -i
 }
 
 function py_sanity_augmentation_test {
     print_msg "Running py_sanity_augmentation_test"
 
     init_confd $YDKGEN_HOME/sdk/cpp/core/tests/confd/augmentation
-
+    run_test generate.py --bundle profiles/test/ydktest-augmentation.json -i
     run_test sdk/python/core/tests/test_sanity_augmentation.py
 #    run_test sdk/python/core/tests/test_sanity_augmentation.py --non-demand
     run_test sdk/python/core/tests/test_on_demand.py
@@ -897,6 +882,7 @@ if [[ $(uname) == "Linux" && ${os_info} == *"fedora"* ]] ; then
 fi
 
 init_py_env
+init_confd_rc
 init_confd_ydktest
 init_rest_server
 init_tcp_server
